@@ -1,4 +1,4 @@
-package org.stepic.plugin.java.actioons;
+package org.stepic.plugin.java.actions;
 
 import com.intellij.openapi.project.Project;
 import com.jetbrains.edu.learning.actions.StudyCheckAction;

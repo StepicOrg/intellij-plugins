@@ -1,4 +1,4 @@
-package org.stepic.plugin.java.actioons;
+package org.stepic.plugin.java.actions;
 
 import com.intellij.execution.application.ApplicationConfiguration;
 import com.intellij.openapi.module.Module;
