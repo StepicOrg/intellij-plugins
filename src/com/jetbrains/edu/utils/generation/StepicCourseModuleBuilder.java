@@ -24,8 +24,8 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-public class EduCourseModuleBuilder extends JavaModuleBuilder {
-    private static final Logger LOG = Logger.getInstance(EduCourseModuleBuilder.class);
+public class StepicCourseModuleBuilder extends JavaModuleBuilder {
+    private static final Logger LOG = Logger.getInstance(StepicCourseModuleBuilder.class);
 
     protected void createCourseFromCourseInfo(@NotNull ModifiableModuleModel moduleModel, Project project, EduProjectGenerator generator, CourseInfo courseInfo) throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
         generator.setSelectedCourse(courseInfo);
@@ -44,7 +44,6 @@ public class EduCourseModuleBuilder extends JavaModuleBuilder {
         EduUtilModuleBuilder utilModuleBuilder = new EduUtilModuleBuilder(moduleDir);
         Module utilModule = utilModuleBuilder.createModule(moduleModel);
 
-        LOG.warn("create modules");
         createLessonModules(moduleModel, course, moduleDir, utilModule);
 
         ApplicationManager.getApplication().invokeLater(
@@ -61,9 +60,8 @@ public class EduCourseModuleBuilder extends JavaModuleBuilder {
             int lessonVisibleIndex = i + 1;
             Lesson lesson = lessons.get(i);
             lesson.setIndex(lessonVisibleIndex);
-            EduLessonModuleBuilder eduLessonModuleBuilder =  new EduLessonModuleBuilder(moduleDir, lesson, utilModule);
-            LOG.warn("create module");
-            eduLessonModuleBuilder.createModule(moduleModel);
+            StepicLessonModuleBuilder stepicLessonModuleBuilder =  new StepicLessonModuleBuilder(moduleDir, lesson, utilModule);
+            stepicLessonModuleBuilder.createModule(moduleModel);
         }
     }
 

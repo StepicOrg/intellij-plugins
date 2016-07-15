@@ -27,12 +27,12 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-public class EduTaskModuleBuilder extends JavaModuleBuilder {
-    private static final Logger LOG = Logger.getInstance(EduTaskModuleBuilder.class);
+public class StepicTaskModuleBuilder extends JavaModuleBuilder {
+    private static final Logger LOG = Logger.getInstance(StepicTaskModuleBuilder.class);
     private final Task myTask;
     private final Module myUtilModule;
 
-    public EduTaskModuleBuilder(String moduleDir, @NotNull String name, @NotNull Task task, @NotNull Module utilModule) {
+    public StepicTaskModuleBuilder(String moduleDir, @NotNull String name, @NotNull Task task, @NotNull Module utilModule) {
         myTask = task;
         myUtilModule = utilModule;
         String taskName = EduNames.TASK + task.getIndex();

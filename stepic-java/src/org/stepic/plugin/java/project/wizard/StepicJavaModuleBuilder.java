@@ -13,7 +13,7 @@ import com.intellij.openapi.util.Conditions;
 import com.intellij.openapi.util.InvalidDataException;
 import com.jetbrains.edu.learning.stepic.CourseInfo;
 import com.jetbrains.edu.learning.stepic.EduStepicConnector;
-import com.jetbrains.edu.utils.generation.EduCourseModuleBuilder;
+import com.jetbrains.edu.utils.generation.StepicCourseModuleBuilder;
 import com.jetbrains.edu.utils.generation.EduProjectGenerator;
 import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
@@ -22,7 +22,7 @@ import org.stepic.plugin.java.StepicJavaCourseConfigurator;
 
 import java.io.IOException;
 
-public class StepicJavaModuleBuilder extends EduCourseModuleBuilder {
+public class StepicJavaModuleBuilder extends StepicCourseModuleBuilder {
     private static final Logger LOG = Logger.getInstance(StepicJavaModuleBuilder.class);
 
 

@@ -21,12 +21,12 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-public class EduLessonModuleBuilder extends JavaModuleBuilder {
-    private static final Logger LOG = Logger.getInstance(EduLessonModuleBuilder.class);
+public class StepicLessonModuleBuilder extends JavaModuleBuilder {
+    private static final Logger LOG = Logger.getInstance(StepicLessonModuleBuilder.class);
     private final Lesson myLesson;
     private final Module myUtilModule;
 
-    public EduLessonModuleBuilder(@NotNull String moduleDir, @NotNull Lesson lesson, @NotNull Module utilModule) {
+    public StepicLessonModuleBuilder(@NotNull String moduleDir, @NotNull Lesson lesson, @NotNull Module utilModule) {
         myLesson = lesson;
         myUtilModule = utilModule;
         String lessonName = EduNames.LESSON + lesson.getIndex();
@@ -43,7 +43,6 @@ public class EduLessonModuleBuilder extends JavaModuleBuilder {
             int visibleTaskIndex = i + 1;
             Task task = taskList.get(i);
             task.setIndex(visibleTaskIndex);
-            LOG.warn("create task module " + task.getName() + " " + task.getText());
             createTaskModule(moduleModel, task);
         }
         return baseModule;
@@ -51,7 +50,7 @@ public class EduLessonModuleBuilder extends JavaModuleBuilder {
     }
 
     private void createTaskModule(@NotNull ModifiableModuleModel moduleModel, @NotNull Task task) throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
-        EduTaskModuleBuilder taskModuleBuilder = new EduTaskModuleBuilder(getModuleFileDirectory(), getName(), task, myUtilModule);
+        StepicTaskModuleBuilder taskModuleBuilder = new StepicTaskModuleBuilder(getModuleFileDirectory(), getName(), task, myUtilModule);
         taskModuleBuilder.createModule(moduleModel);
     }
 
