@@ -11,5 +11,8 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="intellij-plugins" />
     <orderEntry type="library" name="idea-junit" level="project" />
+    <orderEntry type="library" name="groovy-2.4.7" level="application" />
+    <orderEntry type="library" name="org.eclipse.jetty:jetty-server:9.3.9.v20160517" level="project" />
+    <orderEntry type="library" name="com.mashape.unirest:unirest-java:1.4.9" level="project" />
   </component>
 </module>
