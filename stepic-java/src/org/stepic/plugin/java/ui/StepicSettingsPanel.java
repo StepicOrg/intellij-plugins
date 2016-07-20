@@ -89,17 +89,15 @@ public class StepicSettingsPanel {
 
             final GithubAuthData auth = getAuthData();
 
-            StepicUser user = EduStepicConnector.login(this.getLogin(), auth.getBasicAuth().getPassword());
-            LOG.info(user.getEmail());
-            LOG.info(user.getFirstName());
-            LOG.info(user.getLastName());
-            LOG.info(Integer.toString(user.getId()));
-            LOG.info(user.getName());
-            String message = "Are you " + user.getName() + "?";
-            int ans = Messages.showYesNoDialog(message, "Check credentials", Messages.getQuestionIcon());
-//            switch (ans){
-//                case (0):
-//            }
+
+            StepicUser user = EduStepicConnector.testLogin(this.getLogin(), auth.getBasicAuth().getPassword());
+            if (user == null) {
+                Messages.showWarningDialog("Can't sign in.", "Check credentials");
+//                EduStepicConnector.resetClient();
+            } else {
+                String message = "Hello, " + user.getName() + "!\n I am glad to see you.";
+                Messages.showMessageDialog(message, "Check credentials", Messages.getInformationIcon());
+            }
 //        final GithubAuthData auth = getAuthData();
 //        GithubUser user = GithubUtil.computeValueInModalIO(project, "Access to GitHub", indicator ->
 //          GithubUtil.checkAuthData(project, new GithubAuthDataHolder(auth), indicator));
@@ -171,7 +169,6 @@ public class StepicSettingsPanel {
                 }
             }
         };
-//    myHostTextField.getDocument().addDocumentListener(passwordEraser);
         myLoginTextField.getDocument().addDocumentListener(passwordEraser);
 
         myPasswordField.addFocusListener(new FocusListener() {
@@ -282,7 +279,6 @@ public class StepicSettingsPanel {
 
     public boolean isModified() {
         return myCredentialsModified;
-//           !Comparing.equal(mySettings.getHost(), getHost()) ||
     }
 
     public void resetCredentialsModification() {
