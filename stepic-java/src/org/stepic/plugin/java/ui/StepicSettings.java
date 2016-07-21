@@ -49,6 +49,7 @@ public class StepicSettings implements PersistentStateComponent<StepicSettings.S
 
   public static class State {
     @Nullable public String LOGIN = null;
+//    @NotNull public String HOST = GithubApiUtil.DEFAULT_GITHUB_HOST;
     @NotNull public AuthType AUTH_TYPE = AuthType.ANONYMOUS;
     public boolean ANONYMOUS_GIST = false;
     public boolean OPEN_IN_BROWSER_GIST = true;
@@ -211,6 +212,7 @@ public class StepicSettings implements PersistentStateComponent<StepicSettings.S
     setValidGitAuth(isValidGitAuth(auth));
 
     setAuthType(auth.getAuthType());
+//    setHost(auth.getHost());
 
     switch (auth.getAuthType()) {
       case BASIC:

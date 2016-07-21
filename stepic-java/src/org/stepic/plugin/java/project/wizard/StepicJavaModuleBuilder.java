@@ -13,8 +13,8 @@ import com.intellij.openapi.util.Conditions;
 import com.intellij.openapi.util.InvalidDataException;
 import com.jetbrains.edu.learning.stepic.CourseInfo;
 import com.jetbrains.edu.learning.stepic.EduStepicConnector;
-import com.jetbrains.edu.utils.generation.StepicCourseModuleBuilder;
 import com.jetbrains.edu.utils.generation.EduProjectGenerator;
+import com.jetbrains.edu.utils.generation.StepicCourseModuleBuilder;
 import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -56,7 +56,9 @@ public class StepicJavaModuleBuilder extends StepicCourseModuleBuilder {
 //        CourseInfo courseInfo = generator.addLocalCourse(FileUtil.join(courseRoot.getPath(), DEFAULT_COURSE_NAME));
 //        CourseInfo courseInfo = EduStepicConnector.getCourses().get(0);
 //        EduStepicConnector.showLoginDialog();
-        EduStepicConnector.login("step@kismail.ru", "123456");
+//        EduStepicConnector.login("step@kismail.ru", "123456");
+//        EduStepicConnector.login(project);
+        EduStepicConnector.login(project);
         CourseInfo courseInfo = EduStepicConnector.getDefaultCourse();
         if (courseInfo == null) {
             LOG.info("Failed to find course ");

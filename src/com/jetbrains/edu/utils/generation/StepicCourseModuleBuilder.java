@@ -14,6 +14,7 @@ import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.util.InvalidDataException;
 import com.jetbrains.edu.learning.StudyProjectComponent;
 import com.jetbrains.edu.learning.StudyTaskManager;
+import com.jetbrains.edu.learning.core.EduNames;
 import com.jetbrains.edu.learning.courseFormat.Course;
 import com.jetbrains.edu.learning.courseFormat.Lesson;
 import com.jetbrains.edu.learning.stepic.CourseInfo;
@@ -32,6 +33,7 @@ public class StepicCourseModuleBuilder extends JavaModuleBuilder {
         generator.generateProject(project, project.getBaseDir());
 
         Course course = StudyTaskManager.getInstance(project).getCourse();
+        course.setCourseMode(EduNames.STEPIC_CODE);
         if (course == null) {
             LOG.info("failed to generate course");
             return;

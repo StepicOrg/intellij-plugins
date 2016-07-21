@@ -18,7 +18,6 @@ package org.stepic.plugin.java.ui;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.text.StringUtil;
@@ -26,6 +25,8 @@ import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.HyperlinkAdapter;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.util.ui.JBUI;
+import com.jetbrains.edu.learning.StudyTaskManager;
+import com.jetbrains.edu.learning.StudyUtils;
 import com.jetbrains.edu.learning.stepic.EduStepicConnector;
 import com.jetbrains.edu.learning.stepic.StepicUser;
 import org.jetbrains.annotations.NotNull;
@@ -49,8 +50,6 @@ public class StepicSettingsPanel {
 
     private static final Logger LOG = Logger.getInstance(StepicSettingsPanel.class.getName());
 
-    private final StepicSettings mySettings;
-
     private JTextField myLoginTextField;
     private JPasswordField myPasswordField;
     private JPasswordField myTokenField; // look at createUIComponents() to understand
@@ -66,14 +65,12 @@ public class StepicSettingsPanel {
     private boolean myCredentialsModified;
 
     public StepicSettingsPanel() {
-        mySettings = StepicSettings.getInstance();
         mySignupTextField.addHyperlinkListener(new HyperlinkAdapter() {
             @Override
             protected void hyperlinkActivated(final HyperlinkEvent e) {
                 BrowserUtil.browse(e.getURL());
             }
         });
-
         magicButton.setText("Magic auth");
         mySignupTextField.setText("<html>Do not have an account at stepic.org? <a href=\"https://stepic.org/registration\">" + "Sign up" + "</a></html>");
         mySignupTextField.setBackground(myPane.getBackground());
@@ -82,77 +79,17 @@ public class StepicSettingsPanel {
         myAuthTypeComboBox.addItem(AUTH_PASSWORD);
 //        TODO later
 //        myAuthTypeComboBox.addItem(AUTH_TOKEN);
-
-        final Project project = ProjectManager.getInstance().getDefaultProject();
+//        final Project project = ProjectManager.getInstance().getDefaultProject();
 
         myTestButton.addActionListener(e -> {
-
-            final GithubAuthData auth = getAuthData();
-
-
-            StepicUser user = EduStepicConnector.testLogin(this.getLogin(), auth.getBasicAuth().getPassword());
+            StepicUser user = EduStepicConnector.testLogin(getLogin(), getPassword());
             if (user == null) {
                 Messages.showWarningDialog("Can't sign in.", "Check credentials");
-//                EduStepicConnector.resetClient();
             } else {
                 String message = "Hello, " + user.getName() + "!\n I am glad to see you.";
                 Messages.showMessageDialog(message, "Check credentials", Messages.getInformationIcon());
             }
-//        final GithubAuthData auth = getAuthData();
-//        GithubUser user = GithubUtil.computeValueInModalIO(project, "Access to GitHub", indicator ->
-//          GithubUtil.checkAuthData(project, new GithubAuthDataHolder(auth), indicator));
-//
-//        if (GithubAuthData.AuthType.TOKEN.equals(getAuthType())) {
-//          GithubNotifications.showInfoDialog(myPane, "Success", "Connection successful for user " + user.getLogin());
-//        }
-//        else {
-//          GithubNotifications.showInfoDialog(myPane, "Success", "Connection successful");
-//        }
-//      }
-//      catch (GithubAuthenticationException ex) {
-//        GithubNotifications.showErrorDialog(myPane, "Login Failure", "Can't login using given credentials: ", ex);
-//      }
-//      catch (IOException ex) {
-//        GithubNotifications.showErrorDialog(myPane, "Login Failure", "Can't login: ", ex);
-//      }
         });
-//
-//    myCreateTokenButton.addActionListener(e -> {
-//      try {
-//        String newToken = GithubUtil.computeValueInModalIO(project, "Access to GitHub", indicator ->
-//          GithubUtil.runTaskWithBasicAuthForHost(project, GithubAuthDataHolder.createFromSettings(), indicator, getHost(), connection ->
-//            GithubApiUtil.getMasterToken(connection, "IntelliJ plugin")));
-//        myPasswordField.setText(newToken);
-//      }
-//      catch (IOException ex) {
-//        GithubNotifications.showErrorDialog(myPane, "Can't Create API Token", ex);
-//      }
-//    });
-
-//        magicButton.addActionListener(e -> {
-//            URI url = null;
-//            try {
-//                url = new URIBuilder("https://stepic.org/oauth2/authorize/")
-//                        .addParameter("grant_type", "authorization-code")
-//                        .addParameter("client_id", "NHpcRZlHp9PC6tsycZkYF6VL4dxsN8ik1rQlXtjK")
-//                        .addParameter("redirect_uri", "http://localhost:36656")
-//                        .build();
-//            } catch (URISyntaxException ex) {
-//                ex.printStackTrace();
-//            }
-//            LOG.info("Auth url created");
-//
-//            StepicUserAuthorizer authorizer = StepicUserAuthorizer.getInstance();
-//
-//            String token = authorizer.authorizeAndGetUser();
-//            NewStepicConnector.initToken();
-//            LOG.info("2token = " + token);
-////            BrowserUtil.browse(url);
-//            LOG.info("Url browsed");
-//
-//            LOG.info("2token = " + authorizer.getAccessToken());
-//
-//        });
 
         myPasswordField.getDocument().addDocumentListener(new DocumentAdapter() {
             @Override
@@ -219,6 +156,11 @@ public class StepicSettingsPanel {
 
     @NotNull
     private String getPassword() {
+//        if (DEFAULT_PASSWORD_TEXT.equals(String.valueOf(myPasswordField.getPassword()))){
+        if (!isModified()){
+            Project project = StudyUtils.getStudyProject();
+             return StudyTaskManager.getInstance(project).getUser().getPassword();
+        }
         return String.valueOf(myPasswordField.getPassword());
     }
 
@@ -250,29 +192,39 @@ public class StepicSettingsPanel {
         }
     }
 
-    @NotNull
-    public GithubAuthData getAuthData() {
-        if (!myCredentialsModified) {
-            return mySettings.getAuthData();
-        }
-        Object selected = myAuthTypeComboBox.getSelectedItem();
-        if (AUTH_PASSWORD.equals(selected)) return GithubAuthData.createBasicAuth(getLogin(), getPassword());
-//    if (AUTH_TOKEN.equals(selected)) return GithubAuthData.createTokenAuth(getHost(), StringUtil.trim(getPassword()));
-//    LOG.error("StepicSettingsPanel: illegal selection: anonymous AuthData created", selected.toString());
-//    return GithubAuthData.createAnonymous(getHost());
-        return GithubAuthData.createAnonymous();
-    }
-
     public void reset() {
-        setLogin(mySettings.getLogin());
-        setPassword(mySettings.isAuthConfigured() ? DEFAULT_PASSWORD_TEXT : "");
-        setAuthType(mySettings.getAuthType());
-        resetCredentialsModification();
+        Project project = StudyUtils.getStudyProject();
+        if (project != null) {
+            final StepicUser user = StudyTaskManager.getInstance(project).getUser();
+            if (user != null) {
+                setLogin(user.getEmail());
+                setPassword(DEFAULT_PASSWORD_TEXT);
+            }
+            resetCredentialsModification();
+        }
+        else {
+            LOG.warn("No study object is opened");
+        }
     }
 
     public void apply() {
         if (myCredentialsModified) {
-            mySettings.setAuthData(getAuthData(), true);
+            final Project project = StudyUtils.getStudyProject();
+            if (project != null) {
+                if (!StringUtil.isEmptyOrSpaces(getLogin()) && !StringUtil.isEmptyOrSpaces(getPassword())) {
+                    String login = getLogin();
+                    StepicUser user = EduStepicConnector.login(login, getPassword());
+                    if (user == null){
+                        Messages.showWarningDialog("Can't sign in.", "Check credentials");
+                        user = new StepicUser();
+                        user.setEmail(login);
+                        user.setPassword("WRONG");
+                    }
+                    StudyTaskManager.getInstance(project).setUser(user);
+                }
+            } else {
+                LOG.warn("No study object is opened");
+            }
         }
         resetCredentialsModification();
     }
@@ -288,6 +240,5 @@ public class StepicSettingsPanel {
     private void createUIComponents() {
         Document doc = new PlainDocument();
         myPasswordField = new JPasswordField(doc, null, 0);
-        myTokenField = new JPasswordField(doc, null, 0);
     }
 }
