@@ -12,7 +12,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Conditions;
 import com.intellij.openapi.util.InvalidDataException;
 import com.jetbrains.edu.learning.stepic.CourseInfo;
-import com.jetbrains.edu.learning.stepic.EduStepicConnector;
+import com.jetbrains.edu.learning.stepic.StepicConnectorGet;
+import com.jetbrains.edu.learning.stepic.StepicConnectorLogin;
 import com.jetbrains.edu.utils.generation.EduProjectGenerator;
 import com.jetbrains.edu.utils.generation.StepicCourseModuleBuilder;
 import org.jdom.JDOMException;
@@ -51,8 +52,8 @@ public class StepicJavaModuleBuilder extends StepicCourseModuleBuilder {
         Module baseModule = super.createModule(moduleModel);
         Project project = baseModule.getProject();
         EduProjectGenerator generator = new EduProjectGenerator();
-        EduStepicConnector.login(project);
-        CourseInfo courseInfo = EduStepicConnector.getDefaultCourse();
+        StepicConnectorLogin.login(project);
+        CourseInfo courseInfo = StepicConnectorGet.getDefaultCourse();
         if (courseInfo == null) {
             LOG.info("Failed to find course ");
             return baseModule;

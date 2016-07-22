@@ -51,7 +51,7 @@ public class StepicSettingsPanel {
 
     private static final Logger LOG = Logger.getInstance(StepicSettingsPanel.class.getName());
 
-    private JTextField myLoginTextField;
+    private JTextField myEmailTextField;
     private JPasswordField myPasswordField;
     private JPasswordField myTokenField; // look at createUIComponents() to understand
     private JTextPane mySignupTextField;
@@ -86,9 +86,8 @@ public class StepicSettingsPanel {
             initProjectOfSettings();
             StudyTaskManager manager = StudyTaskManager.getInstance(settingsProject);
             StepicUser oldUser = manager.getUser();
-            StepicUser testUser = new StepicUser(getLogin(), getPassword());
+            StepicUser testUser = new StepicUser(getEmail(), getPassword());
             manager.setUser(testUser);
-            StepicConnectorLogin.login(settingsProject);
             if (StepicConnectorLogin.login(settingsProject)) {
                 String message = "Hello, " + testUser.getName() + "!\n I am glad to see you.";
                 Messages.showMessageDialog(message, "Check credentials", Messages.getInformationIcon());
@@ -113,7 +112,7 @@ public class StepicSettingsPanel {
                 }
             }
         };
-        myLoginTextField.getDocument().addDocumentListener(passwordEraser);
+        myEmailTextField.getDocument().addDocumentListener(passwordEraser);
 
         myPasswordField.addFocusListener(new FocusListener() {
             @Override
@@ -151,19 +150,19 @@ public class StepicSettingsPanel {
     }
 
     @NotNull
-    public String getLogin() {
-        return myLoginTextField.getText().trim();
+    public String getEmail() {
+        return myEmailTextField.getText().trim();
     }
 
     public void setLogin(@Nullable final String login) {
-        myLoginTextField.setText(login);
+        myEmailTextField.setText(login);
     }
 
     @NotNull
     private String getPassword() {
         if (!isModified()) {
             initProjectOfSettings();
-            LOG.warn("user's password");
+            LOG.info("user's password");
             return StudyTaskManager.getInstance(settingsProject).getUser().getPassword();
         }
         return String.valueOf(myPasswordField.getPassword());
@@ -185,7 +184,6 @@ public class StepicSettingsPanel {
         final StepicUser user = StudyTaskManager.getInstance(settingsProject).getUser();
         setLogin(user.getEmail());
         setPassword(DEFAULT_PASSWORD_TEXT);
-        LOG.info("init window\n" + user.toString());
         resetCredentialsModification();
     }
 
@@ -193,7 +191,7 @@ public class StepicSettingsPanel {
         if (myCredentialsModified) {
             initProjectOfSettings();
             StudyTaskManager manager = StudyTaskManager.getInstance(settingsProject);
-            StepicUser user = new StepicUser(getLogin(), getPassword());
+            StepicUser user = new StepicUser(getEmail(), getPassword());
             manager.setUser(user);
 
             if (!StepicConnectorLogin.login(settingsProject)) {
