@@ -32,8 +32,6 @@
         <!--<treeStructureProvider implementation="org.stepic.plugin.java.StepicTreeStructureProvider" order="last"/>-->
         <!--<moduleBuilder builderClass="org.stepic.plugin.java.project.wizard.StepicJavaModuleBuilder" id="java.stepic.builder" order="first"/>-->
         <applicationConfigurable instance="org.stepic.plugin.java.ui.StepicSettingsConfigurable"/>
-        <applicationService serviceInterface="org.stepic.plugin.java.ui.StepicSettings"
-                            serviceImplementation="org.stepic.plugin.java.ui.StepicSettings"/>
     </extensions>
 
     <extensions defaultExtensionNs="Edu">

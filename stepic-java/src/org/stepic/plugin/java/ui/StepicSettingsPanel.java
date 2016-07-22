@@ -27,7 +27,7 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.util.ui.JBUI;
 import com.jetbrains.edu.learning.StudyTaskManager;
 import com.jetbrains.edu.learning.StudyUtils;
-import com.jetbrains.edu.learning.stepic.EduStepicConnector;
+import com.jetbrains.edu.learning.stepic.StepicConnectorLogin;
 import com.jetbrains.edu.learning.stepic.StepicUser;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -47,6 +47,7 @@ public class StepicSettingsPanel {
     private static final String DEFAULT_PASSWORD_TEXT = "************";
     private final static String AUTH_PASSWORD = "Password";
     private final static String AUTH_TOKEN = "Token";
+    private Project settingsProject = null;
 
     private static final Logger LOG = Logger.getInstance(StepicSettingsPanel.class.getName());
 
@@ -82,13 +83,19 @@ public class StepicSettingsPanel {
 //        final Project project = ProjectManager.getInstance().getDefaultProject();
 
         myTestButton.addActionListener(e -> {
-            StepicUser user = EduStepicConnector.testLogin(getLogin(), getPassword());
-            if (user == null) {
-                Messages.showWarningDialog("Can't sign in.", "Check credentials");
-            } else {
-                String message = "Hello, " + user.getName() + "!\n I am glad to see you.";
+            initProjectOfSettings();
+            StudyTaskManager manager = StudyTaskManager.getInstance(settingsProject);
+            StepicUser oldUser = manager.getUser();
+            StepicUser testUser = new StepicUser(getLogin(), getPassword());
+            manager.setUser(testUser);
+            StepicConnectorLogin.login(settingsProject);
+            if (StepicConnectorLogin.login(settingsProject)) {
+                String message = "Hello, " + testUser.getName() + "!\n I am glad to see you.";
                 Messages.showMessageDialog(message, "Check credentials", Messages.getInformationIcon());
+            } else {
+                Messages.showWarningDialog("Can't sign in.", "Check credentials");
             }
+            manager.setUser(oldUser);
         });
 
         myPasswordField.getDocument().addDocumentListener(new DocumentAdapter() {
@@ -132,8 +139,6 @@ public class StepicSettingsPanel {
                 erasePassword();
             }
         });
-
-        reset();
     }
 
     private void erasePassword() {
@@ -156,12 +161,18 @@ public class StepicSettingsPanel {
 
     @NotNull
     private String getPassword() {
-//        if (DEFAULT_PASSWORD_TEXT.equals(String.valueOf(myPasswordField.getPassword()))){
-        if (!isModified()){
-            Project project = StudyUtils.getStudyProject();
-             return StudyTaskManager.getInstance(project).getUser().getPassword();
+        if (!isModified()) {
+            initProjectOfSettings();
+            LOG.warn("user's password");
+            return StudyTaskManager.getInstance(settingsProject).getUser().getPassword();
         }
         return String.valueOf(myPasswordField.getPassword());
+    }
+
+    private void initProjectOfSettings() {
+        if (settingsProject == null){
+            settingsProject = StudyUtils.getStudyProject();
+        }
     }
 
     private void setPassword(@NotNull final String password) {
@@ -169,62 +180,27 @@ public class StepicSettingsPanel {
         myPasswordField.setText(StringUtil.isEmpty(password) ? null : password);
     }
 
-    @NotNull
-    public GithubAuthData.AuthType getAuthType() {
-        Object selected = myAuthTypeComboBox.getSelectedItem();
-        if (AUTH_PASSWORD.equals(selected)) return GithubAuthData.AuthType.BASIC;
-        if (AUTH_TOKEN.equals(selected)) return GithubAuthData.AuthType.TOKEN;
-        LOG.error("StepicSettingsPanel: illegal selection: basic AuthType returned", selected.toString());
-        return GithubAuthData.AuthType.BASIC;
-    }
-
-    public void setAuthType(@NotNull final GithubAuthData.AuthType type) {
-        switch (type) {
-            case BASIC:
-                myAuthTypeComboBox.setSelectedItem(AUTH_PASSWORD);
-                break;
-            case TOKEN:
-                myAuthTypeComboBox.setSelectedItem(AUTH_TOKEN);
-                break;
-            case ANONYMOUS:
-            default:
-                myAuthTypeComboBox.setSelectedItem(AUTH_PASSWORD);
-        }
-    }
-
     public void reset() {
-        Project project = StudyUtils.getStudyProject();
-        if (project != null) {
-            final StepicUser user = StudyTaskManager.getInstance(project).getUser();
-            if (user != null) {
-                setLogin(user.getEmail());
-                setPassword(DEFAULT_PASSWORD_TEXT);
-            }
-            resetCredentialsModification();
-        }
-        else {
-            LOG.warn("No study object is opened");
-        }
+        initProjectOfSettings();
+        final StepicUser user = StudyTaskManager.getInstance(settingsProject).getUser();
+        setLogin(user.getEmail());
+        setPassword(DEFAULT_PASSWORD_TEXT);
+        LOG.info("init window\n" + user.toString());
+        resetCredentialsModification();
     }
 
     public void apply() {
         if (myCredentialsModified) {
-            Project project = StudyUtils.getStudyProject();
-            if (project != null) {
-                if (!StringUtil.isEmptyOrSpaces(getLogin()) && !StringUtil.isEmptyOrSpaces(getPassword())) {
-                    String login = getLogin();
-                    StepicUser user = EduStepicConnector.login(login, getPassword());
-                    if (user == null){
-                        Messages.showWarningDialog("Can't sign in.", "Check credentials");
-                        user = new StepicUser();
-                        user.setEmail(login);
-                        user.setPassword("WRONG");
-                    }
-                    StudyTaskManager.getInstance(project).setUser(user);
-                }
-            } else {
-                LOG.warn("No study object is opened");
+            initProjectOfSettings();
+            StudyTaskManager manager = StudyTaskManager.getInstance(settingsProject);
+            StepicUser user = new StepicUser(getLogin(), getPassword());
+            manager.setUser(user);
+
+            if (!StepicConnectorLogin.login(settingsProject)) {
+                Messages.showWarningDialog("Can't sign in.", "Check credentials");
             }
+            LOG.info(manager.getUser().toString());
+            manager.setUser(user);
         }
         resetCredentialsModification();
     }
