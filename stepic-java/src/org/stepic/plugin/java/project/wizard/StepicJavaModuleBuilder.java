@@ -51,13 +51,6 @@ public class StepicJavaModuleBuilder extends StepicCourseModuleBuilder {
         Module baseModule = super.createModule(moduleModel);
         Project project = baseModule.getProject();
         EduProjectGenerator generator = new EduProjectGenerator();
-//        StudyProjectGenerator generator = new StudyProjectGenerator();
-//        File courseRoot = EduIntellijUtils.getBundledCourseRoot(DEFAULT_COURSE_NAME, EduKotlinKoansModuleBuilder.class);
-//        CourseInfo courseInfo = generator.addLocalCourse(FileUtil.join(courseRoot.getPath(), DEFAULT_COURSE_NAME));
-//        CourseInfo courseInfo = EduStepicConnector.getCourses().get(0);
-//        EduStepicConnector.showLoginDialog();
-//        EduStepicConnector.login("step@kismail.ru", "123456");
-//        EduStepicConnector.login(project);
         EduStepicConnector.login(project);
         CourseInfo courseInfo = EduStepicConnector.getDefaultCourse();
         if (courseInfo == null) {

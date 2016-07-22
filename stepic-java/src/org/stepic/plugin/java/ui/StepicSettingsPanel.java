@@ -209,7 +209,7 @@ public class StepicSettingsPanel {
 
     public void apply() {
         if (myCredentialsModified) {
-            final Project project = StudyUtils.getStudyProject();
+            Project project = StudyUtils.getStudyProject();
             if (project != null) {
                 if (!StringUtil.isEmptyOrSpaces(getLogin()) && !StringUtil.isEmptyOrSpaces(getPassword())) {
                     String login = getLogin();
