@@ -34,6 +34,7 @@ public class StepicCourseModuleBuilder extends JavaModuleBuilder {
 
         Course course = StudyTaskManager.getInstance(project).getCourse();
         course.setCourseMode(EduNames.STEPIC_CODE);
+//        course.setCourseMode(EduNames.STUDY);
         if (course == null) {
             LOG.info("failed to generate course");
             return;
@@ -62,7 +63,12 @@ public class StepicCourseModuleBuilder extends JavaModuleBuilder {
             int lessonVisibleIndex = i + 1;
             Lesson lesson = lessons.get(i);
             lesson.setIndex(lessonVisibleIndex);
-            StepicLessonModuleBuilder stepicLessonModuleBuilder =  new StepicLessonModuleBuilder(moduleDir, lesson, utilModule);
+
+            StepicSectionDirBuilder dirBuilder = new StepicSectionDirBuilder(moduleDir, lesson);
+            dirBuilder.build();
+//
+            StepicLessonModuleBuilder stepicLessonModuleBuilder =  new StepicLessonModuleBuilder(dirBuilder.getSectionDir() , lesson, utilModule);
+//            StepicLessonModuleBuilder stepicLessonModuleBuilder =  new StepicLessonModuleBuilder(moduleDir, lesson, utilModule);
             stepicLessonModuleBuilder.createModule(moduleModel);
         }
     }
