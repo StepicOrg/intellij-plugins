@@ -49,7 +49,7 @@
 
 
     <actions>
-        <action id="EduJavaCheckAction" class="org.stepic.plugin.java.actions.EduJavaCheckAction" text="Edu Java Check"/>
+        <action id="StepicJavaPostAction" class="org.stepic.plugin.java.actions.StepicJavaPostAction" text="Stepic Java Check"/>
     </actions>
 
 </idea-plugin>

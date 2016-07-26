@@ -6,7 +6,7 @@ import com.jetbrains.edu.learning.StudyBasePluginConfigurator;
 import com.jetbrains.edu.learning.StudyTaskManager;
 import com.jetbrains.edu.learning.courseFormat.Course;
 import org.jetbrains.annotations.NotNull;
-import org.stepic.plugin.java.actions.EduJavaCheckAction;
+import org.stepic.plugin.java.actions.StepicJavaPostAction;
 
 public class StepicJavaPluginConfigurator extends StudyBasePluginConfigurator {
     @NotNull
@@ -14,8 +14,8 @@ public class StepicJavaPluginConfigurator extends StudyBasePluginConfigurator {
     public DefaultActionGroup getActionGroup(Project project) {
         DefaultActionGroup baseGroup = super.getActionGroup(project);
         final DefaultActionGroup group = new DefaultActionGroup();
-        group.add(new EduJavaCheckAction());
         group.addAll(baseGroup);
+        group.add(new StepicJavaPostAction());
 
         return group;
     }
