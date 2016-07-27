@@ -1,5 +1,8 @@
 package org.stepic.plugin.java.actions;
 
+import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationType;
+import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.diagnostic.Logger;
@@ -11,8 +14,10 @@ import com.jetbrains.edu.learning.StudyState;
 import com.jetbrains.edu.learning.StudyUtils;
 import com.jetbrains.edu.learning.actions.StudyCheckAction;
 import com.jetbrains.edu.learning.checker.StudyCheckUtils;
+import com.jetbrains.edu.learning.courseFormat.StudyStatus;
 import com.jetbrains.edu.learning.courseFormat.Task;
 import com.jetbrains.edu.learning.editor.StudyEditor;
+import com.jetbrains.edu.learning.stepic.StepicConnectorGet;
 import com.jetbrains.edu.learning.stepic.StepicConnectorPost;
 import com.jetbrains.edu.learning.stepic.StepicWrappers;
 import org.jetbrains.annotations.NotNull;
@@ -50,10 +55,50 @@ public class StepicJavaPostAction extends StudyCheckAction {
                 Document document = FileDocumentManager.getInstance().getDocument(studyState.getVirtualFile());
 //                int attempt = StepicConnectorPost.postSubmission(task.getFile("Main.java").text, attemptId).submission.attempt;
                 StepicWrappers.SubmissionContainer container = StepicConnectorPost.postSubmission(document.getText(), attemptId);
-                List<StepicWrappers.SubmissionContainer.Submission> submissions =  container.submissions;
-                int attempt = submissions.get(0).attempt;
-                LOG.warn("attempt = " + attempt);
+                List<StepicWrappers.SubmissionContainer.Submission> submissions = container.submissions;
+                int submissionId = submissions.get(0).id;
+                LOG.warn("submissionId = " + submissionId);
 
+                final Application application = ApplicationManager.getApplication();
+                final int finalSubmissionId = submissionId;
+                application.executeOnPooledThread(
+                        () -> {
+                            String ans = "evaluation";
+                            final int TIMER = 2;
+                            int count = 0;
+                            Notification notification = null;
+                            String b = "";
+                            while (ans.equals("evaluation") && count < 100) {
+                                try {
+                                    Thread.sleep(TIMER * 1000);          //1000 milliseconds is one second.
+                                    StepicWrappers.ResultSubmissionWrapper submissionWrapper = StepicConnectorGet.getStatus(finalSubmissionId);
+                                    ans = submissionWrapper.submissions[0].status;
+                                    b = submissionWrapper.submissions[0].hint;
+                                    count += TIMER;
+                                } catch (InterruptedException | NullPointerException e) {
+                                    notification = new Notification("Step.sending", "Error", "Get Status error", NotificationType.ERROR);
+                                    NotificationUtils.showNotification(notification, project);
+                                    return;
+                                }
+                            }
+
+                            NotificationType notificationType;
+
+                            if (ans.equals("correct")) {
+                                notificationType = NotificationType.INFORMATION;
+                                b = "Success!";
+                                task.setStatus(StudyStatus.Solved);
+                            } else {
+                                notificationType = NotificationType.WARNING;
+                                b = b.split("\\.")[0];
+                                if (task.getStatus() != StudyStatus.Solved)
+                                    task.setStatus(StudyStatus.Failed);
+
+                            }
+                            notification = new Notification("Step.sending", task.getName() + " is " + ans, b, notificationType);
+                            NotificationUtils.showNotification(notification, project);
+                        }
+                );
             });
         });
     }
