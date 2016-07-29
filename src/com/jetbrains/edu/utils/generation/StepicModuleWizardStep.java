@@ -8,19 +8,18 @@ import javax.swing.*;
 
 public class StepicModuleWizardStep extends ModuleWizardStep {
     private JPanel panel;
-    private JLabel courseLabel;
-    private JComboBox courseSelecter;
     private final Project myProjectOrNull;
+    private EduProjectGenerator generator;
 
-    public StepicModuleWizardStep(StepicCourseModuleBuilder builder, WizardContext context) {
+    public StepicModuleWizardStep(EduProjectGenerator generator, WizardContext context) {
+        this.generator = generator;
         myProjectOrNull = context.getProject();
 
         initComponents();
     }
 
     private void initComponents() {
-//        courseSelecter.addActionListener()
-
+        panel = new StepicProjectPanel(generator);
     }
 
 
@@ -36,19 +35,11 @@ public class StepicModuleWizardStep extends ModuleWizardStep {
 
     @Override
     public void onStepLeaving() {
-        saveSettings();
-    }
 
-    private void saveSettings() {
-//        saveValue("login", textField1.getText());
-//        saveValue("password", new String(passwordField1.getPassword()));
-    }
-
-    private static void saveValue(String key, String value) {
     }
 
     private void createUIComponents() {
-        // TODO: place custom component creation code here
+
     }
 
 

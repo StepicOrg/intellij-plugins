@@ -30,6 +30,7 @@ import java.io.IOException;
 
 public class StepicJavaModuleBuilder extends StepicCourseModuleBuilder {
     private static final Logger LOG = Logger.getInstance(StepicJavaModuleBuilder.class);
+    private EduProjectGenerator generator;
 
 
     @Override
@@ -56,10 +57,9 @@ public class StepicJavaModuleBuilder extends StepicCourseModuleBuilder {
     public Module createModule(@NotNull ModifiableModuleModel moduleModel) throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
         Module baseModule = super.createModule(moduleModel);
         Project project = baseModule.getProject();
-        EduProjectGenerator generator = new EduProjectGenerator();
         StepicConnectorLogin.login(project);
 
-        JPanel panel = new StepicProjectPanel(generator);
+        JPanel panel = new StepicProjectPanel(getGenerator());
         panel.setVisible(true);
 
         CourseInfo courseInfo = StepicConnectorGet.getDefaultCourse();
@@ -70,7 +70,7 @@ public class StepicJavaModuleBuilder extends StepicCourseModuleBuilder {
             LOG.warn("succes!!!11");
         }
 
-        createCourseFromCourseInfo(moduleModel, project, generator, courseInfo);
+        createCourseFromCourseInfo(moduleModel, project, getGenerator(), courseInfo);
 //        generator.generateProject(project, project.getBaseDir());
         return baseModule;
     }
@@ -81,7 +81,7 @@ public class StepicJavaModuleBuilder extends StepicCourseModuleBuilder {
         ModuleWizardStep[] previonsWizardSteps = super.createWizardSteps(wizardContext, modulesProvider);
         ModuleWizardStep[] wizardSteps = new ModuleWizardStep[previonsWizardSteps.length+1];
 
-        wizardSteps[0] = new StepicModuleWizardStep(this, wizardContext);
+        wizardSteps[0] = new StepicModuleWizardStep(getGenerator(), wizardContext);
 //        wizardSteps[0] = new StudyNewProjectPanel(this, wizardContext);
         for (int i = 0; i < previonsWizardSteps.length; i++) {
             wizardSteps[i+1] = previonsWizardSteps[i];
@@ -90,6 +90,13 @@ public class StepicJavaModuleBuilder extends StepicCourseModuleBuilder {
         return wizardSteps;
     }
 
+
+    private EduProjectGenerator getGenerator(){
+        if (generator == null){
+            generator = new EduProjectGenerator();
+        }
+        return generator;
+    }
 
 
 }
