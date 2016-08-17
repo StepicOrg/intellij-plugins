@@ -1,4 +1,4 @@
-package org.stepic.plugin.java;
+package org.stepic.plugin.collective;
 
 import com.intellij.ide.projectView.ViewSettings;
 import com.intellij.ide.util.treeView.AbstractTreeNode;

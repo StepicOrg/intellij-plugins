@@ -85,11 +85,11 @@ public class StepicProjectPanel extends JPanel implements PanelWithAnchor {
 
         final JPanel comboPanel = new JPanel(new BorderLayout());
 
-//        comboPanel.add(coursesCombo, BorderLayout.CENTER);
-//        comboPanel.add(myRefreshButton, BorderLayout.EAST);
-//
-//        coursesPanel.add(comboPanel, BorderLayout.CENTER);
-//        coursesPanel.add(myBrowseButton, BorderLayout.EAST);
+        comboPanel.add(coursesCombo, BorderLayout.CENTER);
+        comboPanel.add(myRefreshButton, BorderLayout.EAST);
+
+        coursesPanel.add(comboPanel, BorderLayout.CENTER);
+        coursesPanel.add(myBrowseButton, BorderLayout.EAST);
 
         add(coursesPanel);
         myAnchor = coursesCombo;
@@ -105,7 +105,7 @@ public class StepicProjectPanel extends JPanel implements PanelWithAnchor {
         myDescriptionPane.setEditable(true);
         myDescriptionPane.setEnabled(true);
         myAuthorLabel.setEnabled(true);
-//        myDescriptionPane.setPreferredSize(new Dimension(150, 100));
+        myDescriptionPane.setPreferredSize(new Dimension(150, 100));
         myDescriptionPane.setFont(coursesCombo.getFont());
         myInfoPanel.add(myAuthorLabel);
         myInfoPanel.add(myDescriptionPane);
@@ -239,6 +239,10 @@ public class StepicProjectPanel extends JPanel implements PanelWithAnchor {
     @Override
     public void setAnchor(@Nullable JComponent anchor) {
         myAnchor = anchor;
+    }
+
+    private void createUIComponents() {
+        // TODO: place custom component creation code here
     }
 
     /**

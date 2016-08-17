@@ -1,17 +1,17 @@
 <idea-plugin version="2">
-    <id>org.stepic.plugin.java</id>
-    <name>Stepic java submitter</name>
+    <id>org.stepic.plugin.python</id>
+    <name>Stepic python submitter</name>
     <version>0.0.1</version>
-    <vendor email="petr.bogdanov@stepic.org" url="http://www.stepic.org">Stepic.org</vendor>
+    <vendor email="petr.bogdanov@stepic.org" url="http://www.stepic.org">Stepic</vendor>
 
     <description><![CDATA[
-      Stepic plugin for code challenges on Java.<br>
+      Stepic plugin for code challenges on Python.<br>
       To use this plugin you have to have Stepic account and follow the course.<br>
     ]]></description>
 
     <!--<change-notes><![CDATA[-->
-      <!--Add change notes here.<br>-->
-      <!--<em>most HTML tags may be used</em>-->
+    <!--Add change notes here.<br>-->
+    <!--<em>most HTML tags may be used</em>-->
     <!--]]>-->
     <!--</change-notes>-->
 
@@ -28,28 +28,35 @@
     <depends>com.jetbrains.edu.interactivelearning</depends>
     <depends>com.jetbrains.edu.intellij</depends>
 
+    <depends>com.intellij.modules.lang</depends>
+    <depends>com.jetbrains.edu.interactivelearning</depends>
+    <depends>com.jetbrains.edu.intellij</depends>
+    <depends>com.intellij.modules.python</depends>
+
     <extensions defaultExtensionNs="com.intellij">
         <!--<treeStructureProvider implementation="org.stepic.plugin.collective.StepicTreeStructureProvider" order="last"/>-->
-        <!--<moduleBuilder builderClass="org.stepic.plugin.java.project.wizard.StepicJavaModuleBuilder" id="java.stepic.builder" order="first"/>-->
-        <applicationConfigurable instance="org.stepic.plugin.collective.ui.StepicSettingsConfigurable"/>
+        <!--<moduleBuilder builderClass="org.stepic.plugin.java.project.wizard.StepicPythonModuleBuilder" id="java.stepic.builder" order="first"/>-->
+
+        <!--<applicationConfigurable instance="org.stepic.plugin.collective.ui.StepicSettingsConfigurable"/>-->
     </extensions>
 
     <extensions defaultExtensionNs="Edu">
-        <StudyLanguageManager implementationClass="org.stepic.plugin.java.StepicJavaLanguageManager" language="JAVA"/>
-        <studyPluginConfigurator implementation="org.stepic.plugin.java.StepicJavaPluginConfigurator"/>
+        <!--<StudyLanguageManager implementationClass="org.stepic.plugin.java.StepicJavaLanguageManager" language="JAVA"/>-->
+        <!--<studyPluginConfigurator implementation="org.stepic.plugin.java.StepicJavaPluginConfigurator"/>-->
+
         <!--<optionsProvider instance="com.jetbrains.edu.learning.stepic.StepicStudyOptions"/>-->
         <!--<optionsProvider instance="org.stepic.plugin.java.project.wizard.StepicStudyOptions"/>-->
     </extensions>
 
     <extensions defaultExtensionNs="com.jetbrains.edu.intellij">
-        <eduIntelliJProjectTemplate implementation="org.stepic.plugin.java.StepicJavaProjectTemplate"/>
-        <courseConfigurator language="JAVA" implementationClass="org.stepic.plugin.java.StepicJavaCourseConfigurator"/>
+        <eduIntelliJProjectTemplate implementation="org.stepic.plugin.python.StepicPythonProjectTemplate"/>
+        <courseConfigurator language="Python" implementationClass="org.stepic.plugin.python.StepicPythonCourseConfigurator"/>
     </extensions>
 
 
-
     <actions>
-        <action id="StepicJavaPostAction" class="org.stepic.plugin.java.actions.StepicJavaPostAction" text="Stepic Java Check"/>
+        <!--<action id="StepicJavaPostAction" class="org.stepic.plugin.java.actions.StepicJavaPostAction"-->
+                <!--text="Stepic Java Check"/>-->
     </actions>
 
 </idea-plugin>

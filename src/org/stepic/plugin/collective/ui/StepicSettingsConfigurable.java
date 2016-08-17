@@ -1,4 +1,4 @@
-package org.stepic.plugin.java.ui;
+package org.stepic.plugin.collective.ui;
 
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;

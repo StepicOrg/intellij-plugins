@@ -28,7 +28,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-class EduUtilModuleBuilder extends JavaModuleBuilder {
+public class EduUtilModuleBuilder extends JavaModuleBuilder {
 
     public EduUtilModuleBuilder(String moduleDir) {
         setName("util");

@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/intellij-plugins.iml" filepath="$PROJECT_DIR$/.idea/modules/intellij-plugins.iml" />
       <module fileurl="file://$PROJECT_DIR$/stepic-java/stepic-java.iml" filepath="$PROJECT_DIR$/stepic-java/stepic-java.iml" />
+      <module fileurl="file://$PROJECT_DIR$/stepic-python/stepic-python.iml" filepath="$PROJECT_DIR$/stepic-python/stepic-python.iml" />
     </modules>
   </component>
 </project>

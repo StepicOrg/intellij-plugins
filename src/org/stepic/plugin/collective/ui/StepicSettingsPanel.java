@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.stepic.plugin.java.ui;
+package org.stepic.plugin.collective.ui;
 
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.diagnostic.Logger;
@@ -66,6 +66,8 @@ public class StepicSettingsPanel {
     private boolean myCredentialsModified;
 
     public StepicSettingsPanel() {
+        initProjectOfSettings();
+//        myEmailTextField.setText(StudyTaskManager.getInstance(settingsProject).getUser().getEmail());
         mySignupTextField.addHyperlinkListener(new HyperlinkAdapter() {
             @Override
             protected void hyperlinkActivated(final HyperlinkEvent e) {
@@ -83,13 +85,12 @@ public class StepicSettingsPanel {
 //        final Project project = ProjectManager.getInstance().getDefaultProject();
 
         myTestButton.addActionListener(e -> {
-            initProjectOfSettings();
             StudyTaskManager manager = StudyTaskManager.getInstance(settingsProject);
             StepicUser oldUser = manager.getUser();
             StepicUser testUser = new StepicUser(getEmail(), getPassword());
-            manager.setUser(testUser);
-            if (StepicConnectorLogin.login(settingsProject)) {
-                String message = "Hello, " + testUser.getName() + "!\n I am glad to see you.";
+//            manager.setUser(testUser);
+            if (StepicConnectorLogin.loginFromSettings(settingsProject, testUser)) {
+                String message = "Hello, " + manager.getUser().getName() + "!\n I am glad to see you.";
                 Messages.showMessageDialog(message, "Check credentials", Messages.getInformationIcon());
             } else {
                 Messages.showWarningDialog("Can't sign in.", "Check credentials");
@@ -161,7 +162,7 @@ public class StepicSettingsPanel {
     @NotNull
     private String getPassword() {
         if (!isModified()) {
-            initProjectOfSettings();
+//            initProjectOfSettings();
             LOG.info("user's password");
             return StudyTaskManager.getInstance(settingsProject).getUser().getPassword();
         }
@@ -191,14 +192,13 @@ public class StepicSettingsPanel {
         if (myCredentialsModified) {
             initProjectOfSettings();
             StudyTaskManager manager = StudyTaskManager.getInstance(settingsProject);
-            StepicUser user = new StepicUser(getEmail(), getPassword());
-            manager.setUser(user);
+            StepicUser basicUser = new StepicUser(getEmail(), getPassword());
+            manager.setUser(basicUser);
 
-            if (!StepicConnectorLogin.login(settingsProject)) {
+            if (!StepicConnectorLogin.loginFromSettings(settingsProject, basicUser)) {
                 Messages.showWarningDialog("Can't sign in.", "Check credentials");
             }
             LOG.info(manager.getUser().toString());
-            manager.setUser(user);
         }
         resetCredentialsModification();
     }
