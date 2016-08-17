@@ -5,7 +5,7 @@ import com.intellij.openapi.ui.ValidationInfo;
 import com.jetbrains.edu.intellij.EduIntelliJProjectTemplate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.stepic.plugin.python.project.wizard.StepicPythonModuleBuilder;
+import org.stepic.plugin.python.project.wizard.PythonCourseBuilder;
 
 import javax.swing.*;
 
@@ -20,7 +20,7 @@ public class StepicPythonProjectTemplate implements EduIntelliJProjectTemplate {
     @Nullable
     @Override
     public String getDescription() {
-        return "Generate project template on some programming course at Stepic.org";
+        return "Generate project template on some programming builders at Stepic.org";
     }
 
     @Override
@@ -31,7 +31,7 @@ public class StepicPythonProjectTemplate implements EduIntelliJProjectTemplate {
     @NotNull
     @Override
     public AbstractModuleBuilder createModuleBuilder() {
-        return new StepicPythonModuleBuilder();
+        return new PythonCourseBuilder();
     }
 
     @Nullable

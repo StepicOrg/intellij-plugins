@@ -59,10 +59,10 @@ public class StepicProjectPanel extends JPanel implements PanelWithAnchor {
     private JComponent myAnchor;
     private final EduProjectGenerator myGenerator;
     private static final String CONNECTION_ERROR = "<html>Failed to download courses.<br>Check your Internet connection.</html>";
-    private static final String INVALID_COURSE = "Selected course is invalid";
+    private static final String INVALID_COURSE = "Selected builders is invalid";
     private FacetValidatorsManager myValidationManager;
     private boolean isComboboxInitialized;
-    private static final String LOGIN_TO_STEPIC_MESSAGE = "<html><u>Login to Stepic</u> to open the adaptive course </html>";
+    private static final String LOGIN_TO_STEPIC_MESSAGE = "<html><u>Login to Stepic</u> to open the adaptive builders </html>";
     private static final String LOGIN_TO_STEPIC = "Login to Stepic";
 
     public StepicProjectPanel(@NotNull final EduProjectGenerator generator) {
@@ -127,7 +127,7 @@ public class StepicProjectPanel extends JPanel implements PanelWithAnchor {
             myAuthorLabel.setText(!StringUtil.isEmptyOrSpaces(authorsString) ? "Author: " + authorsString : "");
             myDescriptionPane.setText(selectedCourse.getDescription());
             myDescriptionPane.setEditable(false);
-            //setting the first course in list as selected
+            //setting the first builders in list as selected
             myGenerator.setSelectedCourse(selectedCourse);
 
             if (selectedCourse.isAdaptive() && !myGenerator.isLoggedIn()) {
@@ -153,11 +153,11 @@ public class StepicProjectPanel extends JPanel implements PanelWithAnchor {
         };
         myBrowseButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                final BaseListPopupStep<String> popupStep = new BaseListPopupStep<String>("", "Add local course", LOGIN_TO_STEPIC) {
+                final BaseListPopupStep<String> popupStep = new BaseListPopupStep<String>("", "Add local builders", LOGIN_TO_STEPIC) {
                     @Override
                     public PopupStep onChosen(final String selectedValue, boolean finalChoice) {
                         return doFinalStep(() -> {
-                            if ("Add local course".equals(selectedValue)) {
+                            if ("Add local builders".equals(selectedValue)) {
 
                                 Project[] projects = ProjectManager.getInstance().getOpenProjects();
                                 FileChooser.chooseFile(fileChooser, null, projects.length == 0 ? null : projects[0].getBaseDir(),
@@ -284,8 +284,8 @@ public class StepicProjectPanel extends JPanel implements PanelWithAnchor {
 
 
     /**
-     * Handles selecting course in combo box
-     * Sets selected course in combo box as selected in
+     * Handles selecting builders in combo box
+     * Sets selected builders in combo box as selected in
      * {@link StudyNewProjectPanel#myGenerator}
      */
     private class CourseSelectedListener implements ActionListener {

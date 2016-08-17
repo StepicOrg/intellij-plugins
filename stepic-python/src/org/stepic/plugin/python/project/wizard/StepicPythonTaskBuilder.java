@@ -1,9 +1,8 @@
-package com.jetbrains.edu.utils.generation;
+package org.stepic.plugin.python.project.wizard;
 
 import com.intellij.codeInsight.daemon.impl.quickfix.OrderEntryFix;
 import com.intellij.execution.junit.JUnitExternalLibraryDescriptor;
 import com.intellij.ide.highlighter.ModuleFileType;
-import com.intellij.ide.util.projectWizard.JavaModuleBuilder;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.ModifiableModuleModel;
 import com.intellij.openapi.module.Module;
@@ -19,6 +18,8 @@ import com.jetbrains.edu.learning.core.EduNames;
 import com.jetbrains.edu.learning.courseFormat.Course;
 import com.jetbrains.edu.learning.courseFormat.Task;
 import com.jetbrains.edu.utils.EduIntelliJNames;
+import com.jetbrains.edu.utils.generation.builders.TaskBuilder;
+import com.jetbrains.python.module.PythonModuleBuilder;
 import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,12 +28,12 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-public class StepicTaskModuleBuilder extends JavaModuleBuilder {
-    private static final Logger LOG = Logger.getInstance(StepicTaskModuleBuilder.class);
+public class StepicPythonTaskBuilder extends PythonModuleBuilder implements TaskBuilder {
+    private static final Logger LOG = Logger.getInstance(StepicPythonTaskBuilder.class);
     private final Task myTask;
     private final Module myUtilModule;
 
-    public StepicTaskModuleBuilder(String moduleDir, @NotNull String name, @NotNull Task task, @NotNull Module utilModule) {
+    public StepicPythonTaskBuilder(String moduleDir, @NotNull String name, @NotNull Task task, @NotNull Module utilModule) {
         myTask = task;
         myUtilModule = utilModule;
         String taskName = EduNames.TASK + task.getIndex();
@@ -51,7 +52,7 @@ public class StepicTaskModuleBuilder extends JavaModuleBuilder {
             LOG.info("Failed to copy task content");
             return module;
         }
-        addJUnitLib(module);
+//        addJUnitLib(module);
         ModuleRootModificationUtil.addDependency(module, myUtilModule);
         return module;
     }
@@ -82,5 +83,10 @@ public class StepicTaskModuleBuilder extends JavaModuleBuilder {
                 EduNames.TASK + myTask.getIndex());
         FileUtil.copyDirContent(new File(taskResourcesPath), new File(src.getPath()));
         return true;
+    }
+
+    @Override
+    public Module createTask(@NotNull ModifiableModuleModel moduleModel) throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
+        return createModule(moduleModel);
     }
 }

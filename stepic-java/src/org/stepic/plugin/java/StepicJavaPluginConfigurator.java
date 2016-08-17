@@ -43,7 +43,7 @@ public class StepicJavaPluginConfigurator extends StudyBasePluginConfigurator {
         StudyTaskManager instance = StudyTaskManager.getInstance(project);
         if (instance == null) return false;
         Course course = instance.getCourse();
-//        return course != null && "PyCharm".equals(course.getCourseType()) && "JAVA".equals(course.getLanguage());
+//        return builders != null && "PyCharm".equals(builders.getCourseType()) && "JAVA".equals(builders.getLanguage());
         return course != null;
     }
 

@@ -22,11 +22,11 @@ public class EduProjectGenerator extends StudyProjectGenerator {
     public void generateProject(@NotNull Project project, @NotNull VirtualFile baseDir) {
         final Course course = getCourse(project);
         if (course == null) {
-            LOG.warn("EduProjectGenerator: Failed to get course");
+            LOG.warn("EduProjectGenerator: Failed to get builders");
             return;
         }
-        //need this not to update course
-        //when we update course we don't know anything about modules, so we create folders for lessons directly
+        //need this not to update builders
+        //when we update builders we don't know anything about modules, so we create folders for lessons directly
         course.setUpToDate(true);
         StudyTaskManager.getInstance(project).setCourse(course);
         course.setCourseDirectory(new File(OUR_COURSES_DIR, mySelectedCourseInfo.getName()).getAbsolutePath());

@@ -50,7 +50,7 @@ public class EduIntellijUtils {
                             }
                         });
                     } catch (IOException e) {
-                        LOG.info("Failed to extract default course", e);
+                        LOG.info("Failed to extract default builders", e);
                     }
                 }
             }

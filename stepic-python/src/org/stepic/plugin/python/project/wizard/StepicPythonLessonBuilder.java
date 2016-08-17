@@ -1,32 +1,31 @@
-package com.jetbrains.edu.utils.generation;
+package org.stepic.plugin.python.project.wizard;
 
 import com.intellij.ide.highlighter.ModuleFileType;
-import com.intellij.ide.util.projectWizard.JavaModuleBuilder;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.ModifiableModuleModel;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleWithNameAlreadyExists;
 import com.intellij.openapi.options.ConfigurationException;
-import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.util.InvalidDataException;
-import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.io.FileUtil;
 import com.jetbrains.edu.learning.core.EduNames;
 import com.jetbrains.edu.learning.courseFormat.Lesson;
 import com.jetbrains.edu.learning.courseFormat.Task;
+import com.jetbrains.edu.utils.generation.builders.LessonBuilder;
+import com.jetbrains.edu.utils.generation.builders.TaskBuilder;
+import com.jetbrains.python.module.PythonModuleBuilder;
 import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 
-public class StepicLessonModuleBuilder extends JavaModuleBuilder {
-    private static final Logger LOG = Logger.getInstance(StepicLessonModuleBuilder.class);
+public class StepicPythonLessonBuilder extends PythonModuleBuilder implements LessonBuilder {
+    private static final Logger LOG = Logger.getInstance(StepicPythonLessonBuilder.class);
     private final Lesson myLesson;
     private final Module myUtilModule;
 
-    public StepicLessonModuleBuilder(@NotNull String moduleDir, @NotNull Lesson lesson, @NotNull Module utilModule) {
+    public StepicPythonLessonBuilder(@NotNull String moduleDir, @NotNull Lesson lesson, @NotNull Module utilModule) {
         myLesson = lesson;
         myUtilModule = utilModule;
         String lessonName = EduNames.LESSON + lesson.getIndex();
@@ -50,13 +49,12 @@ public class StepicLessonModuleBuilder extends JavaModuleBuilder {
     }
 
     private void createTaskModule(@NotNull ModifiableModuleModel moduleModel, @NotNull Task task) throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
-        StepicTaskModuleBuilder taskModuleBuilder = new StepicTaskModuleBuilder(getModuleFileDirectory(), getName(), task, myUtilModule);
-        taskModuleBuilder.createModule(moduleModel);
+        TaskBuilder taskBuilder = new StepicPythonTaskBuilder(getModuleFileDirectory(), getName(), task, myUtilModule);
+        taskBuilder.createTask(moduleModel);
     }
 
     @Override
-    public void setupRootModel(ModifiableRootModel rootModel) throws ConfigurationException {
-        setSourcePaths(Collections.<Pair<String, String>>emptyList());
-        super.setupRootModel(rootModel);
+    public Module createLesson(@NotNull ModifiableModuleModel moduleModel) throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
+        return createModule(moduleModel);
     }
 }

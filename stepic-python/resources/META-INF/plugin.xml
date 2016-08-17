@@ -35,7 +35,7 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <!--<treeStructureProvider implementation="org.stepic.plugin.collective.StepicTreeStructureProvider" order="last"/>-->
-        <!--<moduleBuilder builderClass="org.stepic.plugin.java.project.wizard.StepicPythonModuleBuilder" id="java.stepic.builder" order="first"/>-->
+        <!--<moduleBuilder builderClass="org.stepic.plugin.java.project.wizard.PythonCourseBuilder" id="java.stepic.builder" order="first"/>-->
 
         <!--<applicationConfigurable instance="org.stepic.plugin.collective.ui.StepicSettingsConfigurable"/>-->
     </extensions>
