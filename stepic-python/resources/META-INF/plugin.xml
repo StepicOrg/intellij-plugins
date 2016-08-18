@@ -49,8 +49,8 @@
     </extensions>
 
     <extensions defaultExtensionNs="com.jetbrains.edu.intellij">
-        <eduIntelliJProjectTemplate implementation="org.stepic.plugin.python.StepicPythonProjectTemplate"/>
-        <courseConfigurator language="Python" implementationClass="org.stepic.plugin.python.StepicPythonCourseConfigurator"/>
+        <eduIntelliJProjectTemplate implementation="org.stepic.plugin.StepicPythonProjectTemplate"/>
+        <courseConfigurator language="Python" implementationClass="org.stepic.plugin.StepicPythonCourseConfigurator"/>
     </extensions>
 
 
