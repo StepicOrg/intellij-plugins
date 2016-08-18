@@ -18,13 +18,13 @@ import com.jetbrains.edu.learning.StudyTaskManager;
 import com.jetbrains.edu.learning.core.EduNames;
 import com.jetbrains.edu.learning.courseFormat.Course;
 import com.jetbrains.edu.learning.courseFormat.Lesson;
-import com.jetbrains.edu.learning.stepic.CourseInfo;
+import com.jetbrains.edu.learning.stepic.StepicConnectorLogin;
 import com.jetbrains.edu.utils.generation.EduProjectGenerator;
 import com.jetbrains.edu.utils.generation.EduUtilModuleBuilder;
-import com.jetbrains.edu.utils.generation.StepicSectionDirBuilder;
-import com.jetbrains.edu.utils.generation.builders.LessonBuilder;
-import com.jetbrains.edu.utils.generation.builders.CourseBuilder;
 import com.jetbrains.edu.utils.generation.StepicModuleWizardStep;
+import com.jetbrains.edu.utils.generation.StepicSectionDirBuilder;
+import com.jetbrains.edu.utils.generation.builders.CourseBuilder;
+import com.jetbrains.edu.utils.generation.builders.LessonBuilder;
 import com.jetbrains.python.module.PythonModuleBuilder;
 import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
@@ -36,9 +36,19 @@ public class PythonCourseBuilder extends PythonModuleBuilder implements CourseBu
     private static final Logger LOG = Logger.getInstance(PythonCourseBuilder.class);
     private EduProjectGenerator generator;
 
+    @NotNull
     @Override
-    public void createCourseFromCourseInfo(@NotNull ModifiableModuleModel moduleModel, Project project, EduProjectGenerator generator, CourseInfo courseInfo) throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
-        generator.setSelectedCourse(courseInfo);
+    public Module createModule(@NotNull ModifiableModuleModel moduleModel) throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
+        Module baseModule = super.createModule(moduleModel);
+        Project project = baseModule.getProject();
+        LOG.warn("login dialog");
+        StepicConnectorLogin.loginFromDialog(project);
+
+        createCourseFromGenerator(moduleModel, project, getGenerator());
+        return baseModule;
+    }
+
+    public void createCourseFromGenerator(@NotNull ModifiableModuleModel moduleModel, Project project, EduProjectGenerator generator) throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
         generator.generateProject(project, project.getBaseDir());
 
         Course course = StudyTaskManager.getInstance(project).getCourse();

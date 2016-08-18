@@ -19,10 +19,11 @@ import com.jetbrains.edu.learning.StudyTaskManager;
 import com.jetbrains.edu.learning.core.EduNames;
 import com.jetbrains.edu.learning.courseFormat.Course;
 import com.jetbrains.edu.learning.courseFormat.Lesson;
-import com.jetbrains.edu.learning.stepic.CourseInfo;
-import com.jetbrains.edu.learning.stepic.StepicConnectorGet;
 import com.jetbrains.edu.learning.stepic.StepicConnectorLogin;
-import com.jetbrains.edu.utils.generation.*;
+import com.jetbrains.edu.utils.generation.EduProjectGenerator;
+import com.jetbrains.edu.utils.generation.EduUtilModuleBuilder;
+import com.jetbrains.edu.utils.generation.StepicModuleWizardStep;
+import com.jetbrains.edu.utils.generation.StepicSectionDirBuilder;
 import com.jetbrains.edu.utils.generation.builders.CourseBuilder;
 import com.jetbrains.edu.utils.generation.builders.LessonBuilder;
 import org.jdom.JDOMException;
@@ -30,7 +31,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepic.plugin.java.StepicJavaCourseConfigurator;
 
-import javax.swing.*;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -40,8 +40,8 @@ public class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilde
     private EduProjectGenerator generator;
 
     @Override
-    public void createCourseFromCourseInfo(@NotNull ModifiableModuleModel moduleModel, Project project, EduProjectGenerator generator, CourseInfo courseInfo) throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
-        generator.setSelectedCourse(courseInfo);
+    public void createCourseFromGenerator(@NotNull ModifiableModuleModel moduleModel, Project project, EduProjectGenerator generator) throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
+//        generator.setSelectedCourse(courseInfo);
         generator.generateProject(project, project.getBaseDir());
 
         Course course = StudyTaskManager.getInstance(project).getCourse();
@@ -114,19 +114,7 @@ public class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilde
         LOG.warn("login dialog");
         StepicConnectorLogin.loginFromDialog(project);
 
-        JPanel panel = new StepicProjectPanel(getGenerator());
-        panel.setVisible(true);
-
-        CourseInfo courseInfo = StepicConnectorGet.getDefaultCourse();
-        if (courseInfo == null) {
-            LOG.info("Failed to find builders ");
-            return baseModule;
-        } else {
-            LOG.warn("succes!!!11");
-        }
-
-        createCourseFromCourseInfo(moduleModel, project, getGenerator(), courseInfo);
-//        generator.generateProject(project, project.getBaseDir());
+        createCourseFromGenerator(moduleModel, project, getGenerator());
         return baseModule;
     }
 

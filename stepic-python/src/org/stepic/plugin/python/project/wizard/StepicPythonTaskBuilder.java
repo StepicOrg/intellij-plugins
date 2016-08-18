@@ -17,7 +17,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.edu.learning.core.EduNames;
 import com.jetbrains.edu.learning.courseFormat.Course;
 import com.jetbrains.edu.learning.courseFormat.Task;
-import com.jetbrains.edu.utils.EduIntelliJNames;
 import com.jetbrains.edu.utils.generation.builders.TaskBuilder;
 import com.jetbrains.python.module.PythonModuleBuilder;
 import org.jdom.JDOMException;
@@ -74,14 +73,14 @@ public class StepicPythonTaskBuilder extends PythonModuleBuilder implements Task
         if (moduleDir == null) {
             return false;
         }
-        VirtualFile src = moduleDir.findChild(EduIntelliJNames.SRC);
-        if (src == null) {
-            return false;
-        }
+//        VirtualFile src = moduleDir.findChild(EduIntelliJNames.SRC);
+//        if (src == null) {
+//            return false;
+//        }
         String courseResourcesDirectory = course.getCourseDirectory();
         String taskResourcesPath = FileUtil.join(courseResourcesDirectory, EduNames.LESSON + myTask.getLesson().getIndex(),
                 EduNames.TASK + myTask.getIndex());
-        FileUtil.copyDirContent(new File(taskResourcesPath), new File(src.getPath()));
+        FileUtil.copyDirContent(new File(taskResourcesPath), new File(moduleDir.getPath()));
         return true;
     }
 
