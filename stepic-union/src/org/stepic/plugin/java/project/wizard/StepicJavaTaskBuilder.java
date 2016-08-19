@@ -15,6 +15,7 @@ import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.jetbrains.edu.learning.StudyTaskManager;
 import com.jetbrains.edu.learning.core.EduNames;
 import com.jetbrains.edu.learning.courseFormat.Course;
 import com.jetbrains.edu.learning.courseFormat.Task;
@@ -25,6 +26,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Collections;
 import java.util.List;
 
@@ -81,7 +85,19 @@ public class StepicJavaTaskBuilder extends JavaModuleBuilder implements TaskBuil
         String courseResourcesDirectory = course.getCourseDirectory();
         String taskResourcesPath = FileUtil.join(courseResourcesDirectory, EduNames.LESSON + myTask.getLesson().getIndex(),
                 EduNames.TASK + myTask.getIndex());
-        FileUtil.copyDirContent(new File(taskResourcesPath), new File(src.getPath()));
+//        FileUtil.copyDirContent(new File(taskResourcesPath), new File(src.getPath()));
+        FileUtil.copyDirContent(new File(taskResourcesPath), new File(FileUtil.join(src.getPath(), "hide")));
+        String currentLang = StudyTaskManager.getInstance(myUtilModule.getProject()).getLang(myTask);
+        switch (currentLang) {
+            case ("java"):
+                Files.move(Paths.get(FileUtil.join(src.getPath(), "hide", "Main.java")), Paths.get(FileUtil.join(src.getPath(), "Main.java")), StandardCopyOption.REPLACE_EXISTING);
+//                FileUtil.copyFileOrDir(new File(FileUtil.join(src.getPath(), "hide", "Main.java")), new File(FileUtil.join(src.getPath(), "Main.java")));
+                break;
+            case ("python3"):
+                Files.move(Paths.get(FileUtil.join(src.getPath(), "hide", "main.py")), Paths.get(src.getPath(), "main.py"), StandardCopyOption.REPLACE_EXISTING);
+//                FileUtil.copyFileOrDir(new File(FileUtil.join(src.getPath(), "hide", "main.py")), new File(FileUtil.join(src.getPath(), "main.py")));
+                break;
+        }
         return true;
     }
 

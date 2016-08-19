@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.stepic.plugin.actions.StepicJavaPostAction;
 import org.stepic.plugin.actions.StepicNextTaskAction;
 import org.stepic.plugin.actions.StepicPreviousTaskAction;
+import org.stepic.plugin.actions.SwitchLanguage;
 
 public class StepicPluginConfigurator extends StudyBasePluginConfigurator {
     @NotNull
@@ -22,9 +23,9 @@ public class StepicPluginConfigurator extends StudyBasePluginConfigurator {
         group.add(postAction);
         group.add(new StepicPreviousTaskAction());
         group.add(new StepicNextTaskAction());
-        StudyRefreshTaskFileAction resetTaskFile = new StudyRefreshTaskFileAction();
 //        resetTaskFile.getTemplatePresentation().setIcon(EduKotlinIcons.RESET_TASK_FILE);
-        group.add(resetTaskFile);
+        group.add(new StudyRefreshTaskFileAction());
+        group.add(new SwitchLanguage());
 //        StudyFillPlaceholdersAction fillPlaceholdersAction = new StudyFillPlaceholdersAction();
 //        fillPlaceholdersAction.getTemplatePresentation().setIcon(EduKotlinIcons.FILL_PLACEHOLDERS_ICON);
 //        fillPlaceholdersAction.getTemplatePresentation().setText("Fill Answer Placeholders");

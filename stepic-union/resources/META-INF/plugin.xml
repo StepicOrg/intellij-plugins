@@ -52,6 +52,7 @@
 
   <actions>
     <!--<action id="StepicJavaPostAction" class="org.stepic.plugin.java.actions.StepicJavaPostAction"-->
+    <action id="SwitchLanguage" class="org.stepic.plugin.actions.SwitchLanguage"/>
     <!--text="Stepic Java Check"/>-->
   </actions>
 

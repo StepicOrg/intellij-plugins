@@ -8,6 +8,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleWithNameAlreadyExists;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.util.InvalidDataException;
+import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.io.FileUtil;
 import com.jetbrains.edu.learning.core.EduNames;
 import com.jetbrains.edu.learning.courseFormat.Lesson;
@@ -24,6 +25,12 @@ public class StepicJavaLessonBuilder extends JavaModuleBuilder implements Lesson
     private static final Logger LOG = Logger.getInstance(StepicJavaLessonBuilder.class);
     private final Lesson myLesson;
     private final Module myUtilModule;
+    private List<Pair<String,String>> mySourcePaths;
+
+    @Override
+    public List<Pair<String, String>> getSourcePaths() {
+        return mySourcePaths;
+    }
 
     public StepicJavaLessonBuilder(@NotNull String moduleDir, @NotNull Lesson lesson, @NotNull Module utilModule) {
         myLesson = lesson;

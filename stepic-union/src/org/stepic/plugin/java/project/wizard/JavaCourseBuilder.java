@@ -14,6 +14,7 @@ import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.ui.configuration.ModulesProvider;
 import com.intellij.openapi.util.Conditions;
 import com.intellij.openapi.util.InvalidDataException;
+import com.intellij.openapi.util.Pair;
 import com.jetbrains.edu.learning.StudyProjectComponent;
 import com.jetbrains.edu.learning.StudyTaskManager;
 import com.jetbrains.edu.learning.core.EduNames;
@@ -38,6 +39,12 @@ import java.util.List;
 public class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilder {
     private static final Logger LOG = Logger.getInstance(JavaCourseBuilder.class);
     private EduProjectGenerator generator;
+    private List<Pair<String,String>> mySourcePaths;
+
+    @Override
+    public List<Pair<String, String>> getSourcePaths() {
+        return mySourcePaths;
+    }
 
     @Override
     public void createCourseFromGenerator(@NotNull ModifiableModuleModel moduleModel, Project project, EduProjectGenerator generator) throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
