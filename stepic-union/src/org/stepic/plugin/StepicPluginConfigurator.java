@@ -7,10 +7,7 @@ import com.jetbrains.edu.learning.StudyTaskManager;
 import com.jetbrains.edu.learning.actions.StudyRefreshTaskFileAction;
 import com.jetbrains.edu.learning.courseFormat.Course;
 import org.jetbrains.annotations.NotNull;
-import org.stepic.plugin.actions.StepicJavaPostAction;
-import org.stepic.plugin.actions.StepicNextTaskAction;
-import org.stepic.plugin.actions.StepicPreviousTaskAction;
-import org.stepic.plugin.actions.SwitchLanguage;
+import org.stepic.plugin.actions.*;
 
 public class StepicPluginConfigurator extends StudyBasePluginConfigurator {
     @NotNull
@@ -25,6 +22,7 @@ public class StepicPluginConfigurator extends StudyBasePluginConfigurator {
         group.add(new StepicNextTaskAction());
 //        resetTaskFile.getTemplatePresentation().setIcon(EduKotlinIcons.RESET_TASK_FILE);
         group.add(new StudyRefreshTaskFileAction());
+        group.add(new DownloadSubmission());
         group.add(new SwitchLanguage());
 //        StudyFillPlaceholdersAction fillPlaceholdersAction = new StudyFillPlaceholdersAction();
 //        fillPlaceholdersAction.getTemplatePresentation().setIcon(EduKotlinIcons.FILL_PLACEHOLDERS_ICON);

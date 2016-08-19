@@ -3,7 +3,6 @@ package org.stepic.plugin.actions;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.keymap.KeymapUtil;
@@ -27,7 +26,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 public class SwitchLanguage extends StudyActionWithShortcut {
-    private static final Logger LOG = Logger.getInstance(SwitchLanguage.class);
     public static final String ACTION_ID = "SwitchLanguage";
     public static final String SHORTCUT = "ctrl pressed PAGE_UP";
 
