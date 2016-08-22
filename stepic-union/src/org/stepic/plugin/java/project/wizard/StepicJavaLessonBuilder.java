@@ -27,17 +27,17 @@ public class StepicJavaLessonBuilder extends JavaModuleBuilder implements Lesson
     private final Module myUtilModule;
     private List<Pair<String,String>> mySourcePaths;
 
-    @Override
-    public List<Pair<String, String>> getSourcePaths() {
-        return mySourcePaths;
-    }
-
     public StepicJavaLessonBuilder(@NotNull String moduleDir, @NotNull Lesson lesson, @NotNull Module utilModule) {
         myLesson = lesson;
         myUtilModule = utilModule;
         String lessonName = EduNames.LESSON + lesson.getIndex();
         setName(lessonName);
         setModuleFilePath(FileUtil.join(moduleDir, lessonName, lessonName + ModuleFileType.DOT_DEFAULT_EXTENSION));
+    }
+
+    @Override
+    public Module createLesson(@NotNull ModifiableModuleModel moduleModel) throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
+        return createModule(moduleModel);
     }
 
     @NotNull
@@ -52,16 +52,15 @@ public class StepicJavaLessonBuilder extends JavaModuleBuilder implements Lesson
             createTaskModule(moduleModel, task);
         }
         return baseModule;
+    }
 
+    @Override
+    public List<Pair<String, String>> getSourcePaths() {
+        return mySourcePaths;
     }
 
     private void createTaskModule(@NotNull ModifiableModuleModel moduleModel, @NotNull Task task) throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
         TaskBuilder taskModuleBuilder = new StepicJavaTaskBuilder(getModuleFileDirectory(), getName(), task, myUtilModule);
         taskModuleBuilder.createTask(moduleModel);
-    }
-
-    @Override
-    public Module createLesson(@NotNull ModifiableModuleModel moduleModel) throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
-        return createModule(moduleModel);
     }
 }

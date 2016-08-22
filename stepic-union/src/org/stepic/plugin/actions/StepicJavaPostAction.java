@@ -11,6 +11,7 @@ import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.IdeFocusManager;
 import com.jetbrains.edu.learning.StudyState;
+import com.jetbrains.edu.learning.StudyTaskManager;
 import com.jetbrains.edu.learning.StudyUtils;
 import com.jetbrains.edu.learning.actions.StudyCheckAction;
 import com.jetbrains.edu.learning.checker.StudyCheckUtils;
@@ -54,7 +55,10 @@ public class StepicJavaPostAction extends StudyCheckAction {
 //                studyState.getVirtualFile().get
                 Document document = FileDocumentManager.getInstance().getDocument(studyState.getVirtualFile());
 //                int attempt = StepicConnectorPost.postSubmission(task.getFile("Main.java").text, attemptId).submission.attempt;
-                StepicWrappers.SubmissionContainer container = StepicConnectorPost.postSubmission(document.getText(), attemptId);
+//                StepicWrappers.SubmissionContainer container = StepicConnectorPost.postSubmission(document.getText(), attemptId);
+                String currentLang = StudyTaskManager.getInstance(project).getLang(task);
+                StepicWrappers.SubmissionToPostWrapper sTPW = new StepicWrappers.SubmissionToPostWrapper(attemptId, currentLang, document.getText());
+                StepicWrappers.SubmissionContainer container = StepicConnectorPost.postSubmission(sTPW);
                 List<StepicWrappers.SubmissionContainer.Submission> submissions = container.submissions;
                 int submissionId = submissions.get(0).id;
                 LOG.warn("submissionId = " + submissionId);

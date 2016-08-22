@@ -40,6 +40,7 @@ public class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilde
     private static final Logger LOG = Logger.getInstance(JavaCourseBuilder.class);
     private EduProjectGenerator generator;
     private List<Pair<String,String>> mySourcePaths;
+    static Module utilModule;
 
     @Override
     public List<Pair<String, String>> getSourcePaths() {
@@ -48,12 +49,10 @@ public class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilde
 
     @Override
     public void createCourseFromGenerator(@NotNull ModifiableModuleModel moduleModel, Project project, EduProjectGenerator generator) throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
-//        generator.setSelectedCourse(courseInfo);
         generator.generateProject(project, project.getBaseDir());
 
         Course course = StudyTaskManager.getInstance(project).getCourse();
         course.setCourseMode(EduNames.STEPIC_CODE);
-//        builders.setCourseMode(EduNames.STUDY);
         if (course == null) {
             LOG.info("failed to generate builders");
             return;
@@ -64,7 +63,7 @@ public class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilde
         }
 
         EduUtilModuleBuilder utilModuleBuilder = new EduUtilModuleBuilder(moduleDir);
-        Module utilModule = utilModuleBuilder.createModule(moduleModel);
+        utilModule = utilModuleBuilder.createModule(moduleModel);
 
         createLessonModules(moduleModel, course, moduleDir, utilModule);
 
@@ -86,9 +85,8 @@ public class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilde
 
                 StepicSectionDirBuilder dirBuilder = new StepicSectionDirBuilder(moduleDir, lesson);
                 dirBuilder.build();
-//
+
                 LessonBuilder lessonBuilder = new StepicJavaLessonBuilder(dirBuilder.getSectionDir(), lesson, utilModule);
-//            StepicLessonModuleBuilder stepicLessonModuleBuilder =  new StepicLessonModuleBuilder(moduleDir, lesson, utilModule);
                 lessonBuilder.createLesson(moduleModel);
             }
         }

@@ -85,17 +85,14 @@ public class StepicJavaTaskBuilder extends JavaModuleBuilder implements TaskBuil
         String courseResourcesDirectory = course.getCourseDirectory();
         String taskResourcesPath = FileUtil.join(courseResourcesDirectory, EduNames.LESSON + myTask.getLesson().getIndex(),
                 EduNames.TASK + myTask.getIndex());
-//        FileUtil.copyDirContent(new File(taskResourcesPath), new File(src.getPath()));
         FileUtil.copyDirContent(new File(taskResourcesPath), new File(FileUtil.join(src.getPath(), "hide")));
         String currentLang = StudyTaskManager.getInstance(myUtilModule.getProject()).getLang(myTask);
         switch (currentLang) {
             case ("java"):
                 Files.move(Paths.get(FileUtil.join(src.getPath(), "hide", "Main.java")), Paths.get(FileUtil.join(src.getPath(), "Main.java")), StandardCopyOption.REPLACE_EXISTING);
-//                FileUtil.copyFileOrDir(new File(FileUtil.join(src.getPath(), "hide", "Main.java")), new File(FileUtil.join(src.getPath(), "Main.java")));
                 break;
             case ("python3"):
                 Files.move(Paths.get(FileUtil.join(src.getPath(), "hide", "main.py")), Paths.get(src.getPath(), "main.py"), StandardCopyOption.REPLACE_EXISTING);
-//                FileUtil.copyFileOrDir(new File(FileUtil.join(src.getPath(), "hide", "main.py")), new File(FileUtil.join(src.getPath(), "main.py")));
                 break;
         }
         return true;
