@@ -4,6 +4,7 @@ import com.intellij.ide.projectView.TreeStructureProvider;
 import com.intellij.ide.projectView.ViewSettings;
 import com.intellij.ide.projectView.impl.nodes.PsiFileNode;
 import com.intellij.ide.util.treeView.AbstractTreeNode;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class StepicTreeStructureProvider implements TreeStructureProvider, DumbAware {
+  private static final Logger LOG = Logger.getInstance(StepicTreeStructureProvider.class);
   @NotNull
   @Override
   public Collection<AbstractTreeNode> modify(@NotNull AbstractTreeNode parent,
@@ -48,6 +50,7 @@ public class StepicTreeStructureProvider implements TreeStructureProvider, DumbA
             if (virtualFile == null) {
               return nodes;
             }
+            if (virtualFile.getName().endsWith(".iml")) continue;
             final TaskFile taskFile = StudyUtils.getTaskFile(project, virtualFile);
             if (taskFile != null) {
               nodes.add(node);
