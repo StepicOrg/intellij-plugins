@@ -20,10 +20,7 @@ import com.jetbrains.edu.learning.core.EduNames;
 import com.jetbrains.edu.learning.courseFormat.Course;
 import com.jetbrains.edu.learning.courseFormat.Lesson;
 import com.jetbrains.edu.learning.stepic.StepicConnectorLogin;
-import com.jetbrains.edu.utils.generation.EduProjectGenerator;
-import com.jetbrains.edu.utils.generation.EduUtilModuleBuilder;
-import com.jetbrains.edu.utils.generation.StepicModuleWizardStep;
-import com.jetbrains.edu.utils.generation.StepicSectionDirBuilder;
+import com.jetbrains.edu.utils.generation.*;
 import com.jetbrains.edu.utils.generation.builders.CourseBuilder;
 import com.jetbrains.edu.utils.generation.builders.LessonBuilder;
 import org.jdom.JDOMException;
@@ -37,7 +34,7 @@ import java.util.List;
 
 public class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilder {
     private static final Logger LOG = Logger.getInstance(JavaCourseBuilder.class);
-    private EduProjectGenerator generator;
+    private StepikProjectGenerator generator;
 
     @Override
     public void createCourseFromGenerator(@NotNull ModifiableModuleModel moduleModel, Project project, EduProjectGenerator generator) throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
@@ -125,7 +122,7 @@ public class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilde
         ModuleWizardStep[] wizardSteps = new ModuleWizardStep[previousWizardSteps.length + 1];
 
         wizardSteps[0] = new StepicModuleWizardStep(getGenerator(), wizardContext);
-//        wizardSteps[0] = new StudyNewProjectPanel(this, wizardContext);
+//        wizardSteps[0] = new StepicProjectPanel(this, wizardContext);
         for (int i = 0; i < previousWizardSteps.length; i++) {
             wizardSteps[i + 1] = previousWizardSteps[i];
         }
@@ -136,7 +133,7 @@ public class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilde
 
     private EduProjectGenerator getGenerator() {
         if (generator == null) {
-            generator = new EduProjectGenerator();
+            generator = new StepikProjectGenerator();
         }
         return generator;
     }

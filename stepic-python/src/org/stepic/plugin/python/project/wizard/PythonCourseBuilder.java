@@ -100,7 +100,7 @@ public class PythonCourseBuilder extends PythonModuleBuilder implements CourseBu
         ModuleWizardStep[] wizardSteps = new ModuleWizardStep[previousWizardSteps.length+1];
 
         wizardSteps[0] = new StepicModuleWizardStep(getGenerator(), wizardContext);
-//        wizardSteps[0] = new StudyNewProjectPanel(this, wizardContext);
+//        wizardSteps[0] = new StepicProjectPanel(this, wizardContext);
         for (int i = 0; i < previousWizardSteps.length; i++) {
             wizardSteps[i+1] = previousWizardSteps[i];
         }

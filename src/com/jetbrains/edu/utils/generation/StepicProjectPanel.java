@@ -4,6 +4,7 @@ import com.intellij.facet.ui.FacetValidatorsManager;
 import com.intellij.facet.ui.ValidationResult;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileChooser.FileChooser;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.progress.ProgressManager;
@@ -27,11 +28,7 @@ import com.intellij.ui.PanelWithAnchor;
 import com.jetbrains.edu.learning.StudyUtils;
 import com.jetbrains.edu.learning.courseFormat.Course;
 import com.jetbrains.edu.learning.courseGeneration.StudyProjectGenerator;
-import com.jetbrains.edu.learning.stepic.CourseInfo;
-import com.jetbrains.edu.learning.stepic.EduStepicConnector;
-import com.jetbrains.edu.learning.stepic.LoginDialog;
-import com.jetbrains.edu.learning.stepic.StepicUser;
-import com.jetbrains.edu.learning.ui.StudyNewProjectPanel;
+import com.jetbrains.edu.learning.stepic.*;
 import icons.InteractiveLearningIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -49,6 +46,7 @@ import java.util.List;
  * data: 7/31/14.
  */
 public class StepicProjectPanel extends JPanel implements PanelWithAnchor {
+    private static final Logger LOG = Logger.getInstance(StepicSectionDirBuilder.class);
     private List<CourseInfo> myAvailableCourses = new ArrayList<CourseInfo>();
     private JButton myBrowseButton;
     private ComboBox<CourseInfo> myCoursesComboBox;
@@ -57,15 +55,15 @@ public class StepicProjectPanel extends JPanel implements PanelWithAnchor {
     private JPanel myInfoPanel;
     private JTextPane myDescriptionPane;
     private JComponent myAnchor;
-    private final EduProjectGenerator myGenerator;
+    private final StepikProjectGenerator myGenerator;
     private static final String CONNECTION_ERROR = "<html>Failed to download courses.<br>Check your Internet connection.</html>";
-    private static final String INVALID_COURSE = "Selected builders is invalid";
+    private static final String INVALID_COURSE = "Selected course is invalid";
     private FacetValidatorsManager myValidationManager;
     private boolean isComboboxInitialized;
-    private static final String LOGIN_TO_STEPIC_MESSAGE = "<html><u>Login to Stepic</u> to open the adaptive builders </html>";
+    private static final String LOGIN_TO_STEPIC_MESSAGE = "<html><u>Login to Stepic</u> to open the adaptive course </html>";
     private static final String LOGIN_TO_STEPIC = "Login to Stepic";
 
-    public StepicProjectPanel(@NotNull final EduProjectGenerator generator) {
+    public StepicProjectPanel(@NotNull final StepikProjectGenerator generator) {
         super(new VerticalFlowLayout(true, true));
         myGenerator = generator;
 
@@ -116,23 +114,27 @@ public class StepicProjectPanel extends JPanel implements PanelWithAnchor {
     }
 
     private void initCoursesCombobox() {
+        StepicConnectorLogin.loginFromDialog(DefaultProjectFactory.getInstance().getDefaultProject());
         myAvailableCourses =
                 myGenerator.getCoursesUnderProgress(false, "Getting Available Courses", ProjectManager.getInstance().getDefaultProject());
         if (myAvailableCourses.contains(CourseInfo.INVALID_COURSE)) {
             setError(CONNECTION_ERROR);
-        } else {
+        }
+        else {
             addCoursesToCombobox(myAvailableCourses);
             final CourseInfo selectedCourse = StudyUtils.getFirst(myAvailableCourses);
             final String authorsString = Course.getAuthorsString(selectedCourse.getAuthors());
             myAuthorLabel.setText(!StringUtil.isEmptyOrSpaces(authorsString) ? "Author: " + authorsString : "");
             myDescriptionPane.setText(selectedCourse.getDescription());
             myDescriptionPane.setEditable(false);
-            //setting the first builders in list as selected
+            myDescriptionPane.setContentType("text/html");
+            //setting the first course in list as selected
             myGenerator.setSelectedCourse(selectedCourse);
 
             if (selectedCourse.isAdaptive() && !myGenerator.isLoggedIn()) {
                 setError(LOGIN_TO_STEPIC_MESSAGE);
-            } else {
+            }
+            else {
                 setOK();
             }
         }
@@ -153,11 +155,11 @@ public class StepicProjectPanel extends JPanel implements PanelWithAnchor {
         };
         myBrowseButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                final BaseListPopupStep<String> popupStep = new BaseListPopupStep<String>("", "Add local builders", LOGIN_TO_STEPIC) {
+                final BaseListPopupStep<String> popupStep = new BaseListPopupStep<String>("", "Add local course", LOGIN_TO_STEPIC) {
                     @Override
                     public PopupStep onChosen(final String selectedValue, boolean finalChoice) {
                         return doFinalStep(() -> {
-                            if ("Add local builders".equals(selectedValue)) {
+                            if ("Add local course".equals(selectedValue)) {
 
                                 Project[] projects = ProjectManager.getInstance().getOpenProjects();
                                 FileChooser.chooseFile(fileChooser, null, projects.length == 0 ? null : projects[0].getBaseDir(),
@@ -171,7 +173,8 @@ public class StepicProjectPanel extends JPanel implements PanelWithAnchor {
                                                 }
                                                 myCoursesComboBox.setSelectedItem(courseInfo);
                                                 setOK();
-                                            } else {
+                                            }
+                                            else {
                                                 setError(INVALID_COURSE);
                                                 myCoursesComboBox.removeAllItems();
                                                 myCoursesComboBox.addItem(CourseInfo.INVALID_COURSE);
@@ -181,7 +184,8 @@ public class StepicProjectPanel extends JPanel implements PanelWithAnchor {
                                                 myCoursesComboBox.setSelectedItem(CourseInfo.INVALID_COURSE);
                                             }
                                         });
-                            } else if (LOGIN_TO_STEPIC.equals(selectedValue)) {
+                            }
+                            else if (LOGIN_TO_STEPIC.equals(selectedValue)) {
                                 showLoginDialog(true, "Signing In And Getting Stepic Course List");
                             }
                         });
@@ -241,10 +245,6 @@ public class StepicProjectPanel extends JPanel implements PanelWithAnchor {
         myAnchor = anchor;
     }
 
-    private void createUIComponents() {
-        // TODO: place custom component creation code here
-    }
-
     /**
      * Handles refreshing courses
      * Old courses added to new courses only if their
@@ -279,20 +279,21 @@ public class StepicProjectPanel extends JPanel implements PanelWithAnchor {
     private void addCoursesToCombobox(@NotNull List<CourseInfo> courses) {
         for (CourseInfo courseInfo : courses) {
             myCoursesComboBox.addItem(courseInfo);
+            LOG.warn(courseInfo.toString());
         }
     }
 
 
     /**
-     * Handles selecting builders in combo box
-     * Sets selected builders in combo box as selected in
-     * {@link StudyNewProjectPanel#myGenerator}
+     * Handles selecting course in combo box
+     * Sets selected course in combo box as selected in
+     * {@link StepicProjectPanel#myGenerator}
      */
     private class CourseSelectedListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            JComboBox cb = (JComboBox) e.getSource();
-            CourseInfo selectedCourse = (CourseInfo) cb.getSelectedItem();
+            JComboBox cb = (JComboBox)e.getSource();
+            CourseInfo selectedCourse = (CourseInfo)cb.getSelectedItem();
             if (selectedCourse == null || selectedCourse.equals(CourseInfo.INVALID_COURSE)) {
                 myAuthorLabel.setText("");
                 myDescriptionPane.setText("");
@@ -341,20 +342,22 @@ public class StepicProjectPanel extends JPanel implements PanelWithAnchor {
             ProgressManager.getInstance().runProcessWithProgressSynchronously(() -> {
                 ProgressManager.getInstance().getProgressIndicator().setIndeterminate(true);
 
-                final StepicUser stepicUser = StudyUtils.execCancelable(() -> EduStepicConnector.login(myLoginPanel.getLogin(),
-                        myLoginPanel.getPassword()));
+                final StepicUser stepicUser =
+                        StudyUtils.execCancelable(() -> StepicConnectorLogin.minorLogin(new StepicUser(myLoginPanel.getLogin(),
+                                myLoginPanel.getPassword())));
                 if (stepicUser != null) {
                     stepicUser.setEmail(myLoginPanel.getLogin());
                     stepicUser.setPassword(myLoginPanel.getPassword());
                     myGenerator.myUser = stepicUser;
-                    myGenerator.setEnrolledCoursesIds(EduStepicConnector.getEnrolledCoursesIds());
+                    myGenerator.setEnrolledCoursesIds(StepicConnectorGet.getEnrolledCoursesIds());
 
                     final List<CourseInfo> courses = myGenerator.getCourses(true);
                     if (courses != null && myRefreshCourseList) {
                         ApplicationManager.getApplication().invokeLater(() -> refreshCoursesList(courses));
                     }
                     setOK();
-                } else {
+                }
+                else {
                     setError("Failed to login");
                 }
             }, myProgressTitle, true, new DefaultProjectFactoryImpl().getDefaultProject());

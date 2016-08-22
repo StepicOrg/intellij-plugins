@@ -9,9 +9,9 @@ import javax.swing.*;
 public class StepicModuleWizardStep extends ModuleWizardStep {
     private JPanel panel;
     private final Project myProjectOrNull;
-    private EduProjectGenerator generator;
+    private StepikProjectGenerator generator;
 
-    public StepicModuleWizardStep(EduProjectGenerator generator, WizardContext context) {
+    public StepicModuleWizardStep(StepikProjectGenerator generator, WizardContext context) {
         this.generator = generator;
         myProjectOrNull = context.getProject();
 
