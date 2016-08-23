@@ -83,6 +83,10 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
 
         List<CourseInfo> myAvailableCourses = myGenerator.getCoursesUnderProgress(false, "Getting Available Courses", ProjectManager.getInstance().getDefaultProject());
         myAvailableCourses.forEach(courseComboBox::addItem);
+
+        selectedCourse = StudyUtils.getFirst(myAvailableCourses);
+        myGenerator.setSelectedCourse(selectedCourse);
+        courseDescription.setText(selectedCourse.getDescription());
     }
 
     private void initListeners() {
