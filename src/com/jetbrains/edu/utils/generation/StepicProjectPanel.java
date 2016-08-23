@@ -279,7 +279,7 @@ public class StepicProjectPanel extends JPanel implements PanelWithAnchor {
     private void addCoursesToCombobox(@NotNull List<CourseInfo> courses) {
         for (CourseInfo courseInfo : courses) {
             myCoursesComboBox.addItem(courseInfo);
-            LOG.warn(courseInfo.toString());
+//            LOG.warn(courseInfo.toString());
         }
     }
 

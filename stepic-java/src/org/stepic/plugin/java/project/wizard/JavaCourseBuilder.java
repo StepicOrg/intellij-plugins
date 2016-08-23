@@ -131,7 +131,7 @@ public class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilde
     }
 
 
-    private EduProjectGenerator getGenerator() {
+    private StepikProjectGenerator getGenerator() {
         if (generator == null) {
             generator = new StepikProjectGenerator();
         }
