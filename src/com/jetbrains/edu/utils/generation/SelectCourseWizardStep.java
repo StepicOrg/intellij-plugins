@@ -4,6 +4,7 @@ import com.intellij.icons.AllIcons;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.ide.util.projectWizard.WizardContext;
+import com.intellij.ide.wizard.CommitStepException;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.DefaultProjectFactory;
@@ -15,6 +16,7 @@ import com.jetbrains.edu.learning.StudyUtils;
 import com.jetbrains.edu.learning.stepic.CourseInfo;
 import com.jetbrains.edu.learning.stepic.StepicConnectorGet;
 import com.jetbrains.edu.learning.stepic.StepicConnectorLogin;
+import com.jetbrains.edu.learning.stepic.StepicConnectorPost;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -237,7 +239,16 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
 
     @Override
     public void onStepLeaving() {
-        if (selectedCourse != null)
+        if (selectedCourse != null){
             myGenerator.setSelectedCourse(selectedCourse);
+        }
+    }
+
+    @Override
+    public void onWizardFinished() throws CommitStepException {
+        super.onWizardFinished();
+        if (buildType.getSelectedItem().equals(COURSE_LINK)){
+            StepicConnectorPost.enrollToCourse(selectedCourse.getId());
+        }
     }
 }

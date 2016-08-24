@@ -1,6 +1,5 @@
 package org.stepic.plugin.java.project.wizard;
 
-import com.intellij.ide.projectWizard.ProjectSettingsStep;
 import com.intellij.ide.util.projectWizard.*;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
@@ -11,7 +10,6 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.DumbModePermission;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.ui.configuration.ModulesProvider;
 import com.intellij.openapi.util.Conditions;
@@ -26,7 +24,6 @@ import com.jetbrains.edu.learning.stepic.StepicConnectorLogin;
 import com.jetbrains.edu.utils.generation.*;
 import com.jetbrains.edu.utils.generation.builders.CourseBuilder;
 import com.jetbrains.edu.utils.generation.builders.LessonBuilder;
-import com.jetbrains.python.sdk.PythonSdkType;
 import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -39,9 +36,8 @@ import java.util.List;
 public class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilder {
     private static final Logger LOG = Logger.getInstance(JavaCourseBuilder.class);
     private StepikProjectGenerator generator;
-    private List<Pair<String,String>> mySourcePaths;
+    private List<Pair<String, String>> mySourcePaths;
     static Module utilModule;
-    private Sdk mySdk;
 
     @Override
     public List<Pair<String, String>> getSourcePaths() {
@@ -119,29 +115,42 @@ public class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilde
         Project project = baseModule.getProject();
         LOG.warn("login dialog");
         StepicConnectorLogin.loginFromDialog(project);
-
         createCourseFromGenerator(moduleModel, project, getGenerator());
         return baseModule;
     }
 
 
-
     @Override
     public ModuleWizardStep[] createWizardSteps(@NotNull WizardContext wizardContext, @NotNull ModulesProvider modulesProvider) {
         ModuleWizardStep[] previousWizardSteps = super.createWizardSteps(wizardContext, modulesProvider);
-//        ModuleWizardStep[] wizardSteps = new ModuleWizardStep[previousWizardSteps.length + 1];
-        ModuleWizardStep[] wizardSteps = new ModuleWizardStep[3];
+        ModuleWizardStep[] wizardSteps = new ModuleWizardStep[previousWizardSteps.length + 1];
+//        ModuleWizardStep[] wizardSteps = new ModuleWizardStep[3];
 
 //        wizardSteps[0] = new StepicModuleWizardStep(getGenerator(), wizardContext);
 //        wizardSteps[0] = new StepicProjectPanel(this, wizardContext);
         wizardSteps[0] = new SelectCourseWizardStep(getGenerator(), wizardContext);
-        ProjectSettingsStep myProjectSettingsStep = new ProjectSettingsStep(wizardContext);
-//        wizardSteps[1] = ProjectWizardStepFactory.getInstance().createJavaSettingsStep(myProjectSettingsStep, this, moduleBuilder::isSuitableSdkType);
-        wizardSteps[1] = ProjectWizardStepFactory.getInstance().createJavaSettingsStep(myProjectSettingsStep, this, this::isSuitableSdkType);
-        wizardSteps[2] = new SdkSettingsStep(myProjectSettingsStep, this, id -> PythonSdkType.getInstance() == id) {};
-        for (int i = 0; i < previousWizardSteps.length; i++) {
-            wizardSteps[i + 1] = previousWizardSteps[i];
-        }
+
+//        ProjectSettingsStep myProjectSettingsStep = new ProjectSettingsStep(wizardContext);
+//        wizardSteps[1] = ProjectWizardStepFactory.getInstance().createJavaSettingsStep(myProjectSettingsStep, this, this::isSuitableSdkType);
+//        wizardSteps[2] = new SdkSettingsStep(myProjectSettingsStep, this, id -> PythonSdkType.getInstance() == id) {
+//            @Override
+//            protected void onSdkSelected(Sdk sdk) {
+//                setSdk(sdk);
+//            }
+//
+//            public void setSdk(final Sdk sdk) {
+//                final List<Runnable> mySdkChangedListeners = ContainerUtil.createLockFreeCopyOnWriteList();
+//                if (mySdk != sdk) {
+//                    mySdk = sdk;
+//                    for (Runnable runnable : mySdkChangedListeners) {
+//                        runnable.run();
+//                    }
+//                }
+//            }
+//        };
+//        for (int i = 0; i < previousWizardSteps.length; i++) {
+//            wizardSteps[i + 1] = previousWizardSteps[i];
+//        }
 
         return wizardSteps;
     }
