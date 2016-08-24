@@ -15,6 +15,7 @@ import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.jetbrains.edu.learning.LangSetting;
 import com.jetbrains.edu.learning.StudyTaskManager;
 import com.jetbrains.edu.learning.core.EduNames;
 import com.jetbrains.edu.learning.courseFormat.Course;
@@ -26,11 +27,11 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class StepicJavaTaskBuilder extends JavaModuleBuilder implements TaskBuilder {
     private static final Logger LOG = Logger.getInstance(StepicJavaTaskBuilder.class);
@@ -69,6 +70,8 @@ public class StepicJavaTaskBuilder extends JavaModuleBuilder implements TaskBuil
     }
 
     private boolean createTaskContent() throws IOException {
+        StudyTaskManager taskManager = StudyTaskManager.getInstance(myUtilModule.getProject());
+        String defaultLang = taskManager.getDefaultLang();
         Course course = myTask.getLesson().getCourse();
         String directory = getModuleFileDirectory();
         if (directory == null) {
@@ -86,20 +89,77 @@ public class StepicJavaTaskBuilder extends JavaModuleBuilder implements TaskBuil
         String taskResourcesPath = FileUtil.join(courseResourcesDirectory, EduNames.LESSON + myTask.getLesson().getIndex(),
                 EduNames.TASK + myTask.getIndex());
         FileUtil.copyDirContent(new File(taskResourcesPath), new File(FileUtil.join(src.getPath(), "hide")));
-        String currentLang = StudyTaskManager.getInstance(myUtilModule.getProject()).getLang(myTask);
+
+        Set<String> supportedLang = getSupportedLang(taskResourcesPath);
+        String currentLang = null;
+        if (supportedLang.contains(defaultLang)){
+            currentLang = defaultLang;
+        }
+        else {
+            currentLang = getPopularLang(supportedLang);
+        }
+
+//        taskManager.putCurrentLang(myTask, currentLang);
+//        taskManager.putSupportedLang(myTask, supportedLang);
+
+        taskManager.getLangManager().setLangSetting(myTask, new LangSetting(currentLang, supportedLang));
+
+//        if (!supportedLang.contains(currentLang)) {
+//            currentLang = currentLang.equals("java8") ? "python3" : "java8";
+//        }
+        moveFromHide(currentLang, src);
+        moveFromHide("task.html", src);
+
+        return true;
+    }
+
+    private String getPopularLang(Set<String> supportedLang) {
+        if (supportedLang.contains("python3"))
+            return "python3";
+        if (supportedLang.contains("java8"))
+            return "java8";
+        return "empty_lang";
+    }
+
+    private void moveFromHide(String currentLang, VirtualFile src) throws IOException {
+        String filename = "task.html";
         switch (currentLang) {
-            case ("java"):
-                Files.move(Paths.get(FileUtil.join(src.getPath(), "hide", "Main.java")), Paths.get(FileUtil.join(src.getPath(), "Main.java")), StandardCopyOption.REPLACE_EXISTING);
+            case ("java8"):
+                filename = "Main.java";
                 break;
             case ("python3"):
-                Files.move(Paths.get(FileUtil.join(src.getPath(), "hide", "main.py")), Paths.get(src.getPath(), "main.py"), StandardCopyOption.REPLACE_EXISTING);
+                filename = "main.py";
                 break;
         }
-        return true;
+        Files.move(Paths.get(FileUtil.join(src.getPath(), "hide", filename)), Paths.get(src.getPath(), filename), StandardCopyOption.REPLACE_EXISTING);
     }
 
     @Override
     public Module createTask(@NotNull ModifiableModuleModel moduleModel) throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
         return createModule(moduleModel);
+    }
+
+    public Set<String> getSupportedLang(String path) {
+        Set<String> supportedLang = new HashSet<>();
+        Path dir = Paths.get(path);
+
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir, "*.java")) {
+            for (Path file : stream) {
+                supportedLang.add("java8");
+                break;
+            }
+        } catch (IOException e) {
+            LOG.warn(e.getMessage());
+        }
+
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir, "*.py")) {
+            for (Path file : stream) {
+                supportedLang.add("python3");
+                break;
+            }
+        } catch (IOException e) {
+            LOG.warn(e.getMessage());
+        }
+        return supportedLang;
     }
 }

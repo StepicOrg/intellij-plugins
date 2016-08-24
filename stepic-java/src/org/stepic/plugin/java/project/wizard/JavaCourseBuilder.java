@@ -121,7 +121,7 @@ public class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilde
         ModuleWizardStep[] previousWizardSteps = super.createWizardSteps(wizardContext, modulesProvider);
         ModuleWizardStep[] wizardSteps = new ModuleWizardStep[previousWizardSteps.length + 1];
 
-        wizardSteps[0] = new StepicModuleWizardStep(getGenerator(), wizardContext);
+        wizardSteps[0] = new SelectCourseWizardStep(getGenerator(), wizardContext);
 //        wizardSteps[0] = new StepicProjectPanel(this, wizardContext);
         for (int i = 0; i < previousWizardSteps.length; i++) {
             wizardSteps[i + 1] = previousWizardSteps[i];

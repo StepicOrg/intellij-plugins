@@ -32,6 +32,8 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
     private static final Logger LOG = Logger.getInstance(SelectCourseWizardStep.class);
     private final static String COURSE_LIST = "Course list";
     private final static String COURSE_LINK = "Course link";
+    private final static String JAVA = "java8";
+    private final static String PYTHON = "python3";
 
     private JPanel mainPanel;
     private JLabel nameLabel;
@@ -51,6 +53,8 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
     private JLabel courseLinkLabel;
     private JTextField courseLinkFiled;
     private JButton checkCourseLinkButton;
+    private JLabel langLabel;
+    private JComboBox langComboBox;
 
     private final StepikProjectGenerator myGenerator;
     private final WizardContext wizardContext;
@@ -89,6 +93,10 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
         selectedCourse = StudyUtils.getFirst(myAvailableCourses);
         myGenerator.setSelectedCourse(selectedCourse);
         courseDescription.setText(selectedCourse.getDescription());
+
+        langComboBox.addItem(JAVA);
+        langComboBox.addItem(PYTHON);
+        langComboBox.setSelectedItem(JAVA);
     }
 
     private void initListeners() {
@@ -239,6 +247,7 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
 
     @Override
     public void onStepLeaving() {
+        StudyTaskManager.getInstance(defaultProject).setDefaultLang((String) langComboBox.getSelectedItem());
         if (selectedCourse != null){
             myGenerator.setSelectedCourse(selectedCourse);
         }

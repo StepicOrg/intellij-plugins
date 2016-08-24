@@ -10,6 +10,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.jetbrains.edu.learning.LangSetting;
 import com.jetbrains.edu.learning.StudyState;
 import com.jetbrains.edu.learning.StudyTaskManager;
 import com.jetbrains.edu.learning.StudyUtils;
@@ -49,6 +50,12 @@ public class SwitchLanguage extends StudyActionWithShortcut {
             return;
         }
 
+        StudyTaskManager taskManager = StudyTaskManager.getInstance(project);
+        LangSetting langSetting = taskManager.getLangManager().getLangSetting(targetTask);
+        if (langSetting.getSupportLangs().size() == 1) {
+            return;
+        }
+
         FileDocumentManager documentManager = FileDocumentManager.getInstance();
         FileEditorManager editorManager = FileEditorManager.getInstance(project);
         for (VirtualFile file : FileEditorManager.getInstance(project).getOpenFiles()) {
@@ -58,11 +65,11 @@ public class SwitchLanguage extends StudyActionWithShortcut {
 
         VirtualFile src = studyState.getTaskDir();
 
-        StudyTaskManager taskManager = StudyTaskManager.getInstance(project);
-        String currentLang = taskManager.getLang(targetTask);
+
+
         String activateFileName = null;
-        switch (currentLang) {
-            case ("java"):
+        switch (langSetting.getCurrentLang()) {
+            case ("java8"):
                 try {
                     Files.move(Paths.get(FileUtil.join(src.getPath(), "Main.java")), Paths.get(FileUtil.join(src.getPath(), "hide", "Main.java")), StandardCopyOption.REPLACE_EXISTING);
                     Files.move(Paths.get(FileUtil.join(src.getPath(), "hide", "main.py")), Paths.get(src.getPath(), "main.py"), StandardCopyOption.REPLACE_EXISTING);
@@ -70,7 +77,8 @@ public class SwitchLanguage extends StudyActionWithShortcut {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                taskManager.setLang(targetTask, "python3");
+//                langSettings.currentLang =  "python3";
+                langSetting.setCurrentLang("python3");
                 break;
             case ("python3"):
                 try {
@@ -80,11 +88,13 @@ public class SwitchLanguage extends StudyActionWithShortcut {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                taskManager.setLang(targetTask, "java");
+//                langSettings.currentLang = "java8";
+                langSetting.setCurrentLang("java8");
                 break;
         }
         if (activateFileName == null) return;
 
+        LocalFileSystem.getInstance().refresh(false);
         LocalFileSystem.getInstance().refresh(false);
         VirtualFile vf = src.findChild(activateFileName);
         FileEditorManager.getInstance(project).openFile(vf, true);

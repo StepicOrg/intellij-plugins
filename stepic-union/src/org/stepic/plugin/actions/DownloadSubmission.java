@@ -72,7 +72,7 @@ public class DownloadSubmission extends StudyActionWithShortcut {
 
         List<StepicWrappers.SubmissionContainer.Submission> submissions = StepicConnectorGet.getSubmissions(nvps).submissions;
 
-        String currentLang = StudyTaskManager.getInstance(project).getLang(targetTask);
+        String currentLang = StudyTaskManager.getInstance(project).getLangManager().getLangSetting(targetTask).getCurrentLang();
         String activateFileName = currentLang.equals("python3") ? "main.py" : "Main.java";
         String code = null;
         for (StepicWrappers.SubmissionContainer.Submission submission : submissions){

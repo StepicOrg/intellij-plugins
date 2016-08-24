@@ -56,7 +56,7 @@ public class StepicJavaPostAction extends StudyCheckAction {
                 Document document = FileDocumentManager.getInstance().getDocument(studyState.getVirtualFile());
 //                int attempt = StepicConnectorPost.postSubmission(task.getFile("Main.java").text, attemptId).submission.attempt;
 //                StepicWrappers.SubmissionContainer container = StepicConnectorPost.postSubmission(document.getText(), attemptId);
-                String currentLang = StudyTaskManager.getInstance(project).getLang(task);
+                String currentLang = StudyTaskManager.getInstance(project).getLangManager().getLangSetting(task).getCurrentLang();
                 StepicWrappers.SubmissionToPostWrapper sTPW = new StepicWrappers.SubmissionToPostWrapper(attemptId, currentLang, document.getText());
                 StepicWrappers.SubmissionContainer container = StepicConnectorPost.postSubmission(sTPW);
                 List<StepicWrappers.SubmissionContainer.Submission> submissions = container.submissions;
