@@ -1,8 +1,8 @@
 <idea-plugin version="2">
   <id>org.stepic.plugin.union</id>
-  <name>Stepic submitter</name>
+  <name>Stepik Union</name>
   <version>0.0.1</version>
-  <vendor email="petr.bogdanov@stepic.org" url="http://www.stepic.org">Stepic</vendor>
+  <vendor email="petr.bogdanov@stepic.org" url="http://www.stepik.org">Stepik</vendor>
 
   <description><![CDATA[
       Stepic plugin for code challenges on Python.<br>
@@ -34,6 +34,8 @@
     <!--<moduleBuilder builderClass="org.stepic.plugin.java.project.wizard.PythonCourseBuilder" id="java.stepic.builder" order="first"/>-->
 
     <applicationConfigurable instance="org.stepic.plugin.collective.ui.StepicSettingsConfigurable"/>
+    <moduleType id="STEPIK_MODULE_TYPE"
+                implementationClass="org.stepic.plugin.java.project.wizard.StepikModuleType"/>
   </extensions>
 
   <extensions defaultExtensionNs="Edu">
@@ -45,8 +47,8 @@
   </extensions>
 
   <extensions defaultExtensionNs="com.jetbrains.edu.intellij">
-    <eduIntelliJProjectTemplate implementation="org.stepic.plugin.StepicProjectTemplate"/>
-    <!--<courseConfigurator language="Python" implementationClass="org.stepic.plugin.StepicCourseConfigurator"/>-->
+    <!--<eduIntelliJProjectTemplate implementation="org.stepic.plugin.StepicProjectTemplate"/>-->
+    <courseConfigurator language="JAVA" implementationClass="org.stepic.plugin.java.StepicJavaCourseConfigurator"/>
   </extensions>
 
 

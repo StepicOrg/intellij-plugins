@@ -75,7 +75,7 @@ public class StepicSettingsPanel {
             }
         });
         magicButton.setText("Magic auth");
-        mySignupTextField.setText("<html>Do not have an account at stepic.org? <a href=\"https://stepic.org/registration\">" + "Sign up" + "</a></html>");
+        mySignupTextField.setText("<html>Do not have an account at stepik.org? <a href=\"https://stepik.org/registration\">" + "Sign up" + "</a></html>");
         mySignupTextField.setBackground(myPane.getBackground());
         mySignupTextField.setCursor(new Cursor(Cursor.HAND_CURSOR));
         myAuthTypeLabel.setBorder(JBUI.Borders.emptyLeft(10));

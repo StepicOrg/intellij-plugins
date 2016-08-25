@@ -5,6 +5,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.ModifiableModuleModel;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.module.ModuleWithNameAlreadyExists;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.DumbModePermission;
@@ -27,7 +28,6 @@ import com.jetbrains.edu.utils.generation.builders.LessonBuilder;
 import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.stepic.plugin.java.StepicJavaCourseConfigurator;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -89,18 +89,24 @@ public class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilde
         }
     }
 
+//    @Override
+//    public String getBuilderId() {
+//        return "java.stepic.builder";
+//    }
+
+
     @Override
-    public String getBuilderId() {
-        return "java.stepic.builder";
+    public ModuleType getModuleType() {
+        return StepikModuleType.STEPIK_MODULE_TYPE;
     }
 
-    @Nullable
-    @Override
-    public Module commitModule(@NotNull Project project, @Nullable ModifiableModuleModel model) {
-        Module baseModule = super.commitModule(project, model);
-        new StepicJavaCourseConfigurator().configureModule(project);
-        return baseModule;
-    }
+//    @Nullable
+//    @Override
+//    public Module commitModule(@NotNull Project project, @Nullable ModifiableModuleModel model) {
+//        Module baseModule = super.commitModule(project, model);
+//        new StepicJavaCourseConfigurator().configureModule(project);
+//        return baseModule;
+//    }
 
     @Nullable
     @Override

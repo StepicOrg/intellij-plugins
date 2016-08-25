@@ -18,7 +18,7 @@ public class StepicSettingsConfigurable implements SearchableConfigurable, VcsCo
 
   @NotNull
   public String getDisplayName() {
-    return "Stepic";
+    return "Stepik";
   }
 
   @NotNull
