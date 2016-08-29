@@ -12,9 +12,9 @@
 
 
 from=/home/user/IdeaProjects/stepic-intellij-community/python/educational-core/gradleBuild/student/libs/*.jar
-from2=/home/user/IdeaProjects/educational-plugins/Edu-Utils/gradleBuild/Edu-IntelliJ/libs/*.jar
+#from2=/home/user/IdeaProjects/educational-plugins/Edu-Utils/gradleBuild/Edu-IntelliJ/libs/*.jar
 
 to=/home/user/Documents/add_to_Stepic_SDK
 
 cp $from $to
-cp $from2 $to
+#cp $from2 $to

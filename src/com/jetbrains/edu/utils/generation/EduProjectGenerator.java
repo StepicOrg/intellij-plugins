@@ -6,8 +6,8 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.edu.learning.StudyTaskManager;
 import com.jetbrains.edu.learning.courseFormat.Course;
 import com.jetbrains.edu.learning.courseGeneration.StudyProjectGenerator;
-import com.jetbrains.edu.learning.stepic.CourseInfo;
-import com.jetbrains.edu.learning.stepic.StepicConnectorGet;
+import com.jetbrains.edu.learning.stepik.CourseInfo;
+import com.jetbrains.edu.learning.stepik.StepikConnectorGet;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -38,7 +38,7 @@ public class EduProjectGenerator extends StudyProjectGenerator {
             myCourses = getCoursesFromCache();
         }
         if (force || myCourses.isEmpty()) {
-            myCourses = execCancelable(StepicConnectorGet::getCourses);
+            myCourses = execCancelable(StepikConnectorGet::getCourses);
             flushCache(myCourses);
         }
         if (myCourses.isEmpty()) {

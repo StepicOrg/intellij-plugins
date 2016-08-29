@@ -1,0 +1,62 @@
+<idea-plugin version="2">
+    <id>org.stepik.plugin.python</id>
+    <name>Stepik python submitter</name>
+    <version>0.0.1</version>
+    <vendor email="petr.bogdanov@stepik.org" url="http://www.stepik.org">Stepik</vendor>
+
+    <description><![CDATA[
+      Stepik plugin for code challenges on Python.<br>
+      To use this plugin you have to have Stepik account and follow the course.<br>
+    ]]></description>
+
+    <!--<change-notes><![CDATA[-->
+    <!--Add change notes here.<br>-->
+    <!--<em>most HTML tags may be used</em>-->
+    <!--]]>-->
+    <!--</change-notes>-->
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+    <idea-version since-build="141.0"/>
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+         on how to target different products -->
+    <!-- uncomment to enable plugin in all products
+    <depends>com.intellij.modules.lang</depends>
+    -->
+
+    <depends>com.intellij.modules.lang</depends>
+    <depends>com.jetbrains.edu.interactivelearning</depends>
+    <depends>com.jetbrains.edu.intellij</depends>
+
+    <depends>com.intellij.modules.lang</depends>
+    <depends>com.jetbrains.edu.interactivelearning</depends>
+    <depends>com.jetbrains.edu.intellij</depends>
+    <depends>com.intellij.modules.python</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!--<treeStructureProvider implementation="StepikTreeStructureProvider" order="last"/>-->
+        <!--<moduleBuilder builderClass="org.stepik.plugin.java.project.wizard.PythonCourseBuilder" id="java.stepik.builder" order="first"/>-->
+
+        <!--<applicationConfigurable instance="StepikSettingsConfigurable"/>-->
+    </extensions>
+
+    <extensions defaultExtensionNs="Edu">
+        <!--<StudyLanguageManager implementationClass="StepikJavaLanguageManager" language="JAVA"/>-->
+        <!--<studyPluginConfigurator implementation="StepikJavaPluginConfigurator"/>-->
+
+        <!--<optionsProvider instance="com.jetbrains.edu.learning.stepik.StepikStudyOptions"/>-->
+        <!--<optionsProvider instance="org.stepik.plugin.java.project.wizard.StepikStudyOptions"/>-->
+    </extensions>
+
+    <extensions defaultExtensionNs="com.jetbrains.edu.intellij">
+        <eduIntelliJProjectTemplate implementation="org.stepik.plugin.StepikPythonProjectTemplate"/>
+        <courseConfigurator language="Python" implementationClass="org.stepik.plugin.StepikPythonCourseConfigurator"/>
+    </extensions>
+
+
+    <actions>
+        <!--<action id="StepikJavaPostAction" class="StepikJavaPostAction"-->
+                <!--text="Stepik Java Check"/>-->
+    </actions>
+
+</idea-plugin>

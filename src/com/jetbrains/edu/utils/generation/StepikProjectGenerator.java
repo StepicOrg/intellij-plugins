@@ -6,8 +6,8 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.intellij.openapi.diagnostic.Logger;
 import com.jetbrains.edu.learning.StudyUtils;
-import com.jetbrains.edu.learning.stepic.CourseInfo;
-import com.jetbrains.edu.learning.stepic.StepicConnectorGet;
+import com.jetbrains.edu.learning.stepik.CourseInfo;
+import com.jetbrains.edu.learning.stepik.StepikConnectorGet;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ public class StepikProjectGenerator extends EduProjectGenerator {
             myCourses = getCoursesFromCache();
         }
         if (force || myCourses.isEmpty()) {
-            myCourses = execCancelable(StepicConnectorGet::getEnrolledCourses);
+            myCourses = execCancelable(StepikConnectorGet::getEnrolledCourses);
             flushCache(myCourses);
         }
         if (myCourses.isEmpty()) {
