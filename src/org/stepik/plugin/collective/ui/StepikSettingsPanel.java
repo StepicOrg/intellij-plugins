@@ -88,7 +88,7 @@ public class StepikSettingsPanel {
             StudyTaskManager manager = StudyTaskManager.getInstance(settingsProject);
             StepikUser oldUser = manager.getUser();
             StepikUser testUser = new StepikUser(getEmail(), getPassword());
-//            manager.setUser(testUser);
+            manager.setUser(testUser);
             if (StepikConnectorLogin.loginFromSettings(settingsProject, testUser)) {
                 String message = "Hello, " + manager.getUser().getName() + "!\n I am glad to see you.";
                 Messages.showMessageDialog(message, "Check credentials", Messages.getInformationIcon());
