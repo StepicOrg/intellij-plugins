@@ -16,6 +16,7 @@ import com.jetbrains.edu.learning.actions.StudyActionWithShortcut;
 import com.jetbrains.edu.learning.courseFormat.Task;
 import com.jetbrains.edu.learning.editor.StudyEditor;
 import com.jetbrains.edu.learning.stepik.StepikConnectorGet;
+import com.jetbrains.edu.learning.stepik.StepikConnectorPost;
 import com.jetbrains.edu.learning.stepik.StepikWrappers;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -71,6 +72,12 @@ public class DownloadSubmission extends StudyActionWithShortcut {
         nvps.add(new BasicNameValuePair("order", "desc"));
 
         List<StepikWrappers.SubmissionContainer.Submission> submissions = StepikConnectorGet.getSubmissions(nvps).submissions;
+        StepikWrappers.Metric metric = new StepikWrappers.Metric(
+                StepikWrappers.Metric.PluginNames.S_Union,
+                StepikWrappers.Metric.MetricActions.DOWNLOAD,
+                targetTask.getLesson().getCourse().getId(),
+                targetTask.getStepikId());
+        metric = StepikConnectorPost.postMetric(metric);
 
         String currentLang = StudyTaskManager.getInstance(project).getLangManager().getLangSetting(targetTask).getCurrentLang();
         String activateFileName = currentLang.equals("python3") ? "main.py" : "Main.java";

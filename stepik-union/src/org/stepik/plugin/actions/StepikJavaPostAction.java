@@ -60,6 +60,12 @@ public class StepikJavaPostAction extends StudyCheckAction {
                 StepikWrappers.SubmissionToPostWrapper sTPW = new StepikWrappers.SubmissionToPostWrapper(attemptId, currentLang, document.getText());
                 StepikWrappers.SubmissionContainer container = StepikConnectorPost.postSubmission(sTPW);
                 List<StepikWrappers.SubmissionContainer.Submission> submissions = container.submissions;
+                StepikWrappers.Metric metric = new StepikWrappers.Metric(
+                        StepikWrappers.Metric.PluginNames.S_Union,
+                        StepikWrappers.Metric.MetricActions.POST,
+                        task.getLesson().getCourse().getId(),
+                        task.getStepikId());
+                metric = StepikConnectorPost.postMetric(metric);
                 int submissionId = submissions.get(0).id;
                 LOG.warn("submissionId = " + submissionId);
 
