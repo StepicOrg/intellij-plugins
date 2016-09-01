@@ -46,12 +46,12 @@ public class StepikJavaPostAction extends StudyCheckAction {
                         () -> IdeFocusManager.getInstance(project).requestFocus(studyState.getEditor().getComponent(), true));
 
                 Task task = studyState.getTask();
-                LOG.warn(task.getName());
-                LOG.warn(Integer.toString(task.getStepikId()));
+//                LOG.warn(task.getName());
+//                LOG.warn(Integer.toString(task.getStepikId()));
 
                 int intAttemptId = StepikConnectorPost.getAttempt(task.getStepikId()).attempts.get(0).id;
                 String attemptId = Integer.toString(intAttemptId);
-                LOG.warn("att id = " + attemptId);
+//                LOG.warn("att id = " + attemptId);
 //                studyState.getVirtualFile().get
                 Document document = FileDocumentManager.getInstance().getDocument(studyState.getVirtualFile());
 //                int attempt = StepikConnectorPost.postSubmission(task.getFile("Main.java").text, attemptId).submission.attempt;
@@ -60,12 +60,12 @@ public class StepikJavaPostAction extends StudyCheckAction {
                 StepikWrappers.SubmissionToPostWrapper sTPW = new StepikWrappers.SubmissionToPostWrapper(attemptId, currentLang, document.getText());
                 StepikWrappers.SubmissionContainer container = StepikConnectorPost.postSubmission(sTPW);
                 List<StepikWrappers.SubmissionContainer.Submission> submissions = container.submissions;
-                StepikWrappers.Metric metric = new StepikWrappers.Metric(
-                        StepikWrappers.Metric.PluginNames.S_Union,
-                        StepikWrappers.Metric.MetricActions.POST,
+                StepikWrappers.MetricsWrapper metric = new StepikWrappers.MetricsWrapper(
+                        StepikWrappers.MetricsWrapper.PluginNames.S_Union,
+                        StepikWrappers.MetricsWrapper.MetricActions.POST,
                         task.getLesson().getCourse().getId(),
                         task.getStepikId());
-                metric = StepikConnectorPost.postMetric(metric);
+                StepikConnectorPost.postMetric(metric);
                 int submissionId = submissions.get(0).id;
                 LOG.warn("submissionId = " + submissionId);
 

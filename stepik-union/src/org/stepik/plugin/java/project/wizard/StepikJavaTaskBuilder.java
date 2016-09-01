@@ -1,7 +1,5 @@
 package org.stepik.plugin.java.project.wizard;
 
-import com.intellij.codeInsight.daemon.impl.quickfix.OrderEntryFix;
-import com.intellij.execution.junit.JUnitExternalLibraryDescriptor;
 import com.intellij.ide.highlighter.ModuleFileType;
 import com.intellij.ide.util.projectWizard.JavaModuleBuilder;
 import com.intellij.openapi.diagnostic.Logger;
@@ -9,7 +7,6 @@ import com.intellij.openapi.module.ModifiableModuleModel;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleWithNameAlreadyExists;
 import com.intellij.openapi.options.ConfigurationException;
-import com.intellij.openapi.roots.ExternalLibraryDescriptor;
 import com.intellij.openapi.roots.ModuleRootModificationUtil;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.io.FileUtil;
@@ -28,9 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class StepikJavaTaskBuilder extends JavaModuleBuilder implements TaskBuilder {
@@ -57,17 +52,17 @@ public class StepikJavaTaskBuilder extends JavaModuleBuilder implements TaskBuil
             LOG.info("Failed to copy task content");
             return module;
         }
-        addJUnitLib(module);
+//        addJUnitLib(module);
         ModuleRootModificationUtil.addDependency(module, myUtilModule);
         return module;
     }
 
-    private void addJUnitLib(Module module) {
-        ExternalLibraryDescriptor descriptor = JUnitExternalLibraryDescriptor.JUNIT4;
-        List<String> defaultRoots = descriptor.getLibraryClassesRoots();
-        final List<String> urls = OrderEntryFix.refreshAndConvertToUrls(defaultRoots);
-        ModuleRootModificationUtil.addModuleLibrary(module, descriptor.getPresentableName(), urls, Collections.emptyList());
-    }
+//    private void addJUnitLib(Module module) {
+//        ExternalLibraryDescriptor descriptor = JUnitExternalLibraryDescriptor.JUNIT4;
+//        List<String> defaultRoots = descriptor.getLibraryClassesRoots();
+//        final List<String> urls = OrderEntryFix.refreshAndConvertToUrls(defaultRoots);
+//        ModuleRootModificationUtil.addModuleLibrary(module, descriptor.getPresentableName(), urls, Collections.emptyList());
+//    }
 
     private boolean createTaskContent() throws IOException {
         StudyTaskManager taskManager = StudyTaskManager.getInstance(myUtilModule.getProject());

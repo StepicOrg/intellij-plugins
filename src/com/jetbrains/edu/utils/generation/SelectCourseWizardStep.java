@@ -133,7 +133,7 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
 
     @Override
     public void updateStep() {
-        StepikConnectorLogin.resetClient();
+//        StepikConnectorLogin.resetClient();
         StepikConnectorLogin.loginFromDialog(defaultProject);
         userName.setText(StudyTaskManager.getInstance(defaultProject).getUser().getName());
     }
