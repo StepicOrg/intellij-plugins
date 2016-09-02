@@ -60,6 +60,7 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
     private final WizardContext wizardContext;
     private CourseInfo selectedCourse;
     Project defaultProject = DefaultProjectFactory.getInstance().getDefaultProject();
+    List<CourseInfo> myAvailableCourses;
 //    private final Project project;
 
     public SelectCourseWizardStep(@NotNull final StepikProjectGenerator generator, WizardContext wizardContext) {
@@ -87,7 +88,7 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
             }
         });
 
-        List<CourseInfo> myAvailableCourses = myGenerator.getCoursesUnderProgress(false, "Getting Available Courses", ProjectManager.getInstance().getDefaultProject());
+        myAvailableCourses = myGenerator.getCoursesUnderProgress(false, "Getting Available Courses", ProjectManager.getInstance().getDefaultProject());
         myAvailableCourses.forEach(courseComboBox::addItem);
 
         selectedCourse = StudyUtils.getFirst(myAvailableCourses);
@@ -175,7 +176,7 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
             courseDescription.setText(selectedCourse.getDescription());
 
             myGenerator.setCourses(courses);
-//            myAvailableCourses = courses;
+            myAvailableCourses = courses;
             myGenerator.flushCache(courses);
         }
 
@@ -193,7 +194,7 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
         public void actionPerformed(ActionEvent e) {
             String link = courseLinkFiled.getText();
             String courseId = getCourseIdFromLink(link);
-            if ("-1".equals(courseId)) {
+            if (courseId == null || "-1".equals(courseId)) {
                 courseDescription.setText("Wrong link");
                 return;
             }

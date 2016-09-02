@@ -52,7 +52,7 @@ public class StepikProjectGenerator extends EduProjectGenerator {
 
             final Set<CourseInfo> courseInfos = new HashSet<>();
             courseInfos.addAll(courses);
-            courseInfos.addAll(getCoursesFromCache());
+//            courseInfos.addAll(getCoursesFromCache());
 
             writer = new PrintWriter(cacheFile);
             for (CourseInfo courseInfo : courseInfos) {
