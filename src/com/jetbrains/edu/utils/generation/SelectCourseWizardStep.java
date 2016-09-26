@@ -59,14 +59,15 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
     private final StepikProjectGenerator myGenerator;
     private final WizardContext wizardContext;
     private CourseInfo selectedCourse;
-    Project defaultProject = DefaultProjectFactory.getInstance().getDefaultProject();
+//    Project project = DefaultProjectFactory.getInstance().getDefaultProject();
+    Project project;
     List<CourseInfo> myAvailableCourses;
 //    private final Project project;
 
     public SelectCourseWizardStep(@NotNull final StepikProjectGenerator generator, WizardContext wizardContext) {
         this.myGenerator = generator;
         this.wizardContext = wizardContext;
-
+        project = wizardContext.getProject() == null ? DefaultProjectFactory.getInstance().getDefaultProject() : wizardContext.getProject();
 
         layoutPanel();
         initListeners();
@@ -87,17 +88,6 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
                 BrowserUtil.browse(e.getURL());
             }
         });
-
-        myAvailableCourses = myGenerator.getCoursesUnderProgress(false, "Getting Available Courses", ProjectManager.getInstance().getDefaultProject());
-        myAvailableCourses.forEach(courseComboBox::addItem);
-
-        selectedCourse = StudyUtils.getFirst(myAvailableCourses);
-        myGenerator.setSelectedCourse(selectedCourse);
-        courseDescription.setText(selectedCourse.getDescription());
-
-        langComboBox.addItem(JAVA);
-        langComboBox.addItem(PYTHON);
-        langComboBox.setSelectedItem(JAVA);
     }
 
     private void initListeners() {
@@ -135,8 +125,19 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
     @Override
     public void updateStep() {
 //        StepikConnectorLogin.resetClient();
-        StepikConnectorLogin.loginFromDialog(defaultProject);
-        userName.setText(StudyTaskManager.getInstance(defaultProject).getUser().getName());
+        StepikConnectorLogin.loginFromDialog(project);
+        userName.setText(StudyTaskManager.getInstance(project).getUser().getName());
+
+        myAvailableCourses = myGenerator.getCoursesUnderProgress(false, "Getting Available Courses", ProjectManager.getInstance().getDefaultProject());
+        myAvailableCourses.forEach(courseComboBox::addItem);
+
+        selectedCourse = StudyUtils.getFirst(myAvailableCourses);
+        myGenerator.setSelectedCourse(selectedCourse);
+        courseDescription.setText(selectedCourse.getDescription());
+
+        langComboBox.addItem(JAVA);
+        langComboBox.addItem(PYTHON);
+        langComboBox.setSelectedItem(JAVA);
     }
 
     @Override
@@ -156,7 +157,7 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
                     .runProcessWithProgressSynchronously(() -> {
                         ProgressManager.getInstance().getProgressIndicator().setIndeterminate(true);
                         return myGenerator.getCourses(true);
-                    }, "Refreshing Course List", true, defaultProject);
+                    }, "Refreshing Course List", true, project);
 
             if (!courses.contains(CourseInfo.INVALID_COURSE)) {
                 refreshCoursesList(courses);
@@ -248,7 +249,7 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
 
     @Override
     public void onStepLeaving() {
-        StudyTaskManager.getInstance(defaultProject).setDefaultLang((String) langComboBox.getSelectedItem());
+        StudyTaskManager.getInstance(project).setDefaultLang((String) langComboBox.getSelectedItem());
         if (selectedCourse != null){
             myGenerator.setSelectedCourse(selectedCourse);
         }

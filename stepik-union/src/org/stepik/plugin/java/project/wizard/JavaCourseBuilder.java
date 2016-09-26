@@ -119,7 +119,7 @@ public class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilde
     public Module createModule(@NotNull ModifiableModuleModel moduleModel) throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
         Module baseModule = super.createModule(moduleModel);
         Project project = baseModule.getProject();
-        LOG.warn("login dialog");
+        LOG.info("create module - login");
         StepikConnectorLogin.loginFromDialog(project);
         createCourseFromGenerator(moduleModel, project, getGenerator());
         return baseModule;

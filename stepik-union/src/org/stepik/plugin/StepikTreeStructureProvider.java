@@ -15,6 +15,7 @@ import com.jetbrains.edu.learning.core.EduNames;
 import com.jetbrains.edu.learning.courseFormat.Course;
 import com.jetbrains.edu.learning.courseFormat.TaskFile;
 import com.jetbrains.edu.learning.projectView.StudyDirectoryNode;
+import com.siyeh.ig.psiutils.CollectionUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -48,9 +49,14 @@ public class StepikTreeStructureProvider implements TreeStructureProvider, DumbA
             final PsiFileNode psiFileNode = (PsiFileNode)node;
             final VirtualFile virtualFile = psiFileNode.getVirtualFile();
             if (virtualFile == null) {
-              return nodes;
+//              return nodes;
+              continue;
             }
             if (virtualFile.getName().endsWith(".iml")) continue;
+            if (virtualFile.getName().endsWith(".java") || virtualFile.getName().endsWith(".py")){
+                nodes.add(node);
+                continue;
+            }
             final TaskFile taskFile = StudyUtils.getTaskFile(project, virtualFile);
             if (taskFile != null) {
               nodes.add(node);

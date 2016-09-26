@@ -49,7 +49,7 @@ public class StepikJavaPostAction extends StudyCheckAction {
 //                LOG.warn(task.getName());
 //                LOG.warn(Integer.toString(task.getStepikId()));
 
-                int intAttemptId = StepikConnectorPost.getAttempt(task.getStepikId()).attempts.get(0).id;
+                int intAttemptId = StepikConnectorPost.getAttempt(task.getStepId()).attempts.get(0).id;
                 String attemptId = Integer.toString(intAttemptId);
 //                LOG.warn("att id = " + attemptId);
 //                studyState.getVirtualFile().get
@@ -64,7 +64,7 @@ public class StepikJavaPostAction extends StudyCheckAction {
                         StepikWrappers.MetricsWrapper.PluginNames.S_Union,
                         StepikWrappers.MetricsWrapper.MetricActions.POST,
                         task.getLesson().getCourse().getId(),
-                        task.getStepikId());
+                        task.getStepId());
                 StepikConnectorPost.postMetric(metric);
                 int submissionId = submissions.get(0).id;
                 LOG.warn("submissionId = " + submissionId);

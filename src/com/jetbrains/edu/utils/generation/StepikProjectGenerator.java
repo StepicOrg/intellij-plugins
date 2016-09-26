@@ -17,10 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static com.jetbrains.edu.learning.StudyUtils.execCancelable;
 
@@ -154,4 +151,19 @@ public class StepikProjectGenerator extends EduProjectGenerator {
             }
         }, "Creating Course", true, project);
     }
+
+    @NotNull
+    public List<CourseInfo> getCoursesUnderProgress(boolean force, @NotNull final String progressTitle, @NotNull final Project project) {
+        try {
+            return ProgressManager.getInstance()
+                    .runProcessWithProgressSynchronously(() -> {
+                        ProgressManager.getInstance().getProgressIndicator().setIndeterminate(true);
+                        return getCourses(force);
+                    }, progressTitle, true, project);
+        }
+        catch (RuntimeException e) {
+            return Collections.singletonList(CourseInfo.INVALID_COURSE);
+        }
+    }
+
 }
