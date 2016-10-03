@@ -12,7 +12,7 @@
 
 user=`whoami`
 
-from=/home/$user/IdeaProjects/old-core-intellij-community/python/educational-core/gradleBuild/student/libs/*.jar
+from=/home/$user/IdeaProjects/stepic-intellij-community/python/educational-core/gradleBuild/stepik-student/libs/*.jar
 #from2=/home/user/IdeaProjects/educational-plugins/Edu-Utils/gradleBuild/Edu-IntelliJ/libs/*.jar
 
 to=/home/$user/Documents/add_to_Stepic_SDK

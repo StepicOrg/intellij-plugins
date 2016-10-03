@@ -1,4 +1,4 @@
-package com.jetbrains.edu.utils;
+package com.jetbrains.tmp.utils;
 
 import com.intellij.ide.fileTemplates.FileTemplate;
 import com.intellij.ide.fileTemplates.FileTemplateManager;

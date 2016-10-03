@@ -1,4 +1,4 @@
-package com.jetbrains.edu.utils.generation;
+package com.jetbrains.tmp.utils.generation;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.BrowserUtil;

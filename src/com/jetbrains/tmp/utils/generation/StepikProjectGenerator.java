@@ -1,4 +1,4 @@
-package com.jetbrains.edu.utils.generation;
+package com.jetbrains.tmp.utils.generation;
 
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
@@ -9,7 +9,6 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.ThrowableComputable;
 import com.jetbrains.tmp.learning.StudyUtils;
-import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.stepik.CourseInfo;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorGet;
@@ -122,18 +121,18 @@ public class StepikProjectGenerator extends EduProjectGenerator {
     @Nullable
     protected Course getCourse(@NotNull final Project project) {
 
-        final File courseFile = new File(new File(OUR_COURSES_DIR, mySelectedCourseInfo.getName()), EduNames.COURSE_META_FILE);
-        if (courseFile.exists()) {
-            return readCourseFromCache(courseFile, false);
-        }
-        else if (myUser != null) {
-            final File adaptiveCourseFile = new File(new File(OUR_COURSES_DIR, ADAPTIVE_COURSE_PREFIX +
-                    mySelectedCourseInfo.getName() + "_" +
-                    myUser.getEmail()), EduNames.COURSE_META_FILE);
-            if (adaptiveCourseFile.exists()) {
-                return readCourseFromCache(adaptiveCourseFile, true);
-            }
-        }
+//        final File courseFile = new File(new File(OUR_COURSES_DIR, mySelectedCourseInfo.getName()), EduNames.COURSE_META_FILE);
+//        if (courseFile.exists()) {
+//            return readCourseFromCache(courseFile, false);
+//        }
+//        else if (myUser != null) {
+//            final File adaptiveCourseFile = new File(new File(OUR_COURSES_DIR, ADAPTIVE_COURSE_PREFIX +
+//                    mySelectedCourseInfo.getName() + "_" +
+//                    myUser.getEmail()), EduNames.COURSE_META_FILE);
+//            if (adaptiveCourseFile.exists()) {
+//                return readCourseFromCache(adaptiveCourseFile, true);
+//            }
+//        }
 
         return ProgressManager.getInstance().runProcessWithProgressSynchronously(new ThrowableComputable<Course, RuntimeException>() {
             @Override

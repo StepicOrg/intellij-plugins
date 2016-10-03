@@ -7,8 +7,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.tmp.learning.StudyState;
-import com.jetbrains.edu.utils.EduCheckAction;
-import com.jetbrains.edu.utils.EduIntelliJNames;
+import com.jetbrains.tmp.utils.EduCheckAction;
+import com.jetbrains.tmp.utils.EduIntelliJNames;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

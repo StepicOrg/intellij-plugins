@@ -1,4 +1,4 @@
-package com.jetbrains.edu.utils;
+package com.jetbrains.tmp.utils;
 
 import com.intellij.ide.projectView.ViewSettings;
 import com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode;
