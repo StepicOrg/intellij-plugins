@@ -6,12 +6,12 @@ import com.intellij.ide.util.treeView.AbstractTreeNode;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
-import com.jetbrains.edu.learning.core.EduNames;
-import com.jetbrains.edu.learning.courseFormat.Course;
-import com.jetbrains.edu.learning.courseFormat.Lesson;
-import com.jetbrains.edu.learning.StudyTaskManager;
-import com.jetbrains.edu.learning.projectView.StudyDirectoryNode;
-import com.jetbrains.edu.learning.projectView.StudyTreeStructureProvider;
+import com.jetbrains.tmp.learning.core.EduNames;
+import com.jetbrains.tmp.learning.courseFormat.Course;
+import com.jetbrains.tmp.learning.courseFormat.Lesson;
+import com.jetbrains.tmp.learning.StudyTaskManager;
+import com.jetbrains.tmp.learning.projectView.StudyDirectoryNode;
+import com.jetbrains.tmp.learning.projectView.StudyTreeStructureProvider;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;

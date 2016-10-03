@@ -8,18 +8,18 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.ThrowableComputable;
-import com.jetbrains.edu.learning.StudyUtils;
-import com.jetbrains.edu.learning.core.EduNames;
-import com.jetbrains.edu.learning.courseFormat.Course;
-import com.jetbrains.edu.learning.stepik.CourseInfo;
-import com.jetbrains.edu.learning.stepik.StepikConnectorGet;
+import com.jetbrains.tmp.learning.StudyUtils;
+import com.jetbrains.tmp.learning.core.EduNames;
+import com.jetbrains.tmp.learning.courseFormat.Course;
+import com.jetbrains.tmp.learning.stepik.CourseInfo;
+import com.jetbrains.tmp.learning.stepik.StepikConnectorGet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.util.*;
 
-import static com.jetbrains.edu.learning.StudyUtils.execCancelable;
+import static com.jetbrains.tmp.learning.StudyUtils.execCancelable;
 
 public class StepikProjectGenerator extends EduProjectGenerator {
     private static final Logger LOG = Logger.getInstance(StepikProjectGenerator.class);

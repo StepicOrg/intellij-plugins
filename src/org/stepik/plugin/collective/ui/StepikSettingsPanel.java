@@ -25,10 +25,10 @@ import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.HyperlinkAdapter;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.util.ui.JBUI;
-import com.jetbrains.edu.learning.StudyTaskManager;
-import com.jetbrains.edu.learning.StudyUtils;
-import com.jetbrains.edu.learning.stepik.StepikConnectorLogin;
-import com.jetbrains.edu.learning.stepik.StepikUser;
+import com.jetbrains.tmp.learning.StudyTaskManager;
+import com.jetbrains.tmp.learning.StudyUtils;
+import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
+import com.jetbrains.tmp.learning.stepik.StepikUser;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -162,7 +162,7 @@ public class StepikSettingsPanel {
     @NotNull
     private String getPassword() {
         if (!isModified()) {
-//            initProjectOfSettings();
+            initProjectOfSettings();
             LOG.info("user's password");
             return StudyTaskManager.getInstance(settingsProject).getUser().getPassword();
         }

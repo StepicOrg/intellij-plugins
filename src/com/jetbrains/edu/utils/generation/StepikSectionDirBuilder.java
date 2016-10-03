@@ -1,7 +1,7 @@
 package com.jetbrains.edu.utils.generation;
 
 import com.intellij.openapi.diagnostic.Logger;
-import com.jetbrains.edu.learning.courseFormat.Lesson;
+import com.jetbrains.tmp.learning.courseFormat.Lesson;
 
 import java.io.File;
 

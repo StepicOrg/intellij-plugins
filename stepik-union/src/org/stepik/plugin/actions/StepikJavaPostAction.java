@@ -10,17 +10,17 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.IdeFocusManager;
-import com.jetbrains.edu.learning.StudyState;
-import com.jetbrains.edu.learning.StudyTaskManager;
-import com.jetbrains.edu.learning.StudyUtils;
-import com.jetbrains.edu.learning.actions.StudyCheckAction;
-import com.jetbrains.edu.learning.checker.StudyCheckUtils;
-import com.jetbrains.edu.learning.courseFormat.StudyStatus;
-import com.jetbrains.edu.learning.courseFormat.Task;
-import com.jetbrains.edu.learning.editor.StudyEditor;
-import com.jetbrains.edu.learning.stepik.StepikConnectorGet;
-import com.jetbrains.edu.learning.stepik.StepikConnectorPost;
-import com.jetbrains.edu.learning.stepik.StepikWrappers;
+import com.jetbrains.tmp.learning.StudyState;
+import com.jetbrains.tmp.learning.StudyTaskManager;
+import com.jetbrains.tmp.learning.StudyUtils;
+import com.jetbrains.tmp.learning.actions.StudyCheckAction;
+import com.jetbrains.tmp.learning.checker.StudyCheckUtils;
+import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
+import com.jetbrains.tmp.learning.courseFormat.Task;
+import com.jetbrains.tmp.learning.editor.StudyEditor;
+import com.jetbrains.tmp.learning.stepik.StepikConnectorGet;
+import com.jetbrains.tmp.learning.stepik.StepikConnectorPost;
+import com.jetbrains.tmp.learning.stepik.StepikWrappers;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -30,7 +30,7 @@ public class StepikJavaPostAction extends StudyCheckAction {
 
     @Override
     public void check(@NotNull Project project) {
-        LOG.warn("check is started");
+        LOG.info("check is started");
         ApplicationManager.getApplication().runWriteAction(() -> {
             CommandProcessor.getInstance().runUndoTransparentAction(() -> {
                 final StudyEditor selectedEditor = StudyUtils.getSelectedStudyEditor(project);
@@ -67,7 +67,7 @@ public class StepikJavaPostAction extends StudyCheckAction {
                         task.getStepId());
                 StepikConnectorPost.postMetric(metric);
                 int submissionId = submissions.get(0).id;
-                LOG.warn("submissionId = " + submissionId);
+                LOG.info("submissionId = " + submissionId);
 
                 final Application application = ApplicationManager.getApplication();
                 final int finalSubmissionId = submissionId;
@@ -117,6 +117,6 @@ public class StepikJavaPostAction extends StudyCheckAction {
     @NotNull
     @Override
     public String getActionId() {
-        return "StepikJavaPostAction";
+        return "STEPIK.StepikJavaPostAction";
     }
 }

@@ -3,17 +3,17 @@ package com.jetbrains.edu.utils.generation;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.jetbrains.edu.learning.StudyTaskManager;
-import com.jetbrains.edu.learning.courseFormat.Course;
-import com.jetbrains.edu.learning.courseGeneration.StudyProjectGenerator;
-import com.jetbrains.edu.learning.stepik.CourseInfo;
-import com.jetbrains.edu.learning.stepik.StepikConnectorGet;
+import com.jetbrains.tmp.learning.StudyTaskManager;
+import com.jetbrains.tmp.learning.courseFormat.Course;
+import com.jetbrains.tmp.learning.courseGeneration.StudyProjectGenerator;
+import com.jetbrains.tmp.learning.stepik.CourseInfo;
+import com.jetbrains.tmp.learning.stepik.StepikConnectorGet;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.List;
 
-import static com.jetbrains.edu.learning.StudyUtils.execCancelable;
+import static com.jetbrains.tmp.learning.StudyUtils.execCancelable;
 
 public class EduProjectGenerator extends StudyProjectGenerator {
     private static final Logger LOG = Logger.getInstance(EduProjectGenerator.class);
