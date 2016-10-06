@@ -22,6 +22,7 @@ import com.jetbrains.tmp.learning.stepik.StepikConnectorGet;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorPost;
 import com.jetbrains.tmp.learning.stepik.StepikWrappers;
 import org.jetbrains.annotations.NotNull;
+import org.stepik.plugin.collective.SupportedLanguages;
 
 import java.util.List;
 
@@ -57,7 +58,9 @@ public class StepikJavaPostAction extends StudyCheckAction {
 //                int attempt = StepikConnectorPost.postSubmission(task.getFile("Main.java").text, attemptId).submission.attempt;
 //                StepikWrappers.SubmissionContainer container = StepikConnectorPost.postSubmission(document.getText(), attemptId);
                 String currentLang = StudyTaskManager.getInstance(project).getLangManager().getLangSetting(task).getCurrentLang();
-                StepikWrappers.SubmissionToPostWrapper sTPW = new StepikWrappers.SubmissionToPostWrapper(attemptId, currentLang, document.getText());
+                SupportedLanguages langSetting = DirectivesUtils.loadLangSettings(currentLang);
+                String solution = DirectivesUtils.getTextUnderDirectives(studyState.getVirtualFile(), langSetting);
+                StepikWrappers.SubmissionToPostWrapper sTPW = new StepikWrappers.SubmissionToPostWrapper(attemptId, currentLang, solution);
                 StepikWrappers.SubmissionContainer container = StepikConnectorPost.postSubmission(sTPW);
                 List<StepikWrappers.SubmissionContainer.Submission> submissions = container.submissions;
                 StepikWrappers.MetricsWrapper metric = new StepikWrappers.MetricsWrapper(
@@ -78,7 +81,7 @@ public class StepikJavaPostAction extends StudyCheckAction {
                             int count = 0;
                             Notification notification = null;
                             String b = "";
-                            while (ans.equals("evaluation") && count < 100) {
+                            while (ans.equals("evaluation") && count < 200) {
                                 try {
                                     Thread.sleep(TIMER * 1000);          //1000 milliseconds is one second.
                                     StepikWrappers.ResultSubmissionWrapper submissionWrapper = StepikConnectorGet.getStatus(finalSubmissionId);

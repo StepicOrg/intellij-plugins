@@ -8,8 +8,25 @@ import org.stepik.plugin.collective.SupportedLanguages;
 
 public class DirectivesUtils {
 
+    public static String getTextUnderDirectives(VirtualFile vf, SupportedLanguages lang){
+        Pair<Integer, Integer> locations = findDirectives(vf, lang);
+
+        Document document = FileDocumentManager.getInstance().getDocument(vf);
+        String text[] = document.getText().split("\n");
+
+        int start = locations.first == null ? 0 : locations.first;
+        int end = locations.second == null ? text.length : locations.second;
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = start + 1; i < end; i++) {
+            sb.append(text[i]).append("\n");
+        }
+
+        return sb.toString();
+    }
+
     //    Find first "start" and last "end". If it was not find, method return null;
-    static Pair<Integer, Integer> findDirectives(VirtualFile vf, SupportedLanguages lang) {
+    public static Pair<Integer, Integer> findDirectives(VirtualFile vf, SupportedLanguages lang) {
         Document document = FileDocumentManager.getInstance().getDocument(vf);
         String[] text = document.getText().split("\n");
         Integer start = null;
