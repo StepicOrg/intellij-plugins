@@ -1,15 +1,13 @@
 <idea-plugin version="2">
     <id>org.stepik.plugin.union</id>
     <name>Stepik Union</name>
-    <version>0.3.6</version>
+    <version>0.3.10</version>
     <vendor email="petr.bogdanov@stepik.org" url="http://www.stepik.org">Stepik</vendor>
 
     <description><![CDATA[
       Stepik plugin for code challenges on Python and Java.<br>
 
-      It based on unstable PyCharm Edu plugin, download it from here
-       <em><a href="https://drive.google.com/drive/u/0/folders/0B3r_Au4BpPbweXZCbm9LMGNkVTg">student-2.0.5.jar</a></em>
-      and install it before Stepic Union.<br>
+      It use unstable PyCharm Edu plugin.<br>
       To use this plugin you have to have Stepik account and follow the course.<br>
     ]]></description>
 
@@ -20,7 +18,7 @@
     <!--</change-notes>-->
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
-    <idea-version since-build="141.0"/>
+    <idea-version since-build="162.0"/>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->
@@ -29,7 +27,7 @@
     -->
 
     <depends>com.intellij.modules.lang</depends>
-    <depends>com.jetbrains.edu.interactivelearning</depends>
+    <depends>com.jetbrains.tmp.interactivelearning</depends>
     <depends>com.jetbrains.edu.intellij</depends>
     <!--<depends>com.intellij.modules.python</depends>-->
     <!--<depends>com.intellij.modules.lang</depends>-->
@@ -46,11 +44,11 @@
                     implementationClass="org.stepik.plugin.java.project.wizard.StepikModuleType"/>
     </extensions>
 
-    <extensions defaultExtensionNs="Edu">
+    <extensions defaultExtensionNs="STEPIK">
         <!--<StudyLanguageManager implementationClass="StepikJavaLanguageManager" language="JAVA"/>-->
         <studyPluginConfigurator implementation="org.stepik.plugin.StepikPluginConfigurator"/>
 
-        <!--<optionsProvider instance="com.jetbrains.edu.learning.stepik.StepikStudyOptions"/>-->
+        <!--<optionsProvider instance="com.jetbrains.tmp.learning.stepik.StepikStudyOptions"/>-->
         <!--<optionsProvider instance="org.stepik.plugin.java.project.wizard.StepikStudyOptions"/>-->
     </extensions>
 

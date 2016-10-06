@@ -3,14 +3,14 @@ package org.stepik.plugin.actions;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.keymap.KeymapUtil;
-import com.jetbrains.edu.learning.courseFormat.Task;
-import com.jetbrains.edu.learning.navigation.StudyNavigator;
+import com.jetbrains.tmp.learning.courseFormat.Task;
+import com.jetbrains.tmp.learning.navigation.StudyNavigator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 
 public class StepikNextTaskAction extends StepikTaskNavigationAction {
-    public static final String ACTION_ID = "NextTaskAction";
+    public static final String ACTION_ID = "STEPIK.NextTaskAction";
     public static final String SHORTCUT = "ctrl pressed PERIOD";
 
     public StepikNextTaskAction() {

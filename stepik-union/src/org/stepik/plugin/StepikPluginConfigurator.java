@@ -2,10 +2,10 @@ package org.stepik.plugin;
 
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.project.Project;
-import com.jetbrains.edu.learning.StudyBasePluginConfigurator;
-import com.jetbrains.edu.learning.StudyTaskManager;
-import com.jetbrains.edu.learning.actions.StudyRefreshTaskFileAction;
-import com.jetbrains.edu.learning.courseFormat.Course;
+import com.jetbrains.tmp.learning.StudyBasePluginConfigurator;
+import com.jetbrains.tmp.learning.StudyTaskManager;
+import com.jetbrains.tmp.learning.actions.StudyRefreshTaskFileAction;
+import com.jetbrains.tmp.learning.courseFormat.Course;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.plugin.actions.*;
 

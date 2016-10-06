@@ -2,7 +2,7 @@ package org.stepik.plugin.collective;
 
 import com.intellij.ide.projectView.ViewSettings;
 import com.intellij.ide.util.treeView.AbstractTreeNode;
-import com.jetbrains.edu.utils.EduTreeStructureProvider;
+import com.jetbrains.tmp.utils.EduTreeStructureProvider;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;

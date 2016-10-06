@@ -9,15 +9,15 @@ import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.jetbrains.edu.learning.StudyState;
-import com.jetbrains.edu.learning.StudyTaskManager;
-import com.jetbrains.edu.learning.StudyUtils;
-import com.jetbrains.edu.learning.actions.StudyActionWithShortcut;
-import com.jetbrains.edu.learning.courseFormat.Task;
-import com.jetbrains.edu.learning.editor.StudyEditor;
-import com.jetbrains.edu.learning.stepik.StepikConnectorGet;
-import com.jetbrains.edu.learning.stepik.StepikConnectorPost;
-import com.jetbrains.edu.learning.stepik.StepikWrappers;
+import com.jetbrains.tmp.learning.StudyState;
+import com.jetbrains.tmp.learning.StudyTaskManager;
+import com.jetbrains.tmp.learning.StudyUtils;
+import com.jetbrains.tmp.learning.actions.StudyActionWithShortcut;
+import com.jetbrains.tmp.learning.courseFormat.Task;
+import com.jetbrains.tmp.learning.editor.StudyEditor;
+import com.jetbrains.tmp.learning.stepik.StepikConnectorGet;
+import com.jetbrains.tmp.learning.stepik.StepikConnectorPost;
+import com.jetbrains.tmp.learning.stepik.StepikWrappers;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.jetbrains.annotations.NotNull;
@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DownloadSubmission extends StudyActionWithShortcut {
-    public static final String ACTION_ID = "DownloadSubmission";
+    public static final String ACTION_ID = "STEPIK.DownloadSubmission";
     public static final String SHORTCUT = "ctrl pressed PAGE_DOWN";
 
     public DownloadSubmission() {
@@ -63,7 +63,7 @@ public class DownloadSubmission extends StudyActionWithShortcut {
             return;
         }
 
-        String stepId = Integer.toString(targetTask.getStepikId());
+        String stepId = Integer.toString(targetTask.getStepId());
         String userId = Integer.toString(StudyTaskManager.getInstance(project).getUser().getId());
 
         List<NameValuePair> nvps = new ArrayList<>();
@@ -76,7 +76,7 @@ public class DownloadSubmission extends StudyActionWithShortcut {
                 StepikWrappers.MetricsWrapper.PluginNames.S_Union,
                 StepikWrappers.MetricsWrapper.MetricActions.DOWNLOAD,
                 targetTask.getLesson().getCourse().getId(),
-                targetTask.getStepikId());
+                targetTask.getStepId());
         StepikConnectorPost.postMetric(metric);
 
         String currentLang = StudyTaskManager.getInstance(project).getLangManager().getLangSetting(targetTask).getCurrentLang();
