@@ -3,14 +3,10 @@ package org.stepik.plugin.actions;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.command.CommandProcessor;
-import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.tmp.learning.LangSetting;
@@ -25,6 +21,7 @@ import org.stepik.plugin.collective.SupportedLanguages;
 
 import javax.swing.*;
 
+import static org.stepik.plugin.actions.DirectivesUtils.*;
 import static org.stepik.plugin.collective.SupportedLanguages.JAVA;
 
 
@@ -32,14 +29,11 @@ public class InsertStepikDirectives extends StudyActionWithShortcut {
     public static final String SHORTCUT = "ctrl alt pressed R";
     public static final String ACTION_ID = "STEPIK.InsertStepikDirectives";
 
-    private final String MESSAGE = "Do you want to remove Stepik directives and external code?\n" +
-            "You can undo this action using \"ctrl + Z\".";
 
     public InsertStepikDirectives() {
 
         super("Repair standard template(" + KeymapUtil.getShortcutText(new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT), null)) + ")",
                 "Insert Stepik directives. Repair ordinary template if it is possible.",
-//                AllIcons.Actions.EditSource);
                 AllIcons.General.ExternalToolsSmall);
     }
 
@@ -68,7 +62,6 @@ public class InsertStepikDirectives extends StudyActionWithShortcut {
             return;
         }
 
-
         StudyTaskManager taskManager = StudyTaskManager.getInstance(project);
         LangSetting langSetting = taskManager.getLangManager().getLangSetting(targetTask);
 
@@ -82,69 +75,17 @@ public class InsertStepikDirectives extends StudyActionWithShortcut {
         VirtualFile src = studyState.getTaskDir();
         VirtualFile file = src.findChild(currentLang.getMainFileName());
 
-        Pair<Integer, Integer> locations = DirectivesUtils.findDirectives(file, currentLang);
-        if (locations.first == null && locations.second == null) {
-            insertDirectives(file, project, currentLang);
+        String[] text = DirectivesUtils.getFileText(file);
+
+        Pair<Integer, Integer> locations = DirectivesUtils.findDirectives(text, currentLang);
+        if (locations.first == -1 && locations.second == text.length) {
+            text = insertDirectives(text, currentLang);
             if (currentLang.getName().equals(JAVA.getName())) {
-                insertMainClass(file, project);
+                text = insertMainClass(text);
             }
         } else {
-            removeDirectives(file, locations, project);
+            text = removeDirectives(text, locations, project);
         }
-    }
-
-    private void removeDirectives(VirtualFile vf, Pair<Integer, Integer> locations, Project project) {
-        Document document = FileDocumentManager.getInstance().getDocument(vf);
-        String text[] = document.getText().split("\n");
-
-        int start = locations.first == null ? 0 : locations.first;
-        int end = locations.second == null ? text.length : locations.second;
-
-        if (start > 1 || text.length - end > 2) {
-            int information = Messages.showYesNoDialog(project, MESSAGE, "Information", Messages.getInformationIcon());
-            if (information != 0) return;
-        }
-
-        StringBuilder sb = new StringBuilder();
-        for (int i = start + 1; i < end; i++) {
-            sb.append(text[i]);
-            sb.append("\n");
-        }
-
-        CommandProcessor.getInstance().executeCommand(project,
-                () -> ApplicationManager.getApplication().runWriteAction(
-                        () -> document.setText(sb.toString())), "Remove Stepik directives", "Remove Stepik directives");
-    }
-
-    private void insertMainClass(VirtualFile vf, Project project) {
-        Document document = FileDocumentManager.getInstance().getDocument(vf);
-        String text[] = document.getText().split("\n");
-        StringBuilder sb = new StringBuilder();
-        sb.append("class Main {\n");
-        for (String tmp : text) {
-            sb.append("\t");
-            sb.append(tmp);
-            sb.append("\n");
-        }
-        sb.append("}");
-
-        CommandProcessor.getInstance().executeCommand(project,
-                () -> ApplicationManager.getApplication().runWriteAction(
-                        () -> document.setText(sb.toString())), "Insert Main class", "Insert Main class");
-
-    }
-
-    private void insertDirectives(VirtualFile vf, Project project, SupportedLanguages lang) {
-        Document document = FileDocumentManager.getInstance().getDocument(vf);
-        String text = document.getText();
-        StringBuilder sb = new StringBuilder();
-        sb.append(lang.getComment()).append("Stepik code: start\n");
-        sb.append(text);
-        sb.append("\n").append(lang.getComment()).append("Stepik code: end\n");
-
-        CommandProcessor.getInstance().executeCommand(project,
-                () -> ApplicationManager.getApplication().runWriteAction(
-                        () -> document.setText(sb.toString())), "Insert Stepik directives", "Insert Stepik directives");
-
+        writeInToFile(text, file, project);
     }
 }

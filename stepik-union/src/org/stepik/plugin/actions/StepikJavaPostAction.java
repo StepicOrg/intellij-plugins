@@ -59,7 +59,8 @@ public class StepikJavaPostAction extends StudyCheckAction {
 //                StepikWrappers.SubmissionContainer container = StepikConnectorPost.postSubmission(document.getText(), attemptId);
                 String currentLang = StudyTaskManager.getInstance(project).getLangManager().getLangSetting(task).getCurrentLang();
                 SupportedLanguages langSetting = DirectivesUtils.loadLangSettings(currentLang);
-                String solution = DirectivesUtils.getTextUnderDirectives(studyState.getVirtualFile(), langSetting);
+                String[] text = DirectivesUtils.getFileText(studyState.getVirtualFile());
+                String solution = DirectivesUtils.getTextUnderDirectives(text, langSetting);
                 StepikWrappers.SubmissionToPostWrapper sTPW = new StepikWrappers.SubmissionToPostWrapper(attemptId, currentLang, solution);
                 StepikWrappers.SubmissionContainer container = StepikConnectorPost.postSubmission(sTPW);
                 List<StepikWrappers.SubmissionContainer.Submission> submissions = container.submissions;
