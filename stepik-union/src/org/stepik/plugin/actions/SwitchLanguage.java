@@ -67,17 +67,22 @@ public class SwitchLanguage extends StudyActionWithShortcut {
         PsiDirectory hide = PsiManager.getInstance(project).findDirectory(src.findChild("hide"));
         PsiDirectory scrPsi = PsiManager.getInstance(project).findDirectory(src);
 
-        SupportedLanguages currentLang = DirectivesUtils.loadLangSettings(langSetting.getCurrentLang());
+        SupportedLanguages currentLang = SupportedLanguages.loadLangSettings(langSetting.getCurrentLang());
         SupportedLanguages secondLang;
 
-        if (currentLang.getName().equals("java8"))
+        if (currentLang.getName().equals("java8")) {
             secondLang = SupportedLanguages.PYTHON;
-        else
+        } else {
             secondLang = SupportedLanguages.JAVA;
+        }
 
 
-        final PsiFile first = PsiManager.getInstance(project).findFile(src.findChild(currentLang.getMainFileName()));
-        final PsiFile second = PsiManager.getInstance(project).findFile(hide.getVirtualFile().findChild(secondLang.getMainFileName()));
+        final PsiFile first = PsiManager
+                .getInstance(project)
+                .findFile(src.findChild(currentLang.getMainFileName()));
+        final PsiFile second = PsiManager
+                .getInstance(project)
+                .findFile(hide.getVirtualFile().findChild(secondLang.getMainFileName()));
 
         ApplicationManager.getApplication().runWriteAction(() -> {
             MoveFilesOrDirectoriesUtil.doMoveFile(first, hide);

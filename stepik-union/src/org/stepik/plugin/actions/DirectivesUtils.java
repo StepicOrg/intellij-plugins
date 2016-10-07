@@ -69,11 +69,6 @@ public class DirectivesUtils {
         return END_DIRECTIVE.equals(line);
     }
 
-    public static SupportedLanguages loadLangSettings(String lang) {
-        lang = lang.replaceAll("[0-9]+", "").toUpperCase();
-        return SupportedLanguages.valueOf(lang);
-    }
-
     public static void writeInToFile(String[] text, VirtualFile file, Project project) {
         Document document = FileDocumentManager.getInstance().getDocument(file);
         final StringBuilder sb = new StringBuilder();

@@ -26,4 +26,9 @@ public enum SupportedLanguages {
     public String getMainFileName(){
         return mainFileName;
     }
+
+    public static SupportedLanguages loadLangSettings(String lang) {
+        lang = lang.replaceAll("[0-9]+", "").toUpperCase();
+        return SupportedLanguages.valueOf(lang);
+    }
 }
