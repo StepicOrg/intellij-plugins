@@ -73,7 +73,7 @@ public class StepikJavaPostAction extends StudyCheckAction {
                             int count = 0;
                             Notification notification = null;
                             String b = "";
-                            while (ans.equals("evaluation") && count < 200) {
+                            while ("evaluation".equals(ans) && count < 200) {
                                 try {
                                     Thread.sleep(TIMER * 1000);          //1000 milliseconds is one second.
                                     StepikWrappers.ResultSubmissionWrapper submissionWrapper = StepikConnectorGet.getStatus(finalSubmissionId);
@@ -89,7 +89,7 @@ public class StepikJavaPostAction extends StudyCheckAction {
 
                             NotificationType notificationType;
 
-                            if (ans.equals("correct")) {
+                            if ("correct".equals(ans)) {
                                 notificationType = NotificationType.INFORMATION;
                                 b = "Success!";
                                 task.setStatus(StudyStatus.Solved);
