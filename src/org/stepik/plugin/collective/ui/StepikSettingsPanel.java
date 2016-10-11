@@ -62,12 +62,13 @@ public class StepikSettingsPanel {
     private JPanel myCardPanel;
     private JBLabel myAuthTypeLabel;
     private JButton magicButton;
+    private JCheckBox hintCheckBox;
 
     private boolean myCredentialsModified;
+    private boolean myHintCheckBoxModified;
 
     public StepikSettingsPanel() {
         initProjectOfSettings();
-//        myEmailTextField.setText(StudyTaskManager.getInstance(settingsProject).getUser().getEmail());
         mySignupTextField.addHyperlinkListener(new HyperlinkAdapter() {
             @Override
             protected void hyperlinkActivated(final HyperlinkEvent e) {
@@ -80,6 +81,8 @@ public class StepikSettingsPanel {
         mySignupTextField.setCursor(new Cursor(Cursor.HAND_CURSOR));
         myAuthTypeLabel.setBorder(JBUI.Borders.emptyLeft(10));
         myAuthTypeComboBox.addItem(AUTH_PASSWORD);
+        hintCheckBox.setSelected(StudyTaskManager.getInstance(settingsProject).getShowHint());
+        hintCheckBox.addActionListener(e -> myHintCheckBoxModified = true);
 //        TODO later
 //        myAuthTypeComboBox.addItem(AUTH_TOKEN);
 //        final Project project = ProjectManager.getInstance().getDefaultProject();
@@ -161,7 +164,7 @@ public class StepikSettingsPanel {
 
     @NotNull
     private String getPassword() {
-        if (!isModified()) {
+        if (!myCredentialsModified) {
             initProjectOfSettings();
             LOG.info("user's password");
             return StudyTaskManager.getInstance(settingsProject).getUser().getPassword();
@@ -170,7 +173,7 @@ public class StepikSettingsPanel {
     }
 
     private void initProjectOfSettings() {
-        if (settingsProject == null){
+        if (settingsProject == null) {
             settingsProject = StudyUtils.getStudyProject();
         }
     }
@@ -200,11 +203,15 @@ public class StepikSettingsPanel {
             }
             LOG.info(manager.getUser().toString());
         }
+        if (myHintCheckBoxModified) {
+            StudyTaskManager manager = StudyTaskManager.getInstance(settingsProject);
+            manager.setShowHint(hintCheckBox.isSelected());
+        }
         resetCredentialsModification();
     }
 
     public boolean isModified() {
-        return myCredentialsModified;
+        return myCredentialsModified || myHintCheckBoxModified;
     }
 
     public void resetCredentialsModification() {

@@ -59,6 +59,7 @@ public class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilde
             return;
         }
 
+        LOG.info("Modile dir = " + moduleDir);
         EduUtilModuleBuilder utilModuleBuilder = new EduUtilModuleBuilder(moduleDir);
         utilModule = utilModuleBuilder.createModule(moduleModel);
 
@@ -75,15 +76,28 @@ public class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilde
     public void createLessonModules(@NotNull ModifiableModuleModel moduleModel, Course course, String moduleDir, Module utilModule) throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
         {
             List<Lesson> lessons = course.getLessons();
+            String sectionName = "";
+            int j = 0;
             for (int i = 0; i < lessons.size(); i++) {
                 int lessonVisibleIndex = i + 1;
                 Lesson lesson = lessons.get(i);
                 lesson.setIndex(lessonVisibleIndex);
 
                 StepikSectionDirBuilder dirBuilder = new StepikSectionDirBuilder(moduleDir, lesson);
-                dirBuilder.build();
+                if (!sectionName.equals(dirBuilder.getSectionName())){
 
-                LessonBuilder lessonBuilder = new StepikJavaLessonBuilder(dirBuilder.getSectionDir(), lesson, utilModule);
+                    j++;
+                    sectionName = dirBuilder.getSectionName();
+//                    dirBuilder.setName(sectionName);
+                    LessonBuilder sectionBuilder = new StepikJavaSectionBuilder(moduleDir, j, utilModule);
+                    ((StepikJavaSectionBuilder) sectionBuilder).setName(sectionName);
+                    Module section = sectionBuilder.createLesson(moduleModel);
+                    moduleModel.renameModule(section, sectionName);
+                }
+//                dirBuilder.build();
+
+                String sectionDir = moduleDir +"/"+ EduNames.SECTION + j;
+                LessonBuilder lessonBuilder = new StepikJavaLessonBuilder(sectionDir, lesson, utilModule);
                 lessonBuilder.createLesson(moduleModel);
             }
         }
@@ -130,33 +144,8 @@ public class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilde
     public ModuleWizardStep[] createWizardSteps(@NotNull WizardContext wizardContext, @NotNull ModulesProvider modulesProvider) {
         ModuleWizardStep[] previousWizardSteps = super.createWizardSteps(wizardContext, modulesProvider);
         ModuleWizardStep[] wizardSteps = new ModuleWizardStep[previousWizardSteps.length + 1];
-//        ModuleWizardStep[] wizardSteps = new ModuleWizardStep[3];
 
-//        wizardSteps[0] = new StepikModuleWizardStep(getGenerator(), wizardContext);
-//        wizardSteps[0] = new StepikProjectPanel(this, wizardContext);
         wizardSteps[0] = new SelectCourseWizardStep(getGenerator(), wizardContext);
-
-//        ProjectSettingsStep myProjectSettingsStep = new ProjectSettingsStep(wizardContext);
-//        wizardSteps[1] = ProjectWizardStepFactory.getInstance().createJavaSettingsStep(myProjectSettingsStep, this, this::isSuitableSdkType);
-//        wizardSteps[2] = new SdkSettingsStep(myProjectSettingsStep, this, id -> PythonSdkType.getInstance() == id) {
-//            @Override
-//            protected void onSdkSelected(Sdk sdk) {
-//                setSdk(sdk);
-//            }
-//
-//            public void setSdk(final Sdk sdk) {
-//                final List<Runnable> mySdkChangedListeners = ContainerUtil.createLockFreeCopyOnWriteList();
-//                if (mySdk != sdk) {
-//                    mySdk = sdk;
-//                    for (Runnable runnable : mySdkChangedListeners) {
-//                        runnable.run();
-//                    }
-//                }
-//            }
-//        };
-//        for (int i = 0; i < previousWizardSteps.length; i++) {
-//            wizardSteps[i + 1] = previousWizardSteps[i];
-//        }
 
         return wizardSteps;
     }
