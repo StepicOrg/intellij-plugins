@@ -80,11 +80,12 @@ public class DirectivesUtils {
                         () -> document.setText(sb.toString())), "Stepik directives process", "Stepik directives process");
     }
 
-    public static String[] removeDirectives(String[] text, Pair<Integer, Integer> locations, Project project) {
+    public static String[] removeDirectives(String[] text, Pair<Integer, Integer> locations,boolean showHint, Project project) {
         int start = locations.first;
         int end = locations.second;
+        final int k = showHint ? 2 : 1;
 
-        if (start > 1 || text.length - end > 2) {
+        if (start > k || text.length - end > 1 + k) {
             int information = Messages.showYesNoDialog(project, MESSAGE, "Information", Messages.getInformationIcon());
             if (information != 0) return text;
         }
@@ -103,14 +104,23 @@ public class DirectivesUtils {
         return ans;
     }
 
-    public static String[] insertDirectives(String[] text, SupportedLanguages lang) {
-        String[] ans = new String[text.length + 2];
+    public static String[] insertDirectives(String[] text, SupportedLanguages lang, boolean showHint) {
 
-        ans[0] = lang.getComment() + "Stepik code: start";
-        ans[ans.length - 1] = lang.getComment() + "Stepik code: end";
+        int k = showHint ? 2 : 1;
+        String[] ans = new String[text.length + 2*k];
+        if (showHint) {
+            ans[0] = lang.getComment() + "Please note, only the code below will be sent to Stepik.org";
+            ans[1] = lang.getComment() + "Stepik code: start";
+            ans[ans.length - 2] = lang.getComment() + "Stepik code: end";
+            ans[ans.length - 1] = lang.getComment() + "Please note, only the code above will be sent to Stepik.org";
+        }
+        else {
+            ans[0] = lang.getComment() + "Stepik code: start";
+            ans[ans.length - 1] = lang.getComment() + "Stepik code: end";
+        }
 
         for (int i = 0; i < text.length; i++) {
-            ans[i + 1] = text[i];
+            ans[i + k] = text[i];
         }
 
         return ans;
