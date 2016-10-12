@@ -22,6 +22,7 @@ import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.editor.StudyEditor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.plugin.collective.SupportedLanguages;
 
 import javax.swing.*;
 
@@ -66,51 +67,30 @@ public class SwitchLanguage extends StudyActionWithShortcut {
         PsiDirectory hide = PsiManager.getInstance(project).findDirectory(src.findChild("hide"));
         PsiDirectory scrPsi = PsiManager.getInstance(project).findDirectory(src);
 
-        PsiFile java;
-        PsiFile python;
+        SupportedLanguages currentLang = SupportedLanguages.loadLangSettings(langSetting.getCurrentLang());
+        SupportedLanguages secondLang;
 
-        String activateFileName = null;
-        switch (langSetting.getCurrentLang()) {
-            case ("java8"):
-
-                java = PsiManager.getInstance(project).findFile(src.findChild("Main.java"));
-                python = PsiManager.getInstance(project).findFile(hide.getVirtualFile().findChild("main.py"));
-                ApplicationManager.getApplication().runWriteAction(() -> {
-                    MoveFilesOrDirectoriesUtil.doMoveFile(java, hide);
-                    MoveFilesOrDirectoriesUtil.doMoveFile(python, scrPsi);
-                });
-                activateFileName = "main.py";
-//                try {
-//                    Files.move(Paths.get(FileUtil.join(src.getPath(), "Main.java")), Paths.get(FileUtil.join(src.getPath(), "hide", "Main.java")), StandardCopyOption.REPLACE_EXISTING);
-//                    Files.move(Paths.get(FileUtil.join(src.getPath(), "hide", "main.py")), Paths.get(src.getPath(), "main.py"), StandardCopyOption.REPLACE_EXISTING);
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-////                langSettings.currentLang =  "python3";
-                langSetting.setCurrentLang("python3");
-                break;
-            case ("python3"):
-                python = PsiManager.getInstance(project).findFile(src.findChild("main.py"));
-                java = PsiManager.getInstance(project).findFile(hide.getVirtualFile().findChild("Main.java"));
-                ApplicationManager.getApplication().runWriteAction(() -> {
-                    MoveFilesOrDirectoriesUtil.doMoveFile(python, hide);
-                    MoveFilesOrDirectoriesUtil.doMoveFile(java, scrPsi);
-                });
-                activateFileName = "Main.java";
-//                try {
-//                    Files.move(Paths.get(FileUtil.join(src.getPath(), "hide", "Main.java")), Paths.get(FileUtil.join(src.getPath(), "Main.java")), StandardCopyOption.REPLACE_EXISTING);
-//                    Files.move(Paths.get(FileUtil.join(src.getPath(), "main.py")), Paths.get(src.getPath(), "hide", "main.py"), StandardCopyOption.REPLACE_EXISTING);
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-////                langSettings.currentLang = "java8";
-                langSetting.setCurrentLang("java8");
-                break;
+        if (currentLang.getName().equals("java8")) {
+            secondLang = SupportedLanguages.PYTHON;
+        } else {
+            secondLang = SupportedLanguages.JAVA;
         }
-        if (activateFileName == null) return;
 
-//        LocalFileSystem.getInstance().refresh(false);
-//        LocalFileSystem.getInstance().refresh(false);
+
+        final PsiFile first = PsiManager
+                .getInstance(project)
+                .findFile(src.findChild(currentLang.getMainFileName()));
+        final PsiFile second = PsiManager
+                .getInstance(project)
+                .findFile(hide.getVirtualFile().findChild(secondLang.getMainFileName()));
+
+        ApplicationManager.getApplication().runWriteAction(() -> {
+            MoveFilesOrDirectoriesUtil.doMoveFile(first, hide);
+            MoveFilesOrDirectoriesUtil.doMoveFile(second, scrPsi);
+        });
+        String activateFileName = secondLang.getMainFileName();
+        langSetting.setCurrentLang(secondLang.getName());
+
         VirtualFile vf = src.findChild(activateFileName);
         FileEditorManager.getInstance(project).openFile(vf, true);
     }

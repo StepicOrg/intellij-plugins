@@ -6,8 +6,6 @@ import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.IdeFocusManager;
 import com.jetbrains.tmp.learning.StudyState;
@@ -22,6 +20,7 @@ import com.jetbrains.tmp.learning.stepik.StepikConnectorGet;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorPost;
 import com.jetbrains.tmp.learning.stepik.StepikWrappers;
 import org.jetbrains.annotations.NotNull;
+import org.stepik.plugin.collective.SupportedLanguages;
 
 import java.util.List;
 
@@ -46,19 +45,15 @@ public class StepikJavaPostAction extends StudyCheckAction {
                         () -> IdeFocusManager.getInstance(project).requestFocus(studyState.getEditor().getComponent(), true));
 
                 Task task = studyState.getTask();
-//                LOG.warn(task.getName());
-//                LOG.warn(Integer.toString(task.getStepikId()));
 
                 int intAttemptId = StepikConnectorPost.getAttempt(task.getStepId()).attempts.get(0).id;
                 String attemptId = Integer.toString(intAttemptId);
-//                LOG.warn("att id = " + attemptId);
-//                studyState.getVirtualFile().get
-                Document document = FileDocumentManager.getInstance().getDocument(studyState.getVirtualFile());
-//                int attempt = StepikConnectorPost.postSubmission(task.getFile("Main.java").text, attemptId).submission.attempt;
-//                StepikWrappers.SubmissionContainer container = StepikConnectorPost.postSubmission(document.getText(), attemptId);
                 String currentLang = StudyTaskManager.getInstance(project).getLangManager().getLangSetting(task).getCurrentLang();
-                StepikWrappers.SubmissionToPostWrapper sTPW = new StepikWrappers.SubmissionToPostWrapper(attemptId, currentLang, document.getText());
-                StepikWrappers.SubmissionContainer container = StepikConnectorPost.postSubmission(sTPW);
+                SupportedLanguages langSetting = SupportedLanguages.loadLangSettings(currentLang);
+                String[] text = DirectivesUtils.getFileText(studyState.getVirtualFile());
+                String solution = DirectivesUtils.getTextUnderDirectives(text, langSetting);
+                StepikWrappers.SubmissionToPostWrapper postWrapper = new StepikWrappers.SubmissionToPostWrapper(attemptId, currentLang, solution);
+                StepikWrappers.SubmissionContainer container = StepikConnectorPost.postSubmission(postWrapper);
                 List<StepikWrappers.SubmissionContainer.Submission> submissions = container.submissions;
                 StepikWrappers.MetricsWrapper metric = new StepikWrappers.MetricsWrapper(
                         StepikWrappers.MetricsWrapper.PluginNames.S_Union,
@@ -75,10 +70,11 @@ public class StepikJavaPostAction extends StudyCheckAction {
                         () -> {
                             String ans = "evaluation";
                             final int TIMER = 2;
+                            final int FIVE_MINUTES = 5*60;
                             int count = 0;
                             Notification notification = null;
                             String b = "";
-                            while (ans.equals("evaluation") && count < 100) {
+                            while ("evaluation".equals(ans) && count < FIVE_MINUTES) {
                                 try {
                                     Thread.sleep(TIMER * 1000);          //1000 milliseconds is one second.
                                     StepikWrappers.ResultSubmissionWrapper submissionWrapper = StepikConnectorGet.getStatus(finalSubmissionId);
@@ -94,7 +90,7 @@ public class StepikJavaPostAction extends StudyCheckAction {
 
                             NotificationType notificationType;
 
-                            if (ans.equals("correct")) {
+                            if ("correct".equals(ans)) {
                                 notificationType = NotificationType.INFORMATION;
                                 b = "Success!";
                                 task.setStatus(StudyStatus.Solved);
