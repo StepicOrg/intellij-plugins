@@ -70,10 +70,11 @@ public class StepikJavaPostAction extends StudyCheckAction {
                         () -> {
                             String ans = "evaluation";
                             final int TIMER = 2;
+                            final int FIVE_MINUTES = 5*60;
                             int count = 0;
                             Notification notification = null;
                             String b = "";
-                            while ("evaluation".equals(ans) && count < 200) {
+                            while ("evaluation".equals(ans) && count < FIVE_MINUTES) {
                                 try {
                                     Thread.sleep(TIMER * 1000);          //1000 milliseconds is one second.
                                     StepikWrappers.ResultSubmissionWrapper submissionWrapper = StepikConnectorGet.getStatus(finalSubmissionId);
