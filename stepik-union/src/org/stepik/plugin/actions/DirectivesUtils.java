@@ -75,12 +75,21 @@ public class DirectivesUtils {
         for (String tmp : text)
             sb.append(tmp).append("\n");
 
-        CommandProcessor.getInstance().executeCommand(project,
-                () -> ApplicationManager.getApplication().runWriteAction(
-                        () -> document.setText(sb.toString())), "Stepik directives process", "Stepik directives process");
+        CommandProcessor
+                .getInstance()
+                .executeCommand(project,
+                        () -> ApplicationManager
+                                .getApplication()
+                                .runWriteAction(
+                                        () -> document.setText(sb.toString())),
+                        "Stepik directives process",
+                        "Stepik directives process");
     }
 
-    public static String[] removeDirectives(String[] text, Pair<Integer, Integer> locations, boolean showHint, Project project) {
+    public static String[] removeDirectives(String[] text,
+                                            Pair<Integer, Integer> locations,
+                                            boolean showHint,
+                                            Project project) {
         int start = locations.first;
         int end = locations.second;
         final int k = showHint ? 2 : 1;
