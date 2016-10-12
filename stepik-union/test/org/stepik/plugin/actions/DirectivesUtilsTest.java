@@ -5,28 +5,21 @@ import org.junit.Before;
 import org.junit.Test;
 import org.stepik.plugin.collective.SupportedLanguages;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.File;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
 public class DirectivesUtilsTest {
-    final String JAVA = "java/";
-    final String PYTHON = "python/";
+    final String JAVA = "java" + File.separator;
+    final String PYTHON = "python" + File.separator;
     private HashMap<String, String> testsMap = new HashMap<>();
 
     public String readTestFile(String fileName) {
         StringBuilder sb = new StringBuilder();
-        fileName = "test/org/stepik/plugin/actions/text/samples/" + fileName;
-        Path path = Paths.get(fileName).toAbsolutePath();
-        Scanner scanner = null;
-        try {
-            scanner = new Scanner(path);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        InputStream inputStream = this.getClass().getResourceAsStream(File.separator + "samples" + File.separator + fileName);
+        Scanner scanner = new Scanner(inputStream);
 
         while (scanner.hasNextLine()) {
             sb.append(scanner.nextLine()).append("\n");
@@ -43,14 +36,14 @@ public class DirectivesUtilsTest {
         }
 
         for (int i = 1; i < 7; i++) {
-            String fileName = PYTHON +  Integer.toString(i) + ".txt";
+            String fileName = PYTHON + Integer.toString(i) + ".txt";
             testsMap.put(PYTHON + i, readTestFile(fileName));
         }
     }
 
     @Test
     public void getTextUnderDirectivesJava() throws Exception {
-        Map<Integer,String> res = new HashMap<>();
+        Map<Integer, String> res = new HashMap<>();
         for (int i = 1; i < 7; i++) {
             String test = testsMap.get(JAVA + i);
             res.put(i, DirectivesUtils.getTextUnderDirectives(test.split("\n"), SupportedLanguages.JAVA));
@@ -62,7 +55,7 @@ public class DirectivesUtilsTest {
 
     @Test
     public void getTextUnderDirectivesPy() throws Exception {
-        Map<Integer,String> res = new HashMap<>();
+        Map<Integer, String> res = new HashMap<>();
         for (int i = 1; i < 7; i++) {
             String test = testsMap.get(PYTHON + i);
             res.put(i, DirectivesUtils.getTextUnderDirectives(test.split("\n"), SupportedLanguages.PYTHON));
