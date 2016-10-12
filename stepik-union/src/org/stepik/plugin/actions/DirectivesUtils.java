@@ -75,12 +75,21 @@ public class DirectivesUtils {
         for (String tmp : text)
             sb.append(tmp).append("\n");
 
-        CommandProcessor.getInstance().executeCommand(project,
-                () -> ApplicationManager.getApplication().runWriteAction(
-                        () -> document.setText(sb.toString())), "Stepik directives process", "Stepik directives process");
+        CommandProcessor
+                .getInstance()
+                .executeCommand(project,
+                        () -> ApplicationManager
+                                .getApplication()
+                                .runWriteAction(
+                                        () -> document.setText(sb.toString())),
+                        "Stepik directives process",
+                        "Stepik directives process");
     }
 
-    public static String[] removeDirectives(String[] text, Pair<Integer, Integer> locations,boolean showHint, Project project) {
+    public static String[] removeDirectives(String[] text,
+                                            Pair<Integer, Integer> locations,
+                                            boolean showHint,
+                                            Project project) {
         int start = locations.first;
         int end = locations.second;
         final int k = showHint ? 2 : 1;
@@ -107,14 +116,13 @@ public class DirectivesUtils {
     public static String[] insertDirectives(String[] text, SupportedLanguages lang, boolean showHint) {
 
         int k = showHint ? 2 : 1;
-        String[] ans = new String[text.length + 2*k];
+        String[] ans = new String[text.length + 2 * k];
         if (showHint) {
             ans[0] = lang.getComment() + "Please note, only the code below will be sent to Stepik.org";
             ans[1] = lang.getComment() + "Stepik code: start";
             ans[ans.length - 2] = lang.getComment() + "Stepik code: end";
             ans[ans.length - 1] = lang.getComment() + "Please note, only the code above will be sent to Stepik.org";
-        }
-         else {
+        } else {
             ans[0] = lang.getComment() + "Stepik code: start";
             ans[ans.length - 1] = lang.getComment() + "Stepik code: end";
         }
