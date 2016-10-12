@@ -59,7 +59,7 @@ public class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilde
             return;
         }
 
-        LOG.info("Modile dir = " + moduleDir);
+        LOG.info("Module dir = " + moduleDir);
         EduUtilModuleBuilder utilModuleBuilder = new EduUtilModuleBuilder(moduleDir);
         utilModule = utilModuleBuilder.createModule(moduleModel);
 
@@ -83,18 +83,17 @@ public class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilde
                 Lesson lesson = lessons.get(i);
                 lesson.setIndex(lessonVisibleIndex);
 
-                StepikSectionDirBuilder dirBuilder = new StepikSectionDirBuilder(moduleDir, lesson);
+                // TODO add sections to core
+                StepikSectionDirConfigurator dirBuilder = new StepikSectionDirConfigurator(moduleDir, lesson);
                 if (!sectionName.equals(dirBuilder.getSectionName())){
 
                     j++;
                     sectionName = dirBuilder.getSectionName();
-//                    dirBuilder.setName(sectionName);
                     LessonBuilder sectionBuilder = new StepikJavaSectionBuilder(moduleDir, j, utilModule);
                     ((StepikJavaSectionBuilder) sectionBuilder).setName(sectionName);
                     Module section = sectionBuilder.createLesson(moduleModel);
                     moduleModel.renameModule(section, sectionName);
                 }
-//                dirBuilder.build();
 
                 String sectionDir = moduleDir +"/"+ EduNames.SECTION + j;
                 LessonBuilder lessonBuilder = new StepikJavaLessonBuilder(sectionDir, lesson, utilModule);
