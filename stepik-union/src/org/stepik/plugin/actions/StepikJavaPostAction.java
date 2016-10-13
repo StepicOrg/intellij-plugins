@@ -27,6 +27,12 @@ import java.util.List;
 public class StepikJavaPostAction extends StudyCheckAction {
     private static final Logger LOG = Logger.getInstance(StepikJavaPostAction.class);
 
+    @NotNull
+    @Override
+    public String getActionId() {
+        return "STEPIK.StepikJavaPostAction";
+    }
+
     @Override
     public void check(@NotNull Project project) {
         LOG.info("check is started");
@@ -107,12 +113,5 @@ public class StepikJavaPostAction extends StudyCheckAction {
                 );
             });
         });
-    }
-
-
-    @NotNull
-    @Override
-    public String getActionId() {
-        return "STEPIK.StepikJavaPostAction";
     }
 }

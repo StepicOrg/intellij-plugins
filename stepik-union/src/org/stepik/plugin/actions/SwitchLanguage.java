@@ -27,8 +27,8 @@ import org.stepik.plugin.collective.SupportedLanguages;
 import javax.swing.*;
 
 public class SwitchLanguage extends StudyActionWithShortcut {
-    public static final String ACTION_ID = "STEPIK.SwitchLanguage";
-    public static final String SHORTCUT = "ctrl pressed PAGE_UP";
+    private static final String ACTION_ID = "STEPIK.SwitchLanguage";
+    private static final String SHORTCUT = "ctrl alt pressed PAGE_UP";
 
     public SwitchLanguage() {
         super("Switch language(" + KeymapUtil.getShortcutText(new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT), null)) + ")", "Switch language", AllIcons.Actions.Diff);

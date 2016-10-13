@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>org.stepik.plugin.union</id>
     <name>Stepik Union</name>
-    <version>0.3.11</version>
+    <version>0.3.12</version>
     <idea-version since-build="162.0"/>
     <vendor email="petr.bogdanov@stepik.org" url="http://www.stepik.org">Stepik</vendor>
 
@@ -28,11 +28,11 @@
 
     <depends>com.intellij.modules.lang</depends>
     <depends>com.jetbrains.tmp.interactivelearning</depends>
-    <depends>com.jetbrains.edu.intellij</depends>
+    <!--<depends>com.jetbrains.tmp.intellij</depends>-->
     <!--<depends>com.intellij.modules.python</depends>-->
     <!--<depends>com.intellij.modules.lang</depends>-->
     <depends>com.intellij.modules.python</depends>
-    <depends optional="true">Pythonid</depends>
+    <!--<depends optional="true">Pythonid</depends>-->
     <depends optional="true">PythonCore</depends>
 
     <extensions defaultExtensionNs="com.intellij">
@@ -44,7 +44,7 @@
                     implementationClass="org.stepik.plugin.java.project.wizard.StepikModuleType"/>
     </extensions>
 
-    <extensions defaultExtensionNs="STEPIK">
+    <extensions defaultExtensionNs="SCore">
         <!--<StudyLanguageManager implementationClass="StepikJavaLanguageManager" language="JAVA"/>-->
         <studyPluginConfigurator implementation="org.stepik.plugin.StepikPluginConfigurator"/>
 
@@ -52,17 +52,19 @@
         <!--<optionsProvider instance="org.stepik.plugin.java.project.wizard.StepikStudyOptions"/>-->
     </extensions>
 
-    <extensions defaultExtensionNs="com.jetbrains.edu.intellij">
-        <!--<eduIntelliJProjectTemplate implementation="StepikProjectTemplate"/>-->
+<!--    <extensions defaultExtensionNs="com.jetbrains.tmp.intellij">
+        &lt;!&ndash;<eduIntelliJProjectTemplate implementation="StepikProjectTemplate"/>&ndash;&gt;
         <courseConfigurator language="JAVA" implementationClass="org.stepik.plugin.java.StepikJavaCourseConfigurator"/>
-    </extensions>
+    </extensions>-->
 
 
     <actions>
         <!--<action id="StepikJavaPostAction" class="StepikJavaPostAction"-->
-        <action id="StepikJavaPostAction" class="org.stepik.plugin.actions.StepikJavaPostAction"/>
-        <action id="DownloadSubmission" class="org.stepik.plugin.actions.DownloadSubmission"/>
-        <action id="SwitchLanguage" class="org.stepik.plugin.actions.SwitchLanguage"/>
+        <action id="STEPIK.StepikJavaPostAction" class="org.stepik.plugin.actions.StepikJavaPostAction"/>
+        <action id="STEPIK.PreviousTaskAction" class="org.stepik.plugin.actions.StepikPreviousTaskAction"/>
+        <action id="STEPIK.NextTaskAction" class="org.stepik.plugin.actions.StepikNextTaskAction"/>
+        <action id="STEPIK.DownloadSubmission" class="org.stepik.plugin.actions.DownloadSubmission"/>
+        <action id="STEPIK.SwitchLanguage" class="org.stepik.plugin.actions.SwitchLanguage"/>
         <!--text="Stepik Java Check"/>-->
     </actions>
 
