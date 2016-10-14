@@ -142,8 +142,10 @@
                                  id="com.jetbrains.tmp.learning.settings.StudyConfigurable"
                                  displayName="Education"/>
 
-        <toolWindow id="Task Description" anchor="right" factoryClass="core.com.jetbrains.tmp.learning.ui.StudyToolWindowFactory" conditionClass="com.jetbrains.tmp.learning.ui.StudyCondition"/>
-        <toolWindow id="Test Results" anchor="bottom" factoryClass="core.com.jetbrains.tmp.learning.ui.StudyTestResultsToolWindowFactory" conditionClass="com.jetbrains.tmp.learning.ui.StudyCondition"/>
+        <toolWindow id="Task Description" anchor="right" factoryClass="core.com.jetbrains.tmp.learning.ui.StudyToolWindowFactory"
+                    conditionClass="core.com.jetbrains.tmp.learning.ui.StudyCondition"/>
+        <toolWindow id="Test Results" anchor="bottom" factoryClass="core.com.jetbrains.tmp.learning.ui.StudyTestResultsToolWindowFactory"
+                    conditionClass="core.com.jetbrains.tmp.learning.ui.StudyCondition"/>
         <fileEditorProvider implementation="core.com.jetbrains.tmp.learning.editor.StudyFileEditorProvider"/>
         <treeStructureProvider implementation="core.com.jetbrains.tmp.learning.projectView.StudyTreeStructureProvider"/>
         <highlightErrorFilter implementation="core.com.jetbrains.tmp.learning.editor.StudyHighlightErrorFilter"/>
