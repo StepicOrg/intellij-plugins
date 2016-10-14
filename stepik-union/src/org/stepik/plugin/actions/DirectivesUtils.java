@@ -8,9 +8,13 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
+import org.jetbrains.annotations.NotNull;
 import org.stepik.plugin.collective.SupportedLanguages;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.BiPredicate;
 
 public class DirectivesUtils {
     private static final String START_DIRECTIVE = "Stepik code: start";
@@ -18,6 +22,16 @@ public class DirectivesUtils {
 
     private static final String MESSAGE = "Do you want to remove Stepik directives and external code?\n" +
             "You can undo this action using \"ctrl + Z\".";
+
+    private static final Map<SupportedLanguages, String[]> BEFORE_TEXT = new HashMap<>();
+    static {
+        BEFORE_TEXT.put(SupportedLanguages.JAVA, new String[]{"class Main {"});
+        BEFORE_TEXT.put(SupportedLanguages.PYTHON, new String[]{"class Main:"});
+    }
+    private static final Map<SupportedLanguages, String[]> AFTER_TEXT = new HashMap<>();
+    static {
+        AFTER_TEXT.put(SupportedLanguages.JAVA, new String[]{"}"});
+    }
 
     public static String[] getFileText(VirtualFile vf) {
         Document document = FileDocumentManager.getInstance().getDocument(vf);
@@ -31,6 +45,7 @@ public class DirectivesUtils {
         int end = locations.second;
 
         StringBuilder sb = new StringBuilder();
+
         for (int i = start + 1; i < end; i++) {
             sb.append(text[i]).append("\n");
         }
@@ -44,29 +59,39 @@ public class DirectivesUtils {
      * If "Stepik code: end" not found, end = text.length
      */
     public static Pair<Integer, Integer> findDirectives(String[] text, SupportedLanguages lang) {
-        Integer start = -1;
-        Integer end = text.length;
-        for (int i = 0; i < text.length; i++) {
-            String line = text[i].trim();
-            if (line.startsWith(lang.getComment())) {
-                line = line.substring(2).trim();
-                if (start == -1 && isStart(line)) {
-                    start = i;
-                    continue;
-                }
+        Integer start;
+        Integer end;
 
-                if (isEnd(line)) end = i;
+        start = findDirective(text, 0, DirectivesUtils::isStart, lang);
+        end = findDirective(text, start + 1, DirectivesUtils::isEnd, lang);
+
+        return Pair.create(start, end == -1? text.length : end);
+    }
+
+    private static int findDirective(String[] lines, int start, BiPredicate<String, SupportedLanguages> finder, SupportedLanguages lang) {
+
+        for (int i = start; i < lines.length; i++) {
+
+            if (finder.test(lines[i], lang)) {
+                return i;
             }
         }
-        return Pair.create(start, end);
+
+        return -1;
     }
 
-    private static boolean isStart(String line) {
-        return START_DIRECTIVE.equals(line);
+    private static boolean isStart(String line, SupportedLanguages lang) {
+
+        line = line.trim();
+
+        return line.startsWith(lang.getComment()) && START_DIRECTIVE.equals(line.substring(2).trim());
     }
 
-    private static boolean isEnd(String line) {
-        return END_DIRECTIVE.equals(line);
+    private static boolean isEnd(String line, SupportedLanguages lang) {
+
+        line = line.trim();
+
+        return line.startsWith(lang.getComment()) && END_DIRECTIVE.equals(line.substring(2).trim());
     }
 
     public static void writeInToFile(String[] text, VirtualFile file, Project project) {
@@ -89,26 +114,56 @@ public class DirectivesUtils {
     public static String[] removeDirectives(String[] text,
                                             Pair<Integer, Integer> locations,
                                             boolean showHint,
-                                            Project project) {
+                                            Project project,
+                                            @NotNull SupportedLanguages lang) {
         int start = locations.first;
         int end = locations.second;
         final int k = showHint ? 2 : 1;
 
-        if (start > k || text.length - end > 1 + k) {
+        String[] before = Arrays.copyOf(text, start);
+        String[] after = Arrays.copyOfRange(text, end + 1, text.length);
+
+        //TODO Will store text and will not ask
+        if (!Arrays.equals(before, BEFORE_TEXT.get(lang)) ||
+                !Arrays.equals(after, AFTER_TEXT.get(lang))) {
             int information = Messages.showYesNoDialog(project, MESSAGE, "Information", Messages.getInformationIcon());
             if (information != 0) return text;
         }
 
-        return Arrays.copyOfRange(text, start + 1, end);
+        String[] result = new String[end - (start + 1)];
+
+        for (int i = 0; i < result.length; i++) {
+            result[i] = text[i + start + 1].replaceFirst("^\\t", "");
+        }
+
+        return result;
     }
 
-    public static String[] insertMainClass(String[] text) {
-        String[] ans = new String[text.length + 2];
-        ans[0] = "class Main {";
-        for (int i = 0; i < text.length; i++) {
-            ans[i + 1] = "\t" + text[i];
+    public static String[] insertMainClass(@NotNull String[] text, @NotNull SupportedLanguages lang) {
+        //TODO To get text from storage if text was stored
+        String[] before = BEFORE_TEXT.getOrDefault(lang, new String[0]);
+        String[] after = AFTER_TEXT.getOrDefault(lang, new String[0]);
+
+        String[] ans = new String[text.length + before.length + after.length];
+
+        if (before.length != 0) {
+            for (int i = 0; i < before.length; i++) {
+                ans[i] = before[i];
+            }
         }
-        ans[ans.length - 1] = "}";
+
+        for (int i = 0; i < text.length; i++) {
+            ans[i + before.length] = "\t" + text[i];
+        }
+
+        if (after.length != 0) {
+
+            int start = text.length + before.length;
+
+            for (int i = 0; i < after.length; i++) {
+                ans[i + start] = after[i];
+            }
+        }
 
         return ans;
     }
