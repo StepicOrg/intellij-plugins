@@ -1,32 +1,22 @@
 package com.jetbrains.tmp.utils.generation;
 
-import com.intellij.codeInsight.daemon.impl.quickfix.OrderEntryFix;
-import com.intellij.execution.junit.JUnitExternalLibraryDescriptor;
 import com.intellij.ide.highlighter.ModuleFileType;
 import com.intellij.ide.util.projectWizard.JavaModuleBuilder;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.ModifiableModuleModel;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleWithNameAlreadyExists;
 import com.intellij.openapi.options.ConfigurationException;
-import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.ExternalLibraryDescriptor;
-import com.intellij.openapi.roots.ModuleRootModificationUtil;
-import com.intellij.openapi.startup.StartupManager;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.tmp.learning.StudyTaskManager;
-import com.jetbrains.tmp.utils.EduIntellijUtils;
 import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
 
 public class EduUtilModuleBuilder extends JavaModuleBuilder {
 
@@ -52,13 +42,13 @@ public class EduUtilModuleBuilder extends JavaModuleBuilder {
             return baseModule;
         }
         Project project = baseModule.getProject();
-        StartupManager.getInstance(project).registerPostStartupActivity(() -> DumbService.getInstance(project).runWhenSmart(() -> ApplicationManager.getApplication().runWriteAction(() -> {
-            EduIntellijUtils.addTemplate(project, src, "EduTestRunner.java");
-        })));
-        ExternalLibraryDescriptor descriptor = JUnitExternalLibraryDescriptor.JUNIT4;
-        List<String> defaultRoots = descriptor.getLibraryClassesRoots();
-        final List<String> urls = OrderEntryFix.refreshAndConvertToUrls(defaultRoots);
-        ModuleRootModificationUtil.addModuleLibrary(baseModule, descriptor.getPresentableName(), urls, Collections.<String>emptyList());
+//        StartupManager.getInstance(project).registerPostStartupActivity(() -> DumbService.getInstance(project).runWhenSmart(() -> ApplicationManager.getApplication().runWriteAction(() -> {
+//            EduIntellijUtils.addTemplate(project, src, "EduTestRunner.java");
+//        })));
+//        ExternalLibraryDescriptor descriptor = JUnitExternalLibraryDescriptor.JUNIT4;
+//        List<String> defaultRoots = descriptor.getLibraryClassesRoots();
+//        final List<String> urls = OrderEntryFix.refreshAndConvertToUrls(defaultRoots);
+//        ModuleRootModificationUtil.addModuleLibrary(baseModule, descriptor.getPresentableName(), urls, Collections.<String>emptyList());
 
         String courseDirectory = StudyTaskManager.getInstance(project).getCourse().getCourseDirectory();
         FileUtil.copyDirContent(new File(courseDirectory, "util"), new File(src.getPath()));
