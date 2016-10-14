@@ -34,9 +34,7 @@ public class InsertStepikDirectives extends StudyActionWithShortcut {
 
         super("Repair standard template(" + KeymapUtil.getShortcutText(new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT), null)) + ")",
                 "Insert Stepik directives. Repair ordinary template if it is possible.",
-                AllIcons.General.ExternalToolsSmall);
-//                AllIcons.General.ImportSettings);
-//               IconLoader.getIcon("/icons/externalTools.png"));
+                AllIcons.General.ImportSettings);
     }
 
     @NotNull

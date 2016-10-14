@@ -65,6 +65,7 @@
         <action id="STEPIK.NextTaskAction" class="org.stepik.plugin.actions.StepikNextTaskAction"/>
         <action id="STEPIK.DownloadSubmission" class="org.stepik.plugin.actions.DownloadSubmission"/>
         <action id="STEPIK.SwitchLanguage" class="org.stepik.plugin.actions.SwitchLanguage"/>
+        <action id="STEPIK.InsertStepikDirectives" class="org.stepik.plugin.actions.InsertStepikDirectives"/>
         <!--text="Stepik Java Check"/>-->
     </actions>
 

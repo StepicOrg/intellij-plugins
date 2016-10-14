@@ -32,7 +32,9 @@ public class DownloadSubmission extends StudyActionWithShortcut {
     private static final String SHORTCUT = "ctrl alt pressed PAGE_DOWN";
 
     public DownloadSubmission() {
-        super("Download submission(" + KeymapUtil.getShortcutText(new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT), null)) + ")",
+        super("Download submission("
+                        + KeymapUtil.getShortcutText(new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT), null))
+                        + ")",
                 "Download submission",
                 IconLoader.getIcon("/icons/arrow-down.png")
         );
@@ -99,7 +101,11 @@ public class DownloadSubmission extends StudyActionWithShortcut {
 
         CommandProcessor.getInstance().executeCommand(project,
                 () -> ApplicationManager.getApplication().runWriteAction(
-                        () -> documentManager.getDocument(vf).setText(finalCode)), "Download last submission", "Download last submission");
+                        () -> documentManager
+                                .getDocument(vf)
+                                .setText(finalCode)),
+                "Download last submission",
+                "Download last submission");
 
     }
 }
