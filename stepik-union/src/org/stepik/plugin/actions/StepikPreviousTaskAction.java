@@ -2,9 +2,9 @@ package org.stepik.plugin.actions;
 
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.keymap.KeymapUtil;
-import com.jetbrains.tmp.learning.courseFormat.Task;
-import com.jetbrains.tmp.learning.navigation.StudyNavigator;
-import icons.InteractiveLearningIcons;
+import core.com.jetbrains.tmp.learning.courseFormat.Task;
+import core.com.jetbrains.tmp.learning.navigation.StudyNavigator;
+import core.icons.InteractiveLearningIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

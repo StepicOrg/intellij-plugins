@@ -9,13 +9,13 @@ import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.jetbrains.tmp.learning.LangSetting;
-import com.jetbrains.tmp.learning.StudyState;
-import com.jetbrains.tmp.learning.StudyTaskManager;
-import com.jetbrains.tmp.learning.StudyUtils;
-import com.jetbrains.tmp.learning.actions.StudyActionWithShortcut;
-import com.jetbrains.tmp.learning.courseFormat.Task;
-import com.jetbrains.tmp.learning.editor.StudyEditor;
+import core.com.jetbrains.tmp.learning.LangSetting;
+import core.com.jetbrains.tmp.learning.StudyState;
+import core.com.jetbrains.tmp.learning.StudyTaskManager;
+import core.com.jetbrains.tmp.learning.StudyUtils;
+import core.com.jetbrains.tmp.learning.actions.StudyActionWithShortcut;
+import core.com.jetbrains.tmp.learning.courseFormat.Task;
+import core.com.jetbrains.tmp.learning.editor.StudyEditor;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.plugin.collective.SupportedLanguages;
 
@@ -34,7 +34,7 @@ public class InsertStepikDirectives extends StudyActionWithShortcut {
 
         super("Repair standard template(" + KeymapUtil.getShortcutText(new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT), null)) + ")",
                 "Insert Stepik directives. Repair ordinary template if it is possible.",
-                AllIcons.General.ImportSettings);
+                AllIcons.General.ExternalToolsSmall);
     }
 
     @NotNull

@@ -11,8 +11,8 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.io.FileUtil;
-import com.jetbrains.tmp.learning.core.EduNames;
-import com.jetbrains.tmp.utils.generation.builders.LessonBuilder;
+import core.com.jetbrains.tmp.learning.core.EduNames;
+import org.stepik.from.edu.intellij.utils.generation.builders.LessonBuilder;
 import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
 
