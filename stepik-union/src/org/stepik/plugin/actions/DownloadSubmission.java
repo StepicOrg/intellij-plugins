@@ -28,11 +28,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DownloadSubmission extends StudyActionWithShortcut {
-    public static final String ACTION_ID = "STEPIK.DownloadSubmission";
-    public static final String SHORTCUT = "ctrl pressed PAGE_DOWN";
+    private static final String ACTION_ID = "STEPIK.DownloadSubmission";
+    private static final String SHORTCUT = "ctrl alt pressed PAGE_DOWN";
 
     public DownloadSubmission() {
-        super("Download submission(" + KeymapUtil.getShortcutText(new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT), null)) + ")", "Download submission", IconLoader.getIcon("/icons/arrow-down.png"));
+        super("Download submission("
+                        + KeymapUtil.getShortcutText(new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT), null))
+                        + ")",
+                "Download submission",
+                IconLoader.getIcon("/icons/arrow-down.png")
+        );
     }
 
     @NotNull
@@ -96,9 +101,11 @@ public class DownloadSubmission extends StudyActionWithShortcut {
 
         CommandProcessor.getInstance().executeCommand(project,
                 () -> ApplicationManager.getApplication().runWriteAction(
-                        () -> {
-                            documentManager.getDocument(vf).setText(finalCode);
-                        }), "Download last submission", "Download last submission");
+                        () -> documentManager
+                                .getDocument(vf)
+                                .setText(finalCode)),
+                "Download last submission",
+                "Download last submission");
 
     }
 }

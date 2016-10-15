@@ -19,11 +19,13 @@ public class StepikPluginConfigurator extends StudyBasePluginConfigurator {
         group.add(new StepikJavaPostAction());
         group.add(new StepikPreviousTaskAction());
         group.add(new StepikNextTaskAction());
-//        resetTaskFile.getTemplatePresentation().setIcon(EduKotlinIcons.RESET_TASK_FILE);
         group.add(new StudyRefreshTaskFileAction());
         group.add(new DownloadSubmission());
         group.add(new SwitchLanguage());
         group.add(new InsertStepikDirectives());
+
+
+//        resetTaskFile.getTemplatePresentation().setIcon(EduKotlinIcons.RESET_TASK_FILE);
 //        StudyFillPlaceholdersAction fillPlaceholdersAction = new StudyFillPlaceholdersAction();
 //        fillPlaceholdersAction.getTemplatePresentation().setIcon(EduKotlinIcons.FILL_PLACEHOLDERS_ICON);
 //        fillPlaceholdersAction.getTemplatePresentation().setText("Fill Answer Placeholders");
