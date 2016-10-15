@@ -90,6 +90,6 @@ public class InsertStepikDirectives extends StudyActionWithShortcut {
         }
         writeInToFile(text, file, project);
 
-        reformatCode(project);
+        ReformatWholeEditor.processCode(project);
     }
 }
