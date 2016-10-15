@@ -165,7 +165,7 @@ public class DirectivesUtils {
 
         DataContext dataContext = new ActionDataContext(project);
         Presentation presentation = reformatCodeAction.getTemplatePresentation();
-        AnActionEvent event = new AnActionEvent(null, dataContext, "", presentation, actionManager, 0);
+        AnActionEvent event = new AnActionEvent(null, dataContext, ActionPlaces.UNKNOWN, presentation, actionManager, 0);
         reformatCodeAction.actionPerformed(event);
     }
 }
