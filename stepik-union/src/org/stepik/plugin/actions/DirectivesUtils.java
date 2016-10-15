@@ -12,26 +12,15 @@ import org.jetbrains.annotations.NotNull;
 import org.stepik.plugin.collective.SupportedLanguages;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.BiPredicate;
 
 public class DirectivesUtils {
     private static final String START_DIRECTIVE = "Stepik code: start";
     private static final String END_DIRECTIVE = "Stepik code: end";
+    private static final String START_HINT = "Please note, only the code below will be sent to Stepik.org";
+    private static final String END_HINT = "Please note, only the code above will be sent to Stepik.org";
 
     private static final String MESSAGE = "Do you want to remove Stepik directives and external code?\n" +
             "You can undo this action using \"ctrl + Z\".";
-
-    private static final Map<SupportedLanguages, String[]> BEFORE_TEXT = new HashMap<>();
-    static {
-        BEFORE_TEXT.put(SupportedLanguages.JAVA, new String[]{"class Main {"});
-        BEFORE_TEXT.put(SupportedLanguages.PYTHON, new String[]{"class Main:"});
-    }
-    private static final Map<SupportedLanguages, String[]> AFTER_TEXT = new HashMap<>();
-    static {
-        AFTER_TEXT.put(SupportedLanguages.JAVA, new String[]{"}"});
-    }
 
     public static String[] getFileText(VirtualFile vf) {
         Document document = FileDocumentManager.getInstance().getDocument(vf);
@@ -55,43 +44,47 @@ public class DirectivesUtils {
 
     /**
      * Find first "Stepik code: start" and last "Stepik code: end". Return Pair(start, end).
+     * <p>
      * If "Stepik code: start" not found, start = -1
+     * <p>
      * If "Stepik code: end" not found, end = text.length
      */
     public static Pair<Integer, Integer> findDirectives(String[] text, SupportedLanguages lang) {
-        Integer start;
-        Integer end;
+        int start = -1;
+        int end = text.length;
 
-        start = findDirective(text, 0, DirectivesUtils::isStart, lang);
-        end = findDirective(text, start + 1, DirectivesUtils::isEnd, lang);
-
-        return Pair.create(start, end == -1? text.length : end);
-    }
-
-    private static int findDirective(String[] lines, int start, BiPredicate<String, SupportedLanguages> finder, SupportedLanguages lang) {
-
-        for (int i = start; i < lines.length; i++) {
-
-            if (finder.test(lines[i], lang)) {
-                return i;
+        for (int i = 0; i < text.length; i++) {
+            if (isStart(text[i], lang)) {
+                start = i;
+                break;
             }
         }
 
-        return -1;
+        for (int i = start + 1; i < text.length; i++) {
+            if (isEnd(text[i], lang)) {
+                end = i;
+            }
+        }
+
+        return Pair.create(start, end);
     }
 
     private static boolean isStart(String line, SupportedLanguages lang) {
+        if (!lang.isCommentedLine(line))
+            return false;
 
-        line = line.trim();
+        line = line.substring(lang.getComment().length()).trim();
 
-        return line.startsWith(lang.getComment()) && START_DIRECTIVE.equals(line.substring(2).trim());
+        return START_DIRECTIVE.equals(line);
     }
 
     private static boolean isEnd(String line, SupportedLanguages lang) {
+        if (!lang.isCommentedLine(line))
+            return false;
 
-        line = line.trim();
+        line = line.substring(lang.getComment().length()).trim();
 
-        return line.startsWith(lang.getComment()) && END_DIRECTIVE.equals(line.substring(2).trim());
+        return END_DIRECTIVE.equals(line);
     }
 
     public static void writeInToFile(String[] text, VirtualFile file, Project project) {
@@ -118,14 +111,12 @@ public class DirectivesUtils {
                                             @NotNull SupportedLanguages lang) {
         int start = locations.first;
         int end = locations.second;
-        final int k = showHint ? 2 : 1;
 
         String[] before = Arrays.copyOf(text, start);
         String[] after = Arrays.copyOfRange(text, end + 1, text.length);
 
-        //TODO Will store text and will not ask
-        if (!Arrays.equals(before, BEFORE_TEXT.get(lang)) ||
-                !Arrays.equals(after, AFTER_TEXT.get(lang))) {
+        if (!Arrays.equals(before, lang.getBeforeCode()) ||
+                !Arrays.equals(after, lang.getAfterCode())) {
             int information = Messages.showYesNoDialog(project, MESSAGE, "Information", Messages.getInformationIcon());
             if (information != 0) return text;
         }
@@ -139,29 +130,28 @@ public class DirectivesUtils {
         return result;
     }
 
-    public static String[] insertMainClass(@NotNull String[] text, @NotNull SupportedLanguages lang) {
-        //TODO To get text from storage if text was stored
-        String[] before = BEFORE_TEXT.getOrDefault(lang, new String[0]);
-        String[] after = AFTER_TEXT.getOrDefault(lang, new String[0]);
+    public static String[] insertAmbientCode(@NotNull String[] text, @NotNull SupportedLanguages lang) {
+        String[] beforeCode = lang.getBeforeCode();
+        String[] afterCode = lang.getAfterCode();
 
-        String[] ans = new String[text.length + before.length + after.length];
+        String[] ans = new String[text.length + beforeCode.length + afterCode.length];
 
-        if (before.length != 0) {
-            for (int i = 0; i < before.length; i++) {
-                ans[i] = before[i];
+        if (beforeCode.length != 0) {
+            for (int i = 0; i < beforeCode.length; i++) {
+                ans[i] = beforeCode[i];
             }
         }
 
         for (int i = 0; i < text.length; i++) {
-            ans[i + before.length] = "\t" + text[i];
+            ans[i + beforeCode.length] = "\t" + text[i];
         }
 
-        if (after.length != 0) {
+        if (afterCode.length != 0) {
 
-            int start = text.length + before.length;
+            int start = text.length + beforeCode.length;
 
-            for (int i = 0; i < after.length; i++) {
-                ans[i + start] = after[i];
+            for (int i = 0; i < afterCode.length; i++) {
+                ans[i + start] = afterCode[i];
             }
         }
 
@@ -169,17 +159,16 @@ public class DirectivesUtils {
     }
 
     public static String[] insertDirectives(String[] text, SupportedLanguages lang, boolean showHint) {
-
         int k = showHint ? 2 : 1;
         String[] ans = new String[text.length + 2 * k];
         if (showHint) {
-            ans[0] = lang.getComment() + "Please note, only the code below will be sent to Stepik.org";
-            ans[1] = lang.getComment() + "Stepik code: start";
-            ans[ans.length - 2] = lang.getComment() + "Stepik code: end";
-            ans[ans.length - 1] = lang.getComment() + "Please note, only the code above will be sent to Stepik.org";
+            ans[0] = lang.getComment() + START_HINT;
+            ans[1] = lang.getComment() + START_DIRECTIVE;
+            ans[ans.length - 2] = lang.getComment() + END_DIRECTIVE;
+            ans[ans.length - 1] = lang.getComment() + END_HINT;
         } else {
-            ans[0] = lang.getComment() + "Stepik code: start";
-            ans[ans.length - 1] = lang.getComment() + "Stepik code: end";
+            ans[0] = lang.getComment() + START_DIRECTIVE;
+            ans[ans.length - 1] = lang.getComment() + END_DIRECTIVE;
         }
 
         for (int i = 0; i < text.length; i++) {
