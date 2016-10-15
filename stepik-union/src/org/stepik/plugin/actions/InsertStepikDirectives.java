@@ -25,15 +25,15 @@ import static org.stepik.plugin.actions.DirectivesUtils.*;
 
 
 public class InsertStepikDirectives extends StudyActionWithShortcut {
-    public static final String SHORTCUT = "ctrl alt pressed R";
-    public static final String ACTION_ID = "STEPIK.InsertStepikDirectives";
+    private static final String SHORTCUT = "ctrl alt pressed R";
+    private static final String ACTION_ID = "STEPIK.InsertStepikDirectives";
 
 
     public InsertStepikDirectives() {
 
         super("Repair standard template(" + KeymapUtil.getShortcutText(new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT), null)) + ")",
                 "Insert Stepik directives. Repair ordinary template if it is possible.",
-                AllIcons.General.ExternalToolsSmall);
+                AllIcons.General.ImportSettings);
     }
 
     @NotNull
