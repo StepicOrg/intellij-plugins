@@ -22,19 +22,18 @@ import org.stepik.plugin.collective.SupportedLanguages;
 import javax.swing.*;
 
 import static org.stepik.plugin.actions.DirectivesUtils.*;
-import static org.stepik.plugin.collective.SupportedLanguages.JAVA;
 
 
 public class InsertStepikDirectives extends StudyActionWithShortcut {
-    private static final String SHORTCUT = "ctrl alt pressed R";
-    private static final String ACTION_ID = "STEPIK.InsertStepikDirectives";
+    public static final String SHORTCUT = "ctrl alt pressed R";
+    public static final String ACTION_ID = "STEPIK.InsertStepikDirectives";
 
 
     public InsertStepikDirectives() {
 
         super("Repair standard template(" + KeymapUtil.getShortcutText(new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT), null)) + ")",
                 "Insert Stepik directives. Repair ordinary template if it is possible.",
-                AllIcons.General.ImportSettings);
+                AllIcons.General.ExternalToolsSmall);
     }
 
     @NotNull
@@ -52,7 +51,8 @@ public class InsertStepikDirectives extends StudyActionWithShortcut {
     @Override
     public void actionPerformed(AnActionEvent e) {
         Project project = e.getProject();
-        if (project == null) return;
+        if (project == null)
+            return;
         StudyEditor studyEditor = StudyUtils.getSelectedStudyEditor(project);
         StudyState studyState = new StudyState(studyEditor);
         if (!studyState.isValid()) {
@@ -82,11 +82,9 @@ public class InsertStepikDirectives extends StudyActionWithShortcut {
         boolean showHint = StudyTaskManager.getInstance(project).getShowHint();
         if (locations.first == -1 && locations.second == text.length) {
             text = insertDirectives(text, currentLang, showHint);
-            if (currentLang.getName().equals(JAVA.getName())) {
-                text = insertMainClass(text);
-            }
+            text = insertAmbientCode(text, currentLang);
         } else {
-            text = removeDirectives(text, locations, showHint, project);
+            text = removeDirectives(text, locations, showHint, project, currentLang);
         }
         writeInToFile(text, file, project);
     }
