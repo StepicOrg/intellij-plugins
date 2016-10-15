@@ -1,5 +1,6 @@
 package org.stepik.plugin.actions;
 
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.editor.Document;
@@ -8,9 +9,15 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.jetbrains.tmp.learning.StudyUtils;
+import org.jetbrains.annotations.NonNls;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.stepik.plugin.collective.SupportedLanguages;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DirectivesUtils {
     private static final String START_DIRECTIVE = "Stepik code: start";
@@ -106,7 +113,7 @@ public class DirectivesUtils {
         String[] ans = new String[text.length + 2];
         ans[0] = "class Main {";
         for (int i = 0; i < text.length; i++) {
-            ans[i + 1] = "\t" + text[i];
+            ans[i + 1] = text[i];
         }
         ans[ans.length - 1] = "}";
 
@@ -132,5 +139,33 @@ public class DirectivesUtils {
         }
 
         return ans;
+    }
+
+    private static class ActionDataContext implements DataContext {
+        private final Map<String, Object> context = new HashMap<>();
+
+        public ActionDataContext(@NotNull Project project){
+            context.put("project", project);
+            context.put("editor", StudyUtils.getSelectedEditor(project));
+        }
+
+        @Nullable
+        @Override
+        public Object getData(@NonNls String dataId) {
+            return context.get(dataId);
+        }
+    }
+
+    public static void reformatCode(@NotNull Project project) {
+        ActionManager actionManager = ActionManager.getInstance();
+        AnAction reformatCodeAction = actionManager.getAction(IdeActions.ACTION_EDITOR_REFORMAT);
+
+        if (reformatCodeAction == null)
+            return;
+
+        DataContext dataContext = new ActionDataContext(project);
+        Presentation presentation = reformatCodeAction.getTemplatePresentation();
+        AnActionEvent event = new AnActionEvent(null, dataContext, "", presentation, actionManager, 0);
+        reformatCodeAction.actionPerformed(event);
     }
 }

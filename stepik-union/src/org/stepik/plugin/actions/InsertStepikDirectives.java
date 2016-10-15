@@ -89,5 +89,7 @@ public class InsertStepikDirectives extends StudyActionWithShortcut {
             text = removeDirectives(text, locations, showHint, project);
         }
         writeInToFile(text, file, project);
+
+        reformatCode(project);
     }
 }
