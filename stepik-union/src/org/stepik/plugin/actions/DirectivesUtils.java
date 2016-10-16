@@ -125,13 +125,7 @@ public class DirectivesUtils {
             if (information != 0) return text;
         }
 
-        String[] result = new String[end - (start + 1)];
-
-        for (int i = 0; i < result.length; i++) {
-            result[i] = text[i + start + 1];
-        }
-
-        return result;
+        return Arrays.copyOfRange(text, start + 1, end - start);
     }
 
     public static String[] insertAmbientCode(@NotNull String[] text, @NotNull SupportedLanguages lang, boolean showHint) {
