@@ -3,6 +3,7 @@ package org.stepik.plugin.actions;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.keymap.KeymapUtil;
@@ -68,7 +69,9 @@ public class InsertStepikDirectives extends StudyActionWithShortcut {
 
         FileDocumentManager documentManager = FileDocumentManager.getInstance();
         for (VirtualFile file : FileEditorManager.getInstance(project).getOpenFiles()) {
-            documentManager.saveDocument(documentManager.getDocument(file));
+            Document document = documentManager.getDocument(file);
+            if (document != null)
+                documentManager.saveDocument(document);
         }
 
         SupportedLanguages currentLang = SupportedLanguages.loadLangSettings(langSetting.getCurrentLang());
@@ -81,10 +84,9 @@ public class InsertStepikDirectives extends StudyActionWithShortcut {
         Pair<Integer, Integer> locations = DirectivesUtils.findDirectives(text, currentLang);
         boolean showHint = StudyTaskManager.getInstance(project).getShowHint();
         if (locations.first == -1 && locations.second == text.length) {
-            text = insertDirectives(text, currentLang, showHint);
-            text = insertAmbientCode(text, currentLang);
+            text = insertAmbientCode(text, currentLang, showHint);
         } else {
-            text = removeDirectives(text, locations, showHint, project, currentLang);
+            text = removeAmbientCode(text, locations, project, currentLang);
         }
         writeInToFile(text, file, project);
     }
