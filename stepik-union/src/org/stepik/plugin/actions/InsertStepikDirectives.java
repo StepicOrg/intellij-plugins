@@ -94,7 +94,5 @@ public class InsertStepikDirectives extends StudyActionWithShortcut {
             text = removeAmbientCode(text, locations, project, showHint, currentLang);
         }
         writeInToFile(text, file, project);
-
-        ReformatWholeEditor.processCode(project);
     }
 }
