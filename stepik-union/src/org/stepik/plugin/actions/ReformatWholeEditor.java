@@ -30,15 +30,8 @@ public class ReformatWholeEditor {
         if (file == null)
             return;
 
-        LastRunReformatCodeOptionsProvider provider = new LastRunReformatCodeOptionsProvider(PropertiesComponent.getInstance());
-        ReformatCodeRunOptions currentRunOptions = provider.getLastRunOptions(file);
-
-        currentRunOptions.setProcessingScope(null);
-
         AbstractLayoutCodeProcessor myProcessor = new OptimizeImportsProcessor(project, file);
-
         myProcessor = mixWithReformatProcessor(myProcessor, file);
-
         myProcessor.run();
     }
 
@@ -49,11 +42,6 @@ public class ReformatWholeEditor {
         else {
             processor = new ReformatCodeProcessor(file, false);
         }
-        return processor;
-    }
-
-    private static AbstractLayoutCodeProcessor mixWithRearrangeProcessor(@NotNull AbstractLayoutCodeProcessor processor) {
-        processor = new RearrangeCodeProcessor(processor);
         return processor;
     }
 }
