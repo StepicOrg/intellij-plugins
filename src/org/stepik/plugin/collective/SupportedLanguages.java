@@ -3,7 +3,7 @@ package org.stepik.plugin.collective;
 import org.jetbrains.annotations.NotNull;
 
 public enum SupportedLanguages {
-    JAVA("java8", "// ", "Main.java", new String[]{"class Maim {"}, new String[]{"}"}),
+    JAVA("java8", "// ", "Main.java", new String[]{"class Main {"}, new String[]{"}"}),
     PYTHON("python3", "# ", "main.py", new String[]{"class Main:"}, new String[0]);
 
     private final String name;
