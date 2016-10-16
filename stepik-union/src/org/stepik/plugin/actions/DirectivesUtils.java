@@ -125,7 +125,7 @@ public class DirectivesUtils {
             if (information != 0) return text;
         }
 
-        return Arrays.copyOfRange(text, start + 1, end - start);
+        return Arrays.copyOfRange(text, start + 1, end);
     }
 
     public static String[] insertAmbientCode(@NotNull String[] text, @NotNull SupportedLanguages lang, boolean showHint) {
