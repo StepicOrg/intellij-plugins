@@ -22,12 +22,12 @@ public class DirectivesUtils {
     private static final String MESSAGE = "Do you want to remove Stepik directives and external code?\n" +
             "You can undo this action using \"ctrl + Z\".";
 
-    public static String[] getFileText(VirtualFile vf) {
+    public static String[] getFileText(@NotNull VirtualFile vf) {
         Document document = FileDocumentManager.getInstance().getDocument(vf);
         return document != null ? document.getText().split("\n") : new String[0];
     }
 
-    public static String getTextUnderDirectives(String[] text, SupportedLanguages lang) {
+    public static String getTextUnderDirectives(@NotNull String[] text, @NotNull SupportedLanguages lang) {
         Pair<Integer, Integer> locations = findDirectives(text, lang);
 
         int start = locations.first;
@@ -49,7 +49,8 @@ public class DirectivesUtils {
      * <p>
      * If "Stepik code: end" not found, end = text.length
      */
-    public static Pair<Integer, Integer> findDirectives(String[] text, SupportedLanguages lang) {
+    public static @NotNull Pair<Integer, Integer> findDirectives(@NotNull String[] text,
+                                                                 @NotNull SupportedLanguages lang) {
         int start = -1;
         int end = text.length;
 
@@ -70,7 +71,7 @@ public class DirectivesUtils {
         return Pair.create(start, end);
     }
 
-    private static boolean isStart(String line, SupportedLanguages lang) {
+    private static boolean isStart(@NotNull String line, @NotNull SupportedLanguages lang) {
         if (!lang.isCommentedLine(line))
             return false;
 
@@ -79,7 +80,7 @@ public class DirectivesUtils {
         return START_DIRECTIVE.equals(line);
     }
 
-    private static boolean isEnd(String line, SupportedLanguages lang) {
+    private static boolean isEnd(@NotNull String line, @NotNull SupportedLanguages lang) {
         if (!lang.isCommentedLine(line))
             return false;
 
@@ -88,7 +89,8 @@ public class DirectivesUtils {
         return END_DIRECTIVE.equals(line);
     }
 
-    public static void writeInToFile(String[] text, VirtualFile file, Project project) {
+    public static void writeInToFile(@NotNull String[] text, @NotNull VirtualFile file,
+                                     @NotNull Project project) {
         final Document document = FileDocumentManager.getInstance().getDocument(file);
         if (document == null)
             return;
@@ -107,9 +109,9 @@ public class DirectivesUtils {
                         "Stepik directives process");
     }
 
-    public static String[] removeAmbientCode(String[] text,
-                                             Pair<Integer, Integer> locations,
-                                             Project project,
+    public static String[] removeAmbientCode(@NotNull String[] text,
+                                             @NotNull Pair<Integer, Integer> locations,
+                                             @NotNull Project project,
                                              boolean showHint,
                                              @NotNull SupportedLanguages lang) {
         int start = locations.first;
@@ -121,14 +123,16 @@ public class DirectivesUtils {
 
         if (!Arrays.equals(before, lang.getBeforeCode()) ||
                 !Arrays.equals(after, lang.getAfterCode())) {
-            int information = Messages.showYesNoDialog(project, MESSAGE, "Information", Messages.getInformationIcon());
+            int information = Messages.showYesNoDialog(project, MESSAGE, "Information",
+                    Messages.getInformationIcon());
             if (information != 0) return text;
         }
 
         return Arrays.copyOfRange(text, start + 1, end);
     }
 
-    public static String[] insertAmbientCode(@NotNull String[] text, @NotNull SupportedLanguages lang, boolean showHint) {
+    public static String[] insertAmbientCode(@NotNull String[] text, @NotNull SupportedLanguages lang,
+                                             boolean showHint) {
         String[] beforeCode = lang.getBeforeCode();
         String[] afterCode = lang.getAfterCode();
 

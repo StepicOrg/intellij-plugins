@@ -4,6 +4,7 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.keymap.KeymapUtil;
@@ -31,7 +32,9 @@ public class SwitchLanguage extends StudyActionWithShortcut {
     private static final String SHORTCUT = "ctrl alt pressed PAGE_UP";
 
     public SwitchLanguage() {
-        super("Switch language(" + KeymapUtil.getShortcutText(new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT), null)) + ")", "Switch language", AllIcons.Actions.Diff);
+        super("Switch language(" + KeymapUtil.getShortcutText(
+                new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT), null)) +
+                ")", "Switch language", AllIcons.Actions.Diff);
     }
 
     @Override
@@ -39,7 +42,10 @@ public class SwitchLanguage extends StudyActionWithShortcut {
         switchLang(e.getProject());
     }
 
-    private void switchLang(Project project) {
+    private void switchLang(@Nullable Project project) {
+        if (project == null) {
+            return;
+        }
         StudyEditor studyEditor = StudyUtils.getSelectedStudyEditor(project);
         StudyState studyState = new StudyState(studyEditor);
         if (!studyState.isValid()) {
@@ -59,30 +65,59 @@ public class SwitchLanguage extends StudyActionWithShortcut {
         FileDocumentManager documentManager = FileDocumentManager.getInstance();
         FileEditorManager editorManager = FileEditorManager.getInstance(project);
         for (VirtualFile file : FileEditorManager.getInstance(project).getOpenFiles()) {
-            documentManager.saveDocument(documentManager.getDocument(file));
+            Document document = documentManager.getDocument(file);
+            if (document == null)
+                continue;
+            documentManager.saveDocument(document);
             editorManager.closeFile(file);
         }
 
         VirtualFile src = studyState.getTaskDir();
-        PsiDirectory hide = PsiManager.getInstance(project).findDirectory(src.findChild("hide"));
+        VirtualFile hideVF = src.findChild("hide");
+        if (hideVF == null) {
+            return;
+        }
+        PsiDirectory hide = PsiManager.getInstance(project).findDirectory(hideVF);
+        if (hide == null) {
+            return;
+        }
         PsiDirectory scrPsi = PsiManager.getInstance(project).findDirectory(src);
-
-        SupportedLanguages currentLang = SupportedLanguages.loadLangSettings(langSetting.getCurrentLang());
+        if (scrPsi == null) {
+            return;
+        }
+        SupportedLanguages currentLang = SupportedLanguages.langOf(langSetting.getCurrentLang());
+        if (currentLang == null) {
+            return;
+        }
         SupportedLanguages secondLang;
 
-        if (currentLang.getName().equals("java8")) {
+        if (currentLang == SupportedLanguages.JAVA) {
             secondLang = SupportedLanguages.PYTHON;
         } else {
             secondLang = SupportedLanguages.JAVA;
         }
 
-
+        VirtualFile firstVF = src.findChild(currentLang.getMainFileName());
+        if (firstVF == null) {
+            return;
+        }
         final PsiFile first = PsiManager
                 .getInstance(project)
-                .findFile(src.findChild(currentLang.getMainFileName()));
+                .findFile(firstVF);
+        if (first == null) {
+            return;
+        }
+
+        VirtualFile secondVF = hide.getVirtualFile().findChild(secondLang.getMainFileName());
+        if (secondVF == null) {
+            return;
+        }
         final PsiFile second = PsiManager
                 .getInstance(project)
-                .findFile(hide.getVirtualFile().findChild(secondLang.getMainFileName()));
+                .findFile(secondVF);
+        if (second == null) {
+            return;
+        }
 
         ApplicationManager.getApplication().runWriteAction(() -> {
             MoveFilesOrDirectoriesUtil.doMoveFile(first, hide);
@@ -92,7 +127,8 @@ public class SwitchLanguage extends StudyActionWithShortcut {
         langSetting.setCurrentLang(secondLang.getName());
 
         VirtualFile vf = src.findChild(activateFileName);
-        FileEditorManager.getInstance(project).openFile(vf, true);
+        if (vf != null)
+            FileEditorManager.getInstance(project).openFile(vf, true);
     }
 
     @NotNull

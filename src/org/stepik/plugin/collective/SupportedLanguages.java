@@ -1,10 +1,14 @@
 package org.stepik.plugin.collective;
 
+import com.intellij.lang.Language;
+import com.intellij.lang.LanguageCommenters;
+import com.intellij.openapi.fileTypes.LanguageFileType;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public enum SupportedLanguages {
-    JAVA("java8", "// ", "Main.java", new String[]{"class Main {"}, new String[]{"}"}),
-    PYTHON("python3", "# ", "main.py", new String[]{"class Main:"}, new String[0]);
+    JAVA("java8", "Main", new String[]{"class Main {"}, new String[]{"}"}),
+    PYTHON("python3", "main", new String[]{"class Main:"}, null);
 
     private final String name;
     private final String comment;
@@ -15,44 +19,58 @@ public enum SupportedLanguages {
     /**
      * A Constructor for a supported language.
      *
-     * @param name         Name language
-     * @param comment      A string starting line comment
-     * @param mainFileName A name for main file
+     * @param name         Language name
+     * @param mainFileName A name for main file without extension
      * @param beforeCode   Part of the surrounding code before text
      * @param afterCode    Part of the surrounding code after text
      */
-    SupportedLanguages(@NotNull String name, @NotNull String comment, @NotNull String mainFileName,
-                       @NotNull String[] beforeCode, @NotNull String[] afterCode) {
+    SupportedLanguages(@NotNull String name, @NotNull String mainFileName,
+                       @Nullable String[] beforeCode, @Nullable String[] afterCode) {
         this.name = name;
-        this.comment = comment;
+        Language language = Language.findLanguageByID(this.name());
+        if (language != null) {
+            LanguageFileType fileType;
+            if ((fileType = language.getAssociatedFileType()) != null) {
+                mainFileName = String.format("%s.%s", mainFileName, fileType.getDefaultExtension());
+            }
+            this.comment = LanguageCommenters.INSTANCE.forLanguage(language).getLineCommentPrefix();
+        } else {
+            this.comment = "";
+        }
         this.mainFileName = mainFileName;
         this.beforeCode = beforeCode;
         this.afterCode = afterCode;
     }
 
+    @NotNull
     public String getName() {
         return name;
     }
 
+    @NotNull
     public String getComment() {
         return comment;
     }
 
+    @NotNull
     public String getMainFileName() {
         return mainFileName;
     }
 
-    public static SupportedLanguages loadLangSettings(String lang) {
+    @Nullable
+    public static SupportedLanguages langOf(@NotNull String lang) {
         lang = lang.replaceAll("[0-9]+", "").toUpperCase();
         return SupportedLanguages.valueOf(lang);
     }
 
+    @NotNull
     public String[] getBeforeCode() {
-        return beforeCode;
+        return beforeCode != null ? beforeCode : new String[0];
     }
 
+    @NotNull
     public String[] getAfterCode() {
-        return afterCode;
+        return afterCode != null ? afterCode : new String[0];
     }
 
     /**
@@ -61,7 +79,12 @@ public enum SupportedLanguages {
      * @param line String to check
      * @return true if line is commented, false otherwise
      */
-    public boolean isCommentedLine(String line) {
+    public boolean isCommentedLine(@NotNull String line) {
         return line.trim().startsWith(comment);
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

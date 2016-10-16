@@ -32,9 +32,10 @@ public class InsertStepikDirectives extends StudyActionWithShortcut {
 
     public InsertStepikDirectives() {
 
-        super("Repair standard template(" + KeymapUtil.getShortcutText(new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT), null)) + ")",
+        super("Repair standard template(" + KeymapUtil.getShortcutText(
+                new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT), null)) + ")",
                 "Insert Stepik directives. Repair ordinary template if it is possible.",
-                AllIcons.General.ImportSettings);
+                AllIcons.General.ExternalToolsSmall);
     }
 
     @NotNull
@@ -74,11 +75,15 @@ public class InsertStepikDirectives extends StudyActionWithShortcut {
                 documentManager.saveDocument(document);
         }
 
-        SupportedLanguages currentLang = SupportedLanguages.loadLangSettings(langSetting.getCurrentLang());
-
+        SupportedLanguages currentLang = SupportedLanguages.langOf(langSetting.getCurrentLang());
+        if (currentLang == null) {
+            return;
+        }
         VirtualFile src = studyState.getTaskDir();
         VirtualFile file = src.findChild(currentLang.getMainFileName());
-
+        if (file == null) {
+            return;
+        }
         String[] text = DirectivesUtils.getFileText(file);
 
         Pair<Integer, Integer> locations = DirectivesUtils.findDirectives(text, currentLang);
@@ -89,5 +94,7 @@ public class InsertStepikDirectives extends StudyActionWithShortcut {
             text = removeAmbientCode(text, locations, project, showHint, currentLang);
         }
         writeInToFile(text, file, project);
+
+        ReformatWholeEditor.processCode(project);
     }
 }
