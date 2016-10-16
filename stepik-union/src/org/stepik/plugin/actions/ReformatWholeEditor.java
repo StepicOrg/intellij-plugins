@@ -1,12 +1,8 @@
 package org.stepik.plugin.actions;
 
 import com.intellij.codeInsight.actions.AbstractLayoutCodeProcessor;
-import com.intellij.codeInsight.actions.LastRunReformatCodeOptionsProvider;
 import com.intellij.codeInsight.actions.OptimizeImportsProcessor;
-import com.intellij.codeInsight.actions.RearrangeCodeProcessor;
 import com.intellij.codeInsight.actions.ReformatCodeProcessor;
-import com.intellij.codeInsight.actions.ReformatCodeRunOptions;
-import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDocumentManager;
