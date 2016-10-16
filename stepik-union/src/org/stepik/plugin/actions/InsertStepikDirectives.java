@@ -86,7 +86,7 @@ public class InsertStepikDirectives extends StudyActionWithShortcut {
         if (locations.first == -1 && locations.second == text.length) {
             text = insertAmbientCode(text, currentLang, showHint);
         } else {
-            text = removeAmbientCode(text, locations, project, currentLang);
+            text = removeAmbientCode(text, locations, project, showHint, currentLang);
         }
         writeInToFile(text, file, project);
     }

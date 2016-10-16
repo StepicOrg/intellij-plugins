@@ -110,12 +110,14 @@ public class DirectivesUtils {
     public static String[] removeAmbientCode(String[] text,
                                              Pair<Integer, Integer> locations,
                                              Project project,
+                                             boolean showHint,
                                              @NotNull SupportedLanguages lang) {
         int start = locations.first;
         int end = locations.second;
 
-        String[] before = Arrays.copyOfRange(text, 0, start > 0? start : 0);
-        String[] after = Arrays.copyOfRange(text, end + 1, text.length);
+        int k = showHint ? 1 : 0;
+        String[] before = Arrays.copyOfRange(text, 0, start > 0? start - k : 0);
+        String[] after = Arrays.copyOfRange(text, end + k + 1, text.length);
 
         if (!Arrays.equals(before, lang.getBeforeCode()) ||
                 !Arrays.equals(after, lang.getAfterCode())) {
@@ -142,13 +144,13 @@ public class DirectivesUtils {
         System.arraycopy(beforeCode, 0, ans, 0, beforeCode.length);
 
         if (showHint) {
-            ans[beforeCode.length] = START_HINT;
-            ans[beforeCode.length + 1] = START_DIRECTIVE;
-            ans[beforeCode.length + text.length + 1] = END_DIRECTIVE;
-            ans[beforeCode.length + text.length + 2] = END_HINT;
+            ans[beforeCode.length] = lang.getComment() + START_HINT;
+            ans[beforeCode.length + 1] = lang.getComment() + START_DIRECTIVE;
+            ans[beforeCode.length + text.length + k] = lang.getComment() + END_DIRECTIVE;
+            ans[beforeCode.length + text.length + k + 1] = lang.getComment() + END_HINT;
         } else {
-            ans[beforeCode.length] = START_DIRECTIVE;
-            ans[beforeCode.length + text.length] = END_DIRECTIVE;
+            ans[beforeCode.length] = lang.getComment() + START_DIRECTIVE;
+            ans[beforeCode.length + text.length + k] = lang.getComment() + END_DIRECTIVE;
         }
         System.arraycopy(text, 0, ans, beforeCode.length + k, text.length);
         System.arraycopy(afterCode, 0, ans, beforeCode.length + text.length + 2 * k, afterCode.length);
