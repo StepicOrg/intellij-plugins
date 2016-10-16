@@ -38,7 +38,6 @@ public class ReformatWholeEditor {
         AbstractLayoutCodeProcessor myProcessor = new OptimizeImportsProcessor(project, file);
 
         myProcessor = mixWithReformatProcessor(myProcessor, file);
-        myProcessor = mixWithRearrangeProcessor(myProcessor);
 
         myProcessor.run();
     }
