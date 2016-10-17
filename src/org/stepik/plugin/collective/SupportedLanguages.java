@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 
 public enum SupportedLanguages {
     JAVA("java8", "Main", new String[]{"class Main {"}, new String[]{"}"}),
-    PYTHON("python3", "main", new String[]{"class Main:"}, null);
+    PYTHON("python3", "main", null, null);
 
     private final String name;
     private final String comment;
