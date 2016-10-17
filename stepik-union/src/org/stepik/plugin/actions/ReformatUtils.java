@@ -13,14 +13,12 @@ public class ReformatUtils {
 
     public static void reformatSelectedEditor(@NotNull Project project) {
         PsiDocumentManager.getInstance(project).commitAllDocuments();
+
         final Editor editor = StudyUtils.getSelectedEditor(project);
-
-        PsiFile file;
-
         if (editor == null)
             return;
 
-        file = PsiDocumentManager.getInstance(project).getPsiFile(editor.getDocument());
+        PsiFile file = PsiDocumentManager.getInstance(project).getPsiFile(editor.getDocument());
         if (file == null)
             return;
 
