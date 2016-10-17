@@ -61,7 +61,7 @@ public class DirectivesUtils {
             }
         }
 
-        for (int i = start + 1; i < text.length; i++) {
+        for (int i = text.length - 1; i > start; i--) {
             if (isEnd(text[i], lang)) {
                 end = i;
                 break;
@@ -118,8 +118,9 @@ public class DirectivesUtils {
         int end = locations.second;
 
         int k = showHint ? 1 : 0;
-        String[] before = Arrays.copyOfRange(text, 0, start > 0? start - k : 0);
-        String[] after = Arrays.copyOfRange(text, end + k + 1, text.length);
+        String[] before = start > 0 ? Arrays.copyOfRange(text, 0, start - k) : new String[0];
+        int e = end + k + 1;
+        String[] after = e < text.length ? Arrays.copyOfRange(text, e , text.length) : new String[0];
 
         if (!Arrays.equals(before, lang.getBeforeCode()) ||
                 !Arrays.equals(after, lang.getAfterCode())) {
