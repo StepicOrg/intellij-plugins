@@ -91,7 +91,7 @@ public class InsertStepikDirectives extends StudyActionWithShortcut {
         }
         writeInToFile(text, file, project);
         if (needInsert) {
-            ReformatWholeEditor.processCode(project);
+            ReformatUtils.reformatSelectedEditor(project);
         }
     }
 }

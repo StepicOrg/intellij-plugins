@@ -1,6 +1,5 @@
 package org.stepik.plugin.actions;
 
-import com.intellij.codeInsight.actions.AbstractLayoutCodeProcessor;
 import com.intellij.codeInsight.actions.OptimizeImportsProcessor;
 import com.intellij.codeInsight.actions.ReformatCodeProcessor;
 import com.intellij.openapi.editor.Editor;
@@ -9,11 +8,10 @@ import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import com.jetbrains.tmp.learning.StudyUtils;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-public class ReformatWholeEditor {
+public class ReformatUtils {
 
-    public static void processCode(@NotNull Project project) {
+    public static void reformatSelectedEditor(@NotNull Project project) {
         PsiDocumentManager.getInstance(project).commitAllDocuments();
         final Editor editor = StudyUtils.getSelectedEditor(project);
 
@@ -26,18 +24,6 @@ public class ReformatWholeEditor {
         if (file == null)
             return;
 
-        AbstractLayoutCodeProcessor myProcessor = new OptimizeImportsProcessor(project, file);
-        myProcessor = mixWithReformatProcessor(myProcessor, file);
-        myProcessor.run();
-    }
-
-    private static AbstractLayoutCodeProcessor mixWithReformatProcessor(@Nullable AbstractLayoutCodeProcessor processor, PsiFile file) {
-        if (processor != null) {
-            processor = new ReformatCodeProcessor(processor, false);
-        }
-        else {
-            processor = new ReformatCodeProcessor(file, false);
-        }
-        return processor;
+        new ReformatCodeProcessor(new OptimizeImportsProcessor(project, file), false).run();
     }
 }
