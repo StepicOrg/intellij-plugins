@@ -1,6 +1,6 @@
 package org.stepik.from.edu.intellij.utils.generation;
 
-import core.com.jetbrains.tmp.learning.courseFormat.Lesson;
+import com.jetbrains.tmp.learning.courseFormat.Lesson;
 
 public class StepikSectionDirConfigurator {
     private String sectionDir;

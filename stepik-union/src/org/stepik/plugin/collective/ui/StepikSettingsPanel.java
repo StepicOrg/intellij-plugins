@@ -25,10 +25,10 @@ import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.HyperlinkAdapter;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.util.ui.JBUI;
-import core.com.jetbrains.tmp.learning.StudyTaskManager;
-import core.com.jetbrains.tmp.learning.StudyUtils;
-import core.com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
-import core.com.jetbrains.tmp.learning.stepik.StepikUser;
+import com.jetbrains.tmp.learning.StudyTaskManager;
+import com.jetbrains.tmp.learning.StudyUtils;
+import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
+import com.jetbrains.tmp.learning.stepik.StepikUser;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

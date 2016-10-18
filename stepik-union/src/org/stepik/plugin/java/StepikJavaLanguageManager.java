@@ -1,6 +1,6 @@
 package org.stepik.plugin.java;
 
-import core.com.jetbrains.tmp.learning.StudyLanguageManager;
+import com.jetbrains.tmp.learning.StudyLanguageManager;
 import org.jetbrains.annotations.NotNull;
 
 public class StepikJavaLanguageManager implements StudyLanguageManager {

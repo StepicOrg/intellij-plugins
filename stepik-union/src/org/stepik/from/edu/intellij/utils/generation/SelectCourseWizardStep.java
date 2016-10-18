@@ -11,12 +11,12 @@ import com.intellij.openapi.project.DefaultProjectFactory;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.ui.HyperlinkAdapter;
-import core.com.jetbrains.tmp.learning.StudyTaskManager;
-import core.com.jetbrains.tmp.learning.StudyUtils;
-import core.com.jetbrains.tmp.learning.stepik.CourseInfo;
-import core.com.jetbrains.tmp.learning.stepik.StepikConnectorGet;
-import core.com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
-import core.com.jetbrains.tmp.learning.stepik.StepikConnectorPost;
+import com.jetbrains.tmp.learning.StudyTaskManager;
+import com.jetbrains.tmp.learning.StudyUtils;
+import com.jetbrains.tmp.learning.stepik.CourseInfo;
+import com.jetbrains.tmp.learning.stepik.StepikConnectorGet;
+import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
+import com.jetbrains.tmp.learning.stepik.StepikConnectorPost;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;

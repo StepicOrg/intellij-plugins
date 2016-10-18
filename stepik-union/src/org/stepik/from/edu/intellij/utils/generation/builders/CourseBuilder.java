@@ -6,7 +6,7 @@ import com.intellij.openapi.module.ModuleWithNameAlreadyExists;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.InvalidDataException;
-import core.com.jetbrains.tmp.learning.courseFormat.Course;
+import com.jetbrains.tmp.learning.courseFormat.Course;
 import org.stepik.from.edu.intellij.utils.generation.EduProjectGenerator;
 import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;

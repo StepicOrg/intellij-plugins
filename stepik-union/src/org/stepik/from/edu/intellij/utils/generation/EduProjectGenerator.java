@@ -3,17 +3,17 @@ package org.stepik.from.edu.intellij.utils.generation;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import core.com.jetbrains.tmp.learning.StudyTaskManager;
-import core.com.jetbrains.tmp.learning.courseFormat.Course;
-import core.com.jetbrains.tmp.learning.courseGeneration.StudyProjectGenerator;
-import core.com.jetbrains.tmp.learning.stepik.CourseInfo;
-import core.com.jetbrains.tmp.learning.stepik.StepikConnectorGet;
+import com.jetbrains.tmp.learning.StudyTaskManager;
+import com.jetbrains.tmp.learning.courseFormat.Course;
+import com.jetbrains.tmp.learning.courseGeneration.StudyProjectGenerator;
+import com.jetbrains.tmp.learning.stepik.CourseInfo;
+import com.jetbrains.tmp.learning.stepik.StepikConnectorGet;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.List;
 
-import static core.com.jetbrains.tmp.learning.StudyUtils.execCancelable;
+import static com.jetbrains.tmp.learning.StudyUtils.execCancelable;
 
 public class EduProjectGenerator extends StudyProjectGenerator {
     private static final Logger LOG = Logger.getInstance(EduProjectGenerator.class);

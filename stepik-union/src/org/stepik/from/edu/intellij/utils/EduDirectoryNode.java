@@ -7,11 +7,11 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
-import core.com.jetbrains.tmp.learning.core.EduNames;
-import core.com.jetbrains.tmp.learning.courseFormat.Task;
-import core.com.jetbrains.tmp.learning.courseFormat.TaskFile;
-import core.com.jetbrains.tmp.learning.StudyUtils;
-import core.com.jetbrains.tmp.learning.projectView.StudyDirectoryNode;
+import com.jetbrains.tmp.learning.core.EduNames;
+import com.jetbrains.tmp.learning.courseFormat.Task;
+import com.jetbrains.tmp.learning.courseFormat.TaskFile;
+import com.jetbrains.tmp.learning.StudyUtils;
+import com.jetbrains.tmp.learning.projectView.StudyDirectoryNode;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
