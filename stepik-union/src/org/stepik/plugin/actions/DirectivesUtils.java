@@ -106,7 +106,7 @@ public class DirectivesUtils {
         String[] ans = new String[text.length + 2];
         ans[0] = "class Main {";
         for (int i = 0; i < text.length; i++) {
-            ans[i + 1] = "\t" + text[i];
+            ans[i + 1] = text[i];
         }
         ans[ans.length - 1] = "}";
 
