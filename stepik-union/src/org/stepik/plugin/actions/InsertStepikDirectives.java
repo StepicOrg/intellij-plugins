@@ -90,6 +90,12 @@ public class InsertStepikDirectives extends StudyActionWithShortcut {
         boolean showHint = StudyTaskManager.getInstance(project).getShowHint();
         if (locations.first == -1 && locations.second == text.length) {
             text = insertAmbientCode(text, currentLang, showHint);
+        boolean needInsert = locations.first == -1 && locations.second == text.length;
+        if (needInsert) {
+            text = insertDirectives(text, currentLang, showHint);
+            if (currentLang.getName().equals(JAVA.getName())) {
+                text = insertMainClass(text);
+            }
         } else {
             text = removeAmbientCode(text, locations, project, showHint, currentLang);
         }
