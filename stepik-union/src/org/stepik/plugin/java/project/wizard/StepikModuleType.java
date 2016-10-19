@@ -12,7 +12,7 @@ import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.psi.CommonClassNames;
 import com.intellij.psi.JavaPsiFacade;
-import com.jetbrains.tmp.utils.generation.StepikProjectGenerator;
+import org.stepik.from.edu.intellij.utils.generation.StepikProjectGenerator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jps.model.java.JavaModuleSourceRootTypes;
