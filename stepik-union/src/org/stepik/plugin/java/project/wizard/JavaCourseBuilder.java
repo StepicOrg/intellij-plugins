@@ -49,11 +49,12 @@ public class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilde
         generator.generateProject(project, project.getBaseDir());
 
         Course course = StudyTaskManager.getInstance(project).getCourse();
-        course.setCourseMode(EduNames.STEPIK_CODE);
         if (course == null) {
             LOG.info("failed to generate builders");
             return;
         }
+        course.setCourseMode(EduNames.STEPIK_CODE);
+
         String moduleDir = getModuleFileDirectory();
         if (moduleDir == null) {
             return;
@@ -67,59 +68,44 @@ public class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilde
 
         ApplicationManager.getApplication().invokeLater(
                 () -> DumbService.allowStartingDumbModeInside(DumbModePermission.MAY_START_BACKGROUND,
-                        () -> ApplicationManager.getApplication().runWriteAction(() -> {
-                            StudyProjectComponent.getInstance(project).registerStudyToolWindow(course);
-                        })));
+                        () -> ApplicationManager.getApplication().runWriteAction(
+                                () -> StudyProjectComponent.getInstance(project)
+                                        .registerStudyToolWindow(course))));
     }
 
     @Override
-    public void createLessonModules(@NotNull ModifiableModuleModel moduleModel, Course course, String moduleDir, Module utilModule) throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
-        {
-            List<Lesson> lessons = course.getLessons();
-            String sectionName = "";
-            int j = 0;
-            for (int i = 0; i < lessons.size(); i++) {
-                int lessonVisibleIndex = i + 1;
-                Lesson lesson = lessons.get(i);
-                lesson.setIndex(lessonVisibleIndex);
+    public void createLessonModules(@NotNull ModifiableModuleModel moduleModel, Course course,
+                                    String moduleDir, Module utilModule) throws InvalidDataException,
+            IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
+        List<Lesson> lessons = course.getLessons();
+        String sectionName = "";
+        int j = 0;
+        for (int i = 0; i < lessons.size(); i++) {
+            int lessonVisibleIndex = i + 1;
+            Lesson lesson = lessons.get(i);
+            lesson.setIndex(lessonVisibleIndex);
 
-                // TODO add sections to core
-                StepikSectionDirConfigurator dirBuilder = new StepikSectionDirConfigurator(moduleDir, lesson);
-                if (!sectionName.equals(dirBuilder.getSectionName())){
+            // TODO add sections to core
+            StepikSectionDirConfigurator dirBuilder = new StepikSectionDirConfigurator(moduleDir, lesson);
+            if (!sectionName.equals(dirBuilder.getSectionName())) {
 
-                    j++;
-                    sectionName = dirBuilder.getSectionName();
-                    LessonBuilder sectionBuilder = new StepikJavaSectionBuilder(moduleDir, j, utilModule);
-                    ((StepikJavaSectionBuilder) sectionBuilder).setName(sectionName);
-                    Module section = sectionBuilder.createLesson(moduleModel);
-                    moduleModel.renameModule(section, sectionName);
-                }
-
-                String sectionDir = moduleDir +"/"+ EduNames.SECTION + j;
-                LessonBuilder lessonBuilder = new StepikJavaLessonBuilder(sectionDir, lesson, utilModule);
-                lessonBuilder.createLesson(moduleModel);
+                j++;
+                sectionName = dirBuilder.getSectionName();
+                LessonBuilder sectionBuilder = new StepikJavaSectionBuilder(moduleDir, j, utilModule);
+                ((StepikJavaSectionBuilder) sectionBuilder).setName(sectionName);
+                sectionBuilder.createLesson(moduleModel);
             }
+
+            String sectionDir = moduleDir + "/" + EduNames.SECTION + j;
+            LessonBuilder lessonBuilder = new StepikJavaLessonBuilder(sectionDir, lesson, utilModule);
+            lessonBuilder.createLesson(moduleModel);
         }
     }
-
-//    @Override
-//    public String getBuilderId() {
-//        return "java.stepik.builder";
-//    }
-
 
     @Override
     public ModuleType getModuleType() {
         return StepikModuleType.STEPIK_MODULE_TYPE;
     }
-
-//    @Nullable
-//    @Override
-//    public Module commitModule(@NotNull Project project, @Nullable ModifiableModuleModel model) {
-//        Module baseModule = super.commitModule(project, model);
-//        new StepikJavaCourseConfigurator().configureModule(project);
-//        return baseModule;
-//    }
 
     @Nullable
     @Override
@@ -137,7 +123,6 @@ public class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilde
         createCourseFromGenerator(moduleModel, project, getGenerator());
         return baseModule;
     }
-
 
     @Override
     public ModuleWizardStep[] createWizardSteps(@NotNull WizardContext wizardContext, @NotNull ModulesProvider modulesProvider) {
