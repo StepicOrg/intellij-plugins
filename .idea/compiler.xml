@@ -18,10 +18,5 @@
         <processorPath useClasspath="true" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="intellij-plugins_core" target="1.8" />
-      <module name="intellij-plugins_main" target="1.8" />
-      <module name="intellij-plugins_test" target="1.8" />
-    </bytecodeTargetLevel>
   </component>
 </project>

@@ -12,5 +12,7 @@ hs_err_pid*
 out/
 .idea/workspace.xml
 .idea/tasks.xml
+.idea/modules.xml
+.idea/compiler.xml
 .gradle/
 build/
