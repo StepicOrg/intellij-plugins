@@ -3,6 +3,7 @@ package org.stepik.plugin.actions;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.keymap.KeymapUtil;
@@ -22,7 +23,6 @@ import org.stepik.plugin.collective.SupportedLanguages;
 import javax.swing.*;
 
 import static org.stepik.plugin.actions.DirectivesUtils.*;
-import static org.stepik.plugin.collective.SupportedLanguages.JAVA;
 
 
 public class InsertStepikDirectives extends StudyActionWithShortcut {
@@ -32,7 +32,8 @@ public class InsertStepikDirectives extends StudyActionWithShortcut {
 
     public InsertStepikDirectives() {
 
-        super("Repair standard template(" + KeymapUtil.getShortcutText(new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT), null)) + ")",
+        super("Repair standard template(" + KeymapUtil.getShortcutText(
+                new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT), null)) + ")",
                 "Insert Stepik directives. Repair ordinary template if it is possible.",
                 AllIcons.General.ExternalToolsSmall);
     }
@@ -52,7 +53,8 @@ public class InsertStepikDirectives extends StudyActionWithShortcut {
     @Override
     public void actionPerformed(AnActionEvent e) {
         Project project = e.getProject();
-        if (project == null) return;
+        if (project == null)
+            return;
         StudyEditor studyEditor = StudyUtils.getSelectedStudyEditor(project);
         StudyState studyState = new StudyState(studyEditor);
         if (!studyState.isValid()) {
@@ -68,26 +70,29 @@ public class InsertStepikDirectives extends StudyActionWithShortcut {
 
         FileDocumentManager documentManager = FileDocumentManager.getInstance();
         for (VirtualFile file : FileEditorManager.getInstance(project).getOpenFiles()) {
-            documentManager.saveDocument(documentManager.getDocument(file));
+            Document document = documentManager.getDocument(file);
+            if (document != null)
+                documentManager.saveDocument(document);
         }
 
-        SupportedLanguages currentLang = SupportedLanguages.loadLangSettings(langSetting.getCurrentLang());
-
+        SupportedLanguages currentLang = SupportedLanguages.langOf(langSetting.getCurrentLang());
+        if (currentLang == null) {
+            return;
+        }
         VirtualFile src = studyState.getTaskDir();
         VirtualFile file = src.findChild(currentLang.getMainFileName());
-
+        if (file == null) {
+            return;
+        }
         String[] text = DirectivesUtils.getFileText(file);
 
         Pair<Integer, Integer> locations = DirectivesUtils.findDirectives(text, currentLang);
         boolean showHint = StudyTaskManager.getInstance(project).getShowHint();
         boolean needInsert = locations.first == -1 && locations.second == text.length;
         if (needInsert) {
-            text = insertDirectives(text, currentLang, showHint);
-            if (currentLang.getName().equals(JAVA.getName())) {
-                text = insertMainClass(text);
-            }
+            text = insertAmbientCode(text, currentLang, showHint);
         } else {
-            text = removeDirectives(text, locations, showHint, project);
+            text = removeAmbientCode(text, locations, project, showHint, currentLang);
         }
         writeInToFile(text, file, project);
         if (needInsert) {

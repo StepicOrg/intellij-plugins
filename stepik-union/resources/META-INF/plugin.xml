@@ -1,15 +1,14 @@
 <idea-plugin version="2">
     <id>org.stepik.plugin.union</id>
     <name>Stepik Union</name>
-    <version>0.3.12</version>
+    <version>0.3.14</version>
     <idea-version since-build="162.0"/>
     <vendor email="petr.bogdanov@stepik.org" url="http://www.stepik.org">Stepik</vendor>
 
     <description><![CDATA[
       Stepik plugin for code challenges on Python and Java.<br>
 
-      It use unstable PyCharm Edu plugin.<br>
-      To use this plugin you have to have Stepik account and follow the course.<br>
+      To uses this plugin you have to have Stepik account and follow the course.<br>
     ]]></description>
 
     <!--<change-notes><![CDATA[-->
@@ -29,10 +28,7 @@
     <depends>com.intellij.modules.lang</depends>
     <depends>com.jetbrains.edu.interactivelearning</depends>
     <!--<depends>com.jetbrains.edu.intellij</depends>-->
-    <!--<depends>com.intellij.modules.python</depends>-->
-    <!--<depends>com.intellij.modules.lang</depends>-->
     <depends>com.intellij.modules.python</depends>
-    <!--<depends optional="true">Pythonid</depends>-->
     <depends optional="true">PythonCore</depends>
 
     <extensions defaultExtensionNs="com.intellij">
