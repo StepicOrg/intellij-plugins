@@ -8,8 +8,7 @@
     <description><![CDATA[
       Stepik plugin for code challenges on Python and Java.<br>
 
-      It use unstable PyCharm Edu plugin.<br>
-      To use this plugin you have to have Stepik account and follow the course.<br>
+      To uses this plugin you have to have Stepik account and follow the course.<br>
     ]]></description>
 
     <!--<change-notes><![CDATA[-->
