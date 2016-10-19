@@ -3,11 +3,18 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/core/core.iml" filepath="$PROJECT_DIR$/.idea/modules/core/core.iml" group="core" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/core/core.iml" filepath="$PROJECT_DIR$/.idea/modules/core/core.iml" group="core" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/core/core_main.iml" filepath="$PROJECT_DIR$/.idea/modules/core/core_main.iml" group="core" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/core/core_main.iml" filepath="$PROJECT_DIR$/.idea/modules/core/core_main.iml" group="core" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/core/core_test.iml" filepath="$PROJECT_DIR$/.idea/modules/core/core_test.iml" group="core" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/core/core_test.iml" filepath="$PROJECT_DIR$/.idea/modules/core/core_test.iml" group="core" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/intellij-plugins.iml" filepath="$PROJECT_DIR$/.idea/modules/intellij-plugins.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/intellij-plugins.iml" filepath="$PROJECT_DIR$/.idea/modules/intellij-plugins.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/stepik-union/stepik-union.iml" filepath="$PROJECT_DIR$/.idea/modules/stepik-union/stepik-union.iml" group="stepik-union" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/stepik-union/stepik-union.iml" filepath="$PROJECT_DIR$/.idea/modules/stepik-union/stepik-union.iml" group="stepik-union" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/stepik-union/stepik-union_main.iml" filepath="$PROJECT_DIR$/.idea/modules/stepik-union/stepik-union_main.iml" group="stepik-union" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/stepik-union/stepik-union_main.iml" filepath="$PROJECT_DIR$/.idea/modules/stepik-union/stepik-union_main.iml" group="stepik-union" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/stepik-union/stepik-union_test.iml" filepath="$PROJECT_DIR$/.idea/modules/stepik-union/stepik-union_test.iml" group="stepik-union" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/stepik-union/stepik-union_test.iml" filepath="$PROJECT_DIR$/.idea/modules/stepik-union/stepik-union_test.iml" group="stepik-union" />
     </modules>
   </component>

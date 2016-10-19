@@ -1,19 +1,109 @@
-apply plugin: "idea"
+import org.apache.tools.ant.filters.ReplaceTokens
 
-subprojects {
-
-    apply plugin: "java"
-
-    tasks.withType(JavaCompile) {
-        sourceCompatibility = JavaVersion.VERSION_1_7
-        targetCompatibility = JavaVersion.VERSION_1_7
-    }
-
+buildscript {
+    ext.kotlin_version = '1.0.3'
     repositories {
         mavenCentral()
     }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
 }
 
-task wrapper(type: Wrapper) {
-    gradleVersion = "2.13"
+plugins {
+    id "org.jetbrains.intellij" version "0.0.39"
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'kotlin'
+    apply plugin: "org.jetbrains.intellij"
+
+    tasks.withType(JavaCompile) { options.encoding = 'UTF-8' }
+
+    sourceSets {
+        main {
+            java.srcDirs 'src', '../src', '../gen'
+            kotlin.srcDirs 'src'
+            resources.srcDirs 'resources', '../resources'
+        }
+        test {
+            java.srcDir 'test'
+        }
+    }
+
+    processResources {
+        filesNotMatching("**/*.png") {
+            it.filter(ReplaceTokens, tokens: [
+                    'VERSION'     : version.toString(),
+                    'BUILD-NUMBER': buildNumber,
+            ])
+        }
+    }
+
+    repositories {
+        ivy {
+            ivyPattern      'http://buildserver.labs.intellij.net/guestAuth/repository/download/ijplatform_master_PyCharm_Installers/lastSuccessful/teamcity-ivy.xml'
+            artifactPattern 'http://buildserver.labs.intellij.net/guestAuth/repository/download/ijplatform_master_PyCharm_Installers/lastSuccessful/[artifact].[ext]'
+        }
+    }
+
+    configurations {
+        pycharm
+    }
+
+    dependencies {
+        pycharm ('org:ijplatform_master_PyCharm_Installers:lastSuccessful')
+        compileOnly fileTree(dir: rootProject.projectDir.toString() + "/gradleBuild/pycharm", include: ['**/*.jar'])
+    }
+
+    task extractPyCharm(type: Copy) {
+        from zipTree(configurations.pycharm.filter{dep -> dep.name.startsWith("pycharmPC-") && dep.name.endsWith(".zip")}[0])
+        into rootProject.projectDir.toString() + "/gradleBuild/pycharm"
+        include "**/*.jar"
+    }
+
+    intellij {
+        version ideaVersion
+        updateSinceUntilBuild Boolean.valueOf(updateBuildNumber)
+        downloadSources Boolean.valueOf(downloadIdeaSources)
+        sandboxDirectory = new File(rootProject.projectDir, "gradleBuild/idea-sandbox")
+    }
+}
+
+project(':student-python') {
+    sourceSets {
+        main {
+            java {
+                srcDir '/stepik-union/src/main/java'
+            }
+
+            resources {
+                srcDir '/stepik-union/src/main/resources'
+            }
+        }
+
+        test {
+            java {
+                srcDir '/stepik-union/src/test/java'
+            }
+
+            resources {
+                srcDir '/stepik-union/src/test/resources'
+            }
+        }
+    }
+}
+
+
+project(':stepik-union') {
+
+    dependencies {
+        compile project(':core')
+    }
+
+    intellij {
+        pluginName 'stepik-union'
+    }
+
 }
