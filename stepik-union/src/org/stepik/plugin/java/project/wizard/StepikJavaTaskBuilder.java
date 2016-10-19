@@ -44,8 +44,8 @@ public class StepikJavaTaskBuilder extends JavaModuleBuilder implements TaskBuil
         //module name like lessoni-taski
         String moduleName = name + "-" + taskName;
         setName(moduleName);
-        setModuleFilePath(FileUtil.join(moduleDir, taskName, moduleName +
-                ModuleFileType.DOT_DEFAULT_EXTENSION));
+        setModuleFilePath(FileUtil.join(moduleDir, taskName,
+                moduleName + ModuleFileType.DOT_DEFAULT_EXTENSION));
     }
 
 
