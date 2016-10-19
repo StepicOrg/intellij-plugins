@@ -120,7 +120,7 @@
         <action id="SCore.RefreshAnswerPlaceholder" class="com.jetbrains.tmp.learning.actions.StudyRefreshAnswerPlaceholder" text="Refresh Answer Placeholder">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
-        description="Watch test input "/>
+
         <action id="SCore.ShowHintAction" class="com.jetbrains.tmp.learning.actions.StudyShowHintAction" text="Show Hint for Answer Placeholder"
                 description="Show hint for answer placeholder"/>
         <action id="SCore.StudyRunAction" class="com.jetbrains.tmp.learning.actions.StudyRunAction" text="Run File With Tests"

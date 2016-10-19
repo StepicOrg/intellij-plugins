@@ -12,3 +12,5 @@ hs_err_pid*
 out/
 .idea/workspace.xml
 .idea/tasks.xml
+.idea/stepik_study_project.xml
+.idea/study_project.xml
