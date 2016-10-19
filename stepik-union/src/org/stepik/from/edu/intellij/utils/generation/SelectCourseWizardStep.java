@@ -22,9 +22,15 @@ import com.jetbrains.tmp.learning.stepik.StepikWrappers;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.plugin.collective.SupportedLanguages;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.JTextPane;
 import javax.swing.event.HyperlinkEvent;
-import java.awt.*;
+import java.awt.CardLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -66,7 +72,8 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
                                   WizardContext wizardContext) {
         this.myGenerator = generator;
         project = wizardContext.getProject() == null ?
-                DefaultProjectFactory.getInstance().getDefaultProject() : wizardContext.getProject();
+                DefaultProjectFactory.getInstance().getDefaultProject() :
+                wizardContext.getProject();
 
         layoutPanel();
         initListeners();
@@ -125,7 +132,8 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
         StepikConnectorLogin.loginFromDialog(project);
         userName.setText(StudyTaskManager.getInstance(project).getUser().getName());
 
-        myAvailableCourses = myGenerator.getCoursesUnderProgress(false, "Getting Available Courses",
+        myAvailableCourses = myGenerator.getCoursesUnderProgress(false,
+                "Getting Available Courses",
                 ProjectManager.getInstance().getDefaultProject());
         myAvailableCourses.forEach(courseComboBox::addItem);
 
@@ -148,7 +156,8 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
             courseDescription.setText("");
             final java.util.List<CourseInfo> courses = ProgressManager.getInstance()
                     .runProcessWithProgressSynchronously(() -> {
-                        ProgressManager.getInstance().getProgressIndicator().setIndeterminate(true);
+                        ProgressManager.getInstance().getProgressIndicator()
+                                .setIndeterminate(true);
                         return myGenerator.getCourses(true);
                     }, "Refreshing Course List", true, project);
 
@@ -186,12 +195,15 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
         public void actionPerformed(ActionEvent e) {
             String link = courseLinkFiled.getText();
             String courseId = getCourseIdFromLink(link);
-            if ("-1".equals(courseId)) {
+
+            StepikWrappers.CoursesContainer coursesContainer;
+            if ("-1".equals(courseId) ||
+                    (coursesContainer = StepikConnectorGet.getCourseInfos(courseId)) == null) {
                 courseDescription.setText("Wrong link");
                 return;
             }
 
-            selectedCourse = StepikConnectorGet.getCourseInfos(courseId).courses.get(0);
+            selectedCourse = coursesContainer.courses.get(0);
             myGenerator.setSelectedCourse(selectedCourse);
             courseDescription.setText(String.format("<b>Course:</b> %s<br><br>%s",
                     selectedCourse.toString(), selectedCourse.getDescription()));
@@ -207,38 +219,60 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
                 return link;
             }
 
-            if (link.contains("course/")) {
-                List<String> list = Arrays.asList(link.split("/"));
-                int i = list.indexOf("course");
-                if (i == -1) {
+            List<String> list = Arrays.asList(link.split("/"));
+            int i = list.indexOf("course");
+            if (i != -1) {
+                if (i + 1 == list.size())
                     return "-1";
-                }
                 String[] parts = list.get(i + 1).split("-");
-                return parts[parts.length - 1];
+                return parts.length != 0 ? parts[parts.length - 1] : "-1";
             }
-            if (link.contains("unit=")) {
-                String unitId = link.split("&")[1].split("=")[1];
-                List<StepikWrappers.Unit> units = StepikConnectorGet.getUnits(unitId).units;
-                String sectionId = Integer.toString(units.get(0).section);
-                return Integer.toString(StepikConnectorGet.getSections(sectionId).sections.get(0).course);
-            }
-            if (link.contains("lesson/")) {
-                List<String> list = Arrays.asList(link.split("/"));
-                int i = list.indexOf("lesson");
-                if (i == -1) {
-                    return "-1";
+
+            String[] paramStr = link.split("\\?");
+            if (paramStr.length > 1) {
+                String[] params = paramStr[1].split("&");
+                final String[] unitId = {"-1"};
+                Arrays.stream(params)
+                        .filter(s -> s.startsWith("unit="))
+                        .forEach(s -> unitId[0] = s.substring(5, s.length()));
+
+                if (!unitId[0].equals("-1")) {
+                    StepikWrappers.UnitContainer unitContainer =
+                            StepikConnectorGet.getUnits(unitId[0]);
+                    if (unitContainer == null) {
+                        return "-1";
+                    }
+                    return getCourseId(unitContainer);
                 }
+            }
+
+            list = Arrays.asList(link.split("/"));
+            i = list.indexOf("lesson");
+            if (i != -1) {
+                if (i + 1 == list.size())
+                    return "-1";
                 String[] parts = list.get(i + 1).split("-");
                 String lessonId = parts[parts.length - 1];
-                List<StepikWrappers.Unit> units = StepikConnectorGet.getUnits("?lesson=" + lessonId).units;
-                String sectionId = Integer.toString(units.get(0).section);
-                return Integer.toString(StepikConnectorGet.getSections(sectionId).sections.get(0).course);
+                StepikWrappers.UnitContainer unitContainer =
+                        StepikConnectorGet.getUnits("?lesson=" + lessonId);
+
+                return unitContainer == null? "-1":getCourseId(unitContainer);
             }
-            return "-1";
+           return "-1";
+        }
+
+        @NotNull
+        private String getCourseId(@NotNull StepikWrappers.UnitContainer unitContainer) {
+            String sectionId = Integer.toString(unitContainer.units.get(0).section);
+            StepikWrappers.SectionContainer sectionContainer =
+                    StepikConnectorGet.getSections(sectionId);
+
+            return sectionContainer == null ? "-1" :
+                    Integer.toString(sectionContainer.sections.get(0).course);
         }
 
         private boolean isFillOfInt(@NotNull String link) {
-            return !link.matches(".*[^0-9]+.*");
+            return link.matches("[0-9]+");
         }
     }
 
@@ -246,7 +280,7 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
     public void onStepLeaving() {
         String selLang = ((SupportedLanguages) langComboBox.getSelectedItem()).getName();
         StudyTaskManager.getInstance(project).setDefaultLang(selLang);
-        if (selectedCourse != null){
+        if (selectedCourse != null) {
             myGenerator.setSelectedCourse(selectedCourse);
         }
     }
@@ -254,7 +288,7 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
     @Override
     public void onWizardFinished() throws CommitStepException {
         super.onWizardFinished();
-        if (buildType.getSelectedItem().equals(COURSE_LINK)){
+        if (buildType.getSelectedItem().equals(COURSE_LINK)) {
             StepikConnectorPost.enrollToCourse(selectedCourse.getId());
         }
     }
