@@ -19,8 +19,12 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="core_main" target="1.7" />
+      <module name="core_test" target="1.7" />
       <module name="intellij-plugins_main" target="1.8" />
       <module name="intellij-plugins_test" target="1.8" />
+      <module name="stepik-union_main" target="1.7" />
+      <module name="stepik-union_test" target="1.7" />
     </bytecodeTargetLevel>
   </component>
 </project>
