@@ -208,12 +208,12 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
             }
 
             if (link.contains("course/")) {
-                List<String> ar = Arrays.asList(link.split("/"));
-                int i = ar.indexOf("course");
+                List<String> list = Arrays.asList(link.split("/"));
+                int i = list.indexOf("course");
                 if (i == -1) {
                     return "-1";
                 }
-                String[] parts = ar.get(i + 1).split("-");
+                String[] parts = list.get(i + 1).split("-");
                 return parts[parts.length - 1];
             }
             if (link.contains("unit=")) {
@@ -223,12 +223,12 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
                 return Integer.toString(StepikConnectorGet.getSections(sectionId).sections.get(0).course);
             }
             if (link.contains("lesson/")) {
-                List<String> ar = Arrays.asList(link.split("/"));
-                int i = ar.indexOf("lesson");
+                List<String> list = Arrays.asList(link.split("/"));
+                int i = list.indexOf("lesson");
                 if (i == -1) {
                     return "-1";
                 }
-                String[] parts = ar.get(i + 1).split("-");
+                String[] parts = list.get(i + 1).split("-");
                 String lessonId = parts[parts.length - 1];
                 List<StepikWrappers.Unit> units = StepikConnectorGet.getUnits("?lesson=" + lessonId).units;
                 String sectionId = Integer.toString(units.get(0).section);
@@ -238,7 +238,7 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
         }
 
         private boolean isFillOfInt(@NotNull String link) {
-            return !link.matches("[^0-9]");
+            return !link.matches(".*[^0-9]+.*");
         }
     }
 
