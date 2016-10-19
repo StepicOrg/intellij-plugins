@@ -13,8 +13,8 @@ import com.intellij.openapi.util.io.FileUtil;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.Lesson;
 import com.jetbrains.tmp.learning.courseFormat.Task;
-import com.jetbrains.tmp.utils.generation.builders.LessonBuilder;
-import com.jetbrains.tmp.utils.generation.builders.TaskBuilder;
+import org.stepik.from.edu.intellij.utils.generation.builders.LessonBuilder;
+import org.stepik.from.edu.intellij.utils.generation.builders.TaskBuilder;
 import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
 
