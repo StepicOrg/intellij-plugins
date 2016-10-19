@@ -3,6 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/intellij-plugins.iml" filepath="$PROJECT_DIR$/.idea/modules/intellij-plugins.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/intellij-plugins_main.iml" filepath="$PROJECT_DIR$/.idea/modules/intellij-plugins_main.iml" group="intellij-plugins" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/intellij-plugins_test.iml" filepath="$PROJECT_DIR$/.idea/modules/intellij-plugins_test.iml" group="intellij-plugins" />
       <module fileurl="file://$PROJECT_DIR$/stepik-union/stepik-union.iml" filepath="$PROJECT_DIR$/stepik-union/stepik-union.iml" />
     </modules>
   </component>
