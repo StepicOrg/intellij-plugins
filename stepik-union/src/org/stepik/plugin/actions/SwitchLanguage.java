@@ -33,8 +33,8 @@ public class SwitchLanguage extends StudyActionWithShortcut {
 
     public SwitchLanguage() {
         super("Switch language(" + KeymapUtil.getShortcutText(
-                new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT), null)) +
-                ")", "Switch language", AllIcons.Actions.Diff);
+                new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT), null)) + ")",
+                "Switch language", AllIcons.Actions.Diff);
     }
 
     @Override
