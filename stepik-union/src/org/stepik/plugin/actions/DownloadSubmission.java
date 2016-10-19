@@ -50,7 +50,7 @@ public class DownloadSubmission extends StudyActionWithShortcut {
     @Nullable
     @Override
     public String[] getShortcuts() {
-        return new String[0];
+        return new String[]{SHORTCUT};
     }
 
     @Override
