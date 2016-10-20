@@ -1,0 +1,12 @@
+intellij {
+    pluginName 'stepik-union'
+}
+
+dependencies {
+    compile project(":core")
+}
+
+group 'org.stepik'
+version '0.3.16-SNAPSHOT'
+
+defaultTasks "runIdea"
