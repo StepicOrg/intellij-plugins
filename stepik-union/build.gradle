@@ -1,5 +1,6 @@
 intellij {
     pluginName 'stepik-union'
+    sandboxDirectory = new File('build/idea-sandbox/')
 }
 
 dependencies {
