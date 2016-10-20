@@ -9,7 +9,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module-library">
-      <library name="Gradle: com.jetbrains:ideaIC:162.2228.15">
+      <library name="Gradle: com.jetbrains:idea:162.2228.15">
         <CLASSES>
           <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIC/162.2228.15/9da18bcb3f042e1e81dad469b2c5e99603412cd0/ideaIC-162.2228.15/lib/annotations.jar!/" />
           <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIC/162.2228.15/9da18bcb3f042e1e81dad469b2c5e99603412cd0/ideaIC-162.2228.15/lib/asm-all.jar!/" />
@@ -115,12 +115,20 @@
           <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIC/162.2228.15/9da18bcb3f042e1e81dad469b2c5e99603412cd0/ideaIC-162.2228.15/lib/xmlrpc-2.0.jar!/" />
           <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIC/162.2228.15/9da18bcb3f042e1e81dad469b2c5e99603412cd0/ideaIC-162.2228.15/lib/xpp3-1.1.4-min.jar!/" />
           <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIC/162.2228.15/9da18bcb3f042e1e81dad469b2c5e99603412cd0/ideaIC-162.2228.15/lib/xstream-1.4.8.jar!/" />
-          <root url="jar://D:/Programs/Java/jdk1.8.0_92/lib/tools.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
           <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIC/162.2228.15/4a91be5d52a50d4c535347846b374fd65f0a8d5a/ideaIC-162.2228.15-sources.jar!/" />
         </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="RUNTIME">
+      <library>
+        <CLASSES>
+          <root url="jar://D:/Programs/Java/jdk1.8.0_92/lib/tools.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
       </library>
     </orderEntry>
   </component>

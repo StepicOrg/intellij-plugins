@@ -1,5 +1,11 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+}
+
 plugins {
-    id "org.jetbrains.intellij" version "0.0.20"
+    id "org.jetbrains.intellij" version "0.1.10"
 }
 
 apply plugin: 'org.jetbrains.intellij'
@@ -20,10 +26,6 @@ subprojects {
 
     intellij {
         version ideaVersion //IntelliJ IDEA dependency
-    }
-
-    repositories {
-        mavenCentral()
     }
 }
 
