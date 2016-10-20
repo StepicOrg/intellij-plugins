@@ -12,5 +12,13 @@ hs_err_pid*
 out/
 .idea/workspace.xml
 .idea/tasks.xml
-.idea/stepik_study_project.xml
 .idea/study_project.xml
+.idea/modules/
+.idea/copyright
+.idea/stepik_study_project.xml
+.idea/compiler.xml
+.idea/modules.xml
+.gradle/
+build/
+core/build/
+stepik-union/build/
