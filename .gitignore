@@ -16,3 +16,4 @@ out/
 .idea/study_project.xml
 /*/build/
 build/
+.gradle/
