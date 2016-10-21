@@ -4,35 +4,41 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.jetbrains.edu.learning.StudyState;
-import com.jetbrains.edu.learning.StudyTaskManager;
-import com.jetbrains.edu.learning.StudyUtils;
-import com.jetbrains.edu.learning.actions.StudyActionWithShortcut;
-import com.jetbrains.edu.learning.courseFormat.Task;
-import com.jetbrains.edu.learning.editor.StudyEditor;
-import com.jetbrains.edu.learning.stepik.StepikConnectorGet;
-import com.jetbrains.edu.learning.stepik.StepikConnectorPost;
-import com.jetbrains.edu.learning.stepik.StepikWrappers;
+import com.jetbrains.tmp.learning.LangManager;
+import com.jetbrains.tmp.learning.LangSetting;
+import com.jetbrains.tmp.learning.StudyState;
+import com.jetbrains.tmp.learning.StudyTaskManager;
+import com.jetbrains.tmp.learning.StudyUtils;
+import com.jetbrains.tmp.learning.actions.StudyActionWithShortcut;
+import com.jetbrains.tmp.learning.courseFormat.Task;
+import com.jetbrains.tmp.learning.editor.StudyEditor;
+import com.jetbrains.tmp.learning.stepik.StepikConnectorGet;
+import com.jetbrains.tmp.learning.stepik.StepikConnectorPost;
+import com.jetbrains.tmp.learning.stepik.StepikWrappers;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.plugin.collective.SupportedLanguages;
 
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DownloadSubmission extends StudyActionWithShortcut {
-    public static final String ACTION_ID = "DownloadSubmission";
-    public static final String SHORTCUT = "ctrl pressed PAGE_DOWN";
+    private static final String ACTION_ID = "STEPIK.DownloadSubmission";
+    private static final String SHORTCUT = "ctrl alt pressed PAGE_DOWN";
 
     public DownloadSubmission() {
-        super("Download submission(" + KeymapUtil.getShortcutText(new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT), null)) + ")", "Download submission", IconLoader.getIcon("/icons/arrow-down.png"));
+        super("Download submission(" + KeymapUtil.getShortcutText(
+                new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT), null)) + ")",
+                "Download submission", IconLoader.getIcon("/icons/arrow-down.png"));
     }
 
     @NotNull
@@ -44,7 +50,7 @@ public class DownloadSubmission extends StudyActionWithShortcut {
     @Nullable
     @Override
     public String[] getShortcuts() {
-        return new String[0];
+        return new String[]{SHORTCUT};
     }
 
     @Override
@@ -63,7 +69,7 @@ public class DownloadSubmission extends StudyActionWithShortcut {
             return;
         }
 
-        String stepId = Integer.toString(targetTask.getStepikId());
+        String stepId = Integer.toString(targetTask.getStepId());
         String userId = Integer.toString(StudyTaskManager.getInstance(project).getUser().getId());
 
         List<NameValuePair> nvps = new ArrayList<>();
@@ -71,34 +77,49 @@ public class DownloadSubmission extends StudyActionWithShortcut {
         nvps.add(new BasicNameValuePair("user", userId));
         nvps.add(new BasicNameValuePair("order", "desc"));
 
-        List<StepikWrappers.SubmissionContainer.Submission> submissions = StepikConnectorGet.getSubmissions(nvps).submissions;
+        List<StepikWrappers.SubmissionContainer.Submission> submissions =
+                StepikConnectorGet.getSubmissions(nvps).submissions;
         StepikWrappers.MetricsWrapper metric = new StepikWrappers.MetricsWrapper(
                 StepikWrappers.MetricsWrapper.PluginNames.S_Union,
                 StepikWrappers.MetricsWrapper.MetricActions.DOWNLOAD,
                 targetTask.getLesson().getCourse().getId(),
-                targetTask.getStepikId());
+                targetTask.getStepId());
         StepikConnectorPost.postMetric(metric);
 
-        String currentLang = StudyTaskManager.getInstance(project).getLangManager().getLangSetting(targetTask).getCurrentLang();
-        String activateFileName = currentLang.equals("python3") ? "main.py" : "Main.java";
+        LangManager langManager = StudyTaskManager.getInstance(project).getLangManager();
+        LangSetting langSetting = langManager.getLangSetting(targetTask);
+        SupportedLanguages currentLang = SupportedLanguages.langOf(langSetting.getCurrentLang());
+        if (currentLang == null) {
+            return;
+        }
+        String activateFileName = currentLang.getMainFileName();
         String code = null;
         for (StepikWrappers.SubmissionContainer.Submission submission : submissions){
-            if (submission.reply.language.startsWith(currentLang) ){
+            if (submission.reply.language.startsWith(currentLang.getName())){
                 code = submission.reply.code;
                 break;
             }
         }
-        if (code == null) return;
+        if (code == null) {
+            return;
+        }
         final String finalCode = code;
 
         VirtualFile vf = studyState.getTaskDir().findChild(activateFileName);
         FileDocumentManager documentManager = FileDocumentManager.getInstance();
-
+        if (vf == null) {
+            return;
+        }
         CommandProcessor.getInstance().executeCommand(project,
                 () -> ApplicationManager.getApplication().runWriteAction(
                         () -> {
-                            documentManager.getDocument(vf).setText(finalCode);
-                        }), "Download last submission", "Download last submission");
+                            Document document = documentManager
+                                    .getDocument(vf);
+                            if (document != null)
+                                document.setText(finalCode);
+                        }),
+                "Download last submission",
+                "Download last submission");
 
     }
 }

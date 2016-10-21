@@ -2,8 +2,8 @@ package org.stepik.plugin.actions;
 
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.keymap.KeymapUtil;
-import com.jetbrains.edu.learning.courseFormat.Task;
-import com.jetbrains.edu.learning.navigation.StudyNavigator;
+import com.jetbrains.tmp.learning.courseFormat.Task;
+import com.jetbrains.tmp.learning.navigation.StudyNavigator;
 import icons.InteractiveLearningIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 
 public class StepikPreviousTaskAction extends StepikTaskNavigationAction {
-    public static final String ACTION_ID = "PreviousTaskAction";
+    public static final String ACTION_ID = "STEPIK.PreviousTaskAction";
     public static final String SHORTCUT = "ctrl pressed COMMA";
 
     public StepikPreviousTaskAction() {

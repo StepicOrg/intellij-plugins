@@ -10,11 +10,11 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.io.FileUtil;
-import com.jetbrains.edu.learning.core.EduNames;
-import com.jetbrains.edu.learning.courseFormat.Lesson;
-import com.jetbrains.edu.learning.courseFormat.Task;
-import com.jetbrains.edu.utils.generation.builders.LessonBuilder;
-import com.jetbrains.edu.utils.generation.builders.TaskBuilder;
+import com.jetbrains.tmp.learning.core.EduNames;
+import com.jetbrains.tmp.learning.courseFormat.Lesson;
+import com.jetbrains.tmp.learning.courseFormat.Task;
+import org.stepik.from.edu.intellij.utils.generation.builders.LessonBuilder;
+import org.stepik.from.edu.intellij.utils.generation.builders.TaskBuilder;
 import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
 
