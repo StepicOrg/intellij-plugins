@@ -28,8 +28,8 @@
     <depends>com.intellij.modules.lang</depends>
     <depends>com.jetbrains.edu.interactivelearning</depends>
     <!--<depends>com.jetbrains.edu.intellij</depends>-->
+    <!--<depends>com.intellij.modules.python</depends>-->
     <depends optional="true">PythonCore</depends>
-    <depends optional="true">PythonId</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <treeStructureProvider implementation="org.stepik.plugin.StepikTreeStructureProvider"/>
