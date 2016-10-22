@@ -1,0 +1,13 @@
+intellij {
+    pluginName 'stepik-union'
+    sandboxDirectory ideaSandboxDir
+}
+
+dependencies {
+    compile project(":core")
+}
+
+group 'org.stepik'
+version pluginVersion // This version will path to plugin.xml
+
+defaultTasks "runIdea"

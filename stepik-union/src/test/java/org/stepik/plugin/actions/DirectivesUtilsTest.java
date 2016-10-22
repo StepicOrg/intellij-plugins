@@ -19,7 +19,7 @@ public class DirectivesUtilsTest {
 
     private String readTestFile(@NotNull String fileName) {
         StringBuilder sb = new StringBuilder();
-        InputStream inputStream = this.getClass().getResourceAsStream("/resources/samples/" + fileName);
+        InputStream inputStream = this.getClass().getResourceAsStream("/samples/" + fileName);
 
         if (inputStream == null)
             return null;
