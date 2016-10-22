@@ -1,5 +1,6 @@
 package org.stepik.plugin;
 
+import com.intellij.ide.navigationToolbar.JavaNavBarExtension;
 import com.intellij.ide.navigationToolbar.NavBarModelExtension;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -19,7 +20,7 @@ import java.util.Collections;
 /**
  * @author meanmail
  */
-public class StepikNavBarModelExtension implements NavBarModelExtension {
+public class StepikNavBarModelExtension extends JavaNavBarExtension {
 
     @Nullable
     @Override
@@ -62,29 +63,11 @@ public class StepikNavBarModelExtension implements NavBarModelExtension {
             }
         }
 
-        return null;
+        return super.getPresentableText(object);
     }
     @Nullable
     private Course getCourse(@NotNull Project project) {
         StudyTaskManager studyTaskManager = StudyTaskManager.getInstance(project);
         return studyTaskManager.getCourse();
-    }
-
-    @Nullable
-    @Override
-    public PsiElement getParent(PsiElement psiElement) {
-        return psiElement.getParent();
-    }
-
-    @Nullable
-    @Override
-    public PsiElement adjustElement(PsiElement psiElement) {
-        return psiElement;
-    }
-
-    @NotNull
-    @Override
-    public Collection<VirtualFile> additionalRoots(Project project) {
-        return Collections.emptyList();
     }
 }
