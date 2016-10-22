@@ -25,7 +25,7 @@ public class StudyToolWindowFactory implements ToolWindowFactory, DumbAware {
     StudyTaskManager taskManager = StudyTaskManager.getInstance(project);
     final Course course = taskManager.getCourse();
     if (course != null || !taskManager.getUser().getEmail().isEmpty()) {
-      LOG.info("create TW");
+      LOG.info("Study Tool Window is created");
       final StudyToolWindow studyToolWindow;
       if (StudyUtils.hasJavaFx() && taskManager.shouldUseJavaFx()) {
         studyToolWindow = new StudyJavaFxToolWindow();
@@ -40,7 +40,7 @@ public class StudyToolWindowFactory implements ToolWindowFactory, DumbAware {
       Disposer.register(project, studyToolWindow);
     }
     else {
-      LOG.warn("Tool window did not create");
+      LOG.warn("Study Tool Window did not create");
     }
   }
 }
