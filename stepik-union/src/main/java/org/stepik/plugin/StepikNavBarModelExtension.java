@@ -37,11 +37,12 @@ public class StepikNavBarModelExtension implements NavBarModelExtension {
             Course course = getCourse(item.getProject());
             if (course == null)
                 return null;
-            String name = item.getName();
 
             if (item.getVirtualFile().equals(item.getProject().getBaseDir())) {
                 return course.getName();
             }
+
+            String name = item.getName();
 
             if (name.startsWith(EduNames.SECTION)) {
                 return course.getSectionsNames().get(name);
@@ -59,11 +60,9 @@ public class StepikNavBarModelExtension implements NavBarModelExtension {
                 Lesson lesson = course.getLessons().get(EduUtils.getIndex(lessonName, EduNames.LESSON));
                 return lesson.getTask(name).getName();
             }
-
-            return null;
-        } else {
-            return null;
         }
+
+        return null;
     }
     @Nullable
     private Course getCourse(@NotNull Project project) {
