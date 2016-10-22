@@ -357,10 +357,12 @@ public class StepikConnectorGet {
     final StringBuilder stringBuilder = new StringBuilder();
 
     task.setName("step" + task.getPosition());
-    stringBuilder
-      .append(getStepLink(stepSource))
-      .append(step.text)
-      .append("<br>");
+    stringBuilder.append(getStepLink(stepSource));
+    if (!step.text.startsWith("<p>")) {
+      stringBuilder.append("<br><br>");
+    }
+    stringBuilder.append(step.text).append("<br>");
+
     if (step.options.samples != null) {
       for (List<String> sample : step.options.samples) {
         if (sample.size() == 2) {
