@@ -157,6 +157,7 @@
         <statistics.usagesCollector implementation="com.jetbrains.tmp.learning.statistics.EduUsagesCollector"/>
         <applicationService serviceImplementation="com.jetbrains.tmp.learning.statistics.EduUsagesCollector"/>
         <applicationService serviceImplementation="com.jetbrains.tmp.learning.stepik.StepikUpdateSettings"/>
+        <navbar implementation="org.stepik.plugin.StepikNavBarModelExtention"></navbar>
     </extensions>
 
     <extensions defaultExtensionNs="SCore">
