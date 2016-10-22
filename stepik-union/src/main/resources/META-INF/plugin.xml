@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>org.stepik.plugin.union</id>
     <name>Stepik Union</name>
-    <version>0.3.14</version>
+    <version>SNAPSHOT</version>
     <idea-version since-build="162.0"/>
     <vendor email="petr.bogdanov@stepik.org" url="http://www.stepik.org">Stepik</vendor>
 
@@ -16,14 +16,6 @@
     <!--<em>most HTML tags may be used</em>-->
     <!--]]>-->
     <!--</change-notes>-->
-
-    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
-
-    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
-         on how to target different products -->
-    <!-- uncomment to enable plugin in all products
-    <depends>com.intellij.modules.lang</depends>
-    -->
 
     <depends>com.intellij.modules.lang</depends>
     <depends>com.jetbrains.edu.interactivelearning</depends>
@@ -53,6 +45,9 @@
         <courseConfigurator language="JAVA" implementationClass="org.stepik.plugin.java.StepikJavaCourseConfigurator"/>
     </extensions>-->
 
+    <extensions defaultExtensionNs="com.intellij">
+        <navbar implementation="org.stepik.plugin.StepikNavBarModelExtension"></navbar>
+    </extensions>
 
     <actions>
         <!--<action id="StepikJavaPostAction" class="StepikJavaPostAction"-->
