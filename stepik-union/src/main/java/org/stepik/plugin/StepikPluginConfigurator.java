@@ -4,32 +4,30 @@ import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.project.Project;
 import com.jetbrains.tmp.learning.StudyBasePluginConfigurator;
 import com.jetbrains.tmp.learning.StudyTaskManager;
-import com.jetbrains.tmp.learning.actions.StudyRefreshTaskFileAction;
 import com.jetbrains.tmp.learning.courseFormat.Course;
 import org.jetbrains.annotations.NotNull;
-import org.stepik.plugin.actions.*;
+import org.stepik.plugin.actions.DownloadSubmission;
+import org.stepik.plugin.actions.InsertStepikDirectives;
+import org.stepik.plugin.actions.StepikJavaPostAction;
+import org.stepik.plugin.actions.StepikNextTaskAction;
+import org.stepik.plugin.actions.StepikPreviousTaskAction;
+import org.stepik.plugin.actions.StepikRefreshTaskFileAction;
+import org.stepik.plugin.actions.SwitchLanguage;
 
 public class StepikPluginConfigurator extends StudyBasePluginConfigurator {
     @NotNull
     @Override
     public DefaultActionGroup getActionGroup(Project project) {
-//        DefaultActionGroup baseGroup = super.getActionGroup(project);
         final DefaultActionGroup group = new DefaultActionGroup();
 
         group.add(new StepikJavaPostAction());
         group.add(new StepikPreviousTaskAction());
         group.add(new StepikNextTaskAction());
-        group.add(new StudyRefreshTaskFileAction());
+        group.add(new StepikRefreshTaskFileAction());
         group.add(new DownloadSubmission());
         group.add(new SwitchLanguage());
         group.add(new InsertStepikDirectives());
 
-
-//        resetTaskFile.getTemplatePresentation().setIcon(EduKotlinIcons.RESET_TASK_FILE);
-//        StudyFillPlaceholdersAction fillPlaceholdersAction = new StudyFillPlaceholdersAction();
-//        fillPlaceholdersAction.getTemplatePresentation().setIcon(EduKotlinIcons.FILL_PLACEHOLDERS_ICON);
-//        fillPlaceholdersAction.getTemplatePresentation().setText("Fill Answer Placeholders");
-//        group.add(fillPlaceholdersAction);
         return group;
     }
 
@@ -42,9 +40,10 @@ public class StepikPluginConfigurator extends StudyBasePluginConfigurator {
     @Override
     public boolean accept(@NotNull Project project) {
         StudyTaskManager instance = StudyTaskManager.getInstance(project);
-        if (instance == null) return false;
+        if (instance == null)
+            return false;
         Course course = instance.getCourse();
-//        return builders != null && "PyCharm".equals(builders.getCourseType()) && "JAVA".equals(builders.getLanguage());
+
         return course != null;
     }
 

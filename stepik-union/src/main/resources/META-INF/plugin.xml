@@ -11,62 +11,41 @@
       To uses this plugin you have to have Stepik account and follow the course.<br>
     ]]></description>
 
-    <!--<change-notes><![CDATA[-->
-    <!--Add change notes here.<br>-->
-    <!--<em>most HTML tags may be used</em>-->
-    <!--]]>-->
-    <!--</change-notes>-->
-
     <depends>com.intellij.modules.lang</depends>
     <depends>com.jetbrains.edu.interactivelearning</depends>
-    <!--<depends>com.jetbrains.edu.intellij</depends>-->
     <depends>com.intellij.modules.python</depends>
     <depends optional="true">PythonCore</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <treeStructureProvider implementation="org.stepik.plugin.StepikTreeStructureProvider"/>
-        <!--<moduleBuilder builderClass="org.stepik.plugin.java.project.wizard.PythonCourseBuilder" id="java.stepik.builder" order="first"/>-->
-
-        <applicationConfigurable instance="org.stepik.plugin.collective.ui.StepikSettingsConfigurable"/>
+        <applicationConfigurable
+                instance="org.stepik.plugin.collective.ui.StepikSettingsConfigurable"/>
         <moduleType id="STEPIK_MODULE_TYPE"
                     implementationClass="org.stepik.plugin.java.project.wizard.StepikModuleType"/>
-    </extensions>
-
-    <extensions defaultExtensionNs="SCore">
-        <!--<StudyLanguageManager implementationClass="StepikJavaLanguageManager" language="JAVA"/>-->
-        <studyPluginConfigurator implementation="org.stepik.plugin.StepikPluginConfigurator"/>
-
-        <!--<optionsProvider instance="com.jetbrains.tmp.learning.stepik.StepikStudyOptions"/>-->
-        <!--<optionsProvider instance="org.stepik.plugin.java.project.wizard.StepikStudyOptions"/>-->
-    </extensions>
-
-<!--    <extensions defaultExtensionNs="com.jetbrains.tmp.intellij">
-        &lt;!&ndash;<eduIntelliJProjectTemplate implementation="StepikProjectTemplate"/>&ndash;&gt;
-        <courseConfigurator language="JAVA" implementationClass="org.stepik.plugin.java.StepikJavaCourseConfigurator"/>
-    </extensions>-->
-
-    <extensions defaultExtensionNs="com.intellij">
         <navbar implementation="org.stepik.plugin.StepikNavBarModelExtension"></navbar>
     </extensions>
 
+    <extensions defaultExtensionNs="SCore">
+        <studyPluginConfigurator implementation="org.stepik.plugin.StepikPluginConfigurator"/>
+    </extensions>
+
     <actions>
-        <!--<action id="StepikJavaPostAction" class="StepikJavaPostAction"-->
         <action id="STEPIK.StepikJavaPostAction" class="org.stepik.plugin.actions.StepikJavaPostAction"/>
         <action id="STEPIK.PreviousTaskAction" class="org.stepik.plugin.actions.StepikPreviousTaskAction"/>
         <action id="STEPIK.NextTaskAction" class="org.stepik.plugin.actions.StepikNextTaskAction"/>
         <action id="STEPIK.DownloadSubmission" class="org.stepik.plugin.actions.DownloadSubmission"/>
         <action id="STEPIK.SwitchLanguage" class="org.stepik.plugin.actions.SwitchLanguage"/>
         <action id="STEPIK.InsertStepikDirectives" class="org.stepik.plugin.actions.InsertStepikDirectives"/>
-        <!--text="Stepik Java Check"/>-->
+        <action id="STEPIK.RefreshTaskAction"
+                class="org.stepik.plugin.actions.StepikRefreshTaskFileAction" text="Reset Task File"
+                description="Refresh current task"/>
     </actions>
-
 
     <!--______________________ CORE ________________________________________-->
 
     <project-components>
         <component>
             <implementation-class>com.jetbrains.tmp.learning.StudyProjectComponent</implementation-class>
-            <interface-class>com.jetbrains.tmp.learning.StudyProjectComponent</interface-class>
         </component>
     </project-components>
 
@@ -85,7 +64,6 @@
         </extensionPoint>
         <extensionPoint qualifiedName="SCore.studyPluginConfigurator" interface="com.jetbrains.tmp.learning.StudyPluginConfigurator"/>
         <extensionPoint qualifiedName="SCore.studyActionsProvider" interface="com.jetbrains.tmp.learning.StudyActionsProvider"/>
-        <!--<extensionPoint qualifiedName="SCore.studyTwitterPluginConfigurator" interface="com.jetbrains.tmp.learning.StudyTwitterPluginConfigurator"/>-->
         <extensionPoint qualifiedName="SCore.studyActionListener" interface="com.jetbrains.tmp.learning.StudyActionListener"/>
         <extensionPoint qualifiedName="SCore.optionsProvider" beanClass="com.jetbrains.tmp.learning.settings.StudyOptionsProviderEP">>
             <with attribute="instance" implements="com.jetbrains.tmp.learning.settings.StudyOptionsProvider"/>
@@ -106,8 +84,6 @@
                 description="Navigate to the previous task"/>
         <action id="SCore.NextTaskAction" class="com.jetbrains.tmp.learning.actions.StudyNextStudyTaskAction" text="Next Task"
                 description="Navigate to the next task"/>
-        <action id="SCore.RefreshTaskAction" class="com.jetbrains.tmp.learning.actions.StudyRefreshTaskFileAction" text="Reset Task File"
-                description="Refresh current task"/>
         <action id="SCore.RefreshAnswerPlaceholder" class="com.jetbrains.tmp.learning.actions.StudyRefreshAnswerPlaceholder" text="Refresh Answer Placeholder">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
@@ -123,7 +99,6 @@
         <action id="SCore.StudySwitchPanel" class="com.jetbrains.tmp.learning.actions.StudySwitchTaskPanelAction"
                 text="Switch Task Description Panel">
         </action>
-
     </actions>
 
     <extensions defaultExtensionNs="com.intellij">
@@ -154,6 +129,5 @@
     <extensions defaultExtensionNs="SCore">
         <optionsProvider instance="com.jetbrains.tmp.learning.stepik.StepikStudyOptions"/>
     </extensions>
-
 
 </idea-plugin>
