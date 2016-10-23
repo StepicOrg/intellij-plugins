@@ -175,9 +175,9 @@ public class StepikRefreshTaskFileAction extends StudyActionWithShortcut {
         }
 
         presentation.setVisible(true);
-
-        if (!(EduNames.STEPIK_CODE.equals(course.getCourseMode())||
-                EduNames.STUDY.equals(course.getCourseMode()))) {
+        String courseMode = course.getCourseMode();
+        if (!(EduNames.STEPIK_CODE.equals(courseMode)||
+                EduNames.STUDY.equals(courseMode))) {
             presentation.setEnabled(false);
         }
     }
