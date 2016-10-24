@@ -46,8 +46,9 @@ public class StepikRefreshTaskFileAction extends StudyActionWithShortcut {
             .getInstance(StepikRefreshTaskFileAction.class.getName());
 
     public StepikRefreshTaskFileAction() {
-        super("Reset Task File (" + KeymapUtil.getShortcutText(new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT), null)) + ")", "Refresh current task",
-                InteractiveLearningIcons.ResetTaskFile);
+        super("Reset Task File (" + KeymapUtil.getShortcutText(
+                new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT), null)) + ")",
+                "Refresh current task", InteractiveLearningIcons.ResetTaskFile);
     }
 
     public static void refresh(@NotNull final Project project) {
@@ -101,8 +102,8 @@ public class StepikRefreshTaskFileAction extends StudyActionWithShortcut {
 
     private static void showBalloon(@NotNull final Project project, String text,
                                     @NotNull final MessageType messageType) {
-        BalloonBuilder balloonBuilder =
-                JBPopupFactory.getInstance().createHtmlTextBalloonBuilder(text, messageType, null);
+        BalloonBuilder balloonBuilder = JBPopupFactory.getInstance()
+                .createHtmlTextBalloonBuilder(text, messageType, null);
         final Balloon balloon = balloonBuilder.createBalloon();
         StudyEditor selectedStudyEditor = StudyUtils.getSelectedStudyEditor(project);
         assert selectedStudyEditor != null;
@@ -129,27 +130,24 @@ public class StepikRefreshTaskFileAction extends StudyActionWithShortcut {
         }
         StudyUtils.deleteGuardedBlocks(document);
 
-        CommandProcessor
-                .getInstance()
-                .executeCommand(project,
-                        () -> ApplicationManager
-                                .getApplication()
-                                .runWriteAction(
-                                        () -> document.setText(patternDocument.getCharsSequence())),
-                        "Stepik refresh task",
-                        "Stepik refresh task");
+        CommandProcessor.getInstance().executeCommand(project,
+                () -> ApplicationManager
+                        .getApplication()
+                        .runWriteAction(() -> document.setText(patternDocument.getCharsSequence())),
+                "Stepik refresh task", "Stepik refresh task"
+        );
         return true;
     }
 
     public void actionPerformed(@NotNull AnActionEvent event) {
         final Project project = event.getProject();
-        if (project != null) {
-            for (StudyActionListener listener : Extensions
-                    .getExtensions(StudyActionListener.EP_NAME)) {
-                listener.beforeCheck(event);
-            }
-            refresh(project);
+        if (project == null) {
+            return;
         }
+        for (StudyActionListener listener : Extensions.getExtensions(StudyActionListener.EP_NAME)) {
+            listener.beforeCheck(event);
+        }
+        refresh(project);
     }
 
     @Override
@@ -176,8 +174,7 @@ public class StepikRefreshTaskFileAction extends StudyActionWithShortcut {
 
         presentation.setVisible(true);
         String courseMode = course.getCourseMode();
-        if (!(EduNames.STEPIK_CODE.equals(courseMode)||
-                EduNames.STUDY.equals(courseMode))) {
+        if (!(EduNames.STEPIK_CODE.equals(courseMode) || EduNames.STUDY.equals(courseMode))) {
             presentation.setEnabled(false);
         }
     }
