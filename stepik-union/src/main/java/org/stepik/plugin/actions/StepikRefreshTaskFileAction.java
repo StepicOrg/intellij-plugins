@@ -27,7 +27,6 @@ import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.actions.StudyActionWithShortcut;
 import com.jetbrains.tmp.learning.core.EduAnswerPlaceholderPainter;
 import com.jetbrains.tmp.learning.core.EduNames;
-import com.jetbrains.tmp.learning.courseFormat.AnswerPlaceholder;
 import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
 import com.jetbrains.tmp.learning.courseFormat.TaskFile;
@@ -94,7 +93,6 @@ public class StepikRefreshTaskFileAction extends StudyActionWithShortcut {
             return false;
         }
         taskFile.getTask().setStatus(StudyStatus.Unchecked);
-        resetAnswerPlaceholders(taskFile, project);
         ProjectView.getInstance(project).refresh();
         StudyUtils.updateToolWindows(project);
         return true;
@@ -110,14 +108,6 @@ public class StepikRefreshTaskFileAction extends StudyActionWithShortcut {
         balloon.show(StudyUtils.computeLocation(selectedStudyEditor.getEditor()),
                 Balloon.Position.above);
         Disposer.register(project, balloon);
-    }
-
-    private static void resetAnswerPlaceholders(TaskFile selectedTaskFile, Project project) {
-        final StudyTaskManager taskManager = StudyTaskManager.getInstance(project);
-        for (AnswerPlaceholder answerPlaceholder : selectedTaskFile.getAnswerPlaceholders()) {
-            answerPlaceholder.reset();
-            taskManager.setStatus(answerPlaceholder, StudyStatus.Unchecked);
-        }
     }
 
     private static boolean resetDocument(@NotNull final Document document,
@@ -174,7 +164,7 @@ public class StepikRefreshTaskFileAction extends StudyActionWithShortcut {
 
         presentation.setVisible(true);
         String courseMode = course.getCourseMode();
-        if (!(EduNames.STEPIK_CODE.equals(courseMode) || EduNames.STUDY.equals(courseMode))) {
+        if (!(EduNames.STEPIK_CODE.equals(courseMode))) {
             presentation.setEnabled(false);
         }
     }
