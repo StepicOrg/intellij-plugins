@@ -24,6 +24,7 @@ import java.util.Map;
 
 public abstract class StepikTaskNavigationAction extends StudyTaskNavigationAction {
     private static final Logger LOG = Logger.getInstance(StepikTaskNavigationAction.class);
+
     public StepikTaskNavigationAction(@Nullable String text, @Nullable String description, @Nullable Icon icon) {
         super(text, description, icon);
     }
@@ -54,7 +55,7 @@ public abstract class StepikTaskNavigationAction extends StudyTaskNavigationActi
         }
 
         VirtualFile lessonDir = null;
-        for (VirtualFile sectionDir : sectionDirs){
+        for (VirtualFile sectionDir : sectionDirs) {
             lessonDir = sectionDir.findChild(lessonDirName);
             if (lessonDir != null) break;
         }
@@ -84,7 +85,10 @@ public abstract class StepikTaskNavigationAction extends StudyTaskNavigationActi
     }
 
     @Nullable
-    protected VirtualFile getFileToActivate(@NotNull Project project, Map<String, TaskFile> nextTaskFiles, VirtualFile taskDir) {
+    protected VirtualFile getFileToActivate(
+            @NotNull Project project,
+            Map<String, TaskFile> nextTaskFiles,
+            VirtualFile taskDir) {
         VirtualFile shouldBeActive = null;
         for (Map.Entry<String, TaskFile> entry : nextTaskFiles.entrySet()) {
             String name = entry.getKey();
@@ -94,7 +98,7 @@ public abstract class StepikTaskNavigationAction extends StudyTaskNavigationActi
                 if (shouldBeActive != null) {
                     FileEditorManager.getInstance(project).openFile(vf, true);
                 }
-                if (shouldBeActive == null ) {
+                if (shouldBeActive == null) {
                     shouldBeActive = vf;
                 }
             }

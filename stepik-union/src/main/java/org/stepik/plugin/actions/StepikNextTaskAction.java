@@ -7,6 +7,7 @@ import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.navigation.StudyNavigator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
 import javax.swing.*;
 
 public class StepikNextTaskAction extends StepikTaskNavigationAction {
@@ -14,7 +15,8 @@ public class StepikNextTaskAction extends StepikTaskNavigationAction {
     public static final String SHORTCUT = "ctrl pressed PERIOD";
 
     public StepikNextTaskAction() {
-        super("Next Task (" + KeymapUtil.getShortcutText(new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT), null)) + ")", "Navigate to the next task", AllIcons.Actions.Forward);
+        super("Next Task (" + KeymapUtil.getShortcutText(new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT),
+                null)) + ")", "Navigate to the next task", AllIcons.Actions.Forward);
     }
 
     @Override

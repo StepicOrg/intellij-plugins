@@ -19,7 +19,7 @@ import java.util.NoSuchElementException;
 
 public class StepikAuthorizationException extends NoSuchElementException {
 
-  public StepikAuthorizationException(String s) {
-    super(s);
-  }
+    public StepikAuthorizationException(String s) {
+        super(s);
+    }
 }

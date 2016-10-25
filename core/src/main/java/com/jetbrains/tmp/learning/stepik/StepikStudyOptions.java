@@ -34,131 +34,129 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
 public class StepikStudyOptions implements StudyOptionsProvider {
-  private static final String DEFAULT_PASSWORD_TEXT = "************";
-  private static final Logger LOG = Logger.getInstance(StepikStudyOptions.class);
-  private JTextField myLoginTextField;
-  private JPasswordField myPasswordField;
-  private JPanel myPane;
+    private static final String DEFAULT_PASSWORD_TEXT = "************";
+    private static final Logger LOG = Logger.getInstance(StepikStudyOptions.class);
+    private JTextField myLoginTextField;
+    private JPasswordField myPasswordField;
+    private JPanel myPane;
 
-  private boolean myCredentialsModified;
+    private boolean myCredentialsModified;
 
-  public StepikStudyOptions() {
-    myPasswordField.getDocument().addDocumentListener(new DocumentAdapter() {
-      @Override
-      protected void textChanged(DocumentEvent e) {
+    public StepikStudyOptions() {
+        myPasswordField.getDocument().addDocumentListener(new DocumentAdapter() {
+            @Override
+            protected void textChanged(DocumentEvent e) {
+                myCredentialsModified = true;
+            }
+        });
+
+        DocumentListener passwordEraser = new DocumentAdapter() {
+            @Override
+            protected void textChanged(DocumentEvent e) {
+                if (!myCredentialsModified) {
+                    erasePassword();
+                }
+            }
+        };
+        myLoginTextField.getDocument().addDocumentListener(passwordEraser);
+
+        myPasswordField.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (!myCredentialsModified && !getPassword().isEmpty()) {
+                    erasePassword();
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+            }
+        });
+        reset();
+    }
+
+    private void erasePassword() {
+        setPassword("");
         myCredentialsModified = true;
-      }
-    });
-
-    DocumentListener passwordEraser = new DocumentAdapter() {
-      @Override
-      protected void textChanged(DocumentEvent e) {
-        if (!myCredentialsModified) {
-          erasePassword();
-        }
-      }
-    };
-    myLoginTextField.getDocument().addDocumentListener(passwordEraser);
-
-    myPasswordField.addFocusListener(new FocusListener() {
-      @Override
-      public void focusGained(FocusEvent e) {
-        if (!myCredentialsModified && !getPassword().isEmpty()) {
-          erasePassword();
-        }
-      }
-
-      @Override
-      public void focusLost(FocusEvent e) {
-      }
-    });
-    reset();
-  }
-
-  private void erasePassword() {
-    setPassword("");
-    myCredentialsModified = true;
-  }
-
-  @NotNull
-  public JComponent getPanel() {
-    return myPane;
-  }
-
-  @NotNull
-  public String getLogin() {
-    return myLoginTextField.getText().trim();
-  }
-
-  public void setLogin(@Nullable final String login) {
-    myLoginTextField.setText(login);
-  }
-
-  @NotNull
-  private String getPassword() {
-    return String.valueOf(myPasswordField.getPassword());
-  }
-
-  private void setPassword(@NotNull final String password) {
-    myPasswordField.setText(StringUtil.isEmpty(password) ? null : password);
-  }
-
-  @Override
-  public void reset() {
-    Project project = StudyUtils.getStudyProject();
-    if (project != null) {
-      final StepikUser user = StudyTaskManager.getInstance(project).getUser();
-      if (user != null) {
-        setLogin(user.getEmail());
-        setPassword(DEFAULT_PASSWORD_TEXT);
-      }
-      resetCredentialsModification();
     }
-    else {
-      LOG.warn("No study object is opened");
+
+    @NotNull
+    public JComponent getPanel() {
+        return myPane;
     }
-  }
 
-  @Override
-  public void disposeUIResources() {
+    @NotNull
+    public String getLogin() {
+        return myLoginTextField.getText().trim();
+    }
 
-  }
+    public void setLogin(@Nullable final String login) {
+        myLoginTextField.setText(login);
+    }
 
-  @Override
-  public void apply() {
-    if (myCredentialsModified) {
-      final Project project = StudyUtils.getStudyProject();
-      if (project != null) {
-        final StepikUser user = StudyTaskManager.getInstance(project).getUser();
-        user.setEmail(getLogin());
-        user.setPassword(getPassword());
-        if (!StringUtil.isEmptyOrSpaces(getLogin()) && !StringUtil.isEmptyOrSpaces(getPassword())) {
-          StepikConnectorLogin.minorLogin(new StepikUser(getLogin(), getPassword()));
+    @NotNull
+    private String getPassword() {
+        return String.valueOf(myPasswordField.getPassword());
+    }
+
+    private void setPassword(@NotNull final String password) {
+        myPasswordField.setText(StringUtil.isEmpty(password) ? null : password);
+    }
+
+    @Override
+    public void reset() {
+        Project project = StudyUtils.getStudyProject();
+        if (project != null) {
+            final StepikUser user = StudyTaskManager.getInstance(project).getUser();
+            if (user != null) {
+                setLogin(user.getEmail());
+                setPassword(DEFAULT_PASSWORD_TEXT);
+            }
+            resetCredentialsModification();
+        } else {
+            LOG.warn("No study object is opened");
         }
-      }
-      else {
-        LOG.warn("No study object is opened");
-      }
     }
-    resetCredentialsModification();
-  }
 
-  @Nullable
-  @Override
-  public JComponent createComponent() {
-    return myPane;
-  }
+    @Override
+    public void disposeUIResources() {
 
-  public boolean isModified() {
-    return myCredentialsModified;
-  }
-  
-  public void resetCredentialsModification() {
-    myCredentialsModified = false;
-  }
+    }
 
-  private void createUIComponents() {
-    Document doc = new PlainDocument();
-    myPasswordField = new JPasswordField(doc, null, 0);
-  }
+    @Override
+    public void apply() {
+        if (myCredentialsModified) {
+            final Project project = StudyUtils.getStudyProject();
+            if (project != null) {
+                final StepikUser user = StudyTaskManager.getInstance(project).getUser();
+                user.setEmail(getLogin());
+                user.setPassword(getPassword());
+                if (!StringUtil.isEmptyOrSpaces(getLogin()) && !StringUtil.isEmptyOrSpaces(getPassword())) {
+                    StepikConnectorLogin.minorLogin(new StepikUser(getLogin(), getPassword()));
+                }
+            } else {
+                LOG.warn("No study object is opened");
+            }
+        }
+        resetCredentialsModification();
+    }
+
+    @Nullable
+    @Override
+    public JComponent createComponent() {
+        return myPane;
+    }
+
+    public boolean isModified() {
+        return myCredentialsModified;
+    }
+
+    public void resetCredentialsModification() {
+        myCredentialsModified = false;
+    }
+
+    private void createUIComponents() {
+        Document doc = new PlainDocument();
+        myPasswordField = new JPasswordField(doc, null, 0);
+    }
 }

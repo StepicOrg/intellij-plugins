@@ -18,87 +18,88 @@ import java.util.Collections;
 import java.util.Map;
 
 public abstract class StudyBasePluginConfigurator implements StudyPluginConfigurator {
-  @NotNull
-  @Override
-  public DefaultActionGroup getActionGroup(Project project) {
-    return getDefaultActionGroup();
-  }
+    @NotNull
+    @Override
+    public DefaultActionGroup getActionGroup(Project project) {
+        return getDefaultActionGroup();
+    }
 
-  @NotNull
-  public static DefaultActionGroup getDefaultActionGroup() {
-    final DefaultActionGroup group = new DefaultActionGroup();
-    group.add(new StudyPreviousStudyTaskAction());
-    group.add(new StudyNextStudyTaskAction());
-    group.add(new StudyRefreshTaskFileAction());
-    group.add(new StudyShowHintAction());
+    @NotNull
+    public static DefaultActionGroup getDefaultActionGroup() {
+        final DefaultActionGroup group = new DefaultActionGroup();
+        group.add(new StudyPreviousStudyTaskAction());
+        group.add(new StudyNextStudyTaskAction());
+        group.add(new StudyRefreshTaskFileAction());
+        group.add(new StudyShowHintAction());
 
-    group.add(new StudyRunAction());
-    group.add(new StudyEditInputAction());
-    return group;
-  }
+        group.add(new StudyRunAction());
+        group.add(new StudyEditInputAction());
+        return group;
+    }
 
-  @NotNull
-  @Override
-  public Map<String, JPanel> getAdditionalPanels(Project project) {
-    return Collections.emptyMap();
-  }
+    @NotNull
+    @Override
+    public Map<String, JPanel> getAdditionalPanels(Project project) {
+        return Collections.emptyMap();
+    }
 
-  @NotNull
-  @Override
-  public FileEditorManagerListener getFileEditorManagerListener(@NotNull Project project, @NotNull StudyToolWindow toolWindow) {
+    @NotNull
+    @Override
+    public FileEditorManagerListener getFileEditorManagerListener(
+            @NotNull Project project,
+            @NotNull StudyToolWindow toolWindow) {
 
-    return new FileEditorManagerListener() {
-      @Override
-      public void fileOpened(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
-        Task task = getTask(file);
-        setTaskText(task, file.getParent());
-      }
+        return new FileEditorManagerListener() {
+            @Override
+            public void fileOpened(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
+                Task task = getTask(file);
+                setTaskText(task, file.getParent());
+            }
 
-      @Override
-      public void fileClosed(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
-        for (VirtualFile openedFile : source.getOpenFiles()) {
-          if (StudyUtils.getTaskFile(project, openedFile) != null) {
-            return;
-          }
-        }
-        toolWindow.setEmptyText(project);
-      }
+            @Override
+            public void fileClosed(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
+                for (VirtualFile openedFile : source.getOpenFiles()) {
+                    if (StudyUtils.getTaskFile(project, openedFile) != null) {
+                        return;
+                    }
+                }
+                toolWindow.setEmptyText(project);
+            }
 
-      @Override
-      public void selectionChanged(@NotNull FileEditorManagerEvent event) {
-        VirtualFile file = event.getNewFile();
-        if (file != null) {
-          Task task = getTask(file);
-          setTaskText(task, file.getParent());
-        }
-        toolWindow.setBottomComponent(null);
-      }
+            @Override
+            public void selectionChanged(@NotNull FileEditorManagerEvent event) {
+                VirtualFile file = event.getNewFile();
+                if (file != null) {
+                    Task task = getTask(file);
+                    setTaskText(task, file.getParent());
+                }
+                toolWindow.setBottomComponent(null);
+            }
 
-      @Nullable
-      private Task getTask(@NotNull VirtualFile file) {
-        TaskFile taskFile = StudyUtils.getTaskFile(project, file);
-        if (taskFile != null) {
-          return taskFile.getTask();
-        }
-        else {
-          return null;
-        }
-      }
+            @Nullable
+            private Task getTask(@NotNull VirtualFile file) {
+                TaskFile taskFile = StudyUtils.getTaskFile(project, file);
+                if (taskFile != null) {
+                    return taskFile.getTask();
+                } else {
+                    return null;
+                }
+            }
 
-      private void setTaskText(@Nullable final Task task, @Nullable final VirtualFile taskDirectory) {
-        String text = StudyUtils.getTaskTextFromTask(taskDirectory, task);
-        if (text == null) {
-          toolWindow.setEmptyText(project);
-          return;
-        }
-        toolWindow.setTaskText(text, taskDirectory, project);
-      }
-    };
-  }
+            private void setTaskText(@Nullable final Task task, @Nullable final VirtualFile taskDirectory) {
+                String text = StudyUtils.getTaskTextFromTask(taskDirectory, task);
+                if (text == null) {
+                    toolWindow.setEmptyText(project);
+                    return;
+                }
+                toolWindow.setTaskText(text, taskDirectory, project);
+            }
+        };
+    }
 
-  @Nullable
-  @Override
-  public StudyAfterCheckAction[] getAfterCheckActions() {
-    return null;
-  }
+    @Nullable
+    @Override
+    public StudyAfterCheckAction[] getAfterCheckActions() {
+        return null;
+    }
 }

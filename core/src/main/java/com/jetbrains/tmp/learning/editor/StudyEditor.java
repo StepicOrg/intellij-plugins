@@ -18,28 +18,30 @@ import java.util.Map;
  * also @see {@link StudyFileEditorProvider}
  */
 public class StudyEditor extends PsiAwareTextEditorImpl {
-  private final TaskFile myTaskFile;
-  private static final Map<Document, EduDocumentListener> myDocumentListeners = new HashMap<Document, EduDocumentListener>();
+    private final TaskFile myTaskFile;
+    private static final Map<Document, EduDocumentListener> myDocumentListeners = new HashMap<Document, EduDocumentListener>();
 
-  public StudyEditor(@NotNull final Project project, @NotNull final VirtualFile file) {
-    super(project, file, TextEditorProvider.getInstance());
-    myTaskFile = StudyUtils.getTaskFile(project, file);
-  }
-
-  public TaskFile getTaskFile() {
-    return myTaskFile;
-  }
-
-  public static void addDocumentListener(@NotNull final Document document, @NotNull final EduDocumentListener listener) {
-    document.addDocumentListener(listener);
-    myDocumentListeners.put(document, listener);
-  }
-
-  public static void removeListener(Document document) {
-    final EduDocumentListener listener = myDocumentListeners.get(document);
-    if (listener != null) {
-      document.removeDocumentListener(listener);
+    public StudyEditor(@NotNull final Project project, @NotNull final VirtualFile file) {
+        super(project, file, TextEditorProvider.getInstance());
+        myTaskFile = StudyUtils.getTaskFile(project, file);
     }
-    myDocumentListeners.remove(document);
-  }
+
+    public TaskFile getTaskFile() {
+        return myTaskFile;
+    }
+
+    public static void addDocumentListener(
+            @NotNull final Document document,
+            @NotNull final EduDocumentListener listener) {
+        document.addDocumentListener(listener);
+        myDocumentListeners.put(document, listener);
+    }
+
+    public static void removeListener(Document document) {
+        final EduDocumentListener listener = myDocumentListeners.get(document);
+        if (listener != null) {
+            document.removeDocumentListener(listener);
+        }
+        myDocumentListeners.remove(document);
+    }
 }

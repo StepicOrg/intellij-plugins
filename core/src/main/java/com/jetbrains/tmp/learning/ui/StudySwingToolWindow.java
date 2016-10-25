@@ -31,39 +31,39 @@ import javax.swing.text.html.HTMLEditorKit;
 import java.awt.*;
 
 public class StudySwingToolWindow extends StudyToolWindow {
-  private JTextPane myTaskTextPane;
+    private JTextPane myTaskTextPane;
 
-  public StudySwingToolWindow() {
-    super();
-  }
-
-  @Override
-  public JComponent createTaskInfoPanel(Project project) {
-    myTaskTextPane = new JTextPane();
-    final JBScrollPane scrollPane = new JBScrollPane(myTaskTextPane);
-    myTaskTextPane.setContentType(new HTMLEditorKit().getContentType());
-    final EditorColorsScheme editorColorsScheme = EditorColorsManager.getInstance().getGlobalScheme();
-    int fontSize = editorColorsScheme.getEditorFontSize();
-    final String fontName = editorColorsScheme.getEditorFontName();
-    final Font font = new Font(fontName, Font.PLAIN, fontSize);
-    String bodyRule = "body { font-family: " + font.getFamily() + "; " +
-                      "font-size: " + font.getSize() + "pt; }" +
-                      "pre {font-family: Courier; display: inline; ine-height: 50px; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; background-color:"
-                      + ColorUtil.toHex(ColorUtil.dimmer(UIUtil.getPanelBackground())) + ";}" +
-                      "code {font-family: Courier; display: flex; float: left; background-color:"
-                      + ColorUtil.toHex(ColorUtil.dimmer(UIUtil.getPanelBackground())) + ";}";
-    ((HTMLDocument)myTaskTextPane.getDocument()).getStyleSheet().addRule(bodyRule);
-    myTaskTextPane.setEditable(false);
-    if (!UIUtil.isUnderDarcula()) {
-      myTaskTextPane.setBackground(EditorColorsManager.getInstance().getGlobalScheme().getDefaultBackground());
+    public StudySwingToolWindow() {
+        super();
     }
-    myTaskTextPane.setBorder(new EmptyBorder(20, 20, 0, 10));
-    myTaskTextPane.addHyperlinkListener(BrowserHyperlinkListener.INSTANCE);
-    return scrollPane;
-  }
 
-  public void setText(@NotNull String text) {
-    myTaskTextPane.setText(text);
-  }
+    @Override
+    public JComponent createTaskInfoPanel(Project project) {
+        myTaskTextPane = new JTextPane();
+        final JBScrollPane scrollPane = new JBScrollPane(myTaskTextPane);
+        myTaskTextPane.setContentType(new HTMLEditorKit().getContentType());
+        final EditorColorsScheme editorColorsScheme = EditorColorsManager.getInstance().getGlobalScheme();
+        int fontSize = editorColorsScheme.getEditorFontSize();
+        final String fontName = editorColorsScheme.getEditorFontName();
+        final Font font = new Font(fontName, Font.PLAIN, fontSize);
+        String bodyRule = "body { font-family: " + font.getFamily() + "; " +
+                "font-size: " + font.getSize() + "pt; }" +
+                "pre {font-family: Courier; display: inline; ine-height: 50px; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; background-color:"
+                + ColorUtil.toHex(ColorUtil.dimmer(UIUtil.getPanelBackground())) + ";}" +
+                "code {font-family: Courier; display: flex; float: left; background-color:"
+                + ColorUtil.toHex(ColorUtil.dimmer(UIUtil.getPanelBackground())) + ";}";
+        ((HTMLDocument) myTaskTextPane.getDocument()).getStyleSheet().addRule(bodyRule);
+        myTaskTextPane.setEditable(false);
+        if (!UIUtil.isUnderDarcula()) {
+            myTaskTextPane.setBackground(EditorColorsManager.getInstance().getGlobalScheme().getDefaultBackground());
+        }
+        myTaskTextPane.setBorder(new EmptyBorder(20, 20, 0, 10));
+        myTaskTextPane.addHyperlinkListener(BrowserHyperlinkListener.INSTANCE);
+        return scrollPane;
+    }
+
+    public void setText(@NotNull String text) {
+        myTaskTextPane.setText(text);
+    }
 }
 

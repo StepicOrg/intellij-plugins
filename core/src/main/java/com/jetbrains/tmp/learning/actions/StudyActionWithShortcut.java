@@ -8,13 +8,13 @@ import javax.swing.*;
 
 public abstract class StudyActionWithShortcut extends DumbAwareAction {
 
-  public StudyActionWithShortcut(@Nullable String text, @Nullable String description, @Nullable Icon icon) {
-    super(text, description, icon);
-  }
+    public StudyActionWithShortcut(@Nullable String text, @Nullable String description, @Nullable Icon icon) {
+        super(text, description, icon);
+    }
 
-  @NotNull
-  public abstract String getActionId();
-  
-  @Nullable
-  public abstract String[] getShortcuts();
+    @NotNull
+    public abstract String getActionId();
+
+    @Nullable
+    public abstract String[] getShortcuts();
 }

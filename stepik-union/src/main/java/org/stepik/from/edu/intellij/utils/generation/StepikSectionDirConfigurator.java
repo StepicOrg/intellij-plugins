@@ -23,11 +23,11 @@ public class StepikSectionDirConfigurator {
         return lessonDir;
     }
 
-    public String getSectionDir(){
+    public String getSectionDir() {
         return sectionDir;
     }
 
-    public String getSectionName(){
+    public String getSectionName() {
         return sectionName;
     }
 }

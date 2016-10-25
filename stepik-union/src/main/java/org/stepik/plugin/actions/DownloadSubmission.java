@@ -94,8 +94,8 @@ public class DownloadSubmission extends StudyActionWithShortcut {
         }
         String activateFileName = currentLang.getMainFileName();
         String code = null;
-        for (StepikWrappers.SubmissionContainer.Submission submission : submissions){
-            if (submission.reply.language.startsWith(currentLang.getName())){
+        for (StepikWrappers.SubmissionContainer.Submission submission : submissions) {
+            if (submission.reply.language.startsWith(currentLang.getName())) {
                 code = submission.reply.code;
                 break;
             }

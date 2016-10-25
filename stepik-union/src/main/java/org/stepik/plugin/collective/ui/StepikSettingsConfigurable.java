@@ -11,61 +11,61 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 
 public class StepikSettingsConfigurable implements SearchableConfigurable, VcsConfigurableProvider {
-  private StepikSettingsPanel mySettingsPane;
+    private StepikSettingsPanel mySettingsPane;
 
-  public StepikSettingsConfigurable() {
-  }
-
-  @NotNull
-  public String getDisplayName() {
-    return "Stepik";
-  }
-
-  @NotNull
-  public String getHelpTopic() {
-    return "settings.stepik";
-  }
-
-  @NotNull
-  public JComponent createComponent() {
-    if (mySettingsPane == null) {
-      mySettingsPane = new StepikSettingsPanel();
+    public StepikSettingsConfigurable() {
     }
-    return mySettingsPane.getPanel();
-  }
 
-  public boolean isModified() {
-    return mySettingsPane != null && mySettingsPane.isModified();
-  }
-
-  public void apply() throws ConfigurationException {
-    if (mySettingsPane != null) {
-      mySettingsPane.apply();
+    @NotNull
+    public String getDisplayName() {
+        return "Stepik";
     }
-  }
 
-  public void reset() {
-    if (mySettingsPane != null) {
-      mySettingsPane.reset();
+    @NotNull
+    public String getHelpTopic() {
+        return "settings.stepik";
     }
-  }
 
-  public void disposeUIResources() {
-    mySettingsPane = null;
-  }
+    @NotNull
+    public JComponent createComponent() {
+        if (mySettingsPane == null) {
+            mySettingsPane = new StepikSettingsPanel();
+        }
+        return mySettingsPane.getPanel();
+    }
 
-  @NotNull
-  public String getId() {
-    return getHelpTopic();
-  }
+    public boolean isModified() {
+        return mySettingsPane != null && mySettingsPane.isModified();
+    }
 
-  public Runnable enableSearch(String option) {
-    return null;
-  }
+    public void apply() throws ConfigurationException {
+        if (mySettingsPane != null) {
+            mySettingsPane.apply();
+        }
+    }
 
-  @Nullable
-  @Override
-  public Configurable getConfigurable(Project project) {
-    return this;
-  }
+    public void reset() {
+        if (mySettingsPane != null) {
+            mySettingsPane.reset();
+        }
+    }
+
+    public void disposeUIResources() {
+        mySettingsPane = null;
+    }
+
+    @NotNull
+    public String getId() {
+        return getHelpTopic();
+    }
+
+    public Runnable enableSearch(String option) {
+        return null;
+    }
+
+    @Nullable
+    @Override
+    public Configurable getConfigurable(Project project) {
+        return this;
+    }
 }
