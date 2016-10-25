@@ -1,5 +1,6 @@
 package org.stepik.plugin.actions;
 
+import com.intellij.ide.projectView.ProjectView;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.application.Application;
@@ -71,6 +72,9 @@ public class StepikJavaPostAction extends StudyCheckAction {
                     StepikWrappers.SubmissionToPostWrapper postWrapper =
                             new StepikWrappers.SubmissionToPostWrapper(attemptId, currentLang.getName(), solution);
                     StepikWrappers.SubmissionContainer container = StepikConnectorPost.postSubmission(postWrapper);
+                    if (container == null) {
+                        return;
+                    }
                     List<StepikWrappers.SubmissionContainer.Submission> submissions = container.submissions;
                     StepikWrappers.MetricsWrapper metric = new StepikWrappers.MetricsWrapper(
                             StepikWrappers.MetricsWrapper.PluginNames.S_Union,
@@ -96,6 +100,9 @@ public class StepikJavaPostAction extends StudyCheckAction {
                                         Thread.sleep(TIMER * 1000);          //1000 milliseconds is one second.
                                         StepikWrappers.ResultSubmissionWrapper submissionWrapper =
                                                 StepikConnectorGet.getStatus(finalSubmissionId);
+                                        if (submissionWrapper == null) {
+                                            continue;
+                                        }
                                         ans = submissionWrapper.submissions[0].status;
                                         b = submissionWrapper.submissions[0].hint;
                                         count += TIMER;
@@ -122,6 +129,7 @@ public class StepikJavaPostAction extends StudyCheckAction {
                                 notification = new Notification("Step.sending", task.getName() + " is " + ans, b,
                                         notificationType);
                                 NotificationUtils.showNotification(notification, project);
+                                ProjectView.getInstance(project).refresh();
                             }
                     );
                 }));
