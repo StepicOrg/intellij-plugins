@@ -10,10 +10,10 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 out/
-.idea/
 */build/
 build/
 .gradle/
 classes/
-!.idea/runConfigurations/*
+.idea/*
+!.idea/runConfigurations/
 !.idea/codeStyleSettings.xml
