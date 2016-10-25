@@ -19,44 +19,47 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 
 public abstract class StudyCheckAction extends StudyActionWithShortcut {
-  public static final String SHORTCUT = "ctrl alt pressed ENTER";
+    public static final String SHORTCUT = "ctrl alt pressed ENTER";
 
-  protected final Ref<Boolean> myCheckInProgress = new Ref<>(false);
+    protected final Ref<Boolean> myCheckInProgress = new Ref<>(false);
 
-  public StudyCheckAction() {
-    super("Check Task (" + KeymapUtil.getShortcutText(new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT), null)) + ")", "Check current task", InteractiveLearningIcons.CheckTask);
-  }
-
-  public abstract void check(@NotNull final Project project);
-
-  @Override
-  public void actionPerformed(@NotNull AnActionEvent e) {
-    Project project = e.getProject();
-    if (project == null) {
-      return;
+    public StudyCheckAction() {
+        super("Check Task (" + KeymapUtil.getShortcutText(new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT),
+                null)) + ")", "Check current task", InteractiveLearningIcons.CheckTask);
     }
-    if (DumbService.isDumb(project)) {
-      StudyCheckUtils.showTestResultPopUp("Checking is not available while indexing is in progress", MessageType.WARNING.getPopupBackground(), project);
-      return;
-    }
-    FileDocumentManager.getInstance().saveAllDocuments();
-    for (StudyActionListener listener : Extensions.getExtensions(StudyActionListener.EP_NAME)) {
-      listener.beforeCheck(e);
-    }
-    check(project);
-  }
 
-  @Override
-  public void update(AnActionEvent e) {
-    final Presentation presentation = e.getPresentation();
-    StudyUtils.updateAction(e);
-    if (presentation.isEnabled()) {
-      presentation.setEnabled(!myCheckInProgress.get());
-    }
-  }
+    public abstract void check(@NotNull final Project project);
 
-  @Override
-  public String[] getShortcuts() {
-    return new String[] {SHORTCUT};
-  }
+    @Override
+    public void actionPerformed(@NotNull AnActionEvent e) {
+        Project project = e.getProject();
+        if (project == null) {
+            return;
+        }
+        if (DumbService.isDumb(project)) {
+            StudyCheckUtils.showTestResultPopUp("Checking is not available while indexing is in progress",
+                    MessageType.WARNING.getPopupBackground(),
+                    project);
+            return;
+        }
+        FileDocumentManager.getInstance().saveAllDocuments();
+        for (StudyActionListener listener : Extensions.getExtensions(StudyActionListener.EP_NAME)) {
+            listener.beforeCheck(e);
+        }
+        check(project);
+    }
+
+    @Override
+    public void update(AnActionEvent e) {
+        final Presentation presentation = e.getPresentation();
+        StudyUtils.updateAction(e);
+        if (presentation.isEnabled()) {
+            presentation.setEnabled(!myCheckInProgress.get());
+        }
+    }
+
+    @Override
+    public String[] getShortcuts() {
+        return new String[]{SHORTCUT};
+    }
 }

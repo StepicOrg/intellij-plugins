@@ -14,46 +14,49 @@ import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 
 public class StudyFileEditorProvider implements FileEditorProvider, DumbAware {
-  public static final String EDITOR_TYPE_ID = "SCore.StudyEditor";
-  private final FileEditorProvider defaultTextEditorProvider = TextEditorProvider.getInstance();
+    public static final String EDITOR_TYPE_ID = "SCore.StudyEditor";
+    private final FileEditorProvider defaultTextEditorProvider = TextEditorProvider.getInstance();
 
-  @Override
-  public boolean accept(@NotNull Project project, @NotNull VirtualFile file) {
-    TaskFile taskFile = StudyUtils.getTaskFile(project, file);
-    return taskFile != null && !taskFile.isUserCreated() && TextEditorProvider.isTextFile(file);
-  }
+    @Override
+    public boolean accept(@NotNull Project project, @NotNull VirtualFile file) {
+        TaskFile taskFile = StudyUtils.getTaskFile(project, file);
+        return taskFile != null && !taskFile.isUserCreated() && TextEditorProvider.isTextFile(file);
+    }
 
-  @NotNull
-  @Override
-  public FileEditor createEditor(@NotNull Project project, @NotNull VirtualFile file) {
-    return new StudyEditor(project, file);
-  }
+    @NotNull
+    @Override
+    public FileEditor createEditor(@NotNull Project project, @NotNull VirtualFile file) {
+        return new StudyEditor(project, file);
+    }
 
-  @Override
-  public void disposeEditor(@NotNull FileEditor editor) {
-    defaultTextEditorProvider.disposeEditor(editor);
-  }
+    @Override
+    public void disposeEditor(@NotNull FileEditor editor) {
+        defaultTextEditorProvider.disposeEditor(editor);
+    }
 
-  @NotNull
-  @Override
-  public FileEditorState readState(@NotNull Element sourceElement, @NotNull Project project, @NotNull VirtualFile file) {
-    return defaultTextEditorProvider.readState(sourceElement, project, file);
-  }
+    @NotNull
+    @Override
+    public FileEditorState readState(
+            @NotNull Element sourceElement,
+            @NotNull Project project,
+            @NotNull VirtualFile file) {
+        return defaultTextEditorProvider.readState(sourceElement, project, file);
+    }
 
-  @Override
-  public void writeState(@NotNull FileEditorState state, @NotNull Project project, @NotNull Element targetElement) {
-    defaultTextEditorProvider.writeState(state, project, targetElement);
-  }
+    @Override
+    public void writeState(@NotNull FileEditorState state, @NotNull Project project, @NotNull Element targetElement) {
+        defaultTextEditorProvider.writeState(state, project, targetElement);
+    }
 
-  @NotNull
-  @Override
-  public String getEditorTypeId() {
-    return EDITOR_TYPE_ID;
-  }
+    @NotNull
+    @Override
+    public String getEditorTypeId() {
+        return EDITOR_TYPE_ID;
+    }
 
-  @NotNull
-  @Override
-  public FileEditorPolicy getPolicy() {
-    return FileEditorPolicy.HIDE_DEFAULT_EDITOR;
-  }
+    @NotNull
+    @Override
+    public FileEditorPolicy getPolicy() {
+        return FileEditorPolicy.HIDE_DEFAULT_EDITOR;
+    }
 }

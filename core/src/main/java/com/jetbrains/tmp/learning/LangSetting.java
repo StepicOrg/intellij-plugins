@@ -19,45 +19,45 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class LangSetting {
-  private String currentLang;
-  private Set<String> supportLangs ;
+    private String currentLang;
+    private Set<String> supportLangs;
 
 
-  public LangSetting() {
-    supportLangs = new HashSet<>();
-  }
+    public LangSetting() {
+        supportLangs = new HashSet<>();
+    }
 
-  public LangSetting(String currentLang) {
-    this.currentLang = currentLang;
-    supportLangs = new HashSet<>();
-    supportLangs.add(currentLang);
-  }
+    public LangSetting(String currentLang) {
+        this.currentLang = currentLang;
+        supportLangs = new HashSet<>();
+        supportLangs.add(currentLang);
+    }
 
-  public LangSetting(String currentLang, Set<String> supportLangs) {
-    this.currentLang = currentLang;
-    this.supportLangs = new HashSet<>();
-    this.supportLangs.addAll(supportLangs);
-  }
+    public LangSetting(String currentLang, Set<String> supportLangs) {
+        this.currentLang = currentLang;
+        this.supportLangs = new HashSet<>();
+        this.supportLangs.addAll(supportLangs);
+    }
 
-  public LangSetting(Set<String> supportLangs) {
-    this.supportLangs = new HashSet<>();
-    this.supportLangs.addAll(supportLangs);
-  }
+    public LangSetting(Set<String> supportLangs) {
+        this.supportLangs = new HashSet<>();
+        this.supportLangs.addAll(supportLangs);
+    }
 
-  public String getCurrentLang() {
-    return currentLang;
-  }
+    public String getCurrentLang() {
+        return currentLang;
+    }
 
-  public void setCurrentLang(String currentLang) {
-    this.currentLang = currentLang;
-  }
+    public void setCurrentLang(String currentLang) {
+        this.currentLang = currentLang;
+    }
 
-  public Set<String> getSupportLangs() {
-    return supportLangs;
-  }
+    public Set<String> getSupportLangs() {
+        return supportLangs;
+    }
 
-  public void setSupportLangs(Set<String> supportLangs) {
-    this.supportLangs = supportLangs;
-  }
+    public void setSupportLangs(Set<String> supportLangs) {
+        this.supportLangs = supportLangs;
+    }
 
 }

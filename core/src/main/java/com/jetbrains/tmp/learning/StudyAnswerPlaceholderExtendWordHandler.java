@@ -18,43 +18,43 @@ import java.util.List;
 
 public class StudyAnswerPlaceholderExtendWordHandler implements ExtendWordSelectionHandler {
 
-  @Nullable
-  private static AnswerPlaceholder getAnswerPlaceholder(PsiElement e, int offset) {
-    PsiFile file = e.getContainingFile();
-    if (file == null) {
-      return null;
+    @Nullable
+    private static AnswerPlaceholder getAnswerPlaceholder(PsiElement e, int offset) {
+        PsiFile file = e.getContainingFile();
+        if (file == null) {
+            return null;
+        }
+        VirtualFile virtualFile = file.getVirtualFile();
+        if (virtualFile == null) {
+            return null;
+        }
+        TaskFile taskFile = StudyUtils.getTaskFile(e.getProject(), virtualFile);
+        if (taskFile == null) {
+            return null;
+        }
+        Document document = FileDocumentManager.getInstance().getDocument(virtualFile);
+        if (document == null) {
+            return null;
+        }
+        Editor editor = FileEditorManager.getInstance(e.getProject()).getSelectedTextEditor();
+        return editor == null ? null : taskFile.getAnswerPlaceholder(offset);
     }
-    VirtualFile virtualFile = file.getVirtualFile();
-    if (virtualFile == null) {
-      return null;
-    }
-    TaskFile taskFile = StudyUtils.getTaskFile(e.getProject(), virtualFile);
-    if (taskFile == null) {
-      return null;
-    }
-    Document document = FileDocumentManager.getInstance().getDocument(virtualFile);
-    if (document == null) {
-      return null;
-    }
-    Editor editor = FileEditorManager.getInstance(e.getProject()).getSelectedTextEditor();
-    return editor == null ? null : taskFile.getAnswerPlaceholder(offset);
-  }
 
 
-  @Override
-  public boolean canSelect(PsiElement e) {
-    Editor editor = FileEditorManager.getInstance(e.getProject()).getSelectedTextEditor();
-    if (editor == null) {
-      return false;
+    @Override
+    public boolean canSelect(PsiElement e) {
+        Editor editor = FileEditorManager.getInstance(e.getProject()).getSelectedTextEditor();
+        if (editor == null) {
+            return false;
+        }
+        return getAnswerPlaceholder(e, editor.getCaretModel().getOffset()) != null;
     }
-    return getAnswerPlaceholder(e, editor.getCaretModel().getOffset()) != null;
-  }
 
-  @Override
-  public List<TextRange> select(PsiElement e, CharSequence editorText, int cursorOffset, Editor editor) {
-    AnswerPlaceholder placeholder = getAnswerPlaceholder(e, cursorOffset);
-    assert placeholder != null;
-    int startOffset = placeholder.getOffset();
-    return Collections.singletonList(new TextRange(startOffset, startOffset + placeholder.getRealLength()));
-  }
+    @Override
+    public List<TextRange> select(PsiElement e, CharSequence editorText, int cursorOffset, Editor editor) {
+        AnswerPlaceholder placeholder = getAnswerPlaceholder(e, cursorOffset);
+        assert placeholder != null;
+        int startOffset = placeholder.getOffset();
+        return Collections.singletonList(new TextRange(startOffset, startOffset + placeholder.getRealLength()));
+    }
 }

@@ -15,7 +15,16 @@ import java.io.IOException;
 
 public interface CourseBuilder {
 
-    void createCourseFromGenerator(@NotNull ModifiableModuleModel moduleModel, Project project, EduProjectGenerator generator) throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException;
+    void createCourseFromGenerator(
+            @NotNull ModifiableModuleModel moduleModel,
+            Project project,
+            EduProjectGenerator generator)
+            throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException;
 
-    void createLessonModules(@NotNull ModifiableModuleModel moduleModel, Course course, String moduleDir, Module utilModule) throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException;
+    void createLessonModules(
+            @NotNull ModifiableModuleModel moduleModel,
+            Course course,
+            String moduleDir,
+            Module utilModule)
+            throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException;
 }

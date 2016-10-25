@@ -8,8 +8,8 @@ import com.intellij.openapi.util.Condition;
  * data: 7/29/14.
  */
 public class StudyCondition implements Condition, DumbAware {
-  @Override
-  public boolean value(Object o) {
-    return false;
-  }
+    @Override
+    public boolean value(Object o) {
+        return false;
+    }
 }

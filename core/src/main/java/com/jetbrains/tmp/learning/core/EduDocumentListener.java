@@ -16,93 +16,92 @@ import java.util.List;
  * coordinates of all the windows in current task file
  */
 public class EduDocumentListener extends DocumentAdapter {
-  private final TaskFile myTaskFile;
-  private final boolean myTrackLength;
-  private final List<AnswerPlaceholderWrapper> myAnswerPlaceholders = new ArrayList<AnswerPlaceholderWrapper>();
+    private final TaskFile myTaskFile;
+    private final boolean myTrackLength;
+    private final List<AnswerPlaceholderWrapper> myAnswerPlaceholders = new ArrayList<AnswerPlaceholderWrapper>();
 
 
-  public EduDocumentListener(TaskFile taskFile) {
-    myTaskFile = taskFile;
-    myTrackLength = true;
-  }
-
-  public EduDocumentListener(TaskFile taskFile, boolean trackLength) {
-    myTaskFile = taskFile;
-    myTrackLength = trackLength;
-  }
-
-  //remembering old end before document change because of problems
-  // with fragments containing "\n"
-  @Override
-  public void beforeDocumentChange(DocumentEvent e) {
-    if (!myTaskFile.isTrackChanges()) {
-      return;
+    public EduDocumentListener(TaskFile taskFile) {
+        myTaskFile = taskFile;
+        myTrackLength = true;
     }
-    myTaskFile.setHighlightErrors(true);
-    myAnswerPlaceholders.clear();
-    for (AnswerPlaceholder answerPlaceholder : myTaskFile.getAnswerPlaceholders()) {
-      int twStart = answerPlaceholder.getOffset();
-      int length = answerPlaceholder.getRealLength();
-      int twEnd = twStart + length;
-      myAnswerPlaceholders.add(new AnswerPlaceholderWrapper(answerPlaceholder, twStart, twEnd));
-    }
-  }
 
-  @Override
-  public void documentChanged(DocumentEvent e) {
-    if (!myTaskFile.isTrackChanges()) {
-      return;
+    public EduDocumentListener(TaskFile taskFile, boolean trackLength) {
+        myTaskFile = taskFile;
+        myTrackLength = trackLength;
     }
-    if (myAnswerPlaceholders.isEmpty()) return;
-    if (e instanceof DocumentEventImpl) {
-      DocumentEventImpl event = (DocumentEventImpl)e;
-      Document document = e.getDocument();
-      int offset = e.getOffset();
-      int change = event.getNewLength() - event.getOldLength();
-      for (AnswerPlaceholderWrapper answerPlaceholderWrapper : myAnswerPlaceholders) {
-        int twStart = answerPlaceholderWrapper.getTwStart();
-        if (twStart > offset) {
-          twStart += change;
+
+    //remembering old end before document change because of problems
+    // with fragments containing "\n"
+    @Override
+    public void beforeDocumentChange(DocumentEvent e) {
+        if (!myTaskFile.isTrackChanges()) {
+            return;
         }
-        int twEnd = answerPlaceholderWrapper.getTwEnd();
-        if (twEnd >= offset) {
-          twEnd += change;
+        myTaskFile.setHighlightErrors(true);
+        myAnswerPlaceholders.clear();
+        for (AnswerPlaceholder answerPlaceholder : myTaskFile.getAnswerPlaceholders()) {
+            int twStart = answerPlaceholder.getOffset();
+            int length = answerPlaceholder.getRealLength();
+            int twEnd = twStart + length;
+            myAnswerPlaceholders.add(new AnswerPlaceholderWrapper(answerPlaceholder, twStart, twEnd));
         }
-        AnswerPlaceholder answerPlaceholder = answerPlaceholderWrapper.getAnswerPlaceholder();
-        int length = twEnd - twStart;
-        answerPlaceholder.setOffset(twStart);
-        if (!answerPlaceholder.getUseLength()) {
-          answerPlaceholder.setPossibleAnswer(document.getText(TextRange.create(twStart, twStart + length)));
+    }
+
+    @Override
+    public void documentChanged(DocumentEvent e) {
+        if (!myTaskFile.isTrackChanges()) {
+            return;
         }
-        else if (myTrackLength) {
-          answerPlaceholder.setLength(length);
+        if (myAnswerPlaceholders.isEmpty()) return;
+        if (e instanceof DocumentEventImpl) {
+            DocumentEventImpl event = (DocumentEventImpl) e;
+            Document document = e.getDocument();
+            int offset = e.getOffset();
+            int change = event.getNewLength() - event.getOldLength();
+            for (AnswerPlaceholderWrapper answerPlaceholderWrapper : myAnswerPlaceholders) {
+                int twStart = answerPlaceholderWrapper.getTwStart();
+                if (twStart > offset) {
+                    twStart += change;
+                }
+                int twEnd = answerPlaceholderWrapper.getTwEnd();
+                if (twEnd >= offset) {
+                    twEnd += change;
+                }
+                AnswerPlaceholder answerPlaceholder = answerPlaceholderWrapper.getAnswerPlaceholder();
+                int length = twEnd - twStart;
+                answerPlaceholder.setOffset(twStart);
+                if (!answerPlaceholder.getUseLength()) {
+                    answerPlaceholder.setPossibleAnswer(document.getText(TextRange.create(twStart, twStart + length)));
+                } else if (myTrackLength) {
+                    answerPlaceholder.setLength(length);
+                }
+            }
         }
-      }
-    }
-  }
-
-  private static class AnswerPlaceholderWrapper {
-    public AnswerPlaceholder myAnswerPlaceholder;
-    public int myTwStart;
-    public int myTwEnd;
-
-    public AnswerPlaceholderWrapper(AnswerPlaceholder answerPlaceholder, int twStart, int twEnd) {
-      myAnswerPlaceholder = answerPlaceholder;
-      myTwStart = twStart;
-      myTwEnd = twEnd;
     }
 
-    public int getTwStart() {
-      return myTwStart;
-    }
+    private static class AnswerPlaceholderWrapper {
+        public AnswerPlaceholder myAnswerPlaceholder;
+        public int myTwStart;
+        public int myTwEnd;
 
-    public int getTwEnd() {
-      return myTwEnd;
-    }
+        public AnswerPlaceholderWrapper(AnswerPlaceholder answerPlaceholder, int twStart, int twEnd) {
+            myAnswerPlaceholder = answerPlaceholder;
+            myTwStart = twStart;
+            myTwEnd = twEnd;
+        }
 
-    public AnswerPlaceholder getAnswerPlaceholder() {
-      return myAnswerPlaceholder;
+        public int getTwStart() {
+            return myTwStart;
+        }
+
+        public int getTwEnd() {
+            return myTwEnd;
+        }
+
+        public AnswerPlaceholder getAnswerPlaceholder() {
+            return myAnswerPlaceholder;
+        }
     }
-  }
 }
 

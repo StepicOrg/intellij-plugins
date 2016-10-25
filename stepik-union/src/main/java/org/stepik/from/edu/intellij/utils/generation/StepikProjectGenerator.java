@@ -55,11 +55,9 @@ public class StepikProjectGenerator extends EduProjectGenerator {
                 final String json = gson.toJson(courseInfo);
                 writer.println(json);
             }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             LOG.error(e);
-        }
-        finally {
+        } finally {
             StudyUtils.closeSilently(writer);
         }
     }
@@ -95,23 +93,20 @@ public class StepikProjectGenerator extends EduProjectGenerator {
                 try {
                     String line;
                     while ((line = reader.readLine()) != null) {
-                        Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
+                        Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+                                .create();
                         final CourseInfo courseInfo = gson.fromJson(line, CourseInfo.class);
                         courses.add(courseInfo);
                     }
-                }
-                catch (IOException | JsonSyntaxException e) {
+                } catch (IOException | JsonSyntaxException e) {
                     LOG.error(e.getMessage());
-                }
-                finally {
+                } finally {
                     StudyUtils.closeSilently(reader);
                 }
-            }
-            finally {
+            } finally {
                 StudyUtils.closeSilently(inputStream);
             }
-        }
-        catch (FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             LOG.error(e.getMessage());
         }
         return courses;
@@ -134,33 +129,36 @@ public class StepikProjectGenerator extends EduProjectGenerator {
 //            }
 //        }
 
-        return ProgressManager.getInstance().runProcessWithProgressSynchronously(new ThrowableComputable<Course, RuntimeException>() {
-            @Override
-            public Course compute() throws RuntimeException {
-                ProgressManager.getInstance().getProgressIndicator().setIndeterminate(true);
-                return execCancelable(() -> {
+        return ProgressManager.getInstance()
+                .runProcessWithProgressSynchronously(new ThrowableComputable<Course, RuntimeException>() {
+                    @Override
+                    public Course compute() throws RuntimeException {
+                        ProgressManager.getInstance().getProgressIndicator().setIndeterminate(true);
+                        return execCancelable(() -> {
 
-                    final Course course = StepikConnectorGet.getCourse(project, mySelectedCourseInfo);
-                    if (course != null) {
-                        flushCourse(project, course);
-                        course.initCourse(false);
+                            final Course course = StepikConnectorGet.getCourse(project, mySelectedCourseInfo);
+                            if (course != null) {
+                                flushCourse(project, course);
+                                course.initCourse(false);
+                            }
+                            return course;
+                        });
                     }
-                    return course;
-                });
-            }
-        }, "Creating Course", true, project);
+                }, "Creating Course", true, project);
     }
 
     @NotNull
-    public List<CourseInfo> getCoursesUnderProgress(boolean force, @NotNull final String progressTitle, @NotNull final Project project) {
+    public List<CourseInfo> getCoursesUnderProgress(
+            boolean force,
+            @NotNull final String progressTitle,
+            @NotNull final Project project) {
         try {
             return ProgressManager.getInstance()
                     .runProcessWithProgressSynchronously(() -> {
                         ProgressManager.getInstance().getProgressIndicator().setIndeterminate(true);
                         return getCourses(force);
                     }, progressTitle, true, project);
-        }
-        catch (RuntimeException e) {
+        } catch (RuntimeException e) {
             return Collections.singletonList(CourseInfo.INVALID_COURSE);
         }
     }

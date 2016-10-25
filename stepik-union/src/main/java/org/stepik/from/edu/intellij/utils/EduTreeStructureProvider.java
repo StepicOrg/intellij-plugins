@@ -23,9 +23,10 @@ public class EduTreeStructureProvider extends StudyTreeStructureProvider {
 
     @NotNull
     @Override
-    public Collection<AbstractTreeNode> modify(@NotNull AbstractTreeNode parent,
-                                               @NotNull Collection<AbstractTreeNode> children,
-                                               ViewSettings settings) {
+    public Collection<AbstractTreeNode> modify(
+            @NotNull AbstractTreeNode parent,
+            @NotNull Collection<AbstractTreeNode> children,
+            ViewSettings settings) {
         if (parent instanceof EduDirectoryNode) {
             //this it task and we need to delete src folder etc
             for (AbstractTreeNode child : children) {

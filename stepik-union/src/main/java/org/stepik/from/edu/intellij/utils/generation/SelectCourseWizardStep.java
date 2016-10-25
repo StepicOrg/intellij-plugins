@@ -68,8 +68,9 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
     private final Project project;
     private List<CourseInfo> myAvailableCourses;
 
-    public SelectCourseWizardStep(@NotNull final StepikProjectGenerator generator,
-                                  WizardContext wizardContext) {
+    public SelectCourseWizardStep(
+            @NotNull final StepikProjectGenerator generator,
+            WizardContext wizardContext) {
         this.myGenerator = generator;
         project = wizardContext.getProject() == null ?
                 DefaultProjectFactory.getInstance().getDefaultProject() :
@@ -256,9 +257,9 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
                 StepikWrappers.UnitContainer unitContainer =
                         StepikConnectorGet.getUnits("?lesson=" + lessonId);
 
-                return unitContainer == null? "-1":getCourseId(unitContainer);
+                return unitContainer == null ? "-1" : getCourseId(unitContainer);
             }
-           return "-1";
+            return "-1";
         }
 
         @NotNull

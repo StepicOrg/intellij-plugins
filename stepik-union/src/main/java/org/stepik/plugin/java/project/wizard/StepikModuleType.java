@@ -76,7 +76,6 @@ public class StepikModuleType extends ModuleType<JavaCourseBuilder> {
 //    }
 
 
-
     private StepikProjectGenerator getGenerator() {
         if (generator == null) {
             generator = new StepikProjectGenerator();
@@ -95,8 +94,11 @@ public class StepikModuleType extends ModuleType<JavaCourseBuilder> {
 
     @Nullable
     @Override
-    public ModuleWizardStep modifyProjectTypeStep(@NotNull SettingsStep settingsStep, @NotNull final ModuleBuilder moduleBuilder) {
-        return ProjectWizardStepFactory.getInstance().createJavaSettingsStep(settingsStep, moduleBuilder, moduleBuilder::isSuitableSdkType);
+    public ModuleWizardStep modifyProjectTypeStep(
+            @NotNull SettingsStep settingsStep,
+            @NotNull final ModuleBuilder moduleBuilder) {
+        return ProjectWizardStepFactory.getInstance()
+                .createJavaSettingsStep(settingsStep, moduleBuilder, moduleBuilder::isSuitableSdkType);
     }
 
     @Override

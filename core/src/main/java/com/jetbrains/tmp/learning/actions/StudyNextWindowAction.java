@@ -12,34 +12,36 @@ import java.util.List;
  * move caret to next task window
  */
 public class StudyNextWindowAction extends StudyWindowNavigationAction {
-  public static final String ACTION_ID = "SCore.NextWindow";
-  public static final String SHORTCUT = "ctrl shift pressed PERIOD";
-  public static final String SHORTCUT2 = "ctrl pressed ENTER";
+    public static final String ACTION_ID = "SCore.NextWindow";
+    public static final String SHORTCUT = "ctrl shift pressed PERIOD";
+    public static final String SHORTCUT2 = "ctrl pressed ENTER";
 
-  public StudyNextWindowAction() {
-    super("Navigate to the Next Answer Placeholder", "Navigate to the next answer placeholder", AllIcons.Actions.Forward);
-  }
-
-  @Override
-  protected AnswerPlaceholder getNextAnswerPlaceholder(@NotNull final AnswerPlaceholder window) {
-    int index = window.getIndex();
-    List<AnswerPlaceholder> windows = window.getTaskFile().getAnswerPlaceholders();
-    if (StudyUtils.indexIsValid(index, windows)) {
-      int newIndex = index + 1;
-      return windows.get(newIndex == windows.size() ? 0 : newIndex);
+    public StudyNextWindowAction() {
+        super("Navigate to the Next Answer Placeholder",
+                "Navigate to the next answer placeholder",
+                AllIcons.Actions.Forward);
     }
-    return null;
-  }
 
-  @NotNull
-  @Override
-  public String getActionId() {
-    return ACTION_ID;
-  }
+    @Override
+    protected AnswerPlaceholder getNextAnswerPlaceholder(@NotNull final AnswerPlaceholder window) {
+        int index = window.getIndex();
+        List<AnswerPlaceholder> windows = window.getTaskFile().getAnswerPlaceholders();
+        if (StudyUtils.indexIsValid(index, windows)) {
+            int newIndex = index + 1;
+            return windows.get(newIndex == windows.size() ? 0 : newIndex);
+        }
+        return null;
+    }
 
-  @Nullable
-  @Override
-  public String[] getShortcuts() {
-    return new String[]{SHORTCUT, SHORTCUT2};
-  }
+    @NotNull
+    @Override
+    public String getActionId() {
+        return ACTION_ID;
+    }
+
+    @Nullable
+    @Override
+    public String[] getShortcuts() {
+        return new String[]{SHORTCUT, SHORTCUT2};
+    }
 }

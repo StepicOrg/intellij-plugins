@@ -21,8 +21,9 @@ public enum SupportedLanguages {
      * @param beforeCode   Part of the surrounding code before text
      * @param afterCode    Part of the surrounding code after text
      */
-    SupportedLanguages(@NotNull String name, @NotNull String mainFileName, @NotNull String comment,
-                       @Nullable String[] beforeCode, @Nullable String[] afterCode) {
+    SupportedLanguages(
+            @NotNull String name, @NotNull String mainFileName, @NotNull String comment,
+            @Nullable String[] beforeCode, @Nullable String[] afterCode) {
         this.name = name;
         this.mainFileName = mainFileName;
         this.comment = comment;

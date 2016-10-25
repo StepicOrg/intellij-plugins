@@ -49,8 +49,11 @@ public class DirectivesUtils {
      * <p>
      * If "Stepik code: end" not found, end = text.length
      */
-    public static @NotNull Pair<Integer, Integer> findDirectives(@NotNull String[] text,
-                                                                 @NotNull SupportedLanguages lang) {
+    public static
+    @NotNull
+    Pair<Integer, Integer> findDirectives(
+            @NotNull String[] text,
+            @NotNull SupportedLanguages lang) {
         int start = -1;
         int end = text.length;
 
@@ -89,8 +92,9 @@ public class DirectivesUtils {
         return END_DIRECTIVE.equals(line);
     }
 
-    public static void writeInToFile(@NotNull String[] text, @NotNull VirtualFile file,
-                                     @NotNull Project project) {
+    public static void writeInToFile(
+            @NotNull String[] text, @NotNull VirtualFile file,
+            @NotNull Project project) {
         final Document document = FileDocumentManager.getInstance().getDocument(file);
         if (document == null)
             return;
@@ -109,18 +113,19 @@ public class DirectivesUtils {
                         "Stepik directives process");
     }
 
-    public static String[] removeAmbientCode(@NotNull String[] text,
-                                             @NotNull Pair<Integer, Integer> locations,
-                                             @NotNull Project project,
-                                             boolean showHint,
-                                             @NotNull SupportedLanguages lang) {
+    public static String[] removeAmbientCode(
+            @NotNull String[] text,
+            @NotNull Pair<Integer, Integer> locations,
+            @NotNull Project project,
+            boolean showHint,
+            @NotNull SupportedLanguages lang) {
         int start = locations.first;
         int end = locations.second;
 
         int k = showHint ? 1 : 0;
         String[] before = start > 0 ? Arrays.copyOfRange(text, 0, start - k) : new String[0];
         int e = end + k + 1;
-        String[] after = e < text.length ? Arrays.copyOfRange(text, e , text.length) : new String[0];
+        String[] after = e < text.length ? Arrays.copyOfRange(text, e, text.length) : new String[0];
 
         if (!Arrays.equals(before, lang.getBeforeCode()) ||
                 !Arrays.equals(after, lang.getAfterCode())) {
@@ -132,8 +137,9 @@ public class DirectivesUtils {
         return Arrays.copyOfRange(text, start + 1, end);
     }
 
-    public static String[] insertAmbientCode(@NotNull String[] text, @NotNull SupportedLanguages lang,
-                                             boolean showHint) {
+    public static String[] insertAmbientCode(
+            @NotNull String[] text, @NotNull SupportedLanguages lang,
+            boolean showHint) {
         String[] beforeCode = lang.getBeforeCode();
         String[] afterCode = lang.getAfterCode();
 
