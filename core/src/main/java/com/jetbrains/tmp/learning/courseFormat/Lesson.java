@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Lesson implements StudyItem {
-  @Expose private int myId;
+  @Expose private int id;
   @Transient public List<Integer> steps;
   @Transient public List<String> tags;
   @Transient boolean is_public;
@@ -99,10 +99,10 @@ public class Lesson implements StudyItem {
   }
 
   public int getId() {
-    return myId;
+    return id;
   }
 
   public void setId(int id) {
-    this.myId = id;
+    this.id = id;
   }
 }
