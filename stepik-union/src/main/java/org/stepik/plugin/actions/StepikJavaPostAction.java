@@ -79,7 +79,7 @@ public class StepikJavaPostAction extends StudyCheckAction {
                     }
                     List<StepikWrappers.SubmissionContainer.Submission> submissions = container.submissions;
                     StepikWrappers.MetricsWrapper metric = new StepikWrappers.MetricsWrapper(
-                            StepikWrappers.MetricsWrapper.PluginNames.S_UNION,
+                            StepikWrappers.MetricsWrapper.PluginNames.STEPIK_UNION,
                             StepikWrappers.MetricsWrapper.MetricActions.POST,
                             task.getLesson().getCourse().getId(),
                             task.getStepId());
