@@ -30,6 +30,8 @@ import java.util.List;
 public class StepikJavaPostAction extends StudyCheckAction {
     private static final Logger LOG = Logger.getInstance(StepikJavaPostAction.class);
     private static final String ACTION_ID = "STEPIC.StepikJavaPostAction";
+    private static final int PERIOD = 2 * 1000; // ms
+    private static final int FIVE_MINUTES = 5 * 60 * 1000; //ms
 
     @NotNull
     @Override
@@ -77,7 +79,7 @@ public class StepikJavaPostAction extends StudyCheckAction {
                     }
                     List<StepikWrappers.SubmissionContainer.Submission> submissions = container.submissions;
                     StepikWrappers.MetricsWrapper metric = new StepikWrappers.MetricsWrapper(
-                            StepikWrappers.MetricsWrapper.PluginNames.S_Union,
+                            StepikWrappers.MetricsWrapper.PluginNames.S_UNION,
                             StepikWrappers.MetricsWrapper.MetricActions.POST,
                             task.getLesson().getCourse().getId(),
                             task.getStepId());
@@ -89,24 +91,21 @@ public class StepikJavaPostAction extends StudyCheckAction {
                     final int finalSubmissionId = submissionId;
                     application.executeOnPooledThread(
                             () -> {
-                                String ans = "evaluation";
-                                final int TIMER = 2;
-                                final int FIVE_MINUTES = 5 * 60;
-                                int count = 0;
+                                String taskStatus = "evaluation";
+                                int timer = 0;
                                 Notification notification = null;
-                                String b = "";
-                                while ("evaluation".equals(ans) && count < FIVE_MINUTES) {
+                                String hint = "";
+                                while ("evaluation".equals(taskStatus) && timer < FIVE_MINUTES) {
                                     try {
-                                        Thread.sleep(TIMER * 1000);          //1000 milliseconds is one second.
+                                        Thread.sleep(PERIOD);          //1000 milliseconds is one second.
+                                        timer += PERIOD;
                                         StepikWrappers.ResultSubmissionWrapper submissionWrapper =
                                                 StepikConnectorGet.getStatus(finalSubmissionId);
-                                        if (submissionWrapper == null) {
-                                            continue;
+                                        if (submissionWrapper != null) {
+                                            taskStatus = submissionWrapper.submissions[0].status;
+                                            hint = submissionWrapper.submissions[0].hint;
                                         }
-                                        ans = submissionWrapper.submissions[0].status;
-                                        b = submissionWrapper.submissions[0].hint;
-                                        count += TIMER;
-                                    } catch (InterruptedException | NullPointerException e) {
+                                    } catch (InterruptedException e) {
                                         notification = new Notification("Step.sending", "Error", "Get Status error",
                                                 NotificationType.ERROR);
                                         NotificationUtils.showNotification(notification, project);
@@ -116,17 +115,16 @@ public class StepikJavaPostAction extends StudyCheckAction {
 
                                 NotificationType notificationType;
 
-                                if ("correct".equals(ans)) {
+                                if ("correct".equals(taskStatus)) {
                                     notificationType = NotificationType.INFORMATION;
-                                    b = "Success!";
+                                    hint = "Success!";
                                     task.setStatus(StudyStatus.Solved);
                                 } else {
                                     notificationType = NotificationType.WARNING;
-                                    b = b.split("\\.")[0];
                                     if (task.getStatus() != StudyStatus.Solved)
                                         task.setStatus(StudyStatus.Failed);
                                 }
-                                notification = new Notification("Step.sending", task.getName() + " is " + ans, b,
+                                notification = new Notification("Step.sending", task.getName() + " is " + taskStatus, hint,
                                         notificationType);
                                 NotificationUtils.showNotification(notification, project);
                                 ProjectView.getInstance(project).refresh();
