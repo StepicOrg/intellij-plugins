@@ -11,11 +11,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Lesson implements StudyItem {
-  @Expose private int myId;
   @Transient public List<Integer> steps;
   @Transient public List<String> tags;
   @Transient boolean is_public;
   @Transient int position;
+  @Transient private Course myCourse = null;
+
+  @Expose
+  @SerializedName("id")
+  private int myId;
 
   @Expose
   @SerializedName("title")
@@ -24,9 +28,6 @@ public class Lesson implements StudyItem {
   @Expose
   @SerializedName("task_list")
   public List<Task> taskList = new ArrayList<Task>();
-
-  @Transient
-  private Course myCourse = null;
 
   // index is visible to user number of lesson from 1 to lesson number
   private int myIndex = -1;
