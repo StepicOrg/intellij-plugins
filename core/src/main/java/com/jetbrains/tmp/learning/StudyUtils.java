@@ -494,14 +494,13 @@ public class StudyUtils {
     StringBuilder stringBuilder = new StringBuilder();
 
     if (task.getLesson().getId() > 0 ) {
-      stringBuilder
-              .append("<a href=\"https://stepik.org/lesson/")
+      stringBuilder.append("<a href=\"https://stepik.org/lesson/")
               .append(task.getLesson().getId())
               .append("/step/")
               .append(task.getPosition())
               .append("\">View step on Stepik.org</a>");
     } else {
-      stringBuilder.append("<b>Please, create a new project to see the link to the step. </b>");
+      stringBuilder.append("<b>Create project for this course again to see the link to the step.</b>");
     }
 
     if (!task.getText().startsWith("<p>")){

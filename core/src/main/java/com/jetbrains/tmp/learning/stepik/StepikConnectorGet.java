@@ -322,7 +322,7 @@ public class StepikConnectorGet {
 
         switch (stepSource.block.name) {
           case (CODE_PREFIX):
-            createCodeTask(task, stepSource);
+            createCodeTask(task, stepSource.block);
             break;
           case (PYCHARM_PREFIX):
             createPyCharmTask(task, stepSource.block);
@@ -352,8 +352,7 @@ public class StepikConnectorGet {
     }
   }
 
-  private static void createCodeTask(Task task, StepikWrappers.StepSource stepSource) {
-    final StepikWrappers.Step step = stepSource.block;
+  private static void createCodeTask(Task task, StepikWrappers.Step step) {
     final StringBuilder stringBuilder = new StringBuilder();
 
     task.setName("step" + task.getPosition());
