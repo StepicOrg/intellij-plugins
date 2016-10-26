@@ -93,7 +93,6 @@ public class StepikJavaPostAction extends StudyCheckAction {
                             () -> {
                                 String taskStatus = "evaluation";
                                 int timer = 0;
-
                                 String hint = "";
                                 while ("evaluation".equals(taskStatus) && timer < FIVE_MINUTES) {
                                     try {
@@ -117,7 +116,6 @@ public class StepikJavaPostAction extends StudyCheckAction {
                                 }
 
                                 NotificationType notificationType;
-
                                 if ("correct".equals(taskStatus)) {
                                     notificationType = NotificationType.INFORMATION;
                                     hint = "Success!";
