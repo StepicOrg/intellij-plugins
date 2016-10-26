@@ -504,9 +504,9 @@ public class StepikWrappers {
     }
 
     public interface PluginNames {
-      String S_Union = "S_Union";
-      String S_CLion = "S_CLion";
-      String S_PyCharm = "S_PyCharm";
+      String STEPIK_UNION = "S_Union";
+      String STEPIK_CLION = "S_CLion";
+      String STEPIK_PYCHARM = "S_PyCharm";
     }
 
     public class Metric {

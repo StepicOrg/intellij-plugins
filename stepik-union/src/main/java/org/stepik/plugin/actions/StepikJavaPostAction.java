@@ -1,5 +1,6 @@
 package org.stepik.plugin.actions;
 
+import com.intellij.ide.projectView.ProjectView;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.application.Application;
@@ -29,6 +30,8 @@ import java.util.List;
 public class StepikJavaPostAction extends StudyCheckAction {
     private static final Logger LOG = Logger.getInstance(StepikJavaPostAction.class);
     private static final String ACTION_ID = "STEPIC.StepikJavaPostAction";
+    private static final int PERIOD = 2 * 1000; // ms
+    private static final int FIVE_MINUTES = 5 * 60 * 1000; //ms
 
     @NotNull
     @Override
@@ -71,9 +74,12 @@ public class StepikJavaPostAction extends StudyCheckAction {
                     StepikWrappers.SubmissionToPostWrapper postWrapper =
                             new StepikWrappers.SubmissionToPostWrapper(attemptId, currentLang.getName(), solution);
                     StepikWrappers.SubmissionContainer container = StepikConnectorPost.postSubmission(postWrapper);
+                    if (container == null) {
+                        return;
+                    }
                     List<StepikWrappers.SubmissionContainer.Submission> submissions = container.submissions;
                     StepikWrappers.MetricsWrapper metric = new StepikWrappers.MetricsWrapper(
-                            StepikWrappers.MetricsWrapper.PluginNames.S_Union,
+                            StepikWrappers.MetricsWrapper.PluginNames.STEPIK_UNION,
                             StepikWrappers.MetricsWrapper.MetricActions.POST,
                             task.getLesson().getCourse().getId(),
                             task.getStepId());
@@ -85,22 +91,24 @@ public class StepikJavaPostAction extends StudyCheckAction {
                     final int finalSubmissionId = submissionId;
                     application.executeOnPooledThread(
                             () -> {
-                                String ans = "evaluation";
-                                final int TIMER = 2;
-                                final int FIVE_MINUTES = 5 * 60;
-                                int count = 0;
-                                Notification notification = null;
-                                String b = "";
-                                while ("evaluation".equals(ans) && count < FIVE_MINUTES) {
+                                String taskStatus = "evaluation";
+                                int timer = 0;
+                                String hint = "";
+                                while ("evaluation".equals(taskStatus) && timer < FIVE_MINUTES) {
                                     try {
-                                        Thread.sleep(TIMER * 1000);          //1000 milliseconds is one second.
+                                        Thread.sleep(PERIOD);          //1000 milliseconds is one second.
+                                        timer += PERIOD;
                                         StepikWrappers.ResultSubmissionWrapper submissionWrapper =
                                                 StepikConnectorGet.getStatus(finalSubmissionId);
-                                        ans = submissionWrapper.submissions[0].status;
-                                        b = submissionWrapper.submissions[0].hint;
-                                        count += TIMER;
-                                    } catch (InterruptedException | NullPointerException e) {
-                                        notification = new Notification("Step.sending", "Error", "Get Status error",
+                                        if (submissionWrapper != null) {
+                                            taskStatus = submissionWrapper.submissions[0].status;
+                                            hint = submissionWrapper.submissions[0].hint;
+                                        }
+                                    } catch (InterruptedException e) {
+                                        Notification notification = new Notification(
+                                                "Step.sending",
+                                                "Error",
+                                                "Get Status error",
                                                 NotificationType.ERROR);
                                         NotificationUtils.showNotification(notification, project);
                                         return;
@@ -108,20 +116,22 @@ public class StepikJavaPostAction extends StudyCheckAction {
                                 }
 
                                 NotificationType notificationType;
-
-                                if ("correct".equals(ans)) {
+                                if ("correct".equals(taskStatus)) {
                                     notificationType = NotificationType.INFORMATION;
-                                    b = "Success!";
+                                    hint = "Success!";
                                     task.setStatus(StudyStatus.Solved);
                                 } else {
                                     notificationType = NotificationType.WARNING;
-                                    b = b.split("\\.")[0];
                                     if (task.getStatus() != StudyStatus.Solved)
                                         task.setStatus(StudyStatus.Failed);
                                 }
-                                notification = new Notification("Step.sending", task.getName() + " is " + ans, b,
+                                Notification notification = new Notification(
+                                        "Step.sending",
+                                        task.getName() + " is " + taskStatus,
+                                        hint,
                                         notificationType);
                                 NotificationUtils.showNotification(notification, project);
+                                ProjectView.getInstance(project).refresh();
                             }
                     );
                 }));
