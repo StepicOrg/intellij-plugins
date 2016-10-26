@@ -15,6 +15,7 @@ public class Lesson implements StudyItem {
   @Transient public List<String> tags;
   @Transient boolean is_public;
   @Transient int position;
+  @Transient private Course myCourse = null;
 
   @Expose
   @SerializedName("id")
@@ -27,9 +28,6 @@ public class Lesson implements StudyItem {
   @Expose
   @SerializedName("task_list")
   public List<Task> taskList = new ArrayList<Task>();
-
-  @Transient
-  private Course myCourse = null;
 
   // index is visible to user number of lesson from 1 to lesson number
   private int myIndex = -1;

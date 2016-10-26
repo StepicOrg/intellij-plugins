@@ -20,24 +20,21 @@ import java.util.Map;
  * Implementation of task which contains task files, tests, input file for tests
  */
 public class Task implements StudyItem {
-  @Expose
-  private String name;
-
   // index is visible to user number of task from 1 to task number
   private int myIndex;
   private int position;
+  private String text;
+  private Map<String, String> testsText = new HashMap<String, String>();
   private StudyStatus myStatus = StudyStatus.Unchecked;
 
+  @Transient private Lesson myLesson;
+
+  @Expose private String name;
   @Expose private int stepId;
 
   @Expose
   @SerializedName("task_files")
   public Map<String, TaskFile> taskFiles = new HashMap<String, TaskFile>();
-
-  private String text;
-  private Map<String, String> testsText = new HashMap<String, String>();
-
-  @Transient private Lesson myLesson;
 
   public Task() {}
 
