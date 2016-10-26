@@ -93,7 +93,7 @@ public class StepikJavaPostAction extends StudyCheckAction {
                             () -> {
                                 String taskStatus = "evaluation";
                                 int timer = 0;
-                                Notification notification = null;
+
                                 String hint = "";
                                 while ("evaluation".equals(taskStatus) && timer < FIVE_MINUTES) {
                                     try {
@@ -106,7 +106,10 @@ public class StepikJavaPostAction extends StudyCheckAction {
                                             hint = submissionWrapper.submissions[0].hint;
                                         }
                                     } catch (InterruptedException e) {
-                                        notification = new Notification("Step.sending", "Error", "Get Status error",
+                                        Notification notification = new Notification(
+                                                "Step.sending",
+                                                "Error",
+                                                "Get Status error",
                                                 NotificationType.ERROR);
                                         NotificationUtils.showNotification(notification, project);
                                         return;
@@ -124,7 +127,10 @@ public class StepikJavaPostAction extends StudyCheckAction {
                                     if (task.getStatus() != StudyStatus.Solved)
                                         task.setStatus(StudyStatus.Failed);
                                 }
-                                notification = new Notification("Step.sending", task.getName() + " is " + taskStatus, hint,
+                                Notification notification = new Notification(
+                                        "Step.sending",
+                                        task.getName() + " is " + taskStatus,
+                                        hint,
                                         notificationType);
                                 NotificationUtils.showNotification(notification, project);
                                 ProjectView.getInstance(project).refresh();
