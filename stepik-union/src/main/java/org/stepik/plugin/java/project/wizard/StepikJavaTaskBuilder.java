@@ -36,8 +36,9 @@ public class StepikJavaTaskBuilder extends JavaModuleBuilder implements TaskBuil
     private final Task myTask;
     private final Module myUtilModule;
 
-    public StepikJavaTaskBuilder(String moduleDir, @NotNull String name, @NotNull Task task,
-                                 @NotNull Module utilModule) {
+    public StepikJavaTaskBuilder(
+            String moduleDir, @NotNull String name, @NotNull Task task,
+            @NotNull Module utilModule) {
         myTask = task;
         myUtilModule = utilModule;
         String taskName = EduNames.TASK + task.getIndex();

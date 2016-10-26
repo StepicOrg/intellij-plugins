@@ -94,7 +94,10 @@ public class EduIntellijUtils {
     }
 
 
-    public static void addTemplate(@NotNull final Project project, @NotNull VirtualFile baseDir, @NotNull @NonNls final String templateName) {
+    public static void addTemplate(
+            @NotNull final Project project,
+            @NotNull VirtualFile baseDir,
+            @NotNull @NonNls final String templateName) {
         final FileTemplate template = FileTemplateManager.getInstance(project).getInternalTemplate(templateName);
         final PsiDirectory projectDir = PsiManager.getInstance(project).findDirectory(baseDir);
         if (projectDir == null) return;

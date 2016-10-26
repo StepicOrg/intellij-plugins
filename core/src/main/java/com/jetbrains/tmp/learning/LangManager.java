@@ -21,33 +21,33 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class LangManager {
-  private Map<Integer, LangSetting> langSettingsMap;
+    private Map<Integer, LangSetting> langSettingsMap;
 
-  public LangManager() {
-    langSettingsMap = new HashMap<>();
-  }
+    public LangManager() {
+        langSettingsMap = new HashMap<>();
+    }
 
-  public Map<Integer, LangSetting> getLangSettingsMap() {
-    return langSettingsMap;
-  }
+    public Map<Integer, LangSetting> getLangSettingsMap() {
+        return langSettingsMap;
+    }
 
-  public void setLangSettingsMap(Map<Integer, LangSetting> langSettingsMap) {
-    this.langSettingsMap = langSettingsMap;
-  }
+    public void setLangSettingsMap(Map<Integer, LangSetting> langSettingsMap) {
+        this.langSettingsMap = langSettingsMap;
+    }
 
-  public LangSetting getLangSetting(Task task) {
-    return getLangSetting(task.getStepId());
-  }
+    public LangSetting getLangSetting(Task task) {
+        return getLangSetting(task.getStepId());
+    }
 
-  public LangSetting getLangSetting(int stepId) {
-    return langSettingsMap.get(stepId);
-  }
+    public LangSetting getLangSetting(int stepId) {
+        return langSettingsMap.get(stepId);
+    }
 
-  public void setLangSetting(Task task, LangSetting langSetting) {
-    setLangSetting(task.getStepId(), langSetting);
-  }
+    public void setLangSetting(Task task, LangSetting langSetting) {
+        setLangSetting(task.getStepId(), langSetting);
+    }
 
-  public void setLangSetting(int stepId, LangSetting langSetting) {
-    langSettingsMap.put(stepId, langSetting);
-  }
+    public void setLangSetting(int stepId, LangSetting langSetting) {
+        langSettingsMap.put(stepId, langSetting);
+    }
 }

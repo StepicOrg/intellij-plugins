@@ -26,42 +26,42 @@ import javax.swing.*;
 import java.util.List;
 
 public class StudyConfigurable extends CompositeConfigurable<StudyOptionsProvider> {
-  public static final String ID = "com.jetbrains.tmp.learning.stepik.EduConfigurable";
-  private final JPanel myMainPanel;
+    public static final String ID = "com.jetbrains.tmp.learning.stepik.EduConfigurable";
+    private final JPanel myMainPanel;
 
-  public StudyConfigurable() {
-    myMainPanel = new JPanel(new VerticalFlowLayout());
-  }
-
-  @Nls
-  @Override
-  public String getDisplayName() {
-    return "Education";
-  }
-
-  @NotNull
-  @Override
-  public String getHelpTopic() {
-    return ID;
-  }
-
-  @Nullable
-  @Override
-  public JComponent createComponent() {
-    myMainPanel.removeAll();
-    for (int i = 0; i < getConfigurables().size(); i++) {
-      StudyOptionsProvider provider = getConfigurables().get(i);
-      JComponent component = provider.createComponent();
-      if (component != null) {
-        myMainPanel.add(component);
-      }
+    public StudyConfigurable() {
+        myMainPanel = new JPanel(new VerticalFlowLayout());
     }
-    return myMainPanel;
-  }
 
-  @Override
-  protected List<StudyOptionsProvider> createConfigurables() {
-    return ConfigurableWrapper.createConfigurables(StudyOptionsProviderEP.EP_NAME);
-  }
+    @Nls
+    @Override
+    public String getDisplayName() {
+        return "Education";
+    }
+
+    @NotNull
+    @Override
+    public String getHelpTopic() {
+        return ID;
+    }
+
+    @Nullable
+    @Override
+    public JComponent createComponent() {
+        myMainPanel.removeAll();
+        for (int i = 0; i < getConfigurables().size(); i++) {
+            StudyOptionsProvider provider = getConfigurables().get(i);
+            JComponent component = provider.createComponent();
+            if (component != null) {
+                myMainPanel.add(component);
+            }
+        }
+        return myMainPanel;
+    }
+
+    @Override
+    protected List<StudyOptionsProvider> createConfigurables() {
+        return ConfigurableWrapper.createConfigurables(StudyOptionsProviderEP.EP_NAME);
+    }
 }
 

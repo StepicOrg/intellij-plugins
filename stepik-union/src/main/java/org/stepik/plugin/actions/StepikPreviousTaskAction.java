@@ -15,7 +15,8 @@ public class StepikPreviousTaskAction extends StepikTaskNavigationAction {
     public static final String SHORTCUT = "ctrl pressed COMMA";
 
     public StepikPreviousTaskAction() {
-        super("Previous Task (" + KeymapUtil.getShortcutText(new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT), null)) + ")", "Navigate to the previous task", InteractiveLearningIcons.Prev);
+        super("Previous Task (" + KeymapUtil.getShortcutText(new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT),
+                null)) + ")", "Navigate to the previous task", InteractiveLearningIcons.Prev);
     }
 
     @Override

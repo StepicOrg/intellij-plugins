@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 package com.jetbrains.tmp.learning.ui;
+
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectUtil;
 import com.jetbrains.tmp.learning.StudyPluginConfigurator;
@@ -23,25 +24,25 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 
 public class StudyJavaFxToolWindow extends StudyToolWindow {
-  private StudyBrowserWindow myBrowserWindow;
+    private StudyBrowserWindow myBrowserWindow;
 
-  public StudyJavaFxToolWindow() {
-    super();
-  }
+    public StudyJavaFxToolWindow() {
+        super();
+    }
 
-  @Override
-  public JComponent createTaskInfoPanel(Project project) {
-    myBrowserWindow = new StudyBrowserWindow(true, false);
-    myBrowserWindow.addBackAndOpenButtons();
-    JPanel panel = new JPanel();
-    panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
-    panel.add(myBrowserWindow.getPanel());
-    return panel;
-  }
+    @Override
+    public JComponent createTaskInfoPanel(Project project) {
+        myBrowserWindow = new StudyBrowserWindow(true, false);
+        myBrowserWindow.addBackAndOpenButtons();
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+        panel.add(myBrowserWindow.getPanel());
+        return panel;
+    }
 
-  @Override
-  public void setText(@NotNull String text) {
-    StudyPluginConfigurator configurator = StudyUtils.getConfigurator(ProjectUtil.guessCurrentProject(this));
-    myBrowserWindow.loadContent(text, configurator);
-  }
+    @Override
+    public void setText(@NotNull String text) {
+        StudyPluginConfigurator configurator = StudyUtils.getConfigurator(ProjectUtil.guessCurrentProject(this));
+        myBrowserWindow.loadContent(text, configurator);
+    }
 }

@@ -8,14 +8,14 @@ import org.jetbrains.annotations.NotNull;
 
 public class EduAnswerPlaceholderDeleteHandler implements ReadonlyFragmentModificationHandler {
 
-  private final Editor myEditor;
+    private final Editor myEditor;
 
-  public EduAnswerPlaceholderDeleteHandler(@NotNull final Editor editor) {
-    myEditor = editor;
-  }
+    public EduAnswerPlaceholderDeleteHandler(@NotNull final Editor editor) {
+        myEditor = editor;
+    }
 
-  @Override
-  public void handle(ReadOnlyFragmentModificationException e) {
-    HintManager.getInstance().showErrorHint(myEditor, "It's not allowed to delete answer placeholders");
-  }
+    @Override
+    public void handle(ReadOnlyFragmentModificationException e) {
+        HintManager.getInstance().showErrorHint(myEditor, "It's not allowed to delete answer placeholders");
+    }
 }

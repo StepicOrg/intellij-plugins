@@ -14,58 +14,58 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class LoginPanel {
-  
-  private JPanel myContentPanel;
-  private JPasswordField myPasswordField;
-  private JTextField myLoginField;
-  private JBLabel mySignUpLabel;
 
-  public LoginPanel(final LoginDialog dialog) {
-    DocumentListener listener = new DocumentAdapter() {
-      @Override
-      protected void textChanged(DocumentEvent e) {
-        dialog.clearErrors();
-      }
-    };
-    
-    myLoginField.getDocument().addDocumentListener(listener);
-    myPasswordField.getDocument().addDocumentListener(listener);
-    
-    mySignUpLabel.addMouseListener(new MouseAdapter() {
-      @Override
-      public void mouseClicked(MouseEvent e) {
-        BrowserUtil.browse(EduStepikNames.STEPIK_SIGN_IN_LINK);
-      }
+    private JPanel myContentPanel;
+    private JPasswordField myPasswordField;
+    private JTextField myLoginField;
+    private JBLabel mySignUpLabel;
 
-      @Override
-      public void mouseEntered(MouseEvent e) {
-        e.getComponent().setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-      }
+    public LoginPanel(final LoginDialog dialog) {
+        DocumentListener listener = new DocumentAdapter() {
+            @Override
+            protected void textChanged(DocumentEvent e) {
+                dialog.clearErrors();
+            }
+        };
 
-      @Override
-      public void mouseExited(MouseEvent e) {
-        e.getComponent().setCursor(Cursor.getDefaultCursor());
-      }
-    });
-  }
+        myLoginField.getDocument().addDocumentListener(listener);
+        myPasswordField.getDocument().addDocumentListener(listener);
 
-  public JPanel getContentPanel() {
-    return myContentPanel;
-  }
+        mySignUpLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                BrowserUtil.browse(EduStepikNames.STEPIK_SIGN_IN_LINK);
+            }
 
-  public JTextField getLoginField() {
-    return myLoginField;
-  }
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                e.getComponent().setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            }
 
-  public String getPassword() {
-    return String.valueOf(myPasswordField.getPassword());
-  }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                e.getComponent().setCursor(Cursor.getDefaultCursor());
+            }
+        });
+    }
 
-  public String getLogin() {
-    return myLoginField.getText();
-  }
+    public JPanel getContentPanel() {
+        return myContentPanel;
+    }
 
-  public JComponent getPreferableFocusComponent() {
-    return myLoginField;
-  }
+    public JTextField getLoginField() {
+        return myLoginField;
+    }
+
+    public String getPassword() {
+        return String.valueOf(myPasswordField.getPassword());
+    }
+
+    public String getLogin() {
+        return myLoginField.getText();
+    }
+
+    public JComponent getPreferableFocusComponent() {
+        return myLoginField;
+    }
 }

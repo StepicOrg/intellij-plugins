@@ -45,7 +45,11 @@ public class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilde
     }
 
     @Override
-    public void createCourseFromGenerator(@NotNull ModifiableModuleModel moduleModel, Project project, EduProjectGenerator generator) throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
+    public void createCourseFromGenerator(
+            @NotNull ModifiableModuleModel moduleModel,
+            Project project,
+            EduProjectGenerator generator)
+            throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
         generator.generateProject(project, project.getBaseDir());
 
         Course course = StudyTaskManager.getInstance(project).getCourse();
@@ -74,8 +78,9 @@ public class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilde
     }
 
     @Override
-    public void createLessonModules(@NotNull ModifiableModuleModel moduleModel, Course course,
-                                    String moduleDir, Module utilModule) throws InvalidDataException,
+    public void createLessonModules(
+            @NotNull ModifiableModuleModel moduleModel, Course course,
+            String moduleDir, Module utilModule) throws InvalidDataException,
             IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
         List<Lesson> lessons = course.getLessons();
         String sectionName = "";
@@ -110,12 +115,14 @@ public class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilde
     @Nullable
     @Override
     public ModuleWizardStep modifySettingsStep(@NotNull SettingsStep settingsStep) {
-        return ProjectWizardStepFactory.getInstance().createJavaSettingsStep(settingsStep, this, Conditions.alwaysTrue());
+        return ProjectWizardStepFactory.getInstance()
+                .createJavaSettingsStep(settingsStep, this, Conditions.alwaysTrue());
     }
 
     @NotNull
     @Override
-    public Module createModule(@NotNull ModifiableModuleModel moduleModel) throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
+    public Module createModule(@NotNull ModifiableModuleModel moduleModel)
+            throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
         Module baseModule = super.createModule(moduleModel);
         Project project = baseModule.getProject();
         LOG.info("create module - login");
@@ -125,7 +132,9 @@ public class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilde
     }
 
     @Override
-    public ModuleWizardStep[] createWizardSteps(@NotNull WizardContext wizardContext, @NotNull ModulesProvider modulesProvider) {
+    public ModuleWizardStep[] createWizardSteps(
+            @NotNull WizardContext wizardContext,
+            @NotNull ModulesProvider modulesProvider) {
         ModuleWizardStep[] previousWizardSteps = super.createWizardSteps(wizardContext, modulesProvider);
         ModuleWizardStep[] wizardSteps = new ModuleWizardStep[previousWizardSteps.length + 1];
 

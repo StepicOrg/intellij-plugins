@@ -8,18 +8,18 @@ import com.jetbrains.tmp.learning.courseFormat.TaskFile;
 import com.jetbrains.tmp.learning.StudyUtils;
 import org.jetbrains.annotations.NotNull;
 
-public class StudyHighlightErrorFilter extends HighlightErrorFilter{
-  @Override
-  public boolean shouldHighlightErrorElement(@NotNull PsiErrorElement element) {
-    PsiFile file = element.getContainingFile();
-    if (file == null) {
-      return true;
+public class StudyHighlightErrorFilter extends HighlightErrorFilter {
+    @Override
+    public boolean shouldHighlightErrorElement(@NotNull PsiErrorElement element) {
+        PsiFile file = element.getContainingFile();
+        if (file == null) {
+            return true;
+        }
+        VirtualFile virtualFile = file.getVirtualFile();
+        if (virtualFile == null) {
+            return true;
+        }
+        TaskFile taskFile = StudyUtils.getTaskFile(element.getProject(), virtualFile);
+        return taskFile == null || taskFile.isHighlightErrors();
     }
-    VirtualFile virtualFile = file.getVirtualFile();
-    if (virtualFile == null) {
-      return true;
-    }
-    TaskFile taskFile = StudyUtils.getTaskFile(element.getProject(), virtualFile);
-    return taskFile == null || taskFile.isHighlightErrors();
-  }
 }

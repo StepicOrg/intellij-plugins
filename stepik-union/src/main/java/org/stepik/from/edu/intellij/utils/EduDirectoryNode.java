@@ -30,7 +30,7 @@ public class EduDirectoryNode extends StudyDirectoryNode {
                 return;
             }
             TaskFile taskFile = null;
-            VirtualFile virtualFile =  null;
+            VirtualFile virtualFile = null;
             for (PsiElement child : src.getChildren()) {
                 VirtualFile childFile = child.getContainingFile().getVirtualFile();
                 taskFile = StudyUtils.getTaskFile(myProject, childFile);
@@ -47,7 +47,7 @@ public class EduDirectoryNode extends StudyDirectoryNode {
                 }
                 VirtualFile child = null;
                 Map<String, TaskFile> taskFiles = task.getTaskFiles();
-                for (Map.Entry<String, TaskFile> entry: taskFiles.entrySet()) {
+                for (Map.Entry<String, TaskFile> entry : taskFiles.entrySet()) {
                     VirtualFile file = taskDir.findChild(entry.getKey());
                     if (file != null) {
                         FileEditorManager.getInstance(myProject).openFile(file, true);

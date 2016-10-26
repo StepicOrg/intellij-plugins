@@ -9,32 +9,32 @@ import org.jetbrains.annotations.Nullable;
 
 @State(name = "StepikUpdateSettings", storages = @Storage("other.xml"))
 public class StepikUpdateSettings implements PersistentStateComponent<StepikUpdateSettings> {
-  public long LAST_TIME_CHECKED = 0;
+    public long LAST_TIME_CHECKED = 0;
 
-  public StepikUpdateSettings() {
+    public StepikUpdateSettings() {
 
-  }
+    }
 
-  public long getLastTimeChecked() {
-    return LAST_TIME_CHECKED;
-  }
+    public long getLastTimeChecked() {
+        return LAST_TIME_CHECKED;
+    }
 
-  public void setLastTimeChecked(long timeChecked) {
-    LAST_TIME_CHECKED = timeChecked;
-  }
+    public void setLastTimeChecked(long timeChecked) {
+        LAST_TIME_CHECKED = timeChecked;
+    }
 
-  @Nullable
-  @Override
-  public StepikUpdateSettings getState() {
-    return this;
-  }
+    @Nullable
+    @Override
+    public StepikUpdateSettings getState() {
+        return this;
+    }
 
-  @Override
-  public void loadState(StepikUpdateSettings state) {
-    XmlSerializerUtil.copyBean(state, this);
-  }
+    @Override
+    public void loadState(StepikUpdateSettings state) {
+        XmlSerializerUtil.copyBean(state, this);
+    }
 
-  public static StepikUpdateSettings getInstance() {
-    return ServiceManager.getService(StepikUpdateSettings.class);
-  }
+    public static StepikUpdateSettings getInstance() {
+        return ServiceManager.getService(StepikUpdateSettings.class);
+    }
 }

@@ -17,52 +17,55 @@ import javax.swing.*;
 
 abstract public class StudyWindowNavigationAction extends StudyActionWithShortcut implements DumbAware {
 
-  protected StudyWindowNavigationAction(String actionId, String description, Icon icon) {
-    super(actionId, description, icon);
-  }
-
-  private void navigateToPlaceholder(@NotNull final Project project) {
-      final Editor selectedEditor = StudyUtils.getSelectedEditor(project);
-      if (selectedEditor != null) {
-        final FileDocumentManager fileDocumentManager = FileDocumentManager.getInstance();
-        final VirtualFile openedFile = fileDocumentManager.getFile(selectedEditor.getDocument());
-        if (openedFile != null) {
-          final TaskFile selectedTaskFile = StudyUtils.getTaskFile(project, openedFile);
-          if (selectedTaskFile != null) {
-            final AnswerPlaceholder selectedAnswerPlaceholder = getSelectedAnswerPlaceholder(selectedEditor, selectedTaskFile);
-            if (selectedAnswerPlaceholder == null) {
-              return;
-            }
-            final AnswerPlaceholder nextAnswerPlaceholder = getNextAnswerPlaceholder(selectedAnswerPlaceholder);
-            if (nextAnswerPlaceholder == null) {
-              return;
-            }
-            StudyNavigator.navigateToAnswerPlaceholder(selectedEditor, nextAnswerPlaceholder);
-            selectedEditor.getSelectionModel().removeSelection();
-            }
-          }
-        }
-      }
-
-  @Nullable
-  private static AnswerPlaceholder getSelectedAnswerPlaceholder(@NotNull final Editor editor, @NotNull final TaskFile file) {
-    return file.getAnswerPlaceholder(editor.getCaretModel().getOffset());
-  }
-
-  @Nullable
-  protected abstract AnswerPlaceholder getNextAnswerPlaceholder(@NotNull final AnswerPlaceholder window);
-
-  @Override
-  public void actionPerformed(@NotNull AnActionEvent e) {
-    final Project project = e.getProject();
-    if (project == null) {
-      return;
+    protected StudyWindowNavigationAction(String actionId, String description, Icon icon) {
+        super(actionId, description, icon);
     }
-    navigateToPlaceholder(project);
-  }
 
-  @Override
-  public void update(@NotNull AnActionEvent e) {
-    StudyUtils.updateAction(e);
-  }
+    private void navigateToPlaceholder(@NotNull final Project project) {
+        final Editor selectedEditor = StudyUtils.getSelectedEditor(project);
+        if (selectedEditor != null) {
+            final FileDocumentManager fileDocumentManager = FileDocumentManager.getInstance();
+            final VirtualFile openedFile = fileDocumentManager.getFile(selectedEditor.getDocument());
+            if (openedFile != null) {
+                final TaskFile selectedTaskFile = StudyUtils.getTaskFile(project, openedFile);
+                if (selectedTaskFile != null) {
+                    final AnswerPlaceholder selectedAnswerPlaceholder = getSelectedAnswerPlaceholder(selectedEditor,
+                            selectedTaskFile);
+                    if (selectedAnswerPlaceholder == null) {
+                        return;
+                    }
+                    final AnswerPlaceholder nextAnswerPlaceholder = getNextAnswerPlaceholder(selectedAnswerPlaceholder);
+                    if (nextAnswerPlaceholder == null) {
+                        return;
+                    }
+                    StudyNavigator.navigateToAnswerPlaceholder(selectedEditor, nextAnswerPlaceholder);
+                    selectedEditor.getSelectionModel().removeSelection();
+                }
+            }
+        }
+    }
+
+    @Nullable
+    private static AnswerPlaceholder getSelectedAnswerPlaceholder(
+            @NotNull final Editor editor,
+            @NotNull final TaskFile file) {
+        return file.getAnswerPlaceholder(editor.getCaretModel().getOffset());
+    }
+
+    @Nullable
+    protected abstract AnswerPlaceholder getNextAnswerPlaceholder(@NotNull final AnswerPlaceholder window);
+
+    @Override
+    public void actionPerformed(@NotNull AnActionEvent e) {
+        final Project project = e.getProject();
+        if (project == null) {
+            return;
+        }
+        navigateToPlaceholder(project);
+    }
+
+    @Override
+    public void update(@NotNull AnActionEvent e) {
+        StudyUtils.updateAction(e);
+    }
 }
