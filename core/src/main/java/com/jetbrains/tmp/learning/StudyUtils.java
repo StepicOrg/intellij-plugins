@@ -476,7 +476,7 @@ public class StudyUtils {
     }
     String text = task.getText();
     if (text != null) {
-      return text;
+      return getTextWithStepLink(task);
     }
     if (taskDirectory != null) {
       final String prefix = String.format(ourPrefix, EditorColorsManager.getInstance().getGlobalScheme().getEditorFontSize());
@@ -487,6 +487,29 @@ public class StudyUtils {
       if (taskTextFileMd != null) return prefix + convertToHtml(taskTextFileMd) + ourPostfix;      
     }
     return null;
+  }
+
+  @NotNull
+  private static String getTextWithStepLink(Task task) {
+    StringBuilder stringBuilder = new StringBuilder();
+
+    if (task.getLesson().getId() > 0 ) {
+      stringBuilder
+              .append("<a href=\"https://stepik.org/lesson/")
+              .append(task.getLesson().getId())
+              .append("/step/")
+              .append(task.getPosition())
+              .append("\">View step on Stepik.org</a>");
+    } else {
+      stringBuilder.append("<b>Please, create a new project to see the link to the step. </b>");
+    }
+
+    if (!task.getText().startsWith("<p>")){
+      stringBuilder.append("<br><br>");
+    }
+
+    stringBuilder.append(task.getText());
+    return stringBuilder.toString();
   }
 
   @Nullable
@@ -555,7 +578,7 @@ public class StudyUtils {
     }
     return taskFile;
   }
-  
+
   @Nullable
   public static Task getCurrentTask(@NotNull final Project project) {
     final TaskFile taskFile = getSelectedTaskFile(project);
@@ -674,24 +697,24 @@ public class StudyUtils {
     ArrayList<String> lines = ContainerUtil.newArrayList(content.split("\n|\r|\r\n"));
     MarkdownUtil.replaceHeaders(lines);
     MarkdownUtil.replaceCodeBlock(lines);
-    
+
     return new MarkdownProcessor().markdown(StringUtil.join(lines, "\n"));
   }
-  
+
   public static boolean isTaskDescriptionFile(@NotNull final String fileName) {
     return EduNames.TASK_HTML.equals(fileName) || EduNames.TASK_MD.equals(fileName);
   }
-  
+
   @Nullable
   public static VirtualFile findTaskDescriptionVirtualFile(@NotNull final VirtualFile parent) {
     return ObjectUtils.chooseNotNull(parent.findChild(EduNames.TASK_HTML), parent.findChild(EduNames.TASK_MD));
   }
-  
+
   @NotNull
   public static String getTaskDescriptionFileName(final boolean useHtml) {
-    return useHtml ? EduNames.TASK_HTML : EduNames.TASK_MD;    
+    return useHtml ? EduNames.TASK_HTML : EduNames.TASK_MD;
   }
-  
+
   @Nullable
   public static File createTaskDescriptionFile(@NotNull final File parent) {
     if(new File(parent, EduNames.TASK_HTML).exists()) {

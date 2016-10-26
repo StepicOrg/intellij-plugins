@@ -357,10 +357,6 @@ public class StepikConnectorGet {
     final StringBuilder stringBuilder = new StringBuilder();
 
     task.setName("step" + task.getPosition());
-    stringBuilder.append(getStepLink(stepSource));
-    if (!step.text.startsWith("<p>")) {
-      stringBuilder.append("<br><br>");
-    }
     stringBuilder.append(step.text).append("<br>");
 
     if (step.options.samples != null) {
@@ -404,16 +400,6 @@ public class StepikConnectorGet {
     }
   }
 
-  private static String getStepLink(StepikWrappers.StepSource stepSource) {
-    StringBuilder stringBuilder = new StringBuilder();
-    stringBuilder
-      .append("<a href=\"https://stepik.org/lesson/")
-      .append(stepSource.lesson)
-      .append("/step/")
-      .append(stepSource.position)
-      .append("\">View step on Stepik.org</a>");
-    return stringBuilder.toString();
-  }
 
   public static StepikWrappers.StepContainer getSteps(List<Integer> steps) throws IOException {
     return getFromStepik(EduStepikNames.STEPS + "/" + getIdQuery(steps), StepikWrappers.StepContainer.class);
