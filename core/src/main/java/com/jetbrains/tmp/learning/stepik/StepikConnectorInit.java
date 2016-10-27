@@ -1,22 +1,8 @@
-
-/*
- * Copyright 2000-2016 JetBrains s.r.o.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.jetbrains.tmp.learning.stepik;
 
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.util.net.HttpConfigurable;
+import org.apache.http.HttpHost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.impl.DefaultConnectionReuseStrategy;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -48,17 +34,24 @@ public class StepikConnectorInit {
     }
 
     public static HttpClientBuilder getBuilder() {
+        HttpConfigurable instance = HttpConfigurable.getInstance();
+        TrustManager[] trustAllCerts = getTrustAllCerts();
         try {
-            TrustManager[] trustAllCerts = getTrustAllCerts();
             SSLContext sslContext = SSLContext.getInstance("TLS");
             sslContext.init(null, trustAllCerts, new SecureRandom());
-            return HttpClients
-                    .custom()
+            HttpClientBuilder httpClientBuilder = HttpClients.custom()
                     .setMaxConnPerRoute(100000)
                     .setConnectionReuseStrategy(DefaultConnectionReuseStrategy.INSTANCE)
                     .setSslcontext(sslContext);
+
+            if (instance.USE_HTTP_PROXY) {
+                HttpHost host = new HttpHost(instance.PROXY_HOST, instance.PROXY_PORT);
+                httpClientBuilder.setProxy(host);
+                logger.info("Uses proxy: Host = " + instance.PROXY_HOST + " Port = " + instance.PROXY_PORT);
+            }
+            return httpClientBuilder;
         } catch (NoSuchAlgorithmException | KeyManagementException e) {
-            logger.error(e.getMessage());
+            logger.warn(e.getMessage());
         }
         return null;
     }
