@@ -17,6 +17,8 @@
 package com.jetbrains.tmp.learning.stepik;
 
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.util.net.HttpConfigurable;
+import org.apache.http.HttpHost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.impl.DefaultConnectionReuseStrategy;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -48,17 +50,25 @@ public class StepikConnectorInit {
     }
 
     public static HttpClientBuilder getBuilder() {
+        HttpConfigurable instance = HttpConfigurable.getInstance();
+
         try {
             TrustManager[] trustAllCerts = getTrustAllCerts();
             SSLContext sslContext = SSLContext.getInstance("TLS");
             sslContext.init(null, trustAllCerts, new SecureRandom());
-            return HttpClients
-                    .custom()
+            HttpClientBuilder httpClientBuilder = HttpClients.custom()
                     .setMaxConnPerRoute(100000)
                     .setConnectionReuseStrategy(DefaultConnectionReuseStrategy.INSTANCE)
                     .setSslcontext(sslContext);
+
+            if (instance.USE_HTTP_PROXY) {
+                HttpHost host = new HttpHost(instance.PROXY_HOST, instance.PROXY_PORT);
+                httpClientBuilder.setProxy(host);
+                logger.info("Uses proxy. Host = " + instance.PROXY_HOST + "; Port = " + instance.PROXY_PORT);
+            }
+            return httpClientBuilder;
         } catch (NoSuchAlgorithmException | KeyManagementException e) {
-            logger.error(e.getMessage());
+            logger.warn(e.getMessage());
         }
         return null;
     }
