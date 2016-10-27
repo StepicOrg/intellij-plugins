@@ -63,8 +63,9 @@ public class StepikRefreshTaskFileAction extends StudyActionWithShortcut {
                 }));
     }
 
-    private static void refreshFile(@NotNull final StudyState studyState,
-                                    @NotNull final Project project) {
+    private static void refreshFile(
+            @NotNull final StudyState studyState,
+            @NotNull final Project project) {
         final Editor editor = studyState.getEditor();
         final TaskFile taskFile = studyState.getTaskFile();
         if (!resetTaskFile(editor.getDocument(), project, taskFile,
@@ -85,10 +86,11 @@ public class StepikRefreshTaskFileAction extends StudyActionWithShortcut {
         showBalloon(project, "You can start again now", MessageType.INFO);
     }
 
-    private static boolean resetTaskFile(@NotNull final Document document,
-                                         @NotNull final Project project,
-                                         TaskFile taskFile,
-                                         String name) {
+    private static boolean resetTaskFile(
+            @NotNull final Document document,
+            @NotNull final Project project,
+            TaskFile taskFile,
+            String name) {
         if (!resetDocument(document, taskFile, name, project)) {
             return false;
         }
@@ -98,8 +100,9 @@ public class StepikRefreshTaskFileAction extends StudyActionWithShortcut {
         return true;
     }
 
-    private static void showBalloon(@NotNull final Project project, String text,
-                                    @NotNull final MessageType messageType) {
+    private static void showBalloon(
+            @NotNull final Project project, String text,
+            @NotNull final MessageType messageType) {
         BalloonBuilder balloonBuilder = JBPopupFactory.getInstance()
                 .createHtmlTextBalloonBuilder(text, messageType, null);
         final Balloon balloon = balloonBuilder.createBalloon();
@@ -110,10 +113,11 @@ public class StepikRefreshTaskFileAction extends StudyActionWithShortcut {
         Disposer.register(project, balloon);
     }
 
-    private static boolean resetDocument(@NotNull final Document document,
-                                         @NotNull final TaskFile taskFile,
-                                         String fileName,
-                                         @NotNull Project project) {
+    private static boolean resetDocument(
+            @NotNull final Document document,
+            @NotNull final TaskFile taskFile,
+            String fileName,
+            @NotNull Project project) {
         final Document patternDocument = StudyUtils.getPatternDocument(taskFile, fileName);
         if (patternDocument == null) {
             return false;
