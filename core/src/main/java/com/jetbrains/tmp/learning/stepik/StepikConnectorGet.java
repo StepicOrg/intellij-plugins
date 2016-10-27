@@ -189,7 +189,7 @@ public class StepikConnectorGet {
       for (Integer instructor : info.instructors) {
         final StepikUser author =
           getFromStepik(EduStepikNames.USERS + "/" + String.valueOf(instructor), StepikWrappers.AuthorWrapper.class,
-                        StepikConnectorInit.getHttpClient()).users.get(0);
+            StepikConnectorInit.getHttpClient()).users.get(0);
         info.addAuthor(author);
       }
 
@@ -301,7 +301,7 @@ public class StepikConnectorGet {
 
     String sectionName = sectionContainer.sections.get(0).title;
     final List<Lesson> lessons = new ArrayList<Lesson>();
-    course.addSectionName(EduNames.SECTION+sectionContainer.sections.get(0).position, sectionName);
+    course.addSectionName(EduNames.SECTION + sectionContainer.sections.get(0).position, sectionName);
     for (Lesson lesson : lessonContainer.lessons) {
       lesson.setName(sectionName + EduNames.SEPARATOR + lesson.getName());
       createTasks(lesson, lesson.steps);
@@ -353,31 +353,33 @@ public class StepikConnectorGet {
   }
 
   private static void createCodeTask(Task task, StepikWrappers.Step step) {
+    final StringBuilder stringBuilder = new StringBuilder();
+
     task.setName("step" + task.getPosition());
+    stringBuilder.append(step.text).append("<br>");
+
     if (step.options.samples != null) {
-      final StringBuilder builder = new StringBuilder();
       for (List<String> sample : step.options.samples) {
         if (sample.size() == 2) {
-          builder.append("<b>Sample Input:</b><br>");
-          builder.append(StringUtil.replace(sample.get(0), "\n", "<br>"));
-          builder.append("<br>");
-          builder.append("<b>Sample Output:</b><br>");
-          builder.append(StringUtil.replace(sample.get(1), "\n", "<br>"));
-          builder.append("<br><br>");
+          stringBuilder.append("<b>Sample Input:</b><br>")
+            .append(StringUtil.replace(sample.get(0), "\n", "<br>"))
+            .append("<br>")
+            .append("<b>Sample Output:</b><br>")
+            .append(StringUtil.replace(sample.get(1), "\n", "<br>"))
+            .append("<br><br>");
         }
       }
-      task.setText(step.text + "<br>" + builder.toString());
     }
 
     if (step.options.executionMemoryLimit != null && step.options.executionTimeLimit != null) {
-      String builder = "<b>Memory limit</b>: " +
-                       step.options.executionMemoryLimit + " Mb" +
-                       "<br>" +
-                       "<b>Time limit</b>: " +
-                       step.options.executionTimeLimit + "s" +
-                       "<br><br>";
-      task.setText(task.getText() + builder);
+      stringBuilder.append("<b>Memory limit</b>: ")
+        .append(step.options.executionMemoryLimit).append(" Mb")
+        .append("<br>")
+        .append("<b>Time limit</b>: ")
+        .append(step.options.executionTimeLimit).append("s")
+        .append("<br><br>");
     }
+    task.setText(stringBuilder.toString());
 
     String templateForTask;
     templateForTask = step.options.codeTemplates.getTemplateForLanguage("java8");
@@ -396,6 +398,7 @@ public class StepikConnectorGet {
       task.taskFiles.put(taskFile.name, taskFile);
     }
   }
+
 
   public static StepikWrappers.StepContainer getSteps(List<Integer> steps) throws IOException {
     return getFromStepik(EduStepikNames.STEPS + "/" + getIdQuery(steps), StepikWrappers.StepContainer.class);

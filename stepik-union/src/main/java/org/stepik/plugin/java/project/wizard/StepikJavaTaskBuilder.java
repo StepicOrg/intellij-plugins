@@ -17,11 +17,10 @@ import com.jetbrains.tmp.learning.StudyTaskManager;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.Task;
-import org.stepik.from.edu.intellij.utils.EduIntelliJNames;
-import org.stepik.from.edu.intellij.utils.generation.builders.TaskBuilder;
 import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.from.edu.intellij.utils.generation.builders.TaskBuilder;
 import org.stepik.plugin.collective.SupportedLanguages;
 
 import java.io.File;
@@ -35,6 +34,7 @@ public class StepikJavaTaskBuilder extends JavaModuleBuilder implements TaskBuil
     private static final Logger LOG = Logger.getInstance(StepikJavaTaskBuilder.class);
     private final Task myTask;
     private final Module myUtilModule;
+    private static final String SRC = "src";
 
     public StepikJavaTaskBuilder(String moduleDir, @NotNull String name, @NotNull Task task,
                                  @NotNull Module utilModule) {
@@ -75,7 +75,7 @@ public class StepikJavaTaskBuilder extends JavaModuleBuilder implements TaskBuil
         if (moduleDir == null) {
             return false;
         }
-        VirtualFile src = moduleDir.findChild(EduIntelliJNames.SRC);
+        VirtualFile src = moduleDir.findChild(SRC);
         if (src == null) {
             return false;
         }
