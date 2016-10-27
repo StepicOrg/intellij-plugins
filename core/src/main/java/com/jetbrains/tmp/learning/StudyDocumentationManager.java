@@ -28,13 +28,15 @@ import java.awt.*;
 
 public class StudyDocumentationManager extends DocumentationManager {
 
-  public StudyDocumentationManager(Project project, ActionManager manager, TargetElementUtil targetElementUtil) {
-    super(project, manager, targetElementUtil);
-  }
+    public StudyDocumentationManager(Project project, ActionManager manager, TargetElementUtil targetElementUtil) {
+        super(project, manager, targetElementUtil);
+    }
 
-  @Override
-  protected void setToolwindowDefaultState() {
-    final Rectangle rectangle = WindowManager.getInstance().getIdeFrame(myProject).suggestChildFrameBounds();
-    myToolWindow.setDefaultState(ToolWindowAnchor.RIGHT, ToolWindowType.DOCKED, new Rectangle(rectangle.width/2, rectangle.height));
-  }
+    @Override
+    protected void setToolwindowDefaultState() {
+        final Rectangle rectangle = WindowManager.getInstance().getIdeFrame(myProject).suggestChildFrameBounds();
+        myToolWindow.setDefaultState(ToolWindowAnchor.RIGHT,
+                ToolWindowType.DOCKED,
+                new Rectangle(rectangle.width / 2, rectangle.height));
+    }
 }

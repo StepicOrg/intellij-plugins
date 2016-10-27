@@ -15,174 +15,183 @@ import java.util.List;
 import java.util.Map;
 
 public class Course {
-  @Expose private List<Lesson> lessons = new ArrayList<Lesson>();
-  @Expose private List<StepikUser> authors = new ArrayList<StepikUser>();
-  @Expose private String description;
-  @Expose private String name;
-  private String myCourseDirectory = "";
-  @Expose private int id;
-  private boolean myUpToDate;
-  @Expose private boolean isAdaptive = false;
-  @Expose @SerializedName("language") private String myLanguage = "Python";
+    @Expose
+    private List<Lesson> lessons = new ArrayList<Lesson>();
+    @Expose
+    private List<StepikUser> authors = new ArrayList<StepikUser>();
+    @Expose
+    private String description;
+    @Expose
+    private String name;
+    private String myCourseDirectory = "";
+    @Expose
+    private int id;
+    private boolean myUpToDate;
+    @Expose
+    private boolean isAdaptive = false;
+    @Expose
+    @SerializedName("language")
+    private String myLanguage = "Python";
 
-  @Expose private Map<String, String> sectionsNames = new HashMap();
+    @Expose
+    private Map<String, String> sectionsNames = new HashMap();
 
-  //this field is used to distinguish ordinary and CheckIO projects,
-  //"PyCharm" is used here for historical reasons
-  private String courseType = EduNames.PYCHARM;
-  private String courseMode = EduNames.STUDY; //this field is used to distinguish study and course creator modes
+    //this field is used to distinguish ordinary and CheckIO projects,
+    //"PyCharm" is used here for historical reasons
+    private String courseType = EduNames.PYCHARM;
+    private String courseMode = EduNames.STUDY; //this field is used to distinguish study and course creator modes
 
-  public Course() {
-  }
-
-  /**
-   * Initializes state of course
-   */
-  public void initCourse(boolean isRestarted) {
-    for (Lesson lesson : getLessons()) {
-      lesson.initLesson(this, isRestarted);
+    public Course() {
     }
-  }
 
-  public List<Lesson> getLessons() {
-    return lessons;
-  }
-
-  public void setLessons(List<Lesson> lessons) {
-    this.lessons = lessons;
-  }
-
-  public void addLessons(List<Lesson> lessons) {
-    this.lessons.addAll(lessons);
-  }
-
-  public void addLesson(@NotNull final Lesson lesson) {
-    lessons.add(lesson);
-  }
-
-  public Lesson getLesson(@NotNull final String name) {
-    int lessonIndex = EduUtils.getIndex(name, EduNames.LESSON);
-    List<Lesson> lessons = getLessons();
-    if (!EduUtils.indexIsValid(lessonIndex, lessons)) {
-      return null;
+    /**
+     * Initializes state of course
+     */
+    public void initCourse(boolean isRestarted) {
+        for (Lesson lesson : getLessons()) {
+            lesson.initLesson(this, isRestarted);
+        }
     }
-    for (Lesson lesson : lessons) {
-      if (lesson.getIndex() - 1 == lessonIndex) {
-        return lesson;
-      }
+
+    public List<Lesson> getLessons() {
+        return lessons;
     }
-    return null;
-  }
 
-  @NotNull
-  public List<StepikUser> getAuthors() {
-    return authors;
-  }
-
-  public static String getAuthorsString(@NotNull List<StepikUser> authors) {
-    return StringUtil.join(authors, StepikUser::getName, ", ");
-  }
-
-  public void setAuthors(String[] authors) {
-    this.authors = new ArrayList<StepikUser>();
-    for (String name : authors) {
-      final List<String> pair = StringUtil.split(name, " ");
-      if (!pair.isEmpty()) {
-        this.authors.add(new StepikUser(pair.get(0), pair.size() > 1 ? pair.get(1) : ""));
-      }
+    public void setLessons(List<Lesson> lessons) {
+        this.lessons = lessons;
     }
-  }
 
-  public String getName() {
-    return name;
-  }
+    public void addLessons(List<Lesson> lessons) {
+        this.lessons.addAll(lessons);
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public void addLesson(@NotNull final Lesson lesson) {
+        lessons.add(lesson);
+    }
 
-  public String getCourseDirectory() {
-    return myCourseDirectory;
-  }
+    public Lesson getLesson(@NotNull final String name) {
+        int lessonIndex = EduUtils.getIndex(name, EduNames.LESSON);
+        List<Lesson> lessons = getLessons();
+        if (!EduUtils.indexIsValid(lessonIndex, lessons)) {
+            return null;
+        }
+        for (Lesson lesson : lessons) {
+            if (lesson.getIndex() - 1 == lessonIndex) {
+                return lesson;
+            }
+        }
+        return null;
+    }
 
-  public void setCourseDirectory(@NotNull final String courseDirectory) {
-    myCourseDirectory = courseDirectory;
-  }
+    @NotNull
+    public List<StepikUser> getAuthors() {
+        return authors;
+    }
 
-  public String getDescription() {
-    return description;
-  }
+    public static String getAuthorsString(@NotNull List<StepikUser> authors) {
+        return StringUtil.join(authors, StepikUser::getName, ", ");
+    }
 
-  public void setDescription(String description) {
-    this.description = description;
-  }
+    public void setAuthors(String[] authors) {
+        this.authors = new ArrayList<StepikUser>();
+        for (String name : authors) {
+            final List<String> pair = StringUtil.split(name, " ");
+            if (!pair.isEmpty()) {
+                this.authors.add(new StepikUser(pair.get(0), pair.size() > 1 ? pair.get(1) : ""));
+            }
+        }
+    }
 
-  public boolean isUpToDate() {
-    return myUpToDate;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public void setUpToDate(boolean upToDate) {
-    myUpToDate = upToDate;
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-  public Language getLanguageById() {
-    return Language.findLanguageByID(myLanguage);
-  }
+    public String getCourseDirectory() {
+        return myCourseDirectory;
+    }
 
-  public String getLanguage() {
-    return myLanguage;
-  }
+    public void setCourseDirectory(@NotNull final String courseDirectory) {
+        myCourseDirectory = courseDirectory;
+    }
 
-  public void setLanguage(@NotNull final String language) {
-    myLanguage = language;
-  }
+    public String getDescription() {
+        return description;
+    }
 
-  public void setAuthors(List<StepikUser> authors) {
-    this.authors = authors;
-  }
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-  @NotNull
-  public String getCourseType() {
-    return courseType;
-  }
+    public boolean isUpToDate() {
+        return myUpToDate;
+    }
 
-  public void setCourseType(String courseType) {
-    this.courseType = courseType;
-  }
+    public void setUpToDate(boolean upToDate) {
+        myUpToDate = upToDate;
+    }
 
-  public boolean isAdaptive() {
-    return isAdaptive;
-  }
+    public Language getLanguageById() {
+        return Language.findLanguageByID(myLanguage);
+    }
 
-  public void setAdaptive(boolean adaptive) {
-    isAdaptive = adaptive;
-  }
+    public String getLanguage() {
+        return myLanguage;
+    }
 
-  public int getId() {
-    return id;
-  }
+    public void setLanguage(@NotNull final String language) {
+        myLanguage = language;
+    }
 
-  public void setId(int id) {
-    this.id = id;
-  }
+    public void setAuthors(List<StepikUser> authors) {
+        this.authors = authors;
+    }
 
-  public String getCourseMode() {
-    return courseMode;
-  }
+    @NotNull
+    public String getCourseType() {
+        return courseType;
+    }
 
-  public void setCourseMode(String courseMode) {
-    this.courseMode = courseMode;
-  }
+    public void setCourseType(String courseType) {
+        this.courseType = courseType;
+    }
 
-  public Map<String, String> getSectionsNames() {
-    return sectionsNames;
-  }
+    public boolean isAdaptive() {
+        return isAdaptive;
+    }
 
-  public void setSectionsNames(Map<String, String> sectionsNames) {
-    this.sectionsNames = sectionsNames;
-  }
+    public void setAdaptive(boolean adaptive) {
+        isAdaptive = adaptive;
+    }
 
-  public void addSectionName(String key, String value){
-    sectionsNames.put(key, value);
-  }
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getCourseMode() {
+        return courseMode;
+    }
+
+    public void setCourseMode(String courseMode) {
+        this.courseMode = courseMode;
+    }
+
+    public Map<String, String> getSectionsNames() {
+        return sectionsNames;
+    }
+
+    public void setSectionsNames(Map<String, String> sectionsNames) {
+        this.sectionsNames = sectionsNames;
+    }
+
+    public void addSectionName(String key, String value) {
+        sectionsNames.put(key, value);
+    }
 }

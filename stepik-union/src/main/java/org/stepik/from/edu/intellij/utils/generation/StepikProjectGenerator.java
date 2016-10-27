@@ -21,7 +21,7 @@ import java.util.*;
 import static com.jetbrains.tmp.learning.StudyUtils.execCancelable;
 
 public class StepikProjectGenerator extends EduProjectGenerator {
-    private static final Logger LOG = Logger.getInstance(StepikProjectGenerator.class);
+    private static final Logger logger = Logger.getInstance(StepikProjectGenerator.class);
 
     protected static final String CACHE_NAME = "enrolledCourseNames.txt";
 
@@ -55,11 +55,9 @@ public class StepikProjectGenerator extends EduProjectGenerator {
                 final String json = gson.toJson(courseInfo);
                 writer.println(json);
             }
-        }
-        catch (IOException e) {
-            LOG.error(e);
-        }
-        finally {
+        } catch (IOException e) {
+            logger.error(e);
+        } finally {
             StudyUtils.closeSilently(writer);
         }
     }
@@ -68,14 +66,14 @@ public class StepikProjectGenerator extends EduProjectGenerator {
         if (!OUR_COURSES_DIR.exists()) {
             final boolean created = OUR_COURSES_DIR.mkdirs();
             if (!created) {
-                LOG.error("Cannot flush courses cache. Can't create courses directory");
+                logger.error("Cannot flush courses cache. Can't create courses directory");
                 return false;
             }
         }
         if (!cacheFile.exists()) {
             final boolean created = cacheFile.createNewFile();
             if (!created) {
-                LOG.error("Cannot flush courses cache. Can't create " + CACHE_NAME + " file");
+                logger.error("Cannot flush courses cache. Can't create " + CACHE_NAME + " file");
                 return false;
             }
         }
@@ -95,24 +93,21 @@ public class StepikProjectGenerator extends EduProjectGenerator {
                 try {
                     String line;
                     while ((line = reader.readLine()) != null) {
-                        Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
+                        Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+                                .create();
                         final CourseInfo courseInfo = gson.fromJson(line, CourseInfo.class);
                         courses.add(courseInfo);
                     }
-                }
-                catch (IOException | JsonSyntaxException e) {
-                    LOG.error(e.getMessage());
-                }
-                finally {
+                } catch (IOException | JsonSyntaxException e) {
+                    logger.error(e.getMessage());
+                } finally {
                     StudyUtils.closeSilently(reader);
                 }
-            }
-            finally {
+            } finally {
                 StudyUtils.closeSilently(inputStream);
             }
-        }
-        catch (FileNotFoundException e) {
-            LOG.error(e.getMessage());
+        } catch (FileNotFoundException e) {
+            logger.error(e.getMessage());
         }
         return courses;
     }
@@ -134,33 +129,36 @@ public class StepikProjectGenerator extends EduProjectGenerator {
 //            }
 //        }
 
-        return ProgressManager.getInstance().runProcessWithProgressSynchronously(new ThrowableComputable<Course, RuntimeException>() {
-            @Override
-            public Course compute() throws RuntimeException {
-                ProgressManager.getInstance().getProgressIndicator().setIndeterminate(true);
-                return execCancelable(() -> {
+        return ProgressManager.getInstance()
+                .runProcessWithProgressSynchronously(new ThrowableComputable<Course, RuntimeException>() {
+                    @Override
+                    public Course compute() throws RuntimeException {
+                        ProgressManager.getInstance().getProgressIndicator().setIndeterminate(true);
+                        return execCancelable(() -> {
 
-                    final Course course = StepikConnectorGet.getCourse(project, mySelectedCourseInfo);
-                    if (course != null) {
-                        flushCourse(project, course);
-                        course.initCourse(false);
+                            final Course course = StepikConnectorGet.getCourse(project, mySelectedCourseInfo);
+                            if (course != null) {
+                                flushCourse(project, course);
+                                course.initCourse(false);
+                            }
+                            return course;
+                        });
                     }
-                    return course;
-                });
-            }
-        }, "Creating Course", true, project);
+                }, "Creating Course", true, project);
     }
 
     @NotNull
-    public List<CourseInfo> getCoursesUnderProgress(boolean force, @NotNull final String progressTitle, @NotNull final Project project) {
+    public List<CourseInfo> getCoursesUnderProgress(
+            boolean force,
+            @NotNull final String progressTitle,
+            @NotNull final Project project) {
         try {
             return ProgressManager.getInstance()
                     .runProcessWithProgressSynchronously(() -> {
                         ProgressManager.getInstance().getProgressIndicator().setIndeterminate(true);
                         return getCourses(force);
                     }, progressTitle, true, project);
-        }
-        catch (RuntimeException e) {
+        } catch (RuntimeException e) {
             return Collections.singletonList(CourseInfo.INVALID_COURSE);
         }
     }

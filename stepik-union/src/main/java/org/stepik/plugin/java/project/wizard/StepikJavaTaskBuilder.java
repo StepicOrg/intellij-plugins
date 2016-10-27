@@ -31,13 +31,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class StepikJavaTaskBuilder extends JavaModuleBuilder implements TaskBuilder {
-    private static final Logger LOG = Logger.getInstance(StepikJavaTaskBuilder.class);
+    private static final Logger logger = Logger.getInstance(StepikJavaTaskBuilder.class);
     private final Task myTask;
     private final Module myUtilModule;
     private static final String SRC = "src";
 
-    public StepikJavaTaskBuilder(String moduleDir, @NotNull String name, @NotNull Task task,
-                                 @NotNull Module utilModule) {
+    public StepikJavaTaskBuilder(
+            String moduleDir, @NotNull String name, @NotNull Task task,
+            @NotNull Module utilModule) {
         myTask = task;
         myUtilModule = utilModule;
         String taskName = EduNames.TASK + task.getIndex();
@@ -55,7 +56,7 @@ public class StepikJavaTaskBuilder extends JavaModuleBuilder implements TaskBuil
             IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
         Module module = super.createModule(moduleModel);
         if (!createTaskContent()) {
-            LOG.info("Failed to copy task content");
+            logger.info("Failed to copy task content");
             return module;
         }
 
@@ -133,7 +134,7 @@ public class StepikJavaTaskBuilder extends JavaModuleBuilder implements TaskBuil
                 supportedLang.add(SupportedLanguages.JAVA);
             }
         } catch (IOException e) {
-            LOG.warn(e.getMessage());
+            logger.warn(e.getMessage());
         }
 
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir, "*.py")) {
@@ -141,7 +142,7 @@ public class StepikJavaTaskBuilder extends JavaModuleBuilder implements TaskBuil
                 supportedLang.add(SupportedLanguages.PYTHON);
             }
         } catch (IOException e) {
-            LOG.warn(e.getMessage());
+            logger.warn(e.getMessage());
         }
         return supportedLang;
     }

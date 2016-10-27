@@ -12,27 +12,28 @@ import javax.swing.*;
 
 public class StudyNextStudyTaskAction extends StudyTaskNavigationAction {
 
-  public static final String ACTION_ID = "SCore.NextTaskAction";
-  public static final String SHORTCUT = "ctrl pressed PERIOD";
+    public static final String ACTION_ID = "SCore.NextTaskAction";
+    public static final String SHORTCUT = "ctrl pressed PERIOD";
 
-  public StudyNextStudyTaskAction() {
-    super("Next Task (" + KeymapUtil.getShortcutText(new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT), null)) + ")", "Navigate to the next task", AllIcons.Actions.Forward);
-  }
+    public StudyNextStudyTaskAction() {
+        super("Next Task (" + KeymapUtil.getShortcutText(new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT),
+                null)) + ")", "Navigate to the next task", AllIcons.Actions.Forward);
+    }
 
-  @Override
-  protected Task getTargetTask(@NotNull final Task sourceTask) {
-    return StudyNavigator.nextTask(sourceTask);
-  }
+    @Override
+    protected Task getTargetTask(@NotNull final Task sourceTask) {
+        return StudyNavigator.nextTask(sourceTask);
+    }
 
-  @NotNull
-  @Override
-  public String getActionId() {
-    return ACTION_ID;
-  }
+    @NotNull
+    @Override
+    public String getActionId() {
+        return ACTION_ID;
+    }
 
-  @Nullable
-  @Override
-  public String[] getShortcuts() {
-    return new String[]{SHORTCUT};
-  }
+    @Nullable
+    @Override
+    public String[] getShortcuts() {
+        return new String[]{SHORTCUT};
+    }
 }

@@ -22,10 +22,10 @@ import java.io.IOException;
 import java.util.List;
 
 public class StepikJavaLessonBuilder extends JavaModuleBuilder implements LessonBuilder {
-    private static final Logger LOG = Logger.getInstance(StepikJavaLessonBuilder.class);
+    private static final Logger logger = Logger.getInstance(StepikJavaLessonBuilder.class);
     private final Lesson myLesson;
     private final Module myUtilModule;
-    private List<Pair<String,String>> mySourcePaths;
+    private List<Pair<String, String>> mySourcePaths;
 
     public StepikJavaLessonBuilder(@NotNull String moduleDir, @NotNull Lesson lesson, @NotNull Module utilModule) {
         myLesson = lesson;
@@ -36,13 +36,15 @@ public class StepikJavaLessonBuilder extends JavaModuleBuilder implements Lesson
     }
 
     @Override
-    public Module createLesson(@NotNull ModifiableModuleModel moduleModel) throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
+    public Module createLesson(@NotNull ModifiableModuleModel moduleModel)
+            throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
         return createModule(moduleModel);
     }
 
     @NotNull
     @Override
-    public Module createModule(@NotNull ModifiableModuleModel moduleModel) throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
+    public Module createModule(@NotNull ModifiableModuleModel moduleModel)
+            throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
         Module baseModule = super.createModule(moduleModel);
         List<Task> taskList = myLesson.getTaskList();
         for (int i = 0; i < taskList.size(); i++) {
@@ -59,8 +61,14 @@ public class StepikJavaLessonBuilder extends JavaModuleBuilder implements Lesson
         return mySourcePaths;
     }
 
-    private void createTaskModule(@NotNull ModifiableModuleModel moduleModel, @NotNull Task task) throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
-        TaskBuilder taskModuleBuilder = new StepikJavaTaskBuilder(getModuleFileDirectory(), getName(), task, myUtilModule);
+    private void createTaskModule(
+            @NotNull ModifiableModuleModel moduleModel,
+            @NotNull Task task)
+            throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
+        TaskBuilder taskModuleBuilder = new StepikJavaTaskBuilder(getModuleFileDirectory(),
+                getName(),
+                task,
+                myUtilModule);
         taskModuleBuilder.createTask(moduleModel);
     }
 }

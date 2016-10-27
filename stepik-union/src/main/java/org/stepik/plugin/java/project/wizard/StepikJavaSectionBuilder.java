@@ -20,11 +20,11 @@ import java.io.IOException;
 import java.util.List;
 
 public class StepikJavaSectionBuilder extends JavaModuleBuilder implements LessonBuilder {
-    private static final Logger LOG = Logger.getInstance(StepikJavaLessonBuilder.class);
+    private static final Logger logger = Logger.getInstance(StepikJavaLessonBuilder.class);
     private final Module myUtilModule;
     private List<Pair<String, String>> mySourcePaths;
 
-    public StepikJavaSectionBuilder(@NotNull String moduleDir,int sectionIndex, @NotNull Module utilModule) {
+    public StepikJavaSectionBuilder(@NotNull String moduleDir, int sectionIndex, @NotNull Module utilModule) {
         myUtilModule = utilModule;
         String sectionName = EduNames.SECTION + sectionIndex;
         setName(sectionName);
@@ -32,13 +32,15 @@ public class StepikJavaSectionBuilder extends JavaModuleBuilder implements Lesso
     }
 
     @Override
-    public Module createLesson(@NotNull ModifiableModuleModel moduleModel) throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
+    public Module createLesson(@NotNull ModifiableModuleModel moduleModel)
+            throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
         return createModule(moduleModel);
     }
 
     @NotNull
     @Override
-    public Module createModule(@NotNull ModifiableModuleModel moduleModel) throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
+    public Module createModule(@NotNull ModifiableModuleModel moduleModel)
+            throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
         Module baseModule = super.createModule(moduleModel);
         return baseModule;
     }

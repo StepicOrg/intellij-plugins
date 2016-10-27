@@ -74,473 +74,484 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 public class StudyUtils {
-  private StudyUtils() {
-  }
-
-  private static final Logger LOG = Logger.getInstance(StudyUtils.class.getName());
-  private static final String EMPTY_TASK_TEXT = "Please, open any task to see task description";
-  private static final String ourPrefix = "<html><head><script type=\"text/x-mathjax-config\">\n" +
-                                          "            MathJax.Hub.Config({\n" +
-                                          "                tex2jax: {\n" +
-                                          "                    inlineMath: [ ['$','$'], [\"\\\\(\",\"\\\\)\"] ],\n" +
-                                          "                    displayMath: [ ['$$','$$'], [\"\\\\[\",\"\\\\]\"] ],\n" +
-                                          "                    processEscapes: true,\n" +
-                                          "                    processEnvironments: true\n" +
-                                          "                },\n" +
-                                          "                displayAlign: 'center',\n" +
-                                          "                \"HTML-CSS\": {\n" +
-                                          "                    styles: {'#mydiv': {\"font-size\": %s}},\n" +
-                                          "                    preferredFont: null,\n" +
-                                          "                    linebreaks: { automatic: true }\n" +
-                                          "                }\n" +
-                                          "            });\n" +
-                                          "</script><script type=\"text/javascript\"\n" +
-                                          " src=\"http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML-full\">\n" +
-                                          " </script></head><body><div id=\"mydiv\">";
-
-  private static final String ourPostfix = "</div></body></html>";
-
-  public static void closeSilently(@Nullable final Closeable stream) {
-    if (stream != null) {
-      try {
-        stream.close();
-      }
-      catch (IOException e) {
-        // close silently
-      }
+    private StudyUtils() {
     }
-  }
 
-  public static boolean isZip(String fileName) {
-    return fileName.contains(".zip");
-  }
+    private static final Logger LOG = Logger.getInstance(StudyUtils.class.getName());
+    private static final String EMPTY_TASK_TEXT = "Please, open any task to see task description";
+    private static final String ourPrefix = "<html><head><script type=\"text/x-mathjax-config\">\n" +
+            "            MathJax.Hub.Config({\n" +
+            "                tex2jax: {\n" +
+            "                    inlineMath: [ ['$','$'], [\"\\\\(\",\"\\\\)\"] ],\n" +
+            "                    displayMath: [ ['$$','$$'], [\"\\\\[\",\"\\\\]\"] ],\n" +
+            "                    processEscapes: true,\n" +
+            "                    processEnvironments: true\n" +
+            "                },\n" +
+            "                displayAlign: 'center',\n" +
+            "                \"HTML-CSS\": {\n" +
+            "                    styles: {'#mydiv': {\"font-size\": %s}},\n" +
+            "                    preferredFont: null,\n" +
+            "                    linebreaks: { automatic: true }\n" +
+            "                }\n" +
+            "            });\n" +
+            "</script><script type=\"text/javascript\"\n" +
+            " src=\"http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML-full\">\n" +
+            " </script></head><body><div id=\"mydiv\">";
 
-  public static <T> T getFirst(@NotNull final Iterable<T> container) {
-    Iterator<T> iterator = container.iterator();
-    if (!iterator.hasNext()) {
-      return null;
-    }
-    return iterator.next();
-  }
+    private static final String ourPostfix = "</div></body></html>";
 
-  public static boolean indexIsValid(int index, @NotNull final Collection collection) {
-    int size = collection.size();
-    return index >= 0 && index < size;
-  }
-
-  @SuppressWarnings("IOResourceOpenedButNotSafelyClosed")
-  @Nullable
-  public static String getFileText(@Nullable final String parentDir, @NotNull final String fileName, boolean wrapHTML,
-                                   @NotNull final String encoding) {
-    final File inputFile = parentDir != null ? new File(parentDir, fileName) : new File(fileName);
-    if (!inputFile.exists()) return null;
-    final StringBuilder taskText = new StringBuilder();
-    BufferedReader reader = null;
-    try {
-      reader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), encoding));
-      String line;
-      while ((line = reader.readLine()) != null) {
-        taskText.append(line).append("\n");
-        if (wrapHTML) {
-          taskText.append("<br>");
+    public static void closeSilently(@Nullable final Closeable stream) {
+        if (stream != null) {
+            try {
+                stream.close();
+            } catch (IOException e) {
+                // close silently
+            }
         }
-      }
-      return wrapHTML ? UIUtil.toHtml(taskText.toString()) : taskText.toString();
     }
-    catch (IOException e) {
-      LOG.info("Failed to get file text from file " + fileName, e);
+
+    public static boolean isZip(String fileName) {
+        return fileName.contains(".zip");
     }
-    finally {
-      closeSilently(reader);
-    }
-    return null;
-  }
 
-  public static void updateAction(@NotNull final AnActionEvent e) {
-    final Presentation presentation = e.getPresentation();
-    presentation.setEnabled(false);
-    final Project project = e.getProject();
-    if (project != null) {
-      final StudyEditor studyEditor = getSelectedStudyEditor(project);
-      if (studyEditor != null) {
-        presentation.setEnabledAndVisible(true);
-      }
-    }
-  }
-
-  public static void updateToolWindows(@NotNull final Project project) {
-    final StudyToolWindow studyToolWindow = getStudyToolWindow(project);
-    if (studyToolWindow != null) {
-      String taskText = getTaskText(project);
-      if (taskText != null) {
-        studyToolWindow.setTaskText(taskText, null, project);
-      }
-      else {
-        LOG.warn("Task text is null");
-      }
-      studyToolWindow.updateCourseProgress(project);
-    }
-  }
-
-  public static void initToolWindows(@NotNull final Project project) {
-    final ToolWindowManager windowManager = ToolWindowManager.getInstance(project);
-    windowManager.getToolWindow(StudyToolWindowFactory.STUDY_TOOL_WINDOW).getContentManager().removeAllContents(false);
-    StudyToolWindowFactory factory = new StudyToolWindowFactory();
-    factory.createToolWindowContent(project, windowManager.getToolWindow(StudyToolWindowFactory.STUDY_TOOL_WINDOW));
-
-  }
-
-  @Nullable
-  public static StudyToolWindow getStudyToolWindow(@NotNull final Project project) {
-    ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(StudyToolWindowFactory.STUDY_TOOL_WINDOW);
-    if (toolWindow != null) {
-      Content[] contents = toolWindow.getContentManager().getContents();
-      for (Content content: contents) {
-        JComponent component = content.getComponent();
-        if (component != null && component instanceof StudyToolWindow) {
-          return (StudyToolWindow)component;
+    public static <T> T getFirst(@NotNull final Iterable<T> container) {
+        Iterator<T> iterator = container.iterator();
+        if (!iterator.hasNext()) {
+            return null;
         }
-      }
+        return iterator.next();
     }
-    return null;
-  }
 
-  public static void deleteFile(@NotNull final VirtualFile file) {
-    try {
-      file.delete(StudyUtils.class);
+    public static boolean indexIsValid(int index, @NotNull final Collection collection) {
+        int size = collection.size();
+        return index >= 0 && index < size;
     }
-    catch (IOException e) {
-      LOG.error(e);
-    }
-  }
 
-  public static File copyResourceFile(@NotNull final String sourceName, @NotNull final String copyName, @NotNull final Project project,
-                                      @NotNull final Task task)
-    throws IOException {
-    final StudyTaskManager taskManager = StudyTaskManager.getInstance(project);
-    final Course course = taskManager.getCourse();
-    int taskNum = task.getIndex();
-    int lessonNum = task.getLesson().getIndex();
-    assert course != null;
-    final String pathToResource = FileUtil.join(course.getCourseDirectory(), EduNames.LESSON + lessonNum, EduNames.TASK + taskNum);
-    final File resourceFile = new File(pathToResource, copyName);
-    FileUtil.copy(new File(pathToResource, sourceName), resourceFile);
-    return resourceFile;
-  }
-
-  @Nullable
-  public static Sdk findSdk(@NotNull final Task task, @NotNull final Project project) {
-    final Language language = task.getLesson().getCourse().getLanguageById();
-    return StudyExecutor.INSTANCE.forLanguage(language).findSdk(project);
-  }
-
-  @NotNull
-  public static StudyTestRunner getTestRunner(@NotNull final Task task, @NotNull final VirtualFile taskDir) {
-    final Language language = task.getLesson().getCourse().getLanguageById();
-    return StudyExecutor.INSTANCE.forLanguage(language).getTestRunner(task, taskDir);
-  }
-
-  public static RunContentExecutor getExecutor(@NotNull final Project project, @NotNull final Task currentTask,
-                                               @NotNull final ProcessHandler handler) {
-    final Language language = currentTask.getLesson().getCourse().getLanguageById();
-    return StudyExecutor.INSTANCE.forLanguage(language).getExecutor(project, handler);
-  }
-
-  public static void setCommandLineParameters(@NotNull final GeneralCommandLine cmd,
-                                              @NotNull final Project project,
-                                              @NotNull final String filePath,
-                                              @NotNull final String sdkPath,
-                                              @NotNull final Task currentTask) {
-    final Language language = currentTask.getLesson().getCourse().getLanguageById();
-    StudyExecutor.INSTANCE.forLanguage(language).setCommandLineParameters(cmd, project, filePath, sdkPath, currentTask);
-  }
-
-  public static void showNoSdkNotification(@NotNull final Task currentTask, @NotNull final Project project) {
-    final Language language = currentTask.getLesson().getCourse().getLanguageById();
-    StudyExecutor.INSTANCE.forLanguage(language).showNoSdkNotification(project);
-  }
-
-
-  /**
-   * shows pop up in the center of "check task" button in study editor
-   */
-  public static void showCheckPopUp(@NotNull final Project project, @NotNull final Balloon balloon) {
-    final StudyEditor studyEditor = getSelectedStudyEditor(project);
-    assert studyEditor != null;
-
-    balloon.show(computeLocation(studyEditor.getEditor()), Balloon.Position.above);
-    Disposer.register(project, balloon);
-  }
-
-  public static RelativePoint computeLocation(Editor editor){
-
-    final Rectangle visibleRect = editor.getComponent().getVisibleRect();
-    Point point = new Point(visibleRect.x + visibleRect.width + 10,
-                            visibleRect.y + 10);
-    return new RelativePoint(editor.getComponent(), point);
-  }
-
-
-  /**
-   * returns language manager which contains all the information about language specific file names
-   */
-  @Nullable
-  public static StudyLanguageManager getLanguageManager(@NotNull final Course course) {
-    Language language = course.getLanguageById();
-    return language == null ? null : StudyLanguageManager.INSTANCE.forLanguage(language);
-  }
-
-  public static boolean isTestsFile(@NotNull Project project, @NotNull final String name) {
-    Course course = StudyTaskManager.getInstance(project).getCourse();
-    if (course == null) {
-      return false;
-    }
-    StudyLanguageManager manager = getLanguageManager(course);
-    if (manager == null) {
-      return false;
-    }
-    return manager.getTestFileName().equals(name);
-  }
-
-  @Nullable
-  public static TaskFile getTaskFile(@NotNull final Project project, @NotNull final VirtualFile file) {
-    final Course course = StudyTaskManager.getInstance(project).getCourse();
-    if (course == null) {
-      return null;
-    }
-    VirtualFile taskDir = file.getParent();
-    if (taskDir == null) {
-      return null;
-    }
-    //need this because of multi-module generation
-    if (EduNames.SRC.equals(taskDir.getName())) {
-      taskDir = taskDir.getParent();
-      if (taskDir == null) {
+    @SuppressWarnings("IOResourceOpenedButNotSafelyClosed")
+    @Nullable
+    public static String getFileText(
+            @Nullable final String parentDir, @NotNull final String fileName, boolean wrapHTML,
+            @NotNull final String encoding) {
+        final File inputFile = parentDir != null ? new File(parentDir, fileName) : new File(fileName);
+        if (!inputFile.exists()) return null;
+        final StringBuilder taskText = new StringBuilder();
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), encoding));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                taskText.append(line).append("\n");
+                if (wrapHTML) {
+                    taskText.append("<br>");
+                }
+            }
+            return wrapHTML ? UIUtil.toHtml(taskText.toString()) : taskText.toString();
+        } catch (IOException e) {
+            LOG.info("Failed to get file text from file " + fileName, e);
+        } finally {
+            closeSilently(reader);
+        }
         return null;
-      }
     }
-    final String taskDirName = taskDir.getName();
-    if (taskDirName.contains(EduNames.TASK)) {
-      final VirtualFile lessonDir = taskDir.getParent();
-      if (lessonDir != null) {
-        int lessonIndex = EduUtils.getIndex(lessonDir.getName(), EduNames.LESSON);
-        List<Lesson> lessons = course.getLessons();
-        if (!indexIsValid(lessonIndex, lessons)) {
-          return null;
+
+    public static void updateAction(@NotNull final AnActionEvent e) {
+        final Presentation presentation = e.getPresentation();
+        presentation.setEnabled(false);
+        final Project project = e.getProject();
+        if (project != null) {
+            final StudyEditor studyEditor = getSelectedStudyEditor(project);
+            if (studyEditor != null) {
+                presentation.setEnabledAndVisible(true);
+            }
         }
-        final Lesson lesson = lessons.get(lessonIndex);
-        int taskIndex = EduUtils.getIndex(taskDirName, EduNames.TASK);
-        final List<Task> tasks = lesson.getTaskList();
-        if (!indexIsValid(taskIndex, tasks)) {
-          return null;
+    }
+
+    public static void updateToolWindows(@NotNull final Project project) {
+        final StudyToolWindow studyToolWindow = getStudyToolWindow(project);
+        if (studyToolWindow != null) {
+            String taskText = getTaskText(project);
+            if (taskText != null) {
+                studyToolWindow.setTaskText(taskText, null, project);
+            } else {
+                LOG.warn("Task text is null");
+            }
+            studyToolWindow.updateCourseProgress(project);
         }
-        final Task task = tasks.get(taskIndex);
-        return task.getFile(file.getName());
-      }
     }
-    return null;
-  }
 
-  public static void drawAllWindows(Editor editor, TaskFile taskFile) {
-    editor.getMarkupModel().removeAllHighlighters();
-    final Project project = editor.getProject();
-    if (project == null) return;
-    final StudyTaskManager taskManager = StudyTaskManager.getInstance(project);
-    for (AnswerPlaceholder answerPlaceholder : taskFile.getAnswerPlaceholders()) {
-      final JBColor color = taskManager.getColor(answerPlaceholder);
-      EduAnswerPlaceholderPainter.drawAnswerPlaceholder(editor, answerPlaceholder, color);
-    }
-    final Document document = editor.getDocument();
-    EditorActionManager.getInstance()
-      .setReadonlyFragmentModificationHandler(document, new EduAnswerPlaceholderDeleteHandler(editor));
-    EduAnswerPlaceholderPainter.createGuardedBlocks(editor, taskFile);
-    editor.getColorsScheme().setColor(EditorColors.READONLY_FRAGMENT_BACKGROUND_COLOR, null);
-  }
+    public static void initToolWindows(@NotNull final Project project) {
+        final ToolWindowManager windowManager = ToolWindowManager.getInstance(project);
+        windowManager.getToolWindow(StudyToolWindowFactory.STUDY_TOOL_WINDOW)
+                .getContentManager()
+                .removeAllContents(false);
+        StudyToolWindowFactory factory = new StudyToolWindowFactory();
+        factory.createToolWindowContent(project, windowManager.getToolWindow(StudyToolWindowFactory.STUDY_TOOL_WINDOW));
 
-  @Nullable
-  public static StudyEditor getSelectedStudyEditor(@NotNull final Project project) {
-    try {
-      final FileEditor fileEditor = FileEditorManagerEx.getInstanceEx(project).getSplitters().getCurrentWindow().
-        getSelectedEditor().getSelectedEditorWithProvider().getFirst();
-      if (fileEditor instanceof StudyEditor) {
-        return (StudyEditor)fileEditor;
-      }
     }
-    catch (Exception e) {
-      return null;
-    }
-    return null;
-  }
 
-  @Nullable
-  public static Editor getSelectedEditor(@NotNull final Project project) {
-    final StudyEditor studyEditor = getSelectedStudyEditor(project);
-    if (studyEditor != null) {
-      return studyEditor.getEditor();
+    @Nullable
+    public static StudyToolWindow getStudyToolWindow(@NotNull final Project project) {
+        ToolWindow toolWindow = ToolWindowManager.getInstance(project)
+                .getToolWindow(StudyToolWindowFactory.STUDY_TOOL_WINDOW);
+        if (toolWindow != null) {
+            Content[] contents = toolWindow.getContentManager().getContents();
+            for (Content content : contents) {
+                JComponent component = content.getComponent();
+                if (component != null && component instanceof StudyToolWindow) {
+                    return (StudyToolWindow) component;
+                }
+            }
+        }
+        return null;
     }
-    return null;
-  }
 
-  public static void deleteGuardedBlocks(@NotNull final Document document) {
-    if (document instanceof DocumentImpl) {
-      final DocumentImpl documentImpl = (DocumentImpl)document;
-      List<RangeMarker> blocks = documentImpl.getGuardedBlocks();
-      for (final RangeMarker block : blocks) {
-        ApplicationManager.getApplication().invokeLater(() -> ApplicationManager.getApplication().runWriteAction(() -> document.removeGuardedBlock(block)));
-      }
+    public static void deleteFile(@NotNull final VirtualFile file) {
+        try {
+            file.delete(StudyUtils.class);
+        } catch (IOException e) {
+            LOG.error(e);
+        }
     }
-  }
+
+    public static File copyResourceFile(
+            @NotNull final String sourceName, @NotNull final String copyName, @NotNull final Project project,
+            @NotNull final Task task)
+            throws IOException {
+        final StudyTaskManager taskManager = StudyTaskManager.getInstance(project);
+        final Course course = taskManager.getCourse();
+        int taskNum = task.getIndex();
+        int lessonNum = task.getLesson().getIndex();
+        assert course != null;
+        final String pathToResource = FileUtil.join(course.getCourseDirectory(),
+                EduNames.LESSON + lessonNum,
+                EduNames.TASK + taskNum);
+        final File resourceFile = new File(pathToResource, copyName);
+        FileUtil.copy(new File(pathToResource, sourceName), resourceFile);
+        return resourceFile;
+    }
+
+    @Nullable
+    public static Sdk findSdk(@NotNull final Task task, @NotNull final Project project) {
+        final Language language = task.getLesson().getCourse().getLanguageById();
+        return StudyExecutor.INSTANCE.forLanguage(language).findSdk(project);
+    }
+
+    @NotNull
+    public static StudyTestRunner getTestRunner(@NotNull final Task task, @NotNull final VirtualFile taskDir) {
+        final Language language = task.getLesson().getCourse().getLanguageById();
+        return StudyExecutor.INSTANCE.forLanguage(language).getTestRunner(task, taskDir);
+    }
+
+    public static RunContentExecutor getExecutor(
+            @NotNull final Project project, @NotNull final Task currentTask,
+            @NotNull final ProcessHandler handler) {
+        final Language language = currentTask.getLesson().getCourse().getLanguageById();
+        return StudyExecutor.INSTANCE.forLanguage(language).getExecutor(project, handler);
+    }
+
+    public static void setCommandLineParameters(
+            @NotNull final GeneralCommandLine cmd,
+            @NotNull final Project project,
+            @NotNull final String filePath,
+            @NotNull final String sdkPath,
+            @NotNull final Task currentTask) {
+        final Language language = currentTask.getLesson().getCourse().getLanguageById();
+        StudyExecutor.INSTANCE.forLanguage(language)
+                .setCommandLineParameters(cmd, project, filePath, sdkPath, currentTask);
+    }
+
+    public static void showNoSdkNotification(@NotNull final Task currentTask, @NotNull final Project project) {
+        final Language language = currentTask.getLesson().getCourse().getLanguageById();
+        StudyExecutor.INSTANCE.forLanguage(language).showNoSdkNotification(project);
+    }
 
 
-  @Nullable
-  public static VirtualFile getPatternFile(@NotNull TaskFile taskFile, String name) {
-    Task task = taskFile.getTask();
-    String lessonDir = EduNames.LESSON + String.valueOf(task.getLesson().getIndex());
-    String taskDir = EduNames.TASK + String.valueOf(task.getIndex());
-    Course course = task.getLesson().getCourse();
-    File resourceFile = new File(course.getCourseDirectory());
-    if (!resourceFile.exists()) {
-      return null;
-    }
-    String patternPath = FileUtil.join(resourceFile.getPath(), lessonDir, taskDir, name);
-    VirtualFile patternFile = VfsUtil.findFileByIoFile(new File(patternPath), true);
-    if (patternFile == null) {
-      return null;
-    }
-    return patternFile;
-  }
+    /**
+     * shows pop up in the center of "check task" button in study editor
+     */
+    public static void showCheckPopUp(@NotNull final Project project, @NotNull final Balloon balloon) {
+        final StudyEditor studyEditor = getSelectedStudyEditor(project);
+        assert studyEditor != null;
 
-  @Nullable
-  public static Document getPatternDocument(@NotNull final TaskFile taskFile, String name) {
-    VirtualFile patternFile = getPatternFile(taskFile, name);
-    if (patternFile == null) {
-      return null;
+        balloon.show(computeLocation(studyEditor.getEditor()), Balloon.Position.above);
+        Disposer.register(project, balloon);
     }
-    return FileDocumentManager.getInstance().getDocument(patternFile);
-  }
 
-  public static boolean isRenameableOrMoveable(@NotNull final Project project, @NotNull final Course course, @NotNull final PsiElement element) {
-    if (element instanceof PsiFile) {
-      VirtualFile virtualFile = ((PsiFile)element).getVirtualFile();
-      if (project.getBaseDir().equals(virtualFile.getParent())) {
-        return false;
-      }
-      TaskFile file = getTaskFile(project, virtualFile);
-      if (file != null) {
-        return false;
-      }
-      String name = virtualFile.getName();
-      return !isTestsFile(project, name) && !isTaskDescriptionFile(name);
+    public static RelativePoint computeLocation(Editor editor) {
+
+        final Rectangle visibleRect = editor.getComponent().getVisibleRect();
+        Point point = new Point(visibleRect.x + visibleRect.width + 10,
+                visibleRect.y + 10);
+        return new RelativePoint(editor.getComponent(), point);
     }
-    if (element instanceof PsiDirectory) {
-      VirtualFile virtualFile = ((PsiDirectory)element).getVirtualFile();
-      VirtualFile parent = virtualFile.getParent();
-      if (parent == null) {
+
+
+    /**
+     * returns language manager which contains all the information about language specific file names
+     */
+    @Nullable
+    public static StudyLanguageManager getLanguageManager(@NotNull final Course course) {
+        Language language = course.getLanguageById();
+        return language == null ? null : StudyLanguageManager.INSTANCE.forLanguage(language);
+    }
+
+    public static boolean isTestsFile(@NotNull Project project, @NotNull final String name) {
+        Course course = StudyTaskManager.getInstance(project).getCourse();
+        if (course == null) {
+            return false;
+        }
+        StudyLanguageManager manager = getLanguageManager(course);
+        if (manager == null) {
+            return false;
+        }
+        return manager.getTestFileName().equals(name);
+    }
+
+    @Nullable
+    public static TaskFile getTaskFile(@NotNull final Project project, @NotNull final VirtualFile file) {
+        final Course course = StudyTaskManager.getInstance(project).getCourse();
+        if (course == null) {
+            return null;
+        }
+        VirtualFile taskDir = file.getParent();
+        if (taskDir == null) {
+            return null;
+        }
+        //need this because of multi-module generation
+        if (EduNames.SRC.equals(taskDir.getName())) {
+            taskDir = taskDir.getParent();
+            if (taskDir == null) {
+                return null;
+            }
+        }
+        final String taskDirName = taskDir.getName();
+        if (taskDirName.contains(EduNames.TASK)) {
+            final VirtualFile lessonDir = taskDir.getParent();
+            if (lessonDir != null) {
+                int lessonIndex = EduUtils.getIndex(lessonDir.getName(), EduNames.LESSON);
+                List<Lesson> lessons = course.getLessons();
+                if (!indexIsValid(lessonIndex, lessons)) {
+                    return null;
+                }
+                final Lesson lesson = lessons.get(lessonIndex);
+                int taskIndex = EduUtils.getIndex(taskDirName, EduNames.TASK);
+                final List<Task> tasks = lesson.getTaskList();
+                if (!indexIsValid(taskIndex, tasks)) {
+                    return null;
+                }
+                final Task task = tasks.get(taskIndex);
+                return task.getFile(file.getName());
+            }
+        }
+        return null;
+    }
+
+    public static void drawAllWindows(Editor editor, TaskFile taskFile) {
+        editor.getMarkupModel().removeAllHighlighters();
+        final Project project = editor.getProject();
+        if (project == null) return;
+        final StudyTaskManager taskManager = StudyTaskManager.getInstance(project);
+        for (AnswerPlaceholder answerPlaceholder : taskFile.getAnswerPlaceholders()) {
+            final JBColor color = taskManager.getColor(answerPlaceholder);
+            EduAnswerPlaceholderPainter.drawAnswerPlaceholder(editor, answerPlaceholder, color);
+        }
+        final Document document = editor.getDocument();
+        EditorActionManager.getInstance()
+                .setReadonlyFragmentModificationHandler(document, new EduAnswerPlaceholderDeleteHandler(editor));
+        EduAnswerPlaceholderPainter.createGuardedBlocks(editor, taskFile);
+        editor.getColorsScheme().setColor(EditorColors.READONLY_FRAGMENT_BACKGROUND_COLOR, null);
+    }
+
+    @Nullable
+    public static StudyEditor getSelectedStudyEditor(@NotNull final Project project) {
+        try {
+            final FileEditor fileEditor = FileEditorManagerEx.getInstanceEx(project).getSplitters().getCurrentWindow().
+                    getSelectedEditor().getSelectedEditorWithProvider().getFirst();
+            if (fileEditor instanceof StudyEditor) {
+                return (StudyEditor) fileEditor;
+            }
+        } catch (Exception e) {
+            return null;
+        }
+        return null;
+    }
+
+    @Nullable
+    public static Editor getSelectedEditor(@NotNull final Project project) {
+        final StudyEditor studyEditor = getSelectedStudyEditor(project);
+        if (studyEditor != null) {
+            return studyEditor.getEditor();
+        }
+        return null;
+    }
+
+    public static void deleteGuardedBlocks(@NotNull final Document document) {
+        if (document instanceof DocumentImpl) {
+            final DocumentImpl documentImpl = (DocumentImpl) document;
+            List<RangeMarker> blocks = documentImpl.getGuardedBlocks();
+            for (final RangeMarker block : blocks) {
+                ApplicationManager.getApplication()
+                        .invokeLater(() -> ApplicationManager.getApplication()
+                                .runWriteAction(() -> document.removeGuardedBlock(block)));
+            }
+        }
+    }
+
+
+    @Nullable
+    public static VirtualFile getPatternFile(@NotNull TaskFile taskFile, String name) {
+        Task task = taskFile.getTask();
+        String lessonDir = EduNames.LESSON + String.valueOf(task.getLesson().getIndex());
+        String taskDir = EduNames.TASK + String.valueOf(task.getIndex());
+        Course course = task.getLesson().getCourse();
+        File resourceFile = new File(course.getCourseDirectory());
+        if (!resourceFile.exists()) {
+            return null;
+        }
+        String patternPath = FileUtil.join(resourceFile.getPath(), lessonDir, taskDir, name);
+        VirtualFile patternFile = VfsUtil.findFileByIoFile(new File(patternPath), true);
+        if (patternFile == null) {
+            return null;
+        }
+        return patternFile;
+    }
+
+    @Nullable
+    public static Document getPatternDocument(@NotNull final TaskFile taskFile, String name) {
+        VirtualFile patternFile = getPatternFile(taskFile, name);
+        if (patternFile == null) {
+            return null;
+        }
+        return FileDocumentManager.getInstance().getDocument(patternFile);
+    }
+
+    public static boolean isRenameableOrMoveable(
+            @NotNull final Project project,
+            @NotNull final Course course,
+            @NotNull final PsiElement element) {
+        if (element instanceof PsiFile) {
+            VirtualFile virtualFile = ((PsiFile) element).getVirtualFile();
+            if (project.getBaseDir().equals(virtualFile.getParent())) {
+                return false;
+            }
+            TaskFile file = getTaskFile(project, virtualFile);
+            if (file != null) {
+                return false;
+            }
+            String name = virtualFile.getName();
+            return !isTestsFile(project, name) && !isTaskDescriptionFile(name);
+        }
+        if (element instanceof PsiDirectory) {
+            VirtualFile virtualFile = ((PsiDirectory) element).getVirtualFile();
+            VirtualFile parent = virtualFile.getParent();
+            if (parent == null) {
+                return true;
+            }
+            if (project.getBaseDir().equals(parent)) {
+                return false;
+            }
+            Lesson lesson = course.getLesson(parent.getName());
+            if (lesson != null) {
+                Task task = lesson.getTask(virtualFile.getName());
+                if (task != null) {
+                    return false;
+                }
+            }
+        }
         return true;
-      }
-      if (project.getBaseDir().equals(parent)) {
-        return false;
-      }
-      Lesson lesson = course.getLesson(parent.getName());
-      if (lesson != null) {
-        Task task = lesson.getTask(virtualFile.getName());
-        if (task != null) {
-          return false;
+    }
+
+    public static boolean canRenameOrMove(DataContext dataContext) {
+        Project project = CommonDataKeys.PROJECT.getData(dataContext);
+        PsiElement element = CommonDataKeys.PSI_ELEMENT.getData(dataContext);
+        if (element == null || project == null) {
+            return false;
         }
-      }
-    }
-    return true;
-  }
+        Course course = StudyTaskManager.getInstance(project).getCourse();
+        if (course == null || !EduNames.STUDY.equals(course.getCourseMode())) {
+            return false;
+        }
 
-  public static boolean canRenameOrMove(DataContext dataContext) {
-    Project project = CommonDataKeys.PROJECT.getData(dataContext);
-    PsiElement element = CommonDataKeys.PSI_ELEMENT.getData(dataContext);
-    if (element == null || project == null) {
-      return false;
-    }
-    Course course = StudyTaskManager.getInstance(project).getCourse();
-    if (course == null || !EduNames.STUDY.equals(course.getCourseMode())) {
-      return false;
+        if (!isRenameableOrMoveable(project, course, element)) {
+            return true;
+        }
+        return false;
     }
 
-    if (!isRenameableOrMoveable(project, course, element)) {
-      return true;
-    }
-    return false;
-  }
+    @Nullable
+    public static String getTaskTextFromTask(@Nullable final VirtualFile taskDirectory, @Nullable final Task task) {
+        if (task == null) {
+            return null;
+        }
+        String text = task.getText();
+        if (text != null) {
+            return getTextWithStepLink(task);
+        }
+        if (taskDirectory != null) {
+            final String prefix = String.format(ourPrefix,
+                    EditorColorsManager.getInstance().getGlobalScheme().getEditorFontSize());
+            final String taskTextFileHtml = getTaskTextFromTaskName(taskDirectory, EduNames.TASK_HTML);
+            if (taskTextFileHtml != null) return prefix + taskTextFileHtml + ourPostfix;
 
-  @Nullable
-  public static String getTaskTextFromTask(@Nullable final VirtualFile taskDirectory, @Nullable final Task task) {
-    if (task == null) {
-      return null;
-    }
-    String text = task.getText();
-    if (text != null) {
-      return getTextWithStepLink(task);
-    }
-    if (taskDirectory != null) {
-      final String prefix = String.format(ourPrefix, EditorColorsManager.getInstance().getGlobalScheme().getEditorFontSize());
-      final String taskTextFileHtml = getTaskTextFromTaskName(taskDirectory, EduNames.TASK_HTML);
-      if (taskTextFileHtml != null) return prefix + taskTextFileHtml + ourPostfix;
-      
-      final String taskTextFileMd = getTaskTextFromTaskName(taskDirectory, EduNames.TASK_MD);
-      if (taskTextFileMd != null) return prefix + convertToHtml(taskTextFileMd) + ourPostfix;      
-    }
-    return null;
-  }
-
-  @NotNull
-  private static String getTextWithStepLink(Task task) {
-    StringBuilder stringBuilder = new StringBuilder();
-
-    if (task.getLesson().getId() > 0 ) {
-      stringBuilder.append("<a href=\"https://stepik.org/lesson/")
-              .append(task.getLesson().getId())
-              .append("/step/")
-              .append(task.getPosition())
-              .append("\">View step on Stepik.org</a>");
-    } else {
-      stringBuilder.append("<b>Create project for this course again to see the link to the step.</b>");
+            final String taskTextFileMd = getTaskTextFromTaskName(taskDirectory, EduNames.TASK_MD);
+            if (taskTextFileMd != null) return prefix + convertToHtml(taskTextFileMd) + ourPostfix;
+        }
+        return null;
     }
 
-    if (!task.getText().startsWith("<p>")){
-      stringBuilder.append("<br><br>");
+    @NotNull
+    private static String getTextWithStepLink(Task task) {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        if (task.getLesson().getId() > 0) {
+            stringBuilder.append("<a href=\"https://stepik.org/lesson/")
+                    .append(task.getLesson().getId())
+                    .append("/step/")
+                    .append(task.getPosition())
+                    .append("\">View step on Stepik.org</a>");
+        } else {
+            stringBuilder.append("<b>Create project for this course again to see the link to the step.</b>");
+        }
+
+        if (!task.getText().startsWith("<p>")) {
+            stringBuilder.append("<br><br>");
+        }
+
+        stringBuilder.append(task.getText());
+        return stringBuilder.toString();
     }
 
-    stringBuilder.append(task.getText());
-    return stringBuilder.toString();
-  }
+    @Nullable
+    private static String getTaskTextFromTaskName(
+            @NotNull VirtualFile taskDirectory,
+            @NotNull String taskTextFilename) {
+        VirtualFile taskTextFile = taskDirectory.findChild(taskTextFilename);
+        if (taskTextFile == null) {
+            VirtualFile srcDir = taskDirectory.findChild(EduNames.SRC);
+            if (srcDir != null) {
+                taskTextFile = srcDir.findChild(taskTextFilename);
+            }
+        }
+        if (taskTextFile != null) {
+            try {
+                return FileUtil.loadTextAndClose(taskTextFile.getInputStream());
+            } catch (IOException e) {
+                LOG.info(e);
+            }
+        }
+        return null;
+    }
 
-  @Nullable
-  private static String getTaskTextFromTaskName(@NotNull VirtualFile taskDirectory, @NotNull String taskTextFilename) {
-    VirtualFile taskTextFile = taskDirectory.findChild(taskTextFilename);
-    if (taskTextFile == null) {
-      VirtualFile srcDir = taskDirectory.findChild(EduNames.SRC);
-      if (srcDir != null) {
-         taskTextFile = srcDir.findChild(taskTextFilename);
-      }
+    @Nullable
+    public static StudyPluginConfigurator getConfigurator(@NotNull final Project project) {
+        StudyPluginConfigurator[] extensions = StudyPluginConfigurator.EP_NAME.getExtensions();
+        for (StudyPluginConfigurator extension : extensions) {
+            if (extension.accept(project)) {
+                return extension;
+            }
+        }
+        return null;
     }
-    if (taskTextFile != null) {
-      try {
-        return FileUtil.loadTextAndClose(taskTextFile.getInputStream());
-      }
-      catch (IOException e) {
-        LOG.info(e);
-      }
-    }
-    return null;
-  }
-
-  @Nullable
-  public static StudyPluginConfigurator getConfigurator(@NotNull final Project project) {
-    StudyPluginConfigurator[] extensions = StudyPluginConfigurator.EP_NAME.getExtensions();
-    for (StudyPluginConfigurator extension: extensions) {
-      if (extension.accept(project)) {
-        return extension;
-      }
-    }
-    return null;
-  }
 
 //  @Nullable
 //  public static StudyTwitterPluginConfigurator getTwitterConfigurator(@NotNull final Project project) {
@@ -553,193 +564,192 @@ public class StudyUtils {
 //    return null;
 //  }
 
-  @Nullable
-  public static String getTaskText(@NotNull final Project project) {
-    TaskFile taskFile = getSelectedTaskFile(project);
-    if (taskFile == null) {
-      return EMPTY_TASK_TEXT;
+    @Nullable
+    public static String getTaskText(@NotNull final Project project) {
+        TaskFile taskFile = getSelectedTaskFile(project);
+        if (taskFile == null) {
+            return EMPTY_TASK_TEXT;
+        }
+        final Task task = taskFile.getTask();
+        if (task != null) {
+            return getTaskTextFromTask(task.getTaskDir(project), task);
+        }
+        return null;
     }
-    final Task task = taskFile.getTask();
-    if (task != null) {
-      return getTaskTextFromTask(task.getTaskDir(project), task);
-    }
-    return null;
-  }
-  @Nullable
-  public static TaskFile getSelectedTaskFile(@NotNull Project project) {
-    VirtualFile[] files = FileEditorManager.getInstance(project).getSelectedFiles();
-    TaskFile taskFile = null;
-    for (VirtualFile file : files) {
-      taskFile = getTaskFile(project, file);
-      if (taskFile != null) {
-        break;
-      }
-    }
-    return taskFile;
-  }
 
-  @Nullable
-  public static Task getCurrentTask(@NotNull final Project project) {
-    final TaskFile taskFile = getSelectedTaskFile(project);
-    return taskFile != null ? taskFile.getTask() : null;
-  }
+    @Nullable
+    public static TaskFile getSelectedTaskFile(@NotNull Project project) {
+        VirtualFile[] files = FileEditorManager.getInstance(project).getSelectedFiles();
+        TaskFile taskFile = null;
+        for (VirtualFile file : files) {
+            taskFile = getTaskFile(project, file);
+            if (taskFile != null) {
+                break;
+            }
+        }
+        return taskFile;
+    }
 
-  public static boolean isStudyProject(@NotNull Project project) {
-    return StudyTaskManager.getInstance(project).getCourse() != null;
-  }
+    @Nullable
+    public static Task getCurrentTask(@NotNull final Project project) {
+        final TaskFile taskFile = getSelectedTaskFile(project);
+        return taskFile != null ? taskFile.getTask() : null;
+    }
 
-  @Nullable
-  public static Project getStudyProject() {
-    Project studyProject = null;
-    Project[] openProjects = ProjectManager.getInstance().getOpenProjects();
-    for (Project project : openProjects) {
-      if (StudyTaskManager.getInstance(project).getCourse() != null) {
-         studyProject = project;
-      }
+    public static boolean isStudyProject(@NotNull Project project) {
+        return StudyTaskManager.getInstance(project).getCourse() != null;
     }
-    if (studyProject == null) {
-      LOG.info("return default project");
-      return ProjectManager.getInstance().getDefaultProject();
-    }
-    LOG.info("return regular project");
-    return studyProject;
-  }
 
-  @NotNull
-  public static File getCourseDirectory(@NotNull Project project, Course course) {
-    final File courseDirectory;
-    if (course.isAdaptive()) {
-      courseDirectory = new File(StudyProjectGenerator.OUR_COURSES_DIR,
-                                 StudyProjectGenerator.ADAPTIVE_COURSE_PREFIX + course.getName()
-                                 + "_" + StudyTaskManager.getInstance(project).getUser().getEmail());
+    @Nullable
+    public static Project getStudyProject() {
+        Project studyProject = null;
+        Project[] openProjects = ProjectManager.getInstance().getOpenProjects();
+        for (Project project : openProjects) {
+            if (StudyTaskManager.getInstance(project).getCourse() != null) {
+                studyProject = project;
+            }
+        }
+        if (studyProject == null) {
+            LOG.info("return default project");
+            return ProjectManager.getInstance().getDefaultProject();
+        }
+        LOG.info("return regular project");
+        return studyProject;
     }
-    else {
-      courseDirectory = new File(StudyProjectGenerator.OUR_COURSES_DIR, course.getName());
-    }
-    return courseDirectory;
-  }
 
-  public static boolean hasJavaFx() {
-    try {
-      Class.forName("javafx.application.Platform");
-      return true;
+    @NotNull
+    public static File getCourseDirectory(@NotNull Project project, Course course) {
+        final File courseDirectory;
+        if (course.isAdaptive()) {
+            courseDirectory = new File(StudyProjectGenerator.OUR_COURSES_DIR,
+                    StudyProjectGenerator.ADAPTIVE_COURSE_PREFIX + course.getName()
+                            + "_" + StudyTaskManager.getInstance(project).getUser().getEmail());
+        } else {
+            courseDirectory = new File(StudyProjectGenerator.OUR_COURSES_DIR, course.getName());
+        }
+        return courseDirectory;
     }
-    catch (ClassNotFoundException e) {
-      return false;
-    }
-  }
 
-  @Nullable
-  public static Task getTask(@NotNull Project project, @NotNull VirtualFile taskVF) {
-    Course course = StudyTaskManager.getInstance(project).getCourse();
-    if (course == null) {
-      return null;
+    public static boolean hasJavaFx() {
+        try {
+            Class.forName("javafx.application.Platform");
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
     }
-    VirtualFile lessonVF = taskVF.getParent();
-    if (lessonVF == null) {
-      return null;
-    }
-    Lesson lesson = course.getLesson(lessonVF.getName());
-    if (lesson == null) {
-      return null;
-    }
-    return lesson.getTask(taskVF.getName());
-  }
 
-  @Nullable
-  public static VirtualFile getTaskDir(@NotNull VirtualFile taskFile) {
-    VirtualFile parent = taskFile.getParent();
-    if (parent == null) {
-      return null;
+    @Nullable
+    public static Task getTask(@NotNull Project project, @NotNull VirtualFile taskVF) {
+        Course course = StudyTaskManager.getInstance(project).getCourse();
+        if (course == null) {
+            return null;
+        }
+        VirtualFile lessonVF = taskVF.getParent();
+        if (lessonVF == null) {
+            return null;
+        }
+        Lesson lesson = course.getLesson(lessonVF.getName());
+        if (lesson == null) {
+            return null;
+        }
+        return lesson.getTask(taskVF.getName());
     }
-    String name = parent.getName();
-    if (name.contains(EduNames.TASK)) {
-      return parent;
+
+    @Nullable
+    public static VirtualFile getTaskDir(@NotNull VirtualFile taskFile) {
+        VirtualFile parent = taskFile.getParent();
+        if (parent == null) {
+            return null;
+        }
+        String name = parent.getName();
+        if (name.contains(EduNames.TASK)) {
+            return parent;
+        }
+        if (EduNames.SRC.equals(name)) {
+            return parent.getParent();
+        }
+        return null;
     }
-    if (EduNames.SRC.equals(name)) {
-      return parent.getParent();
+
+    // supposed to be called under progress
+    @Nullable
+    public static <T> T execCancelable(@NotNull final Callable<T> callable) {
+        final Future<T> future = ApplicationManager.getApplication().executeOnPooledThread(callable);
+
+        while (!future.isCancelled() && !future.isDone()) {
+            ProgressManager.checkCanceled();
+            TimeoutUtil.sleep(500);
+        }
+        T result = null;
+        try {
+            result = future.get();
+        } catch (InterruptedException | ExecutionException e) {
+            LOG.warn(e.getMessage());
+        }
+        return result;
     }
-    return null;
-  }
 
-  // supposed to be called under progress
-  @Nullable
-  public static <T> T execCancelable(@NotNull final Callable<T> callable) {
-    final Future<T> future = ApplicationManager.getApplication().executeOnPooledThread(callable);
-
-    while (!future.isCancelled() && !future.isDone()) {
-      ProgressManager.checkCanceled();
-      TimeoutUtil.sleep(500);
+    @Nullable
+    public static Task getTaskFromSelectedEditor(Project project) {
+        final StudyEditor editor = getSelectedStudyEditor(project);
+        Task task = null;
+        if (editor != null) {
+            final TaskFile file = editor.getTaskFile();
+            task = file.getTask();
+        }
+        return task;
     }
-    T result = null;
-    try {
-      result = future.get();
+
+    private static String convertToHtml(@NotNull final String content) {
+        ArrayList<String> lines = ContainerUtil.newArrayList(content.split("\n|\r|\r\n"));
+        MarkdownUtil.replaceHeaders(lines);
+        MarkdownUtil.replaceCodeBlock(lines);
+
+        return new MarkdownProcessor().markdown(StringUtil.join(lines, "\n"));
     }
-    catch (InterruptedException | ExecutionException e) {
-      LOG.warn(e.getMessage());
+
+    public static boolean isTaskDescriptionFile(@NotNull final String fileName) {
+        return EduNames.TASK_HTML.equals(fileName) || EduNames.TASK_MD.equals(fileName);
     }
-    return result;
-  }
 
-  @Nullable
-  public static Task getTaskFromSelectedEditor(Project project) {
-    final StudyEditor editor = getSelectedStudyEditor(project);
-    Task task = null;
-    if (editor != null) {
-      final TaskFile file = editor.getTaskFile();
-      task = file.getTask();
+    @Nullable
+    public static VirtualFile findTaskDescriptionVirtualFile(@NotNull final VirtualFile parent) {
+        return ObjectUtils.chooseNotNull(parent.findChild(EduNames.TASK_HTML), parent.findChild(EduNames.TASK_MD));
     }
-    return task;
-  }
 
-  private static String convertToHtml(@NotNull final String content) {
-    ArrayList<String> lines = ContainerUtil.newArrayList(content.split("\n|\r|\r\n"));
-    MarkdownUtil.replaceHeaders(lines);
-    MarkdownUtil.replaceCodeBlock(lines);
-
-    return new MarkdownProcessor().markdown(StringUtil.join(lines, "\n"));
-  }
-
-  public static boolean isTaskDescriptionFile(@NotNull final String fileName) {
-    return EduNames.TASK_HTML.equals(fileName) || EduNames.TASK_MD.equals(fileName);
-  }
-
-  @Nullable
-  public static VirtualFile findTaskDescriptionVirtualFile(@NotNull final VirtualFile parent) {
-    return ObjectUtils.chooseNotNull(parent.findChild(EduNames.TASK_HTML), parent.findChild(EduNames.TASK_MD));
-  }
-
-  @NotNull
-  public static String getTaskDescriptionFileName(final boolean useHtml) {
-    return useHtml ? EduNames.TASK_HTML : EduNames.TASK_MD;
-  }
-
-  @Nullable
-  public static File createTaskDescriptionFile(@NotNull final File parent) {
-    if(new File(parent, EduNames.TASK_HTML).exists()) {
-      return new File(parent, EduNames.TASK_HTML);
+    @NotNull
+    public static String getTaskDescriptionFileName(final boolean useHtml) {
+        return useHtml ? EduNames.TASK_HTML : EduNames.TASK_MD;
     }
-    else {
-      return new File(parent, EduNames.TASK_MD);
-    }
-  }
 
-  @Nullable
-  public static Document getDocument(String basePath, int lessonIndex, int taskIndex, String fileName) {
-    String taskPath = FileUtil.join(basePath, EduNames.LESSON + lessonIndex, EduNames.TASK + taskIndex);
-    VirtualFile taskFile = LocalFileSystem.getInstance().findFileByPath(FileUtil.join(taskPath, fileName));
-    if (taskFile == null) {
-      taskFile = LocalFileSystem.getInstance().findFileByPath(FileUtil.join(taskPath, EduNames.SRC, fileName));
+    @Nullable
+    public static File createTaskDescriptionFile(@NotNull final File parent) {
+        if (new File(parent, EduNames.TASK_HTML).exists()) {
+            return new File(parent, EduNames.TASK_HTML);
+        } else {
+            return new File(parent, EduNames.TASK_MD);
+        }
     }
-    if (taskFile == null) {
-      return null;
-    }
-    return FileDocumentManager.getInstance().getDocument(taskFile);
-  }
 
-  public static void showErrorPopupOnToolbar(@NotNull Project project) {
-    final Balloon balloon =
-      JBPopupFactory.getInstance().createHtmlTextBalloonBuilder("Couldn't post your reaction", MessageType.ERROR, null).createBalloon();
-    showCheckPopUp(project, balloon);
-  }
+    @Nullable
+    public static Document getDocument(String basePath, int lessonIndex, int taskIndex, String fileName) {
+        String taskPath = FileUtil.join(basePath, EduNames.LESSON + lessonIndex, EduNames.TASK + taskIndex);
+        VirtualFile taskFile = LocalFileSystem.getInstance().findFileByPath(FileUtil.join(taskPath, fileName));
+        if (taskFile == null) {
+            taskFile = LocalFileSystem.getInstance().findFileByPath(FileUtil.join(taskPath, EduNames.SRC, fileName));
+        }
+        if (taskFile == null) {
+            return null;
+        }
+        return FileDocumentManager.getInstance().getDocument(taskFile);
+    }
+
+    public static void showErrorPopupOnToolbar(@NotNull Project project) {
+        final Balloon balloon =
+                JBPopupFactory.getInstance()
+                        .createHtmlTextBalloonBuilder("Couldn't post your reaction", MessageType.ERROR, null)
+                        .createBalloon();
+        showCheckPopUp(project, balloon);
+    }
 }

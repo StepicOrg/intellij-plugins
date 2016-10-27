@@ -11,5 +11,6 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 
 public interface TaskBuilder {
-    public Module createTask(@NotNull ModifiableModuleModel moduleModel) throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException;
+    public Module createTask(@NotNull ModifiableModuleModel moduleModel)
+            throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException;
 }

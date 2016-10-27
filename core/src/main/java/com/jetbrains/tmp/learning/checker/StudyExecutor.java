@@ -27,20 +27,21 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public interface StudyExecutor {
-  LanguageExtension<StudyExecutor> INSTANCE = new LanguageExtension<StudyExecutor>("SCore.StudyExecutor");
+    LanguageExtension<StudyExecutor> INSTANCE = new LanguageExtension<StudyExecutor>("SCore.StudyExecutor");
 
-  @Nullable
-  Sdk findSdk(@NotNull final Project project);
+    @Nullable
+    Sdk findSdk(@NotNull final Project project);
 
-  StudyTestRunner getTestRunner(@NotNull final Task task, @NotNull final VirtualFile taskDir);
+    StudyTestRunner getTestRunner(@NotNull final Task task, @NotNull final VirtualFile taskDir);
 
-  RunContentExecutor getExecutor(@NotNull final Project project, @NotNull final ProcessHandler handler);
+    RunContentExecutor getExecutor(@NotNull final Project project, @NotNull final ProcessHandler handler);
 
-  void setCommandLineParameters(@NotNull final GeneralCommandLine cmd,
-                                @NotNull final Project project,
-                                @NotNull final String filePath,
-                                @NotNull final String sdkPath,
-                                @NotNull final Task currentTask);
+    void setCommandLineParameters(
+            @NotNull final GeneralCommandLine cmd,
+            @NotNull final Project project,
+            @NotNull final String filePath,
+            @NotNull final String sdkPath,
+            @NotNull final Task currentTask);
 
-  void showNoSdkNotification(@NotNull final Project project);
+    void showNoSdkNotification(@NotNull final Project project);
 }

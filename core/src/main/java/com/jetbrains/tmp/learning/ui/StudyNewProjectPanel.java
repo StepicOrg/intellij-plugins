@@ -45,317 +45,322 @@ import java.util.List;
  * data: 7/31/14.
  */
 public class StudyNewProjectPanel extends JPanel implements PanelWithAnchor {
-  private List<CourseInfo> myAvailableCourses = new ArrayList<CourseInfo>();
-  private JButton myBrowseButton;
-  private ComboBox<CourseInfo> myCoursesComboBox;
-  private JButton myRefreshButton;
-  private JLabel myAuthorLabel;
-  private JPanel myInfoPanel;
-  private JTextPane myDescriptionPane;
-  private JComponent myAnchor;
-  private final StudyProjectGenerator myGenerator;
-  private static final String CONNECTION_ERROR = "<html>Failed to download courses.<br>Check your Internet connection.</html>";
-  private static final String INVALID_COURSE = "Selected course is invalid";
-  private FacetValidatorsManager myValidationManager;
-  private boolean isComboboxInitialized;
-  private static final String LOGIN_TO_STEPIK_MESSAGE = "<html><u>Login to Stepik</u> to open the adaptive course </html>";
-  private static final String LOGIN_TO_STEPIK = "Login to Stepik";
+    private List<CourseInfo> myAvailableCourses = new ArrayList<CourseInfo>();
+    private JButton myBrowseButton;
+    private ComboBox<CourseInfo> myCoursesComboBox;
+    private JButton myRefreshButton;
+    private JLabel myAuthorLabel;
+    private JPanel myInfoPanel;
+    private JTextPane myDescriptionPane;
+    private JComponent myAnchor;
+    private final StudyProjectGenerator myGenerator;
+    private static final String CONNECTION_ERROR = "<html>Failed to download courses.<br>Check your Internet connection.</html>";
+    private static final String INVALID_COURSE = "Selected course is invalid";
+    private FacetValidatorsManager myValidationManager;
+    private boolean isComboboxInitialized;
+    private static final String LOGIN_TO_STEPIK_MESSAGE = "<html><u>Login to Stepik</u> to open the adaptive course </html>";
+    private static final String LOGIN_TO_STEPIK = "Login to Stepik";
 
-  public StudyNewProjectPanel(@NotNull final StudyProjectGenerator generator) {
-    super(new VerticalFlowLayout(true, true));
-    myGenerator = generator;
+    public StudyNewProjectPanel(@NotNull final StudyProjectGenerator generator) {
+        super(new VerticalFlowLayout(true, true));
+        myGenerator = generator;
 
-    layoutPanel();
-    initListeners();
-  }
-
-  private void layoutPanel() {
-    myCoursesComboBox = new ComboBox<CourseInfo>();
-
-    final JPanel coursesPanel = new JPanel(new BorderLayout());
-    final LabeledComponent<ComboBox> coursesCombo = LabeledComponent.create(myCoursesComboBox, "Courses:", BorderLayout.WEST);
-
-    myRefreshButton = new FixedSizeButton(coursesCombo);
-    myRefreshButton.setIcon(AllIcons.Actions.Refresh);
-    myBrowseButton = new FixedSizeButton(coursesCombo);
-
-    final JPanel comboPanel = new JPanel(new BorderLayout());
-
-    comboPanel.add(coursesCombo, BorderLayout.CENTER);
-    comboPanel.add(myRefreshButton, BorderLayout.EAST);
-
-    coursesPanel.add(comboPanel, BorderLayout.CENTER);
-    coursesPanel.add(myBrowseButton, BorderLayout.EAST);
-
-    add(coursesPanel);
-    myAnchor = coursesCombo;
-
-    final JPanel panel = new JPanel(new BorderLayout());
-    final JLabel invisibleLabel = new JLabel();
-    invisibleLabel.setPreferredSize(new JLabel("Location: ").getPreferredSize());
-    panel.add(invisibleLabel, BorderLayout.WEST);
-
-    myInfoPanel = new JPanel(new VerticalFlowLayout());
-    myAuthorLabel = new JLabel();
-    myDescriptionPane = new JTextPane();
-    myDescriptionPane.setEditable(true);
-    myDescriptionPane.setEnabled(true);
-    myAuthorLabel.setEnabled(true);
-    myDescriptionPane.setPreferredSize(new Dimension(150, 100));
-    myDescriptionPane.setFont(coursesCombo.getFont());
-    myInfoPanel.add(myAuthorLabel);
-    myInfoPanel.add(myDescriptionPane);
-    myInfoPanel.setBorder(BorderFactory.createLineBorder(new JBColor(10067616, 10067616)));
-
-    panel.add(myInfoPanel, BorderLayout.CENTER);
-    add(panel);
-  }
-
-  private void initCoursesCombobox() {
-    myAvailableCourses =
-      myGenerator.getCoursesUnderProgress(false, "Getting Available Courses", ProjectManager.getInstance().getDefaultProject());
-    if (myAvailableCourses.contains(CourseInfo.INVALID_COURSE)) {
-      setError(CONNECTION_ERROR);
+        layoutPanel();
+        initListeners();
     }
-    else {
-      addCoursesToCombobox(myAvailableCourses);
-      final CourseInfo selectedCourse = StudyUtils.getFirst(myAvailableCourses);
-      final String authorsString = Course.getAuthorsString(selectedCourse.getAuthors());
-      myAuthorLabel.setText(!StringUtil.isEmptyOrSpaces(authorsString) ? "Author: " + authorsString : "");
-      myDescriptionPane.setText(selectedCourse.getDescription());
-      myDescriptionPane.setEditable(false);
-      //setting the first course in list as selected
-      myGenerator.setSelectedCourse(selectedCourse);
 
-      if (selectedCourse.isAdaptive() && !myGenerator.isLoggedIn()) {
-        setError(LOGIN_TO_STEPIK_MESSAGE);
-      }
-      else {
-        setOK();
-      }
+    private void layoutPanel() {
+        myCoursesComboBox = new ComboBox<CourseInfo>();
+
+        final JPanel coursesPanel = new JPanel(new BorderLayout());
+        final LabeledComponent<ComboBox> coursesCombo = LabeledComponent.create(myCoursesComboBox,
+                "Courses:",
+                BorderLayout.WEST);
+
+        myRefreshButton = new FixedSizeButton(coursesCombo);
+        myRefreshButton.setIcon(AllIcons.Actions.Refresh);
+        myBrowseButton = new FixedSizeButton(coursesCombo);
+
+        final JPanel comboPanel = new JPanel(new BorderLayout());
+
+        comboPanel.add(coursesCombo, BorderLayout.CENTER);
+        comboPanel.add(myRefreshButton, BorderLayout.EAST);
+
+        coursesPanel.add(comboPanel, BorderLayout.CENTER);
+        coursesPanel.add(myBrowseButton, BorderLayout.EAST);
+
+        add(coursesPanel);
+        myAnchor = coursesCombo;
+
+        final JPanel panel = new JPanel(new BorderLayout());
+        final JLabel invisibleLabel = new JLabel();
+        invisibleLabel.setPreferredSize(new JLabel("Location: ").getPreferredSize());
+        panel.add(invisibleLabel, BorderLayout.WEST);
+
+        myInfoPanel = new JPanel(new VerticalFlowLayout());
+        myAuthorLabel = new JLabel();
+        myDescriptionPane = new JTextPane();
+        myDescriptionPane.setEditable(true);
+        myDescriptionPane.setEnabled(true);
+        myAuthorLabel.setEnabled(true);
+        myDescriptionPane.setPreferredSize(new Dimension(150, 100));
+        myDescriptionPane.setFont(coursesCombo.getFont());
+        myInfoPanel.add(myAuthorLabel);
+        myInfoPanel.add(myDescriptionPane);
+        myInfoPanel.setBorder(BorderFactory.createLineBorder(new JBColor(10067616, 10067616)));
+
+        panel.add(myInfoPanel, BorderLayout.CENTER);
+        add(panel);
     }
-  }
 
-  private void setupBrowseButton() {
-    myBrowseButton.setIcon(InteractiveLearningIcons.InterpreterGear);
-    final FileChooserDescriptor fileChooser = new FileChooserDescriptor(true, false, false, true, false, false) {
-      @Override
-      public boolean isFileVisible(VirtualFile file, boolean showHiddenFiles) {
-        return file.isDirectory() || StudyUtils.isZip(file.getName());
-      }
+    private void initCoursesCombobox() {
+        myAvailableCourses =
+                myGenerator.getCoursesUnderProgress(false,
+                        "Getting Available Courses",
+                        ProjectManager.getInstance().getDefaultProject());
+        if (myAvailableCourses.contains(CourseInfo.INVALID_COURSE)) {
+            setError(CONNECTION_ERROR);
+        } else {
+            addCoursesToCombobox(myAvailableCourses);
+            final CourseInfo selectedCourse = StudyUtils.getFirst(myAvailableCourses);
+            final String authorsString = Course.getAuthorsString(selectedCourse.getAuthors());
+            myAuthorLabel.setText(!StringUtil.isEmptyOrSpaces(authorsString) ? "Author: " + authorsString : "");
+            myDescriptionPane.setText(selectedCourse.getDescription());
+            myDescriptionPane.setEditable(false);
+            //setting the first course in list as selected
+            myGenerator.setSelectedCourse(selectedCourse);
 
-      @Override
-      public boolean isFileSelectable(VirtualFile file) {
-        return StudyUtils.isZip(file.getName());
-      }
-    };
-    myBrowseButton.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        final BaseListPopupStep<String> popupStep = new BaseListPopupStep<String>("", "Add local course", LOGIN_TO_STEPIK) {
-          @Override
-          public PopupStep onChosen(final String selectedValue, boolean finalChoice) {
-            return doFinalStep(() -> {
-              if ("Add local course".equals(selectedValue)) {
+            if (selectedCourse.isAdaptive() && !myGenerator.isLoggedIn()) {
+                setError(LOGIN_TO_STEPIK_MESSAGE);
+            } else {
+                setOK();
+            }
+        }
+    }
 
-                Project[] projects = ProjectManager.getInstance().getOpenProjects();
-                FileChooser.chooseFile(fileChooser, null, projects.length == 0 ? null : projects[0].getBaseDir(),
-                                       file -> {
-                                         String fileName = file.getPath();
-                                         int oldSize = myAvailableCourses.size();
-                                         CourseInfo courseInfo = myGenerator.addLocalCourse(fileName);
-                                         if (courseInfo != null) {
-                                           if (oldSize != myAvailableCourses.size()) {
-                                             myCoursesComboBox.addItem(courseInfo);
-                                           }
-                                           myCoursesComboBox.setSelectedItem(courseInfo);
-                                           setOK();
-                                         }
-                                         else {
-                                           setError(INVALID_COURSE);
-                                           myCoursesComboBox.removeAllItems();
-                                           myCoursesComboBox.addItem(CourseInfo.INVALID_COURSE);
-                                           for (CourseInfo course : myAvailableCourses) {
-                                             myCoursesComboBox.addItem(course);
-                                           }
-                                           myCoursesComboBox.setSelectedItem(CourseInfo.INVALID_COURSE);
-                                         }
-                                       });
-              }
-              else if (LOGIN_TO_STEPIK.equals(selectedValue)) {
-                showLoginDialog(true, "Signing In And Getting Stepik Course List");
-              }
-            });
-          }
+    private void setupBrowseButton() {
+        myBrowseButton.setIcon(InteractiveLearningIcons.InterpreterGear);
+        final FileChooserDescriptor fileChooser = new FileChooserDescriptor(true, false, false, true, false, false) {
+            @Override
+            public boolean isFileVisible(VirtualFile file, boolean showHiddenFiles) {
+                return file.isDirectory() || StudyUtils.isZip(file.getName());
+            }
+
+            @Override
+            public boolean isFileSelectable(VirtualFile file) {
+                return StudyUtils.isZip(file.getName());
+            }
         };
-        final ListPopup popup = JBPopupFactory.getInstance().createListPopup(popupStep);
-        popup.showInScreenCoordinates(myBrowseButton, myBrowseButton.getLocationOnScreen());
-      }
-    });
-  }
+        myBrowseButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                final BaseListPopupStep<String> popupStep = new BaseListPopupStep<String>("",
+                        "Add local course",
+                        LOGIN_TO_STEPIK) {
+                    @Override
+                    public PopupStep onChosen(final String selectedValue, boolean finalChoice) {
+                        return doFinalStep(() -> {
+                            if ("Add local course".equals(selectedValue)) {
 
-  public void showLoginDialog(final boolean refreshCourseList, @NotNull final String progressTitle) {
-    final AddRemoteDialog dialog = new AddRemoteDialog(refreshCourseList, progressTitle);
-    dialog.show();
-  }
+                                Project[] projects = ProjectManager.getInstance().getOpenProjects();
+                                FileChooser.chooseFile(fileChooser,
+                                        null,
+                                        projects.length == 0 ? null : projects[0].getBaseDir(),
+                                        file -> {
+                                            String fileName = file.getPath();
+                                            int oldSize = myAvailableCourses.size();
+                                            CourseInfo courseInfo = myGenerator.addLocalCourse(fileName);
+                                            if (courseInfo != null) {
+                                                if (oldSize != myAvailableCourses.size()) {
+                                                    myCoursesComboBox.addItem(courseInfo);
+                                                }
+                                                myCoursesComboBox.setSelectedItem(courseInfo);
+                                                setOK();
+                                            } else {
+                                                setError(INVALID_COURSE);
+                                                myCoursesComboBox.removeAllItems();
+                                                myCoursesComboBox.addItem(CourseInfo.INVALID_COURSE);
+                                                for (CourseInfo course : myAvailableCourses) {
+                                                    myCoursesComboBox.addItem(course);
+                                                }
+                                                myCoursesComboBox.setSelectedItem(CourseInfo.INVALID_COURSE);
+                                            }
+                                        });
+                            } else if (LOGIN_TO_STEPIK.equals(selectedValue)) {
+                                showLoginDialog(true, "Signing In And Getting Stepik Course List");
+                            }
+                        });
+                    }
+                };
+                final ListPopup popup = JBPopupFactory.getInstance().createListPopup(popupStep);
+                popup.showInScreenCoordinates(myBrowseButton, myBrowseButton.getLocationOnScreen());
+            }
+        });
+    }
 
-  private void initListeners() {
-    myRefreshButton.addActionListener(new RefreshActionListener());
-    myCoursesComboBox.addActionListener(new CourseSelectedListener());
-    setupBrowseButton();
-    addAncestorListener(new AncestorListenerAdapter() {
-      @Override
-      public void ancestorMoved(AncestorEvent event) {
-        if (!isComboboxInitialized && isVisible()) {
-          isComboboxInitialized = true;
-          initCoursesCombobox();
+    public void showLoginDialog(final boolean refreshCourseList, @NotNull final String progressTitle) {
+        final AddRemoteDialog dialog = new AddRemoteDialog(refreshCourseList, progressTitle);
+        dialog.show();
+    }
+
+    private void initListeners() {
+        myRefreshButton.addActionListener(new RefreshActionListener());
+        myCoursesComboBox.addActionListener(new CourseSelectedListener());
+        setupBrowseButton();
+        addAncestorListener(new AncestorListenerAdapter() {
+            @Override
+            public void ancestorMoved(AncestorEvent event) {
+                if (!isComboboxInitialized && isVisible()) {
+                    isComboboxInitialized = true;
+                    initCoursesCombobox();
+                }
+            }
+        });
+    }
+
+    private void setError(@NotNull final String errorMessage) {
+        myGenerator.fireStateChanged(new ValidationResult(errorMessage));
+        if (myValidationManager != null) {
+            myValidationManager.validate();
         }
-      }
-    });
-  }
-
-  private void setError(@NotNull final String errorMessage) {
-    myGenerator.fireStateChanged(new ValidationResult(errorMessage));
-    if (myValidationManager != null) {
-      myValidationManager.validate();
     }
-  }
 
-  private void setOK() {
-    myGenerator.fireStateChanged(ValidationResult.OK);
-    if (myValidationManager != null) {
-      myValidationManager.validate();
-    }
-  }
-
-  public void registerValidators(final FacetValidatorsManager manager) {
-    myValidationManager = manager;
-  }
-
-  @Override
-  public JComponent getAnchor() {
-    return myAnchor;
-  }
-
-  @Override
-  public void setAnchor(@Nullable JComponent anchor) {
-    myAnchor = anchor;
-  }
-
-  /**
-   * Handles refreshing courses
-   * Old courses added to new courses only if their
-   * meta file still exists in local file system
-   */
-  private class RefreshActionListener implements ActionListener {
-    @Override
-    public void actionPerformed(ActionEvent e) {
-      final List<CourseInfo> courses =
-        myGenerator.getCoursesUnderProgress(true, "Refreshing Course List", DefaultProjectFactory.getInstance().getDefaultProject());
-      if (!courses.contains(CourseInfo.INVALID_COURSE)) {
-        refreshCoursesList(courses);
-      }
-    }
-  }
-
-  private void refreshCoursesList(@NotNull final List<CourseInfo> courses) {
-    if (courses.isEmpty()) {
-      setError(CONNECTION_ERROR);
-      return;
-    }
-    myCoursesComboBox.removeAllItems();
-
-    addCoursesToCombobox(courses);
-    myGenerator.setSelectedCourse(StudyUtils.getFirst(courses));
-
-    myGenerator.setCourses(courses);
-    myAvailableCourses = courses;
-    StudyProjectGenerator.flushCache(myAvailableCourses);
-  }
-
-  private void addCoursesToCombobox(@NotNull List<CourseInfo> courses) {
-    for (CourseInfo courseInfo : courses) {
-      myCoursesComboBox.addItem(courseInfo);
-    }
-  }
-
-
-  /**
-   * Handles selecting course in combo box
-   * Sets selected course in combo box as selected in
-   * {@link StudyNewProjectPanel#myGenerator}
-   */
-  private class CourseSelectedListener implements ActionListener {
-    @Override
-    public void actionPerformed(ActionEvent e) {
-      JComboBox cb = (JComboBox)e.getSource();
-      CourseInfo selectedCourse = (CourseInfo)cb.getSelectedItem();
-      if (selectedCourse == null || selectedCourse.equals(CourseInfo.INVALID_COURSE)) {
-        myAuthorLabel.setText("");
-        myDescriptionPane.setText("");
-        setError(INVALID_COURSE);
-        return;
-      }
-      final String authorsString = Course.getAuthorsString(selectedCourse.getAuthors());
-      myAuthorLabel.setText(!StringUtil.isEmptyOrSpaces(authorsString) ? "Author: " + authorsString : "");
-      myCoursesComboBox.removeItem(CourseInfo.INVALID_COURSE);
-      myDescriptionPane.setText(selectedCourse.getDescription());
-      myGenerator.setSelectedCourse(selectedCourse);
-
-      setOK();
-      if (selectedCourse.isAdaptive()) {
-        if (!myGenerator.isLoggedIn()) {
-          setError(LOGIN_TO_STEPIK_MESSAGE);
+    private void setOK() {
+        myGenerator.fireStateChanged(ValidationResult.OK);
+        if (myValidationManager != null) {
+            myValidationManager.validate();
         }
-      }
     }
-  }
 
-  public JComboBox<CourseInfo> getCoursesComboBox() {
-    return myCoursesComboBox;
-  }
-
-  public JPanel getInfoPanel() {
-    return myInfoPanel;
-  }
-
-  private class AddRemoteDialog extends LoginDialog {
-
-    private final boolean myRefreshCourseList;
-    private final String myProgressTitle;
-
-    protected AddRemoteDialog(final boolean refreshCourseList, @NotNull final String progressTitle) {
-      super();
-      myRefreshCourseList = refreshCourseList;
-      myProgressTitle = progressTitle;
+    public void registerValidators(final FacetValidatorsManager manager) {
+        myValidationManager = manager;
     }
 
     @Override
-    protected void doOKAction() {
-      if (!validateLoginAndPasswordFields()) return;
-      super.doJustOkAction();
-
-      ProgressManager.getInstance().runProcessWithProgressSynchronously(() -> {
-        ProgressManager.getInstance().getProgressIndicator().setIndeterminate(true);
-
-        final StepikUser stepikUser =
-          StudyUtils.execCancelable(() -> StepikConnectorLogin.minorLogin(new StepikUser(myLoginPanel.getLogin(),
-                                                                                         myLoginPanel.getPassword())));
-        if (stepikUser != null) {
-          stepikUser.setEmail(myLoginPanel.getLogin());
-          stepikUser.setPassword(myLoginPanel.getPassword());
-          myGenerator.myUser = stepikUser;
-          myGenerator.setEnrolledCoursesIds(StepikConnectorGet.getEnrolledCoursesIds());
-
-          final List<CourseInfo> courses = myGenerator.getCourses(true);
-          if (courses != null && myRefreshCourseList) {
-            ApplicationManager.getApplication().invokeLater(() -> refreshCoursesList(courses));
-          }
-          setOK();
-        }
-        else {
-          setError("Failed to login");
-        }
-      }, myProgressTitle, true, new DefaultProjectFactoryImpl().getDefaultProject());
+    public JComponent getAnchor() {
+        return myAnchor;
     }
-  }
+
+    @Override
+    public void setAnchor(@Nullable JComponent anchor) {
+        myAnchor = anchor;
+    }
+
+    /**
+     * Handles refreshing courses
+     * Old courses added to new courses only if their
+     * meta file still exists in local file system
+     */
+    private class RefreshActionListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            final List<CourseInfo> courses =
+                    myGenerator.getCoursesUnderProgress(true,
+                            "Refreshing Course List",
+                            DefaultProjectFactory.getInstance().getDefaultProject());
+            if (!courses.contains(CourseInfo.INVALID_COURSE)) {
+                refreshCoursesList(courses);
+            }
+        }
+    }
+
+    private void refreshCoursesList(@NotNull final List<CourseInfo> courses) {
+        if (courses.isEmpty()) {
+            setError(CONNECTION_ERROR);
+            return;
+        }
+        myCoursesComboBox.removeAllItems();
+
+        addCoursesToCombobox(courses);
+        myGenerator.setSelectedCourse(StudyUtils.getFirst(courses));
+
+        myGenerator.setCourses(courses);
+        myAvailableCourses = courses;
+        StudyProjectGenerator.flushCache(myAvailableCourses);
+    }
+
+    private void addCoursesToCombobox(@NotNull List<CourseInfo> courses) {
+        for (CourseInfo courseInfo : courses) {
+            myCoursesComboBox.addItem(courseInfo);
+        }
+    }
+
+
+    /**
+     * Handles selecting course in combo box
+     * Sets selected course in combo box as selected in
+     * {@link StudyNewProjectPanel#myGenerator}
+     */
+    private class CourseSelectedListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            JComboBox cb = (JComboBox) e.getSource();
+            CourseInfo selectedCourse = (CourseInfo) cb.getSelectedItem();
+            if (selectedCourse == null || selectedCourse.equals(CourseInfo.INVALID_COURSE)) {
+                myAuthorLabel.setText("");
+                myDescriptionPane.setText("");
+                setError(INVALID_COURSE);
+                return;
+            }
+            final String authorsString = Course.getAuthorsString(selectedCourse.getAuthors());
+            myAuthorLabel.setText(!StringUtil.isEmptyOrSpaces(authorsString) ? "Author: " + authorsString : "");
+            myCoursesComboBox.removeItem(CourseInfo.INVALID_COURSE);
+            myDescriptionPane.setText(selectedCourse.getDescription());
+            myGenerator.setSelectedCourse(selectedCourse);
+
+            setOK();
+            if (selectedCourse.isAdaptive()) {
+                if (!myGenerator.isLoggedIn()) {
+                    setError(LOGIN_TO_STEPIK_MESSAGE);
+                }
+            }
+        }
+    }
+
+    public JComboBox<CourseInfo> getCoursesComboBox() {
+        return myCoursesComboBox;
+    }
+
+    public JPanel getInfoPanel() {
+        return myInfoPanel;
+    }
+
+    private class AddRemoteDialog extends LoginDialog {
+
+        private final boolean myRefreshCourseList;
+        private final String myProgressTitle;
+
+        protected AddRemoteDialog(final boolean refreshCourseList, @NotNull final String progressTitle) {
+            super();
+            myRefreshCourseList = refreshCourseList;
+            myProgressTitle = progressTitle;
+        }
+
+        @Override
+        protected void doOKAction() {
+            if (!validateLoginAndPasswordFields()) return;
+            super.doJustOkAction();
+
+            ProgressManager.getInstance().runProcessWithProgressSynchronously(() -> {
+                ProgressManager.getInstance().getProgressIndicator().setIndeterminate(true);
+
+                final StepikUser stepikUser =
+                        StudyUtils.execCancelable(() -> StepikConnectorLogin.minorLogin(new StepikUser(myLoginPanel.getLogin(),
+                                myLoginPanel.getPassword())));
+                if (stepikUser != null) {
+                    stepikUser.setEmail(myLoginPanel.getLogin());
+                    stepikUser.setPassword(myLoginPanel.getPassword());
+                    myGenerator.myUser = stepikUser;
+                    myGenerator.setEnrolledCoursesIds(StepikConnectorGet.getEnrolledCoursesIds());
+
+                    final List<CourseInfo> courses = myGenerator.getCourses(true);
+                    if (courses != null && myRefreshCourseList) {
+                        ApplicationManager.getApplication().invokeLater(() -> refreshCoursesList(courses));
+                    }
+                    setOK();
+                } else {
+                    setError("Failed to login");
+                }
+            }, myProgressTitle, true, new DefaultProjectFactoryImpl().getDefaultProject());
+        }
+    }
 }

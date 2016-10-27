@@ -6,5 +6,8 @@ import com.jetbrains.tmp.learning.courseFormat.Task;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class StudyAfterCheckAction {
-  public abstract void run(@NotNull final Project project, @NotNull final Task solvedTask, StudyStatus statusBeforeCheck);
+    public abstract void run(
+            @NotNull final Project project,
+            @NotNull final Task solvedTask,
+            StudyStatus statusBeforeCheck);
 }

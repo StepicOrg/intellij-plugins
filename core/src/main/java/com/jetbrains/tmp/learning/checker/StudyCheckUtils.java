@@ -43,176 +43,185 @@ import java.util.List;
 import java.util.Map;
 
 public class StudyCheckUtils {
-  private static final Logger LOG = Logger.getInstance(StudyCheckUtils.class);
+    private static final Logger LOG = Logger.getInstance(StudyCheckUtils.class);
 
-  private StudyCheckUtils() {
-  }
-
-  public static void drawAllPlaceholders(@NotNull final Project project, @NotNull final Task task, @NotNull final VirtualFile taskDir) {
-    for (Map.Entry<String, TaskFile> entry : task.getTaskFiles().entrySet()) {
-      String name = entry.getKey();
-      TaskFile taskFile = entry.getValue();
-      VirtualFile virtualFile = taskDir.findChild(name);
-      if (virtualFile == null) {
-        continue;
-      }
-      FileEditor fileEditor = FileEditorManager.getInstance(project).getSelectedEditor(virtualFile);
-      if (fileEditor instanceof StudyEditor) {
-        StudyEditor studyEditor = (StudyEditor)fileEditor;
-        StudyUtils.drawAllWindows(studyEditor.getEditor(), taskFile);
-      }
+    private StudyCheckUtils() {
     }
-  }
 
-  public static void navigateToFailedPlaceholder(@NotNull final StudyState studyState,
-                                                 @NotNull final Task task,
-                                                 @NotNull final VirtualFile taskDir,
-                                                 @NotNull final Project project) {
-    TaskFile selectedTaskFile = studyState.getTaskFile();
-    Editor editor = studyState.getEditor();
-    TaskFile taskFileToNavigate = selectedTaskFile;
-    VirtualFile fileToNavigate = studyState.getVirtualFile();
-    final StudyTaskManager taskManager = StudyTaskManager.getInstance(project);
-    if (!taskManager.hasFailedAnswerPlaceholders(selectedTaskFile)) {
-      for (Map.Entry<String, TaskFile> entry : task.getTaskFiles().entrySet()) {
-        String name = entry.getKey();
-        TaskFile taskFile = entry.getValue();
-        if (taskManager.hasFailedAnswerPlaceholders(taskFile)) {
-          taskFileToNavigate = taskFile;
-          VirtualFile virtualFile = taskDir.findChild(name);
-          if (virtualFile == null) {
-            continue;
-          }
-          FileEditor fileEditor = FileEditorManager.getInstance(project).getSelectedEditor(virtualFile);
-          if (fileEditor instanceof StudyEditor) {
-            StudyEditor studyEditor = (StudyEditor)fileEditor;
-            editor = studyEditor.getEditor();
-          }
-          fileToNavigate = virtualFile;
-          break;
+    public static void drawAllPlaceholders(
+            @NotNull final Project project,
+            @NotNull final Task task,
+            @NotNull final VirtualFile taskDir) {
+        for (Map.Entry<String, TaskFile> entry : task.getTaskFiles().entrySet()) {
+            String name = entry.getKey();
+            TaskFile taskFile = entry.getValue();
+            VirtualFile virtualFile = taskDir.findChild(name);
+            if (virtualFile == null) {
+                continue;
+            }
+            FileEditor fileEditor = FileEditorManager.getInstance(project).getSelectedEditor(virtualFile);
+            if (fileEditor instanceof StudyEditor) {
+                StudyEditor studyEditor = (StudyEditor) fileEditor;
+                StudyUtils.drawAllWindows(studyEditor.getEditor(), taskFile);
+            }
         }
-      }
     }
-    if (fileToNavigate != null) {
-      FileEditorManager.getInstance(project).openFile(fileToNavigate, true);
-    }
-    final Editor editorToNavigate = editor;
-    ApplicationManager.getApplication().invokeLater(
-      () -> IdeFocusManager.getInstance(project).requestFocus(editorToNavigate.getContentComponent(), true));
 
-    StudyNavigator.navigateToFirstFailedAnswerPlaceholder(editor, taskFileToNavigate);
-  }
-
-
-  public static void showTestResultPopUp(final String text, Color color, @NotNull final Project project) {
-    BalloonBuilder balloonBuilder =
-      JBPopupFactory.getInstance().createHtmlTextBalloonBuilder(text, null, color, null);
-    final Balloon balloon = balloonBuilder.createBalloon();
-    StudyUtils.showCheckPopUp(project, balloon);
-  }
-
-
-  public static void runSmartTestProcess(@NotNull final VirtualFile taskDir,
-                                         @NotNull final StudyTestRunner testRunner,
-                                         final String taskFileName,
-                                         @NotNull final TaskFile taskFile,
-                                         @NotNull final Project project) {
-    final TaskFile answerTaskFile = new TaskFile();
-    answerTaskFile.name = taskFileName;
-    final VirtualFile virtualFile = taskDir.findChild(taskFileName);
-    if (virtualFile == null) {
-      return;
-    }
-    final VirtualFile answerFile = getCopyWithAnswers(taskDir, virtualFile, taskFile, answerTaskFile);
-    for (final AnswerPlaceholder answerPlaceholder : answerTaskFile.getAnswerPlaceholders()) {
-      final Document document = FileDocumentManager.getInstance().getDocument(virtualFile);
-      if (document == null) {
-        continue;
-      }
-      StudySmartChecker.smartCheck(answerPlaceholder, project, answerFile, answerTaskFile, taskFile, testRunner,
-                                   virtualFile, document);
-    }
-    StudyUtils.deleteFile(answerFile);
-  }
-
-
-  private static VirtualFile getCopyWithAnswers(@NotNull final VirtualFile taskDir,
-                                                @NotNull final VirtualFile file,
-                                                @NotNull final TaskFile source,
-                                                @NotNull final TaskFile target) {
-    VirtualFile copy = null;
-    try {
-
-      copy = file.copy(taskDir, taskDir, file.getNameWithoutExtension() + EduNames.ANSWERS_POSTFIX + "." + file.getExtension());
-      final FileDocumentManager documentManager = FileDocumentManager.getInstance();
-      final Document document = documentManager.getDocument(copy);
-      if (document != null) {
-        TaskFile.copy(source, target);
-        EduDocumentListener listener = new EduDocumentListener(target);
-        document.addDocumentListener(listener);
-        for (AnswerPlaceholder answerPlaceholder : target.getAnswerPlaceholders()) {
-          final int start = answerPlaceholder.getOffset();
-          final int end = start + answerPlaceholder.getRealLength();
-          final String text = answerPlaceholder.getPossibleAnswer();
-          document.replaceString(start, end, text);
+    public static void navigateToFailedPlaceholder(
+            @NotNull final StudyState studyState,
+            @NotNull final Task task,
+            @NotNull final VirtualFile taskDir,
+            @NotNull final Project project) {
+        TaskFile selectedTaskFile = studyState.getTaskFile();
+        Editor editor = studyState.getEditor();
+        TaskFile taskFileToNavigate = selectedTaskFile;
+        VirtualFile fileToNavigate = studyState.getVirtualFile();
+        final StudyTaskManager taskManager = StudyTaskManager.getInstance(project);
+        if (!taskManager.hasFailedAnswerPlaceholders(selectedTaskFile)) {
+            for (Map.Entry<String, TaskFile> entry : task.getTaskFiles().entrySet()) {
+                String name = entry.getKey();
+                TaskFile taskFile = entry.getValue();
+                if (taskManager.hasFailedAnswerPlaceholders(taskFile)) {
+                    taskFileToNavigate = taskFile;
+                    VirtualFile virtualFile = taskDir.findChild(name);
+                    if (virtualFile == null) {
+                        continue;
+                    }
+                    FileEditor fileEditor = FileEditorManager.getInstance(project).getSelectedEditor(virtualFile);
+                    if (fileEditor instanceof StudyEditor) {
+                        StudyEditor studyEditor = (StudyEditor) fileEditor;
+                        editor = studyEditor.getEditor();
+                    }
+                    fileToNavigate = virtualFile;
+                    break;
+                }
+            }
         }
-        ApplicationManager.getApplication().runWriteAction(() -> documentManager.saveDocument(document));
-      }
-    }
-    catch (IOException e) {
-      LOG.error(e);
-    }
-    return copy;
-  }
-
-
-  public static boolean hasBackgroundProcesses(@NotNull Project project) {
-    final IdeFrame frame = ((WindowManagerEx)WindowManager.getInstance()).findFrameFor(project);
-    final StatusBarEx statusBar = frame == null ? null : (StatusBarEx)frame.getStatusBar();
-    if (statusBar != null) {
-      final List<Pair<TaskInfo, ProgressIndicator>> processes = statusBar.getBackgroundProcesses();
-      if (!processes.isEmpty()) return true;
-    }
-    return false;
-  }
-
-
-  public static void flushWindows(@NotNull final Task task, @NotNull final VirtualFile taskDir) {
-    for (Map.Entry<String, TaskFile> entry : task.getTaskFiles().entrySet()) {
-      String name = entry.getKey();
-      TaskFile taskFile = entry.getValue();
-      VirtualFile virtualFile = taskDir.findChild(name);
-      if (virtualFile == null) {
-        continue;
-      }
-      EduUtils.flushWindows(taskFile, virtualFile);
-    }
-  }
-
-  public static void showTestResultsToolWindow(@NotNull final Project project, @NotNull final String message, boolean solved) {
-    final ToolWindowManager toolWindowManager = ToolWindowManager.getInstance(project);
-    ToolWindow window = toolWindowManager.getToolWindow(StudyTestResultsToolWindowFactoryKt.ID);
-    if (window == null) {
-      toolWindowManager.registerToolWindow(StudyTestResultsToolWindowFactoryKt.ID, true, ToolWindowAnchor.BOTTOM);
-      window = toolWindowManager.getToolWindow(StudyTestResultsToolWindowFactoryKt.ID);
-      new StudyTestResultsToolWindowFactory().createToolWindowContent(project, window);
-    }
-
-    final Content[] contents = window.getContentManager().getContents();
-    for (Content content : contents) {
-      final JComponent component = content.getComponent();
-      if (component instanceof ConsoleViewImpl) {
-        ((ConsoleViewImpl)component).clear();
-        if (!solved) {
-          ((ConsoleViewImpl)component).print(message, ConsoleViewContentType.ERROR_OUTPUT);
+        if (fileToNavigate != null) {
+            FileEditorManager.getInstance(project).openFile(fileToNavigate, true);
         }
-        else {
-          ((ConsoleViewImpl)component).print(message, ConsoleViewContentType.NORMAL_OUTPUT);
-        }
-        window.setAvailable(true, () -> {});
-        window.show(() -> {});
-        return;
-      }
+        final Editor editorToNavigate = editor;
+        ApplicationManager.getApplication().invokeLater(
+                () -> IdeFocusManager.getInstance(project).requestFocus(editorToNavigate.getContentComponent(), true));
+
+        StudyNavigator.navigateToFirstFailedAnswerPlaceholder(editor, taskFileToNavigate);
     }
-  }
+
+
+    public static void showTestResultPopUp(final String text, Color color, @NotNull final Project project) {
+        BalloonBuilder balloonBuilder =
+                JBPopupFactory.getInstance().createHtmlTextBalloonBuilder(text, null, color, null);
+        final Balloon balloon = balloonBuilder.createBalloon();
+        StudyUtils.showCheckPopUp(project, balloon);
+    }
+
+
+    public static void runSmartTestProcess(
+            @NotNull final VirtualFile taskDir,
+            @NotNull final StudyTestRunner testRunner,
+            final String taskFileName,
+            @NotNull final TaskFile taskFile,
+            @NotNull final Project project) {
+        final TaskFile answerTaskFile = new TaskFile();
+        answerTaskFile.name = taskFileName;
+        final VirtualFile virtualFile = taskDir.findChild(taskFileName);
+        if (virtualFile == null) {
+            return;
+        }
+        final VirtualFile answerFile = getCopyWithAnswers(taskDir, virtualFile, taskFile, answerTaskFile);
+        for (final AnswerPlaceholder answerPlaceholder : answerTaskFile.getAnswerPlaceholders()) {
+            final Document document = FileDocumentManager.getInstance().getDocument(virtualFile);
+            if (document == null) {
+                continue;
+            }
+            StudySmartChecker.smartCheck(answerPlaceholder, project, answerFile, answerTaskFile, taskFile, testRunner,
+                    virtualFile, document);
+        }
+        StudyUtils.deleteFile(answerFile);
+    }
+
+
+    private static VirtualFile getCopyWithAnswers(
+            @NotNull final VirtualFile taskDir,
+            @NotNull final VirtualFile file,
+            @NotNull final TaskFile source,
+            @NotNull final TaskFile target) {
+        VirtualFile copy = null;
+        try {
+
+            copy = file.copy(taskDir,
+                    taskDir,
+                    file.getNameWithoutExtension() + EduNames.ANSWERS_POSTFIX + "." + file.getExtension());
+            final FileDocumentManager documentManager = FileDocumentManager.getInstance();
+            final Document document = documentManager.getDocument(copy);
+            if (document != null) {
+                TaskFile.copy(source, target);
+                EduDocumentListener listener = new EduDocumentListener(target);
+                document.addDocumentListener(listener);
+                for (AnswerPlaceholder answerPlaceholder : target.getAnswerPlaceholders()) {
+                    final int start = answerPlaceholder.getOffset();
+                    final int end = start + answerPlaceholder.getRealLength();
+                    final String text = answerPlaceholder.getPossibleAnswer();
+                    document.replaceString(start, end, text);
+                }
+                ApplicationManager.getApplication().runWriteAction(() -> documentManager.saveDocument(document));
+            }
+        } catch (IOException e) {
+            LOG.error(e);
+        }
+        return copy;
+    }
+
+
+    public static boolean hasBackgroundProcesses(@NotNull Project project) {
+        final IdeFrame frame = ((WindowManagerEx) WindowManager.getInstance()).findFrameFor(project);
+        final StatusBarEx statusBar = frame == null ? null : (StatusBarEx) frame.getStatusBar();
+        if (statusBar != null) {
+            final List<Pair<TaskInfo, ProgressIndicator>> processes = statusBar.getBackgroundProcesses();
+            if (!processes.isEmpty()) return true;
+        }
+        return false;
+    }
+
+
+    public static void flushWindows(@NotNull final Task task, @NotNull final VirtualFile taskDir) {
+        for (Map.Entry<String, TaskFile> entry : task.getTaskFiles().entrySet()) {
+            String name = entry.getKey();
+            TaskFile taskFile = entry.getValue();
+            VirtualFile virtualFile = taskDir.findChild(name);
+            if (virtualFile == null) {
+                continue;
+            }
+            EduUtils.flushWindows(taskFile, virtualFile);
+        }
+    }
+
+    public static void showTestResultsToolWindow(
+            @NotNull final Project project,
+            @NotNull final String message,
+            boolean solved) {
+        final ToolWindowManager toolWindowManager = ToolWindowManager.getInstance(project);
+        ToolWindow window = toolWindowManager.getToolWindow(StudyTestResultsToolWindowFactoryKt.ID);
+        if (window == null) {
+            toolWindowManager.registerToolWindow(StudyTestResultsToolWindowFactoryKt.ID, true, ToolWindowAnchor.BOTTOM);
+            window = toolWindowManager.getToolWindow(StudyTestResultsToolWindowFactoryKt.ID);
+            new StudyTestResultsToolWindowFactory().createToolWindowContent(project, window);
+        }
+
+        final Content[] contents = window.getContentManager().getContents();
+        for (Content content : contents) {
+            final JComponent component = content.getComponent();
+            if (component instanceof ConsoleViewImpl) {
+                ((ConsoleViewImpl) component).clear();
+                if (!solved) {
+                    ((ConsoleViewImpl) component).print(message, ConsoleViewContentType.ERROR_OUTPUT);
+                } else {
+                    ((ConsoleViewImpl) component).print(message, ConsoleViewContentType.NORMAL_OUTPUT);
+                }
+                window.setAvailable(true, () -> {});
+                window.show(() -> {});
+                return;
+            }
+        }
+    }
 }

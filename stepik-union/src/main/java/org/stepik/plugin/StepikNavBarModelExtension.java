@@ -65,6 +65,7 @@ public class StepikNavBarModelExtension extends JavaNavBarExtension {
 
         return super.getPresentableText(object);
     }
+
     @Nullable
     private Course getCourse(@NotNull Project project) {
         StudyTaskManager studyTaskManager = StudyTaskManager.getInstance(project);

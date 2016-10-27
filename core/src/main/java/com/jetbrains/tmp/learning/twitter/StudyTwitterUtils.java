@@ -41,9 +41,52 @@ public class StudyTwitterUtils {
   
   */
 /**
-   * Set consumer key and secret. 
-   * @return Twitter instance with consumer key and secret set.
-   *//*
+ * Set consumer key and secret.
+ *
+ * @return Twitter instance with consumer key and secret set.
+ * <p>
+ * Set access token and token secret in Twitter instance
+ * <p>
+ * Post on twitter media and text from panel
+ * @param panel shown to user and used to provide data to post
+ * <p>
+ * Show twitter dialog, asking user to tweet about his achievements. Post tweet with provided by panel
+ * media and text.
+ * As a result of succeeded tweet twitter website is opened in default browser.
+ * <p>
+ * Listener updates label indicating remaining symbols number like in twitter.
+ * <p>
+ * Dialog wrapper class with DoNotAsl option for asking user to tweet.
+ * <p>
+ * Class provides structure for twitter dialog panel
+ * <p>
+ * Provides tweet text
+ * @return Input stream of media should be posted or null if there's nothing to post
+ * @return label that will be used to show remained symbol number
+ * <p>
+ * Api to add document listener to field containing tweet text
+ * <p>
+ * Set access token and token secret in Twitter instance
+ * <p>
+ * Post on twitter media and text from panel
+ * @param panel shown to user and used to provide data to post
+ * <p>
+ * Show twitter dialog, asking user to tweet about his achievements. Post tweet with provided by panel
+ * media and text.
+ * As a result of succeeded tweet twitter website is opened in default browser.
+ * <p>
+ * Listener updates label indicating remaining symbols number like in twitter.
+ * <p>
+ * Dialog wrapper class with DoNotAsl option for asking user to tweet.
+ * <p>
+ * Class provides structure for twitter dialog panel
+ * <p>
+ * Provides tweet text
+ * @return Input stream of media should be posted or null if there's nothing to post
+ * @return label that will be used to show remained symbol number
+ * <p>
+ * Api to add document listener to field containing tweet text
+ *//*
 
   @NotNull
   public static Twitter getTwitter(@NotNull final String consumerKey, @NotNull final String consumerSecret) {
@@ -55,8 +98,8 @@ public class StudyTwitterUtils {
 
   */
 /**
-   * Set access token and token secret in Twitter instance
-   *//*
+ * Set access token and token secret in Twitter instance
+ *//*
 
   private static void setAuthInfoInTwitter(Twitter twitter, @NotNull String accessToken,
                                            @NotNull String tokenSecret) {
@@ -135,9 +178,9 @@ public class StudyTwitterUtils {
 
   */
 /**
-   * Post on twitter media and text from panel
-   * @param panel shown to user and used to provide data to post 
-   *//*
+ * Post on twitter media and text from panel
+ * @param panel shown to user and used to provide data to post
+ *//*
 
   public static void updateStatus(StudyTwitterUtils.TwitterDialogPanel panel, Twitter twitter) throws IOException, TwitterException {
     StatusUpdate update = new StatusUpdate(panel.getMessage());
@@ -154,10 +197,10 @@ public class StudyTwitterUtils {
 
   */
 /**
-   * Show twitter dialog, asking user to tweet about his achievements. Post tweet with provided by panel
-   * media and text. 
-   * As a result of succeeded tweet twitter website is opened in default browser.
-   *//*
+ * Show twitter dialog, asking user to tweet about his achievements. Post tweet with provided by panel
+ * media and text.
+ * As a result of succeeded tweet twitter website is opened in default browser.
+ *//*
 
   public static void authorizeAndUpdateStatus(@NotNull final Project project, @NotNull final Twitter twitter,
                                               @NotNull final StudyTwitterUtils.TwitterDialogPanel panel) throws TwitterException {
@@ -229,8 +272,8 @@ public class StudyTwitterUtils {
 
   */
 /**
-   * Listener updates label indicating remaining symbols number like in twitter.
-   *//*
+ * Listener updates label indicating remaining symbols number like in twitter.
+ *//*
 
   private static DocumentListener createTextFieldLengthDocumentListener(@NotNull TwitterDialogWrapper builder, @NotNull final StudyTwitterUtils.TwitterDialogPanel panel) {
     return new DocumentAdapter() {
@@ -251,8 +294,8 @@ public class StudyTwitterUtils {
 
   */
 /**
-   * Dialog wrapper class with DoNotAsl option for asking user to tweet.
-   * *//*
+ * Dialog wrapper class with DoNotAsl option for asking user to tweet.
+ * *//*
 
   private static class TwitterDialogWrapper extends DialogWrapper {
     private final StudyTwitterUtils.TwitterDialogPanel myPanel;
@@ -283,22 +326,22 @@ public class StudyTwitterUtils {
 
   */
 /**
-   * Class provides structure for twitter dialog panel
-   *//*
+ * Class provides structure for twitter dialog panel
+ *//*
 
   public abstract static class TwitterDialogPanel extends JPanel {
 
     */
 /**
-     * Provides tweet text
-     *//*
+ * Provides tweet text
+ *//*
 
     @NotNull public abstract String getMessage();
 
     */
 /**
-     * @return Input stream of media should be posted or null if there's nothing to post 
-     *//*
+ * @return Input stream of media should be posted or null if there's nothing to post
+ *//*
 
     @Nullable public abstract InputStream getMediaSource();
     
@@ -306,15 +349,15 @@ public class StudyTwitterUtils {
 
     */
 /**
-     * @return label that will be used to show remained symbol number
-     *//*
+ * @return label that will be used to show remained symbol number
+ *//*
 
     @NotNull public abstract JLabel getRemainSymbolsLabel();
 
     */
 /**
-     * Api to add document listener to field containing tweet text
-     *//*
+ * Api to add document listener to field containing tweet text
+ *//*
 
     public abstract void addTextFieldVerifier(@NotNull final DocumentListener documentListener);
     

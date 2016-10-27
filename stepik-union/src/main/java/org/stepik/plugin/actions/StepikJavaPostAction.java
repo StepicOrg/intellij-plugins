@@ -28,7 +28,7 @@ import org.stepik.plugin.collective.SupportedLanguages;
 import java.util.List;
 
 public class StepikJavaPostAction extends StudyCheckAction {
-    private static final Logger LOG = Logger.getInstance(StepikJavaPostAction.class);
+    private static final Logger logger = Logger.getInstance(StepikJavaPostAction.class);
     private static final String ACTION_ID = "STEPIC.StepikJavaPostAction";
     private static final int PERIOD = 2 * 1000; // ms
     private static final int FIVE_MINUTES = 5 * 60 * 1000; //ms
@@ -41,14 +41,14 @@ public class StepikJavaPostAction extends StudyCheckAction {
 
     @Override
     public void check(@NotNull Project project) {
-        LOG.info("check is started");
+        logger.info("check is started");
         ApplicationManager.getApplication().runWriteAction(() ->
                 CommandProcessor.getInstance().runUndoTransparentAction(() -> {
                     final StudyEditor selectedEditor = StudyUtils.getSelectedStudyEditor(project);
                     if (selectedEditor == null) return;
                     final StudyState studyState = new StudyState(selectedEditor);
                     if (!studyState.isValid()) {
-                        LOG.info("StudyCheckAction was invoked outside study editor");
+                        logger.info("StudyCheckAction was invoked outside study editor");
                         return;
                     }
                     if (StudyCheckUtils.hasBackgroundProcesses(project)) return;
@@ -85,7 +85,7 @@ public class StepikJavaPostAction extends StudyCheckAction {
                             task.getStepId());
                     StepikConnectorPost.postMetric(metric);
                     int submissionId = submissions.get(0).id;
-                    LOG.info("submissionId = " + submissionId);
+                    logger.info("submissionId = " + submissionId);
 
                     final Application application = ApplicationManager.getApplication();
                     final int finalSubmissionId = submissionId;

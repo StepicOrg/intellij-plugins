@@ -49,7 +49,7 @@ public class StepikSettingsPanel {
     private final static String AUTH_TOKEN = "Token";
     private Project settingsProject = null;
 
-    private static final Logger LOG = Logger.getInstance(StepikSettingsPanel.class.getName());
+    private static final Logger logger = Logger.getInstance(StepikSettingsPanel.class.getName());
 
     private JTextField myEmailTextField;
     private JPasswordField myPasswordField;
@@ -76,7 +76,8 @@ public class StepikSettingsPanel {
             }
         });
         magicButton.setText("Magic auth");
-        mySignupTextField.setText("<html>Do not have an account at stepik.org? <a href=\"https://stepik.org/registration\">" + "Sign up" + "</a></html>");
+        mySignupTextField.setText(
+                "<html>Do not have an account at stepik.org? <a href=\"https://stepik.org/registration\">" + "Sign up" + "</a></html>");
         mySignupTextField.setBackground(myPane.getBackground());
         mySignupTextField.setCursor(new Cursor(Cursor.HAND_CURSOR));
         myAuthTypeLabel.setBorder(JBUI.Borders.emptyLeft(10));
@@ -166,7 +167,7 @@ public class StepikSettingsPanel {
     private String getPassword() {
         if (!myCredentialsModified) {
             initProjectOfSettings();
-            LOG.info("user's password");
+            logger.info("user's password");
             return StudyTaskManager.getInstance(settingsProject).getUser().getPassword();
         }
         return String.valueOf(myPasswordField.getPassword());
@@ -201,7 +202,7 @@ public class StepikSettingsPanel {
             if (!StepikConnectorLogin.loginFromSettings(settingsProject, basicUser)) {
                 Messages.showWarningDialog("Can't sign in.", "Check credentials");
             }
-            LOG.info(manager.getUser().toString());
+            logger.info(manager.getUser().toString());
         }
         if (myHintCheckBoxModified) {
             StudyTaskManager manager = StudyTaskManager.getInstance(settingsProject);

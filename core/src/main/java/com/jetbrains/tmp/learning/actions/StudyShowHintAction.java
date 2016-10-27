@@ -32,87 +32,91 @@ import java.awt.*;
 import java.util.LinkedList;
 
 public class StudyShowHintAction extends StudyActionWithShortcut {
-  public static final String ACTION_ID = "SCore.ShowHintAction";
-  public static final String SHORTCUT = "ctrl pressed 7";
-  private static final String ourWarningMessage = "Put the caret in the answer placeholder to get hint";
-  public static final String HINT_NOT_AVAILABLE = "There is no hint for this answer placeholder";
+    public static final String ACTION_ID = "SCore.ShowHintAction";
+    public static final String SHORTCUT = "ctrl pressed 7";
+    private static final String ourWarningMessage = "Put the caret in the answer placeholder to get hint";
+    public static final String HINT_NOT_AVAILABLE = "There is no hint for this answer placeholder";
 
-  public StudyShowHintAction() {
-    super("Show hint (" + KeymapUtil.getShortcutText(new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT), null)) + ")", "Show hint", InteractiveLearningIcons.ShowHint);
-  }
-
-  public void actionPerformed(@NotNull AnActionEvent e) {
-    final Project project = e.getProject();
-    if (project == null) {
-      return;
+    public StudyShowHintAction() {
+        super("Show hint (" + KeymapUtil.getShortcutText(new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT),
+                null)) + ")", "Show hint", InteractiveLearningIcons.ShowHint);
     }
-    showHint(project);
-  }
 
-  public static void showHint(Project project) {
-    Course course = StudyTaskManager.getInstance(project).getCourse();
-    if (course == null) {
-      return;
+    public void actionPerformed(@NotNull AnActionEvent e) {
+        final Project project = e.getProject();
+        if (project == null) {
+            return;
+        }
+        showHint(project);
     }
-    StudyState studyState = new StudyState(StudyUtils.getSelectedStudyEditor(project));
-    if (!studyState.isValid()) {
-      return;
+
+    public static void showHint(Project project) {
+        Course course = StudyTaskManager.getInstance(project).getCourse();
+        if (course == null) {
+            return;
+        }
+        StudyState studyState = new StudyState(StudyUtils.getSelectedStudyEditor(project));
+        if (!studyState.isValid()) {
+            return;
+        }
+        PsiFile file = PsiManager.getInstance(project).findFile(studyState.getVirtualFile());
+        final Editor editor = studyState.getEditor();
+        int offset = editor.getCaretModel().getOffset();
+        AnswerPlaceholder answerPlaceholder = studyState.getTaskFile().getAnswerPlaceholder(
+                offset);
+        if (file == null) {
+            return;
+        }
+        EduUsagesCollector.hintShown();
+        LinkedList<String> hints = new LinkedList<>();
+        if (answerPlaceholder != null) {
+            hints.addAll(answerPlaceholder.getHints());
+            //final ArrayList<String> strings = new ArrayList<>();
+            //strings.add(answerPlaceholder.getHints());
+            //strings.add("test");
+            //hints.addAll(strings);
+        } else {
+            hints.add(ourWarningMessage);
+        }
+        final StudyToolWindow hintComponent = new StudyHint(answerPlaceholder, project).getStudyToolWindow();
+
+        showHintPopUp(project, studyState, editor, hintComponent);
     }
-    PsiFile file = PsiManager.getInstance(project).findFile(studyState.getVirtualFile());
-    final Editor editor = studyState.getEditor();
-    int offset = editor.getCaretModel().getOffset();
-    AnswerPlaceholder answerPlaceholder = studyState.getTaskFile().getAnswerPlaceholder(
-      offset);
-    if (file == null) {
-      return;
+
+    private static void showHintPopUp(
+            Project project,
+            StudyState studyState,
+            Editor editor,
+            StudyToolWindow hintComponent) {
+        final JBPopup popup =
+                JBPopupFactory.getInstance().createComponentPopupBuilder(hintComponent, hintComponent)
+                        .setDimensionServiceKey(project, DocumentationManager.JAVADOC_LOCATION_AND_SIZE, false)
+                        .setResizable(true)
+                        .setMovable(true)
+                        .setRequestFocus(true)
+                        .setTitle(studyState.getTask().getName())
+                        .createPopup();
+        Disposer.register(popup, hintComponent);
+
+        final Component focusOwner = IdeFocusManager.getInstance(project).getFocusOwner();
+        DataContext dataContext = DataManager.getInstance().getDataContext(focusOwner);
+        PopupPositionManager.positionPopupInBestPosition(popup, editor, dataContext);
     }
-    EduUsagesCollector.hintShown();
-    LinkedList<String> hints = new LinkedList<>();
-    if (answerPlaceholder != null) {
-      hints.addAll(answerPlaceholder.getHints());
-      //final ArrayList<String> strings = new ArrayList<>();
-      //strings.add(answerPlaceholder.getHints());
-      //strings.add("test");
-      //hints.addAll(strings);
+
+    @Override
+    public void update(@NotNull AnActionEvent e) {
+        StudyUtils.updateAction(e);
     }
-    else {
-      hints.add(ourWarningMessage);
+
+    @NotNull
+    @Override
+    public String getActionId() {
+        return ACTION_ID;
     }
-    final StudyToolWindow hintComponent = new StudyHint(answerPlaceholder, project).getStudyToolWindow();
 
-    showHintPopUp(project, studyState, editor, hintComponent);
-  }
-
-  private static void showHintPopUp(Project project, StudyState studyState, Editor editor, StudyToolWindow hintComponent) {
-    final JBPopup popup = 
-      JBPopupFactory.getInstance().createComponentPopupBuilder(hintComponent, hintComponent)
-        .setDimensionServiceKey(project, DocumentationManager.JAVADOC_LOCATION_AND_SIZE, false)
-        .setResizable(true)
-        .setMovable(true)
-        .setRequestFocus(true)
-        .setTitle(studyState.getTask().getName())
-        .createPopup();
-    Disposer.register(popup, hintComponent);
-
-    final Component focusOwner = IdeFocusManager.getInstance(project).getFocusOwner();
-    DataContext dataContext = DataManager.getInstance().getDataContext(focusOwner);
-    PopupPositionManager.positionPopupInBestPosition(popup, editor, dataContext);
-  }
-
-  @Override
-  public void update(@NotNull AnActionEvent e) {
-    StudyUtils.updateAction(e);
-  }
-
-  @NotNull
-  @Override
-  public String getActionId() {
-    return ACTION_ID;
-  }
-
-  @Nullable
-  @Override
-  public String[] getShortcuts() {
-    return new String[]{SHORTCUT};
-  }
+    @Nullable
+    @Override
+    public String[] getShortcuts() {
+        return new String[]{SHORTCUT};
+    }
 }
