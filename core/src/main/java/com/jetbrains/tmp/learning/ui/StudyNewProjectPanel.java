@@ -58,8 +58,8 @@ public class StudyNewProjectPanel extends JPanel implements PanelWithAnchor {
     private static final String INVALID_COURSE = "Selected course is invalid";
     private FacetValidatorsManager myValidationManager;
     private boolean isComboboxInitialized;
-    private static final String LOGIN_TO_STEPIK_MESSAGE = "<html><u>Login to Stepik</u> to open the adaptive course </html>";
-    private static final String LOGIN_TO_STEPIK = "Login to Stepik";
+    private static final String loggerIN_TO_STEPIK_MESSAGE = "<html><u>Login to Stepik</u> to open the adaptive course </html>";
+    private static final String loggerIN_TO_STEPIK = "Login to Stepik";
 
     public StudyNewProjectPanel(@NotNull final StudyProjectGenerator generator) {
         super(new VerticalFlowLayout(true, true));
@@ -131,7 +131,7 @@ public class StudyNewProjectPanel extends JPanel implements PanelWithAnchor {
             myGenerator.setSelectedCourse(selectedCourse);
 
             if (selectedCourse.isAdaptive() && !myGenerator.isLoggedIn()) {
-                setError(LOGIN_TO_STEPIK_MESSAGE);
+                setError(loggerIN_TO_STEPIK_MESSAGE);
             } else {
                 setOK();
             }
@@ -155,7 +155,7 @@ public class StudyNewProjectPanel extends JPanel implements PanelWithAnchor {
             public void actionPerformed(ActionEvent e) {
                 final BaseListPopupStep<String> popupStep = new BaseListPopupStep<String>("",
                         "Add local course",
-                        LOGIN_TO_STEPIK) {
+                        loggerIN_TO_STEPIK) {
                     @Override
                     public PopupStep onChosen(final String selectedValue, boolean finalChoice) {
                         return doFinalStep(() -> {
@@ -185,7 +185,7 @@ public class StudyNewProjectPanel extends JPanel implements PanelWithAnchor {
                                                 myCoursesComboBox.setSelectedItem(CourseInfo.INVALID_COURSE);
                                             }
                                         });
-                            } else if (LOGIN_TO_STEPIK.equals(selectedValue)) {
+                            } else if (loggerIN_TO_STEPIK.equals(selectedValue)) {
                                 showLoginDialog(true, "Signing In And Getting Stepik Course List");
                             }
                         });
@@ -310,7 +310,7 @@ public class StudyNewProjectPanel extends JPanel implements PanelWithAnchor {
             setOK();
             if (selectedCourse.isAdaptive()) {
                 if (!myGenerator.isLoggedIn()) {
-                    setError(LOGIN_TO_STEPIK_MESSAGE);
+                    setError(loggerIN_TO_STEPIK_MESSAGE);
                 }
             }
         }

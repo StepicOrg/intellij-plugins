@@ -43,7 +43,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StepikConnectorLogin {
-    private static final Logger LOG = Logger.getInstance(StepikConnectorLogin.class.getName());
+    private static final Logger logger = Logger.getInstance(StepikConnectorLogin.class.getName());
     private static CloseableHttpClient ourClient;
     private static final String CLIENT_ID = "hUCWcq3hZHCmz0DKrDtwOWITLcYutzot7p4n59vU";
     private static StepikUser currentUser;
@@ -57,7 +57,7 @@ public class StepikConnectorLogin {
                 headers.add(new BasicHeader("Authorization", "Bearer " + currentUser.getAccessToken()));
                 headers.add(new BasicHeader("Content-type", EduStepikNames.CONTENT_TYPE_APPL_JSON));
             } else {
-                LOG.warn("access_token is empty.. login..");
+                logger.warn("access_token is empty.. login..");
                 showLoginDialog();
                 headers.add(new BasicHeader("Authorization", "Bearer " + currentUser.getAccessToken()));
                 headers.add(new BasicHeader("Content-type", EduStepikNames.CONTENT_TYPE_APPL_JSON));
@@ -69,12 +69,12 @@ public class StepikConnectorLogin {
 
     @Deprecated
     public static boolean login(@NotNull final Project project) {
-        LOG.info("login");
+        logger.info("login");
         resetClient();
         StepikUser user = StudyTaskManager.getInstance(project).getUser();
         String email = user.getEmail();
         if (StringUtil.isEmptyOrSpaces(email)) {
-            LOG.info("current project user is empty");
+            logger.info("current project user is empty");
             Project defaultProject = ProjectManager.getInstance().getDefaultProject();
             StepikUser defaultUser = StudyTaskManager.getInstance(defaultProject).getUser();
             String defaultEmail = defaultUser.getEmail();
@@ -86,10 +86,10 @@ public class StepikConnectorLogin {
         }
 
         try {
-            LOG.info("minor login");
+            logger.info("minor login");
             minorLogin(user);
         } catch (StepikAuthorizationException e) {
-            LOG.warn(e.getMessage());
+            logger.warn(e.getMessage());
             return false;
         }
 
@@ -120,7 +120,7 @@ public class StepikConnectorLogin {
         StepikUser defaultUser = StudyTaskManager.getInstance(ProjectManager.getInstance().getDefaultProject())
                 .getUser();
         final String email = user.getEmail();
-        LOG.info("after get email");
+        logger.info("after get email");
         if (StringUtil.isEmptyOrSpaces(email)) {
             if (StringUtil.isEmptyOrSpaces(defaultUser.getEmail())) {
                 return showLoginDialog();
@@ -161,7 +161,7 @@ public class StepikConnectorLogin {
         List<NameValuePair> nvps = new ArrayList<NameValuePair>();
 
         if (!(refreshToken = basicUser.getRefreshToken()).isEmpty()) {
-            LOG.info("refresh_token auth");
+            logger.info("refresh_token auth");
             nvps.add(new BasicNameValuePair("client_id", CLIENT_ID));
             nvps.add(new BasicNameValuePair("content-type", "application/json"));
             nvps.add(new BasicNameValuePair("grant_type", "refresh_token"));
@@ -173,7 +173,7 @@ public class StepikConnectorLogin {
         nvps.clear();
 
         if (tokenInfo == null) {
-            LOG.info("credentials auth");
+            logger.info("credentials auth");
             String password = basicUser.getPassword();
             if (password.isEmpty()) return null;
             nvps.add(new BasicNameValuePair("client_id", CLIENT_ID));
@@ -205,7 +205,7 @@ public class StepikConnectorLogin {
         final HttpPost request = new HttpPost(EduStepikNames.TOKEN_URL);
         request.setEntity(new UrlEncodedFormEntity(nvps, Consts.UTF_8));
         //for (NameValuePair pair : nvps){
-        //  LOG.info(pair.getName() + " " + pair.getValue());
+        //  logger.info(pair.getName() + " " + pair.getValue());
         //}
 
         try {
@@ -216,11 +216,11 @@ public class StepikConnectorLogin {
             if (statusLine.getStatusCode() == HttpStatus.SC_OK) {
                 return gson.fromJson(responseString, StepikWrappers.TokenInfo.class);
             } else {
-                LOG.warn("Failed to Login: " + statusLine.getStatusCode() + statusLine.getReasonPhrase());
+                logger.warn("Failed to Login: " + statusLine.getStatusCode() + statusLine.getReasonPhrase());
                 throw new IOException("Stepik returned non 200 status code " + responseString);
             }
         } catch (IOException e) {
-            LOG.warn(e.getMessage());
+            logger.warn(e.getMessage());
             return null;
         }
     }

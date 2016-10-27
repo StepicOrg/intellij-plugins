@@ -37,7 +37,7 @@ import java.io.InputStream;
 
 
 public class StudyTwitterUtils {
-  private static final Logger LOG = Logger.getInstance(StudyTwitterUtils.class);
+  private static final Logger logger = Logger.getInstance(StudyTwitterUtils.class);
   
   */
 /**
@@ -131,12 +131,12 @@ public class StudyTwitterUtils {
             }
           }
           catch (TwitterException | IOException e) {
-            LOG.warn(e.getMessage());
+            logger.warn(e.getMessage());
             Messages.showErrorDialog("Status wasn\'t updated. Please, check internet connection and try again", "Twitter");
           }
         }
         else {
-          LOG.warn("Panel is null");
+          logger.warn("Panel is null");
         }
       }
     });
@@ -218,17 +218,17 @@ public class StudyTwitterUtils {
             updateStatus(panel, twitter);
           }
           else {
-            LOG.warn("No twitter configurator is provided for the plugin");
+            logger.warn("No twitter configurator is provided for the plugin");
           }
         }
         catch (TwitterException e) {
           if (e.getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
-            LOG.warn("Unable to get the access token.");
-            LOG.warn(e.getMessage());
+            logger.warn("Unable to get the access token.");
+            logger.warn(e.getMessage());
           }
         }
         catch (IOException e) {
-          LOG.warn(e.getMessage());
+          logger.warn(e.getMessage());
         }
       }
     });

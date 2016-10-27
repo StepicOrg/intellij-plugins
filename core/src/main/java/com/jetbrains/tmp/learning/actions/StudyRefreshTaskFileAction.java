@@ -41,7 +41,7 @@ import javax.swing.*;
 public class StudyRefreshTaskFileAction extends StudyActionWithShortcut {
     public static final String ACTION_ID = "SCore.RefreshTaskAction";
     public static final String SHORTCUT = "ctrl shift pressed X";
-    private static final Logger LOG = Logger.getInstance(StudyRefreshTaskFileAction.class.getName());
+    private static final Logger logger = Logger.getInstance(StudyRefreshTaskFileAction.class.getName());
 
     public StudyRefreshTaskFileAction() {
         super("Reset Task File (" + KeymapUtil.getShortcutText(new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT),
@@ -54,7 +54,7 @@ public class StudyRefreshTaskFileAction extends StudyActionWithShortcut {
             StudyEditor studyEditor = StudyUtils.getSelectedStudyEditor(project);
             StudyState studyState = new StudyState(studyEditor);
             if (studyEditor == null || !studyState.isValid()) {
-                LOG.info("RefreshTaskFileAction was invoked outside of Study Editor");
+                logger.info("RefreshTaskFileAction was invoked outside of Study Editor");
                 return;
             }
             refreshFile(studyState, project);

@@ -51,7 +51,7 @@ public class StudyProjectGenerator {
     public static final String LANGUAGE_ATTRIBUTE = "language";
     public static final String ADAPTIVE_COURSE_PREFIX = "__AdaptivePyCharmPython__";
     public static final File OUR_COURSES_DIR = new File(PathManager.getConfigPath(), "courses");
-    private static final Logger LOG = Logger.getInstance(StudyProjectGenerator.class.getName());
+    private static final Logger logger = Logger.getInstance(StudyProjectGenerator.class.getName());
     private static final String COURSE_NAME_ATTRIBUTE = "name";
     private static final String COURSE_DESCRIPTION = "description";
     protected static final String CACHE_NAME = "courseNames.txt";
@@ -94,14 +94,14 @@ public class StudyProjectGenerator {
         }
         final Course course = getCourse(project);
         if (course == null) {
-            LOG.warn("Course is null");
+            logger.warn("Course is null");
             Messages.showWarningDialog("Some problems occurred while creating the course", "Error in Course Creation");
             return;
         }
         final File courseDirectory = StudyUtils.getCourseDirectory(project, course);
         StudyTaskManager.getInstance(project).setCourse(course);
         ApplicationManager.getApplication().runWriteAction(() -> {
-            LOG.warn("Create course");
+            logger.warn("Create course");
             StudyGenerator.createCourse(course, baseDir, courseDirectory, project);
             course.setCourseDirectory(courseDirectory.getAbsolutePath());
             VirtualFileManager.getInstance().refreshWithoutFileWatcher(true);
@@ -156,9 +156,9 @@ public class StudyProjectGenerator {
             course.initCourse(isAdaptive);
             return course;
         } catch (UnsupportedEncodingException e) {
-            LOG.warn(e.getMessage());
+            logger.warn(e.getMessage());
         } catch (FileNotFoundException e) {
-            LOG.warn(e.getMessage());
+            logger.warn(e.getMessage());
         } finally {
             StudyUtils.closeSilently(reader);
         }
@@ -232,7 +232,7 @@ public class StudyProjectGenerator {
                     FileUtil.writeToFile(file, text);
                 }
             } catch (IOException e) {
-                LOG.error("ERROR copying file " + name);
+                logger.error("ERROR copying file " + name);
             }
         }
     }
@@ -262,7 +262,7 @@ public class StudyProjectGenerator {
                     FileUtil.writeToFile(file, taskFile.text);
                 }
             } catch (IOException e) {
-                LOG.error("ERROR copying file " + name);
+                logger.error("ERROR copying file " + name);
             }
         }
         final Map<String, String> testsText = task.getTestsText();
@@ -275,7 +275,7 @@ public class StudyProjectGenerator {
             try {
                 FileUtil.writeToFile(testsFile, entry.getValue());
             } catch (IOException e) {
-                LOG.error("ERROR copying tests file");
+                logger.error("ERROR copying tests file");
             }
         }
         final File taskText = new File(taskDirectory, "task.html");
@@ -283,7 +283,7 @@ public class StudyProjectGenerator {
         try {
             FileUtil.writeToFile(taskText, task.getText());
         } catch (IOException e) {
-            LOG.error("ERROR copying tests file");
+            logger.error("ERROR copying tests file");
         }
     }
 
@@ -299,16 +299,16 @@ public class StudyProjectGenerator {
                 outputStreamWriter.write(json);
             } catch (IOException e) {
                 Messages.showErrorDialog(e.getMessage(), "Failed to Generate Json");
-                LOG.info(e);
+                logger.info(e);
             } finally {
                 try {
                     outputStreamWriter.close();
                 } catch (IOException e) {
-                    LOG.info(e);
+                    logger.info(e);
                 }
             }
         } catch (FileNotFoundException | UnsupportedEncodingException e) {
-            LOG.info(e);
+            logger.info(e);
         }
     }
 
@@ -333,7 +333,7 @@ public class StudyProjectGenerator {
                 writer.println(json);
             }
         } catch (IOException e) {
-            LOG.error(e);
+            logger.error(e);
         } finally {
             StudyUtils.closeSilently(writer);
         }
@@ -343,14 +343,14 @@ public class StudyProjectGenerator {
         if (!OUR_COURSES_DIR.exists()) {
             final boolean created = OUR_COURSES_DIR.mkdirs();
             if (!created) {
-                LOG.error("Cannot flush courses cache. Can't create courses directory");
+                logger.error("Cannot flush courses cache. Can't create courses directory");
                 return false;
             }
         }
         if (!cacheFile.exists()) {
             final boolean created = cacheFile.createNewFile();
             if (!created) {
-                LOG.error("Cannot flush courses cache. Can't create " + CACHE_NAME + " file");
+                logger.error("Cannot flush courses cache. Can't create " + CACHE_NAME + " file");
                 return false;
             }
         }
@@ -431,7 +431,7 @@ public class StudyProjectGenerator {
                         courses.add(courseInfo);
                     }
                 } catch (IOException | JsonSyntaxException e) {
-                    LOG.error(e.getMessage());
+                    logger.error(e.getMessage());
                 } finally {
                     StudyUtils.closeSilently(reader);
                 }
@@ -439,7 +439,7 @@ public class StudyProjectGenerator {
                 StudyUtils.closeSilently(inputStream);
             }
         } catch (FileNotFoundException e) {
-            LOG.error(e.getMessage());
+            logger.error(e.getMessage());
         }
         return courses;
     }
@@ -467,8 +467,8 @@ public class StudyProjectGenerator {
             }
             return courseName;
         } catch (IOException e) {
-            LOG.error("Failed to unzip course archive");
-            LOG.error(e);
+            logger.error("Failed to unzip course archive");
+            logger.error(e);
         }
         return null;
     }
@@ -485,7 +485,7 @@ public class StudyProjectGenerator {
         if (courseDir.isDirectory()) {
             File[] courseFiles = courseDir.listFiles((dir, name) -> name.equals(EduNames.COURSE_META_FILE));
             if (courseFiles == null || courseFiles.length != 1) {
-                LOG.info("User tried to add course with more than one or without course files");
+                logger.info("User tried to add course with more than one or without course files");
                 return null;
             }
             File courseFile = courseFiles[0];
@@ -508,7 +508,7 @@ public class StudyProjectGenerator {
         if (courseFile.isDirectory()) {
             File[] courseFiles = courseFile.listFiles((dir, name) -> name.equals(EduNames.COURSE_META_FILE));
             if (courseFiles == null || courseFiles.length != 1) {
-                LOG.info("More than one or without course files");
+                logger.info("More than one or without course files");
                 return null;
             }
             courseFile = courseFiles[0];

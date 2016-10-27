@@ -34,7 +34,7 @@ import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 
 public class StepikConnectorInit {
-    private static final Logger LOG = Logger.getInstance(StepikConnectorInit.class.getName());
+    private static final Logger logger = Logger.getInstance(StepikConnectorInit.class.getName());
     private static CloseableHttpClient ourClient;
 
     public static void initializeClient() {
@@ -58,7 +58,7 @@ public class StepikConnectorInit {
                     .setConnectionReuseStrategy(DefaultConnectionReuseStrategy.INSTANCE)
                     .setSslcontext(sslContext);
         } catch (NoSuchAlgorithmException | KeyManagementException e) {
-            LOG.error(e.getMessage());
+            logger.error(e.getMessage());
         }
         return null;
     }

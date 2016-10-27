@@ -36,7 +36,7 @@ import java.io.InputStream;
 import java.net.URL;
 
 public class StudyBrowserWindow extends JFrame {
-    private static final Logger LOG = Logger.getInstance(StudyToolWindow.class);
+    private static final Logger logger = Logger.getInstance(StudyToolWindow.class);
     private static final String EVENT_TYPE_CLICK = "click";
     private JFXPanel myPanel;
     private WebView myWebComponent;
@@ -143,17 +143,17 @@ public class StudyBrowserWindow extends JFrame {
         try {
             template = StreamUtil.readText(stream, "utf-8");
         } catch (IOException e) {
-            LOG.warn(e.getMessage());
+            logger.warn(e.getMessage());
         } finally {
             try {
                 stream.close();
             } catch (IOException e) {
-                LOG.warn(e.getMessage());
+                logger.warn(e.getMessage());
             }
         }
 
         if (template == null) {
-            LOG.warn("Code mirror template is null");
+            logger.warn("Code mirror template is null");
             return null;
         }
 

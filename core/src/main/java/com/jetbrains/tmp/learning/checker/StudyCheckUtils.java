@@ -43,7 +43,7 @@ import java.util.List;
 import java.util.Map;
 
 public class StudyCheckUtils {
-    private static final Logger LOG = Logger.getInstance(StudyCheckUtils.class);
+    private static final Logger logger = Logger.getInstance(StudyCheckUtils.class);
 
     private StudyCheckUtils() {
     }
@@ -167,7 +167,7 @@ public class StudyCheckUtils {
                 ApplicationManager.getApplication().runWriteAction(() -> documentManager.saveDocument(document));
             }
         } catch (IOException e) {
-            LOG.error(e);
+            logger.error(e);
         }
         return copy;
     }

@@ -15,7 +15,7 @@ public class EduStepikNames {
     public static final String UNITS = "/units";
     public static final String DEFAULT_TASKFILE_NAME = "code.py";
     public static final String USERS = "/users";
-    public static final String LOGIN = "/accounts/login/";
+    public static final String loggerIN = "/accounts/login/";
     public static final String STEP_SOURCES = "/step-sources/";
     public static final String CURRENT_USER = "/stepics/1";
     public static final String COURSES = "/courses";

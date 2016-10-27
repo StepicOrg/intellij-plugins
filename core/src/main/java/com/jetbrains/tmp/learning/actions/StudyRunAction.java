@@ -29,7 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class StudyRunAction extends DumbAwareAction {
-    private static final Logger LOG = Logger.getInstance(StudyRunAction.class.getName());
+    private static final Logger logger = Logger.getInstance(StudyRunAction.class.getName());
     public static final String ACTION_ID = "SCore.StudyRunAction";
     private ProcessHandler myHandler;
     private List<ProcessListener> myProcessListeners = new LinkedList<ProcessListener>();
@@ -73,7 +73,7 @@ public class StudyRunAction extends DumbAwareAction {
             try {
                 myHandler = new OSProcessHandler(cmd);
             } catch (ExecutionException e) {
-                LOG.error(e);
+                logger.error(e);
                 return;
             }
 

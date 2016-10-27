@@ -31,7 +31,7 @@ import java.util.*;
 
 @State(name = "StepikStudySettings", storages = @Storage("stepik_study_project.xml"))
 public class StudyTaskManager implements PersistentStateComponent<Element>, DumbAware {
-    private static final Logger LOG = Logger.getInstance(StudyTaskManager.class);
+    private static final Logger logger = Logger.getInstance(StudyTaskManager.class);
     public static final int CURRENT_VERSION = 3;
     private StepikUser myUser = new StepikUser();
     private Course myCourse;
@@ -131,7 +131,7 @@ public class StudyTaskManager implements PersistentStateComponent<Element>, Dumb
         try {
             int version = StudySerializationUtils.Xml.getVersion(state);
             if (version == -1) {
-                LOG.error("StudyTaskManager doesn't contain any version:\n" + state.getValue());
+                logger.error("StudyTaskManager doesn't contain any version:\n" + state.getValue());
                 return;
             }
             switch (version) {
@@ -157,7 +157,7 @@ public class StudyTaskManager implements PersistentStateComponent<Element>, Dumb
                 }
             }
         } catch (StudySerializationUtils.StudyUnrecognizedFormatException e) {
-            LOG.error("Unexpected course format:\n", new XMLOutputter().outputString(state));
+            logger.error("Unexpected course format:\n", new XMLOutputter().outputString(state));
         }
     }
 

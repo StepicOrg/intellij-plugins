@@ -50,7 +50,7 @@ import java.util.Map;
 
 
 public class StudyProjectComponent implements ProjectComponent {
-    private static final Logger LOG = Logger.getInstance(StudyProjectComponent.class.getName());
+    private static final Logger logger = Logger.getInstance(StudyProjectComponent.class.getName());
     private final Project myProject;
     private FileCreatedByUserListener myListener;
     private Map<Keymap, List<Pair<String, String>>> myDeletedShortcuts = new HashMap<Keymap, List<Pair<String, String>>>();
@@ -82,7 +82,7 @@ public class StudyProjectComponent implements ProjectComponent {
                         if (course != null) {
                             UISettings.getInstance().HIDE_TOOL_STRIPES = false;
                             UISettings.getInstance().fireUISettingsChanged();
-                            LOG.info("register Shortcuts");
+                            logger.info("register Shortcuts");
                             registerShortcuts();
                             EduUsagesCollector.projectTypeOpened(course.isAdaptive() ?
                                     EduNames.ADAPTIVE :
@@ -125,7 +125,7 @@ public class StudyProjectComponent implements ProjectComponent {
 //        addShortcut(StudyNextWindowAction.ACTION_ID, new String[]{StudyNextWindowAction.SHORTCUT, StudyNextWindowAction.SHORTCUT2});
 //        addShortcut(StudyPrevWindowAction.ACTION_ID, new String[]{StudyPrevWindowAction.SHORTCUT});
             } else {
-                LOG.warn("Actions on toolbar are nulls");
+                logger.warn("Actions on toolbar are nulls");
             }
         }
     }
@@ -152,7 +152,7 @@ public class StudyProjectComponent implements ProjectComponent {
         }
         StudyLanguageManager manager = StudyUtils.getLanguageManager(course);
         if (manager == null) {
-            LOG.info("Study Language Manager is null for " + course.getLanguageById().getDisplayName());
+            logger.info("Study Language Manager is null for " + course.getLanguageById().getDisplayName());
             return;
         }
         final File[] files = resourceDirectory.listFiles();
@@ -198,7 +198,7 @@ public class StudyProjectComponent implements ProjectComponent {
             try {
                 FileUtil.copy(from, to);
             } catch (IOException e) {
-                LOG.warn("Failed to copy " + from.getName());
+                logger.warn("Failed to copy " + from.getName());
             }
         }
     }

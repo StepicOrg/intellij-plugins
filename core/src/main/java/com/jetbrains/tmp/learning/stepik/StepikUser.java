@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class StepikUser {
     private static final String STEPIK_SETTINGS_PASSWORD_KEY = "STEPIK_SETTINGS_PASSWORD_KEY";
-    private static final Logger LOG = Logger.getInstance(StepikUser.class);
+    private static final Logger logger = Logger.getInstance(StepikUser.class);
     private int id = -1;
     private String firstName = "";
     private String lastName = "";
@@ -83,7 +83,7 @@ public class StepikUser {
             password = PasswordSafe.getInstance()
                     .getPassword(null, StudyTaskManager.class, STEPIK_SETTINGS_PASSWORD_KEY + email);
         } catch (PasswordSafeException e) {
-            LOG.info("Couldn't get password for key [" + STEPIK_SETTINGS_PASSWORD_KEY + "]", e);
+            logger.info("Couldn't get password for key [" + STEPIK_SETTINGS_PASSWORD_KEY + "]", e);
             password = "";
         }
 
@@ -97,7 +97,7 @@ public class StepikUser {
             PasswordSafe.getInstance()
                     .storePassword(null, StudyTaskManager.class, STEPIK_SETTINGS_PASSWORD_KEY + getEmail(), password);
         } catch (PasswordSafeException e) {
-            LOG.info("Couldn't set password for key [" + STEPIK_SETTINGS_PASSWORD_KEY + getEmail() + "]", e);
+            logger.info("Couldn't set password for key [" + STEPIK_SETTINGS_PASSWORD_KEY + getEmail() + "]", e);
         }
     }
 

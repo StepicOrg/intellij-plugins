@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class StudyToolWindowFactory implements ToolWindowFactory, DumbAware {
     public static final String STUDY_TOOL_WINDOW = "Task Description";
-    private static final Logger LOG = Logger.getInstance(StudyToolWindowFactory.class.getName());
+    private static final Logger logger = Logger.getInstance(StudyToolWindowFactory.class.getName());
 
 
     @Override
@@ -25,7 +25,7 @@ public class StudyToolWindowFactory implements ToolWindowFactory, DumbAware {
         StudyTaskManager taskManager = StudyTaskManager.getInstance(project);
         final Course course = taskManager.getCourse();
         if (course != null || !taskManager.getUser().getEmail().isEmpty()) {
-            LOG.info("Study Tool Window is created");
+            logger.info("Study Tool Window is created");
             final StudyToolWindow studyToolWindow;
             if (StudyUtils.hasJavaFx() && taskManager.shouldUseJavaFx()) {
                 studyToolWindow = new StudyJavaFxToolWindow();
@@ -38,7 +38,7 @@ public class StudyToolWindowFactory implements ToolWindowFactory, DumbAware {
             contentManager.addContent(content);
             Disposer.register(project, studyToolWindow);
         } else {
-            LOG.warn("Study Tool Window did not create");
+            logger.warn("Study Tool Window did not create");
         }
     }
 }

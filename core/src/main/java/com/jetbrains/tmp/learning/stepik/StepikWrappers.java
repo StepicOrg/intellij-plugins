@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.Map;
 
 public class StepikWrappers {
-    private static final Logger LOG = Logger.getInstance(StepOptions.class);
+    private static final Logger logger = Logger.getInstance(StepOptions.class);
 
     static class StepContainer {
         List<StepSource> steps;
@@ -98,7 +98,7 @@ public class StepikWrappers {
                         }
                     }
                 } catch (IOException e) {
-                    LOG.error("Can't find file " + file.getPath());
+                    logger.error("Can't find file " + file.getPath());
                 }
 
                 source.files.add(taskFile);

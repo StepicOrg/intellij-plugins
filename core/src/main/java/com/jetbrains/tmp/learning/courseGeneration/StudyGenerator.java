@@ -23,7 +23,7 @@ public class StudyGenerator {
 
     }
 
-    private static final Logger LOG = Logger.getInstance(StudyGenerator.class.getName());
+    private static final Logger logger = Logger.getInstance(StudyGenerator.class.getName());
 
     /**
      * Creates task files in its task folder in project user created
@@ -141,7 +141,7 @@ public class StudyGenerator {
                 }
             }
         } catch (IOException e) {
-            LOG.error(e);
+            logger.error(e);
         }
     }
 

@@ -16,7 +16,7 @@ public class StudyTestContentPanel extends JPanel {
     private static final Font ourHeaderFont = new Font("Arial", Font.BOLD, 16);
     private final JTextArea myInputArea = new JTextArea();
     private final JTextArea myOutputArea = new JTextArea();
-    private static final Logger LOG = Logger.getInstance(StudyTestContentPanel.class.getName());
+    private static final Logger logger = Logger.getInstance(StudyTestContentPanel.class.getName());
 
     public StudyTestContentPanel(UserTest userTest) {
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -63,7 +63,7 @@ public class StudyTestContentPanel extends JPanel {
             try {
                 myBuffer.append(e.getDocument().getText(0, e.getDocument().getLength()));
             } catch (BadLocationException exception) {
-                LOG.warn(exception);
+                logger.warn(exception);
             }
         }
     }

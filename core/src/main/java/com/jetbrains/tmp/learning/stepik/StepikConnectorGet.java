@@ -48,7 +48,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class StepikConnectorGet {
-    private static final Logger LOG = Logger.getInstance(StepikConnectorGet.class.getName());
+    private static final Logger logger = Logger.getInstance(StepikConnectorGet.class.getName());
     private static final String stepikUrl = "https://stepik.org/";
     public static final String PYCHARM_PREFIX = "pycharm";
     public static final String CODE_PREFIX = "code";
@@ -94,7 +94,7 @@ public class StepikConnectorGet {
         try {
             uri = new URIBuilder(EduStepikNames.STEPIK_API_URL + link).addParameters(nvps).build();
         } catch (URISyntaxException e) {
-            LOG.warn(e.getMessage());
+            logger.warn(e.getMessage());
             return null;
         }
         final HttpGet request = new HttpGet(uri);
@@ -120,7 +120,7 @@ public class StepikConnectorGet {
             }
             return result;
         } catch (IOException e) {
-            LOG.error("Cannot load course list " + e.getMessage());
+            logger.error("Cannot load course list " + e.getMessage());
         }
         return Collections.singletonList(CourseInfo.INVALID_COURSE);
     }
@@ -136,7 +136,7 @@ public class StepikConnectorGet {
             }
             return result;
         } catch (IOException e) {
-            LOG.error("Cannot load course list " + e.getMessage());
+            logger.error("Cannot load course list " + e.getMessage());
         }
         return Collections.singletonList(CourseInfo.INVALID_COURSE);
     }
@@ -251,7 +251,7 @@ public class StepikConnectorGet {
             }
             return course;
         } catch (IOException e) {
-            LOG.error("IOException " + e.getMessage());
+            logger.error("IOException " + e.getMessage());
             return null;
         }
     }
@@ -433,7 +433,7 @@ public class StepikConnectorGet {
         try {
             return getFromStepik(EduStepikNames.CURRENT_USER, StepikWrappers.AuthorWrapper.class);
         } catch (IOException e) {
-            LOG.warn("Couldn't get author info");
+            logger.warn("Couldn't get author info");
         }
         return null;
     }
@@ -443,7 +443,7 @@ public class StepikConnectorGet {
         try {
             return getFromStepik(url, StepikWrappers.ResultSubmissionWrapper.class);
         } catch (IOException e) {
-            LOG.warn("Couldn't get Submission");
+            logger.warn("Couldn't get Submission");
             return null;
         }
     }
@@ -470,9 +470,9 @@ public class StepikConnectorGet {
             }
             return ids;
         } catch (IOException e) {
-            LOG.warn(e.getMessage());
+            logger.warn(e.getMessage());
         } catch (URISyntaxException e) {
-            LOG.warn(e.getMessage());
+            logger.warn(e.getMessage());
         }
         return Collections.emptyList();
     }
@@ -484,7 +484,7 @@ public class StepikConnectorGet {
                     StepikConnectorLogin.getHttpClient(),
                     nvps);
         } catch (IOException e) {
-            LOG.warn("Can't get submissions\n" + e.getMessage());
+            logger.warn("Can't get submissions\n" + e.getMessage());
             return null;
         }
     }
@@ -495,7 +495,7 @@ public class StepikConnectorGet {
                     StepikWrappers.UnitContainer.class,
                     StepikConnectorLogin.getHttpClient());
         } catch (IOException e) {
-            LOG.warn("Can't get Units\n" + e.getMessage());
+            logger.warn("Can't get Units\n" + e.getMessage());
             return null;
         }
     }
@@ -505,7 +505,7 @@ public class StepikConnectorGet {
             return getFromStepik(EduStepikNames.SECTIONS + sectionId, StepikWrappers.SectionContainer.class,
                     StepikConnectorLogin.getHttpClient());
         } catch (IOException e) {
-            LOG.warn("Can't get Sections\n" + e.getMessage());
+            logger.warn("Can't get Sections\n" + e.getMessage());
             return null;
         }
     }
@@ -515,7 +515,7 @@ public class StepikConnectorGet {
             return getFromStepik(EduStepikNames.COURSES + "/" + courseId, StepikWrappers.CoursesContainer.class,
                     StepikConnectorLogin.getHttpClient());
         } catch (IOException e) {
-            LOG.warn("Can't get courses Info\n" + e.getMessage());
+            logger.warn("Can't get courses Info\n" + e.getMessage());
             return null;
         }
     }

@@ -58,7 +58,7 @@ import static com.jetbrains.tmp.learning.stepik.StepikConnectorGet.getFromStepik
 public class EduAdaptiveStepikConnector {
     public static final String PYTHON27 = "python27";
     public static final String PYTHON3 = "python3";
-    private static final Logger LOG = Logger.getInstance(EduAdaptiveStepikConnector.class);
+    private static final Logger logger = Logger.getInstance(EduAdaptiveStepikConnector.class);
     private static final int CONNECTION_TIMEOUT = 60 * 1000;
 
     @Nullable
@@ -102,16 +102,16 @@ public class EduAdaptiveStepikConnector {
                             }
                         }
 
-                        LOG.warn("Got a lesson without code part as a recommendation");
+                        logger.warn("Got a lesson without code part as a recommendation");
                     } else {
-                        LOG.warn("Got unexpected number of lessons: " + lessonContainer.lessons.size());
+                        logger.warn("Got unexpected number of lessons: " + lessonContainer.lessons.size());
                     }
                 }
             } else {
                 throw new IOException("Stepik returned non 200 status code: " + responseString);
             }
         } catch (IOException e) {
-            LOG.warn(e.getMessage());
+            logger.warn(e.getMessage());
 
             final String connectionMessages = "Connection problems, Please, try again";
             final Balloon balloon =
@@ -125,7 +125,7 @@ public class EduAdaptiveStepikConnector {
             });
 
         } catch (URISyntaxException e) {
-            LOG.warn(e.getMessage());
+            logger.warn(e.getMessage());
         }
         return null;
     }
@@ -154,7 +154,7 @@ public class EduAdaptiveStepikConnector {
         final StepikWrappers.UnitContainer unitContainer = getFromStepik(unitsUrl.toString(),
                 StepikWrappers.UnitContainer.class);
         if (unitContainer.units.size() != 1) {
-            LOG.warn("Got unexpected numbers of units: " + unitContainer.units.size());
+            logger.warn("Got unexpected numbers of units: " + unitContainer.units.size());
             return;
         }
 
@@ -174,11 +174,11 @@ public class EduAdaptiveStepikConnector {
                 //setHeaders(post, EduStepikNames.CONTENT_TYPE_APPL_JSON);
                 final CloseableHttpResponse viewPostResult = client.execute(post);
                 if (viewPostResult.getStatusLine().getStatusCode() != HttpStatus.SC_CREATED) {
-                    LOG.warn("Error while Views post, code: " + viewPostResult.getStatusLine().getStatusCode());
+                    logger.warn("Error while Views post, code: " + viewPostResult.getStatusLine().getStatusCode());
                 }
             }
         } else {
-            LOG.warn("Got assignments of incorrect length: " + assignments.assignments.size());
+            logger.warn("Got assignments of incorrect length: " + assignments.assignments.size());
         }
     }
 
@@ -200,12 +200,12 @@ public class EduAdaptiveStepikConnector {
             if (execute.getStatusLine().getStatusCode() == HttpStatus.SC_CREATED) {
                 return true;
             } else {
-                LOG.warn("Stepik returned non-201 status code: " + execute.getStatusLine().getStatusCode() + " " +
+                logger.warn("Stepik returned non-201 status code: " + execute.getStatusLine().getStatusCode() + " " +
                         EntityUtils.toString(execute.getEntity()));
                 return false;
             }
         } catch (IOException e) {
-            LOG.warn(e.getMessage());
+            logger.warn(e.getMessage());
         }
         return false;
     }
@@ -249,7 +249,7 @@ public class EduAdaptiveStepikConnector {
                                                             taskFiles.get(
                                                                     EduStepikNames.DEFAULT_TASKFILE_NAME).text)));
                         } else {
-                            LOG.warn("Got task without unexpected number of task files: " + taskFiles.size());
+                            logger.warn("Got task without unexpected number of task files: " + taskFiles.size());
                         }
 
                         final File lessonDirectory = new File(course.getCourseDirectory(),
@@ -283,7 +283,7 @@ public class EduAdaptiveStepikConnector {
                                                     new File(course.getCourseDirectory(), lessonDir.getName()),
                                                     project);
                                         } catch (IOException e) {
-                                            LOG.warn(e.getMessage());
+                                            logger.warn(e.getMessage());
                                         }
                                     }));
                         }
@@ -300,7 +300,7 @@ public class EduAdaptiveStepikConnector {
                     ProjectView.getInstance(project).refresh();
                 });
             } else {
-                LOG.warn("Recommendation reactions weren't posted");
+                logger.warn("Recommendation reactions weren't posted");
                 ApplicationManager.getApplication().invokeLater(() -> StudyUtils.showErrorPopupOnToolbar(project));
             }
         }
@@ -328,10 +328,10 @@ public class EduAdaptiveStepikConnector {
                         }
                     }
                 } else {
-                    LOG.warn("Task directory is null");
+                    logger.warn("Task directory is null");
                 }
             } catch (IOException e) {
-                LOG.warn(e.getMessage());
+                logger.warn(e.getMessage());
             }
         }));
     }
@@ -416,7 +416,7 @@ public class EduAdaptiveStepikConnector {
         try {
             attemptId = getAttemptId(project, task);
         } catch (IOException e) {
-            LOG.warn(e.getMessage());
+            logger.warn(e.getMessage());
         }
         if (attemptId != -1) {
             final Editor editor = StudyUtils.getSelectedEditor(project);
@@ -436,14 +436,14 @@ public class EduAdaptiveStepikConnector {
                         final boolean isSolved = !wrapper.submissions[0].status.equals("wrong");
                         return Pair.create(isSolved, wrapper.submissions[0].hint);
                     } else {
-                        LOG.warn("Got a submission wrapper with incorrect submissions number: " + wrapper.submissions.length);
+                        logger.warn("Got a submission wrapper with incorrect submissions number: " + wrapper.submissions.length);
                     }
                 } else {
-                    LOG.warn("User is null");
+                    logger.warn("User is null");
                 }
             }
         } else {
-            LOG.warn("Got an incorrect attempt id: " + attemptId);
+            logger.warn("Got an incorrect attempt id: " + attemptId);
         }
         return Pair.create(false, "");
     }
@@ -464,13 +464,13 @@ public class EduAdaptiveStepikConnector {
             try {
                 httpPost.setEntity(new StringEntity(new Gson().toJson(submissionToPostWrapper)));
             } catch (UnsupportedEncodingException e) {
-                LOG.warn(e.getMessage());
+                logger.warn(e.getMessage());
             }
             response = client.execute(httpPost);
             return new Gson().fromJson(EntityUtils.toString(response.getEntity()),
                     StepikWrappers.ResultSubmissionWrapper.class);
         } catch (IOException e) {
-            LOG.warn(e.getMessage());
+            logger.warn(e.getMessage());
         }
         return null;
     }
@@ -497,11 +497,11 @@ public class EduAdaptiveStepikConnector {
                 wrapper = new Gson().fromJson(entity, StepikWrappers.ResultSubmissionWrapper.class);
             }
         } catch (InterruptedException e) {
-            LOG.warn(e.getMessage());
+            logger.warn(e.getMessage());
         } catch (IOException e) {
-            LOG.warn(e.getMessage());
+            logger.warn(e.getMessage());
         } catch (URISyntaxException e) {
-            LOG.warn(e.getMessage());
+            logger.warn(e.getMessage());
         }
         return wrapper;
     }

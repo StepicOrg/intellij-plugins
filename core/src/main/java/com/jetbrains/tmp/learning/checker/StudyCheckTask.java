@@ -30,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class StudyCheckTask extends com.intellij.openapi.progress.Task.Backgroundable {
 
-    private static final Logger LOG = Logger.getInstance(StudyCheckTask.class);
+    private static final Logger logger = Logger.getInstance(StudyCheckTask.class);
     private final Project myProject;
     protected final StudyState myStudyState;
     protected final Task myTask;
@@ -126,7 +126,7 @@ public class StudyCheckTask extends com.intellij.openapi.progress.Task.Backgroun
             String stderr = output.getStderr();
             if (!stderr.isEmpty()) {
                 //log error output of tests
-                LOG.info("#educational " + stderr);
+                logger.info("#educational " + stderr);
             }
             return testsOutput;
         }
@@ -214,7 +214,7 @@ public class StudyCheckTask extends com.intellij.openapi.progress.Task.Backgroun
                 }
             }
         } else {
-            LOG.warn("No configurator is provided for the plugin");
+            logger.warn("No configurator is provided for the plugin");
         }
     }
 

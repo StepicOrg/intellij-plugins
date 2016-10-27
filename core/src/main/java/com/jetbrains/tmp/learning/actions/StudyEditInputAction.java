@@ -43,7 +43,7 @@ import java.util.Map;
 
 public class StudyEditInputAction extends DumbAwareAction {
 
-    private static final Logger LOG = Logger.getInstance(StudyEditInputAction.class.getName());
+    private static final Logger logger = Logger.getInstance(StudyEditInputAction.class.getName());
     private JBEditorTabs tabbedPane;
     private Map<TabInfo, UserTest> myEditableTabs = new HashMap<TabInfo, UserTest>();
 
@@ -124,7 +124,7 @@ public class StudyEditInputAction extends DumbAwareAction {
             printWriter = new PrintWriter(new FileOutputStream(file));
             printWriter.print(buffer.toString());
         } catch (FileNotFoundException e) {
-            LOG.error(e);
+            logger.error(e);
         } finally {
             StudyUtils.closeSilently(printWriter);
         }
@@ -220,7 +220,7 @@ public class StudyEditInputAction extends DumbAwareAction {
             if (testInputFile.delete() && testOutputFile.delete()) {
                 EduUtils.synchronize();
             } else {
-                LOG.error("failed to delete user tests");
+                logger.error("failed to delete user tests");
             }
             final Project project = e.getProject();
             if (project != null) {

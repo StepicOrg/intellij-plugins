@@ -29,7 +29,7 @@ public class StudySmartChecker {
 
     }
 
-    private static final Logger LOG = Logger.getInstance(StudySmartChecker.class);
+    private static final Logger logger = Logger.getInstance(StudySmartChecker.class);
 
     public static void smartCheck(
             @NotNull final AnswerPlaceholder placeholder,
@@ -83,12 +83,12 @@ public class StudySmartChecker {
                         StudyUtils.deleteFile(fileWindows);
                     }
                     if (!resourceFile.delete()) {
-                        LOG.error("failed to delete", resourceFile.getPath());
+                        logger.error("failed to delete", resourceFile.getPath());
                     }
                 }
             }
         } catch (ExecutionException | IOException e) {
-            LOG.error(e);
+            logger.error(e);
         }
     }
 }

@@ -45,7 +45,7 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class StudyToolWindow extends SimpleToolWindowPanel implements DataProvider, Disposable {
-    private static final Logger LOG = Logger.getInstance(StudyToolWindow.class);
+    private static final Logger logger = Logger.getInstance(StudyToolWindow.class);
     private static final String TASK_INFO_ID = "taskInfo";
     private static final String EMPTY_TASK_TEXT = "Please, open any task to see task description";
 
@@ -65,7 +65,7 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
     public void init(@NotNull final Project project, final boolean isToolwindow) {
         String taskText = StudyUtils.getTaskText(project);
         if (taskText == null) {
-            LOG.warn("task text is empty");
+            logger.warn("task text is empty");
             return;
         }
 
@@ -182,7 +182,7 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
         DefaultActionGroup group = new DefaultActionGroup();
         Course course = StudyTaskManager.getInstance(project).getCourse();
         if (course == null) {
-            LOG.warn("Course is null");
+            logger.warn("Course is null");
             return group;
         }
         StudyPluginConfigurator configurator = StudyUtils.getConfigurator(project);
@@ -191,7 +191,7 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
             addAdditionalActions(group);
             return group;
         } else {
-            LOG.warn("No configurator is provided for plugin");
+            logger.warn("No configurator is provided for plugin");
             return StudyBasePluginConfigurator.getDefaultActionGroup();
         }
     }
@@ -206,7 +206,7 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
     public void setTaskText(String text, VirtualFile taskDirectory, Project project) {
         if (StudyTaskManager.getInstance(project).isTurnEditingMode()) {
             if (taskDirectory == null) {
-                LOG.info("Failed to enter editing mode for StudyToolWindow");
+                logger.info("Failed to enter editing mode for StudyToolWindow");
                 return;
             }
             VirtualFile taskTextFile = StudyUtils.findTaskDescriptionVirtualFile(taskDirectory);

@@ -30,7 +30,7 @@ public class EduUtils {
     private EduUtils() {
     }
 
-    private static final Logger LOG = Logger.getInstance(EduUtils.class.getName());
+    private static final Logger logger = Logger.getInstance(EduUtils.class.getName());
 
     public static final Comparator<StudyItem> INDEX_COMPARATOR = (o1, o2) -> o1.getIndex() - o2.getIndex();
 
@@ -70,7 +70,7 @@ public class EduUtils {
         VirtualFile fileWindows = null;
         final Document document = FileDocumentManager.getInstance().getDocument(file);
         if (document == null) {
-            LOG.debug("Couldn't flush windows");
+            logger.debug("Couldn't flush windows");
             return null;
         }
         if (taskDir != null) {
@@ -89,7 +89,7 @@ public class EduUtils {
                 ApplicationManager.getApplication()
                         .runWriteAction(() -> FileDocumentManager.getInstance().saveDocument(document));
             } catch (IOException e) {
-                LOG.error(e);
+                logger.error(e);
             } finally {
                 if (printWriter != null) {
                     printWriter.close();
@@ -116,7 +116,7 @@ public class EduUtils {
             try {
                 file.delete(project);
             } catch (IOException e) {
-                LOG.error(e);
+                logger.error(e);
             }
         }
 
@@ -127,7 +127,7 @@ public class EduUtils {
                 try {
                     answerFile.copy(answerFileDir, userFileDir, taskFileName);
                 } catch (IOException e) {
-                    LOG.error(e);
+                    logger.error(e);
                 }
             }
             return;
@@ -135,12 +135,12 @@ public class EduUtils {
         try {
             userFileDir.createChildData(project, taskFileName);
         } catch (IOException e) {
-            LOG.error(e);
+            logger.error(e);
         }
 
         file = userFileDir.findChild(taskFileName);
         if (file == null) {
-            LOG.info("Failed to find task file " + taskFileName);
+            logger.info("Failed to find task file " + taskFileName);
             return;
         }
         VirtualFile answerFile = answerFileDir.findChild(taskFileName);
@@ -174,7 +174,7 @@ public class EduUtils {
             final AnswerPlaceholder answerPlaceholder = taskFile.getAnswerPlaceholders().get(i);
             int offset = answerPlaceholder.getOffset();
             if (offset > document.getTextLength() || offset + answerPlaceholder.getPossibleAnswerLength() > document.getTextLength()) {
-                LOG.error("Wrong startOffset: " + answerPlaceholder.getOffset() + "; document: " + file.getPath());
+                logger.error("Wrong startOffset: " + answerPlaceholder.getOffset() + "; document: " + file.getPath());
                 return;
             }
             replaceAnswerPlaceholder(project, document, answerPlaceholder);
@@ -220,7 +220,7 @@ public class EduUtils {
                 try {
                     fileWindows.delete(taskDir);
                 } catch (IOException e) {
-                    LOG.warn("Tried to delete non existed _windows file");
+                    logger.warn("Tried to delete non existed _windows file");
                 }
             });
         }

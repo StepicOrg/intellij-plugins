@@ -77,7 +77,7 @@ public class StudyUtils {
     private StudyUtils() {
     }
 
-    private static final Logger LOG = Logger.getInstance(StudyUtils.class.getName());
+    private static final Logger logger = Logger.getInstance(StudyUtils.class.getName());
     private static final String EMPTY_TASK_TEXT = "Please, open any task to see task description";
     private static final String ourPrefix = "<html><head><script type=\"text/x-mathjax-config\">\n" +
             "            MathJax.Hub.Config({\n" +
@@ -147,7 +147,7 @@ public class StudyUtils {
             }
             return wrapHTML ? UIUtil.toHtml(taskText.toString()) : taskText.toString();
         } catch (IOException e) {
-            LOG.info("Failed to get file text from file " + fileName, e);
+            logger.info("Failed to get file text from file " + fileName, e);
         } finally {
             closeSilently(reader);
         }
@@ -173,7 +173,7 @@ public class StudyUtils {
             if (taskText != null) {
                 studyToolWindow.setTaskText(taskText, null, project);
             } else {
-                LOG.warn("Task text is null");
+                logger.warn("Task text is null");
             }
             studyToolWindow.updateCourseProgress(project);
         }
@@ -209,7 +209,7 @@ public class StudyUtils {
         try {
             file.delete(StudyUtils.class);
         } catch (IOException e) {
-            LOG.error(e);
+            logger.error(e);
         }
     }
 
@@ -536,7 +536,7 @@ public class StudyUtils {
             try {
                 return FileUtil.loadTextAndClose(taskTextFile.getInputStream());
             } catch (IOException e) {
-                LOG.info(e);
+                logger.info(e);
             }
         }
         return null;
@@ -610,10 +610,10 @@ public class StudyUtils {
             }
         }
         if (studyProject == null) {
-            LOG.info("return default project");
+            logger.info("return default project");
             return ProjectManager.getInstance().getDefaultProject();
         }
-        LOG.info("return regular project");
+        logger.info("return regular project");
         return studyProject;
     }
 
@@ -685,7 +685,7 @@ public class StudyUtils {
         try {
             result = future.get();
         } catch (InterruptedException | ExecutionException e) {
-            LOG.warn(e.getMessage());
+            logger.warn(e.getMessage());
         }
         return result;
     }

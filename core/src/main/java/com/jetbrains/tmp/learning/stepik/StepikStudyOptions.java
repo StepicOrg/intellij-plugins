@@ -35,7 +35,7 @@ import java.awt.event.FocusListener;
 
 public class StepikStudyOptions implements StudyOptionsProvider {
     private static final String DEFAULT_PASSWORD_TEXT = "************";
-    private static final Logger LOG = Logger.getInstance(StepikStudyOptions.class);
+    private static final Logger logger = Logger.getInstance(StepikStudyOptions.class);
     private JTextField myLoginTextField;
     private JPasswordField myPasswordField;
     private JPanel myPane;
@@ -114,7 +114,7 @@ public class StepikStudyOptions implements StudyOptionsProvider {
             }
             resetCredentialsModification();
         } else {
-            LOG.warn("No study object is opened");
+            logger.warn("No study object is opened");
         }
     }
 
@@ -135,7 +135,7 @@ public class StepikStudyOptions implements StudyOptionsProvider {
                     StepikConnectorLogin.minorLogin(new StepikUser(getLogin(), getPassword()));
                 }
             } else {
-                LOG.warn("No study object is opened");
+                logger.warn("No study object is opened");
             }
         }
         resetCredentialsModification();

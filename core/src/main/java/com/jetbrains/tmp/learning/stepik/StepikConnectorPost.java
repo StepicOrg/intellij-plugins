@@ -56,7 +56,7 @@ import java.util.List;
 import java.util.Map;
 
 public class StepikConnectorPost {
-    private static final Logger LOG = Logger.getInstance(StepikConnectorPost.class.getName());
+    private static final Logger logger = Logger.getInstance(StepikConnectorPost.class.getName());
     static final private Gson GSON =
             new GsonBuilder().registerTypeAdapter(TaskFile.class,
                     new StudySerializationUtils.Json.StepikTaskFileAdapter())
@@ -89,8 +89,8 @@ public class StepikConnectorPost {
         if (statusLine.getStatusCode() / 100 != 2) {
             throw new IOException("Stepik returned " + statusLine.getStatusCode() + " status code " + responseString);
         }
-        //LOG.info("request "+requestBody);
-        //LOG.info("response "+responseString);
+        //logger.info("request "+requestBody);
+        //logger.info("response "+responseString);
         return GSON.fromJson(responseString, container);
     }
 
@@ -105,8 +105,8 @@ public class StepikConnectorPost {
         if (statusLine.getStatusCode() / 100 != 2) {
             throw new IOException("Stepik returned " + statusLine.getStatusCode() + " status code " + responseString);
         }
-        //LOG.info("request "+requestBody);
-        //LOG.info("response "+responseString);
+        //logger.info("request "+requestBody);
+        //logger.info("response "+responseString);
         return;
     }
 
@@ -116,7 +116,7 @@ public class StepikConnectorPost {
         try {
             return postToStepik(EduStepikNames.ATTEMPTS, StepikWrappers.AttemptContainer.class, requestBody);
         } catch (IOException e) {
-            LOG.warn("Can not get Attempt\n" + e.toString());
+            logger.warn("Can not get Attempt\n" + e.toString());
             throw new NullPointerException(e.getMessage());
             //      return null;
         }
@@ -128,7 +128,7 @@ public class StepikConnectorPost {
         try {
             return postToStepik(EduStepikNames.SUBMISSIONS, StepikWrappers.SubmissionContainer.class, requestBody);
         } catch (IOException e) {
-            LOG.warn("Can not post Submission\n" + e.toString());
+            logger.warn("Can not post Submission\n" + e.toString());
             return null;
         }
     }
@@ -138,7 +138,7 @@ public class StepikConnectorPost {
         try {
             return postToStepik(EduStepikNames.SUBMISSIONS, StepikWrappers.SubmissionContainer.class, requestBody);
         } catch (IOException e) {
-            LOG.warn("Can not post Submission\n" + e.toString());
+            logger.warn("Can not post Submission\n" + e.toString());
             return null;
         }
     }
@@ -159,7 +159,7 @@ public class StepikConnectorPost {
             final String attemptResponseString = responseEntity != null ? EntityUtils.toString(responseEntity) : "";
             final StatusLine statusLine = attemptResponse.getStatusLine();
             if (statusLine.getStatusCode() != HttpStatus.SC_CREATED) {
-                LOG.error("Failed to make attempt " + attemptResponseString);
+                logger.error("Failed to make attempt " + attemptResponseString);
             }
             final StepikWrappers.AttemptWrapper.Attempt attempt =
                     new Gson().fromJson(attemptResponseString, StepikWrappers.AttemptContainer.class).attempts.get(0);
@@ -172,7 +172,7 @@ public class StepikConnectorPost {
             //postSubmission(passed, attempt, files);
             postSubmission(true, attempt, files);
         } catch (IOException e) {
-            LOG.error(e.getMessage());
+            logger.error(e.getMessage());
         }
     }
 
@@ -192,7 +192,7 @@ public class StepikConnectorPost {
         final String responseString = responseEntity != null ? EntityUtils.toString(responseEntity) : "";
         final StatusLine line = response.getStatusLine();
         if (line.getStatusCode() != HttpStatus.SC_CREATED) {
-            LOG.error("Failed to make submission " + responseString);
+            logger.error("Failed to make submission " + responseString);
         }
     }
 
@@ -203,7 +203,7 @@ public class StepikConnectorPost {
             return postToStepik(EduStepikNames.ENROLLMENTS,
                     new StringEntity(new GsonBuilder().create().toJson(enrollment)));
         } catch (IOException e) {
-            LOG.warn("EnrollToCourse error\n" + e.getMessage());
+            logger.warn("EnrollToCourse error\n" + e.getMessage());
         }
         return false;
     }
@@ -238,7 +238,7 @@ public class StepikConnectorPost {
             final String attemptResponseString = responseEntity != null ? EntityUtils.toString(responseEntity) : "";
             final StatusLine statusLine = attemptResponse.getStatusLine();
             if (statusLine.getStatusCode() != HttpStatus.SC_CREATED) {
-                LOG.error("Failed to make attempt " + attemptResponseString);
+                logger.error("Failed to make attempt " + attemptResponseString);
             }
             final StepikWrappers.AttemptWrapper.Attempt attempt =
                     new Gson().fromJson(attemptResponseString, StepikWrappers.AttemptContainer.class).attempts.get(0);
@@ -250,7 +250,7 @@ public class StepikConnectorPost {
             }
             postSubmission(passed, attempt, files);
         } catch (IOException e) {
-            LOG.error(e.getMessage());
+            logger.error(e.getMessage());
         }
     }
 
@@ -301,7 +301,7 @@ public class StepikConnectorPost {
                     StepikConnectorLogin.loginFromDialog(project);
                     postCourse(project, course, true, indicator);
                 }
-                LOG.error("Failed to push " + responseString);
+                logger.error("Failed to push " + responseString);
                 return;
             }
             final CourseInfo postedCourse = new Gson().fromJson(responseString,
@@ -318,7 +318,7 @@ public class StepikConnectorPost {
             ApplicationManager.getApplication()
                     .runReadAction(() -> postAdditionalFiles(project, postedCourse.id, indicator));
         } catch (IOException e) {
-            LOG.error(e.getMessage());
+            logger.error(e.getMessage());
         }
     }
 
@@ -355,7 +355,7 @@ public class StepikConnectorPost {
                         }
                     }
                 } catch (IOException e) {
-                    LOG.error("Can't find file " + file.getPath());
+                    logger.error("Can't find file " + file.getPath());
                 }
             }
             lesson.addTask(task);
@@ -382,10 +382,10 @@ public class StepikConnectorPost {
             final String responseString = responseEntity != null ? EntityUtils.toString(responseEntity) : "";
             final StatusLine line = response.getStatusLine();
             if (line.getStatusCode() != HttpStatus.SC_CREATED) {
-                LOG.error("Failed to push " + responseString);
+                logger.error("Failed to push " + responseString);
             }
         } catch (IOException e) {
-            LOG.error(e.getMessage());
+            logger.error(e.getMessage());
         }
     }
 
@@ -406,14 +406,14 @@ public class StepikConnectorPost {
             final String responseString = responseEntity != null ? EntityUtils.toString(responseEntity) : "";
             final StatusLine line = response.getStatusLine();
             if (line.getStatusCode() != HttpStatus.SC_CREATED) {
-                LOG.error("Failed to push " + responseString);
+                logger.error("Failed to push " + responseString);
             }
             final StepikWrappers.Section
                     postedSection = new Gson().fromJson(responseString,
                     StepikWrappers.SectionContainer.class).sections.get(0);
             return postedSection.id;
         } catch (IOException e) {
-            LOG.error(e.getMessage());
+            logger.error(e.getMessage());
         }
         return -1;
     }
@@ -437,7 +437,7 @@ public class StepikConnectorPost {
             final String responseString = responseEntity != null ? EntityUtils.toString(responseEntity) : "";
             final StatusLine line = response.getStatusLine();
             if (line.getStatusCode() != HttpStatus.SC_CREATED) {
-                LOG.error("Failed to push " + responseString);
+                logger.error("Failed to push " + responseString);
                 return 0;
             }
             final Lesson postedLesson = new Gson().fromJson(responseString, Course.class).getLessons().get(0);
@@ -448,7 +448,7 @@ public class StepikConnectorPost {
             }
             return postedLesson.getId();
         } catch (IOException e) {
-            LOG.error(e.getMessage());
+            logger.error(e.getMessage());
         }
         return -1;
     }
@@ -468,10 +468,10 @@ public class StepikConnectorPost {
                 if (line.getStatusCode() != HttpStatus.SC_CREATED) {
                     final HttpEntity responseEntity = response.getEntity();
                     final String responseString = responseEntity != null ? EntityUtils.toString(responseEntity) : "";
-                    LOG.error("Failed to push " + responseString);
+                    logger.error("Failed to push " + responseString);
                 }
             } catch (IOException e) {
-                LOG.error(e.getMessage());
+                logger.error(e.getMessage());
             }
         });
     }
@@ -485,7 +485,7 @@ public class StepikConnectorPost {
         CloseableHttpClient ourClient = StepikConnectorLogin.getHttpClient();
         if (ourClient == null) {
             if (!StepikConnectorLogin.loginFromDialog(project)) {
-                LOG.error("Failed to push lesson");
+                logger.error("Failed to push lesson");
                 return 0;
             }
         }
@@ -499,7 +499,7 @@ public class StepikConnectorPost {
             final String responseString = responseEntity != null ? EntityUtils.toString(responseEntity) : "";
             final StatusLine line = response.getStatusLine();
             if (line.getStatusCode() != HttpStatus.SC_OK) {
-                LOG.error("Failed to push " + responseString);
+                logger.error("Failed to push " + responseString);
                 return 0;
             }
             final Lesson postedLesson = new Gson().fromJson(responseString, Course.class).getLessons().get(0);
@@ -513,7 +513,7 @@ public class StepikConnectorPost {
             }
             return lesson.getId();
         } catch (IOException e) {
-            LOG.error(e.getMessage());
+            logger.error(e.getMessage());
         }
         return -1;
     }
@@ -528,21 +528,21 @@ public class StepikConnectorPost {
                 if (line.getStatusCode() != HttpStatus.SC_NO_CONTENT) {
                     final HttpEntity responseEntity = response.getEntity();
                     final String responseString = responseEntity != null ? EntityUtils.toString(responseEntity) : "";
-                    LOG.error("Failed to delete task " + responseString);
+                    logger.error("Failed to delete task " + responseString);
                 }
             } catch (IOException e) {
-                LOG.error(e.getMessage());
+                logger.error(e.getMessage());
             }
         });
     }
 
     public static void postMetric(StepikWrappers.MetricsWrapper metric) {
         String requestBody = GSON.toJson(metric);
-        LOG.info(requestBody.toString());
+        logger.info(requestBody.toString());
         try {
             postToStepikVoid(EduStepikNames.METRICS, StepikWrappers.MetricsWrapper.class, requestBody);
         } catch (IOException e) {
-            LOG.warn("Can't post a metric\n" + e.toString());
+            logger.warn("Can't post a metric\n" + e.toString());
         }
     }
 
