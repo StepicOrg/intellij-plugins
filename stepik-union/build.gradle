@@ -7,6 +7,15 @@ dependencies {
     compile project(":core")
 }
 
+jar {
+    into('/') {
+        from "${project(":core").getBuildDir()}/classes/main"
+    }
+    into('/') {
+        from "${project(":core").getBuildDir()}/resources/main"
+    }
+}
+
 group 'org.stepik'
 version pluginVersion // This version will path to plugin.xml
 
