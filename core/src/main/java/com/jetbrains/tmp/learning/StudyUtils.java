@@ -513,7 +513,7 @@ public class StudyUtils {
             stringBuilder.append("<b>Create project for this course again to see the link to the step.</b>");
         }
 
-        if (!task.getText().startsWith("<p>")) {
+        if (!task.getText().startsWith("<p>") && !task.getText().startsWith("<h") ) {
             stringBuilder.append("<br><br>");
         }
 
