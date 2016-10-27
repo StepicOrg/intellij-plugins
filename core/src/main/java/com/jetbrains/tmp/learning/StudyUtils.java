@@ -625,7 +625,7 @@ public class StudyUtils {
                     StudyProjectGenerator.ADAPTIVE_COURSE_PREFIX + course.getName()
                             + "_" + StudyTaskManager.getInstance(project).getUser().getEmail());
         } else {
-            courseDirectory = new File(StudyProjectGenerator.OUR_COURSES_DIR, course.getName());
+            courseDirectory = new File(StudyProjectGenerator.OUR_COURSES_DIR, Integer.toString(course.getId()));
         }
         return courseDirectory;
     }
