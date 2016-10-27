@@ -35,8 +35,8 @@ public class StepikConnectorInit {
 
     public static HttpClientBuilder getBuilder() {
         HttpConfigurable instance = HttpConfigurable.getInstance();
+        TrustManager[] trustAllCerts = getTrustAllCerts();
         try {
-            TrustManager[] trustAllCerts = getTrustAllCerts();
             SSLContext sslContext = SSLContext.getInstance("TLS");
             sslContext.init(null, trustAllCerts, new SecureRandom());
             HttpClientBuilder httpClientBuilder = HttpClients.custom()
