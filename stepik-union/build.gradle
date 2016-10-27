@@ -4,7 +4,13 @@ intellij {
 }
 
 dependencies {
-    compile project(":core")
+    compile project(':core')
+}
+
+jar {
+    into('/') {
+        from "${project(":core").getBuildDir()}/classes/main"
+    }
 }
 
 group 'org.stepik'
