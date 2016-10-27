@@ -513,7 +513,7 @@ public class StudyUtils {
             stringBuilder.append("<b>Create project for this course again to see the link to the step.</b>");
         }
 
-        if (!task.getText().startsWith("<p>")) {
+        if (!task.getText().startsWith("<p>") && !task.getText().startsWith("<h") ) {
             stringBuilder.append("<br><br>");
         }
 
@@ -625,7 +625,7 @@ public class StudyUtils {
                     StudyProjectGenerator.ADAPTIVE_COURSE_PREFIX + course.getName()
                             + "_" + StudyTaskManager.getInstance(project).getUser().getEmail());
         } else {
-            courseDirectory = new File(StudyProjectGenerator.OUR_COURSES_DIR, course.getName());
+            courseDirectory = new File(StudyProjectGenerator.OUR_COURSES_DIR, Integer.toString(course.getId()));
         }
         return courseDirectory;
     }

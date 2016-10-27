@@ -150,7 +150,7 @@ public class StudyTaskManager implements PersistentStateComponent<Element>, Dumb
                 if (version != VERSION) {
                     String updatedCoursePath = FileUtil.join(PathManager.getConfigPath(),
                             "courses",
-                            myCourse.getName());
+                            Integer.toString(myCourse.getId()));
                     if (new File(updatedCoursePath).exists()) {
                         myCourse.setCourseDirectory(updatedCoursePath);
                     }
