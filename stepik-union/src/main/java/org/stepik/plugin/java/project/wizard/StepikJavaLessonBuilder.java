@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.util.List;
 
 public class StepikJavaLessonBuilder extends JavaModuleBuilder implements LessonBuilder {
-    private static final Logger LOG = Logger.getInstance(StepikJavaLessonBuilder.class);
+    private static final Logger logger = Logger.getInstance(StepikJavaLessonBuilder.class);
     private final Lesson myLesson;
     private final Module myUtilModule;
     private List<Pair<String, String>> mySourcePaths;

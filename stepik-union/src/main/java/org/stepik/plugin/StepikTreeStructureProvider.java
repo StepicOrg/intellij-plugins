@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class StepikTreeStructureProvider implements TreeStructureProvider, DumbAware {
-    private static final Logger LOG = Logger.getInstance(StepikTreeStructureProvider.class);
+    private static final Logger logger = Logger.getInstance(StepikTreeStructureProvider.class);
 
     @NotNull
     @Override

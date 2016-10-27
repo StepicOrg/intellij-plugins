@@ -34,7 +34,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilder {
-    private static final Logger LOG = Logger.getInstance(JavaCourseBuilder.class);
+    private static final Logger logger = Logger.getInstance(JavaCourseBuilder.class);
     private StepikProjectGenerator generator;
     private List<Pair<String, String>> mySourcePaths;
     static Module utilModule;
@@ -54,7 +54,7 @@ public class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilde
 
         Course course = StudyTaskManager.getInstance(project).getCourse();
         if (course == null) {
-            LOG.info("failed to generate builders");
+            logger.info("failed to generate builders");
             return;
         }
         course.setCourseMode(EduNames.STEPIK_CODE);
@@ -64,7 +64,7 @@ public class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilde
             return;
         }
 
-        LOG.info("Module dir = " + moduleDir);
+        logger.info("Module dir = " + moduleDir);
         EduUtilModuleBuilder utilModuleBuilder = new EduUtilModuleBuilder(moduleDir);
         utilModule = utilModuleBuilder.createModule(moduleModel);
 
@@ -125,7 +125,7 @@ public class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilde
             throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
         Module baseModule = super.createModule(moduleModel);
         Project project = baseModule.getProject();
-        LOG.info("create module - login");
+        logger.info("create module - login");
         StepikConnectorLogin.loginFromDialog(project);
         createCourseFromGenerator(moduleModel, project, getGenerator());
         return baseModule;

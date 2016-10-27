@@ -16,13 +16,13 @@ import java.util.List;
 import static com.jetbrains.tmp.learning.StudyUtils.execCancelable;
 
 public class EduProjectGenerator extends StudyProjectGenerator {
-    private static final Logger LOG = Logger.getInstance(EduProjectGenerator.class);
+    private static final Logger logger = Logger.getInstance(EduProjectGenerator.class);
 
     @Override
     public void generateProject(@NotNull Project project, @NotNull VirtualFile baseDir) {
         final Course course = getCourse(project);
         if (course == null) {
-            LOG.warn("EduProjectGenerator: Failed to get builders");
+            logger.warn("EduProjectGenerator: Failed to get builders");
             return;
         }
         //need this not to update builders

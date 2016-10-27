@@ -23,7 +23,7 @@ import javax.swing.*;
 import java.util.Map;
 
 public abstract class StepikTaskNavigationAction extends StudyTaskNavigationAction {
-    private static final Logger LOG = Logger.getInstance(StepikTaskNavigationAction.class);
+    private static final Logger logger = Logger.getInstance(StepikTaskNavigationAction.class);
 
     public StepikTaskNavigationAction(@Nullable String text, @Nullable String description, @Nullable Icon icon) {
         super(text, description, icon);

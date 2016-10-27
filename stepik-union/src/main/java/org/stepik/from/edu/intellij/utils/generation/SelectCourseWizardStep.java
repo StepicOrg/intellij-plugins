@@ -38,7 +38,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class SelectCourseWizardStep extends ModuleWizardStep {
-    private static final Logger LOG = Logger.getInstance(SelectCourseWizardStep.class);
+    private static final Logger logger = Logger.getInstance(SelectCourseWizardStep.class);
     private final static String COURSE_LIST = "Course list";
     private final static String COURSE_LINK = "Course link";
 

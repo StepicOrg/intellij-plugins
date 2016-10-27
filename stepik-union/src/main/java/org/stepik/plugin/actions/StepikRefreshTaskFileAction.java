@@ -41,7 +41,7 @@ import javax.swing.*;
 public class StepikRefreshTaskFileAction extends StudyActionWithShortcut {
     private static final String ACTION_ID = "STEPIK.RefreshTaskAction";
     private static final String SHORTCUT = "ctrl shift pressed X";
-    private static final Logger LOG = Logger
+    private static final Logger logger = Logger
             .getInstance(StepikRefreshTaskFileAction.class.getName());
 
     public StepikRefreshTaskFileAction() {
@@ -56,7 +56,7 @@ public class StepikRefreshTaskFileAction extends StudyActionWithShortcut {
                     StudyEditor studyEditor = StudyUtils.getSelectedStudyEditor(project);
                     StudyState studyState = new StudyState(studyEditor);
                     if (studyEditor == null || !studyState.isValid()) {
-                        LOG.info("RefreshTaskFileAction was invoked outside of Study Editor");
+                        logger.info("RefreshTaskFileAction was invoked outside of Study Editor");
                         return;
                     }
                     refreshFile(studyState, project);
