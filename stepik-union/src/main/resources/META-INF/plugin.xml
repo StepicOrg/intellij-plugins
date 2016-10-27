@@ -9,11 +9,17 @@
       Stepik plugin for code challenges on Python and Java.<br>
 
       To uses this plugin you have to have Stepik account and follow the course.<br>
+      <br>
+      Dependency:<br>
+      Educational plugin core<br>
+      <br>
+      Optional dependency:<br>
+      Python plugin<br>
+
     ]]></description>
 
     <depends>com.intellij.modules.lang</depends>
     <depends>com.jetbrains.edu.interactivelearning</depends>
-    <depends>com.intellij.modules.python</depends>
     <depends optional="true">PythonCore</depends>
 
     <extensions defaultExtensionNs="com.intellij">
