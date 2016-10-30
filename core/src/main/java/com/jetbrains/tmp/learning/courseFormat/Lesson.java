@@ -11,11 +11,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Lesson implements StudyItem {
-    @Transient public List<Integer> steps;
-    @Transient public List<String> tags;
-    @Transient boolean is_public;
-    @Transient int position;
-    @Transient private Course myCourse = null;
+    @Transient
+    public List<Integer> steps;
+    @Transient
+    public List<String> tags;
+    @Transient
+    boolean is_public;
+    @Transient
+    int position;
+    @Transient
+    private Section section = null;
 
     @Expose
     @SerializedName("id")
@@ -27,7 +32,7 @@ public class Lesson implements StudyItem {
 
     @Expose
     @SerializedName("task_list")
-    public List<Task> taskList = new ArrayList<Task>();
+    private List<Task> taskList = new ArrayList<>();
 
     // index is visible to user number of lesson from 1 to lesson number
     private int myIndex = -1;
@@ -35,9 +40,9 @@ public class Lesson implements StudyItem {
     public Lesson() {
     }
 
-    public void initLesson(final Course course, boolean isRestarted) {
-        setCourse(course);
-        for (Task task : getTaskList()) {
+    public void initLesson(final Section section, boolean isRestarted) {
+        setSection(section);
+        for (Task task : taskList) {
             task.initTask(this, isRestarted);
         }
     }
@@ -62,14 +67,8 @@ public class Lesson implements StudyItem {
         return taskList;
     }
 
-    @Transient
-    public Course getCourse() {
-        return myCourse;
-    }
-
-    @Transient
-    public void setCourse(Course course) {
-        myCourse = course;
+    public void setTaskList(List<Task> taskList) {
+        this.taskList = taskList;
     }
 
     public void addTask(@NotNull final Task task) {
@@ -90,6 +89,7 @@ public class Lesson implements StudyItem {
         return null;
     }
 
+    @Override
     public StudyStatus getStatus() {
         for (Task task : taskList) {
             if (task.getStatus() != StudyStatus.Solved) {
@@ -105,5 +105,15 @@ public class Lesson implements StudyItem {
 
     public void setId(int id) {
         this.myId = id;
+    }
+
+    @Transient
+    public Section getSection() {
+        return section;
+    }
+
+    @Transient
+    public void setSection(Section section) {
+        this.section = section;
     }
 }
