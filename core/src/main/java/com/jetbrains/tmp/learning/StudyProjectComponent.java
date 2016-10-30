@@ -53,7 +53,7 @@ public class StudyProjectComponent implements ProjectComponent {
     private static final Logger logger = Logger.getInstance(StudyProjectComponent.class.getName());
     private final Project myProject;
     private FileCreatedByUserListener myListener;
-    private Map<Keymap, List<Pair<String, String>>> myDeletedShortcuts = new HashMap<Keymap, List<Pair<String, String>>>();
+    private final Map<Keymap, List<Pair<String, String>>> myDeletedShortcuts = new HashMap<>();
 
     private StudyProjectComponent(@NotNull final Project project) {
         myProject = project;
@@ -73,34 +73,28 @@ public class StudyProjectComponent implements ProjectComponent {
         }
 
         registerStudyToolWindow(course);
-        ApplicationManager.getApplication().invokeLater(new DumbAwareRunnable() {
-            @Override
-            public void run() {
-                ApplicationManager.getApplication().runWriteAction(new DumbAwareRunnable() {
-                    @Override
-                    public void run() {
-                        if (course != null) {
-                            UISettings.getInstance().HIDE_TOOL_STRIPES = false;
-                            UISettings.getInstance().fireUISettingsChanged();
-                            logger.info("register Shortcuts");
-                            registerShortcuts();
-                            EduUsagesCollector.projectTypeOpened(course.isAdaptive() ?
-                                    EduNames.ADAPTIVE :
-                                    EduNames.STUDY);
-                            StepikConnectorLogin.loginFromDialog(myProject);
-                        }
-                    }
-                });
-            }
-        });
+        ApplicationManager.getApplication()
+                .invokeLater((DumbAwareRunnable) () -> ApplicationManager.getApplication()
+                        .runWriteAction((DumbAwareRunnable) () -> {
+                            if (course != null) {
+                                UISettings.getInstance().HIDE_TOOL_STRIPES = false;
+                                UISettings.getInstance().fireUISettingsChanged();
+                                logger.info("register Shortcuts");
+                                registerShortcuts();
+                                EduUsagesCollector.projectTypeOpened(course.isAdaptive() ?
+                                        EduNames.ADAPTIVE :
+                                        EduNames.STUDY);
+                                StepikConnectorLogin.loginFromDialog(myProject);
+                            }
+                        }));
     }
 
     public void registerStudyToolWindow(@Nullable final Course course) {
-        //if (course != null && ("PyCharm".equals(course.getCourseType()) || EduNames.STEPIK_CODE.equals(course.getCourseType()))) {
         if (course != null) {
             final ToolWindowManager toolWindowManager = ToolWindowManager.getInstance(myProject);
             registerToolWindows(toolWindowManager);
-            final ToolWindow studyToolWindow = toolWindowManager.getToolWindow(StudyToolWindowFactory.STUDY_TOOL_WINDOW);
+            final ToolWindow studyToolWindow =
+                    toolWindowManager.getToolWindow(StudyToolWindowFactory.STUDY_TOOL_WINDOW);
             if (studyToolWindow != null) {
                 studyToolWindow.show(null);
                 StudyUtils.initToolWindows(myProject);
@@ -113,17 +107,15 @@ public class StudyProjectComponent implements ProjectComponent {
         if (window != null) {
             List<AnAction> actionsOnToolbar = window.getActions(true);
             if (actionsOnToolbar != null) {
-                for (AnAction action : actionsOnToolbar) {
-                    if (action instanceof StudyActionWithShortcut) {
-                        String id = ((StudyActionWithShortcut) action).getActionId();
-                        String[] shortcuts = ((StudyActionWithShortcut) action).getShortcuts();
-                        if (shortcuts != null) {
-                            addShortcut(id, shortcuts);
-                        }
-                    }
-                }
-//        addShortcut(StudyNextWindowAction.ACTION_ID, new String[]{StudyNextWindowAction.SHORTCUT, StudyNextWindowAction.SHORTCUT2});
-//        addShortcut(StudyPrevWindowAction.ACTION_ID, new String[]{StudyPrevWindowAction.SHORTCUT});
+                actionsOnToolbar.stream()
+                        .filter(action -> action instanceof StudyActionWithShortcut)
+                        .forEach(action -> {
+                            String id = ((StudyActionWithShortcut) action).getActionId();
+                            String[] shortcuts = ((StudyActionWithShortcut) action).getShortcuts();
+                            if (shortcuts != null) {
+                                addShortcut(id, shortcuts);
+                            }
+                        });
             } else {
                 logger.warn("Actions on toolbar are nulls");
             }
@@ -208,7 +200,7 @@ public class StudyProjectComponent implements ProjectComponent {
         for (Keymap keymap : keymapManager.getAllKeymaps()) {
             List<Pair<String, String>> pairs = myDeletedShortcuts.get(keymap);
             if (pairs == null) {
-                pairs = new ArrayList<Pair<String, String>>();
+                pairs = new ArrayList<>();
                 myDeletedShortcuts.put(keymap, pairs);
             }
             for (String shortcutString : shortcuts) {
@@ -312,19 +304,19 @@ public class StudyProjectComponent implements ProjectComponent {
                 final VirtualFile lessonDir = taskDir.getParent();
                 if (lessonDir != null && lessonDir.getName().contains(EduNames.LESSON)) {
                     int lessonIndex = EduUtils.getIndex(lessonDir.getName(), EduNames.LESSON);
-                    List<Lesson> lessons = course.getLessons();
-                    if (StudyUtils.indexIsValid(lessonIndex, lessons)) {
-                        final Lesson lesson = lessons.get(lessonIndex);
-                        final List<Task> tasks = lesson.getTaskList();
-                        if (StudyUtils.indexIsValid(taskIndex, tasks)) {
-                            final Task task = tasks.get(taskIndex);
-                            final TaskFile taskFile = new TaskFile();
-                            taskFile.initTaskFile(task, false);
-                            taskFile.setUserCreated(true);
-                            final String name = createdFile.getName();
-                            taskFile.name = name;
-                            task.getTaskFiles().put(name, taskFile);
-                        }
+                    final Lesson lesson = course.getLessonOfIndex(lessonIndex);
+                    if (lesson == null) {
+                        return;
+                    }
+                    final List<Task> tasks = lesson.getTaskList();
+                    if (StudyUtils.indexIsValid(taskIndex, tasks)) {
+                        final Task task = tasks.get(taskIndex);
+                        final TaskFile taskFile = new TaskFile();
+                        taskFile.initTaskFile(task, false);
+                        taskFile.setUserCreated(true);
+                        final String name = createdFile.getName();
+                        taskFile.name = name;
+                        task.getTaskFiles().put(name, taskFile);
                     }
                 }
             }

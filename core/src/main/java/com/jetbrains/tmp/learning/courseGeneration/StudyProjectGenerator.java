@@ -11,7 +11,6 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
-import com.intellij.openapi.util.ThrowableComputable;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
@@ -31,6 +30,7 @@ import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.core.EduUtils;
 import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.Lesson;
+import com.jetbrains.tmp.learning.courseFormat.Section;
 import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.courseFormat.TaskFile;
 import com.jetbrains.tmp.learning.statistics.EduUsagesCollector;
@@ -119,28 +119,25 @@ public class StudyProjectGenerator {
         if (courseFile.exists()) {
             return readCourseFromCache(courseFile, false);
         } else if (myUser != null) {
-            final File adaptiveCourseFile = new File(new File(OUR_COURSES_DIR, ADAPTIVE_COURSE_PREFIX +
-                    mySelectedCourseInfo.getName() + "_" +
+            final File adaptiveCourseFile = new File(new File(OUR_COURSES_DIR,
+                    ADAPTIVE_COURSE_PREFIX + mySelectedCourseInfo.getName() + "_" +
                     myUser.getEmail()), EduNames.COURSE_META_FILE);
             if (adaptiveCourseFile.exists()) {
                 return readCourseFromCache(adaptiveCourseFile, true);
             }
         }
         return ProgressManager.getInstance()
-                .runProcessWithProgressSynchronously(new ThrowableComputable<Course, RuntimeException>() {
-                    @Override
-                    public Course compute() throws RuntimeException {
-                        ProgressManager.getInstance().getProgressIndicator().setIndeterminate(true);
-                        return execCancelable(() -> {
-
-                            final Course course = StepikConnectorGet.getCourse(project, mySelectedCourseInfo);
-                            if (course != null) {
-                                flushCourse(project, course);
-                                course.initCourse(false);
-                            }
-                            return course;
-                        });
-                    }
+                .runProcessWithProgressSynchronously(() -> {
+                    ProgressManager.getInstance().getProgressIndicator().setIndeterminate(true);
+                    return execCancelable(() -> {
+                        final Course course = StepikConnectorGet.getCourse(project,
+                                mySelectedCourseInfo);
+                        if (course != null) {
+                            flushCourse(project, course);
+                            course.initCourse(false);
+                        }
+                        return course;
+                    });
                 }, "Creating Course", true, project);
     }
 
@@ -155,9 +152,7 @@ public class StudyProjectGenerator {
             final Course course = gson.fromJson(reader, Course.class);
             course.initCourse(isAdaptive);
             return course;
-        } catch (UnsupportedEncodingException e) {
-            logger.warn(e.getMessage());
-        } catch (FileNotFoundException e) {
+        } catch (UnsupportedEncodingException | FileNotFoundException e) {
             logger.warn(e.getMessage());
         } finally {
             StudyUtils.closeSilently(reader);
@@ -167,10 +162,22 @@ public class StudyProjectGenerator {
 
     public static void openFirstTask(@NotNull final Course course, @NotNull final Project project) {
         LocalFileSystem.getInstance().refresh(false);
-        final Lesson firstLesson = StudyUtils.getFirst(course.getLessons());
+        final Section firstSection = StudyUtils.getFirst(course.getSections());
+        if (firstSection == null) {
+            return;
+        }
+        final Lesson firstLesson = StudyUtils.getFirst(firstSection.getLessons());
+        if (firstLesson == null) {
+            return;
+        }
         final Task firstTask = StudyUtils.getFirst(firstLesson.getTaskList());
+        if (firstTask == null) {
+            return;
+        }
         final VirtualFile taskDir = firstTask.getTaskDir(project);
-        if (taskDir == null) return;
+        if (taskDir == null) {
+            return;
+        }
         final Map<String, TaskFile> taskFiles = firstTask.getTaskFiles();
         VirtualFile activeVirtualFile = null;
         for (Map.Entry<String, TaskFile> entry : taskFiles.entrySet()) {
@@ -205,13 +212,15 @@ public class StudyProjectGenerator {
         flushCourseJson(course, courseDirectory);
 
         int lessonIndex = 1;
-        for (Lesson lesson : course.getLessons()) {
-            if (lesson.getName().equals(EduNames.PYCHARM_ADDITIONAL)) {
-                flushAdditionalFiles(courseDirectory, lesson);
-            } else {
-                final File lessonDirectory = new File(courseDirectory, EduNames.LESSON + String.valueOf(lessonIndex));
-                flushLesson(lessonDirectory, lesson);
-                lessonIndex += 1;
+        for (Section section : course.getSections()) {
+            for (Lesson lesson : section.getLessons()) {
+                if (lesson.getName().equals(EduNames.PYCHARM_ADDITIONAL)) {
+                    flushAdditionalFiles(courseDirectory, lesson);
+                } else {
+                    final File lessonDirectory = new File(courseDirectory,
+                            EduNames.LESSON + String.valueOf(lessonIndex++));
+                    flushLesson(lessonDirectory, lesson);
+                }
             }
         }
     }
@@ -240,10 +249,9 @@ public class StudyProjectGenerator {
     public static void flushLesson(@NotNull final File lessonDirectory, @NotNull final Lesson lesson) {
         FileUtil.createDirectory(lessonDirectory);
         int taskIndex = 1;
-        for (Task task : lesson.taskList) {
-            final File taskDirectory = new File(lessonDirectory, EduNames.TASK + String.valueOf(taskIndex));
+        for (Task task : lesson.getTaskList()) {
+            final File taskDirectory = new File(lessonDirectory, EduNames.TASK + taskIndex++);
             flushTask(task, taskDirectory);
-            taskIndex += 1;
         }
     }
 
@@ -476,7 +484,7 @@ public class StudyProjectGenerator {
     /**
      * Adds course to courses specified in params
      *
-     * @param courses
+     * @param courses courses
      * @param courseDir must be directory containing course file
      * @return added course name or null if course is invalid
      */

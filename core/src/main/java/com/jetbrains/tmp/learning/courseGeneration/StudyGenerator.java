@@ -9,6 +9,7 @@ import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.Lesson;
+import com.jetbrains.tmp.learning.courseFormat.Section;
 import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.courseFormat.TaskFile;
 import org.jetbrains.annotations.NotNull;
@@ -120,16 +121,19 @@ public class StudyGenerator {
             @NotNull final Project project) {
 
         try {
-            final List<Lesson> lessons = course.getLessons();
-            for (int i = 1; i <= lessons.size(); i++) {
-                Lesson lesson = lessons.get(i - 1);
-                lesson.setIndex(i);
-                createLesson(lesson, baseDir, resourceRoot, project);
+            int sectionIndex = 1;
+            int lessonIndex = 1;
+            for (Section section : course.getSections()) {
+                VirtualFile sectionDir = baseDir.createChildDirectory(project, EduNames.SECTION + sectionIndex++);
+                for (Lesson lesson : section.getLessons()) {
+                    lesson.setIndex(lessonIndex++);
+                    createLesson(lesson, sectionDir, resourceRoot, project);
+                }
             }
             baseDir.createChildDirectory(project, EduNames.SANDBOX_DIR);
             File[] files = resourceRoot.listFiles(
-                    (dir, name) -> !name.contains(EduNames.LESSON) && !name.equals(EduNames.COURSE_META_FILE) && !name.equals(
-                            EduNames.HINTS));
+                    (dir, name) -> !name.contains(EduNames.LESSON) && !name.equals(EduNames.COURSE_META_FILE) && !name
+                            .equals(EduNames.HINTS));
             if (files != null) {
                 for (File file : files) {
                     File dir = new File(baseDir.getPath(), file.getName());
