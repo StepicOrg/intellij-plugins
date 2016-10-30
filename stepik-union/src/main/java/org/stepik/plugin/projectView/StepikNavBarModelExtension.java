@@ -25,7 +25,8 @@ public class StepikNavBarModelExtension extends JavaNavBarExtension {
     public String getPresentableText(Object object) {
         if (object instanceof Project) {
             Project project = (Project) object;
-            Course course = getCourse(project);
+            StudyTaskManager studyTaskManager = StudyTaskManager.getInstance(project);
+            Course course = studyTaskManager.getCourse();
             if (course == null)
                 return null;
             return course.getName();
@@ -33,23 +34,14 @@ public class StepikNavBarModelExtension extends JavaNavBarExtension {
 
         if (object instanceof PsiDirectory) {
             PsiDirectory psiDirectory = (PsiDirectory) object;
-
             PresentationData data = new PresentationData();
-
             PresentationUtils.updatePresentationData(data, psiDirectory);
-
             String text = data.getPresentableText();
             if (text != null)
                 return text;
         }
 
         return super.getPresentableText(object);
-    }
-
-    @Nullable
-    private Course getCourse(@NotNull Project project) {
-        StudyTaskManager studyTaskManager = StudyTaskManager.getInstance(project);
-        return studyTaskManager.getCourse();
     }
 
     @Nullable

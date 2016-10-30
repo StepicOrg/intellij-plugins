@@ -132,8 +132,8 @@ public class StudyGenerator {
             }
             baseDir.createChildDirectory(project, EduNames.SANDBOX_DIR);
             File[] files = resourceRoot.listFiles(
-                    (dir, name) -> !name.contains(EduNames.LESSON) && !name.equals(EduNames.COURSE_META_FILE) && !name
-                            .equals(EduNames.HINTS));
+                    (dir, name) -> !name.contains(EduNames.LESSON) && !name.equals(EduNames.COURSE_META_FILE) &&
+                            !name.equals(EduNames.HINTS));
             if (files != null) {
                 for (File file : files) {
                     File dir = new File(baseDir.getPath(), file.getName());

@@ -332,8 +332,7 @@ public class StudyUtils {
         if (taskDirName.contains(EduNames.TASK)) {
             final VirtualFile lessonDir = taskDir.getParent();
             if (lessonDir != null) {
-                int lessonIndex = EduUtils.getIndex(lessonDir.getName(), EduNames.LESSON) + 1;
-                Lesson lesson = course.getLessonOfIndex(lessonIndex);
+                Lesson lesson = course.getLessonOfMnemonic(lessonDir.getName());
                 if (lesson == null) {
                     return null;
                 }

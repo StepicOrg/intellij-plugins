@@ -120,8 +120,8 @@ public class StudyProjectGenerator {
             return readCourseFromCache(courseFile, false);
         } else if (myUser != null) {
             final File adaptiveCourseFile = new File(new File(OUR_COURSES_DIR,
-                    ADAPTIVE_COURSE_PREFIX + mySelectedCourseInfo.getName() + "_" +
-                    myUser.getEmail()), EduNames.COURSE_META_FILE);
+                    ADAPTIVE_COURSE_PREFIX + mySelectedCourseInfo.getName() + "_" + myUser.getEmail()),
+                    EduNames.COURSE_META_FILE);
             if (adaptiveCourseFile.exists()) {
                 return readCourseFromCache(adaptiveCourseFile, true);
             }
@@ -484,7 +484,7 @@ public class StudyProjectGenerator {
     /**
      * Adds course to courses specified in params
      *
-     * @param courses courses
+     * @param courses   courses
      * @param courseDir must be directory containing course file
      * @return added course name or null if course is invalid
      */

@@ -56,8 +56,7 @@ public class PresentationUtils {
             if (parent == null) {
                 return;
             }
-            int index = EduUtils.getIndex(valueName, EduNames.LESSON) + 1;
-            Lesson lesson = course.getLessonOfIndex(index);
+            Lesson lesson = course.getLessonOfMnemonic(valueName);
             setAttributes(data, lesson);
         } else if (valueName.startsWith(EduNames.SECTION)) {
             int index = EduUtils.getIndex(valueName, EduNames.SECTION);
