@@ -1,4 +1,4 @@
-package org.stepik.plugin.actions;
+package org.stepik.plugin.utils;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;

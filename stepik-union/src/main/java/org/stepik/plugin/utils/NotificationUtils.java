@@ -1,4 +1,4 @@
-package org.stepik.plugin.actions;
+package org.stepik.plugin.utils;
 
 import com.intellij.notification.Notification;
 import com.intellij.openapi.project.Project;
