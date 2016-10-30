@@ -91,7 +91,7 @@ public class EduAdaptiveStepikConnector {
                             StepikWrappers.LessonContainer.class);
                     if (lessonContainer.lessons.size() == 1) {
                         final Lesson realLesson = lessonContainer.lessons.get(0);
-                        course.getLessons().get(0).setId(Integer.parseInt(lessonId));
+                        course.getSections().get(0).getLessons().get(0).setId(Integer.parseInt(lessonId));
 
                         viewAllSteps(client, realLesson.getId());
 
@@ -217,7 +217,7 @@ public class EduAdaptiveStepikConnector {
             final StepikUser user = StudyTaskManager.getInstance(project).getUser();
 
             final boolean recommendationReaction =
-                    user != null && postRecommendationReaction(project,
+                    postRecommendationReaction(project,
                             String.valueOf(editor.getTaskFile().getTask().getLesson().getId()),
                             String.valueOf(user.getId()),
                             reaction);
@@ -225,7 +225,7 @@ public class EduAdaptiveStepikConnector {
                 final Task task = getNextRecommendation(project, course);
 
                 if (task != null) {
-                    final Lesson adaptive = course.getLessons().get(0);
+                    final Lesson adaptive = course.getSections().get(0).getLessons().get(0);
                     final Task unsolvedTask = adaptive.getTaskList().get(adaptive.getTaskList().size() - 1);
                     if (reaction == 0 || reaction == -1) {
                         unsolvedTask.setName(task.getName());
@@ -292,7 +292,7 @@ public class EduAdaptiveStepikConnector {
                                 EduNames.LESSON + String.valueOf(adaptive.getIndex()));
                         StudyProjectGenerator.flushLesson(lessonDirectory, adaptive);
                         StudyProjectGenerator.flushCourseJson(course, new File(course.getCourseDirectory()));
-                        adaptive.initLesson(course, true);
+                        course.initCourse(true);
                     }
                 }
                 ApplicationManager.getApplication().invokeLater(() -> {
@@ -348,16 +348,14 @@ public class EduAdaptiveStepikConnector {
         task.setStatus(StudyStatus.Unchecked);
         if (step.options.samples != null) {
             final StringBuilder builder = new StringBuilder();
-            for (List<String> sample : step.options.samples) {
-                if (sample.size() == 2) {
-                    builder.append("<b>Sample Input:</b><br>");
-                    builder.append(StringUtil.replace(sample.get(0), "\n", "<br>"));
-                    builder.append("<br>");
-                    builder.append("<b>Sample Output:</b><br>");
-                    builder.append(StringUtil.replace(sample.get(1), "\n", "<br>"));
-                    builder.append("<br><br>");
-                }
-            }
+            step.options.samples.stream().filter(sample -> sample.size() == 2).forEach(sample -> {
+                builder.append("<b>Sample Input:</b><br>");
+                builder.append(StringUtil.replace(sample.get(0), "\n", "<br>"));
+                builder.append("<br>");
+                builder.append("<b>Sample Output:</b><br>");
+                builder.append(StringUtil.replace(sample.get(1), "\n", "<br>"));
+                builder.append("<br><br>");
+            });
             task.setText(task.getText() + "<br>" + builder.toString());
         }
 
@@ -381,7 +379,7 @@ public class EduAdaptiveStepikConnector {
             }
         }
 
-        task.taskFiles = new HashMap<String, TaskFile>();      // TODO: it looks like we don't need taskFiles as map anymore
+        task.taskFiles = new HashMap<>();      // TODO: it looks like we don't need taskFiles as map anymore
         if (step.options.files != null) {
             for (TaskFile taskFile : step.options.files) {
                 task.taskFiles.put(taskFile.name, taskFile);
@@ -429,17 +427,13 @@ public class EduAdaptiveStepikConnector {
                         editor.getDocument().getText());
 
                 final StepikUser user = StudyTaskManager.getInstance(project).getUser();
-                if (user != null) {
-                    final int id = user.getId();
-                    wrapper = getCheckResults(attemptId, id, client, wrapper);
-                    if (wrapper.submissions.length == 1) {
-                        final boolean isSolved = !wrapper.submissions[0].status.equals("wrong");
-                        return Pair.create(isSolved, wrapper.submissions[0].hint);
-                    } else {
-                        logger.warn("Got a submission wrapper with incorrect submissions number: " + wrapper.submissions.length);
-                    }
+                final int id = user.getId();
+                wrapper = getCheckResults(attemptId, id, client, wrapper);
+                if (wrapper.submissions.length == 1) {
+                    final boolean isSolved = !wrapper.submissions[0].status.equals("wrong");
+                    return Pair.create(isSolved, wrapper.submissions[0].hint);
                 } else {
-                    logger.warn("User is null");
+                    logger.warn("Got a submission wrapper with incorrect submissions number: " + wrapper.submissions.length);
                 }
             }
         } else {
@@ -496,11 +490,7 @@ public class EduAdaptiveStepikConnector {
                 final String entity = EntityUtils.toString(httpResponse.getEntity());
                 wrapper = new Gson().fromJson(entity, StepikWrappers.ResultSubmissionWrapper.class);
             }
-        } catch (InterruptedException e) {
-            logger.warn(e.getMessage());
-        } catch (IOException e) {
-            logger.warn(e.getMessage());
-        } catch (URISyntaxException e) {
+        } catch (InterruptedException | IOException | URISyntaxException e) {
             logger.warn(e.getMessage());
         }
         return wrapper;

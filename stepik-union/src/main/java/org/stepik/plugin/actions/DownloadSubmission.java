@@ -82,7 +82,7 @@ public class DownloadSubmission extends StudyActionWithShortcut {
         StepikWrappers.MetricsWrapper metric = new StepikWrappers.MetricsWrapper(
                 StepikWrappers.MetricsWrapper.PluginNames.STEPIK_UNION,
                 StepikWrappers.MetricsWrapper.MetricActions.DOWNLOAD,
-                targetTask.getLesson().getCourse().getId(),
+                targetTask.getLesson().getSection().getCourse().getId(),
                 targetTask.getStepId());
         StepikConnectorPost.postMetric(metric);
 

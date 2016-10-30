@@ -232,7 +232,7 @@ public class EduUtils {
         if (lessonDir == null) {
             return null;
         }
-        Lesson lesson = course.getLesson(lessonDir.getName());
+        Lesson lesson = course.getLessonOfMnemonic(lessonDir.getName());
         if (lesson == null) {
             return null;
         }

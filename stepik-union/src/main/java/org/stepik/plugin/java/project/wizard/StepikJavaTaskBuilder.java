@@ -67,7 +67,7 @@ public class StepikJavaTaskBuilder extends JavaModuleBuilder implements TaskBuil
     private boolean createTaskContent() throws IOException {
         StudyTaskManager taskManager = StudyTaskManager.getInstance(myUtilModule.getProject());
         SupportedLanguages defaultLang = SupportedLanguages.langOf(taskManager.getDefaultLang());
-        Course course = myTask.getLesson().getCourse();
+        Course course = myTask.getLesson().getSection().getCourse();
         String directory = getModuleFileDirectory();
         if (directory == null) {
             return false;
