@@ -164,7 +164,6 @@ public class PresentationUtils {
 
         String[] dirs = path.split("/");
         return dirs.length > 4;
-
     }
 
     public static boolean isVisibleFile(@NotNull PsiFile psiFile) {
@@ -181,7 +180,6 @@ public class PresentationUtils {
 
         String[] dirs = path.split("/");
         return dirs.length > 4;
-
     }
 
     private static String getRelativePath(@NotNull PsiFileSystemItem item) {

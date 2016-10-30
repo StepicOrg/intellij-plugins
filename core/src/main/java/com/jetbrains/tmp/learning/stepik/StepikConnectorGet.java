@@ -233,10 +233,11 @@ public class StepikConnectorGet {
     }
 
     @Nullable
-    private static StepikWrappers.Section getSection(int id) {
+    private static StepikWrappers.Section getSection(int sectionId) {
         StepikWrappers.SectionContainer sectionContainer;
         try {
-            sectionContainer = getFromStepik(EduStepikNames.SECTIONS + id, StepikWrappers.SectionContainer.class);
+            sectionContainer = getFromStepik(EduStepikNames.SECTIONS + sectionId,
+                    StepikWrappers.SectionContainer.class);
         } catch (IOException e) {
             return null;
         }

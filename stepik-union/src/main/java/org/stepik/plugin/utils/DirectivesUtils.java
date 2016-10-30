@@ -49,9 +49,9 @@ public class DirectivesUtils {
      * <p>
      * If "Stepik code: end" not found, end = text.length
      */
-    public static
+
     @NotNull
-    Pair<Integer, Integer> findDirectives(
+    public static Pair<Integer, Integer> findDirectives(
             @NotNull String[] text,
             @NotNull SupportedLanguages lang) {
         int start = -1;
@@ -92,8 +92,8 @@ public class DirectivesUtils {
         return END_DIRECTIVE.equals(line);
     }
 
-    public static void writeInToFile(
-            @NotNull String[] text, @NotNull VirtualFile file,
+    public static void writeInToFile(@NotNull String[] text,
+            @NotNull VirtualFile file,
             @NotNull Project project) {
         final Document document = FileDocumentManager.getInstance().getDocument(file);
         if (document == null)

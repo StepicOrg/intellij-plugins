@@ -99,7 +99,6 @@ public class Section implements StudyItem {
         Section section = (Section) o;
 
         return id == section.id;
-
     }
 
     @Override
