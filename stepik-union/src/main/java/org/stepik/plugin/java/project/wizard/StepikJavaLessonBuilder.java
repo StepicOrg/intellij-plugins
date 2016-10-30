@@ -8,7 +8,6 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleWithNameAlreadyExists;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.util.InvalidDataException;
-import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.io.FileUtil;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.Lesson;
@@ -25,7 +24,6 @@ public class StepikJavaLessonBuilder extends JavaModuleBuilder implements Lesson
     private static final Logger logger = Logger.getInstance(StepikJavaLessonBuilder.class);
     private final Lesson myLesson;
     private final Module myUtilModule;
-    private List<Pair<String, String>> mySourcePaths;
 
     public StepikJavaLessonBuilder(@NotNull String moduleDir, @NotNull Lesson lesson, @NotNull Module utilModule) {
         myLesson = lesson;
@@ -48,17 +46,11 @@ public class StepikJavaLessonBuilder extends JavaModuleBuilder implements Lesson
         Module baseModule = super.createModule(moduleModel);
         List<Task> taskList = myLesson.getTaskList();
         for (int i = 0; i < taskList.size(); i++) {
-            int visibleTaskIndex = i + 1;
             Task task = taskList.get(i);
-            task.setIndex(visibleTaskIndex);
+            task.setIndex(i + 1);
             createTaskModule(moduleModel, task);
         }
         return baseModule;
-    }
-
-    @Override
-    public List<Pair<String, String>> getSourcePaths() {
-        return mySourcePaths;
     }
 
     private void createTaskModule(

@@ -175,7 +175,7 @@ public class Course implements StudyItem {
     }
 
     @Nullable
-    public Section getSection(int index) {
+    private Section getSection(int index) {
         return sections.get(index);
     }
 
