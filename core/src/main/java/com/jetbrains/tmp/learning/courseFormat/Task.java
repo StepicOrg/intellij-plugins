@@ -209,6 +209,7 @@ public class Task implements StudyItem {
         return stepId;
     }
 
+    @Override
     public StudyStatus getStatus() {
         return myStatus;
     }
