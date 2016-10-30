@@ -1,21 +1,19 @@
 package org.stepik.plugin;
 
 import com.intellij.ide.navigationToolbar.JavaNavBarExtension;
-import com.intellij.ide.navigationToolbar.NavBarModelExtension;
+import com.intellij.ide.projectView.PresentationData;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import com.jetbrains.tmp.learning.StudyTaskManager;
-import com.jetbrains.tmp.learning.core.EduNames;
-import com.jetbrains.tmp.learning.core.EduUtils;
 import com.jetbrains.tmp.learning.courseFormat.Course;
-import com.jetbrains.tmp.learning.courseFormat.Lesson;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.plugin.utils.PresentationUtils;
 
-import java.util.Collection;
-import java.util.Collections;
+import static org.stepik.plugin.utils.PresentationUtils.isVisibleDirectory;
+import static org.stepik.plugin.utils.PresentationUtils.isVisibleFile;
 
 /**
  * @author meanmail
@@ -34,33 +32,15 @@ public class StepikNavBarModelExtension extends JavaNavBarExtension {
         }
 
         if (object instanceof PsiDirectory) {
-            PsiDirectory item = (PsiDirectory) object;
-            Course course = getCourse(item.getProject());
-            if (course == null)
-                return null;
+            PsiDirectory psiDirectory = (PsiDirectory) object;
 
-            if (item.getVirtualFile().equals(item.getProject().getBaseDir())) {
-                return course.getName();
-            }
+            PresentationData data = new PresentationData();
 
-            String name = item.getName();
+            PresentationUtils.updatePresentationData(data, psiDirectory);
 
-            if (name.startsWith(EduNames.SECTION)) {
-                return course.getSectionsNames().get(name);
-            }
-
-            if (name.startsWith(EduNames.LESSON)) {
-                return course.getLesson(name).getName();
-            }
-
-            if (name.startsWith(EduNames.TASK)) {
-                PsiDirectory lessonItem = item.getParent();
-                if (lessonItem == null)
-                    return null;
-                String lessonName = lessonItem.getName();
-                Lesson lesson = course.getLessons().get(EduUtils.getIndex(lessonName, EduNames.LESSON));
-                return lesson.getTask(name).getName();
-            }
+            String text = data.getPresentableText();
+            if (text != null)
+                return text;
         }
 
         return super.getPresentableText(object);
@@ -70,5 +50,19 @@ public class StepikNavBarModelExtension extends JavaNavBarExtension {
     private Course getCourse(@NotNull Project project) {
         StudyTaskManager studyTaskManager = StudyTaskManager.getInstance(project);
         return studyTaskManager.getCourse();
+    }
+
+    @Nullable
+    @Override
+    public PsiElement adjustElement(PsiElement psiElement) {
+        if (psiElement instanceof PsiDirectory) {
+            if (!isVisibleDirectory((PsiDirectory) psiElement))
+                return null;
+        } else if (psiElement instanceof PsiFile) {
+            if (!isVisibleFile((PsiFile) psiElement))
+                return null;
+        }
+
+        return super.adjustElement(psiElement);
     }
 }

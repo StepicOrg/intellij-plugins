@@ -1,4 +1,4 @@
-package org.stepik.plugin;
+package org.stepik.plugin.projectView;
 
 import com.intellij.ide.projectView.TreeStructureProvider;
 import com.intellij.ide.projectView.ViewSettings;
@@ -9,18 +9,21 @@ import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiFile;
 import com.jetbrains.tmp.learning.StudyTaskManager;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.TaskFile;
-import com.jetbrains.tmp.learning.projectView.StudyDirectoryNode;
-import com.siyeh.ig.psiutils.CollectionUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
+
+import static org.stepik.plugin.utils.PresentationUtils.isSourceFile;
+import static org.stepik.plugin.utils.PresentationUtils.isVisibleDirectory;
+import static org.stepik.plugin.utils.PresentationUtils.isVisibleFile;
 
 public class StepikTreeStructureProvider implements TreeStructureProvider, DumbAware {
     private static final Logger logger = Logger.getInstance(StepikTreeStructureProvider.class);
@@ -40,23 +43,19 @@ public class StepikTreeStructureProvider implements TreeStructureProvider, DumbA
             if (project != null) {
                 if (node.getValue() instanceof PsiDirectory) {
                     final PsiDirectory nodeValue = (PsiDirectory) node.getValue();
-                    final String name = nodeValue.getName();
-                    if (!name.contains(EduNames.USER_TESTS) && !name.startsWith(".") && !"lib".equals(name) && !name.equals(
-                            "hide")) {
-                        AbstractTreeNode newNode = createStudyDirectoryNode(settings, project, nodeValue);
+                    if (isVisibleDirectory(nodeValue)) {
+                        AbstractTreeNode newNode = new StepikDirectoryNode(project, nodeValue, settings);
                         nodes.add(newNode);
                     }
-                } else {
-                    if (parent instanceof StudyDirectoryNode && node instanceof PsiFileNode) {
-                        final PsiFileNode psiFileNode = (PsiFileNode) node;
-                        final VirtualFile virtualFile = psiFileNode.getVirtualFile();
-                        if (virtualFile == null) {
-//              return nodes;
+                } else if (parent instanceof StepikDirectoryNode && node instanceof PsiFileNode) {
+                    final PsiFile nodeValue = ((PsiFileNode) node).getValue();
+                    if (isVisibleFile(nodeValue)) {
+                        if (isSourceFile(nodeValue)) {
+                            nodes.add(node);
                             continue;
                         }
-                        if (virtualFile.getName().endsWith(".iml")) continue;
-                        if (virtualFile.getName().endsWith(".java") || virtualFile.getName().endsWith(".py")) {
-                            nodes.add(node);
+                        final VirtualFile virtualFile = nodeValue.getVirtualFile();
+                        if (virtualFile == null) {
                             continue;
                         }
                         final TaskFile taskFile = StudyUtils.getTaskFile(project, virtualFile);
@@ -79,14 +78,6 @@ public class StepikTreeStructureProvider implements TreeStructureProvider, DumbA
         return nodes;
     }
 
-    @NotNull
-    protected AbstractTreeNode createStudyDirectoryNode(
-            ViewSettings settings,
-            Project project,
-            PsiDirectory nodeValue) {
-        return new StudyDirectoryNode(project, nodeValue, settings);
-    }
-
     private static void addNonInvisibleFiles(
             @NotNull final Collection<AbstractTreeNode> nodes,
             @NotNull final AbstractTreeNode node,
@@ -101,17 +92,14 @@ public class StepikTreeStructureProvider implements TreeStructureProvider, DumbA
         }
     }
 
-    protected boolean needModify(@NotNull final AbstractTreeNode parent) {
+    private boolean needModify(@NotNull final AbstractTreeNode parent) {
         final Project project = parent.getProject();
         if (project == null) {
             return false;
         }
         final StudyTaskManager studyTaskManager = StudyTaskManager.getInstance(project);
         Course course = studyTaskManager.getCourse();
-        if (course == null) {
-            return false;
-        }
-        return EduNames.STEPIK_CODE.equals(course.getCourseMode());
+        return course != null && EduNames.STEPIK_CODE.equals(course.getCourseMode());
     }
 
     @Nullable
