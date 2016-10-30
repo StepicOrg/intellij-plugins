@@ -83,7 +83,7 @@ public class StepikJavaTaskBuilder extends JavaModuleBuilder implements TaskBuil
         String courseResourcesDirectory = course.getCourseDirectory();
         String taskResourcesPath = FileUtil.join(courseResourcesDirectory,
                 EduNames.LESSON + myTask.getLesson().getIndex(), EduNames.TASK + myTask.getIndex());
-        FileUtil.copyDirContent(new File(taskResourcesPath), new File(FileUtil.join(src.getPath(), "hide")));
+        FileUtil.copyDirContent(new File(taskResourcesPath), new File(FileUtil.join(src.getPath(), EduNames.HIDE)));
 
         Set<SupportedLanguages> supportedLang = getSupportedLang(taskResourcesPath);
         SupportedLanguages currentLang;
@@ -114,7 +114,7 @@ public class StepikJavaTaskBuilder extends JavaModuleBuilder implements TaskBuil
     }
 
     private void moveFromHide(@NotNull String filename, @NotNull VirtualFile src) throws IOException {
-        Files.move(Paths.get(FileUtil.join(src.getPath(), "hide", filename)),
+        Files.move(Paths.get(FileUtil.join(src.getPath(), EduNames.HIDE, filename)),
                 Paths.get(src.getPath(), filename), StandardCopyOption.REPLACE_EXISTING);
     }
 

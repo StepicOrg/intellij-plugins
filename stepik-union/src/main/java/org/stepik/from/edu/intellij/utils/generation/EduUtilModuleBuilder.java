@@ -12,6 +12,7 @@ import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.tmp.learning.StudyTaskManager;
+import com.jetbrains.tmp.learning.core.EduNames;
 import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,8 +22,8 @@ import java.io.IOException;
 public class EduUtilModuleBuilder extends JavaModuleBuilder {
 
     public EduUtilModuleBuilder(String moduleDir) {
-        setName("util");
-        setModuleFilePath(FileUtil.join(moduleDir, "util", "util" + ModuleFileType.DOT_DEFAULT_EXTENSION));
+        setName(EduNames.UTIL);
+        setModuleFilePath(FileUtil.join(moduleDir, EduNames.UTIL, EduNames.UTIL + ModuleFileType.DOT_DEFAULT_EXTENSION));
     }
 
     @NotNull
@@ -52,7 +53,7 @@ public class EduUtilModuleBuilder extends JavaModuleBuilder {
 //        ModuleRootModificationUtil.addModuleLibrary(baseModule, descriptor.getPresentableName(), urls, Collections.<String>emptyList());
 
         String courseDirectory = StudyTaskManager.getInstance(project).getCourse().getCourseDirectory();
-        FileUtil.copyDirContent(new File(courseDirectory, "util"), new File(src.getPath()));
+        FileUtil.copyDirContent(new File(courseDirectory, EduNames.UTIL), new File(src.getPath()));
         return baseModule;
     }
 }

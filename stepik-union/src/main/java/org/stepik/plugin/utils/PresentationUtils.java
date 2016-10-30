@@ -2,9 +2,11 @@ package org.stepik.plugin.utils;
 
 import com.intellij.ide.projectView.PresentationData;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiFileSystemItem;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.SimpleTextAttributes;
 import com.jetbrains.tmp.learning.StudyTaskManager;
@@ -143,25 +145,52 @@ public class PresentationUtils {
         data.setPresentableText(text);
     }
 
-    public static boolean isVisibleDirectory(@NotNull PsiDirectory psiDirectory) {
-        String name = psiDirectory.getName();
+    private static final String SECTION_EXPR = EduNames.SECTION + "[0-9]+";
+    private static final String LESSON_EXPR = SECTION_EXPR + "/" + EduNames.LESSON + "[0-9]+";
+    private static final String TASK_EXPR = LESSON_EXPR + "/" + EduNames.TASK + "[0-9]+";
+    private static final String SRC_EXPR = TASK_EXPR + "/" + EduNames.SRC;
+    private static final String COURSE_DIRECTORY = SECTION_EXPR + "|" + LESSON_EXPR + "|" + TASK_EXPR + "|" + SRC_EXPR;
 
-        return !(name.contains(EduNames.USER_TESTS) || name.startsWith(".") || "lib".equals(name) || "hide".equals(name));
+    public static boolean isVisibleDirectory(@NotNull PsiDirectory psiDirectory) {
+        String path = getRelativePath(psiDirectory);
+        if (path.equals("."))
+            return true;
+
+        if (path.startsWith(EduNames.SANDBOX_DIR)||path.startsWith(EduNames.UTIL)||path.matches(COURSE_DIRECTORY))
+            return true;
+
+        if (psiDirectory.getName().equals(EduNames.HIDE))
+            return false;
+
+        String[] dirs = path.split("/");
+        if (dirs.length > 4)
+            return true;
+
+        return false;
     }
 
     public static boolean isVisibleFile(@NotNull PsiFile psiFile) {
         String name = psiFile.getName();
-        PsiDirectory parent = psiFile.getParent();
-        if (parent == null)
+        if (name.endsWith(".iml"))
             return false;
-        final String parentName = parent.getName();
-        boolean showFiles = EduNames.SRC.equals(parentName) || EduNames.SANDBOX_DIR.equals(parentName);
-        return !name.endsWith(".iml") && !name.equals(EduNames.TASK_HTML) && showFiles;
+
+        String path = getRelativePath(psiFile);
+        if (path.startsWith(EduNames.SANDBOX_DIR))
+            return true;
+
+        if (name.equals(EduNames.TASK_HTML))
+            return false;
+
+        String[] dirs = path.split("/");
+        if (dirs.length > 4)
+            return true;
+
+        return false;
     }
 
-    public static boolean isSourceFile(@NotNull PsiFile psiFile) {
-        String name = psiFile.getName();
-
-        return name.endsWith(".java") || name.endsWith(".py");
+    private static String getRelativePath(PsiFileSystemItem item) {
+        String path = item.getVirtualFile().getPath();
+        String projectPath = item.getProject().getBasePath();
+        return FileUtil.getRelativePath(projectPath, path, '/');
     }
 }
