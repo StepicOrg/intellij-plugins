@@ -27,6 +27,7 @@
         <applicationConfigurable instance="org.stepik.plugin.collective.ui.StepikSettingsConfigurable"/>
         <moduleType id="STEPIK_MODULE_TYPE" implementationClass="org.stepik.plugin.java.project.wizard.StepikModuleType"/>
         <navbar implementation="org.stepik.plugin.projectView.StepikNavBarModelExtension"/>
+        <refactoring.moveHandler implementation="org.stepik.plugin.StepikMoveDelegate" order="first"/>
     </extensions>
 
     <extensions defaultExtensionNs="SCore">
@@ -102,7 +103,6 @@
         <projectService serviceImplementation="com.jetbrains.tmp.learning.StudyTaskManager"/>
         <extendWordSelectionHandler implementation="com.jetbrains.tmp.learning.StudyAnswerPlaceholderExtendWordHandler"/>
         <renameHandler implementation="com.jetbrains.tmp.learning.StudyRenameHandler"/>
-        <refactoring.moveHandler implementation="com.jetbrains.tmp.learning.StudyMoveDelegate" order="first"/>
         <statistics.usagesCollector implementation="com.jetbrains.tmp.learning.statistics.EduUsagesCollector"/>
         <applicationService serviceImplementation="com.jetbrains.tmp.learning.statistics.EduUsagesCollector"/>
         <applicationService serviceImplementation="com.jetbrains.tmp.learning.stepik.StepikUpdateSettings"/>
