@@ -5,6 +5,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.stepik.plugin.collective.SupportedLanguages;
+import org.stepik.plugin.utils.DirectivesUtils;
 
 import java.io.InputStream;
 import java.util.HashMap;
