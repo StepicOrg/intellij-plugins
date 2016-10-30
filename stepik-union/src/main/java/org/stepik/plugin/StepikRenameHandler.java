@@ -1,18 +1,21 @@
-package com.jetbrains.tmp.learning;
+package org.stepik.plugin;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.Messages;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.refactoring.rename.RenameHandler;
 import org.jetbrains.annotations.NotNull;
+import org.stepik.plugin.utils.ProjectFilesUtils;
 
-public class StudyRenameHandler implements RenameHandler {
+/**
+ * @author meanmail
+ */
+public class StepikRenameHandler implements RenameHandler {
     @Override
     public boolean isAvailableOnDataContext(DataContext dataContext) {
-        return StudyUtils.canRenameOrMove(dataContext);
+        return ProjectFilesUtils.canMoveOrRename(dataContext);
     }
 
     @Override
@@ -22,11 +25,16 @@ public class StudyRenameHandler implements RenameHandler {
 
     @Override
     public void invoke(@NotNull Project project, Editor editor, PsiFile file, DataContext dataContext) {
-        Messages.showInfoMessage("This rename operation can break the course", "Invalid Rename Operation");
+        // Ignored renaming
     }
 
     @Override
     public void invoke(@NotNull Project project, @NotNull PsiElement[] elements, DataContext dataContext) {
         invoke(project, null, null, dataContext);
+    }
+
+    @Override
+    public String toString() {
+        return "Don't rename it! The course can be defective";
     }
 }
