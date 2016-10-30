@@ -145,18 +145,18 @@ public class PresentationUtils {
         data.setPresentableText(text);
     }
 
-    private static final String SECTION_EXPR = EduNames.SECTION + "[0-9]+";
-    private static final String LESSON_EXPR = SECTION_EXPR + "/" + EduNames.LESSON + "[0-9]+";
-    private static final String TASK_EXPR = LESSON_EXPR + "/" + EduNames.TASK + "[0-9]+";
-    private static final String SRC_EXPR = TASK_EXPR + "/" + EduNames.SRC;
-    private static final String COURSE_DIRECTORY = SECTION_EXPR + "|" + LESSON_EXPR + "|" + TASK_EXPR + "|" + SRC_EXPR;
+    public static final String SECTION_EXPR = EduNames.SECTION + "[0-9]+";
+    public static final String LESSON_EXPR = SECTION_EXPR + "/" + EduNames.LESSON + "[0-9]+";
+    public static final String TASK_EXPR = LESSON_EXPR + "/" + EduNames.TASK + "[0-9]+";
+    public static final String SRC_EXPR = TASK_EXPR + "/" + EduNames.SRC;
+    public static final String COURSE_DIRECTORY = SECTION_EXPR + "|" + LESSON_EXPR + "|" + TASK_EXPR + "|" + SRC_EXPR;
 
     public static boolean isVisibleDirectory(@NotNull PsiDirectory psiDirectory) {
         String path = getRelativePath(psiDirectory);
         if (path.equals("."))
             return true;
 
-        if (path.startsWith(EduNames.SANDBOX_DIR) || path.startsWith(EduNames.UTIL) || path.matches(COURSE_DIRECTORY))
+        if (path.startsWith(EduNames.SANDBOX_DIR) || path.startsWith(EduNames.UTIL) || isCourseElement(path))
             return true;
 
         if (psiDirectory.getName().equals(EduNames.HIDE))
@@ -182,12 +182,20 @@ public class PresentationUtils {
         return dirs.length > 4;
     }
 
-    private static String getRelativePath(@NotNull PsiFileSystemItem item) {
+    public static String getRelativePath(@NotNull PsiFileSystemItem item) {
         String path = item.getVirtualFile().getPath();
         String projectPath = item.getProject().getBasePath();
         if (projectPath == null) {
             return path;
         }
         return FileUtil.getRelativePath(projectPath, path, '/');
+    }
+
+    public static boolean isCourseElement(String relativePath) {
+        return relativePath.startsWith(EduNames.UTIL) || relativePath.matches(COURSE_DIRECTORY);
+    }
+
+    public static boolean isSandbox(String relativePath) {
+        return EduNames.SANDBOX_DIR.equals(relativePath);
     }
 }
