@@ -1,4 +1,4 @@
-package org.stepik.plugin;
+package org.stepik.plugin.projectView;
 
 import com.intellij.ide.navigationToolbar.JavaNavBarExtension;
 import com.intellij.ide.projectView.PresentationData;
