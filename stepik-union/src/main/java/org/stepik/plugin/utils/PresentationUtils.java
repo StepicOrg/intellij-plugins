@@ -138,7 +138,7 @@ public class PresentationUtils {
         setAttributes(data, text, color, icon);
     }
 
-    private static void setAttributes(PresentationData data, String text, JBColor color, Icon icon) {
+    private static void setAttributes(@NotNull PresentationData data, String text, JBColor color, Icon icon) {
         data.clearText();
         data.addText(text, new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, color));
         data.setIcon(icon);
@@ -156,17 +156,15 @@ public class PresentationUtils {
         if (path.equals("."))
             return true;
 
-        if (path.startsWith(EduNames.SANDBOX_DIR)||path.startsWith(EduNames.UTIL)||path.matches(COURSE_DIRECTORY))
+        if (path.startsWith(EduNames.SANDBOX_DIR) || path.startsWith(EduNames.UTIL) || path.matches(COURSE_DIRECTORY))
             return true;
 
         if (psiDirectory.getName().equals(EduNames.HIDE))
             return false;
 
         String[] dirs = path.split("/");
-        if (dirs.length > 4)
-            return true;
+        return dirs.length > 4;
 
-        return false;
     }
 
     public static boolean isVisibleFile(@NotNull PsiFile psiFile) {
@@ -182,15 +180,16 @@ public class PresentationUtils {
             return false;
 
         String[] dirs = path.split("/");
-        if (dirs.length > 4)
-            return true;
+        return dirs.length > 4;
 
-        return false;
     }
 
-    private static String getRelativePath(PsiFileSystemItem item) {
+    private static String getRelativePath(@NotNull PsiFileSystemItem item) {
         String path = item.getVirtualFile().getPath();
         String projectPath = item.getProject().getBasePath();
+        if (projectPath == null) {
+            return path;
+        }
         return FileUtil.getRelativePath(projectPath, path, '/');
     }
 }
