@@ -52,7 +52,7 @@ public class EduUtils {
             return -1;
         }
         try {
-            return Integer.parseInt(fullName.substring(logicalName.length())) - 1;
+            return Integer.parseInt(fullName.substring(logicalName.length()));
         } catch (NumberFormatException e) {
             return -1;
         }

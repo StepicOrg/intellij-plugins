@@ -73,8 +73,8 @@ public class StudyProjectComponent implements ProjectComponent {
         }
 
         registerStudyToolWindow(course);
-        ApplicationManager.getApplication()
-                .invokeLater((DumbAwareRunnable) () -> ApplicationManager.getApplication()
+        ApplicationManager.getApplication().invokeLater(
+                (DumbAwareRunnable) () -> ApplicationManager.getApplication()
                         .runWriteAction((DumbAwareRunnable) () -> {
                             if (course != null) {
                                 UISettings.getInstance().HIDE_TOOL_STRIPES = false;
@@ -109,9 +109,10 @@ public class StudyProjectComponent implements ProjectComponent {
             if (actionsOnToolbar != null) {
                 actionsOnToolbar.stream()
                         .filter(action -> action instanceof StudyActionWithShortcut)
+                        .map(action -> (StudyActionWithShortcut) action)
                         .forEach(action -> {
-                            String id = ((StudyActionWithShortcut) action).getActionId();
-                            String[] shortcuts = ((StudyActionWithShortcut) action).getShortcuts();
+                            String id = action.getActionId();
+                            String[] shortcuts = action.getShortcuts();
                             if (shortcuts != null) {
                                 addShortcut(id, shortcuts);
                             }
@@ -300,7 +301,7 @@ public class StudyProjectComponent implements ProjectComponent {
                 return;
             }
             if (taskDir != null && taskDir.getName().contains(EduNames.TASK)) {
-                int taskIndex = EduUtils.getIndex(taskDir.getName(), EduNames.TASK);
+                int taskIndex = EduUtils.getIndex(taskDir.getName(), EduNames.TASK) - 1;
                 final VirtualFile lessonDir = taskDir.getParent();
                 if (lessonDir != null && lessonDir.getName().contains(EduNames.LESSON)) {
                     final Lesson lesson = course.getLessonOfMnemonic(lessonDir.getName());

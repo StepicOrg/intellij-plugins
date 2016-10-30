@@ -41,13 +41,13 @@ public class StepikDirectoryNode extends PsiDirectoryNode {
     public int getTypeSortWeight(boolean sortByType) {
         String name = getValue().getName();
         if (name.startsWith(EduNames.SECTION)) {
-            return EduUtils.getIndex(name, EduNames.SECTION) + 1;
+            return EduUtils.getIndex(name, EduNames.SECTION);
         }
         if (name.startsWith(EduNames.LESSON)) {
-            return EduUtils.getIndex(name, EduNames.LESSON) + 1;
+            return EduUtils.getIndex(name, EduNames.LESSON);
         }
         if (name.startsWith(EduNames.TASK)) {
-            return EduUtils.getIndex(name, EduNames.TASK) + 1;
+            return EduUtils.getIndex(name, EduNames.TASK);
         }
 
         return Integer.MAX_VALUE;

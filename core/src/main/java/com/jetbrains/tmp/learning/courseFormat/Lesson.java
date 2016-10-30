@@ -76,7 +76,7 @@ public class Lesson implements StudyItem {
     }
 
     public Task getTask(@NotNull final String name) {
-        int index = EduUtils.getIndex(name, EduNames.TASK);
+        int index = EduUtils.getIndex(name, EduNames.TASK) - 1;
         List<Task> tasks = getTaskList();
         if (!EduUtils.indexIsValid(index, tasks)) {
             return null;

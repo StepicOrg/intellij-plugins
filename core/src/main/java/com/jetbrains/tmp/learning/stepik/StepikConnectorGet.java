@@ -136,18 +136,6 @@ public class StepikConnectorGet {
         return Collections.singletonList(CourseInfo.INVALID_COURSE);
     }
 
-    @NotNull
-    public static CourseInfo getDefaultCourse() {
-        CourseInfo courseInfo = CourseInfo.INVALID_COURSE;
-        try {
-            courseInfo = getFromStepik(EduStepikNames.COURSES + "/217",
-                    StepikWrappers.CoursesContainer.class).courses.get(0);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return courseInfo;
-    }
-
     private static boolean addCoursesFromStepik(List<CourseInfo> result, int pageNumber) throws IOException {
         final String url = pageNumber == 0 ?
                 EduStepikNames.COURSES :
@@ -461,9 +449,9 @@ public class StepikConnectorGet {
         }
     }
 
-    public static StepikWrappers.SectionContainer getSections(String id) {
+    public static StepikWrappers.SectionContainer getSections(String sectionId) {
         try {
-            return getFromStepik(EduStepikNames.SECTIONS + id, StepikWrappers.SectionContainer.class);
+            return getFromStepik(EduStepikNames.SECTIONS + sectionId, StepikWrappers.SectionContainer.class);
         } catch (IOException e) {
             logger.warn("Can't get Sections\n" + e.getMessage());
             return null;

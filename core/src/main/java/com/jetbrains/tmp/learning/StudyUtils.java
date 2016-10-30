@@ -336,7 +336,7 @@ public class StudyUtils {
                 if (lesson == null) {
                     return null;
                 }
-                int taskIndex = EduUtils.getIndex(taskDirName, EduNames.TASK);
+                int taskIndex = EduUtils.getIndex(taskDirName, EduNames.TASK) - 1;
                 final List<Task> tasks = lesson.getTaskList();
                 if (!indexIsValid(taskIndex, tasks)) {
                     return null;

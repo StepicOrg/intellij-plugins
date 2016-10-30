@@ -114,17 +114,4 @@ public class Section implements StudyItem {
     public int getId() {
         return id;
     }
-
-    public Lesson getLesson(String name) {
-        int index = EduUtils.getIndex(name, EduNames.LESSON) + 1;
-        return getLesson(index);
-    }
-
-    public Lesson getLesson(int index) {
-        for (Lesson lesson : lessons) {
-            if (lesson.getIndex() == index)
-                return lesson;
-        }
-        return null;
-    }
 }

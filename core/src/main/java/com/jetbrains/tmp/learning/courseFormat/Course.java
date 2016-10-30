@@ -201,7 +201,7 @@ public class Course implements StudyItem {
     }
 
     public Lesson getLessonOfMnemonic(String name) {
-        int index = EduUtils.getIndex(name, EduNames.LESSON) + 1;
+        int index = EduUtils.getIndex(name, EduNames.LESSON);
         return getLessonOfIndex(index);
     }
 
@@ -214,5 +214,10 @@ public class Course implements StudyItem {
         }
 
         return StudyStatus.Solved;
+    }
+
+    public Section getSectionOfMnemonic(String valueName) {
+        int index = EduUtils.getIndex(valueName, EduNames.SECTION);
+        return getSection(index - 1);
     }
 }

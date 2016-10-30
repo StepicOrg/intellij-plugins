@@ -9,7 +9,6 @@ import com.intellij.ui.JBColor;
 import com.intellij.ui.SimpleTextAttributes;
 import com.jetbrains.tmp.learning.StudyTaskManager;
 import com.jetbrains.tmp.learning.core.EduNames;
-import com.jetbrains.tmp.learning.core.EduUtils;
 import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.Lesson;
 import com.jetbrains.tmp.learning.courseFormat.Section;
@@ -59,8 +58,7 @@ public class PresentationUtils {
             Lesson lesson = course.getLessonOfMnemonic(valueName);
             setAttributes(data, lesson);
         } else if (valueName.startsWith(EduNames.SECTION)) {
-            int index = EduUtils.getIndex(valueName, EduNames.SECTION);
-            Section section = course.getSection(index);
+            Section section = course.getSectionOfMnemonic(valueName);
             if (section != null) {
                 setAttributes(data, section);
             }
@@ -134,7 +132,7 @@ public class PresentationUtils {
         HashMap<StudyStatus, Icon> iconMap = getIconMap(item);
         StudyStatus status = item.getStatus();
         JBColor color = getColor(status);
-        Icon icon = iconMap != null? iconMap.get(status) : null;
+        Icon icon = iconMap != null ? iconMap.get(status) : null;
         setAttributes(data, text, color, icon);
     }
 
@@ -153,8 +151,12 @@ public class PresentationUtils {
 
     public static boolean isVisibleFile(@NotNull PsiFile psiFile) {
         String name = psiFile.getName();
-
-        return !name.endsWith(".iml") && !name.equals(EduNames.TASK_HTML);
+        PsiDirectory parent = psiFile.getParent();
+        if (parent == null)
+            return false;
+        final String parentName = parent.getName();
+        boolean showFiles = EduNames.SRC.equals(parentName) || EduNames.SANDBOX_DIR.equals(parentName);
+        return !name.endsWith(".iml") && !name.equals(EduNames.TASK_HTML) && showFiles;
     }
 
     public static boolean isSourceFile(@NotNull PsiFile psiFile) {

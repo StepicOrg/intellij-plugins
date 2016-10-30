@@ -359,7 +359,7 @@ public class StudySerializationUtils {
             ArrayList<Element> list = new ArrayList<>();
             sectionsNames.entrySet().forEach(entry -> {
                 Element section = new Element("Section");
-                int index = EduUtils.getIndex(entry.getKey(), EduNames.SECTION) + 1;
+                int index = EduUtils.getIndex(entry.getKey(), EduNames.SECTION);
                 addChildWithName(section, "index", index);
                 addChildWithName(section, "name", entry.getValue());
                 ArrayList<Element> lessonsList = new ArrayList<>();
