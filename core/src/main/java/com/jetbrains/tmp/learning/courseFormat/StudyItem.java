@@ -8,4 +8,6 @@ public interface StudyItem {
     int getIndex();
 
     void setIndex(int index);
+
+    StudyStatus getStatus();
 }
