@@ -27,7 +27,7 @@
         <applicationConfigurable instance="org.stepik.plugin.collective.ui.StepikSettingsConfigurable"/>
         <moduleType id="STEPIK_MODULE_TYPE" implementationClass="org.stepik.plugin.java.project.wizard.StepikModuleType"/>
         <navbar implementation="org.stepik.plugin.projectView.StepikNavBarModelExtension"/>
-        <refactoring.moveHandler implementation="org.stepik.plugin.StepikMoveDelegate" order="first"/>
+        <refactoring.moveHandler implementation="org.stepik.plugin.StepikMoveHandlerDelegate" order="first"/>
         <renameHandler implementation="org.stepik.plugin.StepikRenameHandler" order="first"/>
     </extensions>
 
