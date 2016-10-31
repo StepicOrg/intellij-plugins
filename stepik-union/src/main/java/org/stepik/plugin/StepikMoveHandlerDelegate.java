@@ -14,7 +14,7 @@ import org.stepik.plugin.utils.ProjectFilesUtils;
 /**
  * @author meanmail
  */
-public class StepikMoveDelegate extends MoveHandlerDelegate {
+public class StepikMoveHandlerDelegate extends MoveHandlerDelegate {
     @Override
     public boolean canMove(DataContext dataContext) {
         return ProjectFilesUtils.canMoveOrRename(dataContext);
