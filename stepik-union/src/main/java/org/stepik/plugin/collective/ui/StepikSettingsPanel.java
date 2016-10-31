@@ -217,6 +217,7 @@ public class StepikSettingsPanel {
 
     public void resetCredentialsModification() {
         myCredentialsModified = false;
+        myHintCheckBoxModified = false;
     }
 
     private void createUIComponents() {
