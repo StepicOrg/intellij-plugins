@@ -76,6 +76,8 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class StudyUtils {
     private StudyUtils() {
@@ -562,15 +564,29 @@ public class StudyUtils {
 
     @Nullable
     public static String getTaskText(@NotNull final Project project) {
-        TaskFile taskFile = getSelectedTaskFile(project);
-        if (taskFile == null) {
-            return EMPTY_TASK_TEXT;
-        }
-        final Task task = taskFile.getTask();
+        final Task task = getSelectedTask(project);
         if (task != null) {
             return getTaskTextFromTask(task.getTaskDir(project), task);
         }
-        return null;
+        return EMPTY_TASK_TEXT;
+    }
+
+    private static String getRelativePath(@NotNull Project project, @NotNull VirtualFile item) {
+        String path = item.getPath();
+        String projectPath = project.getBasePath();
+        if (projectPath == null) {
+            return path;
+        }
+        return FileUtil.getRelativePath(projectPath, path, '/');
+    }
+
+    private static Task getSelectedTask(@NotNull Project project) {
+        VirtualFile[] files = FileEditorManager.getInstance(project).getSelectedFiles();
+        if (files.length == 0) {
+            return null;
+        }
+
+        return getTask(project, files[0]);
     }
 
     @Nullable
@@ -637,19 +653,21 @@ public class StudyUtils {
 
     @Nullable
     public static Task getTask(@NotNull Project project, @NotNull VirtualFile taskVF) {
-        Course course = StudyTaskManager.getInstance(project).getCourse();
-        if (course == null) {
-            return null;
+        String path = getRelativePath(project, taskVF);
+        Pattern pattern = Pattern.compile("^(section[0-9]+)/(lesson[0-9]+)/(task[0-9]+)/src/.*");
+        Matcher matcher = pattern.matcher(path);
+        if (matcher.matches()) {
+            Course course = StudyTaskManager.getInstance(project).getCourse();
+            if (course == null) {
+                return null;
+            }
+            Lesson lesson = course.getLessonOfMnemonic(matcher.group(2));
+            if (lesson == null) {
+                return null;
+            }
+            return lesson.getTask(matcher.group(3));
         }
-        VirtualFile lessonVF = taskVF.getParent();
-        if (lessonVF == null) {
-            return null;
-        }
-        Lesson lesson = course.getLessonByDirName(lessonVF.getName());
-        if (lesson == null) {
-            return null;
-        }
-        return lesson.getTask(taskVF.getName());
+        return null;
     }
 
     @Nullable
