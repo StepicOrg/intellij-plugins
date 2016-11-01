@@ -153,7 +153,7 @@
         </constraints>
         <properties>
           <selected value="false"/>
-          <text value="Show hint"/>
+          <text value="Show hint with Stepik special comments"/>
         </properties>
       </component>
       <vspacer id="d2c76">
