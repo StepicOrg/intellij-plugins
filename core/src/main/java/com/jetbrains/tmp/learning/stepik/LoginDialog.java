@@ -1,6 +1,7 @@
 package com.jetbrains.tmp.learning.stepik;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.project.ProjectUtil;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.util.text.StringUtil;
@@ -50,6 +51,11 @@ public class LoginDialog extends DialogWrapper {
             doJustOkAction();
             final Project project = ProjectUtil.guessCurrentProject(myLoginPanel.getContentPanel());
             StudyTaskManager.getInstance(project).setUser(user);
+
+            Project defaultProject = ProjectManager.getInstance().getDefaultProject();
+            if (StudyTaskManager.getInstance(defaultProject).getUser().getEmail().isEmpty()){
+                StudyTaskManager.getInstance(defaultProject).setUser(user);
+            }
         } else {
             setErrorText("Login failed");
         }
