@@ -304,7 +304,7 @@ public class StudyProjectComponent implements ProjectComponent {
                 int taskIndex = EduUtils.getIndex(taskDir.getName(), EduNames.TASK) - 1;
                 final VirtualFile lessonDir = taskDir.getParent();
                 if (lessonDir != null && lessonDir.getName().contains(EduNames.LESSON)) {
-                    final Lesson lesson = course.getLessonOfMnemonic(lessonDir.getName());
+                    final Lesson lesson = course.getLessonByDirName(lessonDir.getName());
                     if (lesson == null) {
                         return;
                     }

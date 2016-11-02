@@ -175,8 +175,12 @@ public class Course implements StudyItem {
     }
 
     @Nullable
-    private Section getSection(int index) {
-        return sections.get(index);
+    private Section getSectionOfIndex(int index) {
+        for (Section section : sections) {
+            if (section.getIndex() == index)
+                return section;
+        }
+        return null;
     }
 
     @NotNull
@@ -200,7 +204,7 @@ public class Course implements StudyItem {
         return null;
     }
 
-    public Lesson getLessonOfMnemonic(String name) {
+    public Lesson getLessonByDirName(String name) {
         int index = EduUtils.getIndex(name, EduNames.LESSON);
         return getLessonOfIndex(index);
     }
@@ -222,8 +226,8 @@ public class Course implements StudyItem {
         return "";
     }
 
-    public Section getSectionOfMnemonic(String valueName) {
+    public Section getSectionByDirName(String valueName) {
         int index = EduUtils.getIndex(valueName, EduNames.SECTION);
-        return getSection(index - 1);
+        return getSectionOfIndex(index);
     }
 }

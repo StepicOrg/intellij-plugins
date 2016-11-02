@@ -330,7 +330,7 @@ public class StudyUtils {
         if (taskDirName.contains(EduNames.TASK)) {
             final VirtualFile lessonDir = taskDir.getParent();
             if (lessonDir != null) {
-                Lesson lesson = course.getLessonOfMnemonic(lessonDir.getName());
+                Lesson lesson = course.getLessonByDirName(lessonDir.getName());
                 if (lesson == null) {
                     return null;
                 }
@@ -449,7 +449,7 @@ public class StudyUtils {
             if (project.getBaseDir().equals(parent)) {
                 return false;
             }
-            Lesson lesson = course.getLessonOfMnemonic(parent.getName());
+            Lesson lesson = course.getLessonByDirName(parent.getName());
             if (lesson != null) {
                 Task task = lesson.getTask(virtualFile.getName());
                 if (task != null) {
@@ -645,7 +645,7 @@ public class StudyUtils {
         if (lessonVF == null) {
             return null;
         }
-        Lesson lesson = course.getLessonOfMnemonic(lessonVF.getName());
+        Lesson lesson = course.getLessonByDirName(lessonVF.getName());
         if (lesson == null) {
             return null;
         }

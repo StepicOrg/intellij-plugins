@@ -45,7 +45,7 @@ public class PresentationUtils {
         } else if (valueName.startsWith(EduNames.TASK)) {
             PsiDirectory lessonDirectory = psiDirectory.getParent();
             if (lessonDirectory != null) {
-                Lesson lesson = course.getLessonOfMnemonic(lessonDirectory.getName());
+                Lesson lesson = course.getLessonByDirName(lessonDirectory.getName());
                 if (lesson != null) {
                     Task task = lesson.getTask(psiDirectory.getName());
                     if (task != null) {
@@ -58,10 +58,10 @@ public class PresentationUtils {
             if (parent == null) {
                 return;
             }
-            Lesson lesson = course.getLessonOfMnemonic(valueName);
+            Lesson lesson = course.getLessonByDirName(valueName);
             setAttributes(data, lesson);
         } else if (valueName.startsWith(EduNames.SECTION)) {
-            Section section = course.getSectionOfMnemonic(valueName);
+            Section section = course.getSectionByDirName(valueName);
             if (section != null) {
                 setAttributes(data, section);
             }
