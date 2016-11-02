@@ -18,7 +18,7 @@ class StudyTestResultsToolWindowFactory : ToolWindowFactory {
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
         val currentTask = StudyUtils.getCurrentTask(project)
         if (currentTask != null) {
-            val consoleView = ConsoleViewImpl(project, true);
+            val consoleView = ConsoleViewImpl(project, true)
             toolWindow.isToHideOnEmptyContent = true
 
             val contentManager = toolWindow.contentManager

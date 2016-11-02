@@ -45,7 +45,7 @@ import java.util.List;
  * data: 7/31/14.
  */
 public class StudyNewProjectPanel extends JPanel implements PanelWithAnchor {
-    private List<CourseInfo> myAvailableCourses = new ArrayList<CourseInfo>();
+    private List<CourseInfo> myAvailableCourses = new ArrayList<>();
     private JButton myBrowseButton;
     private ComboBox<CourseInfo> myCoursesComboBox;
     private JButton myRefreshButton;
@@ -70,7 +70,7 @@ public class StudyNewProjectPanel extends JPanel implements PanelWithAnchor {
     }
 
     private void layoutPanel() {
-        myCoursesComboBox = new ComboBox<CourseInfo>();
+        myCoursesComboBox = new ComboBox<>();
 
         final JPanel coursesPanel = new JPanel(new BorderLayout());
         final LabeledComponent<ComboBox> coursesCombo = LabeledComponent.create(myCoursesComboBox,
@@ -123,14 +123,19 @@ public class StudyNewProjectPanel extends JPanel implements PanelWithAnchor {
         } else {
             addCoursesToCombobox(myAvailableCourses);
             final CourseInfo selectedCourse = StudyUtils.getFirst(myAvailableCourses);
-            final String authorsString = Course.getAuthorsString(selectedCourse.getAuthors());
+            List<StepikUser> authors = null;
+            if (selectedCourse != null) {
+                authors = selectedCourse.getAuthors();
+            }
+            final String authorsString = authors != null ? Course.getAuthorsString(authors) : "";
             myAuthorLabel.setText(!StringUtil.isEmptyOrSpaces(authorsString) ? "Author: " + authorsString : "");
-            myDescriptionPane.setText(selectedCourse.getDescription());
+            final String description = selectedCourse != null ? selectedCourse.getDescription() : "";
+            myDescriptionPane.setText(description);
             myDescriptionPane.setEditable(false);
             //setting the first course in list as selected
             myGenerator.setSelectedCourse(selectedCourse);
 
-            if (selectedCourse.isAdaptive() && !myGenerator.isLoggedIn()) {
+            if (selectedCourse != null && selectedCourse.isAdaptive() && !myGenerator.isLoggedIn()) {
                 setError(loggerIN_TO_STEPIK_MESSAGE);
             } else {
                 setOK();
@@ -151,49 +156,46 @@ public class StudyNewProjectPanel extends JPanel implements PanelWithAnchor {
                 return StudyUtils.isZip(file.getName());
             }
         };
-        myBrowseButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                final BaseListPopupStep<String> popupStep = new BaseListPopupStep<String>("",
-                        "Add local course",
-                        loggerIN_TO_STEPIK) {
-                    @Override
-                    public PopupStep onChosen(final String selectedValue, boolean finalChoice) {
-                        return doFinalStep(() -> {
-                            if ("Add local course".equals(selectedValue)) {
-
-                                Project[] projects = ProjectManager.getInstance().getOpenProjects();
-                                FileChooser.chooseFile(fileChooser,
-                                        null,
-                                        projects.length == 0 ? null : projects[0].getBaseDir(),
-                                        file -> {
-                                            String fileName = file.getPath();
-                                            int oldSize = myAvailableCourses.size();
-                                            CourseInfo courseInfo = myGenerator.addLocalCourse(fileName);
-                                            if (courseInfo != null) {
-                                                if (oldSize != myAvailableCourses.size()) {
-                                                    myCoursesComboBox.addItem(courseInfo);
-                                                }
-                                                myCoursesComboBox.setSelectedItem(courseInfo);
-                                                setOK();
-                                            } else {
-                                                setError(INVALID_COURSE);
-                                                myCoursesComboBox.removeAllItems();
-                                                myCoursesComboBox.addItem(CourseInfo.INVALID_COURSE);
-                                                for (CourseInfo course : myAvailableCourses) {
-                                                    myCoursesComboBox.addItem(course);
-                                                }
-                                                myCoursesComboBox.setSelectedItem(CourseInfo.INVALID_COURSE);
+        myBrowseButton.addActionListener(e -> {
+            final BaseListPopupStep<String> popupStep = new BaseListPopupStep<String>("",
+                    "Add local course",
+                    loggerIN_TO_STEPIK) {
+                @Override
+                public PopupStep onChosen(final String selectedValue, boolean finalChoice) {
+                    return doFinalStep(() -> {
+                        if ("Add local course".equals(selectedValue)) {
+                            Project[] projects = ProjectManager.getInstance().getOpenProjects();
+                            FileChooser.chooseFile(fileChooser,
+                                    null,
+                                    projects.length == 0 ? null : projects[0].getBaseDir(),
+                                    file -> {
+                                        String fileName = file.getPath();
+                                        int oldSize = myAvailableCourses.size();
+                                        CourseInfo courseInfo = myGenerator.addLocalCourse(fileName);
+                                        if (courseInfo != null) {
+                                            if (oldSize != myAvailableCourses.size()) {
+                                                myCoursesComboBox.addItem(courseInfo);
                                             }
-                                        });
-                            } else if (loggerIN_TO_STEPIK.equals(selectedValue)) {
-                                showLoginDialog(true, "Signing In And Getting Stepik Course List");
-                            }
-                        });
-                    }
-                };
-                final ListPopup popup = JBPopupFactory.getInstance().createListPopup(popupStep);
-                popup.showInScreenCoordinates(myBrowseButton, myBrowseButton.getLocationOnScreen());
-            }
+                                            myCoursesComboBox.setSelectedItem(courseInfo);
+                                            setOK();
+                                        } else {
+                                            setError(INVALID_COURSE);
+                                            myCoursesComboBox.removeAllItems();
+                                            myCoursesComboBox.addItem(CourseInfo.INVALID_COURSE);
+                                            for (CourseInfo course : myAvailableCourses) {
+                                                myCoursesComboBox.addItem(course);
+                                            }
+                                            myCoursesComboBox.setSelectedItem(CourseInfo.INVALID_COURSE);
+                                        }
+                                    });
+                        } else if (loggerIN_TO_STEPIK.equals(selectedValue)) {
+                            showLoginDialog(true, "Signing In And Getting Stepik Course List");
+                        }
+                    });
+                }
+            };
+            final ListPopup popup = JBPopupFactory.getInstance().createListPopup(popupStep);
+            popup.showInScreenCoordinates(myBrowseButton, myBrowseButton.getLocationOnScreen());
         });
     }
 

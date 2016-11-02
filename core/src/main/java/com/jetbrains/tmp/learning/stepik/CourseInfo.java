@@ -6,6 +6,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Implementation of class which contains information to be shawn in course description in tool window
@@ -20,7 +21,7 @@ public class CourseInfo {
     boolean isAdaptive;
     boolean isPublic;
     List<Integer> sections;
-    List<Integer> instructors = new ArrayList<Integer>();
+    List<Integer> instructors = new ArrayList<>();
 
     List<StepikUser> myAuthors = new ArrayList<>();
     @SerializedName("summary")
@@ -85,11 +86,10 @@ public class CourseInfo {
 
     public void setAuthors(List<StepikUser> authors) {
         myAuthors = authors;
-        for (StepikUser author : authors) {
-            if (author.getId() > 0) {
-                instructors.add(author.getId());
-            }
-        }
+        instructors.addAll(authors.stream()
+                .filter(author -> author.getId() > 0)
+                .map(StepikUser::getId)
+                .collect(Collectors.toList()));
     }
 
     public void addAuthor(StepikUser author) {

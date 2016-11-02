@@ -19,6 +19,7 @@ import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
 import com.jetbrains.tmp.learning.courseFormat.Task;
 import icons.InteractiveLearningIcons;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -77,7 +78,8 @@ public class PresentationUtils {
 
     private static final HashMap<Object, HashMap<StudyStatus, Icon>> iconMap = new HashMap<>();
 
-    private static HashMap<StudyStatus, Icon> getIconMap(Object subject) {
+    @Nullable
+    private static HashMap<StudyStatus, Icon> getIconMap(@Nullable Object subject) {
         HashMap<StudyStatus, Icon> result = iconMap.get(subject);
         if (result != null)
             return result;
@@ -117,7 +119,8 @@ public class PresentationUtils {
         return null;
     }
 
-    private static JBColor getColor(StudyStatus status) {
+    @NotNull
+    private static JBColor getColor(@NotNull StudyStatus status) {
         switch (status) {
             case Unchecked:
                 return JBColor.BLACK;
@@ -153,7 +156,7 @@ public class PresentationUtils {
 
     public static boolean isVisibleDirectory(@NotNull PsiDirectory psiDirectory) {
         String path = getRelativePath(psiDirectory);
-        if (path.equals("."))
+        if (".".equals(path))
             return true;
 
         if (path.startsWith(EduNames.SANDBOX_DIR) || path.startsWith(EduNames.UTIL) || path.matches(COURSE_DIRECTORY))
@@ -182,12 +185,14 @@ public class PresentationUtils {
         return dirs.length > 4;
     }
 
+    @NotNull
     private static String getRelativePath(@NotNull PsiFileSystemItem item) {
         String path = item.getVirtualFile().getPath();
         String projectPath = item.getProject().getBasePath();
         if (projectPath == null) {
             return path;
         }
-        return FileUtil.getRelativePath(projectPath, path, '/');
+        String relPath = FileUtil.getRelativePath(projectPath, path, '/');
+        return relPath != null ? relPath : path;
     }
 }

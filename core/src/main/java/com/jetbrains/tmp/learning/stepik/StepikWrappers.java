@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class StepikWrappers {
     private static final Logger logger = Logger.getInstance(StepOptions.class);
@@ -45,10 +46,14 @@ public class StepikWrappers {
     }
 
     public static class Step {
-        @Expose StepOptions options;
-        @Expose String text;
-        @Expose String name;
-        @Expose StepOptions source;
+        @Expose
+        StepOptions options;
+        @Expose
+        String text;
+        @Expose
+        String name;
+        @Expose
+        StepOptions source;
 
         public static Step fromTask(Project project, @NotNull final Task task) {
             final Step step = new Step();
@@ -59,20 +64,28 @@ public class StepikWrappers {
     }
 
     public static class StepOptions {
-        @Expose List<TestFileWrapper> test;
-        @Expose String title;
-        @Expose List<TaskFile> files;
-        @Expose String text;
-        @Expose List<List<String>> samples;
-        @Expose Integer executionMemoryLimit;
-        @Expose Integer executionTimeLimit;
+        @Expose
+        List<TestFileWrapper> test;
+        @Expose
+        String title;
+        @Expose
+        List<TaskFile> files;
+        @Expose
+        String text;
+        @Expose
+        List<List<String>> samples;
+        @Expose
+        Integer executionMemoryLimit;
+        @Expose
+        Integer executionTimeLimit;
         //    @Expose Map<String, String> codeTemplates;
-        @Expose CodeTemplatesWrapper codeTemplates;
+        @Expose
+        CodeTemplatesWrapper codeTemplates;
 
         public static StepOptions fromTask(final Project project, @NotNull final Task task) {
             final StepOptions source = new StepOptions();
             setTests(task, source, project);
-            source.files = new ArrayList<TaskFile>();
+            source.files = new ArrayList<>();
             source.title = task.getName();
             for (final Map.Entry<String, TaskFile> entry : task.getTaskFiles().entrySet()) {
                 final TaskFile taskFile = new TaskFile();
@@ -117,10 +130,11 @@ public class StepikWrappers {
                             task.getTestsText(project)));
                 });
             } else {
-                source.test = new ArrayList<TestFileWrapper>();
-                for (Map.Entry<String, String> entry : testsText.entrySet()) {
-                    source.test.add(new TestFileWrapper(entry.getKey(), entry.getValue()));
-                }
+                source.test = new ArrayList<>();
+                source.test.addAll(testsText.entrySet()
+                        .stream()
+                        .map(entry -> new TestFileWrapper(entry.getKey(), entry.getValue()))
+                        .collect(Collectors.toList()));
             }
         }
     }
@@ -185,7 +199,7 @@ public class StepikWrappers {
             this.lesson = new Lesson();
             this.lesson.setName(lesson.getName());
             this.lesson.setId(lesson.getId());
-            this.lesson.steps = new ArrayList<Integer>();
+            this.lesson.steps = new ArrayList<>();
         }
     }
 
@@ -194,10 +208,14 @@ public class StepikWrappers {
     }
 
     static class StepSource {
-        @Expose Step block;
-        @Expose int id;
-        @Expose int position = 0;
-        @Expose int lesson = 0;
+        @Expose
+        Step block;
+        @Expose
+        int id;
+        @Expose
+        int position = 0;
+        @Expose
+        int lesson = 0;
 
         public StepSource(Project project, Task task, int lesson) {
             this.lesson = lesson;
@@ -207,8 +225,10 @@ public class StepikWrappers {
     }
 
     static class TestFileWrapper {
-        @Expose public final String name;
-        @Expose public final String text;
+        @Expose
+        public final String name;
+        @Expose
+        public final String text;
 
         public TestFileWrapper(String name, String text) {
             this.name = name;
@@ -470,11 +490,16 @@ public class StepikWrappers {
     }
 
     static class TokenInfo {
-        @Expose String accessToken;
-        @Expose String refreshToken;
-        @Expose String tokenType;
-        @Expose String scope;
-        @Expose int expiresIn;
+        @Expose
+        String accessToken;
+        @Expose
+        String refreshToken;
+        @Expose
+        String tokenType;
+        @Expose
+        String scope;
+        @Expose
+        int expiresIn;
 
         public TokenInfo() {
             accessToken = "";

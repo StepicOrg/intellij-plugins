@@ -217,8 +217,8 @@ public class StudyProjectGenerator {
                 if (lesson.getName().equals(EduNames.PYCHARM_ADDITIONAL)) {
                     flushAdditionalFiles(courseDirectory, lesson);
                 } else {
-                    final File lessonDirectory = new File(courseDirectory,
-                            EduNames.LESSON + String.valueOf(lessonIndex++));
+                    lesson.setIndex(lessonIndex);
+                    final File lessonDirectory = new File(courseDirectory, lesson.getDirectory());
                     flushLesson(lessonDirectory, lesson);
                 }
             }
@@ -248,9 +248,8 @@ public class StudyProjectGenerator {
 
     public static void flushLesson(@NotNull final File lessonDirectory, @NotNull final Lesson lesson) {
         FileUtil.createDirectory(lessonDirectory);
-        int taskIndex = 1;
         for (Task task : lesson.getTaskList()) {
-            final File taskDirectory = new File(lessonDirectory, EduNames.TASK + taskIndex++);
+            final File taskDirectory = new File(lessonDirectory, task.getDirectory());
             flushTask(task, taskDirectory);
         }
     }

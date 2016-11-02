@@ -216,6 +216,12 @@ public class Course implements StudyItem {
         return StudyStatus.Solved;
     }
 
+    @NotNull
+    @Override
+    public String getDirectory() {
+        return "";
+    }
+
     public Section getSectionOfMnemonic(String valueName) {
         int index = EduUtils.getIndex(valueName, EduNames.SECTION);
         return getSection(index - 1);

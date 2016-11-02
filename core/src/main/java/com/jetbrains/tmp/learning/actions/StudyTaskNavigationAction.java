@@ -44,20 +44,16 @@ abstract public class StudyTaskNavigationAction extends StudyActionWithShortcut 
         for (VirtualFile file : FileEditorManager.getInstance(project).getOpenFiles()) {
             FileEditorManager.getInstance(project).closeFile(file);
         }
-        int nextTaskIndex = targetTask.getIndex();
-        int lessonIndex = targetTask.getLesson().getIndex();
         Map<String, TaskFile> nextTaskFiles = targetTask.getTaskFiles();
         VirtualFile projectDir = project.getBaseDir();
-        String lessonDirName = EduNames.LESSON + String.valueOf(lessonIndex);
         if (projectDir == null) {
             return;
         }
-        VirtualFile lessonDir = projectDir.findChild(lessonDirName);
+        VirtualFile lessonDir = projectDir.findChild(targetTask.getLesson().getDirectory());
         if (lessonDir == null) {
             return;
         }
-        String taskDirName = EduNames.TASK + String.valueOf(nextTaskIndex);
-        VirtualFile taskDir = lessonDir.findChild(taskDirName);
+        VirtualFile taskDir = lessonDir.findChild(targetTask.getDirectory());
         if (taskDir == null) {
             return;
         }
@@ -81,7 +77,7 @@ abstract public class StudyTaskNavigationAction extends StudyActionWithShortcut 
         if (shouldBeActive != null) {
             ProjectView.getInstance(project).selectCB(shouldBeActive, shouldBeActive, false).doWhenDone(() -> {
                 List<TreePath> paths = TreeUtil.collectExpandedPaths(tree);
-                List<TreePath> toCollapse = new ArrayList<TreePath>();
+                List<TreePath> toCollapse = new ArrayList<>();
                 TreePath selectedPath = tree.getSelectionPath();
                 for (TreePath treePath : paths) {
                     if (treePath.isDescendant(selectedPath)) {

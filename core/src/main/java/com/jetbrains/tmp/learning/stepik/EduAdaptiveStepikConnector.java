@@ -252,14 +252,12 @@ public class EduAdaptiveStepikConnector {
                             logger.warn("Got task without unexpected number of task files: " + taskFiles.size());
                         }
 
-                        final File lessonDirectory = new File(course.getCourseDirectory(),
-                                EduNames.LESSON + String.valueOf(adaptive.getIndex()));
+                        final File lessonDirectory = new File(course.getCourseDirectory(), adaptive.getDirectory());
                         final File taskDirectory = new File(lessonDirectory,
                                 EduNames.TASK + String.valueOf(adaptive.getTaskList().size()));
                         StudyProjectGenerator.flushTask(task, taskDirectory);
                         StudyProjectGenerator.flushCourseJson(course, new File(course.getCourseDirectory()));
-                        final VirtualFile lessonDir = project.getBaseDir()
-                                .findChild(EduNames.LESSON + String.valueOf(adaptive.getIndex()));
+                        final VirtualFile lessonDir = project.getBaseDir().findChild(adaptive.getDirectory());
 
                         if (lessonDir != null) {
                             createTestFiles(course, task, unsolvedTask, lessonDir);
@@ -271,8 +269,7 @@ public class EduAdaptiveStepikConnector {
                     } else {
                         adaptive.addTask(task);
                         task.setIndex(adaptive.getTaskList().size());
-                        final VirtualFile lessonDir = project.getBaseDir()
-                                .findChild(EduNames.LESSON + String.valueOf(adaptive.getIndex()));
+                        final VirtualFile lessonDir = project.getBaseDir().findChild(adaptive.getDirectory());
 
                         if (lessonDir != null) {
                             ApplicationManager.getApplication()
@@ -288,8 +285,7 @@ public class EduAdaptiveStepikConnector {
                                     }));
                         }
 
-                        final File lessonDirectory = new File(course.getCourseDirectory(),
-                                EduNames.LESSON + String.valueOf(adaptive.getIndex()));
+                        final File lessonDirectory = new File(course.getCourseDirectory(), adaptive.getDirectory());
                         StudyProjectGenerator.flushLesson(lessonDirectory, adaptive);
                         StudyProjectGenerator.flushCourseJson(course, new File(course.getCourseDirectory()));
                         course.initCourse(true);
@@ -311,7 +307,7 @@ public class EduAdaptiveStepikConnector {
             try {
                 final VirtualFile taskDir = VfsUtil
                         .findFileByIoFile(new File(lessonDir.getCanonicalPath(),
-                                EduNames.TASK + unsolvedTask.getIndex()), true);
+                                unsolvedTask.getDirectory()), true);
                 final File resourceRoot = new File(course.getCourseDirectory(), lessonDir.getName());
                 File newResourceRoot = null;
                 if (taskDir != null) {

@@ -220,7 +220,7 @@ public class StepikConnectorGet {
                 if (sectionWrapper != null) {
                     section.setName(sectionWrapper.title);
                 } else {
-                    section.setName(EduNames.SECTION + " id = " + sectionId);
+                    section.setName(EduNames.SECTION + sectionId);
                 }
                 section.addLessons(getLessons(sectionId));
                 course.addSectionWithSetIndex(section);

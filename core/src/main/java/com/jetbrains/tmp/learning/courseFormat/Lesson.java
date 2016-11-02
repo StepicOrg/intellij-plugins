@@ -99,6 +99,12 @@ public class Lesson implements StudyItem {
         return StudyStatus.Solved;
     }
 
+    @NotNull
+    @Override
+    public String getDirectory() {
+        return EduNames.LESSON + myIndex;
+    }
+
     public int getId() {
         return myId;
     }
