@@ -152,14 +152,14 @@ public class PresentationUtils {
     private static final String LESSON_EXPR = SECTION_EXPR + "/" + EduNames.LESSON + "[0-9]+";
     private static final String TASK_EXPR = LESSON_EXPR + "/" + EduNames.TASK + "[0-9]+";
     private static final String SRC_EXPR = TASK_EXPR + "/" + EduNames.SRC;
-    private static final String COURSE_DIRECTORY = SECTION_EXPR + "|" + LESSON_EXPR + "|" + TASK_EXPR + "|" + SRC_EXPR;
+    private static final String SOURCE_DIRECTORY = SECTION_EXPR + "|" + LESSON_EXPR + "|" + TASK_EXPR + "|" + SRC_EXPR;
 
     public static boolean isVisibleDirectory(@NotNull PsiDirectory psiDirectory) {
         String path = getRelativePath(psiDirectory);
         if (".".equals(path))
             return true;
 
-        if (path.startsWith(EduNames.SANDBOX_DIR) || path.startsWith(EduNames.UTIL) || path.matches(COURSE_DIRECTORY))
+        if (path.startsWith(EduNames.SANDBOX_DIR) || path.startsWith(EduNames.UTIL) || path.matches(SOURCE_DIRECTORY))
             return true;
 
         if (psiDirectory.getName().equals(EduNames.HIDE))
