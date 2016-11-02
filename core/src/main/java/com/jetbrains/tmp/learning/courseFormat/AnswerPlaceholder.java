@@ -16,7 +16,7 @@ import java.util.List;
 public class AnswerPlaceholder {
 
     @Expose
-    private List<String> myHints = new ArrayList<String>();
+    private List<String> myHints = new ArrayList<>();
 
     @SerializedName("possible_answer")
     @Expose

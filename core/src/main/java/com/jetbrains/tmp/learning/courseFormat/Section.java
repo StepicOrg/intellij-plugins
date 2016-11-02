@@ -3,7 +3,6 @@ package com.jetbrains.tmp.learning.courseFormat;
 import com.google.gson.annotations.Expose;
 import com.intellij.util.xmlb.annotations.Transient;
 import com.jetbrains.tmp.learning.core.EduNames;
-import com.jetbrains.tmp.learning.core.EduUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -79,6 +78,12 @@ public class Section implements StudyItem {
         }
 
         return StudyStatus.Solved;
+    }
+
+    @NotNull
+    @Override
+    public String getDirectory() {
+        return EduNames.SECTION + index;
     }
 
     @Transient

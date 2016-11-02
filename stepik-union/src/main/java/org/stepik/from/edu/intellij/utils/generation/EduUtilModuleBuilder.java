@@ -13,6 +13,7 @@ import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.tmp.learning.StudyTaskManager;
 import com.jetbrains.tmp.learning.core.EduNames;
+import com.jetbrains.tmp.learning.courseFormat.Course;
 import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
 
@@ -23,7 +24,9 @@ public class EduUtilModuleBuilder extends JavaModuleBuilder {
 
     public EduUtilModuleBuilder(String moduleDir) {
         setName(EduNames.UTIL);
-        setModuleFilePath(FileUtil.join(moduleDir, EduNames.UTIL, EduNames.UTIL + ModuleFileType.DOT_DEFAULT_EXTENSION));
+        setModuleFilePath(FileUtil.join(moduleDir,
+                EduNames.UTIL,
+                EduNames.UTIL + ModuleFileType.DOT_DEFAULT_EXTENSION));
     }
 
     @NotNull
@@ -44,15 +47,11 @@ public class EduUtilModuleBuilder extends JavaModuleBuilder {
             return baseModule;
         }
         Project project = baseModule.getProject();
-//        StartupManager.getInstance(project).registerPostStartupActivity(() -> DumbService.getInstance(project).runWhenSmart(() -> ApplicationManager.getApplication().runWriteAction(() -> {
-//            EduIntellijUtils.addTemplate(project, src, "EduTestRunner.java");
-//        })));
-//        ExternalLibraryDescriptor descriptor = JUnitExternalLibraryDescriptor.JUNIT4;
-//        List<String> defaultRoots = descriptor.getLibraryClassesRoots();
-//        final List<String> urls = OrderEntryFix.refreshAndConvertToUrls(defaultRoots);
-//        ModuleRootModificationUtil.addModuleLibrary(baseModule, descriptor.getPresentableName(), urls, Collections.<String>emptyList());
-
-        String courseDirectory = StudyTaskManager.getInstance(project).getCourse().getCourseDirectory();
+        Course course = StudyTaskManager.getInstance(project).getCourse();
+        if (course == null) {
+            return baseModule;
+        }
+        String courseDirectory = course.getCourseDirectory();
         FileUtil.copyDirContent(new File(courseDirectory, EduNames.UTIL), new File(src.getPath()));
         return baseModule;
     }

@@ -32,7 +32,7 @@ public class StudyRunAction extends DumbAwareAction {
     private static final Logger logger = Logger.getInstance(StudyRunAction.class.getName());
     public static final String ACTION_ID = "SCore.StudyRunAction";
     private ProcessHandler myHandler;
-    private List<ProcessListener> myProcessListeners = new LinkedList<ProcessListener>();
+    private List<ProcessListener> myProcessListeners = new LinkedList<>();
 
     public StudyRunAction() {
         super("Run File With Tests", "Run your code with tests", AllIcons.General.Run);

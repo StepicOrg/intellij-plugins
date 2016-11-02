@@ -98,6 +98,9 @@ public class StudyNavigator {
             @NotNull final TaskFile taskFile) {
         if (!taskFile.getAnswerPlaceholders().isEmpty()) {
             AnswerPlaceholder firstAnswerPlaceholder = StudyUtils.getFirst(taskFile.getAnswerPlaceholders());
+            if (firstAnswerPlaceholder == null) {
+                return;
+            }
             navigateToAnswerPlaceholder(editor, firstAnswerPlaceholder);
         }
     }

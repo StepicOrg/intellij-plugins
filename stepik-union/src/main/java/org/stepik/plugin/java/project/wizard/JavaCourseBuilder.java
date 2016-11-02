@@ -78,11 +78,11 @@ public class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilde
         int lessonIndex = 1;
         for (Section section : course.getSections()) {
             section.setIndex(++sectionIndex);
-            LessonBuilder sectionBuilder = new StepikJavaSectionBuilder(moduleDir, sectionIndex, utilModule);
+            LessonBuilder sectionBuilder = new StepikJavaSectionBuilder(moduleDir, section, utilModule);
             sectionBuilder.createLesson(moduleModel);
             for (Lesson lesson : section.getLessons()) {
                 lesson.setIndex(lessonIndex++);
-                String sectionDir = moduleDir + "/" + EduNames.SECTION + sectionIndex;
+                String sectionDir = moduleDir + "/" + section.getDirectory();
                 LessonBuilder lessonBuilder = new StepikJavaLessonBuilder(sectionDir, lesson, utilModule);
                 lessonBuilder.createLesson(moduleModel);
             }

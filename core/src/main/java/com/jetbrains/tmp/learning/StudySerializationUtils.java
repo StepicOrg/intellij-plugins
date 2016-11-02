@@ -292,7 +292,7 @@ public class StudySerializationUtils {
 
         public static Element addChildList(Element parent, String name, List<Element> elements) {
             Element listElement = new Element(LIST);
-            elements.forEach((child) -> listElement.addContent(child));
+            elements.forEach(listElement::addContent);
             return addChildWithName(parent, name, listElement);
         }
 

@@ -8,7 +8,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.jetbrains.tmp.learning.StudyTaskManager;
 import com.jetbrains.tmp.learning.courseFormat.Course;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.plugin.utils.PresentationUtils;
 
@@ -22,7 +21,7 @@ public class StepikNavBarModelExtension extends JavaNavBarExtension {
 
     @Nullable
     @Override
-    public String getPresentableText(Object object) {
+    public String getPresentableText(@Nullable final Object object) {
         if (object instanceof Project) {
             Project project = (Project) object;
             StudyTaskManager studyTaskManager = StudyTaskManager.getInstance(project);
@@ -46,7 +45,7 @@ public class StepikNavBarModelExtension extends JavaNavBarExtension {
 
     @Nullable
     @Override
-    public PsiElement adjustElement(PsiElement psiElement) {
+    public PsiElement adjustElement(final PsiElement psiElement) {
         if (psiElement instanceof PsiDirectory) {
             if (!isVisibleDirectory((PsiDirectory) psiElement))
                 return null;

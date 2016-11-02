@@ -9,7 +9,6 @@ import com.intellij.openapi.module.ModuleWithNameAlreadyExists;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.io.FileUtil;
-import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.Lesson;
 import com.jetbrains.tmp.learning.courseFormat.Task;
 import org.stepik.from.edu.intellij.utils.generation.builders.LessonBuilder;
@@ -28,7 +27,7 @@ public class StepikJavaLessonBuilder extends JavaModuleBuilder implements Lesson
     public StepikJavaLessonBuilder(@NotNull String moduleDir, @NotNull Lesson lesson, @NotNull Module utilModule) {
         myLesson = lesson;
         myUtilModule = utilModule;
-        String lessonName = EduNames.LESSON + lesson.getIndex();
+        String lessonName = lesson.getDirectory();
         setName(lessonName);
         setModuleFilePath(FileUtil.join(moduleDir, lessonName, lessonName + ModuleFileType.DOT_DEFAULT_EXTENSION));
     }
