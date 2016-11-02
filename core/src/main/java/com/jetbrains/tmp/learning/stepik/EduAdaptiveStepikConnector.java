@@ -305,9 +305,8 @@ public class EduAdaptiveStepikConnector {
     private static void createTestFiles(Course course, Task task, Task unsolvedTask, VirtualFile lessonDir) {
         ApplicationManager.getApplication().invokeLater(() -> ApplicationManager.getApplication().runWriteAction(() -> {
             try {
-                final VirtualFile taskDir = VfsUtil
-                        .findFileByIoFile(new File(lessonDir.getCanonicalPath(),
-                                unsolvedTask.getDirectory()), true);
+                final VirtualFile taskDir = VfsUtil.findFileByIoFile(new File(lessonDir.getCanonicalPath(),
+                        unsolvedTask.getDirectory()), true);
                 final File resourceRoot = new File(course.getCourseDirectory(), lessonDir.getName());
                 File newResourceRoot = null;
                 if (taskDir != null) {
