@@ -24,7 +24,7 @@ import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.editor.StudyEditor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.stepik.plugin.collective.SupportedLanguages;
+import com.jetbrains.tmp.learning.stepik.SupportedLanguages;
 
 import javax.swing.*;
 

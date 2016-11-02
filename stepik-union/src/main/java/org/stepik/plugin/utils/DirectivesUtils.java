@@ -9,7 +9,7 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
-import org.stepik.plugin.collective.SupportedLanguages;
+import com.jetbrains.tmp.learning.stepik.SupportedLanguages;
 
 import java.util.Arrays;
 

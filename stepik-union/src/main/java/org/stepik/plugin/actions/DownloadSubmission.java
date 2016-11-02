@@ -18,6 +18,7 @@ import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.actions.StudyActionWithShortcut;
 import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.editor.StudyEditor;
+import com.jetbrains.tmp.learning.stepik.MetricBuilder;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorGet;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorPost;
 import com.jetbrains.tmp.learning.stepik.StepikWrappers;
@@ -25,7 +26,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.stepik.plugin.collective.SupportedLanguages;
+import com.jetbrains.tmp.learning.stepik.SupportedLanguages;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -77,24 +78,28 @@ public class DownloadSubmission extends StudyActionWithShortcut {
         nvps.add(new BasicNameValuePair("user", userId));
         nvps.add(new BasicNameValuePair("order", "desc"));
 
-        StepikWrappers.SubmissionContainer submissionContainer = StepikConnectorGet.getSubmissions(nvps);
-        if (submissionContainer == null) {
-            return;
-        }
-        List<StepikWrappers.SubmissionContainer.Submission> submissions = submissionContainer.submissions;
-        StepikWrappers.MetricsWrapper metric = new StepikWrappers.MetricsWrapper(
-                StepikWrappers.MetricsWrapper.PluginNames.STEPIK_UNION,
-                StepikWrappers.MetricsWrapper.MetricActions.DOWNLOAD,
-                targetTask.getLesson().getSection().getCourse().getId(),
-                targetTask.getStepId());
-        StepikConnectorPost.postMetric(metric);
-
         LangManager langManager = StudyTaskManager.getInstance(project).getLangManager();
         LangSetting langSetting = langManager.getLangSetting(targetTask);
         SupportedLanguages currentLang = SupportedLanguages.langOf(langSetting.getCurrentLang());
         if (currentLang == null) {
             return;
         }
+
+        StepikWrappers.SubmissionContainer submissionContainer = StepikConnectorGet.getSubmissions(nvps);
+        if (submissionContainer == null) {
+            return;
+        }
+        List<StepikWrappers.SubmissionContainer.Submission> submissions = submissionContainer.submissions;
+        MetricBuilder.MetricsWrapper metric = MetricBuilder.getInstance()
+                .addTag(MetricBuilder.PluginNames.STEPIK_UNION)
+                .addTag(MetricBuilder.MetricActions.DOWNLOAD)
+                .addTag(currentLang)
+                .setCourseId(targetTask.getLesson().getCourse().getId())
+                .setStepId(targetTask.getStepId())
+                .build();
+        StepikConnectorPost.postMetric(metric);
+
+
         String activateFileName = currentLang.getMainFileName();
         String code = null;
         for (StepikWrappers.SubmissionContainer.Submission submission : submissions) {

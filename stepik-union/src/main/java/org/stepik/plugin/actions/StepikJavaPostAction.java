@@ -19,11 +19,12 @@ import com.jetbrains.tmp.learning.checker.StudyCheckUtils;
 import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
 import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.editor.StudyEditor;
+import com.jetbrains.tmp.learning.stepik.MetricBuilder;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorGet;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorPost;
 import com.jetbrains.tmp.learning.stepik.StepikWrappers;
 import org.jetbrains.annotations.NotNull;
-import org.stepik.plugin.collective.SupportedLanguages;
+import com.jetbrains.tmp.learning.stepik.SupportedLanguages;
 import org.stepik.plugin.utils.DirectivesUtils;
 import org.stepik.plugin.utils.NotificationUtils;
 
@@ -92,11 +93,13 @@ public class StepikJavaPostAction extends StudyCheckAction {
                         return;
                     }
                     List<StepikWrappers.SubmissionContainer.Submission> submissions = container.submissions;
-                    StepikWrappers.MetricsWrapper metric = new StepikWrappers.MetricsWrapper(
-                            StepikWrappers.MetricsWrapper.PluginNames.STEPIK_UNION,
-                            StepikWrappers.MetricsWrapper.MetricActions.POST,
-                            task.getLesson().getSection().getCourse().getId(),
-                            task.getStepId());
+                    MetricBuilder.MetricsWrapper metric = MetricBuilder.getInstance()
+                            .addTag(MetricBuilder.PluginNames.STEPIK_UNION)
+                            .addTag(MetricBuilder.MetricActions.POST)
+                            .addTag(currentLang)
+                            .setCourseId(task.getLesson().getSection().getCourse().getId())
+                            .setStepId(task.getStepId())
+                            .build();
                     StepikConnectorPost.postMetric(metric);
                     int submissionId = submissions.get(0).id;
                     logger.info("submissionId = " + submissionId);

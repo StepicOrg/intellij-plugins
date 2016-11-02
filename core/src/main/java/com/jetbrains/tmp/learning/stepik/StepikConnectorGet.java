@@ -189,6 +189,13 @@ public class StepikConnectorGet {
     }
 
     public static Course getCourse(@NotNull final Project project, @NotNull final CourseInfo info) {
+        MetricBuilder.MetricsWrapper metric = MetricBuilder.getInstance()
+                .addTag(MetricBuilder.PluginNames.STEPIK_UNION)
+                .addTag(MetricBuilder.MetricActions.GET_COURSE)
+                .setCourseId(info.id)
+                .build();
+        StepikConnectorPost.postMetric(metric);
+
         Course course = new Course();
         course.setName(info.getName());
         course.setAuthors(info.getAuthors());

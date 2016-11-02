@@ -516,11 +516,15 @@ public class StepikConnectorPost {
         });
     }
 
-    public static void postMetric(StepikWrappers.MetricsWrapper metric) {
-        String requestBody = GSON.toJson(metric);
-        logger.info(requestBody);
+    public static void postMetric(MetricBuilder.MetricsWrapper metricsWrapper) {
+        if (EduNames.ILLEGAL.equals(metricsWrapper.metric.name)){
+            logger.warn("illegal metric");
+            return;
+        }
+        String requestBody = GSON.toJson(metricsWrapper);
         try {
-            postToStepikVoid(EduStepikNames.METRICS, requestBody);
+            postToStepikVoid(EduStepikNames.METRICS, MetricBuilder.MetricsWrapper.class, requestBody);
+//           postToStepikVoid(EduStepikNames.METRICS, requestBody);
         } catch (IOException e) {
             logger.warn("Can't post a metric\n" + e.toString());
         }

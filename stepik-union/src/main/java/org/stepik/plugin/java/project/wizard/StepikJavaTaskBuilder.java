@@ -21,7 +21,7 @@ import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.from.edu.intellij.utils.generation.builders.TaskBuilder;
-import org.stepik.plugin.collective.SupportedLanguages;
+import com.jetbrains.tmp.learning.stepik.SupportedLanguages;
 
 import java.io.File;
 import java.io.IOException;

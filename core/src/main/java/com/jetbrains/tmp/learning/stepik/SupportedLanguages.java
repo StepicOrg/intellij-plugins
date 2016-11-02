@@ -1,4 +1,4 @@
-package org.stepik.plugin.collective;
+package com.jetbrains.tmp.learning.stepik;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
