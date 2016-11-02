@@ -517,8 +517,8 @@ public class StepikConnectorPost {
     }
 
     public static void postMetric(MetricBuilder.MetricsWrapper metricsWrapper) {
-        if (EduNames.ILLEGAL.equals(metricsWrapper.metric.name)){
-            logger.warn("illegal metric");
+        if (EduNames.INVALID.equals(metricsWrapper.metric.name)){
+            logger.warn(EduNames.INVALID + " metric");
             return;
         }
         String requestBody = GSON.toJson(metricsWrapper);

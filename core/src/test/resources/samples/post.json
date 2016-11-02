@@ -1,0 +1,14 @@
+{
+  "metric": {
+    "name": "ide_plugin",
+    "tags": {
+      "name": "S_Union",
+      "action": "post",
+      "language": "java8"
+    },
+    "data": {
+      "course_id": 187,
+      "step_id": 42
+    }
+  }
+}

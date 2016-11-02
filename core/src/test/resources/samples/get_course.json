@@ -1,0 +1,12 @@
+{
+  "metric": {
+    "name": "ide_plugin",
+    "tags": {
+      "name": "S_Union",
+      "action": "get_course"
+    },
+    "data": {
+      "course_id": 512
+    }
+  }
+}
