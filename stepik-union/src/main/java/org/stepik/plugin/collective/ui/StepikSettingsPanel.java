@@ -58,7 +58,7 @@ public class StepikSettingsPanel {
     private JPanel myPane;
     private JButton myTestButton;
     //  private JTextField myHostTextField;
-    private ComboBox myAuthTypeComboBox;
+    private ComboBox<String> myAuthTypeComboBox;
     private JPanel myCardPanel;
     private JBLabel myAuthTypeLabel;
     private JButton magicButton;

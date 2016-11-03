@@ -24,7 +24,7 @@ public class Task implements StudyItem {
     private int myIndex;
     private int position;
     private String text;
-    private Map<String, String> testsText = new HashMap<String, String>();
+    private Map<String, String> testsText = new HashMap<>();
     private StudyStatus myStatus = StudyStatus.Unchecked;
 
     @Transient
@@ -37,7 +37,7 @@ public class Task implements StudyItem {
 
     @Expose
     @SerializedName("task_files")
-    public Map<String, TaskFile> taskFiles = new HashMap<String, TaskFile>();
+    public Map<String, TaskFile> taskFiles = new HashMap<>();
 
     public Task() {}
 
@@ -132,13 +132,11 @@ public class Task implements StudyItem {
 
     @Nullable
     public VirtualFile getTaskDir(@NotNull final Project project) {
-        String lessonDirName = EduNames.LESSON + String.valueOf(myLesson.getIndex());
-        String taskDirName = EduNames.TASK + String.valueOf(myIndex);
         VirtualFile courseDir = project.getBaseDir();
         if (courseDir != null) {
-            VirtualFile lessonDir = courseDir.findChild(lessonDirName);
+            VirtualFile lessonDir = courseDir.findChild(myLesson.getDirectory());
             if (lessonDir != null) {
-                return lessonDir.findChild(taskDirName);
+                return lessonDir.findChild(getDirectory());
             }
         }
         return null;
@@ -186,9 +184,8 @@ public class Task implements StudyItem {
         if (name != null ? !name.equals(task.name) : task.name != null) return false;
         if (taskFiles != null ? !taskFiles.equals(task.taskFiles) : task.taskFiles != null) return false;
         if (text != null ? !text.equals(task.text) : task.text != null) return false;
-        if (testsText != null ? !testsText.equals(task.testsText) : task.testsText != null) return false;
+        return testsText != null ? testsText.equals(task.testsText) : task.testsText == null;
 
-        return true;
     }
 
     @Override
@@ -209,8 +206,15 @@ public class Task implements StudyItem {
         return stepId;
     }
 
+    @Override
     public StudyStatus getStatus() {
         return myStatus;
+    }
+
+    @NotNull
+    @Override
+    public String getDirectory() {
+        return EduNames.TASK + myIndex;
     }
 
     public void setStatus(StudyStatus status) {

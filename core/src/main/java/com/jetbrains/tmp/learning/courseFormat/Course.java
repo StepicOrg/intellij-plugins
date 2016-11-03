@@ -4,21 +4,19 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.intellij.lang.Language;
 import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.util.xmlb.annotations.Transient;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.core.EduUtils;
 import com.jetbrains.tmp.learning.stepik.StepikUser;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-public class Course {
+public class Course implements StudyItem {
     @Expose
-    private List<Lesson> lessons = new ArrayList<Lesson>();
-    @Expose
-    private List<StepikUser> authors = new ArrayList<StepikUser>();
+    private List<StepikUser> authors = new ArrayList<>();
     @Expose
     private String description;
     @Expose
@@ -32,9 +30,8 @@ public class Course {
     @Expose
     @SerializedName("language")
     private String myLanguage = "Python";
-
     @Expose
-    private Map<String, String> sectionsNames = new HashMap();
+    private List<Section> sections = new ArrayList<>();
 
     //this field is used to distinguish ordinary and CheckIO projects,
     //"PyCharm" is used here for historical reasons
@@ -48,39 +45,9 @@ public class Course {
      * Initializes state of course
      */
     public void initCourse(boolean isRestarted) {
-        for (Lesson lesson : getLessons()) {
-            lesson.initLesson(this, isRestarted);
+        for (Section section : getSections()) {
+            section.initSection(this, isRestarted);
         }
-    }
-
-    public List<Lesson> getLessons() {
-        return lessons;
-    }
-
-    public void setLessons(List<Lesson> lessons) {
-        this.lessons = lessons;
-    }
-
-    public void addLessons(List<Lesson> lessons) {
-        this.lessons.addAll(lessons);
-    }
-
-    public void addLesson(@NotNull final Lesson lesson) {
-        lessons.add(lesson);
-    }
-
-    public Lesson getLesson(@NotNull final String name) {
-        int lessonIndex = EduUtils.getIndex(name, EduNames.LESSON);
-        List<Lesson> lessons = getLessons();
-        if (!EduUtils.indexIsValid(lessonIndex, lessons)) {
-            return null;
-        }
-        for (Lesson lesson : lessons) {
-            if (lesson.getIndex() - 1 == lessonIndex) {
-                return lesson;
-            }
-        }
-        return null;
     }
 
     @NotNull
@@ -88,12 +55,13 @@ public class Course {
         return authors;
     }
 
+    @NotNull
     public static String getAuthorsString(@NotNull List<StepikUser> authors) {
         return StringUtil.join(authors, StepikUser::getName, ", ");
     }
 
     public void setAuthors(String[] authors) {
-        this.authors = new ArrayList<StepikUser>();
+        this.authors = new ArrayList<>();
         for (String name : authors) {
             final List<String> pair = StringUtil.split(name, " ");
             if (!pair.isEmpty()) {
@@ -108,6 +76,18 @@ public class Course {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Transient
+    @Override
+    public int getIndex() {
+        throw new UnsupportedOperationException("Course not support getIndex()");
+    }
+
+    @Transient
+    @Override
+    public void setIndex(int index) {
+        throw new UnsupportedOperationException("Course not support setIndex()");
     }
 
     public String getCourseDirectory() {
@@ -146,7 +126,7 @@ public class Course {
         myLanguage = language;
     }
 
-    public void setAuthors(List<StepikUser> authors) {
+    public void setAuthors(@NotNull List<StepikUser> authors) {
         this.authors = authors;
     }
 
@@ -155,7 +135,7 @@ public class Course {
         return courseType;
     }
 
-    public void setCourseType(String courseType) {
+    public void setCourseType(@NotNull String courseType) {
         this.courseType = courseType;
     }
 
@@ -183,15 +163,71 @@ public class Course {
         this.courseMode = courseMode;
     }
 
-    public Map<String, String> getSectionsNames() {
-        return sectionsNames;
+    public void addSection(@NotNull Section section) {
+        sections.add(section);
     }
 
-    public void setSectionsNames(Map<String, String> sectionsNames) {
-        this.sectionsNames = sectionsNames;
+    public void setSections(@Nullable List<Section> sections) {
+        if (sections == null)
+            sections = new ArrayList<>();
+
+        this.sections = sections;
     }
 
-    public void addSectionName(String key, String value) {
-        sectionsNames.put(key, value);
+    @Nullable
+    private Section getSectionOfIndex(int index) {
+        for (Section section : sections) {
+            if (section.getIndex() == index)
+                return section;
+        }
+        return null;
+    }
+
+    @NotNull
+    public List<Section> getSections() {
+        return sections;
+    }
+
+    public void addSectionWithSetIndex(Section section) {
+        section.setIndex(sections.size() + 1);
+        sections.add(section);
+    }
+
+    public Lesson getLessonOfIndex(int index) {
+        for (Section section : getSections()) {
+            for (Lesson lesson : section.getLessons()) {
+                if (lesson.getIndex() == index) {
+                    return lesson;
+                }
+            }
+        }
+        return null;
+    }
+
+    public Lesson getLessonByDirName(String name) {
+        int index = EduUtils.getIndex(name, EduNames.LESSON);
+        return getLessonOfIndex(index);
+    }
+
+    @Transient
+    @Override
+    public StudyStatus getStatus() {
+        for (Section section : sections) {
+            if (section.getStatus() != StudyStatus.Solved)
+                return StudyStatus.Unchecked;
+        }
+
+        return StudyStatus.Solved;
+    }
+
+    @NotNull
+    @Override
+    public String getDirectory() {
+        return "";
+    }
+
+    public Section getSectionByDirName(String valueName) {
+        int index = EduUtils.getIndex(valueName, EduNames.SECTION);
+        return getSectionOfIndex(index);
     }
 }

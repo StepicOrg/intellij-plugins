@@ -25,6 +25,7 @@ import com.jetbrains.tmp.learning.StudySerializationUtils;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.Lesson;
+import com.jetbrains.tmp.learning.courseFormat.Section;
 import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.courseFormat.TaskFile;
 import org.apache.http.HttpEntity;
@@ -38,6 +39,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.net.URI;
@@ -45,15 +47,14 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class StepikConnectorGet {
     private static final Logger logger = Logger.getInstance(StepikConnectorGet.class.getName());
-    private static final String stepikUrl = "https://stepik.org/";
     public static final String PYCHARM_PREFIX = "pycharm";
     public static final String CODE_PREFIX = "code";
-    public static final String PYTHON27 = "python27";
-    public static final String PYTHON3 = "python3";
 
     static final private Gson GSON =
             new GsonBuilder().registerTypeAdapter(TaskFile.class,
@@ -81,7 +82,6 @@ public class StepikConnectorGet {
             throw new IOException("Stepik returned non 200 status code " + responseString);
         }
         return GSON.fromJson(responseString, container);
-        //    return getFromStepik(link, container, client, new ArrayList<NameValuePair>());
     }
 
     private static <T> T getFromStepik(
@@ -110,14 +110,11 @@ public class StepikConnectorGet {
     }
 
     @NotNull
-    // un login
     public static List<CourseInfo> getCourses() {
         try {
-            List<CourseInfo> result = new ArrayList<CourseInfo>();
+            List<CourseInfo> result = new ArrayList<>();
             int pageNumber = 1;
-            while (addCoursesFromStepik(result, pageNumber)) {
-                pageNumber += 1;
-            }
+            while (addCoursesFromStepik(result, pageNumber++)) ;
             return result;
         } catch (IOException e) {
             logger.error("Cannot load course list " + e.getMessage());
@@ -127,13 +124,11 @@ public class StepikConnectorGet {
 
     public static List<CourseInfo> getEnrolledCourses() {
         try {
-            List<CourseInfo> result = new ArrayList<CourseInfo>();
+            List<CourseInfo> result = new ArrayList<>();
             int pageNumber = 1;
             List<NameValuePair> nvps = new ArrayList<>();
             nvps.add(new BasicNameValuePair("enrolled", "true"));
-            while (addCoursesFromStepik(result, pageNumber, nvps)) {
-                pageNumber += 1;
-            }
+            while (addCoursesFromStepik(result, pageNumber++, nvps)) ;
             return result;
         } catch (IOException e) {
             logger.error("Cannot load course list " + e.getMessage());
@@ -141,42 +136,30 @@ public class StepikConnectorGet {
         return Collections.singletonList(CourseInfo.INVALID_COURSE);
     }
 
-    @NotNull
-    public static CourseInfo getDefaultCourse() {
-        CourseInfo courseInfo = null;
-        try {
-            courseInfo = getFromStepik(EduStepikNames.COURSES + "/217",
-                    StepikWrappers.CoursesContainer.class).courses.get(0);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return courseInfo;
-    }
-
     private static boolean addCoursesFromStepik(List<CourseInfo> result, int pageNumber) throws IOException {
         final String url = pageNumber == 0 ?
                 EduStepikNames.COURSES :
-                EduStepikNames.COURSES_FROM_PAGE + String.valueOf(pageNumber);
+                EduStepikNames.COURSES_FROM_PAGE + pageNumber;
         final StepikWrappers.CoursesContainer coursesContainer = getFromStepikUnLogin(url,
                 StepikWrappers.CoursesContainer.class);
-        final List<CourseInfo> courseInfos = coursesContainer.courses;
-        for (CourseInfo info : courseInfos) {
+        for (CourseInfo info : coursesContainer.courses) {
             final String courseType = info.getType();
-            if (!info.isAdaptive() && StringUtil.isEmptyOrSpaces(courseType)) continue;
-            final List<String> typeLanguage = StringUtil.split(courseType, " ");
-            // TODO: should adaptive course be of PyCharmType ?
-            if (info.isAdaptive() || (typeLanguage.size() == 2 && PYCHARM_PREFIX.equals(typeLanguage.get(0)))) {
-                for (Integer instructor : info.instructors) {
-                    final StepikUser author =
-                            getFromStepikUnLogin(EduStepikNames.USERS + "/" + String.valueOf(instructor),
-                                    StepikWrappers.AuthorWrapper.class).users.get(0);
-                    info.addAuthor(author);
+            if (info.isAdaptive() || !StringUtil.isEmptyOrSpaces(courseType)) {
+                final List<String> typeLanguage = StringUtil.split(courseType, " ");
+                // TODO: should adaptive course be of PyCharmType ?
+                if (info.isAdaptive() || (typeLanguage.size() == 2 && PYCHARM_PREFIX.equals(typeLanguage.get(0)))) {
+                    for (int instructor : info.instructors) {
+                        final StepikUser author =
+                                getFromStepikUnLogin(EduStepikNames.USERS + "/" + instructor,
+                                        StepikWrappers.AuthorWrapper.class).users.get(0);
+                        info.addAuthor(author);
+                    }
+
+                    String name = info.getName().replaceAll("[^a-zA-Z0-9\\s]", "");
+                    info.setName(name.trim());
+
+                    result.add(info);
                 }
-
-                String name = info.getName().replaceAll("[^a-zA-Z0-9\\s]", "");
-                info.setName(name.trim());
-
-                result.add(info);
             }
         }
         return coursesContainer.meta.containsKey("has_next") && coursesContainer.meta.get("has_next") == Boolean.TRUE;
@@ -186,35 +169,28 @@ public class StepikConnectorGet {
             throws IOException {
         final String url = pageNumber == 0 ?
                 EduStepikNames.COURSES :
-                EduStepikNames.COURSES_FROM_PAGE + String.valueOf(pageNumber);
+                EduStepikNames.COURSES_FROM_PAGE + pageNumber;
         final StepikWrappers.CoursesContainer coursesContainer =
                 getFromStepik(url, StepikWrappers.CoursesContainer.class, StepikConnectorLogin.getHttpClient(), nvps);
-        final List<CourseInfo> courseInfos = coursesContainer.courses;
-        for (CourseInfo info : courseInfos) {
-            final String courseType = info.getType();
-            //if (!info.isAdaptive() && StringUtil.isEmptyOrSpaces(courseType)) continue;
-            final List<String> typeLanguage = StringUtil.split(courseType, " ");
-            // TODO: should adaptive course be of PyCharmType ?
-            //if (info.isAdaptive() || (typeLanguage.size() == 2 && PYCHARM_PREFIX.equals(typeLanguage.get(0)))) {
-            for (Integer instructor : info.instructors) {
+        if (coursesContainer == null) {
+            return false;
+        }
+        for (CourseInfo info : coursesContainer.courses) {
+            for (int instructor : info.instructors) {
                 final StepikUser author =
-                        getFromStepik(EduStepikNames.USERS + "/" + String.valueOf(instructor),
+                        getFromStepik(EduStepikNames.USERS + "/" + instructor,
                                 StepikWrappers.AuthorWrapper.class,
                                 StepikConnectorInit.getHttpClient()).users.get(0);
                 info.addAuthor(author);
             }
-
-            //      String name = info.getName().replaceAll("[^a-zA-Z0-9\\s]", "");
-            //      info.setName(name.trim());
-
             result.add(info);
-            //}
         }
         return coursesContainer.meta.containsKey("has_next") && coursesContainer.meta.get("has_next") == Boolean.TRUE;
     }
 
     public static Course getCourse(@NotNull final Project project, @NotNull final CourseInfo info) {
         Course course = new Course();
+        course.setName(info.getName());
         course.setAuthors(info.getAuthors());
         course.setDescription(info.getDescription());
         course.setAdaptive(info.isAdaptive());
@@ -222,32 +198,32 @@ public class StepikConnectorGet {
         course.setUpToDate(true);  // TODO: get from stepik
 
         if (course.isAdaptive()) {
-            course = getAdaptiveCourse(project, course, info);
+            course = getAdaptiveCourse(project, course);
         } else {
-            course = getRegularCourse(project, course, info);
+            course = getRegularCourse(course, info);
         }
         return course;
     }
 
     private static Course getRegularCourse(
-            @NotNull final Project project,
-            Course course,
+            @NotNull Course course,
             @NotNull final CourseInfo info) {
-        String courseType = info.getType();
-        course.setName(info.getName());
-        course.setCourseType(info.getType().startsWith("pycharm") ? info.getType() : "stepik");
-
-        //    what for?
-//    course.setLanguage(courseType.substring(PYCHARM_PREFIX.length() + 1));
         try {
-            for (Integer section : info.sections) {
-                switch (course.getCourseType()) {
-                    case ("stepik"):
-                        course.addLessons(getLessonsWithSectionNames(section, course));
-                        break;
-                    default:
-                        course.addLessons(getLessons(section));
+            for (Integer sectionId : info.sections) {
+                List<Lesson> lessons = getLessons(sectionId);
+                if (lessons.isEmpty())
+                    continue;
+                Section section = new Section();
+                section.setCourse(course);
+                section.setId(sectionId);
+                StepikWrappers.Section sectionWrapper = getSection(sectionId);
+                if (sectionWrapper != null) {
+                    section.setName(sectionWrapper.title);
+                } else {
+                    section.setName(EduNames.SECTION + sectionId);
                 }
+                section.addLessons(getLessons(sectionId));
+                course.addSectionWithSetIndex(section);
             }
             return course;
         } catch (IOException e) {
@@ -256,27 +232,44 @@ public class StepikConnectorGet {
         }
     }
 
+    @Nullable
+    private static StepikWrappers.Section getSection(int sectionId) {
+        StepikWrappers.SectionContainer sectionContainer;
+        try {
+            sectionContainer = getFromStepik(EduStepikNames.SECTIONS + sectionId,
+                    StepikWrappers.SectionContainer.class);
+        } catch (IOException e) {
+            return null;
+        }
+        Iterator<StepikWrappers.Section> iterator = sectionContainer.sections.iterator();
+        if (iterator.hasNext()) {
+            return iterator.next();
+        }
+
+        return null;
+    }
+
     private static Course getAdaptiveCourse(
             @NotNull final Project project,
-            Course course,
-            @NotNull final CourseInfo info) {
+            @NotNull Course course) {
         final Lesson lesson = new Lesson();
-        course.setName(info.getName());
-        //TODO: more specific name?
         lesson.setName("Adaptive");
-        course.addLesson(lesson);
+        Section section = new Section();
+        section.setName(lesson.getName());
+        section.addLesson(lesson);
+        course.addSectionWithSetIndex(section);
         final Task recommendation = EduAdaptiveStepikConnector.getNextRecommendation(project, course);
         if (recommendation != null) {
             lesson.addTask(recommendation);
             return course;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     public static List<Lesson> getLessons(int sectionId) throws IOException {
         final StepikWrappers.SectionContainer
-                sectionContainer = getFromStepik(EduStepikNames.SECTIONS + String.valueOf(sectionId),
+                sectionContainer = getFromStepik(EduStepikNames.SECTIONS + sectionId,
                 StepikWrappers.SectionContainer.class);
         List<Integer> unitIds = sectionContainer.sections.get(0).units;
 
@@ -284,15 +277,15 @@ public class StepikConnectorGet {
                 unitContainer = getFromStepik(EduStepikNames.UNITS + "/" + getIdQuery(unitIds),
                 StepikWrappers.UnitContainer.class);
         List<Integer> lessonsIds = new ArrayList<>();
-        unitContainer.units.forEach(x -> lessonsIds.add(x.lesson));
+        unitContainer.units.forEach(unit -> lessonsIds.add(unit.lesson));
         StepikWrappers.LessonContainer
                 lessonContainer = getFromStepik(EduStepikNames.LESSONS + getIdQuery(lessonsIds),
                 StepikWrappers.LessonContainer.class);
 
-        final List<Lesson> lessons = new ArrayList<Lesson>();
+        final List<Lesson> lessons = new ArrayList<>();
         for (Lesson lesson : lessonContainer.lessons) {
             createTasks(lesson, lesson.steps);
-            if (!lesson.taskList.isEmpty()) {
+            if (!lesson.getTaskList().isEmpty()) {
                 lessons.add(lesson);
             }
         }
@@ -300,57 +293,24 @@ public class StepikConnectorGet {
         return lessons;
     }
 
-    public static List<Lesson> getLessonsWithSectionNames(int sectionId, Course course) throws IOException {
-        final StepikWrappers.SectionContainer
-                sectionContainer = getFromStepik(EduStepikNames.SECTIONS + String.valueOf(sectionId),
-                StepikWrappers.SectionContainer.class);
-        List<Integer> unitIds = sectionContainer.sections.get(0).units;
-        sectionContainer.sections.forEach(x -> x.title = x.position + "." + x.title);
+    private static void createTasks(Lesson lesson, List<Integer> taskIds) throws IOException {
+        final StepikWrappers.StepContainer stepContainer = getSteps(taskIds);
+        stepContainer.steps.stream().filter(stepSource ->
+                supported(stepSource.block.name)).forEach(stepSource -> {
+            final Task task = new Task();
+            task.setStepId(stepSource.id);
+            task.setPosition(stepSource.position);
 
-        StepikWrappers.UnitContainer
-                unitContainer = getFromStepik(EduStepikNames.UNITS + "/" + getIdQuery(unitIds),
-                StepikWrappers.UnitContainer.class);
-        List<Integer> lessonsIds = new ArrayList<>();
-        unitContainer.units.forEach(x -> lessonsIds.add(x.lesson));
-        StepikWrappers.LessonContainer
-                lessonContainer = getFromStepik(EduStepikNames.LESSONS + getIdQuery(lessonsIds),
-                StepikWrappers.LessonContainer.class);
-
-        final int[] i = {1};
-        lessonContainer.lessons.forEach(x -> x.setName(i[0]++ + "." + x.getName()));
-
-        String sectionName = sectionContainer.sections.get(0).title;
-        final List<Lesson> lessons = new ArrayList<Lesson>();
-        course.addSectionName(EduNames.SECTION + sectionContainer.sections.get(0).position, sectionName);
-        for (Lesson lesson : lessonContainer.lessons) {
-            lesson.setName(sectionName + EduNames.SEPARATOR + lesson.getName());
-            createTasks(lesson, lesson.steps);
-            if (!lesson.taskList.isEmpty()) {
-                lessons.add(lesson);
+            switch (stepSource.block.name) {
+                case (CODE_PREFIX):
+                    createCodeTask(task, stepSource.block);
+                    break;
+                case (PYCHARM_PREFIX):
+                    createPyCharmTask(task, stepSource.block);
+                    break;
             }
-        }
-        return lessons;
-    }
-
-    private static void createTasks(Lesson lesson, List<Integer> stepikIds) throws IOException {
-        final StepikWrappers.StepContainer stepContainer = getSteps(stepikIds);
-        for (StepikWrappers.StepSource stepSource : stepContainer.steps) {
-            if (supported(stepSource.block.name)) {
-                final Task task = new Task();
-                task.setStepId(stepSource.id);
-                task.setPosition(stepSource.position);
-
-                switch (stepSource.block.name) {
-                    case (CODE_PREFIX):
-                        createCodeTask(task, stepSource.block);
-                        break;
-                    case (PYCHARM_PREFIX):
-                        createPyCharmTask(task, stepSource.block);
-                        break;
-                }
-                lesson.taskList.add(task);
-            }
-        }
+            lesson.addTask(task);
+        });
     }
 
     private static boolean supported(String name) {
@@ -364,7 +324,7 @@ public class StepikConnectorGet {
             task.addTestsTexts(wrapper.name, wrapper.text);
         }
 
-        task.taskFiles = new HashMap<String, TaskFile>();      // TODO: it looks like we don't need taskFiles as map anymore
+        task.taskFiles = new HashMap<>();      // TODO: it looks like we don't need taskFiles as map anymore
         if (step.options.files != null) {
             for (TaskFile taskFile : step.options.files) {
                 task.taskFiles.put(taskFile.name, taskFile);
@@ -379,16 +339,14 @@ public class StepikConnectorGet {
         stringBuilder.append(step.text).append("<br>");
 
         if (step.options.samples != null) {
-            for (List<String> sample : step.options.samples) {
-                if (sample.size() == 2) {
-                    stringBuilder.append("<b>Sample Input:</b><br>")
+            step.options.samples.stream()
+                    .filter(sample -> sample.size() == 2)
+                    .forEach(sample -> stringBuilder.append("<b>Sample Input:</b><br>")
                             .append(StringUtil.replace(sample.get(0), "\n", "<br>"))
                             .append("<br>")
                             .append("<b>Sample Output:</b><br>")
                             .append(StringUtil.replace(sample.get(1), "\n", "<br>"))
-                            .append("<br><br>");
-                }
-            }
+                            .append("<br><br>"));
         }
 
         if (step.options.executionMemoryLimit != null && step.options.executionTimeLimit != null) {
@@ -451,8 +409,8 @@ public class StepikConnectorGet {
     private static String getIdQuery(List<Integer> list) {
         StringBuilder sb = new StringBuilder();
         sb.append("?");
-        for (Integer id : list) {
-            sb.append("ids[]=" + id + "&");
+        for (int id : list) {
+            sb.append("ids[]=").append(id).append("&");
         }
         return sb.toString();
     }
@@ -464,14 +422,8 @@ public class StepikConnectorGet {
                     .build();
             final List<CourseInfo> courses = getFromStepik(enrolledCoursesUri.toString(),
                     StepikWrappers.CoursesContainer.class).courses;
-            final ArrayList<Integer> ids = new ArrayList<>();
-            for (CourseInfo course : courses) {
-                ids.add(course.getId());
-            }
-            return ids;
-        } catch (IOException e) {
-            logger.warn(e.getMessage());
-        } catch (URISyntaxException e) {
+            return courses.stream().map(CourseInfo::getId).collect(Collectors.toCollection(ArrayList::new));
+        } catch (IOException | URISyntaxException e) {
             logger.warn(e.getMessage());
         }
         return Collections.emptyList();
@@ -491,9 +443,7 @@ public class StepikConnectorGet {
 
     public static StepikWrappers.UnitContainer getUnits(String unitId) {
         try {
-            return getFromStepik(EduStepikNames.UNITS + "/" + unitId,
-                    StepikWrappers.UnitContainer.class,
-                    StepikConnectorLogin.getHttpClient());
+            return getFromStepik(EduStepikNames.UNITS + "/" + unitId, StepikWrappers.UnitContainer.class);
         } catch (IOException e) {
             logger.warn("Can't get Units\n" + e.getMessage());
             return null;
@@ -502,8 +452,7 @@ public class StepikConnectorGet {
 
     public static StepikWrappers.SectionContainer getSections(String sectionId) {
         try {
-            return getFromStepik(EduStepikNames.SECTIONS + sectionId, StepikWrappers.SectionContainer.class,
-                    StepikConnectorLogin.getHttpClient());
+            return getFromStepik(EduStepikNames.SECTIONS + sectionId, StepikWrappers.SectionContainer.class);
         } catch (IOException e) {
             logger.warn("Can't get Sections\n" + e.getMessage());
             return null;
@@ -512,8 +461,7 @@ public class StepikConnectorGet {
 
     public static StepikWrappers.CoursesContainer getCourseInfos(String courseId) {
         try {
-            return getFromStepik(EduStepikNames.COURSES + "/" + courseId, StepikWrappers.CoursesContainer.class,
-                    StepikConnectorLogin.getHttpClient());
+            return getFromStepik(EduStepikNames.COURSES + "/" + courseId, StepikWrappers.CoursesContainer.class);
         } catch (IOException e) {
             logger.warn("Can't get courses Info\n" + e.getMessage());
             return null;

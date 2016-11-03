@@ -53,7 +53,11 @@ import com.jetbrains.tmp.learning.core.EduAnswerPlaceholderDeleteHandler;
 import com.jetbrains.tmp.learning.core.EduAnswerPlaceholderPainter;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.core.EduUtils;
-import com.jetbrains.tmp.learning.courseFormat.*;
+import com.jetbrains.tmp.learning.courseFormat.AnswerPlaceholder;
+import com.jetbrains.tmp.learning.courseFormat.Course;
+import com.jetbrains.tmp.learning.courseFormat.Lesson;
+import com.jetbrains.tmp.learning.courseFormat.Task;
+import com.jetbrains.tmp.learning.courseFormat.TaskFile;
 import com.jetbrains.tmp.learning.courseGeneration.StudyProjectGenerator;
 import com.jetbrains.tmp.learning.editor.StudyEditor;
 import com.jetbrains.tmp.learning.ui.StudyToolWindow;
@@ -219,12 +223,10 @@ public class StudyUtils {
             throws IOException {
         final StudyTaskManager taskManager = StudyTaskManager.getInstance(project);
         final Course course = taskManager.getCourse();
-        int taskNum = task.getIndex();
-        int lessonNum = task.getLesson().getIndex();
         assert course != null;
         final String pathToResource = FileUtil.join(course.getCourseDirectory(),
-                EduNames.LESSON + lessonNum,
-                EduNames.TASK + taskNum);
+                task.getLesson().getDirectory(),
+                task.getDirectory());
         final File resourceFile = new File(pathToResource, copyName);
         FileUtil.copy(new File(pathToResource, sourceName), resourceFile);
         return resourceFile;
@@ -232,20 +234,20 @@ public class StudyUtils {
 
     @Nullable
     public static Sdk findSdk(@NotNull final Task task, @NotNull final Project project) {
-        final Language language = task.getLesson().getCourse().getLanguageById();
+        final Language language = task.getLesson().getSection().getCourse().getLanguageById();
         return StudyExecutor.INSTANCE.forLanguage(language).findSdk(project);
     }
 
     @NotNull
     public static StudyTestRunner getTestRunner(@NotNull final Task task, @NotNull final VirtualFile taskDir) {
-        final Language language = task.getLesson().getCourse().getLanguageById();
+        final Language language = task.getLesson().getSection().getCourse().getLanguageById();
         return StudyExecutor.INSTANCE.forLanguage(language).getTestRunner(task, taskDir);
     }
 
     public static RunContentExecutor getExecutor(
             @NotNull final Project project, @NotNull final Task currentTask,
             @NotNull final ProcessHandler handler) {
-        final Language language = currentTask.getLesson().getCourse().getLanguageById();
+        final Language language = currentTask.getLesson().getSection().getCourse().getLanguageById();
         return StudyExecutor.INSTANCE.forLanguage(language).getExecutor(project, handler);
     }
 
@@ -255,13 +257,13 @@ public class StudyUtils {
             @NotNull final String filePath,
             @NotNull final String sdkPath,
             @NotNull final Task currentTask) {
-        final Language language = currentTask.getLesson().getCourse().getLanguageById();
+        final Language language = currentTask.getLesson().getSection().getCourse().getLanguageById();
         StudyExecutor.INSTANCE.forLanguage(language)
                 .setCommandLineParameters(cmd, project, filePath, sdkPath, currentTask);
     }
 
     public static void showNoSdkNotification(@NotNull final Task currentTask, @NotNull final Project project) {
-        final Language language = currentTask.getLesson().getCourse().getLanguageById();
+        final Language language = currentTask.getLesson().getSection().getCourse().getLanguageById();
         StudyExecutor.INSTANCE.forLanguage(language).showNoSdkNotification(project);
     }
 
@@ -328,13 +330,11 @@ public class StudyUtils {
         if (taskDirName.contains(EduNames.TASK)) {
             final VirtualFile lessonDir = taskDir.getParent();
             if (lessonDir != null) {
-                int lessonIndex = EduUtils.getIndex(lessonDir.getName(), EduNames.LESSON);
-                List<Lesson> lessons = course.getLessons();
-                if (!indexIsValid(lessonIndex, lessons)) {
+                Lesson lesson = course.getLessonByDirName(lessonDir.getName());
+                if (lesson == null) {
                     return null;
                 }
-                final Lesson lesson = lessons.get(lessonIndex);
-                int taskIndex = EduUtils.getIndex(taskDirName, EduNames.TASK);
+                int taskIndex = EduUtils.getIndex(taskDirName, EduNames.TASK) - 1;
                 final List<Task> tasks = lesson.getTaskList();
                 if (!indexIsValid(taskIndex, tasks)) {
                     return null;
@@ -401,14 +401,13 @@ public class StudyUtils {
     @Nullable
     public static VirtualFile getPatternFile(@NotNull TaskFile taskFile, String name) {
         Task task = taskFile.getTask();
-        String lessonDir = EduNames.LESSON + String.valueOf(task.getLesson().getIndex());
-        String taskDir = EduNames.TASK + String.valueOf(task.getIndex());
-        Course course = task.getLesson().getCourse();
+        Course course = task.getLesson().getSection().getCourse();
         File resourceFile = new File(course.getCourseDirectory());
         if (!resourceFile.exists()) {
             return null;
         }
-        String patternPath = FileUtil.join(resourceFile.getPath(), lessonDir, taskDir, name);
+        String patternPath = FileUtil.join(resourceFile.getPath(), task.getLesson().getDirectory(),
+                task.getDirectory(), name);
         VirtualFile patternFile = VfsUtil.findFileByIoFile(new File(patternPath), true);
         if (patternFile == null) {
             return null;
@@ -450,7 +449,7 @@ public class StudyUtils {
             if (project.getBaseDir().equals(parent)) {
                 return false;
             }
-            Lesson lesson = course.getLesson(parent.getName());
+            Lesson lesson = course.getLessonByDirName(parent.getName());
             if (lesson != null) {
                 Task task = lesson.getTask(virtualFile.getName());
                 if (task != null) {
@@ -472,10 +471,7 @@ public class StudyUtils {
             return false;
         }
 
-        if (!isRenameableOrMoveable(project, course, element)) {
-            return true;
-        }
-        return false;
+        return !isRenameableOrMoveable(project, course, element);
     }
 
     @Nullable
@@ -513,7 +509,7 @@ public class StudyUtils {
             stringBuilder.append("<b>Create project for this course again to see the link to the step.</b>");
         }
 
-        if (!task.getText().startsWith("<p>") && !task.getText().startsWith("<h") ) {
+        if (!task.getText().startsWith("<p>") && !task.getText().startsWith("<h")) {
             stringBuilder.append("<br><br>");
         }
 
@@ -649,7 +645,7 @@ public class StudyUtils {
         if (lessonVF == null) {
             return null;
         }
-        Lesson lesson = course.getLesson(lessonVF.getName());
+        Lesson lesson = course.getLessonByDirName(lessonVF.getName());
         if (lesson == null) {
             return null;
         }

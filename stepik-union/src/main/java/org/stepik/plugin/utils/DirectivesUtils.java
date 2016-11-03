@@ -1,4 +1,4 @@
-package org.stepik.plugin.actions;
+package org.stepik.plugin.utils;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
@@ -22,11 +22,13 @@ public class DirectivesUtils {
     private static final String MESSAGE = "Do you want to remove Stepik directives and external code?\n" +
             "You can undo this action using \"ctrl + Z\".";
 
+    @NotNull
     public static String[] getFileText(@NotNull VirtualFile vf) {
         Document document = FileDocumentManager.getInstance().getDocument(vf);
         return document != null ? document.getText().split("\n") : new String[0];
     }
 
+    @NotNull
     public static String getTextUnderDirectives(@NotNull String[] text, @NotNull SupportedLanguages lang) {
         Pair<Integer, Integer> locations = findDirectives(text, lang);
 
@@ -49,9 +51,9 @@ public class DirectivesUtils {
      * <p>
      * If "Stepik code: end" not found, end = text.length
      */
-    public static
+
     @NotNull
-    Pair<Integer, Integer> findDirectives(
+    public static Pair<Integer, Integer> findDirectives(
             @NotNull String[] text,
             @NotNull SupportedLanguages lang) {
         int start = -1;
@@ -93,7 +95,8 @@ public class DirectivesUtils {
     }
 
     public static void writeInToFile(
-            @NotNull String[] text, @NotNull VirtualFile file,
+            @NotNull String[] text,
+            @NotNull VirtualFile file,
             @NotNull Project project) {
         final Document document = FileDocumentManager.getInstance().getDocument(file);
         if (document == null)
@@ -137,6 +140,7 @@ public class DirectivesUtils {
         return Arrays.copyOfRange(text, start + 1, end);
     }
 
+    @NotNull
     public static String[] insertAmbientCode(
             @NotNull String[] text, @NotNull SupportedLanguages lang,
             boolean showHint) {

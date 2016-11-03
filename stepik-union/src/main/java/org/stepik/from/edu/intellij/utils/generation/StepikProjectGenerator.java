@@ -7,7 +7,6 @@ import com.google.gson.JsonSyntaxException;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.ThrowableComputable;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.stepik.CourseInfo;
@@ -115,35 +114,17 @@ public class StepikProjectGenerator extends EduProjectGenerator {
     @Override
     @Nullable
     protected Course getCourse(@NotNull final Project project) {
-
-//        final File courseFile = new File(new File(OUR_COURSES_DIR, mySelectedCourseInfo.getName()), EduNames.COURSE_META_FILE);
-//        if (courseFile.exists()) {
-//            return readCourseFromCache(courseFile, false);
-//        }
-//        else if (myUser != null) {
-//            final File adaptiveCourseFile = new File(new File(OUR_COURSES_DIR, ADAPTIVE_COURSE_PREFIX +
-//                    mySelectedCourseInfo.getName() + "_" +
-//                    myUser.getEmail()), EduNames.COURSE_META_FILE);
-//            if (adaptiveCourseFile.exists()) {
-//                return readCourseFromCache(adaptiveCourseFile, true);
-//            }
-//        }
-
         return ProgressManager.getInstance()
-                .runProcessWithProgressSynchronously(new ThrowableComputable<Course, RuntimeException>() {
-                    @Override
-                    public Course compute() throws RuntimeException {
-                        ProgressManager.getInstance().getProgressIndicator().setIndeterminate(true);
-                        return execCancelable(() -> {
-
-                            final Course course = StepikConnectorGet.getCourse(project, mySelectedCourseInfo);
-                            if (course != null) {
-                                flushCourse(project, course);
-                                course.initCourse(false);
-                            }
-                            return course;
-                        });
-                    }
+                .runProcessWithProgressSynchronously(() -> {
+                    ProgressManager.getInstance().getProgressIndicator().setIndeterminate(true);
+                    return execCancelable(() -> {
+                        final Course course = StepikConnectorGet.getCourse(project, mySelectedCourseInfo);
+                        if (course != null) {
+                            flushCourse(project, course);
+                            course.initCourse(false);
+                        }
+                        return course;
+                    });
                 }, "Creating Course", true, project);
     }
 

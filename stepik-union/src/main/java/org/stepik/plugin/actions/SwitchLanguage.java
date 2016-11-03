@@ -19,6 +19,7 @@ import com.jetbrains.tmp.learning.StudyState;
 import com.jetbrains.tmp.learning.StudyTaskManager;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.actions.StudyActionWithShortcut;
+import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.editor.StudyEditor;
 import org.jetbrains.annotations.NotNull;
@@ -73,7 +74,7 @@ public class SwitchLanguage extends StudyActionWithShortcut {
         }
 
         VirtualFile src = studyState.getTaskDir();
-        VirtualFile hideVF = src.findChild("hide");
+        VirtualFile hideVF = src.findChild(EduNames.HIDE);
         if (hideVF == null) {
             return;
         }

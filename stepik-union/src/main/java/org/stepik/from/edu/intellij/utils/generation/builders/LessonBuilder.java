@@ -11,6 +11,6 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 
 public interface LessonBuilder {
-    public Module createLesson(@NotNull ModifiableModuleModel moduleModel)
+    Module createLesson(@NotNull ModifiableModuleModel moduleModel)
             throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException;
 }

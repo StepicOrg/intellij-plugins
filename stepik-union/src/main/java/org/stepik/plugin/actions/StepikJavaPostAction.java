@@ -24,7 +24,10 @@ import com.jetbrains.tmp.learning.stepik.StepikConnectorPost;
 import com.jetbrains.tmp.learning.stepik.StepikWrappers;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.plugin.collective.SupportedLanguages;
+import org.stepik.plugin.utils.DirectivesUtils;
+import org.stepik.plugin.utils.NotificationUtils;
 
+import java.io.IOException;
 import java.util.List;
 
 public class StepikJavaPostAction extends StudyCheckAction {
@@ -60,7 +63,18 @@ public class StepikJavaPostAction extends StudyCheckAction {
 
                     Task task = studyState.getTask();
 
-                    int intAttemptId = StepikConnectorPost.getAttempt(task.getStepId()).attempts.get(0).id;
+                    int intAttemptId = 0;
+                    try {
+                        intAttemptId = StepikConnectorPost.getAttempt(task.getStepId()).attempts.get(0).id;
+                    } catch (IOException e) {
+                        Notification notification = new Notification(
+                                "Step.sending",
+                                task.getName() + " IOException",
+                                "Did't send",
+                                NotificationType.ERROR);
+                        NotificationUtils.showNotification(notification, project);
+                        return;
+                    }
                     String attemptId = Integer.toString(intAttemptId);
 
                     LangManager langManager = StudyTaskManager.getInstance(project).getLangManager();
@@ -81,7 +95,7 @@ public class StepikJavaPostAction extends StudyCheckAction {
                     StepikWrappers.MetricsWrapper metric = new StepikWrappers.MetricsWrapper(
                             StepikWrappers.MetricsWrapper.PluginNames.STEPIK_UNION,
                             StepikWrappers.MetricsWrapper.MetricActions.POST,
-                            task.getLesson().getCourse().getId(),
+                            task.getLesson().getSection().getCourse().getId(),
                             task.getStepId());
                     StepikConnectorPost.postMetric(metric);
                     int submissionId = submissions.get(0).id;

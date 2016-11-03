@@ -9,6 +9,7 @@ import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.Lesson;
+import com.jetbrains.tmp.learning.courseFormat.Section;
 import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.courseFormat.TaskFile;
 import org.jetbrains.annotations.NotNull;
@@ -57,8 +58,7 @@ public class StudyGenerator {
             @NotNull final VirtualFile lessonDir,
             @NotNull final File resourceRoot,
             @NotNull final Project project) throws IOException {
-        VirtualFile taskDir = lessonDir.createChildDirectory(project,
-                EduNames.TASK + Integer.toString(task.getIndex()));
+        VirtualFile taskDir = lessonDir.createChildDirectory(project, task.getDirectory());
         File newResourceRoot = new File(resourceRoot, taskDir.getName());
         int i = 0;
         for (Map.Entry<String, TaskFile> taskFile : task.getTaskFiles().entrySet()) {
@@ -97,8 +97,7 @@ public class StudyGenerator {
             @NotNull final File resourceRoot,
             @NotNull final Project project) throws IOException {
         if (EduNames.PYCHARM_ADDITIONAL.equals(lesson.getName())) return;
-        String lessonDirName = EduNames.LESSON + Integer.toString(lesson.getIndex());
-        VirtualFile lessonDir = courseDir.createChildDirectory(project, lessonDirName);
+        VirtualFile lessonDir = courseDir.createChildDirectory(project, lesson.getDirectory());
         final List<Task> taskList = lesson.getTaskList();
         for (int i = 1; i <= taskList.size(); i++) {
             Task task = taskList.get(i - 1);
@@ -120,16 +119,16 @@ public class StudyGenerator {
             @NotNull final Project project) {
 
         try {
-            final List<Lesson> lessons = course.getLessons();
-            for (int i = 1; i <= lessons.size(); i++) {
-                Lesson lesson = lessons.get(i - 1);
-                lesson.setIndex(i);
-                createLesson(lesson, baseDir, resourceRoot, project);
+            for (Section section : course.getSections()) {
+                VirtualFile sectionDir = baseDir.createChildDirectory(project, section.getDirectory());
+                for (Lesson lesson : section.getLessons()) {
+                    createLesson(lesson, sectionDir, resourceRoot, project);
+                }
             }
             baseDir.createChildDirectory(project, EduNames.SANDBOX_DIR);
             File[] files = resourceRoot.listFiles(
-                    (dir, name) -> !name.contains(EduNames.LESSON) && !name.equals(EduNames.COURSE_META_FILE) && !name.equals(
-                            EduNames.HINTS));
+                    (dir, name) -> !name.contains(EduNames.LESSON) && !name.equals(EduNames.COURSE_META_FILE) &&
+                            !name.equals(EduNames.HINTS));
             if (files != null) {
                 for (File file : files) {
                     File dir = new File(baseDir.getPath(), file.getName());

@@ -12,6 +12,8 @@ import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.tmp.learning.StudyTaskManager;
+import com.jetbrains.tmp.learning.core.EduNames;
+import com.jetbrains.tmp.learning.courseFormat.Course;
 import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,8 +23,10 @@ import java.io.IOException;
 public class EduUtilModuleBuilder extends JavaModuleBuilder {
 
     public EduUtilModuleBuilder(String moduleDir) {
-        setName("util");
-        setModuleFilePath(FileUtil.join(moduleDir, "util", "util" + ModuleFileType.DOT_DEFAULT_EXTENSION));
+        setName(EduNames.UTIL);
+        setModuleFilePath(FileUtil.join(moduleDir,
+                EduNames.UTIL,
+                EduNames.UTIL + ModuleFileType.DOT_DEFAULT_EXTENSION));
     }
 
     @NotNull
@@ -43,16 +47,12 @@ public class EduUtilModuleBuilder extends JavaModuleBuilder {
             return baseModule;
         }
         Project project = baseModule.getProject();
-//        StartupManager.getInstance(project).registerPostStartupActivity(() -> DumbService.getInstance(project).runWhenSmart(() -> ApplicationManager.getApplication().runWriteAction(() -> {
-//            EduIntellijUtils.addTemplate(project, src, "EduTestRunner.java");
-//        })));
-//        ExternalLibraryDescriptor descriptor = JUnitExternalLibraryDescriptor.JUNIT4;
-//        List<String> defaultRoots = descriptor.getLibraryClassesRoots();
-//        final List<String> urls = OrderEntryFix.refreshAndConvertToUrls(defaultRoots);
-//        ModuleRootModificationUtil.addModuleLibrary(baseModule, descriptor.getPresentableName(), urls, Collections.<String>emptyList());
-
-        String courseDirectory = StudyTaskManager.getInstance(project).getCourse().getCourseDirectory();
-        FileUtil.copyDirContent(new File(courseDirectory, "util"), new File(src.getPath()));
+        Course course = StudyTaskManager.getInstance(project).getCourse();
+        if (course == null) {
+            return baseModule;
+        }
+        String courseDirectory = course.getCourseDirectory();
+        FileUtil.copyDirContent(new File(courseDirectory, EduNames.UTIL), new File(src.getPath()));
         return baseModule;
     }
 }

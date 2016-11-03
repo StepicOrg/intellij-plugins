@@ -11,7 +11,6 @@ import java.util.List;
 
 public class StudyNavigator {
     private StudyNavigator() {
-
     }
 
     public static Task nextTask(@NotNull final Task task) {
@@ -42,23 +41,32 @@ public class StudyNavigator {
     }
 
     public static Lesson nextLesson(@NotNull final Lesson lesson) {
-        List<Lesson> lessons = lesson.getCourse().getLessons();
-        int nextLessonIndex = lesson.getIndex();
-        if (nextLessonIndex >= lessons.size()) {
+        Course course = lesson.getSection().getCourse();
+        if (course == null) {
             return null;
         }
-        final Lesson nextLesson = lessons.get(nextLessonIndex);
-        if (EduNames.PYCHARM_ADDITIONAL.equals(nextLesson.getName()))
+
+        int index = lesson.getIndex();
+
+        Lesson nextLesson = course.getLessonOfIndex(index + 1);
+
+        if (nextLesson == null || EduNames.PYCHARM_ADDITIONAL.equals(nextLesson.getName())) {
             return null;
+        }
         return nextLesson;
     }
 
     public static Lesson previousLesson(@NotNull final Lesson lesson) {
-        int prevLessonIndex = lesson.getIndex() - 2;
-        if (prevLessonIndex < 0) {
+        Course course = lesson.getSection().getCourse();
+        if (course == null)
+            return null;
+
+        int index = lesson.getIndex();
+        if (index <= 0) {
             return null;
         }
-        return lesson.getCourse().getLessons().get(prevLessonIndex);
+
+        return course.getLessonOfIndex(index - 1);
     }
 
     public static void navigateToFirstFailedAnswerPlaceholder(
@@ -90,6 +98,9 @@ public class StudyNavigator {
             @NotNull final TaskFile taskFile) {
         if (!taskFile.getAnswerPlaceholders().isEmpty()) {
             AnswerPlaceholder firstAnswerPlaceholder = StudyUtils.getFirst(taskFile.getAnswerPlaceholders());
+            if (firstAnswerPlaceholder == null) {
+                return;
+            }
             navigateToAnswerPlaceholder(editor, firstAnswerPlaceholder);
         }
     }

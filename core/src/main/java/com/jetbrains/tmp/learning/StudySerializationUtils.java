@@ -10,6 +10,7 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.containers.hash.HashMap;
 import com.jetbrains.tmp.learning.core.EduNames;
+import com.jetbrains.tmp.learning.core.EduUtils;
 import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
 import com.jetbrains.tmp.learning.courseFormat.TaskFile;
@@ -20,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -290,9 +292,7 @@ public class StudySerializationUtils {
 
         public static Element addChildList(Element parent, String name, List<Element> elements) {
             Element listElement = new Element(LIST);
-            for (Element element : elements) {
-                listElement.addContent(element);
-            }
+            elements.forEach(listElement::addContent);
             return addChildWithName(parent, name, listElement);
         }
 
@@ -329,18 +329,57 @@ public class StudySerializationUtils {
                 if (map != null) {
                     HashMap result = new HashMap();
                     for (Element entry : map.getChildren()) {
-                        Object key = entry.getAttribute(KEY) == null ?
-                                entry.getChild(KEY).getChildren().get(0) :
-                                entry.getAttributeValue(KEY);
-                        Object value = entry.getAttribute(VALUE) == null ?
-                                entry.getChild(VALUE).getChildren().get(0) :
-                                entry.getAttributeValue(VALUE);
+                        K key = entry.getAttribute(KEY) == null ?
+                                (K) entry.getChild(KEY).getChildren().get(0) :
+                                (K) entry.getAttributeValue(KEY);
+                        V value = entry.getAttribute(VALUE) == null ?
+                                (V) entry.getChild(VALUE).getChildren().get(0) :
+                                (V) entry.getAttributeValue(VALUE);
                         result.put(key, value);
                     }
                     return result;
                 }
             }
             return Collections.emptyMap();
+        }
+
+        public static Element convertToForthVersion(Element state, Project project)
+                throws StudyUnrecognizedFormatException {
+            Element taskManagerElement = state.getChild(MAIN_ELEMENT);
+
+            Element courseElement = getChildWithName(taskManagerElement, COURSE).getChild(COURSE_TITLED);
+            List<Element> lessons = getChildList(courseElement, LESSONS);
+            Map<String, Element> lessonsNames = new java.util.HashMap<>();
+            for (Element lesson : lessons) {
+                int index = getAsInt(lesson, "index");
+                lessonsNames.put(EduNames.LESSON + index, lesson.clone());
+            }
+            Map<String, String> sectionsNames = getChildMap(courseElement, "sectionsNames");
+
+            ArrayList<Element> list = new ArrayList<>();
+            sectionsNames.entrySet().forEach(entry -> {
+                Element section = new Element("Section");
+                int index = EduUtils.getIndex(entry.getKey(), EduNames.SECTION);
+                addChildWithName(section, "index", index);
+                addChildWithName(section, "name", entry.getValue());
+                ArrayList<Element> lessonsList = new ArrayList<>();
+                VirtualFile sectionDir = project.getBaseDir().findChild(EduNames.SECTION + index);
+                if (sectionDir != null) {
+                    for (VirtualFile child : sectionDir.getChildren()) {
+                        String name = child.getName();
+                        Element lesson = lessonsNames.get(name);
+                        if (lesson != null) {
+                            lessonsList.add(lesson);
+                        }
+                    }
+                }
+                addChildList(section, "lessons", lessonsList);
+                list.add(section);
+            });
+
+            addChildList(courseElement, "sections", list);
+
+            return state;
         }
     }
 
