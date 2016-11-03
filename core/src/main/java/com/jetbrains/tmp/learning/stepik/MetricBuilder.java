@@ -2,6 +2,8 @@ package com.jetbrains.tmp.learning.stepik;
 
 import com.jetbrains.tmp.learning.core.EduNames;
 
+import java.util.Arrays;
+
 public class MetricBuilder {
 
     private String name = null;
@@ -52,14 +54,18 @@ public class MetricBuilder {
         if (name == null || action == null) {
             return false;
         }
-        if (MetricActions.GET_COURSE.toString().equals(action) && courseId == null) {
+        if (MetricActions.GET_COURSE.toString().equals(action) && (courseId == null || !isAllNull(stepId, language))) {
             return false;
         }
 
-        if (!MetricActions.GET_COURSE.toString().equals(action) && (courseId == null || stepId == null)) {
+        if (!MetricActions.GET_COURSE.toString().equals(action) && isAnyNull(courseId, stepId, language)) {
             return false;
         }
         return true;
+    }
+
+    public static boolean check(MetricBuilder.MetricsWrapper it) {
+        return EduNames.INVALID.equals(it.metric.name);
     }
 
     public enum MetricActions {
@@ -122,10 +128,10 @@ public class MetricBuilder {
                     Integer courseId,
                     Integer stepId) {
                 this.name = metricName;
-                if (isAnyNotNull(name, action, language)) {
+                if (!isAllNull(name, action, language)) {
                     this.tags = new Tags(name, action, language);
                 }
-                if (isAnyNotNull(courseId, stepId)) {
+                if (!isAllNull(courseId, stepId)) {
                     this.data = new Data(courseId, stepId);
                 }
             }
@@ -152,14 +158,21 @@ public class MetricBuilder {
                 }
             }
         }
+
+        public boolean isCorrect() {
+            return !EduNames.INVALID.equals(metric.name);
+        }
     }
 
-    private static boolean isAnyNotNull(Object... objects) {
-        if (objects == null) return false;
-        for (Object object : objects) {
-            if (object != null) return true;
-        }
-        return false;
+
+    private static boolean isAllNull(Object... objects) {
+        if (objects == null) return true;
+        return Arrays.stream(objects).allMatch((x) -> x == null);
+    }
+
+    private static boolean isAnyNull(Object... objects) {
+        if (objects == null) return true;
+        return Arrays.stream(objects).anyMatch((x) -> x == null);
     }
 }
 
