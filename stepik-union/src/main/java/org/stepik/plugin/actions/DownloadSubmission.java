@@ -94,7 +94,7 @@ public class DownloadSubmission extends StudyActionWithShortcut {
                 .addTag(MetricBuilder.PluginNames.STEPIK_UNION)
                 .addTag(MetricBuilder.MetricActions.DOWNLOAD)
                 .addTag(currentLang)
-                .setCourseId(targetTask.getLesson().getCourse().getId())
+                .setCourseId(targetTask.getLesson().getSection().getCourse().getId())
                 .setStepId(targetTask.getStepId())
                 .build();
         StepikConnectorPost.postMetric(metric);

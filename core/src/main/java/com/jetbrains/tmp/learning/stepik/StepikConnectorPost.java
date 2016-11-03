@@ -522,12 +522,12 @@ public class StepikConnectorPost {
             return;
         }
         String requestBody = GSON.toJson(metricsWrapper);
-        try {
-            postToStepikVoid(EduStepikNames.METRICS, MetricBuilder.MetricsWrapper.class, requestBody);
+        logger.info(requestBody);
+//        try {
 //           postToStepikVoid(EduStepikNames.METRICS, requestBody);
-        } catch (IOException e) {
-            logger.warn("Can't post a metric\n" + e.toString());
-        }
+//        } catch (IOException e) {
+//            logger.warn("Can't post a metric\n" + e.toString());
+//        }
     }
 
 }

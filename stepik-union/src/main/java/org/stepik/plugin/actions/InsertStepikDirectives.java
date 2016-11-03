@@ -19,7 +19,6 @@ import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.editor.StudyEditor;
 import org.jetbrains.annotations.NotNull;
 import com.jetbrains.tmp.learning.stepik.SupportedLanguages;
-import org.stepik.plugin.collective.SupportedLanguages;
 import org.stepik.plugin.utils.DirectivesUtils;
 import org.stepik.plugin.utils.ReformatUtils;
 
