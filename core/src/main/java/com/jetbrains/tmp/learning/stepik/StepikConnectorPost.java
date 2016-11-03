@@ -528,5 +528,4 @@ public class StepikConnectorPost {
             logger.warn("Can't post a metric\n" + e.toString());
         }
     }
-
 }

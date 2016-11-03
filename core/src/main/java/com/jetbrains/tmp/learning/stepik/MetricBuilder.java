@@ -5,13 +5,11 @@ import com.jetbrains.tmp.learning.core.EduNames;
 import java.util.Arrays;
 
 public class MetricBuilder {
-
     private String name = null;
     private String action = null;
     private String language = null;
     private Integer courseId = null;
     private Integer stepId = null;
-
 
     public static MetricBuilder getInstance() {
         return new MetricBuilder();
@@ -51,7 +49,7 @@ public class MetricBuilder {
     }
 
     private boolean check() {
-        if (name == null || action == null) {
+        if (isAnyNull(name, action)) {
             return false;
         }
         if (MetricActions.GET_COURSE.toString().equals(action) && (courseId == null || !isAllNull(stepId, language))) {
@@ -62,10 +60,6 @@ public class MetricBuilder {
             return false;
         }
         return true;
-    }
-
-    public static boolean check(MetricBuilder.MetricsWrapper it) {
-        return EduNames.INVALID.equals(it.metric.name);
     }
 
     public enum MetricActions {
@@ -175,4 +169,3 @@ public class MetricBuilder {
         return Arrays.stream(objects).anyMatch((x) -> x == null);
     }
 }
-
