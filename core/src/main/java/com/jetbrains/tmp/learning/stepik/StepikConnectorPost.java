@@ -517,7 +517,7 @@ public class StepikConnectorPost {
     }
 
     public static void postMetric(MetricBuilder.MetricsWrapper metricsWrapper) {
-        if (metricsWrapper.isCorrect()){
+        if (!metricsWrapper.isCorrect()){
             logger.warn(EduNames.INVALID + " metric");
             return;
         }

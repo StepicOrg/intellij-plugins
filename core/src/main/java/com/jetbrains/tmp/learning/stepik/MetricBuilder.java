@@ -105,7 +105,7 @@ public class MetricBuilder {
     public static class MetricsWrapper {
         Metric metric;
 
-        MetricsWrapper(
+        private MetricsWrapper(
                 String metricName,
                 String tags_name,
                 String tags_action,
@@ -120,7 +120,7 @@ public class MetricBuilder {
             Tags tags;
             Data data;
 
-            Metric(
+            private Metric(
                     String metricName,
                     String name,
                     String action,
