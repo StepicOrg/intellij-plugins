@@ -81,13 +81,13 @@ public class Course implements StudyItem {
     @Transient
     @Override
     public int getIndex() {
-        return 0;
+        throw new UnsupportedOperationException("Course not support getIndex()");
     }
 
     @Transient
     @Override
     public void setIndex(int index) {
-
+        throw new UnsupportedOperationException("Course not support setIndex()");
     }
 
     public String getCourseDirectory() {
