@@ -23,6 +23,18 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.HashMap;
 
+import static org.stepik.plugin.utils.ProjectFilesUtils.getParent;
+import static org.stepik.plugin.utils.ProjectFilesUtils.getRelativePath;
+import static org.stepik.plugin.utils.ProjectFilesUtils.isHideDir;
+import static org.stepik.plugin.utils.ProjectFilesUtils.isSandbox;
+import static org.stepik.plugin.utils.ProjectFilesUtils.isStudyItemDir;
+import static org.stepik.plugin.utils.ProjectFilesUtils.isTaskHtmlFile;
+import static org.stepik.plugin.utils.ProjectFilesUtils.isUtilDir;
+import static org.stepik.plugin.utils.ProjectFilesUtils.isWithinHideDir;
+import static org.stepik.plugin.utils.ProjectFilesUtils.isWithinSandbox;
+import static org.stepik.plugin.utils.ProjectFilesUtils.isWithinSrc;
+import static org.stepik.plugin.utils.ProjectFilesUtils.isWithinUtil;
+
 /**
  * @author meanmail
  */
@@ -147,41 +159,40 @@ public class PresentationUtils {
     }
 
     public static boolean isVisibleDirectory(@NotNull PsiDirectory psiDirectory) {
-        String path = ProjectFilesUtils.getRelativePath(psiDirectory);
-        if (path == null) {
+        Project project = psiDirectory.getProject();
+        String basePath = project.getBasePath();
+        if (basePath == null) {
             return false;
         }
-        if (".".equals(path)) {
-            return true;
-        }
-        if (path.startsWith(EduNames.SANDBOX_DIR) || ProjectFilesUtils.isStudyItemDir(path))
-            return true;
+        String path = psiDirectory.getVirtualFile().getPath();
+        String relPath = getRelativePath(basePath, path);
 
-        if (EduNames.HIDE.equals(psiDirectory.getName())) {
+        return isVisibleDirectory(relPath);
+    }
+
+    public static boolean isVisibleDirectory(@NotNull String relPath) {
+        if (isHideDir(relPath) || isWithinHideDir(relPath)) {
             return false;
         }
 
-        String[] dirs = path.split("/");
-        return dirs.length > 4;
+        if (isSandbox(relPath) || isStudyItemDir(relPath) || isUtilDir(relPath)) {
+            return true;
+        }
+
+        return isWithinSrc(relPath) || isWithinSandbox(relPath) || isWithinUtil(relPath);
     }
 
     public static boolean isVisibleFile(@NotNull PsiFile psiFile) {
-        String name = psiFile.getName();
-        if (name.endsWith(".iml"))
-            return false;
+        String path = getRelativePath(psiFile);
+        return isVisibleFile(path);
+    }
 
-        String path = ProjectFilesUtils.getRelativePath(psiFile);
-        if (path == null) {
-            return false;
-        }
-        if (path.startsWith(EduNames.SANDBOX_DIR)) {
-            return true;
-        }
-        if (EduNames.TASK_HTML.equals(name)) {
+    public static boolean isVisibleFile(@NotNull String relFilePath) {
+        String parentDir = getParent(relFilePath);
+        if (parentDir == null || isTaskHtmlFile(relFilePath) || !isVisibleDirectory(parentDir)) {
             return false;
         }
 
-        String[] dirs = path.split("/");
-        return dirs.length > 4;
+        return isWithinSrc(relFilePath) || isWithinSandbox(relFilePath) || isWithinUtil(relFilePath);
     }
 }
