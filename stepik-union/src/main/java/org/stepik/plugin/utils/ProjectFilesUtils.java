@@ -16,8 +16,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 /**
@@ -51,34 +54,6 @@ public class ProjectFilesUtils {
         return isNotMovableOrRenameElement(course, (PsiFileSystemItem) element);
     }
 
-    private static boolean isNotMovableOrRenameElement(@NotNull Course course, @NotNull PsiFileSystemItem element) {
-        String path = getRelativePath(element);
-        if (!isWithinSandbox(path) && !isWithinSrc(path)) {
-            return true;
-        }
-        if (isWithinSrc(path)) {
-            if (isHideDir(path) || isWithinHideDir(path) || isTaskHtmlFile(path)) {
-                return true;
-            }
-            String[] dirs = splitPath(path);
-            Lesson lesson = course.getLessonByDirName(dirs[1]);
-            if (lesson == null) {
-                return true;
-            }
-            Task task = lesson.getTask(dirs[2]);
-            if (task == null) {
-                return true;
-            }
-            String elementName = element.getName();
-            Set<String> filenames = task.getTaskFiles().keySet();
-            if (filenames.stream().anyMatch(elementName::equals)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     public static boolean isValidTarget(final PsiElement target, final PsiElement[] sources) {
         final Course course;
         if (sources.length > 0) {
@@ -109,6 +84,47 @@ public class ProjectFilesUtils {
         }
 
         return stream.anyMatch(source -> isNotMovableOrRenameElement(course, (PsiFileSystemItem) source));
+    }
+
+    private static boolean isNotMovableOrRenameElement(@NotNull Course course, @NotNull PsiFileSystemItem element) {
+        String path = getRelativePath(element);
+        return isNotMovableOrRenameElement(course, path);
+    }
+
+    private static boolean isTaskFile(@NotNull Course course, @NotNull String path) {
+        String[] dirs = splitPath(path);
+        if (dirs.length > 3) {
+            Lesson lesson = course.getLessonByDirName(dirs[1]);
+            if (lesson == null) {
+                return false;
+            }
+            Task task = lesson.getTask(dirs[2]);
+            if (task == null) {
+                return false;
+            }
+            String fileName = dirs[dirs.length - 1];
+            Set<String> filenames = task.getTaskFiles().keySet();
+            if (filenames.stream().anyMatch(fileName::equals)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean isNotMovableOrRenameElement(@NotNull Course course, @NotNull String path) {
+        if (!isWithinSandbox(path) && !isWithinSrc(path)) {
+            return true;
+        }
+        if (isWithinSrc(path)) {
+            if (isHideDir(path) || isWithinHideDir(path) || isTaskHtmlFile(path)) {
+                return true;
+            }
+            if (isTaskFile(course, path)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public static boolean isTaskHtmlFile(String path) {
@@ -148,7 +164,7 @@ public class ProjectFilesUtils {
     @NotNull
     public static String getRelativePath(@NotNull String basePath, @NotNull String path) {
         String relPath = FileUtil.getRelativePath(basePath, path, File.separatorChar);
-        return relPath == null? path : relPath;
+        return relPath == null ? path : relPath;
     }
 
     public static boolean isStudyItemDir(@NotNull String relativePath) {
