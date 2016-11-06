@@ -15,7 +15,6 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -25,13 +24,14 @@ import java.util.stream.Stream;
  */
 public class ProjectFilesUtils {
 
-    private static final String SEPARATOR_EXPR = "\\" + File.separator;
+    public static final String SEPARATOR = "/";
+    private static final char SEPARATOR_CHAR = '/';
     private static final String SECTION_EXPR = EduNames.SECTION + "[0-9]+";
-    private static final String LESSON_PATH_EXPR = SECTION_EXPR + SEPARATOR_EXPR + EduNames.LESSON + "[0-9]+";
-    private static final String TASK_PATH_EXPR = LESSON_PATH_EXPR + SEPARATOR_EXPR + EduNames.TASK + "[0-9]+";
-    private static final String SRC_PATH_EXPR = TASK_PATH_EXPR + SEPARATOR_EXPR + EduNames.SRC;
+    private static final String LESSON_PATH_EXPR = SECTION_EXPR + SEPARATOR + EduNames.LESSON + "[0-9]+";
+    private static final String TASK_PATH_EXPR = LESSON_PATH_EXPR + SEPARATOR + EduNames.TASK + "[0-9]+";
+    private static final String SRC_PATH_EXPR = TASK_PATH_EXPR + SEPARATOR + EduNames.SRC;
     private static final String COURSE_DIRECTORIES = "\\.|" + SECTION_EXPR + "|" + LESSON_PATH_EXPR + "|" + TASK_PATH_EXPR + "|" + SRC_PATH_EXPR;
-    private static final String HIDE_PATH_EXPR = SRC_PATH_EXPR + SEPARATOR_EXPR + EduNames.HIDE;
+    private static final String HIDE_PATH_EXPR = SRC_PATH_EXPR + SEPARATOR + EduNames.HIDE;
 
     @Contract("null -> false")
     public static boolean canMoveOrRename(@Nullable DataContext dataContext) {
@@ -144,7 +144,7 @@ public class ProjectFilesUtils {
     }
 
     public static boolean isTaskHtmlFile(String path) {
-        return path.matches(SRC_PATH_EXPR + SEPARATOR_EXPR + EduNames.TASK_HTML);
+        return path.matches(SRC_PATH_EXPR + SEPARATOR + EduNames.TASK_HTML);
     }
 
     public static boolean isSandbox(String path) {
@@ -156,15 +156,15 @@ public class ProjectFilesUtils {
     }
 
     public static boolean isWithinSandbox(String path) {
-        return path.matches(EduNames.SANDBOX_DIR + SEPARATOR_EXPR + ".*");
+        return path.matches(EduNames.SANDBOX_DIR + SEPARATOR + ".*");
     }
 
     public static boolean isWithinUtil(String path) {
-        return path.matches(EduNames.UTIL + SEPARATOR_EXPR + ".*");
+        return path.matches(EduNames.UTIL + SEPARATOR + ".*");
     }
 
     public static boolean isWithinSrc(@NotNull String path) {
-        return path.matches(SRC_PATH_EXPR + SEPARATOR_EXPR + ".*");
+        return path.matches(SRC_PATH_EXPR + SEPARATOR + ".*");
     }
 
     @NotNull
@@ -179,7 +179,7 @@ public class ProjectFilesUtils {
 
     @NotNull
     public static String getRelativePath(@NotNull String basePath, @NotNull String path) {
-        String relPath = FileUtil.getRelativePath(new File(basePath), new File(path));
+        String relPath = FileUtil.getRelativePath(basePath, path, SEPARATOR_CHAR);
         return relPath == null ? path : relPath;
     }
 
@@ -194,11 +194,11 @@ public class ProjectFilesUtils {
 
     @NotNull
     private static String[] splitPath(@NotNull String path) {
-        return path.split(SEPARATOR_EXPR);
+        return path.split(SEPARATOR);
     }
 
     public static boolean isWithinHideDir(@NotNull String path) {
-        return path.matches(ProjectFilesUtils.HIDE_PATH_EXPR + SEPARATOR_EXPR + ".*");
+        return path.matches(ProjectFilesUtils.HIDE_PATH_EXPR + SEPARATOR + ".*");
     }
 
     public static boolean isHideDir(String path) {
@@ -214,6 +214,12 @@ public class ProjectFilesUtils {
             return ".";
         }
 
-        return FileUtil.join(Arrays.copyOf(dirs, dirs.length - 1));
+        StringBuilder parentPath = new StringBuilder(dirs[0]);
+
+        for (int i = 1; i < dirs.length - 1; i++) {
+            parentPath.append(SEPARATOR).append(dirs[i]);
+        }
+
+        return parentPath.toString();
     }
 }

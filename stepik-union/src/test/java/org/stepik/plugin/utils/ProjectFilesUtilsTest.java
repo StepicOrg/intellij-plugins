@@ -1,6 +1,5 @@
 package org.stepik.plugin.utils;
 
-import com.intellij.openapi.util.io.FileUtil;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.Lesson;
@@ -15,12 +14,13 @@ import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 
-import java.io.File;
 import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.stepik.plugin.utils.ProjectFilesUtils.SEPARATOR;
+import static utils.TestUtils.join;
 
 /**
  * @author meanmail
@@ -30,17 +30,16 @@ public class ProjectFilesUtilsTest {
     private static final String COURSE = "course";
     private static final String SECTION1 = EduNames.SECTION + 1;
     private static final String LESSON1 = EduNames.LESSON + 1;
-    private static final String ABS_COURSE_SECTION1 = FileUtil.join("", COURSE, SECTION1);
-    private static final String REL_COURSE_SECTION1 = FileUtil.join(COURSE, SECTION1);
+    private static final String ABS_COURSE_SECTION1 = join("", COURSE, SECTION1);
+    private static final String REL_COURSE_SECTION1 = join(COURSE, SECTION1);
 
     @SuppressWarnings("unused")
     @DataPoints("paths")
     public static final String[][] paths = new String[][]{
-            {"", ABS_COURSE_SECTION1, FileUtil.join(COURSE, SECTION1)},
-            {File.separator, ABS_COURSE_SECTION1, REL_COURSE_SECTION1},
-            {FileUtil.join("", COURSE), ABS_COURSE_SECTION1, SECTION1},
-            {FileUtil.join("", COURSE, LESSON1), ABS_COURSE_SECTION1, FileUtil.join("..", SECTION1)},
-            {".", FileUtil.join(".", REL_COURSE_SECTION1), REL_COURSE_SECTION1},
+            {SEPARATOR, ABS_COURSE_SECTION1, REL_COURSE_SECTION1},
+            {join("", COURSE), ABS_COURSE_SECTION1, SECTION1},
+            {join("", COURSE, LESSON1), ABS_COURSE_SECTION1, join("..", SECTION1)},
+            {".", join(".", REL_COURSE_SECTION1), REL_COURSE_SECTION1},
             {"lesson", ABS_COURSE_SECTION1, ABS_COURSE_SECTION1}
     };
 
@@ -51,15 +50,15 @@ public class ProjectFilesUtilsTest {
 
     private static final String TASK1 = EduNames.TASK + 1;
 
-    private static final String SECTION1_LESSON1_TASK1_SRC = FileUtil.join(SECTION1, LESSON1, TASK1, EduNames.SRC);
+    private static final String SECTION1_LESSON1_TASK1_SRC = join(SECTION1, LESSON1, TASK1, EduNames.SRC);
 
     @SuppressWarnings("WeakerAccess")
     @DataPoints("studyItems")
     public static final String[] studyItems = new String[]{
             ".",
             SECTION1,
-            FileUtil.join(SECTION1, LESSON1),
-            FileUtil.join(SECTION1, LESSON1, TASK1),
+            join(SECTION1, LESSON1),
+            join(SECTION1, LESSON1, TASK1),
             SECTION1_LESSON1_TASK1_SRC
     };
 
@@ -71,22 +70,22 @@ public class ProjectFilesUtilsTest {
     @SuppressWarnings("unused")
     @DataPoints("notStudyItems")
     public static final String[] notStudyItems = new String[]{
-            FileUtil.join(SECTION1, SECTION1),
-            FileUtil.join(SECTION1, TASK1),
-            FileUtil.join(SECTION1, EduNames.SRC),
-            FileUtil.join(SECTION1, EduNames.TASK),
-            FileUtil.join(SECTION1, EduNames.UTIL),
-            FileUtil.join(SECTION1, EduNames.SANDBOX_DIR),
-            FileUtil.join(LESSON1, SECTION1),
-            FileUtil.join(SECTION1, SECTION1, TASK1),
-            FileUtil.join(LESSON1, EduNames.TASK),
-            FileUtil.join(LESSON1, EduNames.UTIL),
-            FileUtil.join(LESSON1, EduNames.SANDBOX_DIR),
+            join(SECTION1, SECTION1),
+            join(SECTION1, TASK1),
+            join(SECTION1, EduNames.SRC),
+            join(SECTION1, EduNames.TASK),
+            join(SECTION1, EduNames.UTIL),
+            join(SECTION1, EduNames.SANDBOX_DIR),
+            join(LESSON1, SECTION1),
+            join(SECTION1, SECTION1, TASK1),
+            join(LESSON1, EduNames.TASK),
+            join(LESSON1, EduNames.UTIL),
+            join(LESSON1, EduNames.SANDBOX_DIR),
             EduNames.SECTION,
             EduNames.LESSON,
             EduNames.TASK,
-            FileUtil.join(EduNames.SECTION, EduNames.LESSON, EduNames.TASK, EduNames.SRC),
-            FileUtil.join(SECTION1, LESSON1 + EduNames.TASK, EduNames.SRC),
+            join(EduNames.SECTION, EduNames.LESSON, EduNames.TASK, EduNames.SRC),
+            join(SECTION1, LESSON1 + EduNames.TASK, EduNames.SRC),
             EduNames.UTIL,
             EduNames.SANDBOX_DIR
     };
@@ -101,10 +100,10 @@ public class ProjectFilesUtilsTest {
     public static String[] validTargets = new String[]{
             EduNames.SANDBOX_DIR,
             SECTION1_LESSON1_TASK1_SRC,
-            FileUtil.join(EduNames.SANDBOX_DIR, SECTION1),
-            FileUtil.join(EduNames.SANDBOX_DIR, "other"),
-            FileUtil.join(SECTION1_LESSON1_TASK1_SRC, SECTION1),
-            FileUtil.join(SECTION1_LESSON1_TASK1_SRC, "other")
+            join(EduNames.SANDBOX_DIR, SECTION1),
+            join(EduNames.SANDBOX_DIR, "other"),
+            join(SECTION1_LESSON1_TASK1_SRC, SECTION1),
+            join(SECTION1_LESSON1_TASK1_SRC, "other")
     };
 
     @SuppressWarnings("unused")
@@ -112,8 +111,8 @@ public class ProjectFilesUtilsTest {
     public static String[] notValidTarget = new String[]{
             ".",
             SECTION1,
-            FileUtil.join(SECTION1, LESSON1),
-            FileUtil.join(SECTION1, LESSON1, TASK1)
+            join(SECTION1, LESSON1),
+            join(SECTION1, LESSON1, TASK1)
     };
 
     @SuppressWarnings("unused")
@@ -147,12 +146,12 @@ public class ProjectFilesUtilsTest {
     @DataPoints("validSources")
     public static String[][] validSources = new String[][]{
             {
-                    FileUtil.join(EduNames.SANDBOX_DIR, SECTION1),
-                    FileUtil.join(EduNames.SANDBOX_DIR, SECTION1_LESSON1_TASK1_SRC),
-                    FileUtil.join(EduNames.SANDBOX_DIR, "other")
+                    join(EduNames.SANDBOX_DIR, SECTION1),
+                    join(EduNames.SANDBOX_DIR, SECTION1_LESSON1_TASK1_SRC),
+                    join(EduNames.SANDBOX_DIR, "other")
             },
             {
-                    FileUtil.join(EduNames.SANDBOX_DIR, SECTION1)
+                    join(EduNames.SANDBOX_DIR, SECTION1)
             }
     };
 
@@ -174,7 +173,7 @@ public class ProjectFilesUtilsTest {
 
     @Test
     public void isTaskHtmlFile() throws Exception {
-        String taskFile = FileUtil.join(SECTION1_LESSON1_TASK1_SRC, EduNames.TASK_HTML);
+        String taskFile = join(SECTION1_LESSON1_TASK1_SRC, EduNames.TASK_HTML);
         assertTrue(ProjectFilesUtils.isTaskHtmlFile(taskFile));
     }
 
@@ -185,19 +184,19 @@ public class ProjectFilesUtilsTest {
 
     @Test
     public void isWithinSandbox() throws Exception {
-        String within = FileUtil.join(EduNames.SANDBOX_DIR, "other");
+        String within = join(EduNames.SANDBOX_DIR, "other");
         assertTrue(ProjectFilesUtils.isWithinSandbox(within));
     }
 
     @Test
     public void isWithinUtil() throws Exception {
-        String within = FileUtil.join(EduNames.UTIL, "other");
+        String within = join(EduNames.UTIL, "other");
         assertTrue(ProjectFilesUtils.isWithinUtil(within));
     }
 
     @Test
     public void isWithinSrc() throws Exception {
-        String within = FileUtil.join(SECTION1_LESSON1_TASK1_SRC, "other");
+        String within = join(SECTION1_LESSON1_TASK1_SRC, "other");
         assertTrue(ProjectFilesUtils.isWithinSrc(within));
     }
 
@@ -208,13 +207,13 @@ public class ProjectFilesUtilsTest {
 
     @Test
     public void isWithinHideDir() throws Exception {
-        String within = FileUtil.join(SECTION1_LESSON1_TASK1_SRC, EduNames.HIDE, "other");
+        String within = join(SECTION1_LESSON1_TASK1_SRC, EduNames.HIDE, "other");
         assertTrue(ProjectFilesUtils.isWithinHideDir(within));
     }
 
     @Test
     public void isHideDir() throws Exception {
-        String hide = FileUtil.join(SECTION1_LESSON1_TASK1_SRC, EduNames.HIDE);
+        String hide = join(SECTION1_LESSON1_TASK1_SRC, EduNames.HIDE);
         assertTrue(ProjectFilesUtils.isHideDir(hide));
     }
 
@@ -230,7 +229,7 @@ public class ProjectFilesUtilsTest {
 
     @Test
     public void getParent() throws Exception {
-        String parent = FileUtil.join(SECTION1, LESSON1, TASK1);
+        String parent = join(SECTION1, LESSON1, TASK1);
         assertEquals(parent, ProjectFilesUtils.getParent(SECTION1_LESSON1_TASK1_SRC));
     }
 

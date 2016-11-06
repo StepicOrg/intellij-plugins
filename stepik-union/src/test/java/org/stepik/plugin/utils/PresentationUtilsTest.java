@@ -1,6 +1,5 @@
 package org.stepik.plugin.utils;
 
-import com.intellij.openapi.util.io.FileUtil;
 import com.jetbrains.tmp.learning.core.EduNames;
 import org.junit.experimental.theories.DataPoints;
 import org.junit.experimental.theories.FromDataPoints;
@@ -10,20 +9,20 @@ import org.junit.runner.RunWith;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static utils.TestUtils.join;
 
 /**
  * @author meanmail
  */
 @RunWith(Theories.class)
 public class PresentationUtilsTest {
-
     private static final String BASE_DIR = ".";
     private static final String SECTION_DIR = EduNames.SECTION + 1;
     private static final String SECTION_PATH = EduNames.SECTION + 1;
-    private static final String LESSON_PATH = FileUtil.join(SECTION_PATH, EduNames.LESSON + 1);
-    private static final String TASK_PATH = FileUtil.join(LESSON_PATH, EduNames.TASK + 1);
-    private static final String SRC_PATH = FileUtil.join(TASK_PATH, EduNames.SRC);
-    private static final String HIDE_PATH = FileUtil.join(SRC_PATH, EduNames.HIDE);
+    private static final String LESSON_PATH = join(SECTION_PATH, EduNames.LESSON + 1);
+    private static final String TASK_PATH = join(LESSON_PATH, EduNames.TASK + 1);
+    private static final String SRC_PATH = join(TASK_PATH, EduNames.SRC);
+    private static final String HIDE_PATH = join(SRC_PATH, EduNames.HIDE);
 
     @DataPoints("visiblePaths")
     public static final String[] visiblePaths = new String[]{
@@ -35,8 +34,8 @@ public class PresentationUtilsTest {
             SRC_PATH,
             EduNames.UTIL,
             EduNames.SANDBOX_DIR,
-            FileUtil.join(SRC_PATH, SECTION_DIR),
-            FileUtil.join(EduNames.UTIL, SECTION_DIR)
+            join(SRC_PATH, SECTION_DIR),
+            join(EduNames.UTIL, SECTION_DIR)
     };
 
     @Theory(nullsAccepted = false)
@@ -47,9 +46,9 @@ public class PresentationUtilsTest {
     @SuppressWarnings("unused")
     @DataPoints("nonVisiblePaths")
     public static final String[] nonVisiblePaths = new String[]{
-            FileUtil.join(SECTION_PATH, SECTION_DIR),
-            FileUtil.join(LESSON_PATH, SECTION_DIR),
-            FileUtil.join(TASK_PATH, SECTION_DIR),
+            join(SECTION_PATH, SECTION_DIR),
+            join(LESSON_PATH, SECTION_DIR),
+            join(TASK_PATH, SECTION_DIR),
             HIDE_PATH
     };
 
@@ -63,7 +62,7 @@ public class PresentationUtilsTest {
     @SuppressWarnings("unused")
     @DataPoints("visibleFiles")
     public static final String[] visibleFiles = new String[]{
-            FileUtil.join(EduNames.SANDBOX_DIR, FILE)
+            join(EduNames.SANDBOX_DIR, FILE)
     };
 
     @Theory(nullsAccepted = false)
@@ -78,12 +77,12 @@ public class PresentationUtilsTest {
             EduNames.SANDBOX_DIR,
             EduNames.UTIL,
             FILE,
-            FileUtil.join(SECTION_PATH, FILE),
-            FileUtil.join(LESSON_PATH, FILE),
-            FileUtil.join(TASK_PATH, FILE),
-            FileUtil.join(TASK_PATH, EduNames.SANDBOX_DIR, FILE),
-            FileUtil.join(HIDE_PATH, FILE),
-            FileUtil.join(SRC_PATH, EduNames.TASK_HTML)
+            join(SECTION_PATH, FILE),
+            join(LESSON_PATH, FILE),
+            join(TASK_PATH, FILE),
+            join(TASK_PATH, EduNames.SANDBOX_DIR, FILE),
+            join(HIDE_PATH, FILE),
+            join(SRC_PATH, EduNames.TASK_HTML)
     };
 
     @Theory(nullsAccepted = false)
