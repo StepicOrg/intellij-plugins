@@ -204,7 +204,7 @@ public class Course implements StudyItem {
         return null;
     }
 
-    public Lesson getLessonByDirName(String name) {
+    public Lesson getLessonByDirName(@NotNull String name) {
         int index = EduUtils.getIndex(name, EduNames.LESSON);
         return getLessonOfIndex(index);
     }
@@ -226,7 +226,7 @@ public class Course implements StudyItem {
         return "";
     }
 
-    public Section getSectionByDirName(String valueName) {
+    public Section getSectionByDirName(@NotNull String valueName) {
         int index = EduUtils.getIndex(valueName, EduNames.SECTION);
         return getSectionOfIndex(index);
     }

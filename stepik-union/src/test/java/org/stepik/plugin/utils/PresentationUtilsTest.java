@@ -44,6 +44,7 @@ public class PresentationUtilsTest {
         assertTrue(PresentationUtils.isVisibleDirectory(directory));
     }
 
+    @SuppressWarnings("unused")
     @DataPoints("nonVisiblePaths")
     public static final String[] nonVisiblePaths = new String[]{
             FileUtil.join(SECTION_PATH, SECTION_DIR),
@@ -58,6 +59,8 @@ public class PresentationUtilsTest {
     }
 
     private static final String FILE = "file.txt";
+
+    @SuppressWarnings("unused")
     @DataPoints("visibleFiles")
     public static final String[] visibleFiles = new String[]{
             FileUtil.join(EduNames.SANDBOX_DIR, FILE)
@@ -68,6 +71,7 @@ public class PresentationUtilsTest {
         assertTrue(PresentationUtils.isVisibleFile(file));
     }
 
+    @SuppressWarnings("unused")
     @DataPoints("nonVisibleFiles")
     public static final String[] nonVisibleFiles = new String[]{
             BASE_DIR,

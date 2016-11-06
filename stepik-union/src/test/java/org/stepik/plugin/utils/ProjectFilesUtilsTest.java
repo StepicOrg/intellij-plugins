@@ -2,13 +2,21 @@ package org.stepik.plugin.utils;
 
 import com.intellij.openapi.util.io.FileUtil;
 import com.jetbrains.tmp.learning.core.EduNames;
+import com.jetbrains.tmp.learning.courseFormat.Course;
+import com.jetbrains.tmp.learning.courseFormat.Lesson;
+import com.jetbrains.tmp.learning.courseFormat.Task;
+import org.jetbrains.annotations.NotNull;
+import org.junit.Test;
 import org.junit.experimental.theories.DataPoints;
 import org.junit.experimental.theories.FromDataPoints;
 import org.junit.experimental.theories.Theories;
 import org.junit.experimental.theories.Theory;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
 
 import java.io.File;
+import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -19,15 +27,15 @@ import static org.junit.Assert.assertTrue;
  */
 @RunWith(Theories.class)
 public class ProjectFilesUtilsTest {
-
     private static final String COURSE = "course";
     private static final String SECTION1 = EduNames.SECTION + 1;
     private static final String LESSON1 = EduNames.LESSON + 1;
     private static final String ABS_COURSE_SECTION1 = FileUtil.join("", COURSE, SECTION1);
     private static final String REL_COURSE_SECTION1 = FileUtil.join(COURSE, SECTION1);
 
+    @SuppressWarnings("unused")
     @DataPoints("paths")
-    public static final String[][] paths = new String[][] {
+    public static final String[][] paths = new String[][]{
             {"", ABS_COURSE_SECTION1, FileUtil.join(COURSE, SECTION1)},
             {File.separator, ABS_COURSE_SECTION1, REL_COURSE_SECTION1},
             {FileUtil.join("", COURSE), ABS_COURSE_SECTION1, SECTION1},
@@ -43,13 +51,16 @@ public class ProjectFilesUtilsTest {
 
     private static final String TASK1 = EduNames.TASK + 1;
 
+    private static final String SECTION1_LESSON1_TASK1_SRC = FileUtil.join(SECTION1, LESSON1, TASK1, EduNames.SRC);
+
+    @SuppressWarnings("WeakerAccess")
     @DataPoints("studyItems")
-    public static final String[] studyItems = new String[] {
+    public static final String[] studyItems = new String[]{
             ".",
             SECTION1,
             FileUtil.join(SECTION1, LESSON1),
             FileUtil.join(SECTION1, LESSON1, TASK1),
-            FileUtil.join(SECTION1, LESSON1, TASK1, EduNames.SRC)
+            SECTION1_LESSON1_TASK1_SRC
     };
 
     @Theory(nullsAccepted = false)
@@ -57,8 +68,9 @@ public class ProjectFilesUtilsTest {
         assertTrue(ProjectFilesUtils.isStudyItemDir(relPath));
     }
 
+    @SuppressWarnings("unused")
     @DataPoints("notStudyItems")
-    public static final String[] notStudyItems = new String[] {
+    public static final String[] notStudyItems = new String[]{
             FileUtil.join(SECTION1, SECTION1),
             FileUtil.join(SECTION1, TASK1),
             FileUtil.join(SECTION1, EduNames.SRC),
@@ -74,7 +86,9 @@ public class ProjectFilesUtilsTest {
             EduNames.LESSON,
             EduNames.TASK,
             FileUtil.join(EduNames.SECTION, EduNames.LESSON, EduNames.TASK, EduNames.SRC),
-            FileUtil.join(SECTION1, LESSON1 + EduNames.TASK, EduNames.SRC)
+            FileUtil.join(SECTION1, LESSON1 + EduNames.TASK, EduNames.SRC),
+            EduNames.UTIL,
+            EduNames.SANDBOX_DIR
     };
 
     @Theory(nullsAccepted = false)
@@ -82,4 +96,146 @@ public class ProjectFilesUtilsTest {
         assertFalse(ProjectFilesUtils.isStudyItemDir(relPath));
     }
 
+    @SuppressWarnings("unused")
+    @DataPoints("validTargets")
+    public static String[] validTargets = new String[]{
+            EduNames.SANDBOX_DIR,
+            SECTION1_LESSON1_TASK1_SRC,
+            FileUtil.join(EduNames.SANDBOX_DIR, SECTION1),
+            FileUtil.join(EduNames.SANDBOX_DIR, "other"),
+            FileUtil.join(SECTION1_LESSON1_TASK1_SRC, SECTION1),
+            FileUtil.join(SECTION1_LESSON1_TASK1_SRC, "other")
+    };
+
+    @SuppressWarnings("unused")
+    @DataPoints("notValidTarget")
+    public static String[] notValidTarget = new String[]{
+            ".",
+            SECTION1,
+            FileUtil.join(SECTION1, LESSON1),
+            FileUtil.join(SECTION1, LESSON1, TASK1)
+    };
+
+    @SuppressWarnings("unused")
+    @DataPoints("notValidSources")
+    public static String[][] notValidSources = new String[][]{
+            {},
+            {EduNames.SANDBOX_DIR},
+            studyItems
+    };
+
+    @Theory
+    public void isValidTargetNotValidSources(
+            @FromDataPoints("validTargets") String targetPath,
+            @FromDataPoints("notValidSources") String[] sourcesPaths) throws Exception {
+        Course course = getTestCourse();
+        assertTrue(ProjectFilesUtils.isValidTarget(course, targetPath, sourcesPaths));
+    }
+
+    @NotNull
+    private Course getTestCourse() {
+        Course course = PowerMockito.mock(Course.class);
+        Lesson lesson = PowerMockito.mock(Lesson.class);
+        Task task = PowerMockito.mock(Task.class);
+        PowerMockito.when(course.getLessonByDirName(Mockito.notNull(String.class))).thenReturn(lesson);
+        PowerMockito.when(lesson.getTask(Mockito.notNull(String.class))).thenReturn(task);
+        PowerMockito.when(task.getTaskFiles()).thenReturn(Collections.emptyMap());
+        return course;
+    }
+
+    @SuppressWarnings("unused")
+    @DataPoints("validSources")
+    public static String[][] validSources = new String[][]{
+            {
+                    FileUtil.join(EduNames.SANDBOX_DIR, SECTION1),
+                    FileUtil.join(EduNames.SANDBOX_DIR, SECTION1_LESSON1_TASK1_SRC),
+                    FileUtil.join(EduNames.SANDBOX_DIR, "other")
+            },
+            {
+                    FileUtil.join(EduNames.SANDBOX_DIR, SECTION1)
+            }
+    };
+
+    @Theory
+    public void isValidTargetValidSources(
+            @FromDataPoints("validTargets") String targetPath,
+            @FromDataPoints("validSources") String[] sourcesPaths) throws Exception {
+        Course course = getTestCourse();
+        assertFalse(ProjectFilesUtils.isValidTarget(course, targetPath, sourcesPaths));
+    }
+
+    @Theory
+    public void isValidTargetNotValidTargetValidSources(
+            @FromDataPoints("notValidTarget") String targetPath,
+            @FromDataPoints("validSources") String[] sourcesPaths) throws Exception {
+        Course course = getTestCourse();
+        assertTrue(ProjectFilesUtils.isValidTarget(course, targetPath, sourcesPaths));
+    }
+
+    @Test
+    public void isTaskHtmlFile() throws Exception {
+        String taskFile = FileUtil.join(SECTION1_LESSON1_TASK1_SRC, EduNames.TASK_HTML);
+        assertTrue(ProjectFilesUtils.isTaskHtmlFile(taskFile));
+    }
+
+    @Test
+    public void isSandbox() throws Exception {
+        assertTrue(ProjectFilesUtils.isSandbox(EduNames.SANDBOX_DIR));
+    }
+
+    @Test
+    public void isWithinSandbox() throws Exception {
+        String within = FileUtil.join(EduNames.SANDBOX_DIR, "other");
+        assertTrue(ProjectFilesUtils.isWithinSandbox(within));
+    }
+
+    @Test
+    public void isWithinUtil() throws Exception {
+        String within = FileUtil.join(EduNames.UTIL, "other");
+        assertTrue(ProjectFilesUtils.isWithinUtil(within));
+    }
+
+    @Test
+    public void isWithinSrc() throws Exception {
+        String within = FileUtil.join(SECTION1_LESSON1_TASK1_SRC, "other");
+        assertTrue(ProjectFilesUtils.isWithinSrc(within));
+    }
+
+    @Test
+    public void isUtilDir() throws Exception {
+        assertTrue(ProjectFilesUtils.isUtilDir(EduNames.UTIL));
+    }
+
+    @Test
+    public void isWithinHideDir() throws Exception {
+        String within = FileUtil.join(SECTION1_LESSON1_TASK1_SRC, EduNames.HIDE, "other");
+        assertTrue(ProjectFilesUtils.isWithinHideDir(within));
+    }
+
+    @Test
+    public void isHideDir() throws Exception {
+        String hide = FileUtil.join(SECTION1_LESSON1_TASK1_SRC, EduNames.HIDE);
+        assertTrue(ProjectFilesUtils.isHideDir(hide));
+    }
+
+    @Test
+    public void getParentForEmpty() throws Exception {
+        assertEquals(null, ProjectFilesUtils.getParent(""));
+    }
+
+    @Test
+    public void getParentForSingle() throws Exception {
+        assertEquals(".", ProjectFilesUtils.getParent(SECTION1));
+    }
+
+    @Test
+    public void getParent() throws Exception {
+        String parent = FileUtil.join(SECTION1, LESSON1, TASK1);
+        assertEquals(parent, ProjectFilesUtils.getParent(SECTION1_LESSON1_TASK1_SRC));
+    }
+
+    @Test
+    public void getParentForDot() throws Exception {
+        assertEquals(null, ProjectFilesUtils.getParent("."));
+    }
 }

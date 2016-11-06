@@ -16,11 +16,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
 /**
@@ -54,36 +51,55 @@ public class ProjectFilesUtils {
         return isNotMovableOrRenameElement(course, (PsiFileSystemItem) element);
     }
 
-    public static boolean isValidTarget(final PsiElement target, final PsiElement[] sources) {
-        final Course course;
-        if (sources.length > 0) {
-            Project project = sources[0].getProject();
-            course = StudyTaskManager.getInstance(project).getCourse();
-        } else {
+    public static boolean isValidTarget(@NotNull final PsiElement target, @NotNull final PsiElement[] sources) {
+        if (sources.length == 0) {
             return false;
         }
+        final Course course;
+        Project project = sources[0].getProject();
+        course = StudyTaskManager.getInstance(project).getCourse();
         if (course == null || !EduNames.STEPIK_CODE.equals(course.getCourseMode())) {
             return false;
         }
+
         if (!(target instanceof PsiFileSystemItem)) {
             return false;
         }
 
         String targetPath = getRelativePath((PsiFileSystemItem) target);
+
+        if (Arrays.stream(sources).anyMatch(source -> !(source instanceof PsiFileSystemItem))) {
+            return false;
+        }
+
+        String[] sourcesPaths = new String[sources.length];
+
+        for (int i = 0; i < sources.length; i++) {
+            PsiElement source = sources[i];
+            sourcesPaths[i] = getRelativePath((PsiFileSystemItem) source);
+        }
+
+        return isValidTarget(course, targetPath, sourcesPaths);
+    }
+
+    public static boolean isValidTarget(
+            @NotNull Course course,
+            @NotNull final String targetPath,
+            @NotNull final String[] sourcesPaths) {
+        if (sourcesPaths.length == 0) {
+            return true;
+        }
+
         if (isHideDir(targetPath) || isWithinHideDir(targetPath)) {
-            return false;
+            return true;
         }
-        if (!(isWithinSrc(targetPath) || isWithinSandbox(targetPath) || isSrc(targetPath) || isSandbox(targetPath))) {
-            return false;
-        }
-
-        Stream<PsiElement> stream = Arrays.stream(sources);
-
-        if (stream.anyMatch(source -> !(source instanceof PsiFileSystemItem))) {
-            return false;
+        if (!(isWithinSrc(targetPath) || isWithinSandbox(targetPath) || isSandbox(targetPath) || isSrc(targetPath))) {
+            return true;
         }
 
-        return stream.anyMatch(source -> isNotMovableOrRenameElement(course, (PsiFileSystemItem) source));
+        Stream<String> sourcesStream = Arrays.stream(sourcesPaths);
+
+        return sourcesStream.anyMatch(source -> isNotMovableOrRenameElement(course, source));
     }
 
     private static boolean isNotMovableOrRenameElement(@NotNull Course course, @NotNull PsiFileSystemItem element) {
@@ -163,7 +179,7 @@ public class ProjectFilesUtils {
 
     @NotNull
     public static String getRelativePath(@NotNull String basePath, @NotNull String path) {
-        String relPath = FileUtil.getRelativePath(basePath, path, File.separatorChar);
+        String relPath = FileUtil.getRelativePath(new File(basePath), new File(path));
         return relPath == null ? path : relPath;
     }
 
@@ -191,10 +207,13 @@ public class ProjectFilesUtils {
 
     @Nullable
     public static String getParent(@NotNull String path) {
-        File parent = FileUtil.getParentFile(new File(path));
-        if (parent == null) {
+        String[] dirs = splitPath(path);
+        if (dirs.length == 0 || path.isEmpty() || path.equals(".")) {
             return null;
+        } else if (dirs.length == 1) {
+            return ".";
         }
-        return parent.getPath();
+
+        return FileUtil.join(Arrays.copyOf(dirs, dirs.length - 1));
     }
 }
