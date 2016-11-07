@@ -114,21 +114,6 @@ public class StepikProjectGenerator extends EduProjectGenerator {
     @Override
     @Nullable
     protected Course getCourse(@NotNull final Project project) {
-
-//        TODO do not remove this. We will use it for update
-//        final File courseFile = new File(new File(OUR_COURSES_DIR, mySelectedCourseInfo.getName()), EduNames.COURSE_META_FILE);
-//        if (courseFile.exists()) {
-//            return readCourseFromCache(courseFile, false);
-//        }
-//        else if (myUser != null) {
-//            final File adaptiveCourseFile = new File(new File(OUR_COURSES_DIR, ADAPTIVE_COURSE_PREFIX +
-//                    mySelectedCourseInfo.getName() + "_" +
-//                    myUser.getEmail()), EduNames.COURSE_META_FILE);
-//            if (adaptiveCourseFile.exists()) {
-//                return readCourseFromCache(adaptiveCourseFile, true);
-//            }
-//        }
-
         return ProgressManager.getInstance()
                 .runProcessWithProgressSynchronously(() -> {
                     ProgressManager.getInstance().getProgressIndicator().setIndeterminate(true);
@@ -158,5 +143,4 @@ public class StepikProjectGenerator extends EduProjectGenerator {
             return Collections.singletonList(CourseInfo.INVALID_COURSE);
         }
     }
-
 }

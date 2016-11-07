@@ -102,7 +102,6 @@ public class DownloadSubmission extends StudyActionWithShortcut {
                 .build();
         StepikConnectorPost.postMetric(metric);
 
-
         String activateFileName = currentLang.getMainFileName();
         String code = null;
         for (StepikWrappers.SubmissionContainer.Submission submission : submissions) {
@@ -131,6 +130,5 @@ public class DownloadSubmission extends StudyActionWithShortcut {
                         }),
                 "Download last submission",
                 "Download last submission");
-
     }
 }
