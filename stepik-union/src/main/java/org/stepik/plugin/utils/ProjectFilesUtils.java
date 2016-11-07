@@ -4,6 +4,7 @@ import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
+import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFileSystemItem;
 import com.jetbrains.tmp.learning.StudyTaskManager;
@@ -39,8 +40,11 @@ public class ProjectFilesUtils {
             return false;
         }
         Project project = CommonDataKeys.PROJECT.getData(dataContext);
+        if (project == null) {
+            return false;
+        }
         PsiElement element = CommonDataKeys.PSI_ELEMENT.getData(dataContext);
-        if (element == null || project == null || !(element instanceof PsiFileSystemItem)) {
+        if (element == null || !(element instanceof PsiFileSystemItem || element instanceof PsiClass)) {
             return false;
         }
         Course course = StudyTaskManager.getInstance(project).getCourse();
@@ -48,7 +52,19 @@ public class ProjectFilesUtils {
             return false;
         }
 
-        return isNotMovableOrRenameElement(course, (PsiFileSystemItem) element);
+        PsiFileSystemItem item;
+
+        if (element instanceof PsiFileSystemItem) {
+            item = (PsiFileSystemItem) element;
+        } else {
+            item = element.getContainingFile();
+        }
+
+        if (item == null) {
+            return false;
+        }
+
+        return isNotMovableOrRenameElement(course, item);
     }
 
     public static boolean isValidTarget(@NotNull final PsiElement target, @NotNull final PsiElement[] sources) {
@@ -62,13 +78,25 @@ public class ProjectFilesUtils {
             return false;
         }
 
-        if (!(target instanceof PsiFileSystemItem)) {
+        if (!(target instanceof PsiFileSystemItem || target instanceof PsiClass)) {
             return false;
         }
 
-        String targetPath = getRelativePath((PsiFileSystemItem) target);
+        PsiFileSystemItem item;
 
-        if (Arrays.stream(sources).anyMatch(source -> !(source instanceof PsiFileSystemItem))) {
+        if (target instanceof PsiFileSystemItem) {
+            item = (PsiFileSystemItem) target;
+        } else {
+            item = target.getContainingFile();
+        }
+
+        if (item == null) {
+            return false;
+        }
+
+        String targetPath = getRelativePath(item);
+
+        if (Arrays.stream(sources).anyMatch(source -> !(source instanceof PsiFileSystemItem || source instanceof PsiClass))) {
             return false;
         }
 
@@ -76,7 +104,17 @@ public class ProjectFilesUtils {
 
         for (int i = 0; i < sources.length; i++) {
             PsiElement source = sources[i];
-            sourcesPaths[i] = getRelativePath((PsiFileSystemItem) source);
+            PsiFileSystemItem sourceFile;
+
+            if (source instanceof PsiFileSystemItem) {
+                sourceFile = (PsiFileSystemItem) source;
+            } else {
+                sourceFile = source.getContainingFile();
+            }
+            if (sourceFile == null) {
+                return false;
+            }
+            sourcesPaths[i] = getRelativePath(sourceFile);
         }
 
         return isValidTarget(course, targetPath, sourcesPaths);
@@ -128,19 +166,11 @@ public class ProjectFilesUtils {
     }
 
     private static boolean isNotMovableOrRenameElement(@NotNull Course course, @NotNull String path) {
-        if (!isWithinSandbox(path) && !isWithinSrc(path)) {
-            return true;
-        }
         if (isWithinSrc(path)) {
-            if (isHideDir(path) || isWithinHideDir(path) || isTaskHtmlFile(path)) {
-                return true;
-            }
-            if (isTaskFile(course, path)) {
-                return true;
-            }
+            return isHideDir(path) || isWithinHideDir(path) || isTaskHtmlFile(path) || isTaskFile(course, path);
         }
 
-        return false;
+        return !isWithinSandbox(path);
     }
 
     public static boolean isTaskHtmlFile(String path) {
