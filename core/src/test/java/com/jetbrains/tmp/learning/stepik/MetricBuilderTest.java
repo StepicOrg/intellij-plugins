@@ -4,16 +4,20 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.jetbrains.tmp.learning.StudySerializationUtils;
-import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.TaskFile;
+import com.jetbrains.tmp.learning.stepik.metric.MetricActions;
 import com.jetbrains.tmp.learning.stepik.metric.MetricBuilder;
+import com.jetbrains.tmp.learning.stepik.metric.MetricsWrapper;
+import com.jetbrains.tmp.learning.stepik.metric.PluginNames;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.io.InputStream;
 import java.util.Scanner;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class MetricBuilderTest {
     static final private Gson GSON =
@@ -24,59 +28,59 @@ public class MetricBuilderTest {
 
     @Test
     public void buildInvalid() throws Exception {
-        MetricBuilder.MetricsWrapper metric = MetricBuilder.getInstance().build();
-        assertEquals(EduNames.INVALID, metric.metric.name);
+        MetricsWrapper metric = new MetricBuilder().build();
+        assertFalse(metric.isCorrect());
     }
 
     @Test
     public void buildGetCourse() throws Exception {
-        MetricBuilder.MetricsWrapper metric = MetricBuilder.getInstance()
-                .addTag(MetricBuilder.PluginNames.STEPIK_UNION)
-                .addTag(MetricBuilder.MetricActions.GET_COURSE)
+        MetricsWrapper metric = new MetricBuilder()
+                .addTag(PluginNames.STEPIK_UNION)
+                .addTag(MetricActions.GET_COURSE)
                 .setCourseId(512)
                 .build();
 
         String requestBody = GSON.toJson(metric);
-        String answer = readTestFile("get_course.json").replaceAll("[\n\t ]+","") ;
+        String answer = readTestFile("get_course.json").replaceAll("[\n\t ]+", "");
         assertEquals(requestBody, answer);
     }
 
     @Test
     public void buildDownload() throws Exception {
-        MetricBuilder.MetricsWrapper metric = MetricBuilder.getInstance()
-                .addTag(MetricBuilder.PluginNames.STEPIK_UNION)
-                .addTag(MetricBuilder.MetricActions.DOWNLOAD)
+        MetricsWrapper metric = new MetricBuilder()
+                .addTag(PluginNames.STEPIK_UNION)
+                .addTag(MetricActions.DOWNLOAD)
                 .addTag(SupportedLanguages.JAVA)
                 .setCourseId(187)
                 .setStepId(42)
                 .build();
 
         String requestBody = GSON.toJson(metric);
-        String answer = readTestFile("download.json").replaceAll("[\n\t ]+","") ;
+        String answer = readTestFile("download.json").replaceAll("[\n\t ]+", "");
         assertEquals(requestBody, answer);
     }
 
     @Test
     public void buildPost() throws Exception {
-        MetricBuilder.MetricsWrapper metric = MetricBuilder.getInstance()
-                .addTag(MetricBuilder.PluginNames.STEPIK_UNION)
-                .addTag(MetricBuilder.MetricActions.POST)
+        MetricsWrapper metric = new MetricBuilder()
+                .addTag(PluginNames.STEPIK_UNION)
+                .addTag(MetricActions.POST)
                 .addTag(SupportedLanguages.JAVA)
                 .setCourseId(187)
                 .setStepId(42)
                 .build();
 
         String requestBody = GSON.toJson(metric);
-        String answer = readTestFile("post.json").replaceAll("[\n\t ]+","") ;
+        String answer = readTestFile("post.json").replaceAll("[\n\t ]+", "");
         assertEquals(requestBody, answer);
     }
 
 
     @Test
-    public void check1() {
-        MetricBuilder.MetricsWrapper wrapper = MetricBuilder.getInstance()
-                .addTag(MetricBuilder.PluginNames.STEPIK_UNION)
-                .addTag(MetricBuilder.MetricActions.POST)
+    public void correctPost() {
+        MetricsWrapper wrapper = new MetricBuilder()
+                .addTag(PluginNames.STEPIK_UNION)
+                .addTag(MetricActions.POST)
                 .addTag(SupportedLanguages.JAVA)
                 .setCourseId(187)
                 .setStepId(42)
@@ -85,20 +89,20 @@ public class MetricBuilderTest {
     }
 
     @Test
-    public void check2() {
-        MetricBuilder.MetricsWrapper wrapper = MetricBuilder.getInstance()
-                .addTag(MetricBuilder.PluginNames.STEPIK_UNION)
-                .addTag(MetricBuilder.MetricActions.GET_COURSE)
+    public void correctGet() {
+        MetricsWrapper wrapper = new MetricBuilder()
+                .addTag(PluginNames.STEPIK_UNION)
+                .addTag(MetricActions.GET_COURSE)
                 .setCourseId(187)
                 .build();
         assertTrue(wrapper.isCorrect());
     }
 
     @Test
-    public void check3() {
-        MetricBuilder.MetricsWrapper wrapper = MetricBuilder.getInstance()
-                .addTag(MetricBuilder.PluginNames.STEPIK_UNION)
-                .addTag(MetricBuilder.MetricActions.DOWNLOAD)
+    public void correctDownload() {
+        MetricsWrapper wrapper = new MetricBuilder()
+                .addTag(PluginNames.STEPIK_UNION)
+                .addTag(MetricActions.DOWNLOAD)
                 .addTag(SupportedLanguages.JAVA)
                 .setCourseId(187)
                 .setStepId(42)
@@ -107,29 +111,34 @@ public class MetricBuilderTest {
     }
 
     @Test
-    public void checkInvalidPost() {
+    public void invalidPostNoStepId() {
         // no step id
-        MetricBuilder.MetricsWrapper wrapper = MetricBuilder.getInstance()
-                .addTag(MetricBuilder.PluginNames.STEPIK_UNION)
-                .addTag(MetricBuilder.MetricActions.POST)
+        MetricsWrapper wrapper = new MetricBuilder()
+                .addTag(PluginNames.STEPIK_UNION)
+                .addTag(MetricActions.POST)
                 .addTag(SupportedLanguages.JAVA)
                 .setCourseId(187)
                 .build();
         assertFalse(wrapper.isCorrect());
+    }
 
-        // no course id
-        wrapper = MetricBuilder.getInstance()
-                .addTag(MetricBuilder.PluginNames.STEPIK_UNION)
-                .addTag(MetricBuilder.MetricActions.POST)
+    @Test
+    public void invalidPostNoCourseId() {
+        MetricsWrapper wrapper = new MetricBuilder()
+                .addTag(PluginNames.STEPIK_UNION)
+                .addTag(MetricActions.POST)
                 .addTag(SupportedLanguages.JAVA)
                 .setStepId(187)
                 .build();
         assertFalse(wrapper.isCorrect());
 
-        // no lang
-        wrapper = MetricBuilder.getInstance()
-                .addTag(MetricBuilder.PluginNames.STEPIK_UNION)
-                .addTag(MetricBuilder.MetricActions.POST)
+    }
+
+    @Test
+    public void invalidPostNoLang() {
+        MetricsWrapper wrapper = new MetricBuilder()
+                .addTag(PluginNames.STEPIK_UNION)
+                .addTag(MetricActions.POST)
                 .setCourseId(187)
                 .setStepId(42)
                 .build();
@@ -137,27 +146,31 @@ public class MetricBuilderTest {
     }
 
     @Test
-    public void checkInvalidGet() {
+    public void invalidGetHaveLang() {
         // have lang
-        MetricBuilder.MetricsWrapper wrapper = MetricBuilder.getInstance()
-                .addTag(MetricBuilder.PluginNames.STEPIK_UNION)
-                .addTag(MetricBuilder.MetricActions.GET_COURSE)
+        MetricsWrapper wrapper = new MetricBuilder()
+                .addTag(PluginNames.STEPIK_UNION)
+                .addTag(MetricActions.GET_COURSE)
                 .addTag(SupportedLanguages.JAVA)
                 .setCourseId(187)
                 .build();
         assertFalse(wrapper.isCorrect());
+    }
 
-        // no course id
-        wrapper = MetricBuilder.getInstance()
-                .addTag(MetricBuilder.PluginNames.STEPIK_UNION)
-                .addTag(MetricBuilder.MetricActions.GET_COURSE)
+    @Test
+    public void invalidGetNoCourseId() {
+        MetricsWrapper wrapper = new MetricBuilder()
+                .addTag(PluginNames.STEPIK_UNION)
+                .addTag(MetricActions.GET_COURSE)
                 .build();
         assertFalse(wrapper.isCorrect());
+    }
 
-        // have step
-        wrapper = MetricBuilder.getInstance()
-                .addTag(MetricBuilder.PluginNames.STEPIK_UNION)
-                .addTag(MetricBuilder.MetricActions.GET_COURSE)
+    @Test
+    public void invalidGetHaveStepId() {
+        MetricsWrapper wrapper = new MetricBuilder()
+                .addTag(PluginNames.STEPIK_UNION)
+                .addTag(MetricActions.GET_COURSE)
                 .setCourseId(187)
                 .setStepId(42)
                 .build();
@@ -165,29 +178,32 @@ public class MetricBuilderTest {
     }
 
     @Test
-    public void checkInvalidDownload() {
-        // no step
-        MetricBuilder.MetricsWrapper wrapper = MetricBuilder.getInstance()
-                .addTag(MetricBuilder.PluginNames.STEPIK_UNION)
-                .addTag(MetricBuilder.MetricActions.DOWNLOAD)
+    public void invalidDownloadNoStepId() {
+        MetricsWrapper wrapper = new MetricBuilder()
+                .addTag(PluginNames.STEPIK_UNION)
+                .addTag(MetricActions.DOWNLOAD)
                 .addTag(SupportedLanguages.JAVA)
                 .setCourseId(187)
                 .build();
         assertFalse(wrapper.isCorrect());
+    }
 
-        // no course
-        wrapper = MetricBuilder.getInstance()
-                .addTag(MetricBuilder.PluginNames.STEPIK_UNION)
-                .addTag(MetricBuilder.MetricActions.DOWNLOAD)
+    @Test
+    public void invalidDownloadNoCourseId() {
+        MetricsWrapper wrapper = new MetricBuilder()
+                .addTag(PluginNames.STEPIK_UNION)
+                .addTag(MetricActions.DOWNLOAD)
                 .addTag(SupportedLanguages.JAVA)
                 .setStepId(187)
                 .build();
         assertFalse(wrapper.isCorrect());
+    }
 
-        // no lang
-        wrapper = MetricBuilder.getInstance()
-                .addTag(MetricBuilder.PluginNames.STEPIK_UNION)
-                .addTag(MetricBuilder.MetricActions.DOWNLOAD)
+    @Test
+    public void invalidDownloadNoLang() {
+        MetricsWrapper wrapper = new MetricBuilder()
+                .addTag(PluginNames.STEPIK_UNION)
+                .addTag(MetricActions.DOWNLOAD)
                 .setCourseId(187)
                 .setStepId(42)
                 .build();

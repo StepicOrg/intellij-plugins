@@ -193,7 +193,7 @@ public class StepikConnectorGet {
     }
 
     public static Course getCourse(@NotNull final Project project, @NotNull final CourseInfo info) {
-        MetricsWrapper metric = MetricBuilder.getInstance()
+        MetricsWrapper metric = new MetricBuilder()
                 .addTag(PluginNames.STEPIK_UNION)
                 .addTag(MetricActions.GET_COURSE)
                 .setCourseId(info.id)

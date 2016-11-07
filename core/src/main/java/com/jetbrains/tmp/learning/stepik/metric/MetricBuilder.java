@@ -13,9 +13,7 @@ public class MetricBuilder {
     private Integer courseId = null;
     private Integer stepId = null;
 
-    public static MetricBuilder getInstance() {
-        return new MetricBuilder();
-    }
+    public MetricBuilder(){}
 
     public MetricBuilder addTag(PluginNames name) {
         this.name = name.toString();
@@ -54,11 +52,14 @@ public class MetricBuilder {
         if (isAnyNull(name, action)) {
             return false;
         }
-        if (MetricActions.GET_COURSE.toString().equals(action) && (courseId == null || !isAllNull(stepId, language))) {
+
+        boolean isGetCourseAction = MetricActions.GET_COURSE.toString().equals(action);
+
+        if (isGetCourseAction && (courseId == null || !isAllNull(stepId, language))) {
             return false;
         }
 
-        if (!MetricActions.GET_COURSE.toString().equals(action) && isAnyNull(courseId, stepId, language)) {
+        if (!isGetCourseAction && isAnyNull(courseId, stepId, language)) {
             return false;
         }
         return true;
