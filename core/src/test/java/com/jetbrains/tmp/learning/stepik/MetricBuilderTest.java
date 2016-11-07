@@ -3,10 +3,10 @@ package com.jetbrains.tmp.learning.stepik;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.jetbrains.tmp.learning.LangManager;
 import com.jetbrains.tmp.learning.StudySerializationUtils;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.TaskFile;
+import com.jetbrains.tmp.learning.stepik.metric.MetricBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 

@@ -18,10 +18,13 @@ import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.actions.StudyActionWithShortcut;
 import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.editor.StudyEditor;
-import com.jetbrains.tmp.learning.stepik.MetricBuilder;
+import com.jetbrains.tmp.learning.stepik.metric.MetricActions;
+import com.jetbrains.tmp.learning.stepik.metric.MetricBuilder;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorGet;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorPost;
 import com.jetbrains.tmp.learning.stepik.StepikWrappers;
+import com.jetbrains.tmp.learning.stepik.metric.MetricsWrapper;
+import com.jetbrains.tmp.learning.stepik.metric.PluginNames;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.jetbrains.annotations.NotNull;
@@ -90,9 +93,9 @@ public class DownloadSubmission extends StudyActionWithShortcut {
             return;
         }
         List<StepikWrappers.SubmissionContainer.Submission> submissions = submissionContainer.submissions;
-        MetricBuilder.MetricsWrapper metric = MetricBuilder.getInstance()
-                .addTag(MetricBuilder.PluginNames.STEPIK_UNION)
-                .addTag(MetricBuilder.MetricActions.DOWNLOAD)
+        MetricsWrapper metric = MetricBuilder.getInstance()
+                .addTag(PluginNames.STEPIK_UNION)
+                .addTag(MetricActions.DOWNLOAD)
                 .addTag(currentLang)
                 .setCourseId(targetTask.getLesson().getSection().getCourse().getId())
                 .setStepId(targetTask.getStepId())

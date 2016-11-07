@@ -34,6 +34,8 @@ import com.jetbrains.tmp.learning.courseFormat.Lesson;
 import com.jetbrains.tmp.learning.courseFormat.Section;
 import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.courseFormat.TaskFile;
+import com.jetbrains.tmp.learning.stepik.metric.MetricBuilder;
+import com.jetbrains.tmp.learning.stepik.metric.MetricsWrapper;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
@@ -516,7 +518,7 @@ public class StepikConnectorPost {
         });
     }
 
-    public static void postMetric(MetricBuilder.MetricsWrapper metricsWrapper) {
+    public static void postMetric(MetricsWrapper metricsWrapper) {
         if (!metricsWrapper.isCorrect()){
             logger.warn(EduNames.INVALID + " metric");
             return;

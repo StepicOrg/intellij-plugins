@@ -19,10 +19,13 @@ import com.jetbrains.tmp.learning.checker.StudyCheckUtils;
 import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
 import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.editor.StudyEditor;
-import com.jetbrains.tmp.learning.stepik.MetricBuilder;
+import com.jetbrains.tmp.learning.stepik.metric.MetricActions;
+import com.jetbrains.tmp.learning.stepik.metric.MetricBuilder;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorGet;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorPost;
 import com.jetbrains.tmp.learning.stepik.StepikWrappers;
+import com.jetbrains.tmp.learning.stepik.metric.MetricsWrapper;
+import com.jetbrains.tmp.learning.stepik.metric.PluginNames;
 import org.jetbrains.annotations.NotNull;
 import com.jetbrains.tmp.learning.stepik.SupportedLanguages;
 import org.stepik.plugin.utils.DirectivesUtils;
@@ -93,9 +96,9 @@ public class StepikJavaPostAction extends StudyCheckAction {
                         return;
                     }
                     List<StepikWrappers.SubmissionContainer.Submission> submissions = container.submissions;
-                    MetricBuilder.MetricsWrapper metric = MetricBuilder.getInstance()
-                            .addTag(MetricBuilder.PluginNames.STEPIK_UNION)
-                            .addTag(MetricBuilder.MetricActions.POST)
+                    MetricsWrapper metric = MetricBuilder.getInstance()
+                            .addTag(PluginNames.STEPIK_UNION)
+                            .addTag(MetricActions.POST)
                             .addTag(currentLang)
                             .setCourseId(task.getLesson().getSection().getCourse().getId())
                             .setStepId(task.getStepId())
