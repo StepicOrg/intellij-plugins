@@ -29,6 +29,7 @@
         <navbar implementation="org.stepik.plugin.projectView.StepikNavBarModelExtension"/>
         <refactoring.moveHandler implementation="org.stepik.plugin.refactoring.move.StepikMoveHandlerDelegate" order="first"/>
         <renamePsiElementProcessor implementation="org.stepik.plugin.refactoring.rename.StepikRenamePsiElementProcessor" order="first"/>
+        <refactoring.safeDeleteProcessor implementation="org.stepik.plugin.refactoring.safeDelete.StepikSafeDeleteProcessorDelegate"/>
     </extensions>
 
     <extensions defaultExtensionNs="SCore">
