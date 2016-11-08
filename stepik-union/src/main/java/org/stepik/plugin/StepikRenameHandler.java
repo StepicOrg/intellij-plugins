@@ -35,6 +35,6 @@ public class StepikRenameHandler implements RenameHandler {
 
     @Override
     public String toString() {
-        return "Don't rename it! The course can be defective";
+        return "Don't make any changes to the structure of the project tree, it might become defective.";
     }
 }
