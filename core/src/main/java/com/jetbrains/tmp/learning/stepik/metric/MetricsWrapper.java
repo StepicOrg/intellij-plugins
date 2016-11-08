@@ -17,6 +17,11 @@ public class MetricsWrapper {
         metric = new Metric(metricName, tags_name, tags_action, tags_languages, courseId, stepId);
     }
 
+    MetricsWrapper(
+            String metricName) {
+        metric = new Metric(metricName, null, null, null, null, null);
+    }
+
     static class Metric {
         final String name;
         Tags tags;

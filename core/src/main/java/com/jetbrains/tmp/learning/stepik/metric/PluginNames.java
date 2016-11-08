@@ -1,5 +1,7 @@
 package com.jetbrains.tmp.learning.stepik.metric;
 
+import org.jetbrains.annotations.NotNull;
+
 public enum PluginNames {
     STEPIK_UNION("S_Union"),
     STEPIK_CLION("S_CLion"),
@@ -11,8 +13,8 @@ public enum PluginNames {
         this.name = name;
     }
 
-    @Override
-    public String toString() {
+    @NotNull
+    public String getTag() {
         return name;
     }
 }

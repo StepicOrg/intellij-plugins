@@ -12,6 +12,7 @@ import com.jetbrains.tmp.learning.stepik.metric.PluginNames;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Scanner;
 
@@ -194,11 +195,13 @@ public class MetricBuilderTest {
         assertFalse(wrapper.isCorrect());
     }
 
-    private String readTestFile(@NotNull String fileName) {
+    private String readTestFile(@NotNull String fileName) throws FileNotFoundException {
         StringBuilder sb = new StringBuilder();
         InputStream inputStream = this.getClass().getResourceAsStream("/samples/" + fileName);
 
-        if (inputStream == null) return null;
+        if (inputStream == null) {
+            throw new FileNotFoundException("/samples/" + fileName);
+        }
         Scanner scanner = new Scanner(inputStream);
 
         while (scanner.hasNextLine()) {

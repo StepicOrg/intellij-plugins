@@ -7,26 +7,28 @@ import static com.jetbrains.tmp.learning.stepik.metric.MetricUtils.isAllNull;
 import static com.jetbrains.tmp.learning.stepik.metric.MetricUtils.isAnyNull;
 
 public class MetricBuilder {
-    private String name = null;
-    private String action = null;
-    private String language = null;
-    private Integer courseId = null;
-    private Integer stepId = null;
+    private String name;
+    private String action;
+    private String language;
+    private Integer courseId;
+    private Integer stepId;
 
-    public MetricBuilder(){}
+    public static MetricsWrapper INVALID_METRICS_WRAPPER = new MetricsWrapper(EduNames.INVALID);
+
+    public MetricBuilder() {}
 
     public MetricBuilder addTag(PluginNames name) {
-        this.name = name.toString();
+        this.name = name.getTag();
         return this;
     }
 
     public MetricBuilder addTag(MetricActions action) {
-        this.action = action.toString();
+        this.action = action.getTag();
         return this;
     }
 
     public MetricBuilder addTag(SupportedLanguages language) {
-        this.language = language.toString();
+        this.language = language.getTag();
         return this;
     }
 
@@ -44,7 +46,7 @@ public class MetricBuilder {
         if (check()) {
             return new MetricsWrapper(EduNames.METRIC_NAME, name, action, language, courseId, stepId);
         } else {
-            return new MetricsWrapper(EduNames.INVALID, null, null, null, null, null);
+            return INVALID_METRICS_WRAPPER;
         }
     }
 
@@ -53,7 +55,7 @@ public class MetricBuilder {
             return false;
         }
 
-        boolean isGetCourseAction = MetricActions.GET_COURSE.toString().equals(action);
+        boolean isGetCourseAction = MetricActions.GET_COURSE.getTag().equals(action);
 
         if (isGetCourseAction && (courseId == null || !isAllNull(stepId, language))) {
             return false;

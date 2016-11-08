@@ -37,6 +37,11 @@ public enum SupportedLanguages {
     }
 
     @NotNull
+    public String getTag() {
+        return name;
+    }
+
+    @NotNull
     public String getComment() {
         return comment;
     }

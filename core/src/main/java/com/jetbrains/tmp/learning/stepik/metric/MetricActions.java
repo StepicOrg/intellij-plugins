@@ -1,5 +1,7 @@
 package com.jetbrains.tmp.learning.stepik.metric;
 
+import org.jetbrains.annotations.NotNull;
+
 public enum MetricActions {
     POST("post"),
     DOWNLOAD("download"),
@@ -11,8 +13,8 @@ public enum MetricActions {
         this.name = name;
     }
 
-    @Override
-    public String toString() {
+    @NotNull
+    public String getTag() {
         return name;
     }
 }
