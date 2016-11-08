@@ -16,6 +16,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -77,22 +78,22 @@ public class ProjectFilesUtils {
 
         String targetPath = getRelativePath(item);
 
-        if (Arrays.stream(sources).anyMatch(source -> !(source instanceof PsiFileSystemItem || source instanceof PsiClass))) {
-            return false;
-        }
-
-        String[] sourcesPaths = new String[sources.length];
+        ArrayList<String> sourcesPaths = new ArrayList<>();
 
         for (int i = 0; i < sources.length; i++) {
-            PsiFileSystemItem sourceFile = getFile(sources[i]);
-
-            if (sourceFile == null) {
-                return false;
+            PsiElement source = sources[i];
+            if (!(source instanceof PsiFileSystemItem || source instanceof PsiClass)) {
+                continue;
             }
-            sourcesPaths[i] = getRelativePath(sourceFile);
+
+            PsiFileSystemItem sourceFile = getFile(source);
+            if (sourceFile == null) {
+                continue;
+            }
+            sourcesPaths.add(getRelativePath(sourceFile));
         }
 
-        return isValidTarget(course, targetPath, sourcesPaths);
+        return isValidTarget(course, targetPath, sourcesPaths.toArray(new String[sourcesPaths.size()]));
     }
 
     @Nullable
