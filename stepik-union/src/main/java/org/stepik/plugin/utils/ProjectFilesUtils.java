@@ -80,8 +80,7 @@ public class ProjectFilesUtils {
 
         ArrayList<String> sourcesPaths = new ArrayList<>();
 
-        for (int i = 0; i < sources.length; i++) {
-            PsiElement source = sources[i];
+        for (PsiElement source : sources) {
             if (!(source instanceof PsiFileSystemItem || source instanceof PsiClass)) {
                 continue;
             }
