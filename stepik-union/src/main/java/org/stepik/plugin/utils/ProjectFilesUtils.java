@@ -44,23 +44,11 @@ public class ProjectFilesUtils {
             return false;
         }
         PsiElement element = CommonDataKeys.PSI_ELEMENT.getData(dataContext);
-        if (element == null || !(element instanceof PsiFileSystemItem || element instanceof PsiClass)) {
-            return false;
-        }
-        Course course = StudyTaskManager.getInstance(project).getCourse();
-        if (course == null || !EduNames.STEPIK_CODE.equals(course.getCourseMode())) {
+        if (element == null) {
             return false;
         }
 
-        PsiFileSystemItem item;
-
-        item = getFile(element);
-
-        if (item == null) {
-            return false;
-        }
-
-        return isNotMovableOrRenameElement(course, item);
+        return isNotMovableOrRenameElement(element);
     }
 
     public static boolean isValidTarget(@Nullable final PsiElement target, @NotNull final PsiElement[] sources) {
@@ -138,8 +126,20 @@ public class ProjectFilesUtils {
         return sourcesStream.anyMatch(source -> isNotMovableOrRenameElement(course, source));
     }
 
-    private static boolean isNotMovableOrRenameElement(@NotNull Course course, @NotNull PsiFileSystemItem element) {
-        String path = getRelativePath(element);
+    public static boolean isNotMovableOrRenameElement(@NotNull PsiElement element) {
+        if (!(element instanceof PsiFileSystemItem || element instanceof PsiClass)) {
+            return false;
+        }
+        Project project = element.getProject();
+        Course course = StudyTaskManager.getInstance(project).getCourse();
+        if (course == null || !EduNames.STEPIK_CODE.equals(course.getCourseMode())) {
+            return false;
+        }
+        PsiFileSystemItem file = getFile(element);
+        if (file == null) {
+            return false;
+        }
+        String path = getRelativePath(file);
         return isNotMovableOrRenameElement(course, path);
     }
 

@@ -1,4 +1,4 @@
-package org.stepik.plugin;
+package org.stepik.plugin.refactoring.move;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
