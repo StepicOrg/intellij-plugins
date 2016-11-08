@@ -54,11 +54,7 @@ public class ProjectFilesUtils {
 
         PsiFileSystemItem item;
 
-        if (element instanceof PsiFileSystemItem) {
-            item = (PsiFileSystemItem) element;
-        } else {
-            item = element.getContainingFile();
-        }
+        item = getFile(element);
 
         if (item == null) {
             return false;
@@ -67,7 +63,10 @@ public class ProjectFilesUtils {
         return isNotMovableOrRenameElement(course, item);
     }
 
-    public static boolean isValidTarget(@NotNull final PsiElement target, @NotNull final PsiElement[] sources) {
+    public static boolean isValidTarget(@Nullable final PsiElement target, @NotNull final PsiElement[] sources) {
+        if (target == null) {
+            return true;
+        }
         if (sources.length == 0) {
             return false;
         }
@@ -82,13 +81,7 @@ public class ProjectFilesUtils {
             return false;
         }
 
-        PsiFileSystemItem item;
-
-        if (target instanceof PsiFileSystemItem) {
-            item = (PsiFileSystemItem) target;
-        } else {
-            item = target.getContainingFile();
-        }
+        PsiFileSystemItem item = getFile(target);
 
         if (item == null) {
             return false;
@@ -103,14 +96,8 @@ public class ProjectFilesUtils {
         String[] sourcesPaths = new String[sources.length];
 
         for (int i = 0; i < sources.length; i++) {
-            PsiElement source = sources[i];
-            PsiFileSystemItem sourceFile;
+            PsiFileSystemItem sourceFile = getFile(sources[i]);
 
-            if (source instanceof PsiFileSystemItem) {
-                sourceFile = (PsiFileSystemItem) source;
-            } else {
-                sourceFile = source.getContainingFile();
-            }
             if (sourceFile == null) {
                 return false;
             }
@@ -118,6 +105,17 @@ public class ProjectFilesUtils {
         }
 
         return isValidTarget(course, targetPath, sourcesPaths);
+    }
+
+    @Nullable
+    private static PsiFileSystemItem getFile(@NotNull PsiElement target) {
+        PsiFileSystemItem item;
+        if (target instanceof PsiFileSystemItem) {
+            item = (PsiFileSystemItem) target;
+        } else {
+            item = target.getContainingFile();
+        }
+        return item;
     }
 
     public static boolean isValidTarget(
