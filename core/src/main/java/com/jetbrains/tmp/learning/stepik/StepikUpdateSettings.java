@@ -5,22 +5,22 @@ import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.util.xmlb.XmlSerializerUtil;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 @State(name = "StepikUpdateSettings", storages = @Storage("other.xml"))
 public class StepikUpdateSettings implements PersistentStateComponent<StepikUpdateSettings> {
-    public long LAST_TIME_CHECKED = 0;
+    private long nextTimeCheck = 0;
 
     public StepikUpdateSettings() {
-
     }
 
-    public long getLastTimeChecked() {
-        return LAST_TIME_CHECKED;
+    public long getNextTimeCheck() {
+        return nextTimeCheck;
     }
 
-    public void setLastTimeChecked(long timeChecked) {
-        LAST_TIME_CHECKED = timeChecked;
+    public void setNextTimeCheck(long timeChecked) {
+        nextTimeCheck = timeChecked;
     }
 
     @Nullable
@@ -30,10 +30,11 @@ public class StepikUpdateSettings implements PersistentStateComponent<StepikUpda
     }
 
     @Override
-    public void loadState(StepikUpdateSettings state) {
+    public void loadState(@NotNull StepikUpdateSettings state) {
         XmlSerializerUtil.copyBean(state, this);
     }
 
+    @Nullable
     public static StepikUpdateSettings getInstance() {
         return ServiceManager.getService(StepikUpdateSettings.class);
     }
