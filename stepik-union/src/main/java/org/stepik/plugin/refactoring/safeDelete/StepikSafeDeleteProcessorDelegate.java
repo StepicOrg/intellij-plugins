@@ -23,7 +23,9 @@ public class StepikSafeDeleteProcessorDelegate extends SafeDeleteProcessorDelega
     @Nullable
     @Override
     public Collection<? extends PsiElement> getElementsToSearch(
-            @NotNull PsiElement element, @Nullable Module module, @NotNull Collection<PsiElement> allElementsToDelete) {
+            @NotNull PsiElement element,
+            @Nullable Module module,
+            @NotNull Collection<PsiElement> allElementsToDelete) {
         return null;
     }
 
@@ -35,28 +37,30 @@ public class StepikSafeDeleteProcessorDelegate extends SafeDeleteProcessorDelega
     @Nullable
     @Override
     public NonCodeUsageSearchInfo findUsages(
-            @NotNull PsiElement element, @NotNull PsiElement[] allElementsToDelete, @NotNull List<UsageInfo> result) {
+            @NotNull PsiElement element,
+            @NotNull PsiElement[] allElementsToDelete,
+            @NotNull List<UsageInfo> result) {
         return null;
     }
 
     @Nullable
     @Override
     public Collection<PsiElement> getAdditionalElementsToDelete(
-            @NotNull PsiElement element, @NotNull Collection<PsiElement> allElementsToDelete, boolean askUser) {
+            @NotNull PsiElement element,
+            @NotNull Collection<PsiElement> allElementsToDelete,
+            boolean askUser) {
         return null;
     }
 
     @Nullable
     @Override
-    public Collection<String> findConflicts(
-            @NotNull PsiElement element, @NotNull PsiElement[] allElementsToDelete) {
+    public Collection<String> findConflicts(@NotNull PsiElement element, @NotNull PsiElement[] allElementsToDelete) {
         return null;
     }
 
     @Nullable
     @Override
-    public UsageInfo[] preprocessUsages(
-            Project project, UsageInfo[] usages) {
+    public UsageInfo[] preprocessUsages(Project project, UsageInfo[] usages) {
         return new UsageInfo[0];
     }
 

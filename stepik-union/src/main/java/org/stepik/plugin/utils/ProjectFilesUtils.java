@@ -59,9 +59,8 @@ public class ProjectFilesUtils {
         if (sources.length == 0) {
             return false;
         }
-        final Course course;
         Project project = sources[0].getProject();
-        course = StudyTaskManager.getInstance(project).getCourse();
+        final Course course = StudyTaskManager.getInstance(project).getCourse();
         if (course == null || !EduNames.STEPIK_CODE.equals(course.getCourseMode())) {
             return false;
         }
@@ -207,8 +206,8 @@ public class ProjectFilesUtils {
 
     @NotNull
     public static String getRelativePath(@NotNull String basePath, @NotNull String path) {
-        String relPath = FileUtil.getRelativePath(basePath, path, SEPARATOR_CHAR);
-        return relPath == null ? path : relPath;
+        String relativePath = FileUtil.getRelativePath(basePath, path, SEPARATOR_CHAR);
+        return relativePath == null ? path : relativePath;
     }
 
     public static boolean isStudyItemDir(@NotNull String relativePath) {
