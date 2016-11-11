@@ -11,6 +11,8 @@ import com.jetbrains.tmp.learning.StudyUtils;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.plugin.utils.ProjectFilesUtils;
 
+import static org.stepik.plugin.utils.ProjectFilesUtils.isNotMovableOrRenameElement;
+
 /**
  * @author meanmail
  */
@@ -41,6 +43,6 @@ public class StepikMoveHandlerDelegate extends MoveHandlerDelegate {
             DataContext dataContext,
             @Nullable PsiReference reference,
             Editor editor) {
-        return StudyUtils.isStudyProject(project);
+        return isNotMovableOrRenameElement(element);
     }
 }
