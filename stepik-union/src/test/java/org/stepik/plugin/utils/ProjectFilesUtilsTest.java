@@ -1,20 +1,12 @@
 package org.stepik.plugin.utils;
 
 import com.jetbrains.tmp.learning.core.EduNames;
-import com.jetbrains.tmp.learning.courseFormat.Course;
-import com.jetbrains.tmp.learning.courseFormat.Lesson;
-import com.jetbrains.tmp.learning.courseFormat.Task;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.junit.experimental.theories.DataPoints;
 import org.junit.experimental.theories.FromDataPoints;
 import org.junit.experimental.theories.Theories;
 import org.junit.experimental.theories.Theory;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-
-import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -52,7 +44,7 @@ public class ProjectFilesUtilsTest {
 
     private static final String SECTION1_LESSON1_TASK1_SRC = join(SECTION1, LESSON1, TASK1, EduNames.SRC);
 
-    @SuppressWarnings("WeakerAccess")
+    @SuppressWarnings("unused")
     @DataPoints("studyItems")
     public static final String[] studyItems = new String[]{
             ".",
@@ -115,60 +107,14 @@ public class ProjectFilesUtilsTest {
             join(SECTION1, LESSON1, TASK1)
     };
 
-    @SuppressWarnings("unused")
-    @DataPoints("notValidSources")
-    public static String[][] notValidSources = new String[][]{
-            {},
-            {EduNames.SANDBOX_DIR},
-            studyItems
-    };
-
     @Theory
-    public void isValidTargetNotValidSources(
-            @FromDataPoints("validTargets") String targetPath,
-            @FromDataPoints("notValidSources") String[] sourcesPaths) throws Exception {
-        Course course = getTestCourse();
-        assertTrue(ProjectFilesUtils.isValidTarget(course, targetPath, sourcesPaths));
-    }
-
-    @NotNull
-    private Course getTestCourse() {
-        Course course = PowerMockito.mock(Course.class);
-        Lesson lesson = PowerMockito.mock(Lesson.class);
-        Task task = PowerMockito.mock(Task.class);
-        PowerMockito.when(course.getLessonByDirName(Mockito.notNull(String.class))).thenReturn(lesson);
-        PowerMockito.when(lesson.getTask(Mockito.notNull(String.class))).thenReturn(task);
-        PowerMockito.when(task.getTaskFiles()).thenReturn(Collections.emptyMap());
-        return course;
-    }
-
-    @SuppressWarnings("unused")
-    @DataPoints("validSources")
-    public static String[][] validSources = new String[][]{
-            {
-                    join(EduNames.SANDBOX_DIR, SECTION1),
-                    join(EduNames.SANDBOX_DIR, SECTION1_LESSON1_TASK1_SRC),
-                    join(EduNames.SANDBOX_DIR, "other")
-            },
-            {
-                    join(EduNames.SANDBOX_DIR, SECTION1)
-            }
-    };
-
-    @Theory
-    public void isValidTargetValidSources(
-            @FromDataPoints("validTargets") String targetPath,
-            @FromDataPoints("validSources") String[] sourcesPaths) throws Exception {
-        Course course = getTestCourse();
-        assertFalse(ProjectFilesUtils.isValidTarget(course, targetPath, sourcesPaths));
+    public void isCanBeTarget(@FromDataPoints("validTargets") String targetPath) throws Exception {
+        assertFalse(ProjectFilesUtils.isCanNotBeTarget(targetPath));
     }
 
     @Theory
-    public void isValidTargetNotValidTargetValidSources(
-            @FromDataPoints("notValidTarget") String targetPath,
-            @FromDataPoints("validSources") String[] sourcesPaths) throws Exception {
-        Course course = getTestCourse();
-        assertTrue(ProjectFilesUtils.isValidTarget(course, targetPath, sourcesPaths));
+    public void isCanNotBeTarget(@FromDataPoints("notValidTarget") String targetPath) throws Exception {
+        assertTrue(ProjectFilesUtils.isCanNotBeTarget(targetPath));
     }
 
     @Test

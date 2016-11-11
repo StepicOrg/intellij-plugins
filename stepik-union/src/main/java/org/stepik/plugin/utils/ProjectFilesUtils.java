@@ -1,7 +1,5 @@
 package org.stepik.plugin.utils;
 
-import com.intellij.openapi.actionSystem.CommonDataKeys;
-import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.psi.PsiClass;
@@ -16,10 +14,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Set;
-import java.util.stream.Stream;
 
 /**
  * @author meanmail
@@ -35,31 +30,23 @@ public class ProjectFilesUtils {
     private static final String COURSE_DIRECTORIES = "\\.|" + SECTION_EXPR + "|" + LESSON_PATH_EXPR + "|" + TASK_PATH_EXPR + "|" + SRC_PATH_EXPR;
     private static final String HIDE_PATH_EXPR = SRC_PATH_EXPR + SEPARATOR + EduNames.HIDE;
 
-    @Contract("null -> false")
-    public static boolean canMoveOrRename(@Nullable DataContext dataContext) {
-        if (dataContext == null) {
-            return false;
+    @Nullable
+    private static PsiFileSystemItem getFile(@NotNull PsiElement target) {
+        PsiFileSystemItem item;
+        if (target instanceof PsiFileSystemItem) {
+            item = (PsiFileSystemItem) target;
+        } else {
+            item = target.getContainingFile();
         }
-        Project project = CommonDataKeys.PROJECT.getData(dataContext);
-        if (project == null) {
-            return false;
-        }
-        PsiElement element = CommonDataKeys.PSI_ELEMENT.getData(dataContext);
-        if (element == null) {
-            return false;
-        }
-
-        return isNotMovableOrRenameElement(element);
+        return item;
     }
 
-    public static boolean isValidTarget(@Nullable final PsiElement target, @NotNull final PsiElement[] sources) {
+    public static boolean isCanNotBeTarget(@Nullable PsiElement target) {
         if (target == null) {
             return true;
         }
-        if (sources.length == 0) {
-            return false;
-        }
-        Project project = sources[0].getProject();
+
+        Project project = target.getProject();
         final Course course = StudyTaskManager.getInstance(project).getCourse();
         if (course == null || !EduNames.STEPIK_CODE.equals(course.getCourseMode())) {
             return false;
@@ -77,52 +64,14 @@ public class ProjectFilesUtils {
 
         String targetPath = getRelativePath(item);
 
-        ArrayList<String> sourcesPaths = new ArrayList<>();
-
-        for (PsiElement source : sources) {
-            if (!(source instanceof PsiFileSystemItem || source instanceof PsiClass)) {
-                continue;
-            }
-
-            PsiFileSystemItem sourceFile = getFile(source);
-            if (sourceFile == null) {
-                continue;
-            }
-            sourcesPaths.add(getRelativePath(sourceFile));
-        }
-
-        return isValidTarget(course, targetPath, sourcesPaths.toArray(new String[sourcesPaths.size()]));
+        return isCanNotBeTarget(targetPath);
     }
 
-    @Nullable
-    private static PsiFileSystemItem getFile(@NotNull PsiElement target) {
-        PsiFileSystemItem item;
-        if (target instanceof PsiFileSystemItem) {
-            item = (PsiFileSystemItem) target;
-        } else {
-            item = target.getContainingFile();
-        }
-        return item;
-    }
-
-    public static boolean isValidTarget(
-            @NotNull Course course,
-            @NotNull final String targetPath,
-            @NotNull final String[] sourcesPaths) {
-        if (sourcesPaths.length == 0) {
-            return true;
-        }
-
+    static boolean isCanNotBeTarget(String targetPath) {
         if (isHideDir(targetPath) || isWithinHideDir(targetPath)) {
             return true;
         }
-        if (!(isWithinSrc(targetPath) || isWithinSandbox(targetPath) || isSandbox(targetPath) || isSrc(targetPath))) {
-            return true;
-        }
-
-        Stream<String> sourcesStream = Arrays.stream(sourcesPaths);
-
-        return sourcesStream.anyMatch(source -> isNotMovableOrRenameElement(course, source));
+        return !(isWithinSrc(targetPath) || isWithinSandbox(targetPath) || isSandbox(targetPath) || isSrc(targetPath));
     }
 
     public static boolean isNotMovableOrRenameElement(@NotNull PsiElement element) {
@@ -170,11 +119,11 @@ public class ProjectFilesUtils {
         return !isWithinSandbox(path);
     }
 
-    public static boolean isTaskHtmlFile(String path) {
+    static boolean isTaskHtmlFile(String path) {
         return path.matches(SRC_PATH_EXPR + SEPARATOR + EduNames.TASK_HTML);
     }
 
-    public static boolean isSandbox(String path) {
+    static boolean isSandbox(String path) {
         return path.matches(EduNames.SANDBOX_DIR);
     }
 
@@ -182,20 +131,20 @@ public class ProjectFilesUtils {
         return path.matches(SRC_PATH_EXPR);
     }
 
-    public static boolean isWithinSandbox(String path) {
+    static boolean isWithinSandbox(String path) {
         return path.matches(EduNames.SANDBOX_DIR + SEPARATOR + ".*");
     }
 
-    public static boolean isWithinUtil(String path) {
+    static boolean isWithinUtil(String path) {
         return path.matches(EduNames.UTIL + SEPARATOR + ".*");
     }
 
-    public static boolean isWithinSrc(@NotNull String path) {
+    static boolean isWithinSrc(@NotNull String path) {
         return path.matches(SRC_PATH_EXPR + SEPARATOR + ".*");
     }
 
     @NotNull
-    public static String getRelativePath(@NotNull PsiFileSystemItem item) {
+    static String getRelativePath(@NotNull PsiFileSystemItem item) {
         String path = item.getVirtualFile().getPath();
         String projectPath = item.getProject().getBasePath();
         if (projectPath == null) {
@@ -205,17 +154,17 @@ public class ProjectFilesUtils {
     }
 
     @NotNull
-    public static String getRelativePath(@NotNull String basePath, @NotNull String path) {
+    static String getRelativePath(@NotNull String basePath, @NotNull String path) {
         String relativePath = FileUtil.getRelativePath(basePath, path, SEPARATOR_CHAR);
         return relativePath == null ? path : relativePath;
     }
 
-    public static boolean isStudyItemDir(@NotNull String relativePath) {
+    static boolean isStudyItemDir(@NotNull String relativePath) {
         return relativePath.matches(COURSE_DIRECTORIES);
     }
 
     @Contract(pure = true)
-    public static boolean isUtilDir(@NotNull String relativePath) {
+    static boolean isUtilDir(@NotNull String relativePath) {
         return relativePath.equals(EduNames.UTIL);
     }
 
@@ -224,16 +173,16 @@ public class ProjectFilesUtils {
         return path.split(SEPARATOR);
     }
 
-    public static boolean isWithinHideDir(@NotNull String path) {
+    static boolean isWithinHideDir(@NotNull String path) {
         return path.matches(ProjectFilesUtils.HIDE_PATH_EXPR + SEPARATOR + ".*");
     }
 
-    public static boolean isHideDir(String path) {
+    static boolean isHideDir(String path) {
         return path.matches(ProjectFilesUtils.HIDE_PATH_EXPR);
     }
 
     @Nullable
-    public static String getParent(@NotNull String path) {
+    static String getParent(@NotNull String path) {
         String[] dirs = splitPath(path);
         if (dirs.length == 0 || path.isEmpty() || path.equals(".")) {
             return null;
