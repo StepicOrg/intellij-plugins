@@ -31,7 +31,7 @@ public class ProjectFilesUtils {
     private static final String HIDE_PATH_EXPR = SRC_PATH_EXPR + SEPARATOR + EduNames.HIDE;
 
     @Nullable
-    private static PsiFileSystemItem getFile(@NotNull PsiElement target) {
+    public static PsiFileSystemItem getFile(@NotNull PsiElement target) {
         PsiFileSystemItem item;
         if (target instanceof PsiFileSystemItem) {
             item = (PsiFileSystemItem) target;
@@ -43,7 +43,7 @@ public class ProjectFilesUtils {
 
     public static boolean isCanNotBeTarget(@Nullable PsiElement target) {
         if (target == null) {
-            return true;
+            return false;
         }
 
         Project project = target.getProject();
