@@ -1,11 +1,13 @@
 package com.jetbrains.tmp.learning.stepik.metric;
 
+import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.stepik.SupportedLanguages;
 
 import static com.jetbrains.tmp.learning.stepik.metric.MetricUtils.isAllNull;
 import static com.jetbrains.tmp.learning.stepik.metric.MetricUtils.isAnyNull;
 
 public class MetricBuilder {
+    String metricName = EduNames.METRIC_NAME;
     String name;
     String action;
     String language;

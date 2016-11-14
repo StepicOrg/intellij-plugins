@@ -42,7 +42,7 @@ public class MetricBuilderTest {
 
         String requestBody = GSON.toJson(metric);
         String answer = readTestFile("get_course.json").replaceAll("[\n\t ]+", "");
-        assertEquals(requestBody, answer);
+        assertEquals(answer, requestBody);
     }
 
     @Test
@@ -56,7 +56,7 @@ public class MetricBuilderTest {
 
         String requestBody = GSON.toJson(metric);
         String answer = readTestFile("download.json").replaceAll("[\n\t ]+", "");
-        assertEquals(requestBody, answer);
+        assertEquals(answer, requestBody);
     }
 
     @Test
@@ -70,7 +70,7 @@ public class MetricBuilderTest {
 
         String requestBody = GSON.toJson(metric);
         String answer = readTestFile("post.json").replaceAll("[\n\t ]+", "");
-        assertEquals(requestBody, answer);
+        assertEquals(answer, requestBody);
     }
 
 

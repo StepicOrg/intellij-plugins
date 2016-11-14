@@ -30,9 +30,9 @@ public class MetricsWrapper {
         Data data;
 
         private Metric(MetricBuilder mb) {
-            this.name = mb.name;
-            if (!isAllNull(name, mb.action, mb.language)) {
-                this.tags = new Tags(name, mb.action, mb.language);
+            this.name = mb.metricName;
+            if (!isAllNull(mb.name, mb.action, mb.language)) {
+                this.tags = new Tags(mb.name, mb.action, mb.language);
             }
             if (!isAllNull(mb.courseId, mb.stepId)) {
                 this.data = new Data(mb.courseId, mb.stepId);
