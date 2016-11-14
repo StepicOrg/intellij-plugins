@@ -104,7 +104,6 @@ public class StepikConnectorPost {
         }
     }
 
-
     public static StepikWrappers.AttemptContainer getAttempt(int stepId) throws IOException {
         String requestBody = new Gson().toJson(new StepikWrappers.AttemptWrapper(stepId));
         try {

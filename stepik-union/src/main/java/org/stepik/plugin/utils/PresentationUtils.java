@@ -2,11 +2,9 @@ package org.stepik.plugin.utils;
 
 import com.intellij.ide.projectView.PresentationData;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiFileSystemItem;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.SimpleTextAttributes;
 import com.jetbrains.tmp.learning.StudyTaskManager;
@@ -24,6 +22,18 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.awt.*;
 import java.util.HashMap;
+
+import static org.stepik.plugin.utils.ProjectFilesUtils.getParent;
+import static org.stepik.plugin.utils.ProjectFilesUtils.getRelativePath;
+import static org.stepik.plugin.utils.ProjectFilesUtils.isHideDir;
+import static org.stepik.plugin.utils.ProjectFilesUtils.isSandbox;
+import static org.stepik.plugin.utils.ProjectFilesUtils.isStudyItemDir;
+import static org.stepik.plugin.utils.ProjectFilesUtils.isTaskHtmlFile;
+import static org.stepik.plugin.utils.ProjectFilesUtils.isUtilDir;
+import static org.stepik.plugin.utils.ProjectFilesUtils.isWithinHideDir;
+import static org.stepik.plugin.utils.ProjectFilesUtils.isWithinSandbox;
+import static org.stepik.plugin.utils.ProjectFilesUtils.isWithinSrc;
+import static org.stepik.plugin.utils.ProjectFilesUtils.isWithinUtil;
 
 /**
  * @author meanmail
@@ -148,51 +158,41 @@ public class PresentationUtils {
         data.setPresentableText(text);
     }
 
-    private static final String SECTION_EXPR = EduNames.SECTION + "[0-9]+";
-    private static final String LESSON_EXPR = SECTION_EXPR + "/" + EduNames.LESSON + "[0-9]+";
-    private static final String TASK_EXPR = LESSON_EXPR + "/" + EduNames.TASK + "[0-9]+";
-    private static final String SRC_EXPR = TASK_EXPR + "/" + EduNames.SRC;
-    private static final String SOURCE_DIRECTORY = SECTION_EXPR + "|" + LESSON_EXPR + "|" + TASK_EXPR + "|" + SRC_EXPR;
-
     public static boolean isVisibleDirectory(@NotNull PsiDirectory psiDirectory) {
-        String path = getRelativePath(psiDirectory);
-        if (".".equals(path))
-            return true;
-
-        if (path.startsWith(EduNames.SANDBOX_DIR) || path.startsWith(EduNames.UTIL) || path.matches(SOURCE_DIRECTORY))
-            return true;
-
-        if (psiDirectory.getName().equals(EduNames.HIDE))
+        Project project = psiDirectory.getProject();
+        String basePath = project.getBasePath();
+        if (basePath == null) {
             return false;
+        }
+        String path = psiDirectory.getVirtualFile().getPath();
+        String relPath = getRelativePath(basePath, path);
 
-        String[] dirs = path.split("/");
-        return dirs.length > 4;
+        return isVisibleDirectory(relPath);
+    }
+
+    public static boolean isVisibleDirectory(@NotNull String relPath) {
+        if (isHideDir(relPath) || isWithinHideDir(relPath)) {
+            return false;
+        }
+
+        if (isSandbox(relPath) || isStudyItemDir(relPath) || isUtilDir(relPath)) {
+            return true;
+        }
+
+        return isWithinSrc(relPath) || isWithinSandbox(relPath) || isWithinUtil(relPath);
     }
 
     public static boolean isVisibleFile(@NotNull PsiFile psiFile) {
-        String name = psiFile.getName();
-        if (name.endsWith(".iml"))
-            return false;
-
         String path = getRelativePath(psiFile);
-        if (path.startsWith(EduNames.SANDBOX_DIR))
-            return true;
-
-        if (name.equals(EduNames.TASK_HTML))
-            return false;
-
-        String[] dirs = path.split("/");
-        return dirs.length > 4;
+        return isVisibleFile(path);
     }
 
-    @NotNull
-    private static String getRelativePath(@NotNull PsiFileSystemItem item) {
-        String path = item.getVirtualFile().getPath();
-        String projectPath = item.getProject().getBasePath();
-        if (projectPath == null) {
-            return path;
+    public static boolean isVisibleFile(@NotNull String relFilePath) {
+        String parentDir = getParent(relFilePath);
+        if (parentDir == null || isTaskHtmlFile(relFilePath) || !isVisibleDirectory(parentDir)) {
+            return false;
         }
-        String relPath = FileUtil.getRelativePath(projectPath, path, '/');
-        return relPath != null ? relPath : path;
+
+        return isWithinSrc(relFilePath) || isWithinSandbox(relFilePath) || isWithinUtil(relFilePath);
     }
 }
