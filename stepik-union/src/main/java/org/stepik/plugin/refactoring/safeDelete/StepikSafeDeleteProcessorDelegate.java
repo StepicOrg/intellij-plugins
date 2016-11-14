@@ -66,7 +66,7 @@ public class StepikSafeDeleteProcessorDelegate extends SafeDeleteProcessorDelega
 
     @Override
     public void prepareForDeletion(PsiElement element) throws IncorrectOperationException {
-        throw new IncorrectOperationException("Don't delete this file");
+        throw new IncorrectOperationException("The operation is suspended. Course structure might become defective");
     }
 
     @Override
