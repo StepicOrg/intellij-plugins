@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.stepik.plugin.collective.SupportedLanguages;
+import com.jetbrains.tmp.learning.stepik.SupportedLanguages;
 
 import java.io.InputStream;
 import java.util.HashMap;
@@ -55,7 +55,6 @@ public class DirectivesUtilsTest {
             res.put(i, DirectivesUtils.getTextUnderDirectives(test.split("\n"), SupportedLanguages.JAVA));
             Assert.assertEquals(testsMap.get(JAVA + 1), res.get(i));
         }
-
     }
 
     @Test
@@ -68,6 +67,5 @@ public class DirectivesUtilsTest {
             res.put(i, DirectivesUtils.getTextUnderDirectives(test.split("\n"), SupportedLanguages.PYTHON));
             Assert.assertEquals(testsMap.get(PYTHON + 1), res.get(i));
         }
-
     }
 }

@@ -28,6 +28,10 @@ import com.jetbrains.tmp.learning.courseFormat.Lesson;
 import com.jetbrains.tmp.learning.courseFormat.Section;
 import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.courseFormat.TaskFile;
+import com.jetbrains.tmp.learning.stepik.metric.MetricActions;
+import com.jetbrains.tmp.learning.stepik.metric.MetricBuilder;
+import com.jetbrains.tmp.learning.stepik.metric.MetricsWrapper;
+import com.jetbrains.tmp.learning.stepik.metric.PluginNames;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
@@ -189,6 +193,12 @@ public class StepikConnectorGet {
     }
 
     public static Course getCourse(@NotNull final Project project, @NotNull final CourseInfo info) {
+        MetricsWrapper metric = new MetricBuilder().addTagName(PluginNames.STEPIK_UNION)
+                .addTagAction(MetricActions.GET_COURSE)
+                .setCourseId(info.id)
+                .build();
+        StepikConnectorPost.postMetric(metric);
+
         Course course = new Course();
         course.setName(info.getName());
         course.setAuthors(info.getAuthors());

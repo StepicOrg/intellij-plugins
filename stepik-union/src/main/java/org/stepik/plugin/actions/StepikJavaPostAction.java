@@ -19,11 +19,15 @@ import com.jetbrains.tmp.learning.checker.StudyCheckUtils;
 import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
 import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.editor.StudyEditor;
+import com.jetbrains.tmp.learning.stepik.metric.MetricActions;
+import com.jetbrains.tmp.learning.stepik.metric.MetricBuilder;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorGet;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorPost;
 import com.jetbrains.tmp.learning.stepik.StepikWrappers;
+import com.jetbrains.tmp.learning.stepik.metric.MetricsWrapper;
+import com.jetbrains.tmp.learning.stepik.metric.PluginNames;
 import org.jetbrains.annotations.NotNull;
-import org.stepik.plugin.collective.SupportedLanguages;
+import com.jetbrains.tmp.learning.stepik.SupportedLanguages;
 import org.stepik.plugin.utils.DirectivesUtils;
 import org.stepik.plugin.utils.NotificationUtils;
 
@@ -92,11 +96,12 @@ public class StepikJavaPostAction extends StudyCheckAction {
                         return;
                     }
                     List<StepikWrappers.SubmissionContainer.Submission> submissions = container.submissions;
-                    StepikWrappers.MetricsWrapper metric = new StepikWrappers.MetricsWrapper(
-                            StepikWrappers.MetricsWrapper.PluginNames.STEPIK_UNION,
-                            StepikWrappers.MetricsWrapper.MetricActions.POST,
-                            task.getLesson().getSection().getCourse().getId(),
-                            task.getStepId());
+                    MetricsWrapper metric = new MetricBuilder().addTagName(PluginNames.STEPIK_UNION)
+                            .addTagAction(MetricActions.POST)
+                            .addTagLanguage(currentLang)
+                            .setCourseId(task.getLesson().getSection().getCourse().getId())
+                            .setStepId(task.getStepId())
+                            .build();
                     StepikConnectorPost.postMetric(metric);
                     int submissionId = submissions.get(0).id;
                     logger.info("submissionId = " + submissionId);

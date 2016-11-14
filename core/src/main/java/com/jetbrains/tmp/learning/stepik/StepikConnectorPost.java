@@ -34,6 +34,8 @@ import com.jetbrains.tmp.learning.courseFormat.Lesson;
 import com.jetbrains.tmp.learning.courseFormat.Section;
 import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.courseFormat.TaskFile;
+import com.jetbrains.tmp.learning.stepik.metric.MetricBuilder;
+import com.jetbrains.tmp.learning.stepik.metric.MetricsWrapper;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
@@ -515,14 +517,16 @@ public class StepikConnectorPost {
         });
     }
 
-    public static void postMetric(StepikWrappers.MetricsWrapper metric) {
-        String requestBody = GSON.toJson(metric);
-        logger.info(requestBody);
+    public static void postMetric(MetricsWrapper metricsWrapper) {
+        if (!metricsWrapper.isCorrect()){
+            logger.warn(EduNames.INVALID + " metric");
+            return;
+        }
+        String requestBody = GSON.toJson(metricsWrapper);
         try {
-            postToStepikVoid(EduStepikNames.METRICS, requestBody);
+           postToStepikVoid(EduStepikNames.METRICS, requestBody);
         } catch (IOException e) {
             logger.warn("Can't post a metric\n" + e.toString());
         }
     }
-
 }

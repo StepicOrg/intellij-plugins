@@ -143,5 +143,4 @@ public class StepikProjectGenerator extends EduProjectGenerator {
             return Collections.singletonList(CourseInfo.INVALID_COURSE);
         }
     }
-
 }

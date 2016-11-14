@@ -53,7 +53,9 @@ public class EduNames {
     public static final String SRC = "src";
 
     public static final String SEPARATOR = "#/*";
-    public static final java.lang.String UTIL = "util";
+    public static final String INVALID = "INVALID";
+    public static final String METRIC_NAME = "ide_plugin";
+    public static final String UTIL = "util";
     public static final String HIDE = "hide";
 
     private EduNames() {
