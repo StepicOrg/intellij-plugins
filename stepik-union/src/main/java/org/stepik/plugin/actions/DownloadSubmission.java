@@ -93,9 +93,9 @@ public class DownloadSubmission extends StudyActionWithShortcut {
             return;
         }
         List<StepikWrappers.SubmissionContainer.Submission> submissions = submissionContainer.submissions;
-        MetricsWrapper metric = new MetricBuilder().addTag(PluginNames.STEPIK_UNION)
-                .addTag(MetricActions.DOWNLOAD)
-                .addTag(currentLang)
+        MetricsWrapper metric = new MetricBuilder().addTagName(PluginNames.STEPIK_UNION)
+                .addTagAction(MetricActions.DOWNLOAD)
+                .addTagLanguage(currentLang)
                 .setCourseId(targetTask.getLesson().getSection().getCourse().getId())
                 .setStepId(targetTask.getStepId())
                 .build();

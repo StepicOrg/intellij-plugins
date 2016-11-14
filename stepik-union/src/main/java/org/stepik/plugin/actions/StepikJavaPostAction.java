@@ -96,9 +96,9 @@ public class StepikJavaPostAction extends StudyCheckAction {
                         return;
                     }
                     List<StepikWrappers.SubmissionContainer.Submission> submissions = container.submissions;
-                    MetricsWrapper metric = new MetricBuilder().addTag(PluginNames.STEPIK_UNION)
-                            .addTag(MetricActions.POST)
-                            .addTag(currentLang)
+                    MetricsWrapper metric = new MetricBuilder().addTagName(PluginNames.STEPIK_UNION)
+                            .addTagAction(MetricActions.POST)
+                            .addTagLanguage(currentLang)
                             .setCourseId(task.getLesson().getSection().getCourse().getId())
                             .setStepId(task.getStepId())
                             .build();

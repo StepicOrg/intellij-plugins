@@ -17,17 +17,17 @@ public class MetricBuilder {
 
     public MetricBuilder() {}
 
-    public MetricBuilder addTag(PluginNames name) {
+    public MetricBuilder addTagName(PluginNames name) {
         this.name = name.getTag();
         return this;
     }
 
-    public MetricBuilder addTag(MetricActions action) {
+    public MetricBuilder addTagAction(MetricActions action) {
         this.action = action.getTag();
         return this;
     }
 
-    public MetricBuilder addTag(SupportedLanguages language) {
+    public MetricBuilder addTagLanguage(SupportedLanguages language) {
         this.language = language.getTag();
         return this;
     }
