@@ -5,42 +5,42 @@ import com.jetbrains.tmp.learning.core.EduNames;
 import static com.jetbrains.tmp.learning.stepik.metric.MetricUtils.isAllNull;
 
 public class MetricsWrapper {
-    Metric metric;
+    private static MetricsWrapper InvalidMetricWrapper;
 
-    MetricsWrapper(
-            String metricName,
-            String tags_name,
-            String tags_action,
-            String tags_languages,
-            Integer courseId,
-            Integer stepId) {
-        metric = new Metric(metricName, tags_name, tags_action, tags_languages, courseId, stepId);
+    private Metric metric;
+
+    private MetricsWrapper() {
+        metric = new Metric();
     }
 
-    MetricsWrapper(
-            String metricName) {
-        metric = new Metric(metricName, null, null, null, null, null);
+    MetricsWrapper(MetricBuilder metricBuilder) {
+        metric = new Metric(metricBuilder);
     }
 
-    static class Metric {
+    static MetricsWrapper getInvalidWrapper() {
+        if (InvalidMetricWrapper == null) {
+            InvalidMetricWrapper = new MetricsWrapper();
+        }
+        return InvalidMetricWrapper;
+    }
+
+    private static class Metric {
         final String name;
         Tags tags;
         Data data;
 
-        private Metric(
-                String metricName,
-                String name,
-                String action,
-                String language,
-                Integer courseId,
-                Integer stepId) {
-            this.name = metricName;
-            if (!isAllNull(name, action, language)) {
-                this.tags = new Tags(name, action, language);
+        private Metric(MetricBuilder mb) {
+            this.name = mb.name;
+            if (!isAllNull(name, mb.action, mb.language)) {
+                this.tags = new Tags(name, mb.action, mb.language);
             }
-            if (!isAllNull(courseId, stepId)) {
-                this.data = new Data(courseId, stepId);
+            if (!isAllNull(mb.courseId, mb.stepId)) {
+                this.data = new Data(mb.courseId, mb.stepId);
             }
+        }
+
+        private Metric() {
+            this.name = EduNames.INVALID;
         }
 
         class Tags {

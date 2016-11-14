@@ -1,19 +1,16 @@
 package com.jetbrains.tmp.learning.stepik.metric;
 
-import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.stepik.SupportedLanguages;
 
 import static com.jetbrains.tmp.learning.stepik.metric.MetricUtils.isAllNull;
 import static com.jetbrains.tmp.learning.stepik.metric.MetricUtils.isAnyNull;
 
 public class MetricBuilder {
-    private String name;
-    private String action;
-    private String language;
-    private Integer courseId;
-    private Integer stepId;
-
-    public static MetricsWrapper INVALID_METRICS_WRAPPER = new MetricsWrapper(EduNames.INVALID);
+    String name;
+    String action;
+    String language;
+    Integer courseId;
+    Integer stepId;
 
     public MetricBuilder() {}
 
@@ -44,9 +41,9 @@ public class MetricBuilder {
 
     public MetricsWrapper build() {
         if (check()) {
-            return new MetricsWrapper(EduNames.METRIC_NAME, name, action, language, courseId, stepId);
+            return new MetricsWrapper(this);
         } else {
-            return INVALID_METRICS_WRAPPER;
+            return MetricsWrapper.getInvalidWrapper();
         }
     }
 
