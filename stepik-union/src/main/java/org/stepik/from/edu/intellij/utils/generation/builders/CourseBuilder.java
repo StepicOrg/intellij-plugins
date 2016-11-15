@@ -16,14 +16,14 @@ public interface CourseBuilder {
 
     void createCourseFromGenerator(
             @NotNull ModifiableModuleModel moduleModel,
-            Project project,
-            EduProjectGenerator generator)
+            @NotNull Project project,
+            @NotNull EduProjectGenerator generator)
             throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException;
 
     void createLessonModules(
             @NotNull ModifiableModuleModel moduleModel,
-            Course course,
-            String moduleDir,
-            Project project)
+            @NotNull Course course,
+            @NotNull String moduleDir,
+            @NotNull Project project)
             throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException;
 }

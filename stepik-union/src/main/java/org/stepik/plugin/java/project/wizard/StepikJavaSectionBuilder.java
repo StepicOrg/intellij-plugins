@@ -23,7 +23,7 @@ class StepikJavaSectionBuilder extends JavaModuleBuilder implements LessonBuilde
     private static final Logger logger = Logger.getInstance(StepikJavaLessonBuilder.class);
     private List<Pair<String, String>> mySourcePaths;
 
-    StepikJavaSectionBuilder(@NotNull String moduleDir, Section section) {
+    StepikJavaSectionBuilder(@NotNull String moduleDir,@NotNull Section section) {
         String sectionName = section.getDirectory();
         setName(sectionName);
         setModuleFilePath(FileUtil.join(moduleDir, sectionName, sectionName + ModuleFileType.DOT_DEFAULT_EXTENSION));

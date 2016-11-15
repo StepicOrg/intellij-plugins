@@ -46,8 +46,8 @@ class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilder {
     @Override
     public void createCourseFromGenerator(
             @NotNull ModifiableModuleModel moduleModel,
-            Project project,
-            EduProjectGenerator generator)
+            @NotNull Project project,
+            @NotNull EduProjectGenerator generator)
             throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
         generator.generateProject(project, project.getBaseDir());
 
@@ -77,9 +77,9 @@ class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilder {
 
     @Override
     public void createLessonModules(@NotNull ModifiableModuleModel moduleModel,
-            Course course,
-            String moduleDir,
-            Project project
+            @NotNull Course course,
+            @NotNull String moduleDir,
+            @NotNull Project project
     ) throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
         int sectionIndex = 0;
         int lessonIndex = 1;
@@ -140,7 +140,7 @@ class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilder {
     }
 
     @Override
-    public void setupRootModel(ModifiableRootModel rootModel) throws ConfigurationException {
+    public void setupRootModel(@NotNull ModifiableRootModel rootModel) throws ConfigurationException {
         setSourcePaths(Collections.emptyList());
         super.setupRootModel(rootModel);
     }

@@ -38,7 +38,6 @@ class StepikJavaTaskBuilder extends JavaModuleBuilder implements TaskBuilder {
     private static final Logger logger = Logger.getInstance(StepikJavaTaskBuilder.class);
     private final Task myTask;
     private final Project project;
-    private static final String SRC = "src";
 
     StepikJavaTaskBuilder(String moduleDir, @NotNull String name, @NotNull Task task, @NotNull Project project) {
         myTask = task;
@@ -59,9 +58,7 @@ class StepikJavaTaskBuilder extends JavaModuleBuilder implements TaskBuilder {
         Module module = super.createModule(moduleModel);
         if (!createTaskContent()) {
             logger.info("Failed to copy task content");
-            return module;
         }
-
         return module;
     }
 
@@ -77,7 +74,7 @@ class StepikJavaTaskBuilder extends JavaModuleBuilder implements TaskBuilder {
         if (moduleDir == null) {
             return false;
         }
-        VirtualFile src = moduleDir.findChild(SRC);
+        VirtualFile src = moduleDir.findChild(EduNames.SRC);
         if (src == null) {
             return false;
         }
@@ -115,7 +112,7 @@ class StepikJavaTaskBuilder extends JavaModuleBuilder implements TaskBuilder {
     }
 
     private void moveFromHide(@NotNull String filename, @NotNull VirtualFile src) throws IOException {
-        Files.move(Paths.get(FileUtil.join(src.getPath(), EduNames.HIDE, filename)),
+        Files.move(Paths.get(src.getPath(), EduNames.HIDE, filename),
                 Paths.get(src.getPath(), filename), StandardCopyOption.REPLACE_EXISTING);
     }
 
