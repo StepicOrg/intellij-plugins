@@ -19,11 +19,11 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.util.List;
 
-public class StepikJavaSectionBuilder extends JavaModuleBuilder implements LessonBuilder {
+class StepikJavaSectionBuilder extends JavaModuleBuilder implements LessonBuilder {
     private static final Logger logger = Logger.getInstance(StepikJavaLessonBuilder.class);
     private List<Pair<String, String>> mySourcePaths;
 
-    public StepikJavaSectionBuilder(@NotNull String moduleDir, Section section, @NotNull Module utilModule) {
+    StepikJavaSectionBuilder(@NotNull String moduleDir, Section section) {
         String sectionName = section.getDirectory();
         setName(sectionName);
         setModuleFilePath(FileUtil.join(moduleDir, sectionName, sectionName + ModuleFileType.DOT_DEFAULT_EXTENSION));

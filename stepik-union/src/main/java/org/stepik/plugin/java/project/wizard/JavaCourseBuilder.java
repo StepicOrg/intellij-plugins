@@ -65,9 +65,9 @@ class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilder {
 
         logger.info("Module dir = " + moduleDir);
         JavaModuleBuilder sandboxModuleBuilder = new JavaSandboxModuleBuilder(moduleDir);
-        Module sandboxModule = sandboxModuleBuilder.createModule(moduleModel);
+        sandboxModuleBuilder.createModule(moduleModel);
 
-        createLessonModules(moduleModel, course, moduleDir, sandboxModule);
+        createLessonModules(moduleModel, course, moduleDir, project);
 
         ApplicationManager.getApplication().invokeLater(
                 () -> DumbService.allowStartingDumbModeInside(DumbModePermission.MAY_START_BACKGROUND,
@@ -77,20 +77,21 @@ class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilder {
     }
 
     @Override
-    public void createLessonModules(
-            @NotNull ModifiableModuleModel moduleModel, Course course,
-            String moduleDir, Module utilModule) throws InvalidDataException,
-            IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
+    public void createLessonModules(@NotNull ModifiableModuleModel moduleModel,
+            Course course,
+            String moduleDir,
+            Project project
+    ) throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
         int sectionIndex = 0;
         int lessonIndex = 1;
         for (Section section : course.getSections()) {
             section.setIndex(++sectionIndex);
-            LessonBuilder sectionBuilder = new StepikJavaSectionBuilder(moduleDir, section, utilModule);
+            LessonBuilder sectionBuilder = new StepikJavaSectionBuilder(moduleDir, section);
             sectionBuilder.createLesson(moduleModel);
             for (Lesson lesson : section.getLessons()) {
                 lesson.setIndex(lessonIndex++);
                 String sectionDir = moduleDir + "/" + section.getDirectory();
-                LessonBuilder lessonBuilder = new StepikJavaLessonBuilder(sectionDir, lesson, utilModule);
+                LessonBuilder lessonBuilder = new StepikJavaLessonBuilder(sectionDir, lesson, project);
                 lessonBuilder.createLesson(moduleModel);
             }
         }

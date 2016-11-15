@@ -7,7 +7,7 @@ import com.intellij.openapi.module.ModifiableModuleModel;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleWithNameAlreadyExists;
 import com.intellij.openapi.options.ConfigurationException;
-import com.intellij.openapi.roots.ModuleRootModificationUtil;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VfsUtil;
@@ -25,22 +25,24 @@ import org.stepik.plugin.collective.SupportedLanguages;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class StepikJavaTaskBuilder extends JavaModuleBuilder implements TaskBuilder {
+class StepikJavaTaskBuilder extends JavaModuleBuilder implements TaskBuilder {
     private static final Logger logger = Logger.getInstance(StepikJavaTaskBuilder.class);
     private final Task myTask;
-    private final Module myUtilModule;
+    private final Project project;
     private static final String SRC = "src";
 
-    public StepikJavaTaskBuilder(
-            String moduleDir, @NotNull String name, @NotNull Task task,
-            @NotNull Module utilModule) {
+    StepikJavaTaskBuilder(String moduleDir, @NotNull String name, @NotNull Task task, @NotNull Project project) {
         myTask = task;
-        myUtilModule = utilModule;
+        this.project = project;
         String taskName = task.getDirectory();
         //module name like lessoni-taski
         String moduleName = name + "-" + taskName;
@@ -60,12 +62,11 @@ public class StepikJavaTaskBuilder extends JavaModuleBuilder implements TaskBuil
             return module;
         }
 
-        ModuleRootModificationUtil.addDependency(module, myUtilModule);
         return module;
     }
 
     private boolean createTaskContent() throws IOException {
-        StudyTaskManager taskManager = StudyTaskManager.getInstance(myUtilModule.getProject());
+        StudyTaskManager taskManager = StudyTaskManager.getInstance(project);
         SupportedLanguages defaultLang = SupportedLanguages.langOf(taskManager.getDefaultLang());
         Course course = myTask.getLesson().getSection().getCourse();
         String directory = getModuleFileDirectory();
