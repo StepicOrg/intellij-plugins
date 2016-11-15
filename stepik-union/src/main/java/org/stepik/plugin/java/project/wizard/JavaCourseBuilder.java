@@ -64,8 +64,7 @@ class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilder {
         }
 
         logger.info("Module dir = " + moduleDir);
-        JavaModuleBuilder sandboxModuleBuilder = new JavaSandboxModuleBuilder(moduleDir);
-        sandboxModuleBuilder.createModule(moduleModel);
+        new JavaSandboxModuleBuilder(moduleDir).createModule(moduleModel);
 
         createLessonModules(moduleModel, course, moduleDir, project);
 
