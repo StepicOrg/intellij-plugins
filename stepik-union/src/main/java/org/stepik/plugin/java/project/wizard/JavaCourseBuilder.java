@@ -1,6 +1,10 @@
 package org.stepik.plugin.java.project.wizard;
 
-import com.intellij.ide.util.projectWizard.*;
+import com.intellij.ide.util.projectWizard.JavaModuleBuilder;
+import com.intellij.ide.util.projectWizard.ModuleWizardStep;
+import com.intellij.ide.util.projectWizard.ProjectWizardStepFactory;
+import com.intellij.ide.util.projectWizard.SettingsStep;
+import com.intellij.ide.util.projectWizard.WizardContext;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.ModifiableModuleModel;
@@ -22,17 +26,20 @@ import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.Lesson;
 import com.jetbrains.tmp.learning.courseFormat.Section;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
-import org.stepik.from.edu.intellij.utils.generation.*;
-import org.stepik.from.edu.intellij.utils.generation.builders.CourseBuilder;
-import org.stepik.from.edu.intellij.utils.generation.builders.LessonBuilder;
 import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.from.edu.intellij.utils.generation.EduProjectGenerator;
+import org.stepik.from.edu.intellij.utils.generation.JavaSandboxModuleBuilder;
+import org.stepik.from.edu.intellij.utils.generation.SelectCourseWizardStep;
+import org.stepik.from.edu.intellij.utils.generation.StepikProjectGenerator;
+import org.stepik.from.edu.intellij.utils.generation.builders.CourseBuilder;
+import org.stepik.from.edu.intellij.utils.generation.builders.LessonBuilder;
 
 import java.io.IOException;
 import java.util.Collections;
 
-public class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilder {
+class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilder {
     private static final Logger logger = Logger.getInstance(JavaCourseBuilder.class);
     private StepikProjectGenerator generator;
 
@@ -57,10 +64,10 @@ public class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilde
         }
 
         logger.info("Module dir = " + moduleDir);
-        EduUtilModuleBuilder utilModuleBuilder = new EduUtilModuleBuilder(moduleDir);
-        Module utilModule = utilModuleBuilder.createModule(moduleModel);
+        JavaModuleBuilder sandboxModuleBuilder = new JavaSandboxModuleBuilder(moduleDir);
+        Module sandboxModule = sandboxModuleBuilder.createModule(moduleModel);
 
-        createLessonModules(moduleModel, course, moduleDir, utilModule);
+        createLessonModules(moduleModel, course, moduleDir, sandboxModule);
 
         ApplicationManager.getApplication().invokeLater(
                 () -> DumbService.allowStartingDumbModeInside(DumbModePermission.MAY_START_BACKGROUND,
