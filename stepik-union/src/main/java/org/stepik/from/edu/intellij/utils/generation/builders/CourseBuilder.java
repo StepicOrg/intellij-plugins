@@ -1,7 +1,6 @@
 package org.stepik.from.edu.intellij.utils.generation.builders;
 
 import com.intellij.openapi.module.ModifiableModuleModel;
-import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleWithNameAlreadyExists;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
@@ -17,14 +16,14 @@ public interface CourseBuilder {
 
     void createCourseFromGenerator(
             @NotNull ModifiableModuleModel moduleModel,
-            Project project,
-            EduProjectGenerator generator)
+            @NotNull Project project,
+            @NotNull EduProjectGenerator generator)
             throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException;
 
     void createLessonModules(
             @NotNull ModifiableModuleModel moduleModel,
-            Course course,
-            String moduleDir,
-            Module utilModule)
+            @NotNull Course course,
+            @NotNull String moduleDir,
+            @NotNull Project project)
             throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException;
 }
