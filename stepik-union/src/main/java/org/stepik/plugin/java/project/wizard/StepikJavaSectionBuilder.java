@@ -11,7 +11,7 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.io.FileUtil;
-import com.jetbrains.tmp.learning.core.EduNames;
+import com.jetbrains.tmp.learning.courseFormat.Section;
 import org.stepik.from.edu.intellij.utils.generation.builders.LessonBuilder;
 import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
@@ -19,14 +19,12 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.util.List;
 
-public class StepikJavaSectionBuilder extends JavaModuleBuilder implements LessonBuilder {
+class StepikJavaSectionBuilder extends JavaModuleBuilder implements LessonBuilder {
     private static final Logger logger = Logger.getInstance(StepikJavaLessonBuilder.class);
-    private final Module myUtilModule;
     private List<Pair<String, String>> mySourcePaths;
 
-    public StepikJavaSectionBuilder(@NotNull String moduleDir, int sectionIndex, @NotNull Module utilModule) {
-        myUtilModule = utilModule;
-        String sectionName = EduNames.SECTION + sectionIndex;
+    StepikJavaSectionBuilder(@NotNull String moduleDir,@NotNull Section section) {
+        String sectionName = section.getDirectory();
         setName(sectionName);
         setModuleFilePath(FileUtil.join(moduleDir, sectionName, sectionName + ModuleFileType.DOT_DEFAULT_EXTENSION));
     }
@@ -35,14 +33,6 @@ public class StepikJavaSectionBuilder extends JavaModuleBuilder implements Lesso
     public Module createLesson(@NotNull ModifiableModuleModel moduleModel)
             throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
         return createModule(moduleModel);
-    }
-
-    @NotNull
-    @Override
-    public Module createModule(@NotNull ModifiableModuleModel moduleModel)
-            throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
-        Module baseModule = super.createModule(moduleModel);
-        return baseModule;
     }
 
     @Override

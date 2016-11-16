@@ -108,10 +108,8 @@ public class StepikStudyOptions implements StudyOptionsProvider {
         Project project = StudyUtils.getStudyProject();
         if (project != null) {
             final StepikUser user = StudyTaskManager.getInstance(project).getUser();
-            if (user != null) {
-                setLogin(user.getEmail());
-                setPassword(DEFAULT_PASSWORD_TEXT);
-            }
+            setLogin(user.getEmail());
+            setPassword(DEFAULT_PASSWORD_TEXT);
             resetCredentialsModification();
         } else {
             logger.warn("No study object is opened");

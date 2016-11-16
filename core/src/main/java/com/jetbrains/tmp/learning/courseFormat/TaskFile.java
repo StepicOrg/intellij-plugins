@@ -26,7 +26,7 @@ public class TaskFile {
     private boolean myHighlightErrors = false;
     @Expose
     @SerializedName("placeholders")
-    private List<AnswerPlaceholder> myAnswerPlaceholders = new ArrayList<AnswerPlaceholder>();
+    private List<AnswerPlaceholder> myAnswerPlaceholders = new ArrayList<>();
     @Transient
     private Task myTask;
 
@@ -94,7 +94,7 @@ public class TaskFile {
 
     public static void copy(@NotNull final TaskFile source, @NotNull final TaskFile target) {
         List<AnswerPlaceholder> sourceAnswerPlaceholders = source.getAnswerPlaceholders();
-        List<AnswerPlaceholder> answerPlaceholdersCopy = new ArrayList<AnswerPlaceholder>(sourceAnswerPlaceholders.size());
+        List<AnswerPlaceholder> answerPlaceholdersCopy = new ArrayList<>(sourceAnswerPlaceholders.size());
         for (AnswerPlaceholder answerPlaceholder : sourceAnswerPlaceholders) {
             AnswerPlaceholder answerPlaceholderCopy = new AnswerPlaceholder();
             answerPlaceholderCopy.setTaskText(answerPlaceholder.getTaskText());

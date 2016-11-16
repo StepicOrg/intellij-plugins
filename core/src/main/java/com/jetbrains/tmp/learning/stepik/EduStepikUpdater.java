@@ -5,6 +5,7 @@ import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.ActionCallback;
 import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.util.text.StringUtil;
@@ -16,7 +17,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 public class EduStepikUpdater {
+    private static final Logger logger = Logger.getInstance(EduStepikUpdater.class);
     private static final long CHECK_INTERVAL = DateFormatUtil.DAY;
+    private static final String UPDATE_SETTINGS_IS_NULL = "StepikUpdateSettings instance is null";
 
     private final Runnable myCheckRunnable = () -> updateCourseList().doWhenDone(() -> queueNextCheck(CHECK_INTERVAL));
     private final Alarm myCheckForUpdatesAlarm = new Alarm(Alarm.ThreadToUse.SWING_THREAD);
@@ -25,7 +28,7 @@ public class EduStepikUpdater {
         scheduleCourseListUpdate(application);
     }
 
-    public void scheduleCourseListUpdate(Application application) {
+    private void scheduleCourseListUpdate(Application application) {
         if (!checkNeeded()) {
             return;
         }
@@ -34,9 +37,13 @@ public class EduStepikUpdater {
                 .subscribe(AppLifecycleListener.TOPIC, new AppLifecycleListener.Adapter() {
                     @Override
                     public void appFrameCreated(String[] commandLineArgs, @NotNull Ref<Boolean> willOpenProject) {
+                        StepikUpdateSettings updateSettings = StepikUpdateSettings.getInstance();
+                        if (updateSettings == null) {
+                            logger.warn(UPDATE_SETTINGS_IS_NULL);
+                            return;
+                        }
+                        long timeToNextCheck = updateSettings.getNextTimeCheck() - System.currentTimeMillis();
 
-                        long timeToNextCheck = StepikUpdateSettings.getInstance()
-                                .getLastTimeChecked() + CHECK_INTERVAL - System.currentTimeMillis();
                         if (timeToNextCheck <= 0) {
                             myCheckRunnable.run();
                         } else {
@@ -47,30 +54,45 @@ public class EduStepikUpdater {
     }
 
     private static ActionCallback updateCourseList() {
-        ActionCallback callback = new ActionCallback();
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             final List<CourseInfo> courses = StepikConnectorGet.getCourses();
-            final List<CourseInfo> cachedCourses = StudyProjectGenerator.getCoursesFromCache();
-            StudyProjectGenerator.flushCache(courses);
-            StepikUpdateSettings.getInstance().setLastTimeChecked(System.currentTimeMillis());
 
+            StepikUpdateSettings updateSettings = StepikUpdateSettings.getInstance();
+            if (updateSettings == null) {
+                logger.warn(UPDATE_SETTINGS_IS_NULL);
+                return;
+            }
+            updateSettings.setNextTimeCheck(System.currentTimeMillis() + CHECK_INTERVAL);
+
+            if ((courses.size() == 1 && courses.get(0) == CourseInfo.INVALID_COURSE)) {
+                return;
+            }
+
+            StudyProjectGenerator.flushCache(courses);
+
+            final List<CourseInfo> cachedCourses = StudyProjectGenerator.getCoursesFromCache();
             courses.removeAll(cachedCourses);
+
             if (!courses.isEmpty() && !cachedCourses.isEmpty()) {
                 final String message;
                 final String title;
                 if (courses.size() == 1) {
-                    message = courses.get(0).getName();
                     title = "New course available";
+                    message = courses.get(0).getName();
                 } else {
                     title = "New courses available";
                     message = StringUtil.join(courses, CourseInfo::getName, ", ");
                 }
-                final Notification notification =
-                        new Notification("New.course", title, message, NotificationType.INFORMATION);
-                notification.notify(null);
+
+                if (!message.isEmpty()) {
+                    final Notification notification =
+                            new Notification("New.course", title, message, NotificationType.INFORMATION);
+                    notification.notify(null);
+                }
             }
         });
-        return callback;
+
+        return new ActionCallback();
     }
 
     private void queueNextCheck(long interval) {
@@ -79,8 +101,17 @@ public class EduStepikUpdater {
 
     private static boolean checkNeeded() {
         final List<CourseInfo> courses = StudyProjectGenerator.getCoursesFromCache();
-        long timeToNextCheck = StepikUpdateSettings.getInstance()
-                .getLastTimeChecked() + CHECK_INTERVAL - System.currentTimeMillis();
-        return courses.isEmpty() || timeToNextCheck <= 0;
+        if (courses.isEmpty()) {
+            return true;
+        }
+
+        StepikUpdateSettings updateSettings = StepikUpdateSettings.getInstance();
+        if (updateSettings == null) {
+            logger.warn(UPDATE_SETTINGS_IS_NULL);
+            return false;
+        }
+        long timeToNextCheck = updateSettings.getNextTimeCheck() - System.currentTimeMillis();
+
+        return timeToNextCheck <= 0;
     }
 }

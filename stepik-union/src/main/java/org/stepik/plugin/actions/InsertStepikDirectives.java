@@ -19,16 +19,17 @@ import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.editor.StudyEditor;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.plugin.collective.SupportedLanguages;
+import org.stepik.plugin.utils.DirectivesUtils;
+import org.stepik.plugin.utils.ReformatUtils;
 
 import javax.swing.*;
 
-import static org.stepik.plugin.actions.DirectivesUtils.*;
+import static org.stepik.plugin.utils.DirectivesUtils.*;
 
 
 public class InsertStepikDirectives extends StudyActionWithShortcut {
     private static final String SHORTCUT = "ctrl alt pressed R";
     private static final String ACTION_ID = "STEPIK.InsertStepikDirectives";
-
 
     public InsertStepikDirectives() {
 
@@ -43,7 +44,6 @@ public class InsertStepikDirectives extends StudyActionWithShortcut {
     public String getActionId() {
         return ACTION_ID;
     }
-
 
     @Override
     public String[] getShortcuts() {

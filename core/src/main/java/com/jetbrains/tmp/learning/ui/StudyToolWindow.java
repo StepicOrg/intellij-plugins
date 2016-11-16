@@ -41,7 +41,6 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
 import java.util.Map;
 
 public abstract class StudyToolWindow extends SimpleToolWindowPanel implements DataProvider, Disposable {
@@ -240,11 +239,7 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
         }
         WebBrowserManager.getInstance().setShowBrowserHover(false);
         final EditorEx createdEditor = (EditorEx) factory.createEditor(document, project, taskFile, false);
-        Disposer.register(project, new Disposable() {
-            public void dispose() {
-                factory.releaseEditor(createdEditor);
-            }
-        });
+        Disposer.register(project, () -> factory.releaseEditor(createdEditor));
         JComponent editorComponent = createdEditor.getComponent();
         mySplitPane.setFirstComponent(editorComponent);
         mySplitPane.repaint();
@@ -283,11 +278,13 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
         if (course != null) {
             int taskNum = 0;
             int taskSolved = 0;
-            List<Lesson> lessons = course.getLessons();
-            for (Lesson lesson : lessons) {
-                if (lesson.getName().equals(EduNames.PYCHARM_ADDITIONAL)) continue;
-                taskNum += lesson.getTaskList().size();
-                taskSolved += getSolvedTasks(lesson);
+            for (Section section : course.getSections()) {
+                for (Lesson lesson : section.getLessons()) {
+                    if (!lesson.getName().equals(EduNames.PYCHARM_ADDITIONAL)) {
+                        taskNum += lesson.getTaskList().size();
+                        taskSolved += getSolvedTasks(lesson);
+                    }
+                }
             }
             String completedTasks = String.format("%d of %d tasks completed", taskSolved, taskNum);
             double percent = (taskSolved * 100.0) / taskNum;
@@ -297,13 +294,9 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
         }
     }
 
-    private static int getSolvedTasks(@NotNull final Lesson lesson) {
-        int solved = 0;
-        for (Task task : lesson.getTaskList()) {
-            if (task.getStatus() == StudyStatus.Solved) {
-                solved += 1;
-            }
-        }
-        return solved;
+    private static long getSolvedTasks(@NotNull final Lesson lesson) {
+        return lesson.getTaskList().stream()
+                .filter(task -> task.getStatus() == StudyStatus.Solved)
+                .count();
     }
 }

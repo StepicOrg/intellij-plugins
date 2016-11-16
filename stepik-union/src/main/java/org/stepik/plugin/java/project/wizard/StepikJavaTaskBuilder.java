@@ -7,7 +7,7 @@ import com.intellij.openapi.module.ModifiableModuleModel;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleWithNameAlreadyExists;
 import com.intellij.openapi.options.ConfigurationException;
-import com.intellij.openapi.roots.ModuleRootModificationUtil;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VfsUtil;
@@ -25,23 +25,24 @@ import org.stepik.plugin.collective.SupportedLanguages;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class StepikJavaTaskBuilder extends JavaModuleBuilder implements TaskBuilder {
+class StepikJavaTaskBuilder extends JavaModuleBuilder implements TaskBuilder {
     private static final Logger logger = Logger.getInstance(StepikJavaTaskBuilder.class);
     private final Task myTask;
-    private final Module myUtilModule;
-    private static final String SRC = "src";
+    private final Project project;
 
-    public StepikJavaTaskBuilder(
-            String moduleDir, @NotNull String name, @NotNull Task task,
-            @NotNull Module utilModule) {
+    StepikJavaTaskBuilder(String moduleDir, @NotNull String name, @NotNull Task task, @NotNull Project project) {
         myTask = task;
-        myUtilModule = utilModule;
-        String taskName = EduNames.TASK + task.getIndex();
+        this.project = project;
+        String taskName = task.getDirectory();
         //module name like lessoni-taski
         String moduleName = name + "-" + taskName;
         setName(moduleName);
@@ -57,17 +58,14 @@ public class StepikJavaTaskBuilder extends JavaModuleBuilder implements TaskBuil
         Module module = super.createModule(moduleModel);
         if (!createTaskContent()) {
             logger.info("Failed to copy task content");
-            return module;
         }
-
-        ModuleRootModificationUtil.addDependency(module, myUtilModule);
         return module;
     }
 
     private boolean createTaskContent() throws IOException {
-        StudyTaskManager taskManager = StudyTaskManager.getInstance(myUtilModule.getProject());
+        StudyTaskManager taskManager = StudyTaskManager.getInstance(project);
         SupportedLanguages defaultLang = SupportedLanguages.langOf(taskManager.getDefaultLang());
-        Course course = myTask.getLesson().getCourse();
+        Course course = myTask.getLesson().getSection().getCourse();
         String directory = getModuleFileDirectory();
         if (directory == null) {
             return false;
@@ -76,14 +74,14 @@ public class StepikJavaTaskBuilder extends JavaModuleBuilder implements TaskBuil
         if (moduleDir == null) {
             return false;
         }
-        VirtualFile src = moduleDir.findChild(SRC);
+        VirtualFile src = moduleDir.findChild(EduNames.SRC);
         if (src == null) {
             return false;
         }
         String courseResourcesDirectory = course.getCourseDirectory();
         String taskResourcesPath = FileUtil.join(courseResourcesDirectory,
-                EduNames.LESSON + myTask.getLesson().getIndex(), EduNames.TASK + myTask.getIndex());
-        FileUtil.copyDirContent(new File(taskResourcesPath), new File(FileUtil.join(src.getPath(), "hide")));
+                myTask.getLesson().getDirectory(), myTask.getDirectory());
+        FileUtil.copyDirContent(new File(taskResourcesPath), new File(FileUtil.join(src.getPath(), EduNames.HIDE)));
 
         Set<SupportedLanguages> supportedLang = getSupportedLang(taskResourcesPath);
         SupportedLanguages currentLang;
@@ -114,7 +112,7 @@ public class StepikJavaTaskBuilder extends JavaModuleBuilder implements TaskBuil
     }
 
     private void moveFromHide(@NotNull String filename, @NotNull VirtualFile src) throws IOException {
-        Files.move(Paths.get(FileUtil.join(src.getPath(), "hide", filename)),
+        Files.move(Paths.get(src.getPath(), EduNames.HIDE, filename),
                 Paths.get(src.getPath(), filename), StandardCopyOption.REPLACE_EXISTING);
     }
 

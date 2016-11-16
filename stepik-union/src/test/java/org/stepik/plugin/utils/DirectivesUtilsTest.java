@@ -1,4 +1,4 @@
-package org.stepik.plugin.actions;
+package org.stepik.plugin.utils;
 
 import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;

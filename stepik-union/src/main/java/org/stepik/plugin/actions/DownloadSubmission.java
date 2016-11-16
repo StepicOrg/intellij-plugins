@@ -77,12 +77,15 @@ public class DownloadSubmission extends StudyActionWithShortcut {
         nvps.add(new BasicNameValuePair("user", userId));
         nvps.add(new BasicNameValuePair("order", "desc"));
 
-        List<StepikWrappers.SubmissionContainer.Submission> submissions =
-                StepikConnectorGet.getSubmissions(nvps).submissions;
+        StepikWrappers.SubmissionContainer submissionContainer = StepikConnectorGet.getSubmissions(nvps);
+        if (submissionContainer == null) {
+            return;
+        }
+        List<StepikWrappers.SubmissionContainer.Submission> submissions = submissionContainer.submissions;
         StepikWrappers.MetricsWrapper metric = new StepikWrappers.MetricsWrapper(
                 StepikWrappers.MetricsWrapper.PluginNames.STEPIK_UNION,
                 StepikWrappers.MetricsWrapper.MetricActions.DOWNLOAD,
-                targetTask.getLesson().getCourse().getId(),
+                targetTask.getLesson().getSection().getCourse().getId(),
                 targetTask.getStepId());
         StepikConnectorPost.postMetric(metric);
 

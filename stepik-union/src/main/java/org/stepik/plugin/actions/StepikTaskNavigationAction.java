@@ -43,16 +43,13 @@ public abstract class StepikTaskNavigationAction extends StudyTaskNavigationActi
         for (VirtualFile file : FileEditorManager.getInstance(project).getOpenFiles()) {
             FileEditorManager.getInstance(project).closeFile(file);
         }
-        int nextTaskIndex = targetTask.getIndex();
-        int lessonIndex = targetTask.getLesson().getIndex();
         Map<String, TaskFile> nextTaskFiles = targetTask.getTaskFiles();
         VirtualFile projectDir = project.getBaseDir();
-        VirtualFile[] sectionDirs = projectDir.getChildren();
-
-        String lessonDirName = EduNames.LESSON + String.valueOf(lessonIndex);
         if (projectDir == null) {
             return;
         }
+        VirtualFile[] sectionDirs = projectDir.getChildren();
+        String lessonDirName = targetTask.getLesson().getDirectory();
 
         VirtualFile lessonDir = null;
         for (VirtualFile sectionDir : sectionDirs) {
@@ -63,7 +60,7 @@ public abstract class StepikTaskNavigationAction extends StudyTaskNavigationActi
         if (lessonDir == null) {
             return;
         }
-        String taskDirName = EduNames.TASK + String.valueOf(nextTaskIndex);
+        String taskDirName = targetTask.getDirectory();
         VirtualFile taskDir = lessonDir.findChild(taskDirName);
         if (taskDir == null) {
             return;

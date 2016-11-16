@@ -53,6 +53,8 @@ public class EduNames {
     public static final String SRC = "src";
 
     public static final String SEPARATOR = "#/*";
+    public static final java.lang.String UTIL = "util";
+    public static final String HIDE = "hide";
 
     private EduNames() {
     }
