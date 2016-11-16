@@ -9,6 +9,7 @@ import com.intellij.openapi.module.ModuleWithNameAlreadyExists;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.InvalidDataException;
+import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.io.FileUtil;
 import com.jetbrains.tmp.learning.courseFormat.Lesson;
 import com.jetbrains.tmp.learning.courseFormat.Task;
@@ -59,5 +60,10 @@ class StepikJavaLessonBuilder extends JavaModuleBuilder implements LessonBuilder
             throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
         TaskBuilder taskModuleBuilder = new StepikJavaTaskBuilder(getModuleFileDirectory(), getName(), task, project);
         taskModuleBuilder.createTask(moduleModel);
+    }
+
+    @Override
+    public List<Pair<String, String>> getSourcePaths() {
+        return null;
     }
 }
