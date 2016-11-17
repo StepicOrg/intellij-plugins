@@ -7,14 +7,14 @@ import com.intellij.psi.PsiFileSystemItem;
 import com.intellij.refactoring.move.MoveCallback;
 import com.intellij.refactoring.move.MoveHandlerDelegate;
 import org.jetbrains.annotations.Nullable;
-import org.stepik.plugin.utils.ProjectFilesUtils;
+import org.stepik.plugin.utils.ProjectPsiFilesUtils;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.stepik.plugin.utils.ProjectFilesUtils.isCanNotBeTarget;
-import static org.stepik.plugin.utils.ProjectFilesUtils.isNotMovableOrRenameElement;
+import static org.stepik.plugin.utils.ProjectPsiFilesUtils.isCanNotBeTarget;
+import static org.stepik.plugin.utils.ProjectPsiFilesUtils.isNotMovableOrRenameElement;
 
 /**
  * @author meanmail
@@ -42,13 +42,14 @@ public class StepikMoveHandlerDelegate extends MoveHandlerDelegate {
     }
 
     @Override
-    public void doMove(Project project,
+    public void doMove(
+            Project project,
             PsiElement[] elements,
             @Nullable PsiElement targetContainer,
             @Nullable MoveCallback callback) {
         List<PsiFileSystemItem> sources = Arrays.stream(elements)
-                .filter(ProjectFilesUtils::isNotMovableOrRenameElement)
-                .map(ProjectFilesUtils::getFile)
+                .filter(ProjectPsiFilesUtils::isNotMovableOrRenameElement)
+                .map(ProjectPsiFilesUtils::getFile)
                 .filter(file -> file != null)
                 .collect(Collectors.toList());
 

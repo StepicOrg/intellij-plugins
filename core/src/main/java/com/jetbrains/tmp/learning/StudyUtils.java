@@ -60,6 +60,7 @@ import com.petebevin.markdown.MarkdownProcessor;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.core.utils.ProjectFilesUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -504,9 +505,7 @@ public class StudyUtils {
             return path;
         }
 
-        String relativePath = FileUtil.getRelativePath(basePath, path, '/');
-
-        return relativePath == null ? path : relativePath;
+        return ProjectFilesUtils.getRelativePath(basePath, path);
     }
 
     @Nullable

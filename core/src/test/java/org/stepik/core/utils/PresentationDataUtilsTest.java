@@ -1,4 +1,4 @@
-package org.stepik.plugin.utils;
+package org.stepik.core.utils;
 
 import com.jetbrains.tmp.learning.core.EduNames;
 import org.junit.experimental.theories.DataPoints;
@@ -9,13 +9,13 @@ import org.junit.runner.RunWith;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static utils.TestUtils.join;
+import static org.stepik.core.TestUtils.join;
 
 /**
  * @author meanmail
  */
 @RunWith(Theories.class)
-public class PresentationUtilsTest {
+public class PresentationDataUtilsTest {
     private static final String BASE_DIR = ".";
     private static final String SECTION_DIR = EduNames.SECTION + 1;
     private static final String SECTION_PATH = EduNames.SECTION + 1;

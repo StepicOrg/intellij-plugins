@@ -17,8 +17,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import static org.stepik.plugin.utils.PresentationUtils.isVisibleDirectory;
-import static org.stepik.plugin.utils.PresentationUtils.isVisibleFile;
+import static org.stepik.plugin.utils.PresentationDataUtils.isVisibleDirectory;
+import static org.stepik.plugin.utils.PresentationDataUtils.isVisibleFile;
 
 public class StepikTreeStructureProvider implements TreeStructureProvider, DumbAware {
     private static final Logger logger = Logger.getInstance(StepikTreeStructureProvider.class);

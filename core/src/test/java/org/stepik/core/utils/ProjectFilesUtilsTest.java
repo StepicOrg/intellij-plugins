@@ -1,4 +1,4 @@
-package org.stepik.plugin.utils;
+package org.stepik.core.utils;
 
 import com.jetbrains.tmp.learning.core.EduNames;
 import org.junit.Test;
@@ -11,8 +11,8 @@ import org.junit.runner.RunWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.stepik.plugin.utils.ProjectFilesUtils.SEPARATOR;
-import static utils.TestUtils.join;
+import static org.stepik.core.utils.ProjectFilesUtils.SEPARATOR;
+import static org.stepik.core.TestUtils.join;
 
 /**
  * @author meanmail

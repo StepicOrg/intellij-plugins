@@ -1,8 +1,8 @@
-package utils;
+package org.stepik.core;
 
 import org.jetbrains.annotations.NotNull;
 
-import static org.stepik.plugin.utils.ProjectFilesUtils.SEPARATOR;
+import static org.stepik.core.utils.ProjectFilesUtils.SEPARATOR;
 
 /**
  * @author meanmail
