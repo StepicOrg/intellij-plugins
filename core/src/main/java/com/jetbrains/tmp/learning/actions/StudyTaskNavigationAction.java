@@ -83,21 +83,21 @@ abstract public class StudyTaskNavigationAction extends StudyActionWithShortcut 
                     if (treePath.isDescendant(selectedPath)) {
                         continue;
                     }
-                    if (toCollapse.isEmpty()) {
-                        toCollapse.add(treePath);
-                        continue;
-                    }
-                    for (int i = 0; i < toCollapse.size(); i++) {
-                        TreePath path = toCollapse.get(i);
-                        if (treePath.isDescendant(path)) {
-                            toCollapse.set(i, treePath);
-                        } else {
-                            if (!path.isDescendant(treePath)) {
-                                toCollapse.add(treePath);
+                    TreePath currPath = treePath;
+                    TreePath parent = treePath.getParentPath();
+
+                    while (parent != null) {
+                        if (parent.isDescendant(selectedPath)) {
+                            if (!toCollapse.contains(currPath)) {
+                                toCollapse.add(currPath);
                             }
+                            break;
                         }
+                        currPath = parent;
+                        parent = parent.getParentPath();
                     }
                 }
+
                 for (TreePath path : toCollapse) {
                     tree.collapsePath(path);
                     tree.fireTreeCollapsed(path);

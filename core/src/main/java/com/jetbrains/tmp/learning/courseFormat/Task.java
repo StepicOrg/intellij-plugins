@@ -217,6 +217,12 @@ public class Task implements StudyItem {
         return EduNames.TASK + myIndex;
     }
 
+    @NotNull
+    @Override
+    public String getPath() {
+        return myLesson.getPath() + "/" + getDirectory();
+    }
+
     public void setStatus(StudyStatus status) {
         myStatus = status;
         for (TaskFile taskFile : taskFiles.values()) {

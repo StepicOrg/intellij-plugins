@@ -86,6 +86,12 @@ public class Section implements StudyItem {
         return EduNames.SECTION + index;
     }
 
+    @NotNull
+    @Override
+    public String getPath() {
+        return myCourse.getPath() + "/" + getDirectory();
+    }
+
     @Transient
     public void setCourse(Course course) {
         this.myCourse = course;

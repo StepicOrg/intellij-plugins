@@ -105,6 +105,12 @@ public class Lesson implements StudyItem {
         return EduNames.LESSON + myIndex;
     }
 
+    @NotNull
+    @Override
+    public String getPath() {
+        return section.getPath() + "/" + getDirectory();
+    }
+
     public int getId() {
         return myId;
     }

@@ -48,20 +48,8 @@ public abstract class StepikTaskNavigationAction extends StudyTaskNavigationActi
         if (projectDir == null) {
             return;
         }
-        VirtualFile[] sectionDirs = projectDir.getChildren();
-        String lessonDirName = targetTask.getLesson().getDirectory();
 
-        VirtualFile lessonDir = null;
-        for (VirtualFile sectionDir : sectionDirs) {
-            lessonDir = sectionDir.findChild(lessonDirName);
-            if (lessonDir != null) break;
-        }
-
-        if (lessonDir == null) {
-            return;
-        }
-        String taskDirName = targetTask.getDirectory();
-        VirtualFile taskDir = lessonDir.findChild(taskDirName);
+        VirtualFile taskDir = projectDir.findFileByRelativePath(targetTask.getPath());
         if (taskDir == null) {
             return;
         }
@@ -84,18 +72,19 @@ public abstract class StepikTaskNavigationAction extends StudyTaskNavigationActi
     @Nullable
     protected VirtualFile getFileToActivate(
             @NotNull Project project,
-            Map<String, TaskFile> nextTaskFiles,
-            VirtualFile taskDir) {
+            @NotNull Map<String, TaskFile> nextTaskFiles,
+            @NotNull VirtualFile taskDir) {
         VirtualFile shouldBeActive = null;
+        VirtualFile srcDir = taskDir.findChild(EduNames.SRC);
+
         for (Map.Entry<String, TaskFile> entry : nextTaskFiles.entrySet()) {
             String name = entry.getKey();
-            VirtualFile srcDir = taskDir.findChild(EduNames.SRC);
-            VirtualFile vf = srcDir == null ? taskDir.findChild(name) : srcDir.findChild(name);
+
+            VirtualFile vf = srcDir != null ? srcDir.findChild(name) : null;
             if (vf != null) {
                 if (shouldBeActive != null) {
                     FileEditorManager.getInstance(project).openFile(vf, true);
-                }
-                if (shouldBeActive == null) {
+                } else {
                     shouldBeActive = vf;
                 }
             }

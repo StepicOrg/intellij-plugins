@@ -226,6 +226,12 @@ public class Course implements StudyItem {
         return "";
     }
 
+    @NotNull
+    @Override
+    public String getPath() {
+        return getDirectory();
+    }
+
     public Section getSectionByDirName(@NotNull String valueName) {
         int index = EduUtils.getIndex(valueName, EduNames.SECTION);
         return getSectionOfIndex(index);
