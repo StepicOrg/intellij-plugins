@@ -8,13 +8,11 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowId;
 import com.intellij.openapi.wm.ToolWindowManager;
-import com.jetbrains.tmp.learning.StudyState;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.actions.StudyTaskNavigationAction;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.courseFormat.TaskFile;
-import com.jetbrains.tmp.learning.editor.StudyEditor;
 import com.jetbrains.tmp.learning.statistics.EduUsagesCollector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -34,13 +32,13 @@ public abstract class StepikTaskNavigationAction extends StudyTaskNavigationActi
 
     @Override
     public void navigateTask(@NotNull final Project project) {
-        StudyEditor studyEditor = StudyUtils.getSelectedStudyEditor(project);
-        StudyState studyState = new StudyState(studyEditor);
+        Task currentTask = StudyUtils.getSelectedTask(project);
         Task targetTask;
-        if (studyState.isValid()) {
-            targetTask = getTargetTask(studyState.getTask());
-        } else {
+
+        if (currentTask == null) {
             targetTask = getDefaultTask(project);
+        } else {
+            targetTask = getTargetTask(currentTask);
         }
 
         if (targetTask == null) {
