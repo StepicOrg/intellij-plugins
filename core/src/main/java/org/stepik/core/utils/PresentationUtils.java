@@ -31,6 +31,7 @@ import static org.stepik.core.utils.ProjectFilesUtils.isWithinUtil;
 public class PresentationUtils {
 
     private static final HashMap<Object, HashMap<StudyStatus, Icon>> iconMap = new HashMap<>();
+    private static final JBColor SOLVED_COLOR = new JBColor(new Color(0, 134, 0), new Color(98, 150, 85));
 
     @Nullable
     public static HashMap<StudyStatus, Icon> getIconMap(@Nullable Object subject) {
@@ -79,7 +80,7 @@ public class PresentationUtils {
             case Unchecked:
                 return JBColor.BLACK;
             case Solved:
-                return new JBColor(new Color(0, 134, 0), new Color(98, 150, 85));
+                return SOLVED_COLOR;
             case Failed:
                 return JBColor.RED;
         }

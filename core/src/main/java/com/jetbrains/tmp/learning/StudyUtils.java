@@ -580,11 +580,15 @@ public class StudyUtils {
         }
     }
 
+    private static Pattern taskPathPattern;
+
     @Nullable
     public static Task getTask(@NotNull Project project, @NotNull VirtualFile taskVF) {
         String path = getRelativePath(project, taskVF);
-        Pattern pattern = Pattern.compile("^(section[0-9]+)/(lesson[0-9]+)/(task[0-9]+)/src/.*");
-        Matcher matcher = pattern.matcher(path);
+        if (taskPathPattern == null) {
+            taskPathPattern = Pattern.compile("^(section[0-9]+)/(lesson[0-9]+)/(task[0-9]+)/src/.*");
+        }
+        Matcher matcher = taskPathPattern.matcher(path);
         if (matcher.matches()) {
             Course course = StudyTaskManager.getInstance(project).getCourse();
             if (course == null) {
