@@ -10,8 +10,10 @@ import com.intellij.openapi.wm.ToolWindowId;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.util.ui.tree.TreeUtil;
 import com.jetbrains.tmp.learning.StudyState;
+import com.jetbrains.tmp.learning.StudyTaskManager;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.core.EduNames;
+import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.courseFormat.TaskFile;
 import com.jetbrains.tmp.learning.editor.StudyEditor;
@@ -158,11 +160,16 @@ abstract public class StudyTaskNavigationAction extends StudyActionWithShortcut 
         if (project == null) {
             return;
         }
+
         StudyEditor studyEditor = StudyUtils.getSelectedStudyEditor(project);
         StudyState studyState = new StudyState(studyEditor);
-        if (!studyState.isValid()) {
+        Course course = StudyTaskManager.getInstance(project).getCourse();
+
+        if (!studyState.isValid() && course != null) {
+            e.getPresentation().setEnabled(true);
             return;
         }
+
         if (getTargetTask(studyState.getTask()) == null) {
             e.getPresentation().setEnabled(false);
         }

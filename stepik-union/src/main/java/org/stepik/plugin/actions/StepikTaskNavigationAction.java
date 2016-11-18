@@ -29,14 +29,20 @@ public abstract class StepikTaskNavigationAction extends StudyTaskNavigationActi
         super(text, description, icon);
     }
 
+    @Nullable
+    protected abstract Task getDefaultTask(@NotNull final Project project);
+
     @Override
     public void navigateTask(@NotNull final Project project) {
         StudyEditor studyEditor = StudyUtils.getSelectedStudyEditor(project);
         StudyState studyState = new StudyState(studyEditor);
-        if (!studyState.isValid()) {
-            return;
+        Task targetTask;
+        if (studyState.isValid()) {
+            targetTask = getTargetTask(studyState.getTask());
+        } else {
+            targetTask = getDefaultTask(project);
         }
-        Task targetTask = getTargetTask(studyState.getTask());
+
         if (targetTask == null) {
             return;
         }
