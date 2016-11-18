@@ -113,12 +113,6 @@ class StepikDirectoryNode extends PsiDirectoryNode {
     }
 
     @Override
-    public boolean expandOnDoubleClick() {
-        final String myValueName = getValue().getName();
-        return !myValueName.contains(EduNames.TASK) && super.expandOnDoubleClick();
-    }
-
-    @Override
     protected boolean hasProblemFileBeneath() {
         return false;
     }
