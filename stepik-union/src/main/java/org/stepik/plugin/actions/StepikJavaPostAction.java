@@ -3,22 +3,22 @@ package org.stepik.plugin.actions;
 import com.intellij.ide.projectView.ProjectView;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
+import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.wm.IdeFocusManager;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.tmp.learning.LangManager;
 import com.jetbrains.tmp.learning.LangSetting;
-import com.jetbrains.tmp.learning.StudyState;
 import com.jetbrains.tmp.learning.StudyTaskManager;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.actions.StudyCheckAction;
 import com.jetbrains.tmp.learning.checker.StudyCheckUtils;
+import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
 import com.jetbrains.tmp.learning.courseFormat.Task;
-import com.jetbrains.tmp.learning.editor.StudyEditor;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorGet;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorPost;
 import com.jetbrains.tmp.learning.stepik.StepikWrappers;
@@ -47,21 +47,14 @@ public class StepikJavaPostAction extends StudyCheckAction {
         logger.info("check is started");
         ApplicationManager.getApplication().runWriteAction(() ->
                 CommandProcessor.getInstance().runUndoTransparentAction(() -> {
-                    final StudyEditor selectedEditor = StudyUtils.getSelectedStudyEditor(project);
-                    if (selectedEditor == null) return;
-                    final StudyState studyState = new StudyState(selectedEditor);
-                    if (!studyState.isValid()) {
-                        logger.info("StudyCheckAction was invoked outside study editor");
+                    if (StudyCheckUtils.hasBackgroundProcesses(project)) {
                         return;
                     }
-                    if (StudyCheckUtils.hasBackgroundProcesses(project)) return;
 
-                    ApplicationManager.getApplication().invokeLater(
-                            () -> IdeFocusManager
-                                    .getInstance(project)
-                                    .requestFocus(studyState.getEditor().getComponent(), true));
-
-                    Task task = studyState.getTask();
+                    Task task = StudyUtils.getSelectedTask(project);
+                    if (task == null) {
+                        return;
+                    }
 
                     int intAttemptId = 0;
                     try {
@@ -83,7 +76,15 @@ public class StepikJavaPostAction extends StudyCheckAction {
                     if (currentLang == null) {
                         return;
                     }
-                    String[] text = DirectivesUtils.getFileText(studyState.getVirtualFile());
+                    String activateFileName = currentLang.getMainFileName();
+
+                    String mainFilePath = String.join("/", task.getPath(), EduNames.SRC, activateFileName);
+                    VirtualFile mainFile = project.getBaseDir().findFileByRelativePath(mainFilePath);
+                    if (mainFile == null) {
+                        return;
+                    }
+
+                    String[] text = DirectivesUtils.getFileText(mainFile);
                     String solution = DirectivesUtils.getTextUnderDirectives(text, currentLang);
                     StepikWrappers.SubmissionToPostWrapper postWrapper =
                             new StepikWrappers.SubmissionToPostWrapper(attemptId, currentLang.getName(), solution);
@@ -149,5 +150,18 @@ public class StepikJavaPostAction extends StudyCheckAction {
                             }
                     );
                 }));
+    }
+
+    @Override
+    public void update(AnActionEvent e) {
+        StudyUtils.updateAction(e);
+
+        Project project = e.getProject();
+        if (project == null) {
+            return;
+        }
+
+        Task targetTask = StudyUtils.getSelectedTask(project);
+        e.getPresentation().setEnabled(targetTask != null);
     }
 }

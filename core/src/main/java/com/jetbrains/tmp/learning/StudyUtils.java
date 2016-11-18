@@ -509,7 +509,7 @@ public class StudyUtils {
     }
 
     @Nullable
-    private static Task getSelectedTask(@NotNull Project project) {
+    public static Task getSelectedTask(@NotNull Project project) {
         VirtualFile[] files = FileEditorManager.getInstance(project).getSelectedFiles();
         if (files.length == 0) {
             return null;
