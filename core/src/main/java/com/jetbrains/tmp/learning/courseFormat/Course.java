@@ -229,7 +229,7 @@ public class Course implements StudyItem {
     @NotNull
     @Override
     public String getPath() {
-        return getDirectory();
+        return "";
     }
 
     public Section getSectionByDirName(@NotNull String valueName) {

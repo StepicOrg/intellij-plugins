@@ -38,6 +38,10 @@ public class Task implements StudyItem {
     @Expose
     @SerializedName("task_files")
     public Map<String, TaskFile> taskFiles = new HashMap<>();
+    @Transient
+    private String directory;
+    @Transient
+    private String path;
 
     public Task() {}
 
@@ -80,6 +84,8 @@ public class Task implements StudyItem {
 
     public void setIndex(int index) {
         myIndex = index;
+        directory = null;
+        path = null;
     }
 
     public Map<String, String> getTestsText() {
@@ -214,13 +220,19 @@ public class Task implements StudyItem {
     @NotNull
     @Override
     public String getDirectory() {
-        return EduNames.TASK + myIndex;
+        if (directory == null) {
+            directory = EduNames.TASK + myIndex;
+        }
+        return directory;
     }
 
     @NotNull
     @Override
     public String getPath() {
-        return myLesson.getPath() + "/" + getDirectory();
+        if (path == null) {
+            path = myLesson.getPath() + "/" + getDirectory();
+        }
+        return path;
     }
 
     public void setStatus(StudyStatus status) {

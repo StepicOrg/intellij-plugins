@@ -36,6 +36,10 @@ public class Lesson implements StudyItem {
 
     // index is visible to user number of lesson from 1 to lesson number
     private int myIndex = -1;
+    @Transient
+    private String directory;
+    @Transient
+    private String path;
 
     public Lesson() {
     }
@@ -61,6 +65,8 @@ public class Lesson implements StudyItem {
 
     public void setIndex(int index) {
         myIndex = index;
+        directory = null;
+        path = null;
     }
 
     public List<Task> getTaskList() {
@@ -102,13 +108,19 @@ public class Lesson implements StudyItem {
     @NotNull
     @Override
     public String getDirectory() {
-        return EduNames.LESSON + myIndex;
+        if (directory == null) {
+            directory = EduNames.LESSON + myIndex;
+        }
+        return directory;
     }
 
     @NotNull
     @Override
     public String getPath() {
-        return section.getPath() + "/" + getDirectory();
+        if (path == null) {
+            path = section.getPath() + "/" + getDirectory();
+        }
+        return path;
     }
 
     public int getId() {

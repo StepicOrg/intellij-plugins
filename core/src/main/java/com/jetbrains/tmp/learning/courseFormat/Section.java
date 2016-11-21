@@ -22,7 +22,10 @@ public class Section implements StudyItem {
     private int id;
     @Transient
     private Course myCourse = null;
-
+    @Transient
+    private String directory;
+    @Transient
+    private String path;
 
     public Section() {
     }
@@ -52,6 +55,8 @@ public class Section implements StudyItem {
     @Override
     public void setIndex(int index) {
         this.index = index;
+        directory = null;
+        path = null;
     }
 
     public void addLesson(Lesson lesson) {
@@ -83,13 +88,19 @@ public class Section implements StudyItem {
     @NotNull
     @Override
     public String getDirectory() {
-        return EduNames.SECTION + index;
+        if (directory == null) {
+            directory = EduNames.SECTION + index;
+        }
+        return directory;
     }
 
     @NotNull
     @Override
     public String getPath() {
-        return myCourse.getPath() + "/" + getDirectory();
+        if (path == null) {
+            path = myCourse.getPath() + "/" + getDirectory();
+        }
+        return path;
     }
 
     @Transient
