@@ -65,8 +65,19 @@ public class Lesson implements StudyItem {
 
     public void setIndex(int index) {
         myIndex = index;
-        directory = null;
+        directory = EduNames.LESSON + myIndex;
+        updatePath();
+    }
+
+    @Override
+    public void updatePath() {
+        if (path == null) {
+            return;
+        }
+
         path = null;
+
+        taskList.forEach(StudyItem::updatePath);
     }
 
     public List<Task> getTaskList() {
@@ -74,7 +85,11 @@ public class Lesson implements StudyItem {
     }
 
     public void setTaskList(List<Task> taskList) {
-        this.taskList = taskList;
+        if (taskList == null) {
+            this.taskList = new ArrayList<>();
+        } else {
+            this.taskList = taskList;
+        }
     }
 
     public void addTask(@NotNull final Task task) {
@@ -108,9 +123,6 @@ public class Lesson implements StudyItem {
     @NotNull
     @Override
     public String getDirectory() {
-        if (directory == null) {
-            directory = EduNames.LESSON + myIndex;
-        }
         return directory;
     }
 

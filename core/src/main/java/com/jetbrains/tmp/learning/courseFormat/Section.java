@@ -55,8 +55,8 @@ public class Section implements StudyItem {
     @Override
     public void setIndex(int index) {
         this.index = index;
-        directory = null;
-        path = null;
+        directory = EduNames.SECTION + index;
+        updatePath();
     }
 
     public void addLesson(Lesson lesson) {
@@ -85,12 +85,20 @@ public class Section implements StudyItem {
         return StudyStatus.Solved;
     }
 
+    @Override
+    public void updatePath() {
+        if (path == null) {
+            return;
+        }
+
+        path = null;
+
+        lessons.forEach(StudyItem::updatePath);
+    }
+
     @NotNull
     @Override
     public String getDirectory() {
-        if (directory == null) {
-            directory = EduNames.SECTION + index;
-        }
         return directory;
     }
 

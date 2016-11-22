@@ -232,6 +232,11 @@ public class Course implements StudyItem {
         return "";
     }
 
+    @Override
+    public void updatePath() {
+        sections.forEach(StudyItem::updatePath);
+    }
+
     public Section getSectionByDirName(@NotNull String valueName) {
         int index = EduUtils.getIndex(valueName, EduNames.SECTION);
         return getSectionOfIndex(index);

@@ -18,4 +18,6 @@ public interface StudyItem {
 
     @NotNull
     String getPath();
+
+    void updatePath();
 }

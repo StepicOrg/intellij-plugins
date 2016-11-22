@@ -61,6 +61,9 @@ public class PresentationDataUtils {
                 return;
             }
             Lesson lesson = course.getLessonByDirName(valueName);
+            if (lesson == null) {
+                return;
+            }
             setAttributes(data, lesson);
         } else if (valueName.startsWith(EduNames.SECTION)) {
             Section section = course.getSectionByDirName(valueName);

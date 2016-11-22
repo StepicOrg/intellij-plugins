@@ -84,7 +84,12 @@ public class Task implements StudyItem {
 
     public void setIndex(int index) {
         myIndex = index;
-        directory = null;
+        directory = EduNames.TASK + myIndex;
+        updatePath();
+    }
+
+    @Override
+    public void updatePath() {
         path = null;
     }
 
@@ -220,9 +225,6 @@ public class Task implements StudyItem {
     @NotNull
     @Override
     public String getDirectory() {
-        if (directory == null) {
-            directory = EduNames.TASK + myIndex;
-        }
         return directory;
     }
 

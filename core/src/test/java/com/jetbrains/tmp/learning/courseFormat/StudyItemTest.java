@@ -23,6 +23,7 @@ public class StudyItemTest {
         section.setIndex(1);
         section.setCourse(course);
 
+
         lesson = new Lesson();
         lesson.setIndex(1);
         lesson.setSection(section);
@@ -30,6 +31,10 @@ public class StudyItemTest {
         task = new Task();
         task.setIndex(1);
         task.setLesson(lesson);
+
+        course.addSection(section);
+        section.addLesson(lesson);
+        lesson.addTask(task);
     }
 
     @Test
@@ -106,5 +111,19 @@ public class StudyItemTest {
     public void getTaskPathAfterChangeIndex() throws Exception {
         task.setIndex(2);
         assertEquals("/section1/lesson1/task2", task.getPath());
+    }
+
+    @Test
+    public void getLessonPathAfterChangeSectionIndex() throws Exception {
+        assertEquals("/section1/lesson1", lesson.getPath());
+        section.setIndex(2);
+        assertEquals("/section2/lesson1", lesson.getPath());
+    }
+
+    @Test
+    public void getTaskPathAfterChangeLessonIndex() throws Exception {
+        assertEquals("/section1/lesson1/task1", task.getPath());
+        lesson.setIndex(2);
+        assertEquals("/section1/lesson2/task1", task.getPath());
     }
 }
