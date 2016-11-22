@@ -78,6 +78,9 @@ public class StudySerializationUtils {
         public static final String TASK_WINDOWS = "taskWindows";
         public static final String RESOURCE_PATH = "resourcePath";
         public static final String COURSE_DIRECTORY = "courseDirectory";
+        public static final String SECTIONS = "sections";
+        public static final String SECTION = "Section";
+        public static final String SECTIONS_NAMES = "sectionsNames";
 
         private Xml() {
         }
@@ -348,20 +351,24 @@ public class StudySerializationUtils {
             Element taskManagerElement = state.getChild(MAIN_ELEMENT);
 
             Element courseElement = getChildWithName(taskManagerElement, COURSE).getChild(COURSE_TITLED);
+            if (courseElement == null) {
+                return state;
+            }
+
             List<Element> lessons = getChildList(courseElement, LESSONS);
             Map<String, Element> lessonsNames = new java.util.HashMap<>();
             for (Element lesson : lessons) {
-                int index = getAsInt(lesson, "index");
+                int index = getAsInt(lesson, INDEX);
                 lessonsNames.put(EduNames.LESSON + index, lesson.clone());
             }
-            Map<String, String> sectionsNames = getChildMap(courseElement, "sectionsNames");
+            Map<String, String> sectionsNames = getChildMap(courseElement, SECTIONS_NAMES);
 
             ArrayList<Element> list = new ArrayList<>();
             sectionsNames.entrySet().forEach(entry -> {
-                Element section = new Element("Section");
+                Element section = new Element(SECTION);
                 int index = EduUtils.getIndex(entry.getKey(), EduNames.SECTION);
-                addChildWithName(section, "index", index);
-                addChildWithName(section, "name", entry.getValue());
+                addChildWithName(section, INDEX, index);
+                addChildWithName(section, NAME, entry.getValue());
                 ArrayList<Element> lessonsList = new ArrayList<>();
                 VirtualFile sectionDir = project.getBaseDir().findChild(EduNames.SECTION + index);
                 if (sectionDir != null) {
@@ -373,11 +380,11 @@ public class StudySerializationUtils {
                         }
                     }
                 }
-                addChildList(section, "lessons", lessonsList);
+                addChildList(section, LESSONS, lessonsList);
                 list.add(section);
             });
 
-            addChildList(courseElement, "sections", list);
+            addChildList(courseElement, SECTIONS, list);
 
             return state;
         }
