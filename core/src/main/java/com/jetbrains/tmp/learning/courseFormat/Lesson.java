@@ -37,7 +37,8 @@ public class Lesson implements StudyItem {
     // index is visible to user number of lesson from 1 to lesson number
     private int myIndex = -1;
     @Transient
-    private String directory;
+    @NotNull
+    private String directory = "";
     @Transient
     private String path;
 

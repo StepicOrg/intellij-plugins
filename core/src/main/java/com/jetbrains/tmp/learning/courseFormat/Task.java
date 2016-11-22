@@ -39,7 +39,8 @@ public class Task implements StudyItem {
     @SerializedName("task_files")
     public Map<String, TaskFile> taskFiles = new HashMap<>();
     @Transient
-    private String directory;
+    @NotNull
+    private String directory = "";
     @Transient
     private String path;
 

@@ -23,7 +23,8 @@ public class Section implements StudyItem {
     @Transient
     private Course myCourse = null;
     @Transient
-    private String directory;
+    @NotNull
+    private String directory = "";
     @Transient
     private String path;
 
