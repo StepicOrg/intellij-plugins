@@ -79,7 +79,7 @@ public class StudySerializationUtils {
         public static final String RESOURCE_PATH = "resourcePath";
         public static final String COURSE_DIRECTORY = "courseDirectory";
         public static final String SECTIONS = "sections";
-        public static final String SECTION = "Section";
+        public static final String SECTION_TITLED = "Section";
         public static final String SECTIONS_NAMES = "sectionsNames";
 
         private Xml() {
@@ -365,7 +365,7 @@ public class StudySerializationUtils {
 
             ArrayList<Element> list = new ArrayList<>();
             sectionsNames.entrySet().forEach(entry -> {
-                Element section = new Element(SECTION);
+                Element section = new Element(SECTION_TITLED);
                 int index = EduUtils.getIndex(entry.getKey(), EduNames.SECTION);
                 addChildWithName(section, INDEX, index);
                 addChildWithName(section, NAME, entry.getValue());
