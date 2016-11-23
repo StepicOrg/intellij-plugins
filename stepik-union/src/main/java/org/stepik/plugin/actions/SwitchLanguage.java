@@ -15,13 +15,11 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.refactoring.move.moveFilesOrDirectories.MoveFilesOrDirectoriesUtil;
 import com.jetbrains.tmp.learning.LangSetting;
-import com.jetbrains.tmp.learning.StudyState;
 import com.jetbrains.tmp.learning.StudyTaskManager;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.actions.StudyActionWithShortcut;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.Task;
-import com.jetbrains.tmp.learning.editor.StudyEditor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.plugin.collective.SupportedLanguages;
@@ -47,12 +45,7 @@ public class SwitchLanguage extends StudyActionWithShortcut {
         if (project == null) {
             return;
         }
-        StudyEditor studyEditor = StudyUtils.getSelectedStudyEditor(project);
-        StudyState studyState = new StudyState(studyEditor);
-        if (!studyState.isValid()) {
-            return;
-        }
-        Task targetTask = studyState.getTask();
+        Task targetTask = StudyUtils.getSelectedTask(project);
         if (targetTask == null) {
             return;
         }
@@ -73,7 +66,11 @@ public class SwitchLanguage extends StudyActionWithShortcut {
             editorManager.closeFile(file);
         }
 
-        VirtualFile src = studyState.getTaskDir();
+        String srcPath = String.join("/", targetTask.getPath(), EduNames.SRC);
+        VirtualFile src = project.getBaseDir().findFileByRelativePath(srcPath);
+        if (src == null) {
+            return;
+        }
         VirtualFile hideVF = src.findChild(EduNames.HIDE);
         if (hideVF == null) {
             return;
@@ -130,6 +127,19 @@ public class SwitchLanguage extends StudyActionWithShortcut {
         VirtualFile vf = src.findChild(activateFileName);
         if (vf != null)
             FileEditorManager.getInstance(project).openFile(vf, true);
+    }
+
+    @Override
+    public void update(AnActionEvent e) {
+        StudyUtils.updateAction(e);
+
+        Project project = e.getProject();
+        if (project == null) {
+            return;
+        }
+
+        Task targetTask = StudyUtils.getSelectedTask(project);
+        e.getPresentation().setEnabled(targetTask != null);
     }
 
     @NotNull

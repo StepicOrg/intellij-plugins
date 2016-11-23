@@ -15,4 +15,9 @@ public interface StudyItem {
 
     @NotNull
     String getDirectory();
+
+    @NotNull
+    String getPath();
+
+    void updatePath();
 }

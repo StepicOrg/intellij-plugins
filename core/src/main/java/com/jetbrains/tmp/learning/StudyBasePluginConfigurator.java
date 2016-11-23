@@ -8,7 +8,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.tmp.learning.actions.*;
 import com.jetbrains.tmp.learning.courseFormat.Task;
-import com.jetbrains.tmp.learning.courseFormat.TaskFile;
 import com.jetbrains.tmp.learning.ui.StudyToolWindow;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -52,14 +51,14 @@ public abstract class StudyBasePluginConfigurator implements StudyPluginConfigur
         return new FileEditorManagerListener() {
             @Override
             public void fileOpened(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
-                Task task = getTask(file);
+                Task task = StudyUtils.getTask(source.getProject(), file);
                 setTaskText(task, file.getParent());
             }
 
             @Override
             public void fileClosed(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
                 for (VirtualFile openedFile : source.getOpenFiles()) {
-                    if (StudyUtils.getTaskFile(project, openedFile) != null) {
+                    if (StudyUtils.getTask(project, openedFile) != null) {
                         return;
                     }
                 }
@@ -70,20 +69,10 @@ public abstract class StudyBasePluginConfigurator implements StudyPluginConfigur
             public void selectionChanged(@NotNull FileEditorManagerEvent event) {
                 VirtualFile file = event.getNewFile();
                 if (file != null) {
-                    Task task = getTask(file);
+                    Task task = StudyUtils.getTask(event.getManager().getProject(), file);
                     setTaskText(task, file.getParent());
                 }
                 toolWindow.setBottomComponent(null);
-            }
-
-            @Nullable
-            private Task getTask(@NotNull VirtualFile file) {
-                TaskFile taskFile = StudyUtils.getTaskFile(project, file);
-                if (taskFile != null) {
-                    return taskFile.getTask();
-                } else {
-                    return null;
-                }
             }
 
             private void setTaskText(@Nullable final Task task, @Nullable final VirtualFile taskDirectory) {

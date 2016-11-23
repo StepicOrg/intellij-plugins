@@ -16,16 +16,16 @@ import com.jetbrains.tmp.learning.core.EduUtils;
 import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.courseFormat.TaskFile;
 import org.jetbrains.annotations.NotNull;
-import org.stepik.plugin.utils.PresentationUtils;
+import org.stepik.plugin.utils.PresentationDataUtils;
 
 import java.util.Map;
 
 /**
  * @author meanmail
  */
-public class StepikDirectoryNode extends PsiDirectoryNode {
+class StepikDirectoryNode extends PsiDirectoryNode {
 
-    public StepikDirectoryNode(
+    StepikDirectoryNode(
             Project project,
             PsiDirectory value,
             ViewSettings viewSettings) {
@@ -34,7 +34,7 @@ public class StepikDirectoryNode extends PsiDirectoryNode {
 
     @Override
     protected void updateImpl(@NotNull PresentationData data) {
-        PresentationUtils.updatePresentationData(data, getValue());
+        PresentationDataUtils.updatePresentationData(data, getValue());
     }
 
     @Override
@@ -110,12 +110,6 @@ public class StepikDirectoryNode extends PsiDirectoryNode {
                 }
             }
         }
-    }
-
-    @Override
-    public boolean expandOnDoubleClick() {
-        final String myValueName = getValue().getName();
-        return !myValueName.contains(EduNames.TASK) && super.expandOnDoubleClick();
     }
 
     @Override

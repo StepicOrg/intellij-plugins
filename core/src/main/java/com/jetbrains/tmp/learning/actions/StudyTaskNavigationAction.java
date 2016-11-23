@@ -10,8 +10,10 @@ import com.intellij.openapi.wm.ToolWindowId;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.util.ui.tree.TreeUtil;
 import com.jetbrains.tmp.learning.StudyState;
+import com.jetbrains.tmp.learning.StudyTaskManager;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.core.EduNames;
+import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.courseFormat.TaskFile;
 import com.jetbrains.tmp.learning.editor.StudyEditor;
@@ -83,21 +85,21 @@ abstract public class StudyTaskNavigationAction extends StudyActionWithShortcut 
                     if (treePath.isDescendant(selectedPath)) {
                         continue;
                     }
-                    if (toCollapse.isEmpty()) {
-                        toCollapse.add(treePath);
-                        continue;
-                    }
-                    for (int i = 0; i < toCollapse.size(); i++) {
-                        TreePath path = toCollapse.get(i);
-                        if (treePath.isDescendant(path)) {
-                            toCollapse.set(i, treePath);
-                        } else {
-                            if (!path.isDescendant(treePath)) {
-                                toCollapse.add(treePath);
+                    TreePath currPath = treePath;
+                    TreePath parent = treePath.getParentPath();
+
+                    while (parent != null) {
+                        if (parent.isDescendant(selectedPath)) {
+                            if (!toCollapse.contains(currPath)) {
+                                toCollapse.add(currPath);
                             }
+                            break;
                         }
+                        currPath = parent;
+                        parent = parent.getParentPath();
                     }
                 }
+
                 for (TreePath path : toCollapse) {
                     tree.collapsePath(path);
                     tree.fireTreeCollapsed(path);
@@ -158,11 +160,16 @@ abstract public class StudyTaskNavigationAction extends StudyActionWithShortcut 
         if (project == null) {
             return;
         }
+
         StudyEditor studyEditor = StudyUtils.getSelectedStudyEditor(project);
         StudyState studyState = new StudyState(studyEditor);
-        if (!studyState.isValid()) {
+        Course course = StudyTaskManager.getInstance(project).getCourse();
+
+        if (!studyState.isValid() && course != null) {
+            e.getPresentation().setEnabled(true);
             return;
         }
+
         if (getTargetTask(studyState.getTask()) == null) {
             e.getPresentation().setEnabled(false);
         }

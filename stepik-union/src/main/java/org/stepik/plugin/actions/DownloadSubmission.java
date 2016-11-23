@@ -6,18 +6,18 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.tmp.learning.LangManager;
 import com.jetbrains.tmp.learning.LangSetting;
-import com.jetbrains.tmp.learning.StudyState;
 import com.jetbrains.tmp.learning.StudyTaskManager;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.actions.StudyActionWithShortcut;
+import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.Task;
-import com.jetbrains.tmp.learning.editor.StudyEditor;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorGet;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorPost;
 import com.jetbrains.tmp.learning.stepik.StepikWrappers;
@@ -58,13 +58,12 @@ public class DownloadSubmission extends StudyActionWithShortcut {
         downloadSubmission(e.getProject());
     }
 
-    private void downloadSubmission(Project project) {
-        StudyEditor studyEditor = StudyUtils.getSelectedStudyEditor(project);
-        StudyState studyState = new StudyState(studyEditor);
-        if (!studyState.isValid()) {
+    private void downloadSubmission(@Nullable Project project) {
+        if (project == null) {
             return;
         }
-        Task targetTask = studyState.getTask();
+
+        Task targetTask = StudyUtils.getSelectedTask(project);
         if (targetTask == null) {
             return;
         }
@@ -106,23 +105,41 @@ public class DownloadSubmission extends StudyActionWithShortcut {
         if (code == null) {
             return;
         }
-        final String finalCode = code;
 
-        VirtualFile vf = studyState.getTaskDir().findChild(activateFileName);
-        FileDocumentManager documentManager = FileDocumentManager.getInstance();
-        if (vf == null) {
+        String mainFilePath = String.join("/", targetTask.getPath(), EduNames.SRC, activateFileName);
+        VirtualFile mainFile = project.getBaseDir().findFileByRelativePath(mainFilePath);
+        if (mainFile == null) {
             return;
         }
+
+        FileDocumentManager documentManager = FileDocumentManager.getInstance();
+        final String finalCode = code;
+
         CommandProcessor.getInstance().executeCommand(project,
                 () -> ApplicationManager.getApplication().runWriteAction(
                         () -> {
                             Document document = documentManager
-                                    .getDocument(vf);
-                            if (document != null)
+                                    .getDocument(mainFile);
+                            if (document != null) {
                                 document.setText(finalCode);
+                                FileEditorManager.getInstance(project).openFile(mainFile, true);
+                            }
                         }),
                 "Download last submission",
                 "Download last submission");
 
+    }
+
+    @Override
+    public void update(AnActionEvent e) {
+        StudyUtils.updateAction(e);
+
+        Project project = e.getProject();
+        if (project == null) {
+            return;
+        }
+
+        Task targetTask = StudyUtils.getSelectedTask(project);
+        e.getPresentation().setEnabled(targetTask != null);
     }
 }
