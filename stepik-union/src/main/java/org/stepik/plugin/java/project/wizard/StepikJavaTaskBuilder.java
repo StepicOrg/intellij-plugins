@@ -50,7 +50,6 @@ class StepikJavaTaskBuilder extends JavaModuleBuilder implements TaskBuilder {
                 moduleName + ModuleFileType.DOT_DEFAULT_EXTENSION));
     }
 
-
     @NotNull
     @Override
     public Module createModule(@NotNull ModifiableModuleModel moduleModel) throws InvalidDataException,
