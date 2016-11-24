@@ -279,8 +279,9 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
 
     @Override
     public void onStepLeaving() {
-        String selLang = ((SupportedLanguages) langComboBox.getSelectedItem()).getName();
-        StudyTaskManager.getInstance(project).setDefaultLang(selLang);
+        String selectedLang = ((SupportedLanguages) langComboBox.getSelectedItem()).getName();
+//        StudyTaskManager.getInstance(project).setDefaultLang(selectedLang);
+        myGenerator.setDefaultLang(selectedLang);
         if (selectedCourse != null) {
             myGenerator.setSelectedCourse(selectedCourse);
         }
