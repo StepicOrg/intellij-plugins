@@ -91,7 +91,7 @@ public class StepikWrappers {
                     assert taskDir != null;
                     VirtualFile ideaDir = project.getBaseDir().findChild(".idea");
                     assert ideaDir != null;
-                    EduUtils.createStudentFileFromAnswer(project, ideaDir, taskDir, entry.getKey(), taskFile);
+                    EduUtils.createStudentFileFromAnswer(project, ideaDir, taskDir, entry.getKey());
                 });
                 taskFile.name = entry.getKey();
 
@@ -123,20 +123,20 @@ public class StepikWrappers {
         String java8;
 
         @Nullable
-        public String getTemplateForLanguage(@NotNull final String langauge) {
-            if (langauge.equals(EduAdaptiveStepikConnector.PYTHON27)) {
+        public String getTemplateForLanguage(@NotNull final String language) {
+            if (language.equals(EduAdaptiveStepikConnector.PYTHON27)) {
                 return python27;
             }
 
-            if (langauge.equals(EduAdaptiveStepikConnector.PYTHON3)) {
+            if (language.equals(EduAdaptiveStepikConnector.PYTHON3)) {
                 return python3;
             }
 
-            if (langauge.equals("java")) {
+            if (language.equals("java")) {
                 return java;
             }
 
-            if (langauge.equals("java8")) {
+            if (language.equals("java8")) {
                 return java8;
             }
 

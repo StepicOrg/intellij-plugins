@@ -7,7 +7,6 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.jetbrains.tmp.learning.courseFormat.TaskFile;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
@@ -48,7 +47,7 @@ public class EduUtils {
             @NotNull final Project project,
             @NotNull final VirtualFile userFileDir,
             @NotNull final VirtualFile answerFileDir,
-            @NotNull final String taskFileName, @NotNull final TaskFile taskFile) {
+            @NotNull final String taskFileName) {
         VirtualFile file = userFileDir.findChild(taskFileName);
         if (file != null) {
             try {
@@ -84,23 +83,18 @@ public class EduUtils {
                     document.replaceString(0, document.getTextLength(), answerDocument.getCharsSequence());
                     FileDocumentManager.getInstance().saveDocument(document);
                 }), "Create Student File", "Create Student File");
-        createStudentDocument(project, taskFile, document);
+        createStudentDocument(project, document);
     }
 
     private static void createStudentDocument(
             @NotNull Project project,
-            @NotNull TaskFile taskFile,
             final Document document) {
-        EduDocumentListener listener = new EduDocumentListener(taskFile);
-        document.addDocumentListener(listener);
-
         CommandProcessor.getInstance()
                 .executeCommand(project,
                         () -> ApplicationManager.getApplication()
                                 .runWriteAction(() -> FileDocumentManager.getInstance().saveDocument(document)),
                         "Create Student File",
                         "Create Student File");
-        document.removeDocumentListener(listener);
     }
 
     public static boolean isImage(String fileName) {

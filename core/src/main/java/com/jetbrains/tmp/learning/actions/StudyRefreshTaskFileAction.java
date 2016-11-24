@@ -66,7 +66,6 @@ public class StudyRefreshTaskFileAction extends StudyActionWithShortcut {
             return;
         }
         WolfTheProblemSolver.getInstance(project).clearProblems(studyState.getVirtualFile());
-        taskFile.setHighlightErrors(false);
         ApplicationManager.getApplication().invokeLater(
                 () -> IdeFocusManager.getInstance(project).requestFocus(editor.getContentComponent(), true));
 
@@ -108,10 +107,8 @@ public class StudyRefreshTaskFileAction extends StudyActionWithShortcut {
             return false;
         }
         StudyUtils.deleteGuardedBlocks(document);
-        taskFile.setTrackChanges(false);
         clearDocument(document);
         document.setText(patternDocument.getCharsSequence());
-        taskFile.setTrackChanges(true);
         return true;
     }
 

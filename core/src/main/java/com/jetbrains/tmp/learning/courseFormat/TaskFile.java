@@ -15,8 +15,6 @@ public class TaskFile {
     @Expose
     public String text;
     private boolean myUserCreated = false;
-    private boolean myTrackChanges = true;
-    private boolean myHighlightErrors = false;
     @Transient
     private Task myTask;
 
@@ -24,17 +22,12 @@ public class TaskFile {
     }
 
     public void initTaskFile(final Task task) {
-        setTask(task);
+        myTask = task;
     }
 
     @Transient
     public Task getTask() {
         return myTask;
-    }
-
-    @Transient
-    public void setTask(Task task) {
-        myTask = task;
     }
 
     public static void copy(@NotNull final TaskFile source, @NotNull final TaskFile target) {
@@ -47,21 +40,5 @@ public class TaskFile {
 
     public boolean isUserCreated() {
         return myUserCreated;
-    }
-
-    public boolean isTrackChanges() {
-        return myTrackChanges;
-    }
-
-    public void setTrackChanges(boolean trackChanges) {
-        myTrackChanges = trackChanges;
-    }
-
-    public boolean isHighlightErrors() {
-        return myHighlightErrors;
-    }
-
-    public void setHighlightErrors(boolean highlightErrors) {
-        myHighlightErrors = highlightErrors;
     }
 }

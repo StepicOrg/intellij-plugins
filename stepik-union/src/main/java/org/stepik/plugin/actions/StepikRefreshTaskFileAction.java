@@ -68,7 +68,6 @@ public class StepikRefreshTaskFileAction extends StudyActionWithShortcut {
             return;
         }
         WolfTheProblemSolver.getInstance(project).clearProblems(studyState.getVirtualFile());
-        taskFile.setHighlightErrors(false);
         ApplicationManager.getApplication().invokeLater(
                 () -> IdeFocusManager.getInstance(project)
                         .requestFocus(editor.getContentComponent(), true));
