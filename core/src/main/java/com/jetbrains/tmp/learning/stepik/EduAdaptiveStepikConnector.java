@@ -7,13 +7,11 @@ import com.intellij.ide.projectView.ProjectView;
 import com.intellij.lang.Language;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.popup.Balloon;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
-import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VfsUtil;
@@ -23,7 +21,11 @@ import com.jetbrains.tmp.learning.StudyTaskManager;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.checker.StudyExecutor;
 import com.jetbrains.tmp.learning.core.EduNames;
-import com.jetbrains.tmp.learning.courseFormat.*;
+import com.jetbrains.tmp.learning.courseFormat.Course;
+import com.jetbrains.tmp.learning.courseFormat.Lesson;
+import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
+import com.jetbrains.tmp.learning.courseFormat.Task;
+import com.jetbrains.tmp.learning.courseFormat.TaskFile;
 import com.jetbrains.tmp.learning.courseGeneration.StudyGenerator;
 import com.jetbrains.tmp.learning.courseGeneration.StudyProjectGenerator;
 import com.jetbrains.tmp.learning.editor.StudyEditor;
@@ -45,24 +47,22 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import static com.jetbrains.tmp.learning.stepik.StepikConnectorGet.getFromStepik;
 
-public class EduAdaptiveStepikConnector {
-    public static final String PYTHON27 = "python27";
-    public static final String PYTHON3 = "python3";
+class EduAdaptiveStepikConnector {
+    static final String PYTHON27 = "python27";
+    static final String PYTHON3 = "python3";
     private static final Logger logger = Logger.getInstance(EduAdaptiveStepikConnector.class);
     private static final int CONNECTION_TIMEOUT = 60 * 1000;
 
     @Nullable
-    public static Task getNextRecommendation(@NotNull final Project project, @NotNull Course course) {
+    static Task getNextRecommendation(@NotNull final Project project, @NotNull Course course) {
         try {
             final CloseableHttpClient client = StepikConnectorLogin.getHttpClient();
             final URI uri = new URIBuilder(EduStepikNames.STEPIK_API_URL + EduStepikNames.RECOMMENDATIONS_URL)
@@ -182,8 +182,8 @@ public class EduAdaptiveStepikConnector {
         }
     }
 
-    public static boolean postRecommendationReaction(
-            @NotNull final Project project, @NotNull final String lessonId,
+    private static boolean postRecommendationReaction(
+            @NotNull final String lessonId,
             @NotNull final String user, int reaction) {
         final HttpPost post = new HttpPost(EduStepikNames.STEPIK_API_URL + EduStepikNames.RECOMMENDATION_REACTIONS_URL);
         final String json = new Gson()
@@ -210,14 +210,14 @@ public class EduAdaptiveStepikConnector {
         return false;
     }
 
-    public static void addNextRecommendedTask(@NotNull final Project project, int reaction) {
+    static void addNextRecommendedTask(@NotNull final Project project, int reaction) {
         final StudyEditor editor = StudyUtils.getSelectedStudyEditor(project);
         final Course course = StudyTaskManager.getInstance(project).getCourse();
         if (course != null && editor != null && editor.getTaskFile() != null) {
             final StepikUser user = StudyTaskManager.getInstance(project).getUser();
 
             final boolean recommendationReaction =
-                    postRecommendationReaction(project,
+                    postRecommendationReaction(
                             String.valueOf(editor.getTaskFile().getTask().getLesson().getId()),
                             String.valueOf(user.getId()),
                             reaction);
@@ -231,12 +231,7 @@ public class EduAdaptiveStepikConnector {
                         unsolvedTask.setName(task.getName());
                         unsolvedTask.setStepId(task.getStepId());
                         unsolvedTask.setText(task.getText());
-                        unsolvedTask.getTestsText().clear();
                         unsolvedTask.setStatus(StudyStatus.Unchecked);
-                        final Map<String, String> testsText = task.getTestsText();
-                        for (String testName : testsText.keySet()) {
-                            unsolvedTask.addTestsTexts(testName, testsText.get(testName));
-                        }
                         final Map<String, TaskFile> taskFiles = task.getTaskFiles();
                         if (taskFiles.size() == 1) {
                             final TaskFile taskFile = editor.getTaskFile();
@@ -364,16 +359,6 @@ public class EduAdaptiveStepikConnector {
             task.setText(task.getText() + builder);
         }
 
-        if (step.options.test != null) {
-            for (StepikWrappers.TestFileWrapper wrapper : step.options.test) {
-                task.addTestsTexts(wrapper.name, wrapper.text);
-            }
-        } else {
-            if (step.options.samples != null) {
-                createTestFileFromSamples(task, step.options.samples);
-            }
-        }
-
         task.taskFiles = new HashMap<>();      // TODO: it looks like we don't need taskFiles as map anymore
         if (step.options.files != null) {
             for (TaskFile taskFile : step.options.files) {
@@ -404,94 +389,6 @@ public class EduAdaptiveStepikConnector {
     }
 
     @Nullable
-    public static Pair<Boolean, String> checkTask(@NotNull final Project project, @NotNull final Task task) {
-        int attemptId = -1;
-        try {
-            attemptId = getAttemptId(project, task);
-        } catch (IOException e) {
-            logger.warn(e.getMessage());
-        }
-        if (attemptId != -1) {
-            final Editor editor = StudyUtils.getSelectedEditor(project);
-            String language = getLanguageString(task, project);
-            if (editor != null && language != null) {
-                final CloseableHttpClient client = StepikConnectorLogin.getHttpClient();
-                StepikWrappers.ResultSubmissionWrapper wrapper = postResultsForCheck(client,
-                        attemptId,
-                        language,
-                        editor.getDocument().getText());
-
-                final StepikUser user = StudyTaskManager.getInstance(project).getUser();
-                final int id = user.getId();
-                wrapper = getCheckResults(attemptId, id, client, wrapper);
-                if (wrapper.submissions.length == 1) {
-                    final boolean isSolved = !wrapper.submissions[0].status.equals("wrong");
-                    return Pair.create(isSolved, wrapper.submissions[0].hint);
-                } else {
-                    logger.warn("Got a submission wrapper with incorrect submissions number: " + wrapper.submissions.length);
-                }
-            }
-        } else {
-            logger.warn("Got an incorrect attempt id: " + attemptId);
-        }
-        return Pair.create(false, "");
-    }
-
-    @Nullable
-    private static StepikWrappers.ResultSubmissionWrapper postResultsForCheck(
-            @NotNull final CloseableHttpClient client,
-            final int attemptId,
-            @NotNull final String language,
-            @NotNull final String text) {
-        final CloseableHttpResponse response;
-        try {
-            final StepikWrappers.SubmissionToPostWrapper submissionToPostWrapper =
-                    new StepikWrappers.SubmissionToPostWrapper(String.valueOf(attemptId), language, text);
-            final HttpPost httpPost = new HttpPost(EduStepikNames.STEPIK_API_URL + EduStepikNames.SUBMISSIONS);
-            //setHeaders(httpPost, EduStepikNames.CONTENT_TYPE_APPL_JSON);
-            setTimeout(httpPost);
-            try {
-                httpPost.setEntity(new StringEntity(new Gson().toJson(submissionToPostWrapper)));
-            } catch (UnsupportedEncodingException e) {
-                logger.warn(e.getMessage());
-            }
-            response = client.execute(httpPost);
-            return new Gson().fromJson(EntityUtils.toString(response.getEntity()),
-                    StepikWrappers.ResultSubmissionWrapper.class);
-        } catch (IOException e) {
-            logger.warn(e.getMessage());
-        }
-        return null;
-    }
-
-    @NotNull
-    private static StepikWrappers.ResultSubmissionWrapper getCheckResults(
-            int attemptId,
-            int id,
-            CloseableHttpClient client,
-            StepikWrappers.ResultSubmissionWrapper wrapper) {
-        try {
-            while (wrapper.submissions.length == 1 && wrapper.submissions[0].status.equals("evaluation")) {
-                TimeUnit.MILLISECONDS.sleep(500);
-                final URI submissionURI = new URIBuilder(EduStepikNames.STEPIK_API_URL + EduStepikNames.SUBMISSIONS)
-                        .addParameter("attempt", String.valueOf(attemptId))
-                        .addParameter("order", "desc")
-                        .addParameter("user", String.valueOf(id))
-                        .build();
-                final HttpGet httpGet = new HttpGet(submissionURI);
-                //setHeaders(httpGet, EduStepikNames.CONTENT_TYPE_APPL_JSON);
-                setTimeout(httpGet);
-                final CloseableHttpResponse httpResponse = client.execute(httpGet);
-                final String entity = EntityUtils.toString(httpResponse.getEntity());
-                wrapper = new Gson().fromJson(entity, StepikWrappers.ResultSubmissionWrapper.class);
-            }
-        } catch (InterruptedException | IOException | URISyntaxException e) {
-            logger.warn(e.getMessage());
-        }
-        return wrapper;
-    }
-
-    @Nullable
     private static String getLanguageString(@NotNull Task task, @NotNull Project project) {
         final Language pythonLanguage = Language.findLanguageByID("Python");
         if (pythonLanguage != null) {
@@ -509,31 +406,5 @@ public class EduAdaptiveStepikConnector {
             }
         }
         return null;
-    }
-
-    private static int getAttemptId(@NotNull final Project project, @NotNull Task task) throws IOException {
-        final StepikWrappers.AttemptToPostWrapper attemptWrapper = new StepikWrappers.AttemptToPostWrapper(task.getStepId());
-
-        final HttpPost post = new HttpPost(EduStepikNames.STEPIK_API_URL + EduStepikNames.ATTEMPTS);
-        post.setEntity(new StringEntity(new Gson().toJson(attemptWrapper)));
-
-        final CloseableHttpClient client = StepikConnectorLogin.getHttpClient();
-        //setHeaders(post, EduStepikNames.CONTENT_TYPE_APPL_JSON);
-        setTimeout(post);
-        final CloseableHttpResponse httpResponse = client.execute(post);
-        final String entity = EntityUtils.toString(httpResponse.getEntity());
-        final StepikWrappers.AttemptContainer container =
-                new Gson().fromJson(entity, StepikWrappers.AttemptContainer.class);
-        return (container.attempts != null && !container.attempts.isEmpty()) ? container.attempts.get(0).id : -1;
-    }
-
-    private static void createTestFileFromSamples(
-            @NotNull final Task task,
-            @NotNull final List<List<String>> samples) {
-
-        String testText = "from test_helper import check_samples\n\n" +
-                "if __name__ == '__main__':\n" +
-                "    check_samples(samples=" + new GsonBuilder().create().toJson(samples) + ")";
-        task.addTestsTexts("tests.py", testText);
     }
 }

@@ -320,9 +320,6 @@ public class StepikConnectorGet {
     private static void createPyCharmTask(Task task, StepikWrappers.Step step) {
         task.setName(step.options != null ? step.options.title : PYCHARM_PREFIX);
         task.setText(step.text);
-        for (StepikWrappers.TestFileWrapper wrapper : step.options.test) {
-            task.addTestsTexts(wrapper.name, wrapper.text);
-        }
 
         task.taskFiles = new HashMap<>();      // TODO: it looks like we don't need taskFiles as map anymore
         if (step.options.files != null) {

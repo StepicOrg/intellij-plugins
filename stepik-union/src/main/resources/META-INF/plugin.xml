@@ -75,15 +75,6 @@
         <action id="SCore.NewScratchFile" class="com.intellij.ide.scratch.ScratchFileActions$NewFileAction" text="New Scratch File...">
             <add-to-group group-id="FileOpenGroup" relative-to-action="OpenFile" anchor="before"/>
         </action>
-        <action id="SCore.PrevWindowAction" class="com.jetbrains.tmp.learning.actions.StudyPrevWindowAction" text="Previous Answer Placeholder" description="Navigate to the previous answer placeholder"/>
-        <action id="SCore.NextWindow" class="com.jetbrains.tmp.learning.actions.StudyNextWindowAction" text="Next Answer Placeholder" description="Navigate to the next answer holder"/>
-        <action id="SCore.RefreshAnswerPlaceholder" class="com.jetbrains.tmp.learning.actions.StudyRefreshAnswerPlaceholder" text="Refresh Answer Placeholder">
-            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
-        </action>
-        <action id="SCore.ShowHintAction" class="com.jetbrains.tmp.learning.actions.StudyShowHintAction" text="Show Hint for Answer Placeholder" description="Show hint for answer placeholder"/>
-        <action id="SCore.StudyShowAnswersAction" class="com.jetbrains.tmp.learning.actions.StudyFillPlaceholdersAction" text="Fill Answer Placeholders">
-            <add-to-group group-id="HelpMenu" anchor="before" relative-to-action="HelpTopics"/>
-        </action>
         <action id="SCore.StudySwitchPanel" class="com.jetbrains.tmp.learning.actions.StudySwitchTaskPanelAction" text="Switch Task Description Panel">
         </action>
     </actions>
@@ -95,7 +86,6 @@
         <fileEditorProvider implementation="com.jetbrains.tmp.learning.editor.StudyFileEditorProvider"/>
         <highlightErrorFilter implementation="com.jetbrains.tmp.learning.editor.StudyHighlightErrorFilter"/>
         <projectService serviceImplementation="com.jetbrains.tmp.learning.StudyTaskManager"/>
-        <extendWordSelectionHandler implementation="com.jetbrains.tmp.learning.StudyAnswerPlaceholderExtendWordHandler"/>
         <applicationService serviceImplementation="com.jetbrains.tmp.learning.stepik.StepikUpdateSettings"/>
     </extensions>
 

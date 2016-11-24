@@ -9,7 +9,6 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
-import com.intellij.ui.JBColor;
 import com.intellij.util.xmlb.XmlSerializer;
 import com.intellij.util.xmlb.annotations.Transient;
 import com.jetbrains.tmp.learning.courseFormat.*;
@@ -21,7 +20,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.util.*;
 
 /**
  * Implementation of class which contains all the information
@@ -37,7 +35,6 @@ public class StudyTaskManager implements PersistentStateComponent<Element>, Dumb
     public int VERSION = CURRENT_VERSION;
 
     private LangManager langManager = new LangManager();
-    public List<String> myInvisibleFiles = new ArrayList<>();
 
     public boolean myShouldUseJavaFx = StudyUtils.hasJavaFx();
     private StudyToolWindow.StudyToolWindowMode myToolWindowMode = StudyToolWindow.StudyToolWindowMode.TEXT;
@@ -64,25 +61,6 @@ public class StudyTaskManager implements PersistentStateComponent<Element>, Dumb
     @Nullable
     public Course getCourse() {
         return myCourse;
-    }
-
-    public void setStatus(AnswerPlaceholder placeholder, StudyStatus status) {
-        placeholder.setStatus(status);
-    }
-
-    public JBColor getColor(@NotNull final AnswerPlaceholder placeholder) {
-        final StudyStatus status = placeholder.getStatus();
-        if (status == StudyStatus.Solved) {
-            return JBColor.GREEN;
-        }
-        if (status == StudyStatus.Failed) {
-            return JBColor.RED;
-        }
-        return JBColor.BLUE;
-    }
-
-    public boolean hasFailedAnswerPlaceholders(@NotNull final TaskFile taskFile) {
-        return taskFile.getAnswerPlaceholders().size() > 0 && taskFile.hasFailedPlaceholders();
     }
 
     @Nullable
@@ -139,14 +117,6 @@ public class StudyTaskManager implements PersistentStateComponent<Element>, Dumb
         return ServiceManager.getService(project, StudyTaskManager.class);
     }
 
-    public void addInvisibleFiles(String filePath) {
-        myInvisibleFiles.add(filePath);
-    }
-
-    public boolean isInvisibleFile(String path) {
-        return myInvisibleFiles.contains(path);
-    }
-
     public boolean shouldUseJavaFx() {
         return myShouldUseJavaFx;
     }
@@ -184,6 +154,7 @@ public class StudyTaskManager implements PersistentStateComponent<Element>, Dumb
         this.defaultLang = defaultLang;
     }
 
+    @Nullable
     public String getDefaultLang() {
         return defaultLang;
     }

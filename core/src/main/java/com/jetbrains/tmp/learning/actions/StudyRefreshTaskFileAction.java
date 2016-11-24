@@ -24,14 +24,11 @@ import com.jetbrains.tmp.learning.StudyActionListener;
 import com.jetbrains.tmp.learning.StudyState;
 import com.jetbrains.tmp.learning.StudyTaskManager;
 import com.jetbrains.tmp.learning.StudyUtils;
-import com.jetbrains.tmp.learning.core.EduAnswerPlaceholderPainter;
 import com.jetbrains.tmp.learning.core.EduNames;
-import com.jetbrains.tmp.learning.courseFormat.AnswerPlaceholder;
 import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
 import com.jetbrains.tmp.learning.courseFormat.TaskFile;
 import com.jetbrains.tmp.learning.editor.StudyEditor;
-import com.jetbrains.tmp.learning.navigation.StudyNavigator;
 import icons.InteractiveLearningIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -39,8 +36,8 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 
 public class StudyRefreshTaskFileAction extends StudyActionWithShortcut {
-    public static final String ACTION_ID = "SCore.RefreshTaskAction";
-    public static final String SHORTCUT = "ctrl shift pressed X";
+    private static final String ACTION_ID = "SCore.RefreshTaskAction";
+    private static final String SHORTCUT = "ctrl shift pressed X";
     private static final Logger logger = Logger.getInstance(StudyRefreshTaskFileAction.class.getName());
 
     public StudyRefreshTaskFileAction() {
@@ -49,7 +46,7 @@ public class StudyRefreshTaskFileAction extends StudyActionWithShortcut {
                 InteractiveLearningIcons.ResetTaskFile);
     }
 
-    public static void refresh(@NotNull final Project project) {
+    private static void refresh(@NotNull final Project project) {
         ApplicationManager.getApplication().invokeLater(() -> ApplicationManager.getApplication().runWriteAction(() -> {
             StudyEditor studyEditor = StudyUtils.getSelectedStudyEditor(project);
             StudyState studyState = new StudyState(studyEditor);
@@ -70,13 +67,10 @@ public class StudyRefreshTaskFileAction extends StudyActionWithShortcut {
         }
         WolfTheProblemSolver.getInstance(project).clearProblems(studyState.getVirtualFile());
         taskFile.setHighlightErrors(false);
-        StudyUtils.drawAllWindows(editor, taskFile);
-        EduAnswerPlaceholderPainter.createGuardedBlocks(editor, taskFile);
         ApplicationManager.getApplication().invokeLater(
                 () -> IdeFocusManager.getInstance(project).requestFocus(editor.getContentComponent(), true));
 
-        StudyNavigator.navigateToFirstAnswerPlaceholder(editor, taskFile);
-        showBalloon(project, "You can start again now", MessageType.INFO);
+        showBalloon(project, MessageType.INFO);
     }
 
     private static boolean resetTaskFile(
@@ -88,7 +82,6 @@ public class StudyRefreshTaskFileAction extends StudyActionWithShortcut {
             return false;
         }
         taskFile.getTask().setStatus(StudyStatus.Unchecked);
-        resetAnswerPlaceholders(taskFile, project);
         ProjectView.getInstance(project).refresh();
         StudyUtils.updateToolWindows(project);
         return true;
@@ -96,25 +89,15 @@ public class StudyRefreshTaskFileAction extends StudyActionWithShortcut {
 
     private static void showBalloon(
             @NotNull final Project project,
-            String text,
             @NotNull final MessageType messageType) {
         BalloonBuilder balloonBuilder =
-                JBPopupFactory.getInstance().createHtmlTextBalloonBuilder(text, messageType, null);
+                JBPopupFactory.getInstance().createHtmlTextBalloonBuilder("You can start again now", messageType, null);
         final Balloon balloon = balloonBuilder.createBalloon();
         StudyEditor selectedStudyEditor = StudyUtils.getSelectedStudyEditor(project);
         assert selectedStudyEditor != null;
         balloon.show(StudyUtils.computeLocation(selectedStudyEditor.getEditor()), Balloon.Position.above);
         Disposer.register(project, balloon);
     }
-
-    private static void resetAnswerPlaceholders(TaskFile selectedTaskFile, Project project) {
-        final StudyTaskManager taskManager = StudyTaskManager.getInstance(project);
-        for (AnswerPlaceholder answerPlaceholder : selectedTaskFile.getAnswerPlaceholders()) {
-            answerPlaceholder.reset();
-            taskManager.setStatus(answerPlaceholder, StudyStatus.Unchecked);
-        }
-    }
-
 
     private static boolean resetDocument(
             @NotNull final Document document,

@@ -95,9 +95,7 @@ class StepikDirectoryNode extends PsiDirectoryNode {
                     if (file != null) {
                         FileEditorManager.getInstance(myProject).openFile(file, true);
                     }
-                    if (!entry.getValue().getAnswerPlaceholders().isEmpty()) {
-                        child = file;
-                    }
+                    child = file;
                 }
                 if (child != null) {
                     ProjectView.getInstance(myProject).select(child, child, false);

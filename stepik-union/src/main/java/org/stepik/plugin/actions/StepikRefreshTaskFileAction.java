@@ -22,11 +22,9 @@ import com.intellij.problems.WolfTheProblemSolver;
 import com.jetbrains.tmp.learning.StudyState;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.actions.StudyActionWithShortcut;
-import com.jetbrains.tmp.learning.core.EduAnswerPlaceholderPainter;
 import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
 import com.jetbrains.tmp.learning.courseFormat.TaskFile;
 import com.jetbrains.tmp.learning.editor.StudyEditor;
-import com.jetbrains.tmp.learning.navigation.StudyNavigator;
 import icons.InteractiveLearningIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -71,13 +69,9 @@ public class StepikRefreshTaskFileAction extends StudyActionWithShortcut {
         }
         WolfTheProblemSolver.getInstance(project).clearProblems(studyState.getVirtualFile());
         taskFile.setHighlightErrors(false);
-        StudyUtils.drawAllWindows(editor, taskFile);
-        EduAnswerPlaceholderPainter.createGuardedBlocks(editor, taskFile);
         ApplicationManager.getApplication().invokeLater(
                 () -> IdeFocusManager.getInstance(project)
                         .requestFocus(editor.getContentComponent(), true));
-
-        StudyNavigator.navigateToFirstAnswerPlaceholder(editor, taskFile);
         showBalloon(project, MessageType.INFO);
     }
 

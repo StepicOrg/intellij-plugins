@@ -3,11 +3,8 @@ package com.jetbrains.tmp.learning.editor;
 
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.editor.event.EditorFactoryEvent;
 import com.intellij.openapi.editor.event.EditorFactoryListener;
-import com.intellij.openapi.editor.event.EditorMouseAdapter;
-import com.intellij.openapi.editor.event.EditorMouseEvent;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -17,42 +14,13 @@ import com.intellij.problems.WolfTheProblemSolver;
 import com.jetbrains.tmp.learning.StudyTaskManager;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.core.EduDocumentListener;
-import com.jetbrains.tmp.learning.core.EduNames;
-import com.jetbrains.tmp.learning.courseFormat.AnswerPlaceholder;
 import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.TaskFile;
-import com.jetbrains.tmp.learning.navigation.StudyNavigator;
 import com.jetbrains.tmp.learning.ui.StudyToolWindowFactory;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.*;
-
 
 public class StudyEditorFactoryListener implements EditorFactoryListener {
-
-    private static class WindowSelectionListener extends EditorMouseAdapter {
-        private final TaskFile myTaskFile;
-
-        WindowSelectionListener(@NotNull final TaskFile taskFile) {
-            myTaskFile = taskFile;
-        }
-
-        @Override
-        public void mouseClicked(EditorMouseEvent e) {
-            final Editor editor = e.getEditor();
-            final Point point = e.getMouseEvent().getPoint();
-            final LogicalPosition pos = editor.xyToLogicalPosition(point);
-            final AnswerPlaceholder answerPlaceholder = myTaskFile.getAnswerPlaceholder(editor.logicalPositionToOffset(
-                    pos));
-            if (answerPlaceholder == null || answerPlaceholder.getSelected()) {
-                return;
-            }
-            int startOffset = answerPlaceholder.getOffset();
-            editor.getSelectionModel().setSelection(startOffset, startOffset + answerPlaceholder.getRealLength());
-            answerPlaceholder.setSelected(true);
-        }
-    }
-
     @Override
     public void editorCreated(@NotNull final EditorFactoryEvent event) {
         final Editor editor = event.getEditor();
@@ -60,7 +28,6 @@ public class StudyEditorFactoryListener implements EditorFactoryListener {
         if (project == null) {
             return;
         }
-
 
         final Document document = editor.getDocument();
         final VirtualFile openedFile = FileDocumentManager.getInstance().getFile(document);
@@ -79,16 +46,7 @@ public class StudyEditorFactoryListener implements EditorFactoryListener {
                     return;
                 }
 
-                StudyEditor.addDocumentListener(document, new EduDocumentListener(taskFile, true));
-
-                if (!taskFile.getAnswerPlaceholders().isEmpty()) {
-                    StudyNavigator.navigateToFirstAnswerPlaceholder(editor, taskFile);
-                    boolean isStudyProject = EduNames.STUDY.equals(course.getCourseMode());
-                    StudyUtils.drawAllWindows(editor, taskFile);
-                    if (isStudyProject) {
-                        editor.addEditorMouseListener(new WindowSelectionListener(taskFile));
-                    }
-                }
+                StudyEditor.addDocumentListener(document, new EduDocumentListener(taskFile));
             }
         }
     }

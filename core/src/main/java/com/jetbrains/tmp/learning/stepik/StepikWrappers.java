@@ -21,7 +21,6 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.core.EduUtils;
 import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.Lesson;
@@ -33,10 +32,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class StepikWrappers {
     private static final Logger logger = Logger.getInstance(StepOptions.class);
@@ -84,7 +81,6 @@ public class StepikWrappers {
 
         public static StepOptions fromTask(final Project project, @NotNull final Task task) {
             final StepOptions source = new StepOptions();
-            setTests(task, source, project);
             source.files = new ArrayList<>();
             source.title = task.getName();
             for (final Map.Entry<String, TaskFile> entry : task.getTaskFiles().entrySet()) {
@@ -117,25 +113,6 @@ public class StepikWrappers {
                 source.files.add(taskFile);
             }
             return source;
-        }
-
-        private static void setTests(
-                @NotNull final Task task,
-                @NotNull final StepOptions source,
-                @NotNull final Project project) {
-            final Map<String, String> testsText = task.getTestsText();
-            if (testsText.isEmpty()) {
-                ApplicationManager.getApplication().runReadAction(() -> {
-                    source.test = Collections.singletonList(new TestFileWrapper(EduNames.TESTS_FILE,
-                            task.getTestsText(project)));
-                });
-            } else {
-                source.test = new ArrayList<>();
-                source.test.addAll(testsText.entrySet()
-                        .stream()
-                        .map(entry -> new TestFileWrapper(entry.getKey(), entry.getValue()))
-                        .collect(Collectors.toList()));
-            }
         }
     }
 

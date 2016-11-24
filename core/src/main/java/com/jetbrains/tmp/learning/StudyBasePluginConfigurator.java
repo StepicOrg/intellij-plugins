@@ -27,7 +27,6 @@ public abstract class StudyBasePluginConfigurator implements StudyPluginConfigur
     public static DefaultActionGroup getDefaultActionGroup() {
         final DefaultActionGroup group = new DefaultActionGroup();
         group.add(new StudyRefreshTaskFileAction());
-        group.add(new StudyShowHintAction());
         return group;
     }
 
