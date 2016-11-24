@@ -33,7 +33,6 @@ import com.intellij.util.ObjectUtils;
 import com.intellij.util.TimeoutUtil;
 import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.text.MarkdownUtil;
-import com.intellij.util.ui.UIUtil;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.core.EduUtils;
 import com.jetbrains.tmp.learning.courseFormat.Course;
@@ -52,12 +51,9 @@ import org.stepik.core.utils.ProjectFilesUtils;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -105,10 +101,6 @@ public class StudyUtils {
         }
     }
 
-    public static boolean isZip(String fileName) {
-        return fileName.contains(".zip");
-    }
-
     @Nullable
     public static <T> T getFirst(@NotNull final Iterable<T> container) {
         Iterator<T> iterator = container.iterator();
@@ -121,33 +113,6 @@ public class StudyUtils {
     static boolean indexIsValid(int index, @NotNull final Collection collection) {
         int size = collection.size();
         return index >= 0 && index < size;
-    }
-
-    @SuppressWarnings("IOResourceOpenedButNotSafelyClosed")
-    @Nullable
-    static String getFileText(
-            @Nullable final String parentDir, @NotNull final String fileName, boolean wrapHTML,
-            @NotNull final String encoding) {
-        final File inputFile = parentDir != null ? new File(parentDir, fileName) : new File(fileName);
-        if (!inputFile.exists()) return null;
-        final StringBuilder taskText = new StringBuilder();
-        BufferedReader reader = null;
-        try {
-            reader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), encoding));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                taskText.append(line).append("\n");
-                if (wrapHTML) {
-                    taskText.append("<br>");
-                }
-            }
-            return wrapHTML ? UIUtil.toHtml(taskText.toString()) : taskText.toString();
-        } catch (IOException e) {
-            logger.info("Failed to get file text from file " + fileName, e);
-        } finally {
-            closeSilently(reader);
-        }
-        return null;
     }
 
     public static void updateAction(@NotNull final AnActionEvent e) {
