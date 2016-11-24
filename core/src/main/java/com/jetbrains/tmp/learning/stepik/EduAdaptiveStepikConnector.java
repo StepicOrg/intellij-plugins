@@ -4,11 +4,9 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.intellij.ide.projectView.ProjectView;
-import com.intellij.lang.Language;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.popup.Balloon;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
@@ -19,7 +17,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.jetbrains.tmp.learning.StudyTaskManager;
 import com.jetbrains.tmp.learning.StudyUtils;
-import com.jetbrains.tmp.learning.checker.StudyExecutor;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.Lesson;
@@ -50,7 +47,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static com.jetbrains.tmp.learning.stepik.StepikConnectorGet.getFromStepik;
@@ -98,7 +94,7 @@ class EduAdaptiveStepikConnector {
                         for (int stepId : realLesson.steps) {
                             final StepikWrappers.Step step = StepikConnectorGet.getStep(stepId);
                             if (step.name.equals("code")) {
-                                return getTaskFromStep(project, stepId, step, realLesson.getName());
+                                return getTaskFromStep(stepId, step, realLesson.getName());
                             }
                         }
 
@@ -328,7 +324,6 @@ class EduAdaptiveStepikConnector {
 
     @NotNull
     private static Task getTaskFromStep(
-            Project project,
             int lessonID,
             @NotNull final StepikWrappers.Step step, @NotNull String name) {
         final Task task = new Task();
@@ -367,44 +362,8 @@ class EduAdaptiveStepikConnector {
         } else {
             final TaskFile taskFile = new TaskFile();
             taskFile.name = "code";
-            final String templateForTask = getCodeTemplateForTask(step.options.codeTemplates, task, project);
-            taskFile.text = templateForTask == null ? "# write your answer here \n" : templateForTask;
             task.taskFiles.put("code.py", taskFile);
         }
         return task;
-    }
-
-    private static String getCodeTemplateForTask(
-            @Nullable StepikWrappers.CodeTemplatesWrapper codeTemplates,
-            @NotNull final Task task, @NotNull final Project project) {
-
-        if (codeTemplates != null) {
-            final String languageString = getLanguageString(task, project);
-            if (languageString != null) {
-                return codeTemplates.getTemplateForLanguage(languageString);
-            }
-        }
-
-        return null;
-    }
-
-    @Nullable
-    private static String getLanguageString(@NotNull Task task, @NotNull Project project) {
-        final Language pythonLanguage = Language.findLanguageByID("Python");
-        if (pythonLanguage != null) {
-            final Sdk language = StudyExecutor.INSTANCE.forLanguage(pythonLanguage).findSdk(project);
-            if (language != null) {
-                final String versionString = language.getVersionString();
-                if (versionString != null) {
-                    final List<String> versionStringParts = StringUtil.split(versionString, " ");
-                    if (versionStringParts.size() == 2) {
-                        return versionStringParts.get(1).startsWith("2") ? PYTHON27 : PYTHON3;
-                    }
-                }
-            } else {
-                StudyUtils.showNoSdkNotification(task, project);
-            }
-        }
-        return null;
     }
 }

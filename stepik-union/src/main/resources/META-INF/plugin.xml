@@ -57,9 +57,6 @@
     </application-components>
 
     <extensionPoints>
-        <extensionPoint qualifiedName="SCore.StudyExecutor" beanClass="com.intellij.lang.LanguageExtensionPoint">
-            <with attribute="implementationClass" implements="com.jetbrains.tmp.learning.checker.StudyExecutor"/>
-        </extensionPoint>
         <extensionPoint qualifiedName="SCore.StudyLanguageManager" beanClass="com.intellij.lang.LanguageExtensionPoint">
             <with attribute="implementationClass" implements="com.jetbrains.tmp.learning.StudyLanguageManager"/>
         </extensionPoint>

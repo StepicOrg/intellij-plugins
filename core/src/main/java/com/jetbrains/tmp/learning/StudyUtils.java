@@ -35,7 +35,6 @@ import com.intellij.util.TimeoutUtil;
 import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.text.MarkdownUtil;
 import com.intellij.util.ui.UIUtil;
-import com.jetbrains.tmp.learning.checker.StudyExecutor;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.core.EduUtils;
 import com.jetbrains.tmp.learning.courseFormat.Course;
@@ -201,11 +200,6 @@ public class StudyUtils {
             }
         }
         return null;
-    }
-
-    public static void showNoSdkNotification(@NotNull final Task currentTask, @NotNull final Project project) {
-        final Language language = currentTask.getLesson().getSection().getCourse().getLanguageById();
-        StudyExecutor.INSTANCE.forLanguage(language).showNoSdkNotification(project);
     }
 
     /**
@@ -457,10 +451,6 @@ public class StudyUtils {
     public static Task getCurrentTask(@NotNull final Project project) {
         final TaskFile taskFile = getSelectedTaskFile(project);
         return taskFile != null ? taskFile.getTask() : null;
-    }
-
-    public static boolean isStudyProject(@NotNull Project project) {
-        return StudyTaskManager.getInstance(project).getCourse() != null;
     }
 
     @Nullable
