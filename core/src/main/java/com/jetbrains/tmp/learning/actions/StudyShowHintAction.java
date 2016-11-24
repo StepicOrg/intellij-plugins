@@ -20,7 +20,6 @@ import com.jetbrains.tmp.learning.StudyTaskManager;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.courseFormat.AnswerPlaceholder;
 import com.jetbrains.tmp.learning.courseFormat.Course;
-import com.jetbrains.tmp.learning.statistics.EduUsagesCollector;
 import com.jetbrains.tmp.learning.ui.StudyHint;
 import com.jetbrains.tmp.learning.ui.StudyToolWindow;
 import icons.InteractiveLearningIcons;
@@ -67,7 +66,6 @@ public class StudyShowHintAction extends StudyActionWithShortcut {
         if (file == null) {
             return;
         }
-        EduUsagesCollector.hintShown();
         LinkedList<String> hints = new LinkedList<>();
         if (answerPlaceholder != null) {
             hints.addAll(answerPlaceholder.getHints());

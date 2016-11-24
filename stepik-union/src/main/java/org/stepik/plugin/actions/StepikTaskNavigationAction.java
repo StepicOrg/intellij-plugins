@@ -13,7 +13,6 @@ import com.jetbrains.tmp.learning.actions.StudyTaskNavigationAction;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.courseFormat.TaskFile;
-import com.jetbrains.tmp.learning.statistics.EduUsagesCollector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -61,8 +60,6 @@ public abstract class StepikTaskNavigationAction extends StudyTaskNavigationActi
             ProjectView.getInstance(project).select(taskDir, taskDir, false);
             return;
         }
-
-        EduUsagesCollector.taskNavigation();
         VirtualFile shouldBeActive = getFileToActivate(project, nextTaskFiles, taskDir);
 
         updateProjectView(project, shouldBeActive);

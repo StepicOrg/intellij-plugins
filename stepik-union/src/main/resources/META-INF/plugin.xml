@@ -100,8 +100,6 @@
         <highlightErrorFilter implementation="com.jetbrains.tmp.learning.editor.StudyHighlightErrorFilter"/>
         <projectService serviceImplementation="com.jetbrains.tmp.learning.StudyTaskManager"/>
         <extendWordSelectionHandler implementation="com.jetbrains.tmp.learning.StudyAnswerPlaceholderExtendWordHandler"/>
-        <statistics.usagesCollector implementation="com.jetbrains.tmp.learning.statistics.EduUsagesCollector"/>
-        <applicationService serviceImplementation="com.jetbrains.tmp.learning.statistics.EduUsagesCollector"/>
         <applicationService serviceImplementation="com.jetbrains.tmp.learning.stepik.StepikUpdateSettings"/>
     </extensions>
 

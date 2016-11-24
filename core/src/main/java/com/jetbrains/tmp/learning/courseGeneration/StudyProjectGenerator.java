@@ -33,7 +33,6 @@ import com.jetbrains.tmp.learning.courseFormat.Lesson;
 import com.jetbrains.tmp.learning.courseFormat.Section;
 import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.courseFormat.TaskFile;
-import com.jetbrains.tmp.learning.statistics.EduUsagesCollector;
 import com.jetbrains.tmp.learning.stepik.CourseInfo;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorGet;
 import com.jetbrains.tmp.learning.stepik.StepikUser;
@@ -107,7 +106,6 @@ public class StudyProjectGenerator {
             VirtualFileManager.getInstance().refreshWithoutFileWatcher(true);
             StudyProjectComponent.getInstance(project).registerStudyToolWindow(course);
             openFirstTask(course, project);
-            EduUsagesCollector.projectTypeCreated(course.isAdaptive() ? EduNames.ADAPTIVE : EduNames.STUDY);
         });
     }
 

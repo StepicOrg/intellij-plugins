@@ -33,7 +33,6 @@ import com.jetbrains.tmp.learning.courseFormat.Lesson;
 import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.courseFormat.TaskFile;
 import com.jetbrains.tmp.learning.editor.StudyEditorFactoryListener;
-import com.jetbrains.tmp.learning.statistics.EduUsagesCollector;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import com.jetbrains.tmp.learning.ui.StudyToolWindow;
 import com.jetbrains.tmp.learning.ui.StudyToolWindowFactory;
@@ -81,9 +80,6 @@ public class StudyProjectComponent implements ProjectComponent {
                                 UISettings.getInstance().fireUISettingsChanged();
                                 logger.info("register Shortcuts");
                                 registerShortcuts();
-                                EduUsagesCollector.projectTypeOpened(course.isAdaptive() ?
-                                        EduNames.ADAPTIVE :
-                                        EduNames.STUDY);
                                 StepikConnectorLogin.loginFromDialog(myProject);
                             }
                         }));
