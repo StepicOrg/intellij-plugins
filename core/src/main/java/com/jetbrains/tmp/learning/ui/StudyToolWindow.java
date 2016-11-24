@@ -187,18 +187,10 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
         StudyPluginConfigurator configurator = StudyUtils.getConfigurator(project);
         if (configurator != null) {
             group.addAll(configurator.getActionGroup(project));
-            addAdditionalActions(group);
             return group;
         } else {
             logger.warn("No configurator is provided for plugin");
             return StudyBasePluginConfigurator.getDefaultActionGroup();
-        }
-    }
-
-    private static void addAdditionalActions(DefaultActionGroup group) {
-        StudyActionsProvider[] providers = Extensions.getExtensions(StudyActionsProvider.EP_NAME);
-        for (StudyActionsProvider provider : providers) {
-            group.addAll(provider.getActions());
         }
     }
 

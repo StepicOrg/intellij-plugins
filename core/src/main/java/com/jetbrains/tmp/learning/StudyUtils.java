@@ -221,15 +221,6 @@ public class StudyUtils {
         return new RelativePoint(editor.getComponent(), point);
     }
 
-    /**
-     * returns language manager which contains all the information about language specific file names
-     */
-    @Nullable
-    static StudyLanguageManager getLanguageManager(@NotNull final Course course) {
-        Language language = course.getLanguageById();
-        return language == null ? null : StudyLanguageManager.INSTANCE.forLanguage(language);
-    }
-
     @Nullable
     public static TaskFile getTaskFile(@NotNull final Project project, @NotNull final VirtualFile file) {
         final Course course = StudyTaskManager.getInstance(project).getCourse();

@@ -139,35 +139,20 @@ public class StudyProjectComponent implements ProjectComponent {
         if (!resourceDirectory.exists()) {
             return;
         }
-        StudyLanguageManager manager = StudyUtils.getLanguageManager(course);
-        if (manager == null) {
-            logger.info("Study Language Manager is null for " + course.getLanguageById().getDisplayName());
-            return;
-        }
         final File[] files = resourceDirectory.listFiles();
         if (files == null) return;
         for (File file : files) {
-            String testHelper = manager.getTestHelperFileName();
-            if (file.getName().equals(testHelper)) {
-                copyFile(file, new File(myProject.getBasePath(), testHelper));
-            }
             if (file.getName().startsWith(EduNames.LESSON)) {
                 final File[] tasks = file.listFiles();
                 if (tasks == null) continue;
                 for (File task : tasks) {
                     final File taskDescrFrom = StudyUtils.createTaskDescriptionFile(task);
                     if (taskDescrFrom != null) {
-                        String testFileName = manager.getTestFileName();
-                        final File taskTests = new File(task, testFileName);
                         final File taskDescrTo =
                                 StudyUtils.createTaskDescriptionFile(new File(new File(myProject.getBasePath(),
                                         file.getName()), task.getName()));
                         if (taskDescrTo != null) {
                             copyFile(taskDescrFrom, taskDescrTo);
-                            copyFile(taskTests,
-                                    new File(new File(new File(myProject.getBasePath(), file.getName()),
-                                            task.getName()),
-                                            testFileName));
                         }
                     }
                 }
