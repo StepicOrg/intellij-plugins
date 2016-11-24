@@ -14,7 +14,6 @@ public class TaskFile {
     public String name;
     @Expose
     public String text;
-    private boolean myUserCreated = false;
     @Transient
     private Task myTask;
 
@@ -32,13 +31,5 @@ public class TaskFile {
 
     public static void copy(@NotNull final TaskFile source, @NotNull final TaskFile target) {
         target.name = source.name;
-    }
-
-    public void setUserCreated(boolean userCreated) {
-        myUserCreated = userCreated;
-    }
-
-    public boolean isUserCreated() {
-        return myUserCreated;
     }
 }

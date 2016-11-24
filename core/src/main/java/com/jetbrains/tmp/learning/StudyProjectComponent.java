@@ -294,7 +294,6 @@ public class StudyProjectComponent implements ProjectComponent {
                         final Task task = tasks.get(taskIndex);
                         final TaskFile taskFile = new TaskFile();
                         taskFile.initTaskFile(task);
-                        taskFile.setUserCreated(true);
                         final String name = createdFile.getName();
                         taskFile.name = name;
                         task.getTaskFiles().put(name, taskFile);
