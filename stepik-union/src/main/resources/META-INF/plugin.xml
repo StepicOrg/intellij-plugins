@@ -66,9 +66,6 @@
         <extensionPoint qualifiedName="SCore.studyPluginConfigurator" interface="com.jetbrains.tmp.learning.StudyPluginConfigurator"/>
         <extensionPoint qualifiedName="SCore.studyActionsProvider" interface="com.jetbrains.tmp.learning.StudyActionsProvider"/>
         <extensionPoint qualifiedName="SCore.studyActionListener" interface="com.jetbrains.tmp.learning.StudyActionListener"/>
-        <extensionPoint qualifiedName="SCore.optionsProvider" beanClass="com.jetbrains.tmp.learning.settings.StudyOptionsProviderEP">>
-            <with attribute="instance" implements="com.jetbrains.tmp.learning.settings.StudyOptionsProvider"/>
-        </extensionPoint>
     </extensionPoints>
 
     <actions>
@@ -81,16 +78,10 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <projectService serviceInterface="com.intellij.codeInsight.documentation.DocumentationManager" serviceImplementation="com.jetbrains.tmp.learning.StudyDocumentationManager" overrides="true"/>
-        <applicationConfigurable groupId="tools" instance="com.jetbrains.tmp.learning.settings.StudyConfigurable" id="com.jetbrains.tmp.learning.settings.StudyConfigurable" displayName="Education"/>
         <toolWindow id="Task Description" anchor="right" factoryClass="com.jetbrains.tmp.learning.ui.StudyToolWindowFactory" conditionClass="com.jetbrains.tmp.learning.ui.StudyCondition"/>
         <fileEditorProvider implementation="com.jetbrains.tmp.learning.editor.StudyFileEditorProvider"/>
         <highlightErrorFilter implementation="com.jetbrains.tmp.learning.editor.StudyHighlightErrorFilter"/>
         <projectService serviceImplementation="com.jetbrains.tmp.learning.StudyTaskManager"/>
         <applicationService serviceImplementation="com.jetbrains.tmp.learning.stepik.StepikUpdateSettings"/>
     </extensions>
-
-    <extensions defaultExtensionNs="SCore">
-        <optionsProvider instance="com.jetbrains.tmp.learning.stepik.StepikStudyOptions"/>
-    </extensions>
-
 </idea-plugin>
