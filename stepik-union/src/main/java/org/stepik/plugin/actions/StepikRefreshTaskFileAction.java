@@ -9,7 +9,6 @@ import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.extensions.Extensions;
 import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.MessageType;
@@ -20,14 +19,10 @@ import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.problems.WolfTheProblemSolver;
-import com.jetbrains.tmp.learning.StudyActionListener;
 import com.jetbrains.tmp.learning.StudyState;
-import com.jetbrains.tmp.learning.StudyTaskManager;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.actions.StudyActionWithShortcut;
 import com.jetbrains.tmp.learning.core.EduAnswerPlaceholderPainter;
-import com.jetbrains.tmp.learning.core.EduNames;
-import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
 import com.jetbrains.tmp.learning.courseFormat.TaskFile;
 import com.jetbrains.tmp.learning.editor.StudyEditor;
@@ -50,7 +45,7 @@ public class StepikRefreshTaskFileAction extends StudyActionWithShortcut {
                 "Refresh current task", InteractiveLearningIcons.ResetTaskFile);
     }
 
-    public static void refresh(@NotNull final Project project) {
+    private static void refresh(@NotNull final Project project) {
         ApplicationManager.getApplication()
                 .invokeLater(() -> ApplicationManager.getApplication().runWriteAction(() -> {
                     StudyEditor studyEditor = StudyUtils.getSelectedStudyEditor(project);
@@ -83,7 +78,7 @@ public class StepikRefreshTaskFileAction extends StudyActionWithShortcut {
                         .requestFocus(editor.getContentComponent(), true));
 
         StudyNavigator.navigateToFirstAnswerPlaceholder(editor, taskFile);
-        showBalloon(project, "You can start again now", MessageType.INFO);
+        showBalloon(project, MessageType.INFO);
     }
 
     private static boolean resetTaskFile(
@@ -101,10 +96,10 @@ public class StepikRefreshTaskFileAction extends StudyActionWithShortcut {
     }
 
     private static void showBalloon(
-            @NotNull final Project project, String text,
+            @NotNull final Project project,
             @NotNull final MessageType messageType) {
         BalloonBuilder balloonBuilder = JBPopupFactory.getInstance()
-                .createHtmlTextBalloonBuilder(text, messageType, null);
+                .createHtmlTextBalloonBuilder("You can start again now", messageType, null);
         final Balloon balloon = balloonBuilder.createBalloon();
         StudyEditor selectedStudyEditor = StudyUtils.getSelectedStudyEditor(project);
         assert selectedStudyEditor != null;
@@ -138,9 +133,7 @@ public class StepikRefreshTaskFileAction extends StudyActionWithShortcut {
         if (project == null) {
             return;
         }
-        for (StudyActionListener listener : Extensions.getExtensions(StudyActionListener.EP_NAME)) {
-            listener.beforeCheck(event);
-        }
+
         refresh(project);
     }
 
@@ -156,21 +149,8 @@ public class StepikRefreshTaskFileAction extends StudyActionWithShortcut {
         StudyEditor studyEditor = StudyUtils.getSelectedStudyEditor(project);
         StudyState studyState = new StudyState(studyEditor);
         Presentation presentation = event.getPresentation();
-        if (!studyState.isValid()) {
-            presentation.setEnabled(false);
-            return;
-        }
 
-        Course course = StudyTaskManager.getInstance(project).getCourse();
-        if (course == null) {
-            return;
-        }
-
-        presentation.setVisible(true);
-        String courseMode = course.getCourseMode();
-        if (!(EduNames.STEPIK_CODE.equals(courseMode))) {
-            presentation.setEnabled(false);
-        }
+        presentation.setEnabled(studyState.isValid());
     }
 
     @NotNull

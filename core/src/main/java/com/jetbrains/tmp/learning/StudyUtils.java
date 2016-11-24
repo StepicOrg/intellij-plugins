@@ -5,8 +5,6 @@ import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.process.ProcessHandler;
 import com.intellij.lang.Language;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.CommonDataKeys;
-import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
@@ -36,9 +34,6 @@ import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
-import com.intellij.psi.PsiDirectory;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.awt.RelativePoint;
 import com.intellij.ui.content.Content;
@@ -48,7 +43,6 @@ import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.text.MarkdownUtil;
 import com.intellij.util.ui.UIUtil;
 import com.jetbrains.tmp.learning.checker.StudyExecutor;
-import com.jetbrains.tmp.learning.checker.StudyTestRunner;
 import com.jetbrains.tmp.learning.core.EduAnswerPlaceholderDeleteHandler;
 import com.jetbrains.tmp.learning.core.EduAnswerPlaceholderPainter;
 import com.jetbrains.tmp.learning.core.EduNames;
@@ -63,8 +57,10 @@ import com.jetbrains.tmp.learning.editor.StudyEditor;
 import com.jetbrains.tmp.learning.ui.StudyToolWindow;
 import com.jetbrains.tmp.learning.ui.StudyToolWindowFactory;
 import com.petebevin.markdown.MarkdownProcessor;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.core.utils.ProjectFilesUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -76,6 +72,8 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class StudyUtils {
     private StudyUtils() {
@@ -118,6 +116,7 @@ public class StudyUtils {
         return fileName.contains(".zip");
     }
 
+    @Nullable
     public static <T> T getFirst(@NotNull final Iterable<T> container) {
         Iterator<T> iterator = container.iterator();
         if (!iterator.hasNext()) {
@@ -238,12 +237,6 @@ public class StudyUtils {
         return StudyExecutor.INSTANCE.forLanguage(language).findSdk(project);
     }
 
-    @NotNull
-    public static StudyTestRunner getTestRunner(@NotNull final Task task, @NotNull final VirtualFile taskDir) {
-        final Language language = task.getLesson().getSection().getCourse().getLanguageById();
-        return StudyExecutor.INSTANCE.forLanguage(language).getTestRunner(task, taskDir);
-    }
-
     public static RunContentExecutor getExecutor(
             @NotNull final Project project, @NotNull final Task currentTask,
             @NotNull final ProcessHandler handler) {
@@ -267,7 +260,6 @@ public class StudyUtils {
         StudyExecutor.INSTANCE.forLanguage(language).showNoSdkNotification(project);
     }
 
-
     /**
      * shows pop up in the center of "check task" button in study editor
      */
@@ -287,12 +279,11 @@ public class StudyUtils {
         return new RelativePoint(editor.getComponent(), point);
     }
 
-
     /**
      * returns language manager which contains all the information about language specific file names
      */
     @Nullable
-    public static StudyLanguageManager getLanguageManager(@NotNull final Course course) {
+    static StudyLanguageManager getLanguageManager(@NotNull final Course course) {
         Language language = course.getLanguageById();
         return language == null ? null : StudyLanguageManager.INSTANCE.forLanguage(language);
     }
@@ -303,10 +294,8 @@ public class StudyUtils {
             return false;
         }
         StudyLanguageManager manager = getLanguageManager(course);
-        if (manager == null) {
-            return false;
-        }
-        return manager.getTestFileName().equals(name);
+
+        return manager != null && manager.getTestFileName().equals(name);
     }
 
     @Nullable
@@ -397,9 +386,8 @@ public class StudyUtils {
         }
     }
 
-
     @Nullable
-    public static VirtualFile getPatternFile(@NotNull TaskFile taskFile, String name) {
+    private static VirtualFile getPatternFile(@NotNull TaskFile taskFile, String name) {
         Task task = taskFile.getTask();
         Course course = task.getLesson().getSection().getCourse();
         File resourceFile = new File(course.getCourseDirectory());
@@ -424,58 +412,9 @@ public class StudyUtils {
         return FileDocumentManager.getInstance().getDocument(patternFile);
     }
 
-    public static boolean isRenameableOrMoveable(
-            @NotNull final Project project,
-            @NotNull final Course course,
-            @NotNull final PsiElement element) {
-        if (element instanceof PsiFile) {
-            VirtualFile virtualFile = ((PsiFile) element).getVirtualFile();
-            if (project.getBaseDir().equals(virtualFile.getParent())) {
-                return false;
-            }
-            TaskFile file = getTaskFile(project, virtualFile);
-            if (file != null) {
-                return false;
-            }
-            String name = virtualFile.getName();
-            return !isTestsFile(project, name) && !isTaskDescriptionFile(name);
-        }
-        if (element instanceof PsiDirectory) {
-            VirtualFile virtualFile = ((PsiDirectory) element).getVirtualFile();
-            VirtualFile parent = virtualFile.getParent();
-            if (parent == null) {
-                return true;
-            }
-            if (project.getBaseDir().equals(parent)) {
-                return false;
-            }
-            Lesson lesson = course.getLessonByDirName(parent.getName());
-            if (lesson != null) {
-                Task task = lesson.getTask(virtualFile.getName());
-                if (task != null) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    public static boolean canRenameOrMove(DataContext dataContext) {
-        Project project = CommonDataKeys.PROJECT.getData(dataContext);
-        PsiElement element = CommonDataKeys.PSI_ELEMENT.getData(dataContext);
-        if (element == null || project == null) {
-            return false;
-        }
-        Course course = StudyTaskManager.getInstance(project).getCourse();
-        if (course == null || !EduNames.STUDY.equals(course.getCourseMode())) {
-            return false;
-        }
-
-        return !isRenameableOrMoveable(project, course, element);
-    }
-
     @Nullable
-    public static String getTaskTextFromTask(@Nullable final VirtualFile taskDirectory, @Nullable final Task task) {
+    @Contract("_, null -> null")
+    static String getTaskTextFromTask(@Nullable final VirtualFile taskDirectory, @Nullable final Task task) {
         if (task == null) {
             return null;
         }
@@ -549,28 +488,34 @@ public class StudyUtils {
         return null;
     }
 
-//  @Nullable
-//  public static StudyTwitterPluginConfigurator getTwitterConfigurator(@NotNull final Project project) {
-//    StudyTwitterPluginConfigurator[] extensions = StudyTwitterPluginConfigurator.EP_NAME.getExtensions();
-//    for (StudyTwitterPluginConfigurator extension: extensions) {
-//      if (extension.accept(project)) {
-//        return extension;
-//      }
-//    }
-//    return null;
-//  }
-
     @Nullable
     public static String getTaskText(@NotNull final Project project) {
-        TaskFile taskFile = getSelectedTaskFile(project);
-        if (taskFile == null) {
-            return EMPTY_TASK_TEXT;
-        }
-        final Task task = taskFile.getTask();
+        final Task task = getSelectedTask(project);
         if (task != null) {
             return getTaskTextFromTask(task.getTaskDir(project), task);
         }
-        return null;
+        return EMPTY_TASK_TEXT;
+    }
+
+    private static String getRelativePath(@NotNull Project project, @NotNull VirtualFile item) {
+        String path = item.getPath();
+        String basePath = project.getBasePath();
+
+        if (basePath == null) {
+            return path;
+        }
+
+        return ProjectFilesUtils.getRelativePath(basePath, path);
+    }
+
+    @Nullable
+    public static Task getSelectedTask(@NotNull Project project) {
+        VirtualFile[] files = FileEditorManager.getInstance(project).getSelectedFiles();
+        if (files.length == 0) {
+            return null;
+        }
+
+        return getTask(project, files[0]);
     }
 
     @Nullable
@@ -635,35 +580,25 @@ public class StudyUtils {
         }
     }
 
-    @Nullable
-    public static Task getTask(@NotNull Project project, @NotNull VirtualFile taskVF) {
-        Course course = StudyTaskManager.getInstance(project).getCourse();
-        if (course == null) {
-            return null;
-        }
-        VirtualFile lessonVF = taskVF.getParent();
-        if (lessonVF == null) {
-            return null;
-        }
-        Lesson lesson = course.getLessonByDirName(lessonVF.getName());
-        if (lesson == null) {
-            return null;
-        }
-        return lesson.getTask(taskVF.getName());
-    }
+    private static Pattern taskPathPattern;
 
     @Nullable
-    public static VirtualFile getTaskDir(@NotNull VirtualFile taskFile) {
-        VirtualFile parent = taskFile.getParent();
-        if (parent == null) {
-            return null;
+    public static Task getTask(@NotNull Project project, @NotNull VirtualFile taskVF) {
+        String path = getRelativePath(project, taskVF);
+        if (taskPathPattern == null) {
+            taskPathPattern = Pattern.compile("^(section[0-9]+)/(lesson[0-9]+)/(task[0-9]+)/src/.*");
         }
-        String name = parent.getName();
-        if (name.contains(EduNames.TASK)) {
-            return parent;
-        }
-        if (EduNames.SRC.equals(name)) {
-            return parent.getParent();
+        Matcher matcher = taskPathPattern.matcher(path);
+        if (matcher.matches()) {
+            Course course = StudyTaskManager.getInstance(project).getCourse();
+            if (course == null) {
+                return null;
+            }
+            Lesson lesson = course.getLessonByDirName(matcher.group(2));
+            if (lesson == null) {
+                return null;
+            }
+            return lesson.getTask(matcher.group(3));
         }
         return null;
     }
@@ -714,13 +649,8 @@ public class StudyUtils {
         return ObjectUtils.chooseNotNull(parent.findChild(EduNames.TASK_HTML), parent.findChild(EduNames.TASK_MD));
     }
 
-    @NotNull
-    public static String getTaskDescriptionFileName(final boolean useHtml) {
-        return useHtml ? EduNames.TASK_HTML : EduNames.TASK_MD;
-    }
-
     @Nullable
-    public static File createTaskDescriptionFile(@NotNull final File parent) {
+    static File createTaskDescriptionFile(@NotNull final File parent) {
         if (new File(parent, EduNames.TASK_HTML).exists()) {
             return new File(parent, EduNames.TASK_HTML);
         } else {

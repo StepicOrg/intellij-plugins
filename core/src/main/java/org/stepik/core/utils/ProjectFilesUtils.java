@@ -1,11 +1,6 @@
-package org.stepik.plugin.utils;
+package org.stepik.core.utils;
 
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
-import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFileSystemItem;
-import com.jetbrains.tmp.learning.StudyTaskManager;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.Lesson;
@@ -30,65 +25,11 @@ public class ProjectFilesUtils {
     private static final String COURSE_DIRECTORIES = "\\.|" + SECTION_EXPR + "|" + LESSON_PATH_EXPR + "|" + TASK_PATH_EXPR + "|" + SRC_PATH_EXPR;
     private static final String HIDE_PATH_EXPR = SRC_PATH_EXPR + SEPARATOR + EduNames.HIDE;
 
-    @Nullable
-    public static PsiFileSystemItem getFile(@NotNull PsiElement target) {
-        PsiFileSystemItem item;
-        if (target instanceof PsiFileSystemItem) {
-            item = (PsiFileSystemItem) target;
-        } else {
-            item = target.getContainingFile();
-        }
-        return item;
-    }
-
-    public static boolean isCanNotBeTarget(@Nullable PsiElement target) {
-        if (target == null) {
-            return false;
-        }
-
-        Project project = target.getProject();
-        final Course course = StudyTaskManager.getInstance(project).getCourse();
-        if (course == null || !EduNames.STEPIK_CODE.equals(course.getCourseMode())) {
-            return false;
-        }
-
-        if (!(target instanceof PsiFileSystemItem || target instanceof PsiClass)) {
-            return false;
-        }
-
-        PsiFileSystemItem item = getFile(target);
-
-        if (item == null) {
-            return false;
-        }
-
-        String targetPath = getRelativePath(item);
-
-        return isCanNotBeTarget(targetPath);
-    }
-
-    static boolean isCanNotBeTarget(String targetPath) {
+    public static boolean isCanNotBeTarget(String targetPath) {
         if (isHideDir(targetPath) || isWithinHideDir(targetPath)) {
             return true;
         }
         return !(isWithinSrc(targetPath) || isWithinSandbox(targetPath) || isSandbox(targetPath) || isSrc(targetPath));
-    }
-
-    public static boolean isNotMovableOrRenameElement(@NotNull PsiElement element) {
-        if (!(element instanceof PsiFileSystemItem || element instanceof PsiClass)) {
-            return false;
-        }
-        Project project = element.getProject();
-        Course course = StudyTaskManager.getInstance(project).getCourse();
-        if (course == null || !EduNames.STEPIK_CODE.equals(course.getCourseMode())) {
-            return false;
-        }
-        PsiFileSystemItem file = getFile(element);
-        if (file == null) {
-            return false;
-        }
-        String path = getRelativePath(file);
-        return isNotMovableOrRenameElement(course, path);
     }
 
     private static boolean isTaskFile(@NotNull Course course, @NotNull String path) {
@@ -111,7 +52,7 @@ public class ProjectFilesUtils {
         return false;
     }
 
-    private static boolean isNotMovableOrRenameElement(@NotNull Course course, @NotNull String path) {
+    public static boolean isNotMovableOrRenameElement(@NotNull Course course, @NotNull String path) {
         if (isWithinSrc(path)) {
             return isHideDir(path) || isWithinHideDir(path) || isTaskHtmlFile(path) || isTaskFile(course, path);
         }
@@ -144,17 +85,7 @@ public class ProjectFilesUtils {
     }
 
     @NotNull
-    static String getRelativePath(@NotNull PsiFileSystemItem item) {
-        String path = item.getVirtualFile().getPath();
-        String projectPath = item.getProject().getBasePath();
-        if (projectPath == null) {
-            return path;
-        }
-        return getRelativePath(projectPath, path);
-    }
-
-    @NotNull
-    static String getRelativePath(@NotNull String basePath, @NotNull String path) {
+    public static String getRelativePath(@NotNull String basePath, @NotNull String path) {
         String relativePath = FileUtil.getRelativePath(basePath, path, SEPARATOR_CHAR);
         return relativePath == null ? path : relativePath;
     }
@@ -174,15 +105,15 @@ public class ProjectFilesUtils {
     }
 
     static boolean isWithinHideDir(@NotNull String path) {
-        return path.matches(ProjectFilesUtils.HIDE_PATH_EXPR + SEPARATOR + ".*");
+        return path.matches(HIDE_PATH_EXPR + SEPARATOR + ".*");
     }
 
     static boolean isHideDir(String path) {
-        return path.matches(ProjectFilesUtils.HIDE_PATH_EXPR);
+        return path.matches(HIDE_PATH_EXPR);
     }
 
     @Nullable
-    static String getParent(@NotNull String path) {
+    public static String getParent(@NotNull String path) {
         String[] dirs = splitPath(path);
         if (dirs.length == 0 || path.isEmpty() || path.equals(".")) {
             return null;

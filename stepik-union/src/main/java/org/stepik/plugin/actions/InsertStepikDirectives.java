@@ -3,6 +3,7 @@ package org.stepik.plugin.actions;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
+import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
@@ -98,5 +99,21 @@ public class InsertStepikDirectives extends StudyActionWithShortcut {
         if (needInsert) {
             ReformatUtils.reformatSelectedEditor(project);
         }
+    }
+
+    @Override
+    public void update(AnActionEvent event) {
+        StudyUtils.updateAction(event);
+
+        final Project project = event.getProject();
+        if (project == null) {
+            return;
+        }
+
+        StudyEditor studyEditor = StudyUtils.getSelectedStudyEditor(project);
+        StudyState studyState = new StudyState(studyEditor);
+        Presentation presentation = event.getPresentation();
+
+        presentation.setEnabled(studyState.isValid());
     }
 }

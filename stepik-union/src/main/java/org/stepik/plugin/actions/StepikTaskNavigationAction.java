@@ -8,13 +8,11 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowId;
 import com.intellij.openapi.wm.ToolWindowManager;
-import com.jetbrains.tmp.learning.StudyState;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.actions.StudyTaskNavigationAction;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.courseFormat.TaskFile;
-import com.jetbrains.tmp.learning.editor.StudyEditor;
 import com.jetbrains.tmp.learning.statistics.EduUsagesCollector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,14 +27,20 @@ public abstract class StepikTaskNavigationAction extends StudyTaskNavigationActi
         super(text, description, icon);
     }
 
+    @Nullable
+    protected abstract Task getDefaultTask(@NotNull final Project project);
+
     @Override
     public void navigateTask(@NotNull final Project project) {
-        StudyEditor studyEditor = StudyUtils.getSelectedStudyEditor(project);
-        StudyState studyState = new StudyState(studyEditor);
-        if (!studyState.isValid()) {
-            return;
+        Task currentTask = StudyUtils.getSelectedTask(project);
+        Task targetTask;
+
+        if (currentTask == null) {
+            targetTask = getDefaultTask(project);
+        } else {
+            targetTask = getTargetTask(currentTask);
         }
-        Task targetTask = getTargetTask(studyState.getTask());
+
         if (targetTask == null) {
             return;
         }
@@ -48,20 +52,8 @@ public abstract class StepikTaskNavigationAction extends StudyTaskNavigationActi
         if (projectDir == null) {
             return;
         }
-        VirtualFile[] sectionDirs = projectDir.getChildren();
-        String lessonDirName = targetTask.getLesson().getDirectory();
 
-        VirtualFile lessonDir = null;
-        for (VirtualFile sectionDir : sectionDirs) {
-            lessonDir = sectionDir.findChild(lessonDirName);
-            if (lessonDir != null) break;
-        }
-
-        if (lessonDir == null) {
-            return;
-        }
-        String taskDirName = targetTask.getDirectory();
-        VirtualFile taskDir = lessonDir.findChild(taskDirName);
+        VirtualFile taskDir = projectDir.findFileByRelativePath(targetTask.getPath());
         if (taskDir == null) {
             return;
         }
@@ -84,18 +76,19 @@ public abstract class StepikTaskNavigationAction extends StudyTaskNavigationActi
     @Nullable
     protected VirtualFile getFileToActivate(
             @NotNull Project project,
-            Map<String, TaskFile> nextTaskFiles,
-            VirtualFile taskDir) {
+            @NotNull Map<String, TaskFile> nextTaskFiles,
+            @NotNull VirtualFile taskDir) {
         VirtualFile shouldBeActive = null;
+        VirtualFile srcDir = taskDir.findChild(EduNames.SRC);
+
         for (Map.Entry<String, TaskFile> entry : nextTaskFiles.entrySet()) {
             String name = entry.getKey();
-            VirtualFile srcDir = taskDir.findChild(EduNames.SRC);
-            VirtualFile vf = srcDir == null ? taskDir.findChild(name) : srcDir.findChild(name);
+
+            VirtualFile vf = srcDir != null ? srcDir.findChild(name) : null;
             if (vf != null) {
                 if (shouldBeActive != null) {
                     FileEditorManager.getInstance(project).openFile(vf, true);
-                }
-                if (shouldBeActive == null) {
+                } else {
                     shouldBeActive = vf;
                 }
             }

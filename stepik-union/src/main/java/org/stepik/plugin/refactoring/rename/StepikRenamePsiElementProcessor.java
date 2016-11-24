@@ -4,15 +4,11 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
-import com.intellij.refactoring.listeners.RefactoringElementListener;
 import com.intellij.refactoring.rename.RenameDialog;
 import com.intellij.refactoring.rename.RenamePsiElementProcessor;
-import com.intellij.usageView.UsageInfo;
-import com.intellij.util.IncorrectOperationException;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import static org.stepik.plugin.utils.ProjectFilesUtils.isNotMovableOrRenameElement;
+import static org.stepik.plugin.utils.ProjectPsiFilesUtils.isNotMovableOrRenameElement;
 
 /**
  * @author meanmail

@@ -116,7 +116,7 @@ public class StudyTaskManager implements PersistentStateComponent<Element>, Dumb
     @Nullable
     @Override
     public Element getState() {
-        if (myCourse == null && myUser.getEmail().isEmpty()) {
+        if (myCourse == null || myUser.getEmail().isEmpty()) {
             return null;
         }
         Element el = new Element("stepikTaskManager");

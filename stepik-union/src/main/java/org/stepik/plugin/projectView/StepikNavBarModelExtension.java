@@ -9,10 +9,10 @@ import com.intellij.psi.PsiFile;
 import com.jetbrains.tmp.learning.StudyTaskManager;
 import com.jetbrains.tmp.learning.courseFormat.Course;
 import org.jetbrains.annotations.Nullable;
-import org.stepik.plugin.utils.PresentationUtils;
 
-import static org.stepik.plugin.utils.PresentationUtils.isVisibleDirectory;
-import static org.stepik.plugin.utils.PresentationUtils.isVisibleFile;
+import static org.stepik.plugin.utils.PresentationDataUtils.isVisibleDirectory;
+import static org.stepik.plugin.utils.PresentationDataUtils.isVisibleFile;
+import static org.stepik.plugin.utils.PresentationDataUtils.updatePresentationData;
 
 /**
  * @author meanmail
@@ -34,7 +34,7 @@ public class StepikNavBarModelExtension extends JavaNavBarExtension {
         if (object instanceof PsiDirectory) {
             PsiDirectory psiDirectory = (PsiDirectory) object;
             PresentationData data = new PresentationData();
-            PresentationUtils.updatePresentationData(data, psiDirectory);
+            updatePresentationData(data, psiDirectory);
             String text = data.getPresentableText();
             if (text != null)
                 return text;
