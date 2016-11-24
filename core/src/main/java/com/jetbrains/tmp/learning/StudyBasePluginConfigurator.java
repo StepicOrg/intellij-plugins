@@ -79,10 +79,4 @@ public abstract class StudyBasePluginConfigurator implements StudyPluginConfigur
             }
         };
     }
-
-    @Nullable
-    @Override
-    public StudyAfterCheckAction[] getAfterCheckActions() {
-        return null;
-    }
 }
