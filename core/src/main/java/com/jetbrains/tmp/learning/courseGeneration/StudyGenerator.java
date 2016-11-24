@@ -31,7 +31,7 @@ public class StudyGenerator {
      * @param resourceRoot directory where original task file stored
      * @throws IOException
      */
-    public static void createTaskFile(
+    private static void createTaskFile(
             @NotNull final VirtualFile taskDir, @NotNull final File resourceRoot,
             @NotNull final String name) throws IOException {
         String systemIndependentName = FileUtil.toSystemIndependentName(name);
@@ -81,7 +81,7 @@ public class StudyGenerator {
      * @param resourceRoot directory where original lesson stored
      * @throws IOException
      */
-    public static void createLesson(
+    private static void createLesson(
             @NotNull final Lesson lesson,
             @NotNull final VirtualFile courseDir,
             @NotNull final File resourceRoot,
