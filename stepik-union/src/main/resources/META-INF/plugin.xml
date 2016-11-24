@@ -68,12 +68,6 @@
         <extensionPoint qualifiedName="SCore.studyActionListener" interface="com.jetbrains.tmp.learning.StudyActionListener"/>
     </extensionPoints>
 
-    <actions>
-        <action id="SCore.NewScratchFile" class="com.intellij.ide.scratch.ScratchFileActions$NewFileAction" text="New Scratch File...">
-            <add-to-group group-id="FileOpenGroup" relative-to-action="OpenFile" anchor="before"/>
-        </action>
-    </actions>
-
     <extensions defaultExtensionNs="com.intellij">
         <projectService serviceInterface="com.intellij.codeInsight.documentation.DocumentationManager" serviceImplementation="com.jetbrains.tmp.learning.StudyDocumentationManager" overrides="true"/>
         <toolWindow id="Task Description" anchor="right" factoryClass="com.jetbrains.tmp.learning.ui.StudyToolWindowFactory" conditionClass="com.jetbrains.tmp.learning.ui.StudyCondition"/>
