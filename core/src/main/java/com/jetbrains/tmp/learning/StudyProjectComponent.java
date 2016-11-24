@@ -47,7 +47,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-
 public class StudyProjectComponent implements ProjectComponent {
     private static final Logger logger = Logger.getInstance(StudyProjectComponent.class.getName());
     private final Project myProject;
@@ -262,7 +261,6 @@ public class StudyProjectComponent implements ProjectComponent {
     @NotNull
     @Override
     public String getComponentName() {
-        //return "StudyTaskManager";
         return "StepikTaskManager";
     }
 

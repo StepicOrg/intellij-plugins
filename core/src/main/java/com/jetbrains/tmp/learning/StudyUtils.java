@@ -140,7 +140,7 @@ public class StudyUtils {
         }
     }
 
-    public static void initToolWindows(@NotNull final Project project) {
+    static void initToolWindows(@NotNull final Project project) {
         final ToolWindowManager windowManager = ToolWindowManager.getInstance(project);
         windowManager.getToolWindow(StudyToolWindowFactory.STUDY_TOOL_WINDOW)
                 .getContentManager()
