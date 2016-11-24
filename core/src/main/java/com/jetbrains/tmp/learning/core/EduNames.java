@@ -40,6 +40,10 @@ public class EduNames {
 
     public static final java.lang.String UTIL = "util";
     public static final String HIDE = "hide";
+    public static final String PYTHON27 = "python27";
+    public static final String PYTHON3 = "python3";
+    public static final String JAVA = "java";
+    public static final String JAVA8 = "java8";
 
     private EduNames() {
     }

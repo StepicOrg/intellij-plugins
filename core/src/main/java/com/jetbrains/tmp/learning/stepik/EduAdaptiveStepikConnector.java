@@ -52,8 +52,6 @@ import java.util.Map;
 import static com.jetbrains.tmp.learning.stepik.StepikConnectorGet.getFromStepik;
 
 class EduAdaptiveStepikConnector {
-    static final String PYTHON27 = "python27";
-    static final String PYTHON3 = "python3";
     private static final Logger logger = Logger.getInstance(EduAdaptiveStepikConnector.class);
     private static final int CONNECTION_TIMEOUT = 60 * 1000;
 
