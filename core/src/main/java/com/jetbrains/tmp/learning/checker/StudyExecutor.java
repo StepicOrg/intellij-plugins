@@ -21,7 +21,6 @@ import com.intellij.execution.process.ProcessHandler;
 import com.intellij.lang.LanguageExtension;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.Sdk;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.tmp.learning.courseFormat.Task;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -31,8 +30,6 @@ public interface StudyExecutor {
 
     @Nullable
     Sdk findSdk(@NotNull final Project project);
-
-    StudyTestRunner getTestRunner(@NotNull final Task task, @NotNull final VirtualFile taskDir);
 
     RunContentExecutor getExecutor(@NotNull final Project project, @NotNull final ProcessHandler handler);
 

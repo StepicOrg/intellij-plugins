@@ -81,7 +81,6 @@
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
         <action id="SCore.ShowHintAction" class="com.jetbrains.tmp.learning.actions.StudyShowHintAction" text="Show Hint for Answer Placeholder" description="Show hint for answer placeholder"/>
-        <action id="SCore.StudyRunAction" class="com.jetbrains.tmp.learning.actions.StudyRunAction" text="Run File With Tests" description="Run your code with tests"/>
         <action id="SCore.StudyShowAnswersAction" class="com.jetbrains.tmp.learning.actions.StudyFillPlaceholdersAction" text="Fill Answer Placeholders">
             <add-to-group group-id="HelpMenu" anchor="before" relative-to-action="HelpTopics"/>
         </action>

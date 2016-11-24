@@ -1,8 +1,5 @@
 package com.jetbrains.tmp.learning;
 
-import com.intellij.execution.RunContentExecutor;
-import com.intellij.execution.configurations.GeneralCommandLine;
-import com.intellij.execution.process.ProcessHandler;
 import com.intellij.lang.Language;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
@@ -22,7 +19,6 @@ import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
-import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.popup.Balloon;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
@@ -229,30 +225,6 @@ public class StudyUtils {
         final File resourceFile = new File(pathToResource, copyName);
         FileUtil.copy(new File(pathToResource, sourceName), resourceFile);
         return resourceFile;
-    }
-
-    @Nullable
-    public static Sdk findSdk(@NotNull final Task task, @NotNull final Project project) {
-        final Language language = task.getLesson().getSection().getCourse().getLanguageById();
-        return StudyExecutor.INSTANCE.forLanguage(language).findSdk(project);
-    }
-
-    public static RunContentExecutor getExecutor(
-            @NotNull final Project project, @NotNull final Task currentTask,
-            @NotNull final ProcessHandler handler) {
-        final Language language = currentTask.getLesson().getSection().getCourse().getLanguageById();
-        return StudyExecutor.INSTANCE.forLanguage(language).getExecutor(project, handler);
-    }
-
-    public static void setCommandLineParameters(
-            @NotNull final GeneralCommandLine cmd,
-            @NotNull final Project project,
-            @NotNull final String filePath,
-            @NotNull final String sdkPath,
-            @NotNull final Task currentTask) {
-        final Language language = currentTask.getLesson().getSection().getCourse().getLanguageById();
-        StudyExecutor.INSTANCE.forLanguage(language)
-                .setCommandLineParameters(cmd, project, filePath, sdkPath, currentTask);
     }
 
     public static void showNoSdkNotification(@NotNull final Task currentTask, @NotNull final Project project) {

@@ -32,14 +32,6 @@ public class EduUtils {
 
     private static final Logger logger = Logger.getInstance(EduUtils.class.getName());
 
-    public static final Comparator<StudyItem> INDEX_COMPARATOR = (o1, o2) -> o1.getIndex() - o2.getIndex();
-
-    public static void enableAction(@NotNull final AnActionEvent event, boolean isEnable) {
-        final Presentation presentation = event.getPresentation();
-        presentation.setVisible(isEnable);
-        presentation.setEnabled(isEnable);
-    }
-
     /**
      * Gets number index in directory names like "task1", "lesson2"
      *
@@ -224,19 +216,6 @@ public class EduUtils {
                 }
             });
         }
-    }
-
-    @Nullable
-    public static Task getTask(@NotNull final PsiDirectory directory, @NotNull final Course course) {
-        PsiDirectory lessonDir = directory.getParent();
-        if (lessonDir == null) {
-            return null;
-        }
-        Lesson lesson = course.getLessonByDirName(lessonDir.getName());
-        if (lesson == null) {
-            return null;
-        }
-        return lesson.getTask(directory.getName());
     }
 
     public static boolean isImage(String fileName) {

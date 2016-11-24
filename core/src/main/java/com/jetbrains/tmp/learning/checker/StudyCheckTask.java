@@ -172,7 +172,6 @@ public class StudyCheckTask extends com.intellij.openapi.progress.Task.Backgroun
                             StudyCheckUtils.showTestResultPopUp("Failed",
                                     MessageType.ERROR.getPopupBackground(),
                                     myProject);
-                            StudyCheckUtils.showTestResultsToolWindow(myProject, message, false);
                         });
             } else {
                 ApplicationManager.getApplication()
@@ -193,7 +192,6 @@ public class StudyCheckTask extends com.intellij.openapi.progress.Task.Backgroun
                             StudyCheckUtils.showTestResultPopUp("Congratulations!",
                                     MessageType.INFO.getPopupBackground(),
                                     myProject);
-                            StudyCheckUtils.showTestResultsToolWindow(myProject, message, true);
                         });
             } else {
                 ApplicationManager.getApplication()

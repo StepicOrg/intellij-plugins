@@ -1,7 +1,5 @@
 package com.jetbrains.tmp.learning.checker;
 
-import com.intellij.execution.impl.ConsoleViewImpl;
-import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
@@ -17,10 +15,11 @@ import com.intellij.openapi.ui.popup.BalloonBuilder;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.wm.*;
+import com.intellij.openapi.wm.IdeFocusManager;
+import com.intellij.openapi.wm.IdeFrame;
+import com.intellij.openapi.wm.WindowManager;
 import com.intellij.openapi.wm.ex.StatusBarEx;
 import com.intellij.openapi.wm.ex.WindowManagerEx;
-import com.intellij.ui.content.Content;
 import com.jetbrains.tmp.learning.StudyState;
 import com.jetbrains.tmp.learning.StudyTaskManager;
 import com.jetbrains.tmp.learning.StudyUtils;
@@ -32,11 +31,8 @@ import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.courseFormat.TaskFile;
 import com.jetbrains.tmp.learning.editor.StudyEditor;
 import com.jetbrains.tmp.learning.navigation.StudyNavigator;
-import com.jetbrains.tmp.learning.ui.StudyTestResultsToolWindowFactory;
-import com.jetbrains.tmp.learning.ui.StudyTestResultsToolWindowFactoryKt;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
 import java.util.List;
@@ -183,7 +179,6 @@ public class StudyCheckUtils {
         return false;
     }
 
-
     public static void flushWindows(@NotNull final Task task, @NotNull final VirtualFile taskDir) {
         for (Map.Entry<String, TaskFile> entry : task.getTaskFiles().entrySet()) {
             String name = entry.getKey();
@@ -193,35 +188,6 @@ public class StudyCheckUtils {
                 continue;
             }
             EduUtils.flushWindows(taskFile, virtualFile);
-        }
-    }
-
-    public static void showTestResultsToolWindow(
-            @NotNull final Project project,
-            @NotNull final String message,
-            boolean solved) {
-        final ToolWindowManager toolWindowManager = ToolWindowManager.getInstance(project);
-        ToolWindow window = toolWindowManager.getToolWindow(StudyTestResultsToolWindowFactoryKt.ID);
-        if (window == null) {
-            toolWindowManager.registerToolWindow(StudyTestResultsToolWindowFactoryKt.ID, true, ToolWindowAnchor.BOTTOM);
-            window = toolWindowManager.getToolWindow(StudyTestResultsToolWindowFactoryKt.ID);
-            new StudyTestResultsToolWindowFactory().createToolWindowContent(project, window);
-        }
-
-        final Content[] contents = window.getContentManager().getContents();
-        for (Content content : contents) {
-            final JComponent component = content.getComponent();
-            if (component instanceof ConsoleViewImpl) {
-                ((ConsoleViewImpl) component).clear();
-                if (!solved) {
-                    ((ConsoleViewImpl) component).print(message, ConsoleViewContentType.ERROR_OUTPUT);
-                } else {
-                    ((ConsoleViewImpl) component).print(message, ConsoleViewContentType.NORMAL_OUTPUT);
-                }
-                window.setAvailable(true, () -> {});
-                window.show(() -> {});
-                return;
-            }
         }
     }
 }
