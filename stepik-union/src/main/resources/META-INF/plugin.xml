@@ -58,7 +58,6 @@
 
     <extensionPoints>
         <extensionPoint qualifiedName="SCore.studyPluginConfigurator" interface="com.jetbrains.tmp.learning.StudyPluginConfigurator"/>
-        <extensionPoint qualifiedName="SCore.studyActionListener" interface="com.jetbrains.tmp.learning.StudyActionListener"/>
     </extensionPoints>
 
     <extensions defaultExtensionNs="com.intellij">
