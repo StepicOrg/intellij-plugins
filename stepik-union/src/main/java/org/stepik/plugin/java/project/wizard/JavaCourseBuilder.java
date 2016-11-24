@@ -51,7 +51,9 @@ class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilder {
             throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
         generator.generateProject(project, project.getBaseDir());
 
-        Course course = StudyTaskManager.getInstance(project).getCourse();
+        StudyTaskManager taskManager = StudyTaskManager.getInstance(project);
+        taskManager.setDefaultLang(this.generator.getDefaultLang());
+        Course course = taskManager.getCourse();
         if (course == null) {
             logger.info("failed to generate builders");
             return;

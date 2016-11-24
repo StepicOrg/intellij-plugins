@@ -21,6 +21,7 @@ import static com.jetbrains.tmp.learning.StudyUtils.execCancelable;
 
 public class StepikProjectGenerator extends EduProjectGenerator {
     private static final Logger logger = Logger.getInstance(StepikProjectGenerator.class);
+    private String defaultLang;
 
     protected static final String CACHE_NAME = "enrolledCourseNames.txt";
 
@@ -144,4 +145,11 @@ public class StepikProjectGenerator extends EduProjectGenerator {
         }
     }
 
+    public String getDefaultLang() {
+        return defaultLang;
+    }
+
+    public void setDefaultLang(String defaultLang) {
+        this.defaultLang = defaultLang;
+    }
 }
