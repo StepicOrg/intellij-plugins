@@ -456,7 +456,7 @@ class Utils {
             return project.getProperties().get('ideaSandboxDir')
         }
 
-        return "pycharm-sandbox"
+        return "build/pycharm-sandbox"
     }
 
     static String getPyCharmPath(@NotNull Project project) {
