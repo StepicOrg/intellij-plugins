@@ -1,13 +1,14 @@
-buildscript {
-    ext.kotlin_version = '1.0.4'
+apply plugin: 'org.stepik.gradle.plugins.pycharm'
+apply plugin: 'org.stepik.gradle.plugins.idea'
 
-    repositories {
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    }
+intellij {
+    version project.getProperties().get('ideaVersion')?: 'LATEST-EAP-SNAPSHOT'
+    pluginName 'core'
+    sandboxDirectory project.getProperties().get('ideaSandboxDir')?: 'build/idea-sandbox/'
 }
 
-apply plugin: 'kotlin'
+pycharm {
+    version project.getProperties().get('pyCharmVersion')?: 'LATEST-EAP-SNAPSHOT'
+    pluginName 'core'
+    sandboxDirectory project.getProperties().get('pyCharmSandboxDir')?: 'build/pycharm-sandbox/'
+}
