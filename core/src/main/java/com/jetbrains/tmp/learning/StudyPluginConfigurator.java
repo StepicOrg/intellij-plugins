@@ -4,10 +4,8 @@ import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.extensions.ExtensionPointName;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.project.Project;
-import com.jetbrains.tmp.learning.actions.StudyAfterCheckAction;
 import com.jetbrains.tmp.learning.ui.StudyToolWindow;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.util.Map;
@@ -39,9 +37,6 @@ public interface StudyPluginConfigurator {
      */
     @NotNull
     String getDefaultHighlightingMode();
-
-    @Nullable
-    StudyAfterCheckAction[] getAfterCheckActions();
 
     @NotNull
     String getLanguageScriptUrl();

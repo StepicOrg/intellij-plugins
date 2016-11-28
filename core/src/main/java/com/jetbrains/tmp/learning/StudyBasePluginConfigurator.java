@@ -6,7 +6,6 @@ import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.jetbrains.tmp.learning.actions.*;
 import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.ui.StudyToolWindow;
 import org.jetbrains.annotations.NotNull;
@@ -25,15 +24,7 @@ public abstract class StudyBasePluginConfigurator implements StudyPluginConfigur
 
     @NotNull
     public static DefaultActionGroup getDefaultActionGroup() {
-        final DefaultActionGroup group = new DefaultActionGroup();
-        group.add(new StudyPreviousStudyTaskAction());
-        group.add(new StudyNextStudyTaskAction());
-        group.add(new StudyRefreshTaskFileAction());
-        group.add(new StudyShowHintAction());
-
-        group.add(new StudyRunAction());
-        group.add(new StudyEditInputAction());
-        return group;
+        return new DefaultActionGroup();
     }
 
     @NotNull
@@ -84,11 +75,5 @@ public abstract class StudyBasePluginConfigurator implements StudyPluginConfigur
                 toolWindow.setTaskText(text, taskDirectory, project);
             }
         };
-    }
-
-    @Nullable
-    @Override
-    public StudyAfterCheckAction[] getAfterCheckActions() {
-        return null;
     }
 }

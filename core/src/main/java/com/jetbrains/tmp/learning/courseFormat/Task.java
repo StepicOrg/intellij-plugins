@@ -16,15 +16,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Implementation of task which contains task files, tests, input file for tests
- */
 public class Task implements StudyItem {
-    // index is visible to user number of task from 1 to task number
     private int myIndex;
     private int position;
     private String text;
-    private Map<String, String> testsText = new HashMap<>();
     private StudyStatus myStatus = StudyStatus.Unchecked;
 
     @Transient
@@ -46,20 +41,11 @@ public class Task implements StudyItem {
 
     public Task() {}
 
-    public Task(@NotNull final String name) {
-        this.name = name;
-    }
-
-    /**
-     * Initializes state of task file
-     *
-     * @param lesson lesson which task belongs to
-     */
-    public void initTask(final Lesson lesson, boolean isRestarted) {
+    void initTask(final Lesson lesson, boolean isRestarted) {
         setLesson(lesson);
         if (!isRestarted) myStatus = StudyStatus.Unchecked;
         for (TaskFile taskFile : getTaskFiles().values()) {
-            taskFile.initTaskFile(this, isRestarted);
+            taskFile.initTaskFile(this);
         }
     }
 
@@ -94,37 +80,12 @@ public class Task implements StudyItem {
         path = null;
     }
 
-    public Map<String, String> getTestsText() {
-        return testsText;
-    }
-
-    public void addTestsTexts(String name, String text) {
-        testsText.put(name, text);
-    }
-
     public Map<String, TaskFile> getTaskFiles() {
         return taskFiles;
     }
 
-    @Nullable
-    public TaskFile getTaskFile(final String name) {
-        return name != null ? taskFiles.get(name) : null;
-    }
-
     public boolean isTaskFile(@NotNull final String fileName) {
         return taskFiles.get(fileName) != null;
-    }
-
-    public void addTaskFile(@NotNull final String name, int index) {
-        TaskFile taskFile = new TaskFile();
-        taskFile.setIndex(index);
-        taskFile.setTask(this);
-        taskFile.name = name;
-        taskFiles.put(name, taskFile);
-    }
-
-    public void addTaskFile(@NotNull final TaskFile taskFile) {
-        taskFiles.put(taskFile.name, taskFile);
     }
 
     @Nullable
@@ -170,21 +131,6 @@ public class Task implements StudyItem {
         return "";
     }
 
-    @NotNull
-    public String getTestsText(@NotNull final Project project) {
-        final VirtualFile taskDir = getTaskDir(project);
-        if (taskDir != null) {
-            final VirtualFile file = taskDir.findChild(EduNames.TESTS_FILE);
-            if (file == null) return "";
-            final Document document = FileDocumentManager.getInstance().getDocument(file);
-            if (document != null) {
-                return document.getImmutableCharSequence().toString();
-            }
-        }
-
-        return "";
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -195,8 +141,7 @@ public class Task implements StudyItem {
         if (myIndex != task.myIndex) return false;
         if (name != null ? !name.equals(task.name) : task.name != null) return false;
         if (taskFiles != null ? !taskFiles.equals(task.taskFiles) : task.taskFiles != null) return false;
-        if (text != null ? !text.equals(task.text) : task.text != null) return false;
-        return testsText != null ? testsText.equals(task.testsText) : task.testsText == null;
+        return text != null ? !text.equals(task.text) : task.text != null;
 
     }
 
@@ -206,7 +151,6 @@ public class Task implements StudyItem {
         result = 31 * result + myIndex;
         result = 31 * result + (taskFiles != null ? taskFiles.hashCode() : 0);
         result = 31 * result + (text != null ? text.hashCode() : 0);
-        result = 31 * result + (testsText != null ? testsText.hashCode() : 0);
         return result;
     }
 
@@ -240,11 +184,6 @@ public class Task implements StudyItem {
 
     public void setStatus(StudyStatus status) {
         myStatus = status;
-        for (TaskFile taskFile : taskFiles.values()) {
-            for (AnswerPlaceholder placeholder : taskFile.getAnswerPlaceholders()) {
-                placeholder.setStatus(status);
-            }
-        }
     }
 
     public int getPosition() {

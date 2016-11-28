@@ -28,18 +28,18 @@ import java.util.Map;
 
 public class StudySerializationUtils {
 
-    public static final String PLACEHOLDERS = "placeholders";
-    public static final String LINE = "line";
-    public static final String START = "start";
-    public static final String OFFSET = "offset";
-    public static final String TEXT = "text";
-    public static final String LESSONS = "lessons";
-    public static final String COURSE = "course";
-    public static final String COURSE_TITLED = "Course";
-    public static final String STATUS = "status";
-    public static final String AUTHOR = "author";
-    public static final String AUTHORS = "authors";
-    public static final String MY_INITIAL_START = "myInitialStart";
+    private static final String PLACEHOLDERS = "placeholders";
+    private static final String LINE = "line";
+    private static final String START = "start";
+    private static final String OFFSET = "offset";
+    private static final String TEXT = "text";
+    private static final String LESSONS = "lessons";
+    private static final String COURSE = "course";
+    private static final String COURSE_TITLED = "Course";
+    private static final String STATUS = "status";
+    private static final String AUTHOR = "author";
+    private static final String AUTHORS = "authors";
+    private static final String MY_INITIAL_START = "myInitialStart";
 
     private StudySerializationUtils() {
     }

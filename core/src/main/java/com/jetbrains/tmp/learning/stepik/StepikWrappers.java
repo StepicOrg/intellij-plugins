@@ -33,10 +33,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class StepikWrappers {
     private static final Logger logger = Logger.getInstance(StepOptions.class);
@@ -84,7 +82,6 @@ public class StepikWrappers {
 
         public static StepOptions fromTask(final Project project, @NotNull final Task task) {
             final StepOptions source = new StepOptions();
-            setTests(task, source, project);
             source.files = new ArrayList<>();
             source.title = task.getName();
             for (final Map.Entry<String, TaskFile> entry : task.getTaskFiles().entrySet()) {
@@ -95,7 +92,7 @@ public class StepikWrappers {
                     assert taskDir != null;
                     VirtualFile ideaDir = project.getBaseDir().findChild(".idea");
                     assert ideaDir != null;
-                    EduUtils.createStudentFileFromAnswer(project, ideaDir, taskDir, entry.getKey(), taskFile);
+                    EduUtils.createStudentFileFromAnswer(project, ideaDir, taskDir, entry.getKey());
                 });
                 taskFile.name = entry.getKey();
 
@@ -118,25 +115,6 @@ public class StepikWrappers {
             }
             return source;
         }
-
-        private static void setTests(
-                @NotNull final Task task,
-                @NotNull final StepOptions source,
-                @NotNull final Project project) {
-            final Map<String, String> testsText = task.getTestsText();
-            if (testsText.isEmpty()) {
-                ApplicationManager.getApplication().runReadAction(() -> {
-                    source.test = Collections.singletonList(new TestFileWrapper(EduNames.TESTS_FILE,
-                            task.getTestsText(project)));
-                });
-            } else {
-                source.test = new ArrayList<>();
-                source.test.addAll(testsText.entrySet()
-                        .stream()
-                        .map(entry -> new TestFileWrapper(entry.getKey(), entry.getValue()))
-                        .collect(Collectors.toList()));
-            }
-        }
     }
 
     static class CodeTemplatesWrapper {
@@ -146,20 +124,20 @@ public class StepikWrappers {
         String java8;
 
         @Nullable
-        public String getTemplateForLanguage(@NotNull final String langauge) {
-            if (langauge.equals(EduAdaptiveStepikConnector.PYTHON27)) {
+        public String getTemplateForLanguage(@NotNull final String language) {
+            if (language.equals(EduNames.PYTHON27)) {
                 return python27;
             }
 
-            if (langauge.equals(EduAdaptiveStepikConnector.PYTHON3)) {
+            if (language.equals(EduNames.PYTHON3)) {
                 return python3;
             }
 
-            if (langauge.equals("java")) {
+            if (language.equals(EduNames.JAVA)) {
                 return java;
             }
 
-            if (langauge.equals("java8")) {
+            if (language.equals(EduNames.JAVA8)) {
                 return java8;
             }
 

@@ -1,11 +1,12 @@
 package org.stepik.plugin.collective;
 
+import com.jetbrains.tmp.learning.core.EduNames;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public enum SupportedLanguages {
-    JAVA("java8", "Main.java", "//", new String[]{"class Main {"}, new String[]{"}"}),
-    PYTHON("python3", "main.py", "#", null, null);
+    JAVA(EduNames.JAVA8, "Main.java", "//", new String[]{"class Main {"}, new String[]{"}"}),
+    PYTHON(EduNames.PYTHON3, "main.py", "#", null, null);
 
     private final String name;
     private final String comment;

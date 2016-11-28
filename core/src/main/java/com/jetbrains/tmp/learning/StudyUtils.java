@@ -1,9 +1,5 @@
 package com.jetbrains.tmp.learning;
 
-import com.intellij.execution.RunContentExecutor;
-import com.intellij.execution.configurations.GeneralCommandLine;
-import com.intellij.execution.process.ProcessHandler;
-import com.intellij.lang.Language;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.application.ApplicationManager;
@@ -11,8 +7,6 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.RangeMarker;
-import com.intellij.openapi.editor.actionSystem.EditorActionManager;
-import com.intellij.openapi.editor.colors.EditorColors;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.impl.DocumentImpl;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
@@ -22,7 +16,6 @@ import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
-import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.popup.Balloon;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
@@ -34,20 +27,14 @@ import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
-import com.intellij.ui.JBColor;
 import com.intellij.ui.awt.RelativePoint;
 import com.intellij.ui.content.Content;
 import com.intellij.util.ObjectUtils;
 import com.intellij.util.TimeoutUtil;
 import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.text.MarkdownUtil;
-import com.intellij.util.ui.UIUtil;
-import com.jetbrains.tmp.learning.checker.StudyExecutor;
-import com.jetbrains.tmp.learning.core.EduAnswerPlaceholderDeleteHandler;
-import com.jetbrains.tmp.learning.core.EduAnswerPlaceholderPainter;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.core.EduUtils;
-import com.jetbrains.tmp.learning.courseFormat.AnswerPlaceholder;
 import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.Lesson;
 import com.jetbrains.tmp.learning.courseFormat.Task;
@@ -64,7 +51,9 @@ import org.stepik.core.utils.ProjectFilesUtils;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.*;
+import java.io.Closeable;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -112,10 +101,6 @@ public class StudyUtils {
         }
     }
 
-    public static boolean isZip(String fileName) {
-        return fileName.contains(".zip");
-    }
-
     @Nullable
     public static <T> T getFirst(@NotNull final Iterable<T> container) {
         Iterator<T> iterator = container.iterator();
@@ -125,36 +110,9 @@ public class StudyUtils {
         return iterator.next();
     }
 
-    public static boolean indexIsValid(int index, @NotNull final Collection collection) {
+    static boolean indexIsValid(int index, @NotNull final Collection collection) {
         int size = collection.size();
         return index >= 0 && index < size;
-    }
-
-    @SuppressWarnings("IOResourceOpenedButNotSafelyClosed")
-    @Nullable
-    public static String getFileText(
-            @Nullable final String parentDir, @NotNull final String fileName, boolean wrapHTML,
-            @NotNull final String encoding) {
-        final File inputFile = parentDir != null ? new File(parentDir, fileName) : new File(fileName);
-        if (!inputFile.exists()) return null;
-        final StringBuilder taskText = new StringBuilder();
-        BufferedReader reader = null;
-        try {
-            reader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), encoding));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                taskText.append(line).append("\n");
-                if (wrapHTML) {
-                    taskText.append("<br>");
-                }
-            }
-            return wrapHTML ? UIUtil.toHtml(taskText.toString()) : taskText.toString();
-        } catch (IOException e) {
-            logger.info("Failed to get file text from file " + fileName, e);
-        } finally {
-            closeSilently(reader);
-        }
-        return null;
     }
 
     public static void updateAction(@NotNull final AnActionEvent e) {
@@ -182,7 +140,7 @@ public class StudyUtils {
         }
     }
 
-    public static void initToolWindows(@NotNull final Project project) {
+    static void initToolWindows(@NotNull final Project project) {
         final ToolWindowManager windowManager = ToolWindowManager.getInstance(project);
         windowManager.getToolWindow(StudyToolWindowFactory.STUDY_TOOL_WINDOW)
                 .getContentManager()
@@ -208,58 +166,6 @@ public class StudyUtils {
         return null;
     }
 
-    public static void deleteFile(@NotNull final VirtualFile file) {
-        try {
-            file.delete(StudyUtils.class);
-        } catch (IOException e) {
-            logger.error(e);
-        }
-    }
-
-    public static File copyResourceFile(
-            @NotNull final String sourceName, @NotNull final String copyName, @NotNull final Project project,
-            @NotNull final Task task)
-            throws IOException {
-        final StudyTaskManager taskManager = StudyTaskManager.getInstance(project);
-        final Course course = taskManager.getCourse();
-        assert course != null;
-        final String pathToResource = FileUtil.join(course.getCourseDirectory(),
-                task.getLesson().getDirectory(),
-                task.getDirectory());
-        final File resourceFile = new File(pathToResource, copyName);
-        FileUtil.copy(new File(pathToResource, sourceName), resourceFile);
-        return resourceFile;
-    }
-
-    @Nullable
-    public static Sdk findSdk(@NotNull final Task task, @NotNull final Project project) {
-        final Language language = task.getLesson().getSection().getCourse().getLanguageById();
-        return StudyExecutor.INSTANCE.forLanguage(language).findSdk(project);
-    }
-
-    public static RunContentExecutor getExecutor(
-            @NotNull final Project project, @NotNull final Task currentTask,
-            @NotNull final ProcessHandler handler) {
-        final Language language = currentTask.getLesson().getSection().getCourse().getLanguageById();
-        return StudyExecutor.INSTANCE.forLanguage(language).getExecutor(project, handler);
-    }
-
-    public static void setCommandLineParameters(
-            @NotNull final GeneralCommandLine cmd,
-            @NotNull final Project project,
-            @NotNull final String filePath,
-            @NotNull final String sdkPath,
-            @NotNull final Task currentTask) {
-        final Language language = currentTask.getLesson().getSection().getCourse().getLanguageById();
-        StudyExecutor.INSTANCE.forLanguage(language)
-                .setCommandLineParameters(cmd, project, filePath, sdkPath, currentTask);
-    }
-
-    public static void showNoSdkNotification(@NotNull final Task currentTask, @NotNull final Project project) {
-        final Language language = currentTask.getLesson().getSection().getCourse().getLanguageById();
-        StudyExecutor.INSTANCE.forLanguage(language).showNoSdkNotification(project);
-    }
-
     /**
      * shows pop up in the center of "check task" button in study editor
      */
@@ -277,25 +183,6 @@ public class StudyUtils {
         Point point = new Point(visibleRect.x + visibleRect.width + 10,
                 visibleRect.y + 10);
         return new RelativePoint(editor.getComponent(), point);
-    }
-
-    /**
-     * returns language manager which contains all the information about language specific file names
-     */
-    @Nullable
-    static StudyLanguageManager getLanguageManager(@NotNull final Course course) {
-        Language language = course.getLanguageById();
-        return language == null ? null : StudyLanguageManager.INSTANCE.forLanguage(language);
-    }
-
-    public static boolean isTestsFile(@NotNull Project project, @NotNull final String name) {
-        Course course = StudyTaskManager.getInstance(project).getCourse();
-        if (course == null) {
-            return false;
-        }
-        StudyLanguageManager manager = getLanguageManager(course);
-
-        return manager != null && manager.getTestFileName().equals(name);
     }
 
     @Nullable
@@ -333,22 +220,6 @@ public class StudyUtils {
             }
         }
         return null;
-    }
-
-    public static void drawAllWindows(Editor editor, TaskFile taskFile) {
-        editor.getMarkupModel().removeAllHighlighters();
-        final Project project = editor.getProject();
-        if (project == null) return;
-        final StudyTaskManager taskManager = StudyTaskManager.getInstance(project);
-        for (AnswerPlaceholder answerPlaceholder : taskFile.getAnswerPlaceholders()) {
-            final JBColor color = taskManager.getColor(answerPlaceholder);
-            EduAnswerPlaceholderPainter.drawAnswerPlaceholder(editor, answerPlaceholder, color);
-        }
-        final Document document = editor.getDocument();
-        EditorActionManager.getInstance()
-                .setReadonlyFragmentModificationHandler(document, new EduAnswerPlaceholderDeleteHandler(editor));
-        EduAnswerPlaceholderPainter.createGuardedBlocks(editor, taskFile);
-        editor.getColorsScheme().setColor(EditorColors.READONLY_FRAGMENT_BACKGROUND_COLOR, null);
     }
 
     @Nullable
@@ -537,10 +408,6 @@ public class StudyUtils {
         return taskFile != null ? taskFile.getTask() : null;
     }
 
-    public static boolean isStudyProject(@NotNull Project project) {
-        return StudyTaskManager.getInstance(project).getCourse() != null;
-    }
-
     @Nullable
     public static Project getStudyProject() {
         Project studyProject = null;
@@ -638,10 +505,6 @@ public class StudyUtils {
         MarkdownUtil.replaceCodeBlock(lines);
 
         return new MarkdownProcessor().markdown(StringUtil.join(lines, "\n"));
-    }
-
-    public static boolean isTaskDescriptionFile(@NotNull final String fileName) {
-        return EduNames.TASK_HTML.equals(fileName) || EduNames.TASK_MD.equals(fileName);
     }
 
     @Nullable

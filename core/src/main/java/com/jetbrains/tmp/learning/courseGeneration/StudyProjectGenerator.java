@@ -33,7 +33,6 @@ import com.jetbrains.tmp.learning.courseFormat.Lesson;
 import com.jetbrains.tmp.learning.courseFormat.Section;
 import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.courseFormat.TaskFile;
-import com.jetbrains.tmp.learning.statistics.EduUsagesCollector;
 import com.jetbrains.tmp.learning.stepik.CourseInfo;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorGet;
 import com.jetbrains.tmp.learning.stepik.StepikUser;
@@ -47,19 +46,18 @@ import java.util.*;
 import static com.jetbrains.tmp.learning.StudyUtils.execCancelable;
 
 public class StudyProjectGenerator {
-    public static final String AUTHOR_ATTRIBUTE = "authors";
-    public static final String LANGUAGE_ATTRIBUTE = "language";
+    private static final String AUTHOR_ATTRIBUTE = "authors";
+    private static final String LANGUAGE_ATTRIBUTE = "language";
     public static final String ADAPTIVE_COURSE_PREFIX = "__AdaptivePyCharmPython__";
     public static final File OUR_COURSES_DIR = new File(PathManager.getConfigPath(), "courses");
     private static final Logger logger = Logger.getInstance(StudyProjectGenerator.class.getName());
     private static final String COURSE_NAME_ATTRIBUTE = "name";
     private static final String COURSE_DESCRIPTION = "description";
-    protected static final String CACHE_NAME = "courseNames.txt";
+    private static final String CACHE_NAME = "courseNames.txt";
     private final List<SettingsListener> myListeners = ContainerUtil.newArrayList();
     @Nullable
     public StepikUser myUser;
     protected List<CourseInfo> myCourses = new ArrayList<>();
-    private List<Integer> myEnrolledCoursesIds = new ArrayList<>();
     protected CourseInfo mySelectedCourseInfo;
 
     public void setCourses(List<CourseInfo> courses) {
@@ -72,12 +70,6 @@ public class StudyProjectGenerator {
     }
 
     public void setEnrolledCoursesIds(@NotNull final List<Integer> coursesIds) {
-        myEnrolledCoursesIds = coursesIds;
-    }
-
-    @NotNull
-    public List<Integer> getEnrolledCoursesIds() {
-        return myEnrolledCoursesIds;
     }
 
     public void setSelectedCourse(final CourseInfo courseName) {
@@ -107,7 +99,6 @@ public class StudyProjectGenerator {
             VirtualFileManager.getInstance().refreshWithoutFileWatcher(true);
             StudyProjectComponent.getInstance(project).registerStudyToolWindow(course);
             openFirstTask(course, project);
-            EduUsagesCollector.projectTypeCreated(course.isAdaptive() ? EduNames.ADAPTIVE : EduNames.STUDY);
         });
     }
 
@@ -142,7 +133,7 @@ public class StudyProjectGenerator {
     }
 
     @Nullable
-    protected static Course readCourseFromCache(@NotNull File courseFile, boolean isAdaptive) {
+    private static Course readCourseFromCache(@NotNull File courseFile, boolean isAdaptive) {
         Reader reader = null;
         try {
             reader = new InputStreamReader(new FileInputStream(courseFile), "UTF-8");
@@ -160,7 +151,7 @@ public class StudyProjectGenerator {
         return null;
     }
 
-    public static void openFirstTask(@NotNull final Course course, @NotNull final Project project) {
+    private static void openFirstTask(@NotNull final Course course, @NotNull final Project project) {
         LocalFileSystem.getInstance().refresh(false);
         final Section firstSection = StudyUtils.getFirst(course.getSections());
         if (firstSection == null) {
@@ -182,13 +173,10 @@ public class StudyProjectGenerator {
         VirtualFile activeVirtualFile = null;
         for (Map.Entry<String, TaskFile> entry : taskFiles.entrySet()) {
             final String name = entry.getKey();
-            final TaskFile taskFile = entry.getValue();
             final VirtualFile virtualFile = ((VirtualDirectoryImpl) taskDir).refreshAndFindChild(name);
             if (virtualFile != null) {
                 FileEditorManager.getInstance(project).openFile(virtualFile, true);
-                if (!taskFile.getAnswerPlaceholders().isEmpty()) {
-                    activeVirtualFile = virtualFile;
-                }
+                activeVirtualFile = virtualFile;
             }
         }
         if (activeVirtualFile != null) {
@@ -206,7 +194,7 @@ public class StudyProjectGenerator {
         }
     }
 
-    public static void flushCourse(@NotNull final Project project, @NotNull final Course course) {
+    protected static void flushCourse(@NotNull final Project project, @NotNull final Course course) {
         final File courseDirectory = StudyUtils.getCourseDirectory(project, course);
         FileUtil.createDirectory(courseDirectory);
         flushCourseJson(course, courseDirectory);
@@ -214,34 +202,11 @@ public class StudyProjectGenerator {
         int lessonIndex = 1;
         for (Section section : course.getSections()) {
             for (Lesson lesson : section.getLessons()) {
-                if (lesson.getName().equals(EduNames.PYCHARM_ADDITIONAL)) {
-                    flushAdditionalFiles(courseDirectory, lesson);
-                } else {
+                if (!lesson.getName().equals(EduNames.PYCHARM_ADDITIONAL)) {
                     lesson.setIndex(lessonIndex++);
                     final File lessonDirectory = new File(courseDirectory, lesson.getDirectory());
                     flushLesson(lessonDirectory, lesson);
                 }
-            }
-        }
-    }
-
-    private static void flushAdditionalFiles(File courseDirectory, Lesson lesson) {
-        final List<Task> taskList = lesson.getTaskList();
-        if (taskList.size() != 1) return;
-        final Task task = taskList.get(0);
-        for (Map.Entry<String, String> entry : task.getTestsText().entrySet()) {
-            final String name = entry.getKey();
-            final String text = entry.getValue();
-            final File file = new File(courseDirectory, name);
-            FileUtil.createIfDoesntExist(file);
-            try {
-                if (EduUtils.isImage(name)) {
-                    FileUtil.writeToFile(file, Base64.decodeBase64(text));
-                } else {
-                    FileUtil.writeToFile(file, text);
-                }
-            } catch (IOException e) {
-                logger.error("ERROR copying file " + name);
             }
         }
     }
@@ -272,19 +237,6 @@ public class StudyProjectGenerator {
                 }
             } catch (IOException e) {
                 logger.error("ERROR copying file " + name);
-            }
-        }
-        final Map<String, String> testsText = task.getTestsText();
-        for (Map.Entry<String, String> entry : testsText.entrySet()) {
-            final File testsFile = new File(taskDirectory, entry.getKey());
-            if (testsFile.exists()) {
-                FileUtil.delete(testsFile);
-            }
-            FileUtil.createIfDoesntExist(testsFile);
-            try {
-                FileUtil.writeToFile(testsFile, entry.getValue());
-            } catch (IOException e) {
-                logger.error("ERROR copying tests file");
             }
         }
         final File taskText = new File(taskDirectory, "task.html");
@@ -395,10 +347,6 @@ public class StudyProjectGenerator {
         } catch (RuntimeException e) {
             return Collections.singletonList(CourseInfo.INVALID_COURSE);
         }
-    }
-
-    public void addSettingsStateListener(@NotNull SettingsListener listener) {
-        myListeners.add(listener);
     }
 
     public interface SettingsListener {

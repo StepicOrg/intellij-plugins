@@ -9,8 +9,6 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
-import com.intellij.ui.JBColor;
-import com.intellij.util.containers.hash.HashMap;
 import com.intellij.util.xmlb.XmlSerializer;
 import com.intellij.util.xmlb.annotations.Transient;
 import com.jetbrains.tmp.learning.courseFormat.*;
@@ -22,7 +20,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.util.*;
 
 /**
  * Implementation of class which contains all the information
@@ -37,11 +34,8 @@ public class StudyTaskManager implements PersistentStateComponent<Element>, Dumb
     private Course myCourse;
     public int VERSION = CURRENT_VERSION;
 
-    public Map<Task, List<UserTest>> myUserTests = new HashMap<>();
     private LangManager langManager = new LangManager();
-    public List<String> myInvisibleFiles = new ArrayList<>();
 
-    public boolean myShouldUseJavaFx = StudyUtils.hasJavaFx();
     private StudyToolWindow.StudyToolWindowMode myToolWindowMode = StudyToolWindow.StudyToolWindowMode.TEXT;
     private boolean myTurnEditingMode = false;
     private boolean showHint = true;
@@ -66,51 +60,6 @@ public class StudyTaskManager implements PersistentStateComponent<Element>, Dumb
     @Nullable
     public Course getCourse() {
         return myCourse;
-    }
-
-    public void setStatus(AnswerPlaceholder placeholder, StudyStatus status) {
-        placeholder.setStatus(status);
-    }
-
-    public void addUserTest(@NotNull final Task task, UserTest userTest) {
-        List<UserTest> userTests = myUserTests.get(task);
-        if (userTests == null) {
-            userTests = new ArrayList<>();
-            myUserTests.put(task, userTests);
-        }
-        userTests.add(userTest);
-    }
-
-    public void setUserTests(@NotNull final Task task, @NotNull final List<UserTest> userTests) {
-        myUserTests.put(task, userTests);
-    }
-
-    @NotNull
-    public List<UserTest> getUserTests(@NotNull final Task task) {
-        final List<UserTest> userTests = myUserTests.get(task);
-        return userTests != null ? userTests : Collections.emptyList();
-    }
-
-    public void removeUserTest(@NotNull final Task task, @NotNull final UserTest userTest) {
-        final List<UserTest> userTests = myUserTests.get(task);
-        if (userTests != null) {
-            userTests.remove(userTest);
-        }
-    }
-
-    public JBColor getColor(@NotNull final AnswerPlaceholder placeholder) {
-        final StudyStatus status = placeholder.getStatus();
-        if (status == StudyStatus.Solved) {
-            return JBColor.GREEN;
-        }
-        if (status == StudyStatus.Failed) {
-            return JBColor.RED;
-        }
-        return JBColor.BLUE;
-    }
-
-    public boolean hasFailedAnswerPlaceholders(@NotNull final TaskFile taskFile) {
-        return taskFile.getAnswerPlaceholders().size() > 0 && taskFile.hasFailedPlaceholders();
     }
 
     @Nullable
@@ -167,22 +116,6 @@ public class StudyTaskManager implements PersistentStateComponent<Element>, Dumb
         return ServiceManager.getService(project, StudyTaskManager.class);
     }
 
-    public void addInvisibleFiles(String filePath) {
-        myInvisibleFiles.add(filePath);
-    }
-
-    public boolean isInvisibleFile(String path) {
-        return myInvisibleFiles.contains(path);
-    }
-
-    public boolean shouldUseJavaFx() {
-        return myShouldUseJavaFx;
-    }
-
-    public void setShouldUseJavaFx(boolean shouldUseJavaFx) {
-        this.myShouldUseJavaFx = shouldUseJavaFx;
-    }
-
     public StudyToolWindow.StudyToolWindowMode getToolWindowMode() {
         return myToolWindowMode;
     }
@@ -212,6 +145,7 @@ public class StudyTaskManager implements PersistentStateComponent<Element>, Dumb
         this.defaultLang = defaultLang;
     }
 
+    @Nullable
     public String getDefaultLang() {
         return defaultLang;
     }

@@ -17,7 +17,6 @@ import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.courseFormat.TaskFile;
 import com.jetbrains.tmp.learning.editor.StudyEditor;
-import com.jetbrains.tmp.learning.statistics.EduUsagesCollector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -63,7 +62,6 @@ abstract public class StudyTaskNavigationAction extends StudyActionWithShortcut 
             ProjectView.getInstance(project).select(taskDir, taskDir, false);
             return;
         }
-        EduUsagesCollector.taskNavigation();
         VirtualFile shouldBeActive = getFileToActivate(project, nextTaskFiles, taskDir);
 
         updateProjectView(project, shouldBeActive);
@@ -117,14 +115,13 @@ abstract public class StudyTaskNavigationAction extends StudyActionWithShortcut 
         VirtualFile shouldBeActive = null;
         for (Map.Entry<String, TaskFile> entry : nextTaskFiles.entrySet()) {
             String name = entry.getKey();
-            TaskFile taskFile = entry.getValue();
             VirtualFile srcDir = taskDir.findChild(EduNames.SRC);
             VirtualFile vf = srcDir == null ? taskDir.findChild(name) : srcDir.findChild(name);
             if (vf != null) {
                 if (shouldBeActive != null) {
                     FileEditorManager.getInstance(project).openFile(vf, true);
                 }
-                if (shouldBeActive == null && !taskFile.getAnswerPlaceholders().isEmpty()) {
+                if (shouldBeActive == null) {
                     shouldBeActive = vf;
                 }
             }
