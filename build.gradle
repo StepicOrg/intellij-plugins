@@ -4,18 +4,6 @@ buildscript {
     }
 }
 
-plugins {
-    id "org.jetbrains.intellij" version "0.1.10"
-}
-
-apply plugin: 'org.jetbrains.intellij'
-
-intellij {
-    version ideaVersion //IntelliJ IDEA dependency
-}
-
-apply from: 'pycharm.gradle'
-
 subprojects {
     apply plugin: "java"
 
@@ -31,16 +19,10 @@ subprojects {
     }
 
     apply plugin: 'idea'
-    apply plugin: 'org.jetbrains.intellij'
 
     tasks.withType(JavaCompile) {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
-    }
-
-    intellij {
-        version ideaVersion //IntelliJ IDEA dependency
-        updateSinceUntilBuild false
     }
 }
 
