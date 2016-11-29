@@ -21,11 +21,12 @@ subprojects {
     apply plugin: 'idea'
 
     tasks.withType(JavaCompile) {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        def javaVersion = project.getProperties().get('javaVersion')?: JavaVersion.current()
+        sourceCompatibility = javaVersion
+        targetCompatibility = javaVersion
     }
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = "3.2.1"
+    gradleVersion = project.getProperties().get('gradleVersion')?: gradle.gradleVersion
 }
