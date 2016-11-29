@@ -36,6 +36,7 @@ import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.core.EduUtils;
 import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.Lesson;
+import com.jetbrains.tmp.learning.courseFormat.Section;
 import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.courseFormat.TaskFile;
 import com.jetbrains.tmp.learning.courseGeneration.StudyProjectGenerator;
@@ -316,10 +317,7 @@ public class StudyUtils {
             stringBuilder.append("<br><br>");
         }
 
-        stringBuilder.append(task.getDescription(StudyTaskManager.getInstance(project)
-                .getLangManager()
-                .getLangSetting(task)
-                .getCurrentLang()));
+        stringBuilder.append(task.getDescription());
         return stringBuilder.toString();
     }
 
@@ -515,5 +513,17 @@ public class StudyUtils {
                         .createHtmlTextBalloonBuilder("Couldn't post your reaction", MessageType.ERROR, null)
                         .createBalloon();
         showCheckPopUp(project, balloon);
+    }
+
+    public static Task getFirstTask(Course course){
+        final Section firstSection = StudyUtils.getFirst(course.getSections());
+        if (firstSection == null) {
+            return null;
+        }
+        final Lesson firstLesson = StudyUtils.getFirst(firstSection.getLessons());
+        if (firstLesson == null) {
+            return null;
+        }
+        return StudyUtils.getFirst(firstLesson.getTaskList());
     }
 }

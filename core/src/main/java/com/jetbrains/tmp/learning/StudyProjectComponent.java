@@ -3,7 +3,13 @@ package com.jetbrains.tmp.learning;
 import com.intellij.ide.ui.UISettings;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
-import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.ActionGroup;
+import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.actionSystem.KeyboardShortcut;
+import com.intellij.openapi.actionSystem.Shortcut;
 import com.intellij.openapi.actionSystem.ex.AnActionListener;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ProjectComponent;
@@ -47,6 +53,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static com.jetbrains.tmp.learning.StudyUtils.getFirstTask;
+
 public class StudyProjectComponent implements ProjectComponent {
     private static final Logger logger = Logger.getInstance(StudyProjectComponent.class.getName());
     private final Project myProject;
@@ -68,6 +76,20 @@ public class StudyProjectComponent implements ProjectComponent {
         if (course != null && !course.isUpToDate()) {
             course.setUpToDate(true);
             updateCourse();
+        }
+
+        LangManager langManager = StudyTaskManager.getInstance(myProject).getLangManager();
+        if (course != null && getFirstTask(course) != null && !getFirstTask(course).getSupportedLanguages().isEmpty()) {
+            logger.info("update lang settings on Task");
+            course.getSections().forEach(section ->
+                    section.getLessons().forEach(lesson ->
+                            lesson.getTaskList().forEach(task -> {
+                                LangSetting langSetting = langManager.getLangSetting(task);
+                                task.setSupportedLanguages(langSetting.getSupportLangs());
+                                task.setCurrentLang(langSetting.getCurrentLang());
+                            })
+                    )
+            );
         }
 
         registerStudyToolWindow(course);

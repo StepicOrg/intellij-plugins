@@ -14,7 +14,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class Task implements StudyItem {
     private int myIndex;
@@ -34,6 +36,10 @@ public class Task implements StudyItem {
     public Map<String, TaskFile> taskFiles = new HashMap<>();
     @Expose
     private Map<String, String> timeLimits = new HashMap<>();
+    @Expose
+    private Set<String> supportedLanguages = new HashSet<>();
+    @Expose
+    private String currentLang;
     @Transient
     @NotNull
     private String directory = "";
@@ -195,8 +201,8 @@ public class Task implements StudyItem {
         this.position = position;
     }
 
-    public String getDescription(String lang) {
-        return text + getTimeLimit(lang);
+    public String getDescription() {
+        return text + getTimeLimit(currentLang);
     }
 
     public Map<String, String> getTimeLimits() {
@@ -209,8 +215,39 @@ public class Task implements StudyItem {
     }
 
     @NotNull
-    public String getTimeLimit(@NotNull String lang){
+    private String getTimeLimit(@NotNull String lang) {
         if (timeLimits == null) return "";
-        return timeLimits.getOrDefault(lang,"");
+        return timeLimits.getOrDefault(lang, "");
+    }
+
+    public void addLang(String lang) {
+        supportedLanguages.add(lang);
+    }
+
+    public Set<String> getSupportedLanguages() {
+        return supportedLanguages;
+    }
+
+    public void setSupportedLanguages(Set<String> supportedLanguages) {
+        this.supportedLanguages = supportedLanguages;
+    }
+
+    public String getCurrentLang() {
+        if (!supportedLanguages.contains(currentLang)) {
+            currentLang = getPopularLang();
+        }
+        return currentLang;
+    }
+
+    public void setCurrentLang(String currentLang) {
+        this.currentLang = currentLang;
+    }
+
+    @Nullable
+    private String getPopularLang() {
+        for (String lang : supportedLanguages)
+            if (supportedLanguages.contains(lang))
+                return lang;
+        return null;
     }
 }

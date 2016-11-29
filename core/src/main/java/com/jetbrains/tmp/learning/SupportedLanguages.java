@@ -1,4 +1,4 @@
-package org.stepik.plugin.collective;
+package com.jetbrains.tmp.learning;
 
 import com.jetbrains.tmp.learning.core.EduNames;
 import org.jetbrains.annotations.NotNull;

@@ -22,6 +22,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.jetbrains.tmp.learning.StudySerializationUtils;
+import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.Lesson;
@@ -42,6 +43,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -50,6 +52,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class StepikConnectorGet {
@@ -335,6 +338,8 @@ public class StepikConnectorGet {
 
         task.setText(stringBuilder.toString());
 
+        setSupportedLang(task, step);
+
         setTimeLimits(task, step);
 
         String templateForTask;
@@ -355,19 +360,34 @@ public class StepikConnectorGet {
         }
     }
 
+    private static void setSupportedLang(Task task, StepikWrappers.Step step) {
+        if (step.options.codeTemplates.java8 != null)
+            task.addLang(SupportedLanguages.JAVA.getName());
+        if (step.options.codeTemplates.python3 != null)
+            task.addLang(SupportedLanguages.PYTHON.getName());
+    }
+
     private static void setTimeLimits(Task task, StepikWrappers.Step step) {
         Map<String, String> timeLimits = new HashMap<>();
+        Set<String> langSet = task.getSupportedLanguages();
 
-        putIfNotNull(timeLimits, "java", step.options.limits.java);
-        putIfNotNull(timeLimits, "java8", step.options.limits.java8);
-        putIfNotNull(timeLimits, "python3", step.options.limits.python3);
-        putIfNotNull(timeLimits, "python27", step.options.limits.python27);
+        StepikWrappers.LimitsWrapper limits = step.options.limits;
+        for (Field field : limits.getClass().getDeclaredFields()) {
+            String curLang = field.getName();
+            if (langSet.contains(curLang)){
+                try {
+                    putIfNotNull(timeLimits, curLang, field.get(limits).toString());
+                } catch (IllegalAccessException e) {
+                    logger.warn(e);
+                }
+            }
+        }
         task.setTimeLimits(timeLimits);
     }
 
-    private static void putIfNotNull(Map<String, String> timeLimits, String lang, StepikWrappers.Limit limit) {
+    private static void putIfNotNull(Map<String, String> timeLimits, String lang, String limit) {
         if (limit != null && lang != null) {
-            timeLimits.put(lang, limit.toString());
+            timeLimits.put(lang, limit);
         }
     }
 

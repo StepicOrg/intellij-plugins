@@ -149,13 +149,9 @@ public class StepikWrappers {
 
     static class LimitsWrapper {
         @Expose
-        Limit java;
-        @Expose
         Limit java8;
         @Expose
         Limit python3;
-        @Expose
-        Limit python27;
     }
 
     static class Limit{

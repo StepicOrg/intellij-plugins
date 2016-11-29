@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.stepik.plugin.collective.SupportedLanguages;
+import com.jetbrains.tmp.learning.SupportedLanguages;
 
 import java.io.InputStream;
 import java.util.HashMap;

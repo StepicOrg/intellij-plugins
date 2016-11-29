@@ -25,7 +25,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.stepik.plugin.collective.SupportedLanguages;
+import com.jetbrains.tmp.learning.SupportedLanguages;
 
 import javax.swing.*;
 import java.util.ArrayList;

@@ -14,6 +14,7 @@ import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.tmp.learning.LangSetting;
 import com.jetbrains.tmp.learning.StudyTaskManager;
+import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.core.EduUtils;
 import com.jetbrains.tmp.learning.courseFormat.Course;
@@ -22,9 +23,7 @@ import com.jetbrains.tmp.learning.courseFormat.TaskFile;
 import org.apache.commons.codec.binary.Base64;
 import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.stepik.from.edu.intellij.utils.generation.builders.TaskBuilder;
-import org.stepik.plugin.collective.SupportedLanguages;
 
 import java.io.File;
 import java.io.IOException;
@@ -68,10 +67,7 @@ class StepikJavaTaskBuilder extends JavaModuleBuilder implements TaskBuilder {
     private boolean createTaskContent() throws IOException {
         StudyTaskManager taskManager = StudyTaskManager.getInstance(project);
         String defaultLangName = taskManager.getDefaultLang();
-        SupportedLanguages defaultLang = null;
-        if (defaultLangName != null) {
-            defaultLang = SupportedLanguages.langOf(defaultLangName);
-        }
+        myTask.setCurrentLang(defaultLangName);
         Course course = myTask.getLesson().getSection().getCourse();
         String directory = getModuleFileDirectory();
         if (directory == null) {
@@ -93,15 +89,11 @@ class StepikJavaTaskBuilder extends JavaModuleBuilder implements TaskBuilder {
 
         createTaskFiles(myTask, src.getPath());
 
-        Set<SupportedLanguages> supportedLang = new HashSet<>();//getSupportedLang(taskResourcesPath);
-        supportedLang.add(SupportedLanguages.JAVA);
-        supportedLang.add(SupportedLanguages.PYTHON);
-        SupportedLanguages currentLang;
-        if (supportedLang.contains(defaultLang)) {
-            currentLang = defaultLang;
-        } else {
-            currentLang = getPopularLang(supportedLang);
-        }
+        Set<SupportedLanguages> supportedLang = myTask.getSupportedLanguages()
+                .stream()
+                .map(SupportedLanguages::langOf)
+                .collect(Collectors.toSet());
+        SupportedLanguages currentLang = SupportedLanguages.langOf(myTask.getCurrentLang());
 
         taskManager.getLangManager()
                 .setLangSetting(myTask,
@@ -130,14 +122,6 @@ class StepikJavaTaskBuilder extends JavaModuleBuilder implements TaskBuilder {
                 logger.error("ERROR copying file " + name);
             }
         }
-    }
-
-    @Nullable
-    private SupportedLanguages getPopularLang(@NotNull Set<SupportedLanguages> supportedLang) {
-        for (SupportedLanguages lang : SupportedLanguages.values())
-            if (supportedLang.contains(lang))
-                return lang;
-        return null;
     }
 
     private void moveFromHide(@NotNull String filename, @NotNull VirtualFile src) throws IOException {

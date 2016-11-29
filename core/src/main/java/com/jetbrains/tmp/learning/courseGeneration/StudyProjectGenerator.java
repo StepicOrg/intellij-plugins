@@ -37,7 +37,6 @@ import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.core.EduUtils;
 import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.Lesson;
-import com.jetbrains.tmp.learning.courseFormat.Section;
 import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.courseFormat.TaskFile;
 import com.jetbrains.tmp.learning.stepik.CourseInfo;
@@ -66,6 +65,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.jetbrains.tmp.learning.StudyUtils.execCancelable;
+import static com.jetbrains.tmp.learning.StudyUtils.getFirstTask;
 
 public class StudyProjectGenerator {
     private static final String AUTHOR_ATTRIBUTE = "authors";
@@ -175,18 +175,11 @@ public class StudyProjectGenerator {
 
     private static void openFirstTask(@NotNull final Course course, @NotNull final Project project) {
         LocalFileSystem.getInstance().refresh(false);
-        final Section firstSection = StudyUtils.getFirst(course.getSections());
-        if (firstSection == null) {
-            return;
-        }
-        final Lesson firstLesson = StudyUtils.getFirst(firstSection.getLessons());
-        if (firstLesson == null) {
-            return;
-        }
-        final Task firstTask = StudyUtils.getFirst(firstLesson.getTaskList());
+        final Task firstTask = getFirstTask(course);
         if (firstTask == null) {
             return;
         }
+
         final VirtualFile taskDir = firstTask.getTaskDir(project);
         if (taskDir == null) {
             return;

@@ -22,7 +22,7 @@ import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.Task;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.stepik.plugin.collective.SupportedLanguages;
+import com.jetbrains.tmp.learning.SupportedLanguages;
 
 import javax.swing.*;
 
@@ -123,6 +123,7 @@ public class SwitchLanguage extends StudyActionWithShortcut {
         });
         String activateFileName = secondLang.getMainFileName();
         langSetting.setCurrentLang(secondLang.getName());
+        targetTask.setCurrentLang(secondLang.getName());
 
         VirtualFile vf = src.findChild(activateFileName);
         if (vf != null)
