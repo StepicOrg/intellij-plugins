@@ -29,10 +29,11 @@ public class Task implements StudyItem {
     private String name;
     @Expose
     private int stepId;
-
     @Expose
     @SerializedName("task_files")
     public Map<String, TaskFile> taskFiles = new HashMap<>();
+    @Expose
+    private Map<String, String> timeLimits = new HashMap<>();
     @Transient
     @NotNull
     private String directory = "";
@@ -192,5 +193,24 @@ public class Task implements StudyItem {
 
     public void setPosition(int position) {
         this.position = position;
+    }
+
+    public String getDescription(String lang) {
+        return text + getTimeLimit(lang);
+    }
+
+    public Map<String, String> getTimeLimits() {
+        if (timeLimits == null) timeLimits = new HashMap<>();
+        return timeLimits;
+    }
+
+    public void setTimeLimits(Map<String, String> timeLimits) {
+        this.timeLimits = timeLimits;
+    }
+
+    @NotNull
+    public String getTimeLimit(@NotNull String lang){
+        if (timeLimits == null) return "";
+        return timeLimits.getOrDefault(lang,"");
     }
 }

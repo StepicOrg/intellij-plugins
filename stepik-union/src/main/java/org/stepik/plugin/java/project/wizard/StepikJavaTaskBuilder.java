@@ -15,8 +15,11 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.tmp.learning.LangSetting;
 import com.jetbrains.tmp.learning.StudyTaskManager;
 import com.jetbrains.tmp.learning.core.EduNames;
+import com.jetbrains.tmp.learning.core.EduUtils;
 import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.Task;
+import com.jetbrains.tmp.learning.courseFormat.TaskFile;
+import org.apache.commons.codec.binary.Base64;
 import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -31,6 +34,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -86,7 +90,12 @@ class StepikJavaTaskBuilder extends JavaModuleBuilder implements TaskBuilder {
                 myTask.getLesson().getDirectory(), myTask.getDirectory());
         FileUtil.copyDirContent(new File(taskResourcesPath), new File(FileUtil.join(src.getPath(), EduNames.HIDE)));
 
-        Set<SupportedLanguages> supportedLang = getSupportedLang(taskResourcesPath);
+
+        createTaskFiles(myTask, src.getPath());
+
+        Set<SupportedLanguages> supportedLang = new HashSet<>();//getSupportedLang(taskResourcesPath);
+        supportedLang.add(SupportedLanguages.JAVA);
+        supportedLang.add(SupportedLanguages.PYTHON);
         SupportedLanguages currentLang;
         if (supportedLang.contains(defaultLang)) {
             currentLang = defaultLang;
@@ -94,16 +103,33 @@ class StepikJavaTaskBuilder extends JavaModuleBuilder implements TaskBuilder {
             currentLang = getPopularLang(supportedLang);
         }
 
-        taskManager.getLangManager().setLangSetting(myTask,
-                new LangSetting(currentLang != null ? currentLang.getName() : null,
-                        supportedLang.stream()
-                                .map(SupportedLanguages::getName)
-                                .collect(Collectors.toSet())));
+        taskManager.getLangManager()
+                .setLangSetting(myTask,
+                        new LangSetting(currentLang != null ? currentLang.getName() : null,
+                                supportedLang.stream().map(SupportedLanguages::getName).collect(Collectors.toSet())));
         if (currentLang != null)
             moveFromHide(currentLang.getMainFileName(), src);
-        moveFromHide("task.html", src);
-
         return true;
+    }
+
+    private void createTaskFiles(Task task, String src) {
+        src = src + "/" + EduNames.HIDE;
+        for (Map.Entry<String, TaskFile> taskFileEntry : task.taskFiles.entrySet()) {
+            final String name = taskFileEntry.getKey();
+            final TaskFile taskFile = taskFileEntry.getValue();
+            final File file = new File(src, name);
+            FileUtil.createIfDoesntExist(file);
+
+            try {
+                if (EduUtils.isImage(taskFile.name)) {
+                    FileUtil.writeToFile(file, Base64.decodeBase64(taskFile.text));
+                } else {
+                    FileUtil.writeToFile(file, taskFile.text);
+                }
+            } catch (IOException e) {
+                logger.error("ERROR copying file " + name);
+            }
+        }
     }
 
     @Nullable

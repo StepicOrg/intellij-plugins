@@ -79,6 +79,8 @@ public class StepikWrappers {
         //    @Expose Map<String, String> codeTemplates;
         @Expose
         CodeTemplatesWrapper codeTemplates;
+        @Expose
+        LimitsWrapper limits;
 
         public static StepOptions fromTask(final Project project, @NotNull final Task task) {
             final StepOptions source = new StepOptions();
@@ -142,6 +144,27 @@ public class StepikWrappers {
             }
 
             return null;
+        }
+    }
+
+    static class LimitsWrapper {
+        @Expose
+        Limit java;
+        @Expose
+        Limit java8;
+        @Expose
+        Limit python3;
+        @Expose
+        Limit python27;
+    }
+
+    static class Limit{
+        int time;
+        int memory;
+
+        @Override
+        public String toString() {
+            return String.format("<b>Memory limit</b>: %d Mb<br><b>Time limit</b>: %ds<br><br>", memory, time);
         }
     }
 

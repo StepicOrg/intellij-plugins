@@ -7,7 +7,6 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.RangeMarker;
-import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.impl.DocumentImpl;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditor;
@@ -284,29 +283,23 @@ public class StudyUtils {
     }
 
     @Nullable
-    @Contract("_, null -> null")
-    static String getTaskTextFromTask(@Nullable final VirtualFile taskDirectory, @Nullable final Task task) {
+    @Contract("_, null, _-> null")
+    static String getTaskTextFromTask(
+            @Nullable final VirtualFile taskDirectory,
+            @Nullable final Task task,
+            Project project) {
         if (task == null) {
             return null;
         }
         String text = task.getText();
         if (text != null) {
-            return getTextWithStepLink(task);
-        }
-        if (taskDirectory != null) {
-            final String prefix = String.format(ourPrefix,
-                    EditorColorsManager.getInstance().getGlobalScheme().getEditorFontSize());
-            final String taskTextFileHtml = getTaskTextFromTaskName(taskDirectory, EduNames.TASK_HTML);
-            if (taskTextFileHtml != null) return prefix + taskTextFileHtml + ourPostfix;
-
-            final String taskTextFileMd = getTaskTextFromTaskName(taskDirectory, EduNames.TASK_MD);
-            if (taskTextFileMd != null) return prefix + convertToHtml(taskTextFileMd) + ourPostfix;
+            return getTextWithStepLink(task, project);
         }
         return null;
     }
 
     @NotNull
-    private static String getTextWithStepLink(Task task) {
+    private static String getTextWithStepLink(Task task, Project project) {
         StringBuilder stringBuilder = new StringBuilder();
 
         if (task.getLesson().getId() > 0) {
@@ -323,29 +316,11 @@ public class StudyUtils {
             stringBuilder.append("<br><br>");
         }
 
-        stringBuilder.append(task.getText());
+        stringBuilder.append(task.getDescription(StudyTaskManager.getInstance(project)
+                .getLangManager()
+                .getLangSetting(task)
+                .getCurrentLang()));
         return stringBuilder.toString();
-    }
-
-    @Nullable
-    private static String getTaskTextFromTaskName(
-            @NotNull VirtualFile taskDirectory,
-            @NotNull String taskTextFilename) {
-        VirtualFile taskTextFile = taskDirectory.findChild(taskTextFilename);
-        if (taskTextFile == null) {
-            VirtualFile srcDir = taskDirectory.findChild(EduNames.SRC);
-            if (srcDir != null) {
-                taskTextFile = srcDir.findChild(taskTextFilename);
-            }
-        }
-        if (taskTextFile != null) {
-            try {
-                return FileUtil.loadTextAndClose(taskTextFile.getInputStream());
-            } catch (IOException e) {
-                logger.info(e);
-            }
-        }
-        return null;
     }
 
     @Nullable
@@ -363,7 +338,7 @@ public class StudyUtils {
     public static String getTaskText(@NotNull final Project project) {
         final Task task = getSelectedTask(project);
         if (task != null) {
-            return getTaskTextFromTask(task.getTaskDir(project), task);
+            return getTaskTextFromTask(task.getTaskDir(project), task, project);
         }
         return EMPTY_TASK_TEXT;
     }
