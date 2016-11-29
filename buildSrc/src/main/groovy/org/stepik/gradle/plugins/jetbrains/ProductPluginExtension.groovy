@@ -1,6 +1,6 @@
-package org.stepik.gradle.plugins.pycharm
+package org.stepik.gradle.plugins.jetbrains
 
-import org.stepik.gradle.plugins.pycharm.dependency.ProductDependency
+import org.stepik.gradle.plugins.jetbrains.dependency.ProductDependency
 
 /**
  * Configuration options for the {@link PyCharmPlugin}.

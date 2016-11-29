@@ -7,10 +7,10 @@ import org.gradle.api.logging.Logging
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.internal.jvm.Jvm
 import org.gradle.jvm.tasks.Jar
-import org.stepik.gradle.plugins.pycharm.PrepareSandboxTask
-import org.stepik.gradle.plugins.pycharm.ProductPluginExtension
-import org.stepik.gradle.plugins.pycharm.UnZipper
-import org.stepik.gradle.plugins.pycharm.dependency.DependencyManager
+import org.stepik.gradle.plugins.jetbrains.PrepareSandboxTask
+import org.stepik.gradle.plugins.jetbrains.ProductPluginExtension
+import org.stepik.gradle.plugins.jetbrains.UnZipper
+import org.stepik.gradle.plugins.jetbrains.dependency.DependencyManager
 
 import java.nio.file.Files
 

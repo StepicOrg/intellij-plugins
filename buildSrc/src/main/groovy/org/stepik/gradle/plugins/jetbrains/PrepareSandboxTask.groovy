@@ -1,4 +1,4 @@
-package org.stepik.gradle.plugins.pycharm
+package org.stepik.gradle.plugins.jetbrains
 
 import com.sun.istack.internal.NotNull
 import org.gradle.api.Project

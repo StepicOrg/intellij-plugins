@@ -1,15 +1,14 @@
-package org.stepik.gradle.plugins.pycharm.dependency
+package org.stepik.gradle.plugins.jetbrains.dependency
 
 import com.sun.istack.internal.NotNull
 import org.gradle.api.Project
-import org.gradle.api.artifacts.Configuration
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.publish.ivy.internal.artifact.DefaultIvyArtifact
 import org.gradle.api.publish.ivy.internal.publication.DefaultIvyConfiguration
 import org.gradle.api.publish.ivy.internal.publication.DefaultIvyPublicationIdentity
 import org.gradle.api.publish.ivy.internal.publisher.IvyDescriptorFileGenerator
 import org.gradle.tooling.BuildException
-import org.stepik.gradle.plugins.pycharm.ProductPluginExtension
+import org.stepik.gradle.plugins.jetbrains.ProductPluginExtension
 
 class DependencyManager {
     @NotNull

@@ -1,4 +1,4 @@
-package org.stepik.gradle.plugins.pycharm.dependency
+package org.stepik.gradle.plugins.jetbrains.dependency
 
 import com.sun.istack.internal.NotNull
 import groovy.transform.ToString
