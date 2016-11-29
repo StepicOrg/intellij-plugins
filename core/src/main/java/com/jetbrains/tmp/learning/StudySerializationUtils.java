@@ -1,6 +1,14 @@
 package com.jetbrains.tmp.learning;
 
-import com.google.gson.*;
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
@@ -23,8 +31,10 @@ import java.io.File;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class StudySerializationUtils {
 
@@ -47,6 +57,7 @@ public class StudySerializationUtils {
     public static class StudyUnrecognizedFormatException extends Exception {}
 
     public static class Xml {
+        private static final Logger logger = Logger.getInstance(StudySerializationUtils.class);
         public final static String COURSE_ELEMENT = "courseElement";
         public final static String MAIN_ELEMENT = "StepikStudyTaskManager";
         public static final String MAP = "map";
@@ -310,6 +321,18 @@ public class StudySerializationUtils {
             return Collections.emptyList();
         }
 
+        public static Set<Element> getChildSet(Element parent, String name) throws StudyUnrecognizedFormatException {
+            Element listParent = null;
+            listParent = getChildWithName(parent, name);
+            if (listParent != null) {
+                Element list = listParent.getChild("set");
+                if (list != null) {
+                    return new HashSet<>(list.getChildren());
+                }
+            }
+            return Collections.emptySet();
+        }
+
         public static Element getChildWithName(Element parent, String name) throws StudyUnrecognizedFormatException {
             for (Element child : parent.getChildren()) {
                 Attribute attribute = child.getAttribute(NAME);
@@ -346,7 +369,7 @@ public class StudySerializationUtils {
             return Collections.emptyMap();
         }
 
-        public static Element convertToForthVersion(Element state, Project project)
+        static Element convertToForthVersion(Element state, Project project)
                 throws StudyUnrecognizedFormatException {
             Element taskManagerElement = state.getChild(MAIN_ELEMENT);
 
@@ -386,6 +409,66 @@ public class StudySerializationUtils {
 
             addChildList(courseElement, SECTIONS, list);
 
+            return state;
+        }
+
+        static Element convertToFifthVersion(Element state, Project project)
+                throws StudyUnrecognizedFormatException {
+            Element taskManagerElement = state.getChild(MAIN_ELEMENT);
+
+
+            Element langManager = getChildWithName(taskManagerElement, "langManager").getChild("LangManager");
+            Map<String, Element> langSettingsMap = getChildMap(langManager, "langSettingsMap");
+            Map<String, LangSetting> mapIdLangSet = new java.util.HashMap<>();
+            langSettingsMap.entrySet().forEach(element -> {
+                        Element langSetting = element.getValue();
+                        final String[] currentLang = new String[1];
+                        langSetting.getChildren().forEach(x -> {
+                            if (x.getAttribute("name").getValue().equals("currentLang")) {
+                                currentLang[0] = x.getAttribute("value").getValue();
+                            }
+                        });
+                        Set<Element> supportLangs = null;
+                        try {
+                            supportLangs = getChildSet(langSetting, "supportLangs");
+                        } catch (StudyUnrecognizedFormatException e) {
+                            e.printStackTrace();
+                        }
+                        Set<String> taskLangs = new HashSet<>();
+                        supportLangs.forEach(lang -> taskLangs.add(lang.getAttribute("value").getValue()));
+
+                        LangSetting ls = new LangSetting(currentLang[0], taskLangs);
+                        mapIdLangSet.put(element.getKey(), ls);
+                    }
+            );
+
+            Element courseElement = getChildWithName(taskManagerElement, COURSE).getChild(COURSE_TITLED);
+            if (courseElement == null) {
+                logger.info("courseElement is null");
+                return state;
+            }
+
+
+            List<Element> sections = getChildList(courseElement, SECTIONS);
+            for (Element section : sections) {
+                List<Element> lessons = getChildList(section, LESSONS);
+                for (Element lesson : lessons) {
+                    List<Element> taskList = getChildList(lesson, TASK_LIST);
+                    for (Element task : taskList) {
+                        LangSetting ls = mapIdLangSet.get(getChildWithName(task, "stepId").getAttributeValue("value"));
+                        if (ls != null) {
+                            addChildWithName(task, "currentLang", ls.getCurrentLang());
+                            Element set = new Element("set");
+                            ls.getSupportLangs().forEach(suppLang -> {
+                                Element child = new Element(OPTION);
+                                child.setAttribute(VALUE, suppLang);
+                                set.addContent(child);
+                            });
+                            addChildWithName(task, "supportedLanguages", set);
+                        }
+                    }
+                }
+            }
             return state;
         }
     }

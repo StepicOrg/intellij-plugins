@@ -10,10 +10,8 @@ import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.jetbrains.tmp.learning.LangManager;
-import com.jetbrains.tmp.learning.LangSetting;
-import com.jetbrains.tmp.learning.StudyTaskManager;
 import com.jetbrains.tmp.learning.StudyUtils;
+import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.actions.StudyCheckAction;
 import com.jetbrains.tmp.learning.checker.StudyCheckUtils;
 import com.jetbrains.tmp.learning.core.EduNames;
@@ -23,7 +21,6 @@ import com.jetbrains.tmp.learning.stepik.StepikConnectorGet;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorPost;
 import com.jetbrains.tmp.learning.stepik.StepikWrappers;
 import org.jetbrains.annotations.NotNull;
-import com.jetbrains.tmp.learning.SupportedLanguages;
 import org.stepik.plugin.utils.DirectivesUtils;
 import org.stepik.plugin.utils.NotificationUtils;
 
@@ -70,9 +67,7 @@ public class StepikJavaPostAction extends StudyCheckAction {
                     }
                     String attemptId = Integer.toString(intAttemptId);
 
-                    LangManager langManager = StudyTaskManager.getInstance(project).getLangManager();
-                    LangSetting taskLangSetting = langManager.getLangSetting(task);
-                    SupportedLanguages currentLang = SupportedLanguages.langOf(taskLangSetting.getCurrentLang());
+                    SupportedLanguages currentLang = SupportedLanguages.langOf(task.getCurrentLang());
                     if (currentLang == null) {
                         return;
                     }

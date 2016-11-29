@@ -38,8 +38,9 @@ public class Task implements StudyItem {
     private Map<String, String> timeLimits = new HashMap<>();
     @Expose
     private Set<String> supportedLanguages = new HashSet<>();
+    @NotNull
     @Expose
-    private String currentLang;
+    private String currentLang = "";
     @Transient
     @NotNull
     private String directory = "";
@@ -206,7 +207,6 @@ public class Task implements StudyItem {
     }
 
     public Map<String, String> getTimeLimits() {
-        if (timeLimits == null) timeLimits = new HashMap<>();
         return timeLimits;
     }
 
@@ -215,7 +215,7 @@ public class Task implements StudyItem {
     }
 
     @NotNull
-    private String getTimeLimit(@NotNull String lang) {
+    private String getTimeLimit(String lang) {
         if (timeLimits == null) return "";
         return timeLimits.getOrDefault(lang, "");
     }
@@ -239,7 +239,7 @@ public class Task implements StudyItem {
         return currentLang;
     }
 
-    public void setCurrentLang(String currentLang) {
+    public void setCurrentLang(@NotNull String currentLang) {
         this.currentLang = currentLang;
     }
 

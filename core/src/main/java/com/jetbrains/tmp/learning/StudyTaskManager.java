@@ -29,7 +29,7 @@ import java.io.File;
 @State(name = "StepikStudySettings", storages = @Storage("stepik_study_project.xml"))
 public class StudyTaskManager implements PersistentStateComponent<Element>, DumbAware {
     private static final Logger logger = Logger.getInstance(StudyTaskManager.class);
-    public static final int CURRENT_VERSION = 4;
+    public static final int CURRENT_VERSION = 5;
     private StepikUser myUser = new StepikUser();
     private Course myCourse;
     public int VERSION = CURRENT_VERSION;
@@ -90,9 +90,11 @@ public class StudyTaskManager implements PersistentStateComponent<Element>, Dumb
                     state = StudySerializationUtils.Xml.convertToThirdVersion(state, myProject);
                 case 3:
                     state = StudySerializationUtils.Xml.convertToForthVersion(state, myProject);
+                case 4:
+                    state = StudySerializationUtils.Xml.convertToFifthVersion(state, myProject);
                     //uncomment for future versions
-                    //case 4:
-                    //state = StudySerializationUtils.Xml.convertToFifthVersion(state, myProject);
+                    //case 5:
+                    //state = StudySerializationUtils.Xml.convertToSixVersion(state, myProject);
             }
             XmlSerializer.deserializeInto(this, state.getChild(StudySerializationUtils.Xml.MAIN_ELEMENT));
             VERSION = CURRENT_VERSION;

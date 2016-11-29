@@ -11,10 +11,9 @@ import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.jetbrains.tmp.learning.LangManager;
-import com.jetbrains.tmp.learning.LangSetting;
 import com.jetbrains.tmp.learning.StudyTaskManager;
 import com.jetbrains.tmp.learning.StudyUtils;
+import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.actions.StudyActionWithShortcut;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.Task;
@@ -25,7 +24,6 @@ import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import com.jetbrains.tmp.learning.SupportedLanguages;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -88,9 +86,7 @@ public class DownloadSubmission extends StudyActionWithShortcut {
                 targetTask.getStepId());
         StepikConnectorPost.postMetric(metric);
 
-        LangManager langManager = StudyTaskManager.getInstance(project).getLangManager();
-        LangSetting langSetting = langManager.getLangSetting(targetTask);
-        SupportedLanguages currentLang = SupportedLanguages.langOf(langSetting.getCurrentLang());
+        SupportedLanguages currentLang = SupportedLanguages.langOf(targetTask.getCurrentLang());
         if (currentLang == null) {
             return;
         }

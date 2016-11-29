@@ -14,15 +14,13 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.refactoring.move.moveFilesOrDirectories.MoveFilesOrDirectoriesUtil;
-import com.jetbrains.tmp.learning.LangSetting;
-import com.jetbrains.tmp.learning.StudyTaskManager;
 import com.jetbrains.tmp.learning.StudyUtils;
+import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.actions.StudyActionWithShortcut;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.Task;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import com.jetbrains.tmp.learning.SupportedLanguages;
 
 import javax.swing.*;
 
@@ -50,9 +48,7 @@ public class SwitchLanguage extends StudyActionWithShortcut {
             return;
         }
 
-        StudyTaskManager taskManager = StudyTaskManager.getInstance(project);
-        LangSetting langSetting = taskManager.getLangManager().getLangSetting(targetTask);
-        if (langSetting.getSupportLangs().size() == 1) {
+        if (targetTask.getSupportedLanguages().size() == 1) {
             return;
         }
 
@@ -83,7 +79,7 @@ public class SwitchLanguage extends StudyActionWithShortcut {
         if (scrPsi == null) {
             return;
         }
-        SupportedLanguages currentLang = SupportedLanguages.langOf(langSetting.getCurrentLang());
+        SupportedLanguages currentLang = SupportedLanguages.langOf(targetTask.getCurrentLang());
         if (currentLang == null) {
             return;
         }
@@ -122,7 +118,6 @@ public class SwitchLanguage extends StudyActionWithShortcut {
             MoveFilesOrDirectoriesUtil.doMoveFile(second, scrPsi);
         });
         String activateFileName = secondLang.getMainFileName();
-        langSetting.setCurrentLang(secondLang.getName());
         targetTask.setCurrentLang(secondLang.getName());
 
         VirtualFile vf = src.findChild(activateFileName);

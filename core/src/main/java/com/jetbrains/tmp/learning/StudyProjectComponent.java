@@ -53,8 +53,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.jetbrains.tmp.learning.StudyUtils.getFirstTask;
-
 public class StudyProjectComponent implements ProjectComponent {
     private static final Logger logger = Logger.getInstance(StudyProjectComponent.class.getName());
     private final Project myProject;
@@ -76,20 +74,6 @@ public class StudyProjectComponent implements ProjectComponent {
         if (course != null && !course.isUpToDate()) {
             course.setUpToDate(true);
             updateCourse();
-        }
-
-        LangManager langManager = StudyTaskManager.getInstance(myProject).getLangManager();
-        if (course != null && getFirstTask(course) != null && !getFirstTask(course).getSupportedLanguages().isEmpty()) {
-            logger.info("update lang settings on Task");
-            course.getSections().forEach(section ->
-                    section.getLessons().forEach(lesson ->
-                            lesson.getTaskList().forEach(task -> {
-                                LangSetting langSetting = langManager.getLangSetting(task);
-                                task.setSupportedLanguages(langSetting.getSupportLangs());
-                                task.setCurrentLang(langSetting.getCurrentLang());
-                            })
-                    )
-            );
         }
 
         registerStudyToolWindow(course);
