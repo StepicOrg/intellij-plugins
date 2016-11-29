@@ -1,0 +1,44 @@
+plugins {
+    id 'com.gradle.plugin-publish' version '0.9.4'
+    id 'java-gradle-plugin'
+    id 'maven'
+}
+
+apply plugin: 'groovy'
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+plugins.withType(JavaPlugin) {
+    project.tasks.withType(GroovyCompile) { task ->
+        task.sourceCompatibility = project.sourceCompatibility
+        task.targetCompatibility = project.targetCompatibility
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile gradleApi()
+}
+
+version = '0.1'
+group = 'org.stepik.gradle.plugins.pycharm'
+
+gradlePlugin {
+    //noinspection GroovyAssignabilityCheck
+    plugins {
+        pyCharmPlugin {
+            id = 'org.stepik.gradle.plugins.pycharm'
+            implementationClass = "org.stepik.gradle.plugins.pycharm.PyCharmPlugin"
+        }
+    }
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
