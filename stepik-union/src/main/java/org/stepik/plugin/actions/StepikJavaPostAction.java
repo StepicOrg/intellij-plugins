@@ -27,6 +27,8 @@ import org.stepik.plugin.utils.NotificationUtils;
 import java.io.IOException;
 import java.util.List;
 
+import static org.stepik.plugin.actions.ActionUtils.checkLangSettings;
+
 public class StepikJavaPostAction extends StudyCheckAction {
     private static final Logger logger = Logger.getInstance(StepikJavaPostAction.class);
     private static final String ACTION_ID = "STEPIC.StepikJavaPostAction";
@@ -53,7 +55,11 @@ public class StepikJavaPostAction extends StudyCheckAction {
                         return;
                     }
 
-                    int intAttemptId = 0;
+                    if (!checkLangSettings(task, project)){
+                        return;
+                    }
+
+                    int intAttemptId;
                     try {
                         intAttemptId = StepikConnectorPost.getAttempt(task.getStepId()).attempts.get(0).id;
                     } catch (IOException e) {

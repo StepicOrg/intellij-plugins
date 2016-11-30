@@ -422,12 +422,13 @@ public class StudySerializationUtils {
             Map<String, LangSetting> mapIdLangSet = new java.util.HashMap<>();
             langSettingsMap.entrySet().forEach(element -> {
                         Element langSetting = element.getValue();
-                        final String[] currentLang = new String[1];
-                        langSetting.getChildren().forEach(x -> {
-                            if (x.getAttribute("name").getValue().equals("currentLang")) {
-                                currentLang[0] = x.getAttribute("value").getValue();
-                            }
-                        });
+                        String currentLang = "";
+                        try {
+                            currentLang = getChildWithName(langSetting, "currentLang").getValue();
+                        } catch (StudyUnrecognizedFormatException e) {
+                            e.printStackTrace();
+                        }
+
                         Set<Element> supportLangs = null;
                         try {
                             supportLangs = getChildSet(langSetting, "supportLangs");
@@ -435,9 +436,12 @@ public class StudySerializationUtils {
                             e.printStackTrace();
                         }
                         Set<String> taskLangs = new HashSet<>();
-                        supportLangs.forEach(lang -> taskLangs.add(lang.getAttribute("value").getValue()));
 
-                        LangSetting ls = new LangSetting(currentLang[0], taskLangs);
+                        if (supportLangs != null) {
+                            supportLangs.forEach(lang -> taskLangs.add(lang.getAttribute("value").getValue()));
+                        }
+
+                        LangSetting ls = new LangSetting(currentLang, taskLangs);
                         mapIdLangSet.put(element.getKey(), ls);
                     }
             );

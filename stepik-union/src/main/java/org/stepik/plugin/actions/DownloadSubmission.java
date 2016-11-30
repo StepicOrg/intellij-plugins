@@ -29,6 +29,8 @@ import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.stepik.plugin.actions.ActionUtils.checkLangSettings;
+
 public class DownloadSubmission extends StudyActionWithShortcut {
     private static final String ACTION_ID = "STEPIK.DownloadSubmission";
     private static final String SHORTCUT = "ctrl alt pressed PAGE_DOWN";
@@ -63,6 +65,10 @@ public class DownloadSubmission extends StudyActionWithShortcut {
 
         Task targetTask = StudyUtils.getSelectedTask(project);
         if (targetTask == null) {
+            return;
+        }
+
+        if (!checkLangSettings(targetTask, project)){
             return;
         }
 

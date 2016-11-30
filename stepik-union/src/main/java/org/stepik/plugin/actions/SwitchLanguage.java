@@ -24,6 +24,8 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
+import static org.stepik.plugin.actions.ActionUtils.checkLangSettings;
+
 public class SwitchLanguage extends StudyActionWithShortcut {
     private static final String ACTION_ID = "STEPIK.SwitchLanguage";
     private static final String SHORTCUT = "ctrl alt pressed PAGE_UP";
@@ -52,6 +54,10 @@ public class SwitchLanguage extends StudyActionWithShortcut {
             return;
         }
 
+        if (!checkLangSettings(targetTask, project)){
+            return;
+        }
+
         FileDocumentManager documentManager = FileDocumentManager.getInstance();
         FileEditorManager editorManager = FileEditorManager.getInstance(project);
         for (VirtualFile file : FileEditorManager.getInstance(project).getOpenFiles()) {
@@ -75,16 +81,16 @@ public class SwitchLanguage extends StudyActionWithShortcut {
         if (hide == null) {
             return;
         }
-        PsiDirectory scrPsi = PsiManager.getInstance(project).findDirectory(src);
-        if (scrPsi == null) {
+        PsiDirectory srcPsi = PsiManager.getInstance(project).findDirectory(src);
+        if (srcPsi == null) {
             return;
         }
         SupportedLanguages currentLang = SupportedLanguages.langOf(targetTask.getCurrentLang());
         if (currentLang == null) {
             return;
         }
-        SupportedLanguages secondLang;
 
+        SupportedLanguages secondLang;
         if (currentLang == SupportedLanguages.JAVA) {
             secondLang = SupportedLanguages.PYTHON;
         } else {
@@ -115,7 +121,7 @@ public class SwitchLanguage extends StudyActionWithShortcut {
 
         ApplicationManager.getApplication().runWriteAction(() -> {
             MoveFilesOrDirectoriesUtil.doMoveFile(first, hide);
-            MoveFilesOrDirectoriesUtil.doMoveFile(second, scrPsi);
+            MoveFilesOrDirectoriesUtil.doMoveFile(second, srcPsi);
         });
         String activateFileName = secondLang.getMainFileName();
         targetTask.setCurrentLang(secondLang.getName());

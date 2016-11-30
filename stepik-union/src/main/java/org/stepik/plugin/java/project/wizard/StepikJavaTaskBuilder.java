@@ -26,14 +26,10 @@ import org.stepik.from.edu.intellij.utils.generation.builders.TaskBuilder;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 class StepikJavaTaskBuilder extends JavaModuleBuilder implements TaskBuilder {
     private static final Logger logger = Logger.getInstance(StepikJavaTaskBuilder.class);
@@ -126,28 +122,5 @@ class StepikJavaTaskBuilder extends JavaModuleBuilder implements TaskBuilder {
     public Module createTask(@NotNull ModifiableModuleModel moduleModel) throws InvalidDataException,
             IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
         return createModule(moduleModel);
-    }
-
-    @NotNull
-    private Set<SupportedLanguages> getSupportedLang(@NotNull String path) {
-        Set<SupportedLanguages> supportedLang = new HashSet<>();
-        Path dir = Paths.get(path);
-
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir, "*.java")) {
-            if (stream.iterator().hasNext()) {
-                supportedLang.add(SupportedLanguages.JAVA);
-            }
-        } catch (IOException e) {
-            logger.warn(e.getMessage());
-        }
-
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir, "*.py")) {
-            if (stream.iterator().hasNext()) {
-                supportedLang.add(SupportedLanguages.PYTHON);
-            }
-        } catch (IOException e) {
-            logger.warn(e.getMessage());
-        }
-        return supportedLang;
     }
 }

@@ -233,21 +233,10 @@ public class Task implements StudyItem {
     }
 
     public String getCurrentLang() {
-        if (!supportedLanguages.contains(currentLang)) {
-            currentLang = getPopularLang();
-        }
         return currentLang;
     }
 
     public void setCurrentLang(@NotNull String currentLang) {
         this.currentLang = currentLang;
-    }
-
-    @Nullable
-    private String getPopularLang() {
-        for (String lang : supportedLanguages)
-            if (supportedLanguages.contains(lang))
-                return lang;
-        return null;
     }
 }
