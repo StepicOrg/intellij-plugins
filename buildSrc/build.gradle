@@ -1,28 +1,20 @@
 plugins {
-    id 'com.gradle.plugin-publish' version '0.9.4'
     id 'java-gradle-plugin'
-    id 'maven'
 }
 
-apply plugin: 'groovy'
 apply plugin: 'java'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-
-plugins.withType(JavaPlugin) {
-    project.tasks.withType(GroovyCompile) { task ->
-        task.sourceCompatibility = project.sourceCompatibility
-        task.targetCompatibility = project.targetCompatibility
-    }
-}
-
 repositories {
+    maven { url 'http://dl.bintray.com/jetbrains/intellij-plugin-service' }
     mavenCentral()
 }
 
 dependencies {
     compile gradleApi()
+    compile 'org.jetbrains:annotations:13.0'
+    compile 'org.jetbrains.intellij.plugins:intellij-plugin-structure:1.34'
+
+    testCompile 'junit:junit:4.12'
 }
 
 version = '0.1'
