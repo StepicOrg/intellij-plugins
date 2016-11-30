@@ -12,7 +12,6 @@ import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.jetbrains.tmp.learning.LangSetting;
 import com.jetbrains.tmp.learning.StudyTaskManager;
 import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.core.EduNames;
@@ -35,7 +34,6 @@ import java.nio.file.StandardCopyOption;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 class StepikJavaTaskBuilder extends JavaModuleBuilder implements TaskBuilder {
     private static final Logger logger = Logger.getInstance(StepikJavaTaskBuilder.class);
@@ -92,16 +90,8 @@ class StepikJavaTaskBuilder extends JavaModuleBuilder implements TaskBuilder {
 
         createTaskFiles(myTask, src.getPath());
 
-        Set<SupportedLanguages> supportedLang = myTask.getSupportedLanguages()
-                .stream()
-                .map(SupportedLanguages::langOf)
-                .collect(Collectors.toSet());
         SupportedLanguages currentLang = SupportedLanguages.langOf(myTask.getCurrentLang());
 
-        taskManager.getLangManager()
-                .setLangSetting(myTask,
-                        new LangSetting(currentLang != null ? currentLang.getName() : null,
-                                supportedLang.stream().map(SupportedLanguages::getName).collect(Collectors.toSet())));
         if (currentLang != null)
             moveFromHide(currentLang.getMainFileName(), src);
         return true;

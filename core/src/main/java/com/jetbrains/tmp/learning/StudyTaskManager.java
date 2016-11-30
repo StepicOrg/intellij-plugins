@@ -29,12 +29,10 @@ import java.io.File;
 @State(name = "StepikStudySettings", storages = @Storage("stepik_study_project.xml"))
 public class StudyTaskManager implements PersistentStateComponent<Element>, DumbAware {
     private static final Logger logger = Logger.getInstance(StudyTaskManager.class);
-    public static final int CURRENT_VERSION = 5;
+    private static final int CURRENT_VERSION = 5;
     private StepikUser myUser = new StepikUser();
     private Course myCourse;
-    public int VERSION = CURRENT_VERSION;
-
-    private LangManager langManager = new LangManager();
+    private int VERSION = CURRENT_VERSION;
 
     private StudyToolWindow.StudyToolWindowMode myToolWindowMode = StudyToolWindow.StudyToolWindowMode.TEXT;
     private boolean myTurnEditingMode = false;
@@ -150,14 +148,6 @@ public class StudyTaskManager implements PersistentStateComponent<Element>, Dumb
     @Nullable
     public String getDefaultLang() {
         return defaultLang;
-    }
-
-    public LangManager getLangManager() {
-        return langManager;
-    }
-
-    public void setLangManager(LangManager langManager) {
-        this.langManager = langManager;
     }
 
     public boolean getShowHint() {
