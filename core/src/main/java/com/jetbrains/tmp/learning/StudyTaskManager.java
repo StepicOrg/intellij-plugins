@@ -11,7 +11,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.util.xmlb.XmlSerializer;
 import com.intellij.util.xmlb.annotations.Transient;
-import com.jetbrains.tmp.learning.courseFormat.*;
+import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.stepik.StepikUser;
 import com.jetbrains.tmp.learning.ui.StudyToolWindow;
 import org.jdom.Element;
@@ -29,16 +29,18 @@ import java.io.File;
 @State(name = "StepikStudySettings", storages = @Storage("stepik_study_project.xml"))
 public class StudyTaskManager implements PersistentStateComponent<Element>, DumbAware {
     private static final Logger logger = Logger.getInstance(StudyTaskManager.class);
-    private static final int CURRENT_VERSION = 5;
     private StepikUser myUser = new StepikUser();
     private Course myCourse;
-    private int VERSION = CURRENT_VERSION;
 
     private StudyToolWindow.StudyToolWindowMode myToolWindowMode = StudyToolWindow.StudyToolWindowMode.TEXT;
     private boolean myTurnEditingMode = false;
     private boolean showHint = true;
-
     private String defaultLang;
+
+    // must be public
+    public static final int CURRENT_VERSION = 5;
+    public int VERSION = CURRENT_VERSION;
+
 
     @Transient
     private final Project myProject;
