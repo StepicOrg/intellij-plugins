@@ -2,13 +2,13 @@ apply plugin: 'org.stepik.gradle.plugins.pycharm'
 apply plugin: 'org.stepik.gradle.plugins.idea'
 
 intellij {
-    version project.getProperties().get('ideaVersion')?: 'LATEST-EAP-SNAPSHOT'
-    pluginName 'core'
-    sandboxDirectory project.getProperties().get('ideaSandboxDir')?: 'build/idea-sandbox/'
+    version = project.getProperties().get('ideaVersion')
+    sandboxDirectory = project.getProperties().get('ideaSandboxDir')
+    idePath = project.getProperties().get('ideaPath')
 }
 
 pycharm {
-    version project.getProperties().get('pyCharmVersion')?: 'LATEST-EAP-SNAPSHOT'
-    pluginName 'core'
-    sandboxDirectory project.getProperties().get('pyCharmSandboxDir')?: 'build/pycharm-sandbox/'
+    version = project.getProperties().get('pyCharmVersion')
+    sandboxDirectory = project.getProperties().get('pyCharmSandboxDir')
+    idePath = project.getProperties().get('pyCharmPath')
 }
