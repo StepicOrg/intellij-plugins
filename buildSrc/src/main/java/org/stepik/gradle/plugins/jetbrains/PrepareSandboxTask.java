@@ -17,14 +17,13 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.DirectoryNotEmptyException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.nio.file.attribute.BasicFileAttributes;
 
+/**
+ * @author meanmail
+ */
 public class PrepareSandboxTask extends DefaultTask {
     private static final Logger LOG = Logging.getLogger(PrepareSandboxTask.class);
 
@@ -58,6 +57,7 @@ public class PrepareSandboxTask extends DefaultTask {
         return pluginName != null ? FileUtils.toSafeFileName(pluginName) : null;
     }
 
+    @SuppressWarnings("WeakerAccess")
     @Input
     @Nullable
     public File getConfigDirectory() {
@@ -78,6 +78,7 @@ public class PrepareSandboxTask extends DefaultTask {
         return getProject().file(new File(extension.getSandboxDirectory(), "plugins"));
     }
 
+    @SuppressWarnings("WeakerAccess")
     public PrepareSandboxTask() {
     }
 
@@ -99,7 +100,7 @@ public class PrepareSandboxTask extends DefaultTask {
         Path pluginPath = destinationDir.toPath().resolve(getPluginName());
         Path target = pluginPath.resolve("lib/" + source.getFileName());
         try {
-            deleteDirectory(pluginPath);
+            Utils.deleteDirectory(pluginPath);
             Files.createDirectories(target.getParent());
             Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
@@ -107,44 +108,6 @@ public class PrepareSandboxTask extends DefaultTask {
             return;
         }
         disableIdeUpdate();
-    }
-
-    private void deleteDirectory(Path pluginPath) throws IOException {
-        if (!Files.exists(pluginPath)) {
-            return;
-        }
-
-        Files.walkFileTree(pluginPath, new FileVisitor<Path>() {
-            @Override
-            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-                return FileVisitResult.CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                Files.delete(file);
-                return FileVisitResult.CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-                return FileVisitResult.CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                try {
-                    Files.delete(dir);
-                } catch (DirectoryNotEmptyException ignore) {
-                }
-                return FileVisitResult.CONTINUE;
-            }
-        });
-
-        try {
-            Files.deleteIfExists(pluginPath);
-        } catch (DirectoryNotEmptyException ignore) {
-        }
     }
 
     private void disableIdeUpdate() {
