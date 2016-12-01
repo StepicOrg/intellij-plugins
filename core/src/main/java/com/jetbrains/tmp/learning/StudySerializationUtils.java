@@ -426,14 +426,14 @@ public class StudySerializationUtils {
                         try {
                             currentLang = getChildWithName(langSetting, "currentLang").getValue();
                         } catch (StudyUnrecognizedFormatException e) {
-                            e.printStackTrace();
+                            logger.error(e);
                         }
 
                         Set<Element> supportLangs = null;
                         try {
                             supportLangs = getChildSet(langSetting, "supportLangs");
                         } catch (StudyUnrecognizedFormatException e) {
-                            e.printStackTrace();
+                            logger.error(e);
                         }
                         Set<String> taskLangs = new HashSet<>();
 
