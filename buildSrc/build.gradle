@@ -18,7 +18,7 @@ dependencies {
 }
 
 version = '0.1'
-group = 'org.stepik.gradle.plugins.pycharm'
+group = 'org.stepik.gradle.plugins'
 
 gradlePlugin {
     //noinspection GroovyAssignabilityCheck
@@ -26,6 +26,10 @@ gradlePlugin {
         pyCharmPlugin {
             id = 'org.stepik.gradle.plugins.pycharm'
             implementationClass = "org.stepik.gradle.plugins.pycharm.PyCharmPlugin"
+        }
+        ideaPlugin {
+            id = 'org.stepik.gradle.plugins.idea'
+            implementationClass = "org.stepik.gradle.plugins.idea.IdeaPlugin"
         }
     }
 }
