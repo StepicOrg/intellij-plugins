@@ -4,16 +4,20 @@ import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.stepik.gradle.plugins.jetbrains.dependency.ProductDependency;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @author meanmail
+ */
 public class ProductPluginExtension {
     private static final Logger LOG = Logging.getLogger(ProductPluginExtension.class);
 
-    public static final String DEFAULT_VERSION = "LATEST-EAP-SNAPSHOT";
+    static final String DEFAULT_VERSION = "LATEST-EAP-SNAPSHOT";
     private final Map<String, Object> systemProperties = new HashMap<>();
     private File idePath;
     private String version = DEFAULT_VERSION;
@@ -31,11 +35,13 @@ public class ProductPluginExtension {
     private Project project;
     private BasePlugin plugin;
 
+    @SuppressWarnings("WeakerAccess")
     public String getType() {
         return type;
     }
 
-    void setType(String type) {
+    @SuppressWarnings("WeakerAccess")
+    public void setType(String type) {
         this.type = type;
     }
 
@@ -43,44 +49,48 @@ public class ProductPluginExtension {
         return version.startsWith("CE-") || version.startsWith("IC-") ? version.substring(3) : version;
     }
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings({"WeakerAccess", "unused"})
     public void setVersion(String version) {
-        this.version = version != null? version : DEFAULT_VERSION;
+        this.version = version != null ? version : DEFAULT_VERSION;
     }
 
+    @SuppressWarnings({"WeakerAccess"})
     public Map<String, Object> getSystemProperties() {
         return systemProperties;
     }
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings({"WeakerAccess", "unused"})
     public void setSystemProperties(Map<String, ?> properties) {
         systemProperties.clear();
         systemProperties.putAll(properties);
     }
 
-    @SuppressWarnings("unused")
-    String getSinceBuild() {
+    @SuppressWarnings({"WeakerAccess", "unused"})
+    public String getSinceBuild() {
         return sinceBuild;
     }
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings({"WeakerAccess", "unused"})
     public void setSinceBuild(String sinceBuild) {
         this.sinceBuild = sinceBuild;
     }
 
-    File getSandboxDirectory() {
+    @SuppressWarnings("WeakerAccess")
+    public File getSandboxDirectory() {
         return sandboxDirectory;
     }
 
-    void setSandboxDirectory(Object sandboxDirectory) {
+    @SuppressWarnings({"WeakerAccess"})
+    public void setSandboxDirectory(Object sandboxDirectory) {
         if (sandboxDirectory == null) {
             return;
         }
         this.sandboxDirectory = new File(sandboxDirectory.toString());
     }
 
+    @SuppressWarnings({"WeakerAccess", "unused"})
     @NotNull
-    File getIdePath() {
+    public File getIdePath() {
         if (idePath != null) {
             if (idePath.getName().endsWith(".app")) {
                 idePath = new File(idePath, "Contents");
@@ -96,31 +106,44 @@ public class ProductPluginExtension {
         return Utils.getDefaultIdePath(project, plugin, getType(), getVersion());
     }
 
+    @SuppressWarnings("WeakerAccess")
     public void setIdePath(Object idePath) {
         if (idePath instanceof File) {
             this.idePath = (File) idePath;
         }
 
-        this.idePath = idePath != null? new File(idePath.toString()) : null;
+        this.idePath = idePath != null ? new File(idePath.toString()) : null;
     }
 
-    String getPluginName() {
+    @SuppressWarnings("WeakerAccess")
+    public String getPluginName() {
         return pluginName;
     }
 
-    void setPluginName(String pluginName) {
+    @SuppressWarnings("WeakerAccess")
+    public void setPluginName(String pluginName) {
         this.pluginName = pluginName;
     }
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings({"WeakerAccess", "unused"})
+    @Nullable
     public String getRepository() {
+        if (repository == null) {
+            return null;
+        }
+        repository = repository.replaceAll("\\$\\{productName}", plugin.getProductName());
+        repository = repository.replaceAll("\\$\\{productType}", plugin.getProductType());
+        repository = repository.replaceAll("\\$\\{version}", plugin.getProductType());
+
         return repository;
     }
 
-    void setRepository(String repository) {
+    @SuppressWarnings("WeakerAccess")
+    public void setRepository(String repository) {
         this.repository = repository;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public String getUntilBuild() {
         return untilBuild;
     }
@@ -138,10 +161,12 @@ public class ProductPluginExtension {
         this.dependency = dependency;
     }
 
-    boolean getUpdateSinceUntilBuild() {
+    @SuppressWarnings("WeakerAccess")
+    public boolean getUpdateSinceUntilBuild() {
         return updateSinceUntilBuild;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public boolean isUpdateSinceUntilBuild() {
         return updateSinceUntilBuild;
     }
@@ -151,7 +176,8 @@ public class ProductPluginExtension {
         this.updateSinceUntilBuild = updateSinceUntilBuild;
     }
 
-    boolean getSameSinceUntilBuild() {
+    @SuppressWarnings("WeakerAccess")
+    public boolean getSameSinceUntilBuild() {
         return sameSinceUntilBuild;
     }
 
@@ -165,6 +191,7 @@ public class ProductPluginExtension {
         this.sameSinceUntilBuild = sameSinceUntilBuild;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public String getPluginDescription() {
         return pluginDescription;
     }
@@ -186,6 +213,7 @@ public class ProductPluginExtension {
         this.pluginDescription = pluginDescription.toString();
     }
 
+    @SuppressWarnings("WeakerAccess")
     public String getChangeNotes() {
         return changeNotes;
     }
