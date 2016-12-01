@@ -48,7 +48,7 @@ public abstract class BasePlugin implements Plugin<Project> {
         extension.setPluginName(project.getName());
         File defaultSandboxDirectory = new File(project.getBuildDir(),productName.toLowerCase() + "-sandbox");
         extension.setSandboxDirectory(defaultSandboxDirectory);
-        extension.setRepository(getRepository(extension));
+        extension.setRepository(getRepositoryTemplate());
         extension.setExtensionProject(project);
         extension.setPlugin(this);
         extension.setIdePath(Utils.getDefaultIdePath(project, this, productType,
@@ -57,7 +57,7 @@ public abstract class BasePlugin implements Plugin<Project> {
         configureTasks(project, extension);
     }
 
-    protected abstract String getRepository(@NotNull ProductPluginExtension extension);
+    protected abstract String getRepositoryTemplate();
 
     private void configureTasks(@NotNull Project project, @NotNull final ProductPluginExtension extension) {
         LOG.info("Configuring {} gradle plugin", productName);
@@ -94,7 +94,7 @@ public abstract class BasePlugin implements Plugin<Project> {
 
             if (file == null) {
                 System.out.println(productName + " not loaded");
-                LOG.warn("{} not loaded from {}", productName, getRepository(extension));
+                LOG.warn("{} not loaded from {}", productName, extension.getRepository());
                 return;
             }
 
@@ -119,7 +119,11 @@ public abstract class BasePlugin implements Plugin<Project> {
     private File downloadProduct(@NotNull ProductPluginExtension extension, @NotNull String ideVersion) {
         URL url;
         File file;
-        String repository = getRepository(extension);
+        String repository = extension.getRepository();
+        if (repository == null) {
+            return null;
+        }
+
         try {
             url = new URL(repository);
             Path tempDirectory = Files.createTempDirectory("product");
@@ -214,5 +218,9 @@ public abstract class BasePlugin implements Plugin<Project> {
 
     String getPrepareSandboxTaskName() {
         return prepareSandboxTaskName;
+    }
+
+    String getProductType() {
+        return productType;
     }
 }
