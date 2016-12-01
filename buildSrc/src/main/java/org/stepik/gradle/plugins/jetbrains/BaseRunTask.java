@@ -4,6 +4,7 @@ import org.codehaus.groovy.runtime.DefaultGroovyMethods;
 import org.gradle.api.Project;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.tasks.InputDirectory;
+import org.gradle.api.tasks.Internal;
 import org.gradle.api.tasks.JavaExec;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.internal.jvm.Jvm;
@@ -18,6 +19,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author meanmail
+ */
 public abstract class BaseRunTask extends JavaExec {
     private ProductPluginExtension extension;
     private BasePlugin plugin;
@@ -109,6 +113,7 @@ public abstract class BaseRunTask extends JavaExec {
         super.exec();
     }
 
+    @Internal
     protected abstract String[] getLibs();
 
     private void configureClasspath() {
@@ -123,6 +128,7 @@ public abstract class BaseRunTask extends JavaExec {
         Arrays.stream(libs).forEach(lib -> classpath.add(project.files(String.valueOf(ideaDirectory) + "/lib/" + lib)));
     }
 
+    @Internal
     protected abstract String getPlatformPrefix();
 
     private void configureSystemProperties() {

@@ -16,6 +16,9 @@ import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.function.Predicate;
 
+/**
+ * @author meanmail
+ */
 public class DependencyManager {
     @NotNull
     public static ProductDependency resolveLocal(
@@ -99,7 +102,8 @@ public class DependencyManager {
             generator.addConfiguration(new DefaultIvyConfiguration("default"));
             generator.addConfiguration(new DefaultIvyConfiguration("compile"));
             generator.addConfiguration(new DefaultIvyConfiguration("sources"));
-            dependency.getJarFiles().forEach(jar -> generator.addArtifact(createJarCompileDependency(jar, dependency.getClasses())));
+            dependency.getJarFiles()
+                    .forEach(jar -> generator.addArtifact(createJarCompileDependency(jar, dependency.getClasses())));
 
             generator.writeTo(ivyFile);
         }

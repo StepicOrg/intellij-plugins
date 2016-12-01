@@ -2,10 +2,13 @@ package org.stepik.gradle.plugins.idea;
 
 import org.stepik.gradle.plugins.jetbrains.BaseRunTask;
 
+/**
+ * @author meanmail
+ */
 public class RunIdeaTask extends BaseRunTask {
     @Override
-    public String[] getLibs() {
-        return new String[] {
+    protected String[] getLibs() {
+        return new String[]{
                 "idea_rt.jar",
                 "idea.jar",
                 "bootstrap.jar",
@@ -19,7 +22,7 @@ public class RunIdeaTask extends BaseRunTask {
     }
 
     @Override
-    public String getPlatformPrefix() {
+    protected String getPlatformPrefix() {
         return "Idea";
     }
 

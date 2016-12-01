@@ -9,6 +9,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
+/**
+ * @author meanmail
+ */
 @ToString(includeNames = true, includeFields = true, ignoreNulls = true)
 public class ProductDependency implements Serializable {
     @NotNull
@@ -32,6 +35,7 @@ public class ProductDependency implements Serializable {
         this.withKotlin = withKotlin;
     }
 
+    @NotNull
     private Collection<File> collectJarFiles() {
         File lib = new File(classes, "lib");
         if (lib.exists()) {
@@ -46,7 +50,7 @@ public class ProductDependency implements Serializable {
     }
 
     @NotNull
-    public String getVersion() {
+    String getVersion() {
         return version;
     }
 
@@ -61,11 +65,12 @@ public class ProductDependency implements Serializable {
     }
 
     @NotNull
-    public Collection<File> getJarFiles() {
+    Collection<File> getJarFiles() {
         return jarFiles;
     }
 
-    public String getFqn(@NotNull String productName) {
+    @NotNull
+    String getFqn(@NotNull String productName) {
         String fqn = productName + version;
         if (withKotlin) {
             fqn += "-withKotlin";

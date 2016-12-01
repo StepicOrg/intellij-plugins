@@ -17,6 +17,9 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * @author meanmail
+ */
 public class PatchPluginXmlTask extends ConventionTask {
     private String destinationDirName;
     private ProductPluginExtension extension;
@@ -45,7 +48,7 @@ public class PatchPluginXmlTask extends ConventionTask {
     @Input
     @Optional
     public String getPluginDescription() {
-        return extension != null? extension.getPluginDescription() : null;
+        return extension != null ? extension.getPluginDescription() : null;
     }
 
     @SuppressWarnings("WeakerAccess")
@@ -80,7 +83,7 @@ public class PatchPluginXmlTask extends ConventionTask {
     @Input
     @Optional
     public String getChangeNotes() {
-        return extension != null? extension.getChangeNotes() : null;
+        return extension != null ? extension.getChangeNotes() : null;
     }
 
     @TaskAction
@@ -136,11 +139,11 @@ public class PatchPluginXmlTask extends ConventionTask {
         }
     }
 
-    public void setDestinationDirName(String destinationDirName) {
+    void setDestinationDirName(String destinationDirName) {
         this.destinationDirName = destinationDirName;
     }
 
-    public void setExtension(ProductPluginExtension extension) {
+    void setExtension(ProductPluginExtension extension) {
         this.extension = extension;
     }
 }
