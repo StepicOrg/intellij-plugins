@@ -18,8 +18,14 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.file.DirectoryNotEmptyException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.FileVisitor;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -41,6 +47,16 @@ class Utils {
         try {
             SAXBuilder builder = new SAXBuilder();
             return builder.build(file);
+        } catch (JDOMException | IOException e) {
+            return null;
+        }
+    }
+
+    @Nullable
+    static Document getXmlDocument(@NotNull InputStream input) {
+        try {
+            SAXBuilder builder = new SAXBuilder();
+            return builder.build(input);
         } catch (JDOMException | IOException e) {
             return null;
         }
@@ -118,12 +134,14 @@ class Utils {
     }
 
     static void repairUpdateXml(Document doc) {
-        Element applicationNode = doc.getRootElement();
+        Element applicationNode;
 
-        if (applicationNode == null) {
+        if (!doc.hasRootElement()) {
             applicationNode = new Element(APPLICATION);
             doc.setRootElement(applicationNode);
         }
+
+        applicationNode = doc.getRootElement();
 
         if (!APPLICATION.equals(applicationNode.getName())) {
             applicationNode.setName(APPLICATION);
@@ -145,7 +163,7 @@ class Utils {
 
         Attribute name = component.getAttribute(NAME);
 
-        if ( name == null || UPDATES_CONFIGURABLE.equals(name.getValue())) {
+        if (name == null || UPDATES_CONFIGURABLE.equals(name.getValue())) {
             Utils.setAttributeValue(component, NAME, UPDATES_CONFIGURABLE);
         }
 
@@ -196,5 +214,43 @@ class Utils {
                 plugin.getProductGroup(), name, name + type);
 
         return new File(gradleHomePath, defaultRelativePath + "/" + version);
+    }
+
+    static void deleteDirectory(Path pluginPath) throws IOException {
+        if (!Files.exists(pluginPath)) {
+            return;
+        }
+
+        Files.walkFileTree(pluginPath, new FileVisitor<Path>() {
+            @Override
+            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                Files.delete(file);
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                try {
+                    Files.delete(dir);
+                } catch (DirectoryNotEmptyException ignore) {
+                }
+                return FileVisitResult.CONTINUE;
+            }
+        });
+
+        try {
+            Files.deleteIfExists(pluginPath);
+        } catch (DirectoryNotEmptyException ignore) {
+        }
     }
 }
