@@ -1,8 +1,6 @@
 package org.stepik.gradle.plugins.pycharm;
 
-import org.jetbrains.annotations.NotNull;
 import org.stepik.gradle.plugins.jetbrains.BasePlugin;
-import org.stepik.gradle.plugins.jetbrains.ProductPluginExtension;
 
 /**
  * @author meanmail
@@ -10,7 +8,7 @@ import org.stepik.gradle.plugins.jetbrains.ProductPluginExtension;
 public class PyCharmPlugin extends BasePlugin {
     private static final String PRODUCT_NAME = "PyCharm";
     private static final String EXTENSION_NAME = "pycharm";
-    private static final String DEFAULT_REPO = "https://download-cf.jetbrains.com/python/pycharm-community-";
+    private static final String DEFAULT_REPO = "https://download-cf.jetbrains.com/python/pycharm-community-${version}.zip";
 
     public PyCharmPlugin() {
         extensionName = EXTENSION_NAME;
@@ -22,7 +20,7 @@ public class PyCharmPlugin extends BasePlugin {
     }
 
     @Override
-    public String getRepository(@NotNull final ProductPluginExtension extension) {
-        return DEFAULT_REPO + extension.getVersion() + ".zip";
+    public String getRepositoryTemplate() {
+        return DEFAULT_REPO;
     }
 }
