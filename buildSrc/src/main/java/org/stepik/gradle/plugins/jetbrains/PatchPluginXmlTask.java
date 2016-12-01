@@ -1,6 +1,5 @@
 package org.stepik.gradle.plugins.jetbrains;
 
-import com.intellij.structure.domain.IdeVersion;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.internal.ConventionTask;
 import org.gradle.api.tasks.Input;
@@ -56,7 +55,11 @@ public class PatchPluginXmlTask extends ConventionTask {
     @Optional
     public String getSinceBuild() {
         if (extension.getUpdateSinceUntilBuild()) {
-            IdeVersion ideVersion = IdeVersion.createIdeVersion(extension.getDependency().getBuildNumber());
+            IdeVersion ideVersion = IdeVersion.fromString(extension.getDependency().getBuildNumber());
+            if (ideVersion == null) {
+                return null;
+            }
+
             return ideVersion.getBaselineVersion() + "." + ideVersion.getBuild();
         }
 
@@ -68,7 +71,10 @@ public class PatchPluginXmlTask extends ConventionTask {
     @Optional
     public String getUntilBuild() {
         if (extension.getUpdateSinceUntilBuild()) {
-            IdeVersion ideVersion = IdeVersion.createIdeVersion(extension.getDependency().getBuildNumber());
+            IdeVersion ideVersion = IdeVersion.fromString(extension.getDependency().getBuildNumber());
+            if (ideVersion == null) {
+                return null;
+            }
 
             if (extension.getSameSinceUntilBuild()) {
                 return ideVersion.getBaselineVersion() + ".*";

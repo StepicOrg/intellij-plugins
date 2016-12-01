@@ -52,6 +52,7 @@ class Utils {
         }
     }
 
+    @SuppressWarnings("unused")
     @Nullable
     static Document getXmlDocument(@NotNull InputStream input) {
         try {

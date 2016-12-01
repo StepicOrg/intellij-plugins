@@ -5,14 +5,14 @@ plugins {
 apply plugin: 'java'
 
 repositories {
-    maven { url 'http://dl.bintray.com/jetbrains/intellij-plugin-service' }
     mavenCentral()
 }
 
 dependencies {
     compile gradleApi()
-    compile 'org.jetbrains:annotations:13.0'
-    compile 'org.jetbrains.intellij.plugins:intellij-plugin-structure:1.34'
+    compile 'org.jetbrains:annotations:15.0'
+    compile 'org.jdom:jdom2:2.0.6'
+
 
     testCompile 'junit:junit:4.12'
 }
