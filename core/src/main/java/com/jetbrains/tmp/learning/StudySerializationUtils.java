@@ -13,6 +13,7 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -321,9 +322,9 @@ public class StudySerializationUtils {
             return Collections.emptyList();
         }
 
-        public static Set<Element> getChildSet(Element parent, String name) throws StudyUnrecognizedFormatException {
-            Element listParent = null;
-            listParent = getChildWithName(parent, name);
+        @NotNull
+        public static Set<Element> getChildSet(Element parent, String name) {
+            Element listParent = getChildByNameOrEmpty(parent, name);
             if (listParent != null) {
                 Element list = listParent.getChild("set");
                 if (list != null) {
@@ -416,33 +417,20 @@ public class StudySerializationUtils {
                 throws StudyUnrecognizedFormatException {
             Element taskManagerElement = state.getChild(MAIN_ELEMENT);
 
-
             Element langManager = getChildWithName(taskManagerElement, "langManager").getChild("LangManager");
             Map<String, Element> langSettingsMap = getChildMap(langManager, "langSettingsMap");
-            Map<String, LangSetting> mapIdLangSet = new java.util.HashMap<>();
+            Map<String, Pair<String, Set<String>>> mapIdLangSetting = Collections.emptyMap();
             langSettingsMap.entrySet().forEach(element -> {
                         Element langSetting = element.getValue();
-                        String currentLang = "";
-                        try {
-                            currentLang = getChildWithName(langSetting, "currentLang").getValue();
-                        } catch (StudyUnrecognizedFormatException e) {
-                            logger.error(e);
-                        }
 
-                        Set<Element> supportLangs = null;
-                        try {
-                            supportLangs = getChildSet(langSetting, "supportLangs");
-                        } catch (StudyUnrecognizedFormatException e) {
-                            logger.error(e);
-                        }
-                        Set<String> taskLangs = new HashSet<>();
+                        String currentLang = getChildByNameOrEmpty(langSetting, "currentLang").getValue();
+                        Set<Element> supportLangs = getChildSet(langSetting, "supportLangs");
+                        Set<String> taskLangs = Collections.emptySet();
 
-                        if (supportLangs != null) {
-                            supportLangs.forEach(lang -> taskLangs.add(lang.getAttribute("value").getValue()));
-                        }
+                        supportLangs.forEach(lang -> taskLangs.add(lang.getAttribute("value").getValue()));
 
-                        LangSetting ls = new LangSetting(currentLang, taskLangs);
-                        mapIdLangSet.put(element.getKey(), ls);
+                        Pair<String, Set<String>> ls = Pair.create(currentLang,taskLangs);
+                        mapIdLangSetting.put(element.getKey(), ls);
                     }
             );
 
@@ -452,18 +440,17 @@ public class StudySerializationUtils {
                 return state;
             }
 
-
             List<Element> sections = getChildList(courseElement, SECTIONS);
             for (Element section : sections) {
                 List<Element> lessons = getChildList(section, LESSONS);
                 for (Element lesson : lessons) {
                     List<Element> taskList = getChildList(lesson, TASK_LIST);
                     for (Element task : taskList) {
-                        LangSetting ls = mapIdLangSet.get(getChildWithName(task, "stepId").getAttributeValue("value"));
+                        Pair<String, Set<String>> ls = mapIdLangSetting.get(getChildWithName(task, "stepId").getAttributeValue("value"));
                         if (ls != null) {
-                            addChildWithName(task, "currentLang", ls.getCurrentLang());
+                            addChildWithName(task, "currentLang", ls.first);
                             Element set = new Element("set");
-                            ls.getSupportLangs().forEach(suppLang -> {
+                            ls.second.forEach(suppLang -> {
                                 Element child = new Element(OPTION);
                                 child.setAttribute(VALUE, suppLang);
                                 set.addContent(child);
@@ -474,6 +461,17 @@ public class StudySerializationUtils {
                 }
             }
             return state;
+        }
+
+        private static final Element EMPTY_ELEMENT = new Element("");
+
+        private static Element getChildByNameOrEmpty(Element element, String name) {
+            try {
+                return getChildWithName(element, name);
+            } catch (StudyUnrecognizedFormatException e) {
+                logger.warn(e);
+                return EMPTY_ELEMENT;
+            }
         }
     }
 
