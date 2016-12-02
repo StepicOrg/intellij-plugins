@@ -133,8 +133,7 @@ public class ProductPluginExtension {
         }
         repository = repository.replaceAll("\\$\\{productName}", plugin.getProductName());
         repository = repository.replaceAll("\\$\\{productType}", plugin.getProductType());
-        repository = repository.replaceAll("\\$\\{version}", plugin.getProductType());
-
+        repository = repository.replaceAll("\\$\\{version}", getVersion());
         return repository;
     }
 
