@@ -21,7 +21,7 @@ public class ProductDependency implements Serializable {
     @NotNull
     private final File classes;
     @NotNull
-    private final Collection<File> jarFiles = collectJarFiles();
+    private final Collection<File> jarFiles;
     private final boolean withKotlin;
 
     ProductDependency(
@@ -33,6 +33,7 @@ public class ProductDependency implements Serializable {
         this.buildNumber = buildNumber;
         this.classes = classes;
         this.withKotlin = withKotlin;
+        this.jarFiles = collectJarFiles();
     }
 
     @NotNull
