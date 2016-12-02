@@ -9,6 +9,7 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.xmlb.annotations.Transient;
 import com.jetbrains.tmp.learning.StudyUtils;
+import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.core.EduNames;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -37,10 +38,10 @@ public class Task implements StudyItem {
     @Expose
     private Map<String, String> timeLimits = new HashMap<>();
     @Expose
-    private Set<String> supportedLanguages = new HashSet<>();
+    private Set<SupportedLanguages> supportedLanguages = new HashSet<>();
     @NotNull
     @Expose
-    private String currentLang = "";
+    private SupportedLanguages currentLang;
     @Transient
     @NotNull
     private String directory = "";
@@ -203,7 +204,7 @@ public class Task implements StudyItem {
     }
 
     public String getDescription() {
-        return text + getTimeLimit(currentLang);
+        return text + getTimeLimit(currentLang.getName());
     }
 
     public Map<String, String> getTimeLimits() {
@@ -220,23 +221,23 @@ public class Task implements StudyItem {
         return timeLimits.getOrDefault(lang, "");
     }
 
-    public void addLang(String lang) {
+    public void addLang(SupportedLanguages lang) {
         supportedLanguages.add(lang);
     }
 
-    public Set<String> getSupportedLanguages() {
+    public Set<SupportedLanguages> getSupportedLanguages() {
         return supportedLanguages;
     }
 
-    public void setSupportedLanguages(Set<String> supportedLanguages) {
+    public void setSupportedLanguages(Set<SupportedLanguages> supportedLanguages) {
         this.supportedLanguages = supportedLanguages;
     }
 
-    public String getCurrentLang() {
+    public SupportedLanguages getCurrentLang() {
         return currentLang;
     }
 
-    public void setCurrentLang(@NotNull String currentLang) {
+    public void setCurrentLang(@NotNull SupportedLanguages currentLang) {
         this.currentLang = currentLang;
     }
 }

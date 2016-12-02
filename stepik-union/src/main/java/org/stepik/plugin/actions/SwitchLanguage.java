@@ -85,7 +85,7 @@ public class SwitchLanguage extends StudyActionWithShortcut {
         if (srcPsi == null) {
             return;
         }
-        SupportedLanguages currentLang = SupportedLanguages.langOf(targetTask.getCurrentLang());
+        SupportedLanguages currentLang = targetTask.getCurrentLang();
         if (currentLang == null) {
             return;
         }
@@ -124,7 +124,7 @@ public class SwitchLanguage extends StudyActionWithShortcut {
             MoveFilesOrDirectoriesUtil.doMoveFile(second, srcPsi);
         });
         String activateFileName = secondLang.getMainFileName();
-        targetTask.setCurrentLang(secondLang.getName());
+        targetTask.setCurrentLang(secondLang);
 
         VirtualFile vf = src.findChild(activateFileName);
         if (vf != null)

@@ -157,7 +157,7 @@ public class StepikConnectorPost {
             final Map<String, TaskFile> taskFiles = task.getTaskFiles();
             final ArrayList<StepikWrappers.SolutionFile> files = taskFiles.values()
                     .stream()
-                    .map(fileEntry -> new StepikWrappers.SolutionFile(fileEntry.name, fileEntry.text))
+                    .map(fileEntry -> new StepikWrappers.SolutionFile(fileEntry.getName(), fileEntry.getText()))
                     .collect(Collectors.toCollection(ArrayList::new));
             postSubmission(true, attempt, files);
         } catch (IOException e) {
@@ -220,7 +220,7 @@ public class StepikConnectorPost {
             final Map<String, TaskFile> taskFiles = task.getTaskFiles();
             final ArrayList<StepikWrappers.SolutionFile> files = taskFiles.values()
                     .stream()
-                    .map(fileEntry -> new StepikWrappers.SolutionFile(fileEntry.name, fileEntry.text))
+                    .map(fileEntry -> new StepikWrappers.SolutionFile(fileEntry.getName(), fileEntry.getText()))
                     .collect(Collectors.toCollection(ArrayList::new));
             postSubmission(passed, attempt, files);
         } catch (IOException e) {

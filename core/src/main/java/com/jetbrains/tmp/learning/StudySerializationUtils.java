@@ -324,7 +324,7 @@ public class StudySerializationUtils {
 
         @NotNull
         public static Set<Element> getChildSet(Element parent, String name) {
-            Element listParent = getChildByNameOrEmpty(parent, name);
+            Element listParent = getChildWithNameOrNull(parent, name);
             if (listParent != null) {
                 Element list = listParent.getChild("set");
                 if (list != null) {
@@ -419,17 +419,19 @@ public class StudySerializationUtils {
 
             Element langManager = getChildWithName(taskManagerElement, "langManager").getChild("LangManager");
             Map<String, Element> langSettingsMap = getChildMap(langManager, "langSettingsMap");
-            Map<String, Pair<String, Set<String>>> mapIdLangSetting = Collections.emptyMap();
+            Map<String, Pair<String, Set<String>>> mapIdLangSetting = new java.util.HashMap<>();
             langSettingsMap.entrySet().forEach(element -> {
                         Element langSetting = element.getValue();
 
-                        String currentLang = getChildByNameOrEmpty(langSetting, "currentLang").getValue();
+                        Element currentLangElement = getChildWithNameOrNull(langSetting, "currentLang");
+                        String currentLang = currentLangElement == null ? "" : currentLangElement.getValue();
+
                         Set<Element> supportLangs = getChildSet(langSetting, "supportLangs");
-                        Set<String> taskLangs = Collections.emptySet();
+                        Set<String> taskLangs = new HashSet<>();
 
                         supportLangs.forEach(lang -> taskLangs.add(lang.getAttribute("value").getValue()));
 
-                        Pair<String, Set<String>> ls = Pair.create(currentLang,taskLangs);
+                        Pair<String, Set<String>> ls = Pair.create(currentLang, taskLangs);
                         mapIdLangSetting.put(element.getKey(), ls);
                     }
             );
@@ -446,7 +448,8 @@ public class StudySerializationUtils {
                 for (Element lesson : lessons) {
                     List<Element> taskList = getChildList(lesson, TASK_LIST);
                     for (Element task : taskList) {
-                        Pair<String, Set<String>> ls = mapIdLangSetting.get(getChildWithName(task, "stepId").getAttributeValue("value"));
+                        Pair<String, Set<String>> ls = mapIdLangSetting.get(
+                                getChildWithName(task, "stepId").getAttributeValue("value"));
                         if (ls != null) {
                             addChildWithName(task, "currentLang", ls.first);
                             Element set = new Element("set");
@@ -463,14 +466,12 @@ public class StudySerializationUtils {
             return state;
         }
 
-        private static final Element EMPTY_ELEMENT = new Element("");
-
-        private static Element getChildByNameOrEmpty(Element element, String name) {
+        private static Element getChildWithNameOrNull(Element element, String name) {
             try {
                 return getChildWithName(element, name);
             } catch (StudyUnrecognizedFormatException e) {
                 logger.warn(e);
-                return EMPTY_ELEMENT;
+                return null;
             }
         }
     }

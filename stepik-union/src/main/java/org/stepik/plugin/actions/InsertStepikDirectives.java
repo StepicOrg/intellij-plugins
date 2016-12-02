@@ -74,7 +74,7 @@ public class InsertStepikDirectives extends StudyActionWithShortcut {
                 documentManager.saveDocument(document);
         }
 
-        SupportedLanguages currentLang = SupportedLanguages.langOf(targetTask.getCurrentLang());
+        SupportedLanguages currentLang = targetTask.getCurrentLang();
         if (currentLang == null) {
             return;
         }

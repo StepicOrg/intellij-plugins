@@ -73,7 +73,7 @@ public class StepikJavaPostAction extends StudyCheckAction {
                     }
                     String attemptId = Integer.toString(intAttemptId);
 
-                    SupportedLanguages currentLang = SupportedLanguages.langOf(task.getCurrentLang());
+                    SupportedLanguages currentLang = task.getCurrentLang();
                     if (currentLang == null) {
                         return;
                     }

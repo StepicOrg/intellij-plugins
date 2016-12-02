@@ -92,7 +92,7 @@ public class DownloadSubmission extends StudyActionWithShortcut {
                 targetTask.getStepId());
         StepikConnectorPost.postMetric(metric);
 
-        SupportedLanguages currentLang = SupportedLanguages.langOf(targetTask.getCurrentLang());
+        SupportedLanguages currentLang = targetTask.getCurrentLang();
         if (currentLang == null) {
             return;
         }

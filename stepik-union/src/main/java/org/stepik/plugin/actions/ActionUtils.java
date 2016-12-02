@@ -20,11 +20,11 @@ class ActionUtils {
             return false;
         }
 
-        Optional<String> lang = Optional.of(task.getCurrentLang());
-        if (src.findChild(SupportedLanguages.langOf(lang.get()).getMainFileName()) == null) {
+        Optional<SupportedLanguages> lang = Optional.of(task.getCurrentLang());
+        if (src.findChild(lang.get().getMainFileName()) == null) {
             lang = task.getSupportedLanguages()
                     .stream()
-                    .filter(x -> src.findChild(SupportedLanguages.langOf(x).getMainFileName()) != null)
+                    .filter(x -> src.findChild(x.getMainFileName()) != null)
                     .findFirst();
         }
 

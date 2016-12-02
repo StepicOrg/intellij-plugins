@@ -347,12 +347,12 @@ public class StepikConnectorGet {
         );
     }
 
-    private static void setTemplate(Task task, StepikWrappers.Step step, String lang) {
+    private static void setTemplate(Task task, StepikWrappers.Step step, SupportedLanguages lang) {
         String templateForTask;
-        templateForTask = step.options.codeTemplates.getTemplateForLanguage(lang);
+        templateForTask = step.options.codeTemplates.getTemplateForLanguage(lang.getName());
         if (templateForTask != null) {
             final TaskFile taskFile = new TaskFile();
-            taskFile.setName(SupportedLanguages.langOf(lang).getMainFileName());
+            taskFile.setName(lang.getMainFileName());
             taskFile.setText(templateForTask);
             task.taskFiles.put(taskFile.getName(), taskFile);
         }
@@ -360,19 +360,19 @@ public class StepikConnectorGet {
 
     private static void setSupportedLang(Task task, StepikWrappers.Step step) {
         if (step.options.codeTemplates.java8 != null)
-            task.addLang(SupportedLanguages.JAVA.getName());
+            task.addLang(SupportedLanguages.JAVA);
         if (step.options.codeTemplates.python3 != null)
-            task.addLang(SupportedLanguages.PYTHON.getName());
+            task.addLang(SupportedLanguages.PYTHON);
     }
 
     private static void setTimeLimits(Task task, StepikWrappers.Step step) {
         Map<String, String> timeLimits = new HashMap<>();
-        Set<String> langSet = task.getSupportedLanguages();
+        Set<SupportedLanguages> langSet = task.getSupportedLanguages();
 
         StepikWrappers.LimitsWrapper limits = step.options.limits;
         for (Field field : limits.getClass().getDeclaredFields()) {
             String curLang = field.getName();
-            if (langSet.contains(curLang)) {
+            if (langSet.contains(SupportedLanguages.langOf(curLang))) {
                 try {
                     putIfNotNull(timeLimits, curLang, field.get(limits).toString());
                 } catch (IllegalAccessException e) {

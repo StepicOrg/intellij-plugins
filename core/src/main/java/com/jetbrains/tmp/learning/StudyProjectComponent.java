@@ -49,7 +49,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -185,7 +185,11 @@ public class StudyProjectComponent implements ProjectComponent {
     private void addShortcut(@NotNull final String actionIdString, @NotNull final String[] shortcuts) {
         KeymapManagerEx keymapManager = KeymapManagerEx.getInstanceEx();
         for (Keymap keymap : keymapManager.getAllKeymaps()) {
-            List<Pair<String, String>> pairs = myDeletedShortcuts.computeIfAbsent(keymap, k -> Collections.emptyList());
+            List<Pair<String, String>> pairs = myDeletedShortcuts.get(keymap);
+            if (pairs == null) {
+                pairs = new ArrayList<>();
+                myDeletedShortcuts.put(keymap, pairs);
+            }
             for (String shortcutString : shortcuts) {
                 Shortcut studyActionShortcut = new KeyboardShortcut(KeyStroke.getKeyStroke(shortcutString), null);
                 String[] actionsIds = keymap.getActionIds(studyActionShortcut);

@@ -64,7 +64,7 @@ class StepikJavaTaskBuilder extends JavaModuleBuilder implements TaskBuilder {
         if (defaultLangName == null) {
             return false;
         }
-        myTask.setCurrentLang(defaultLangName);
+        myTask.setCurrentLang(SupportedLanguages.langOf(defaultLangName));
         Course course = myTask.getLesson().getSection().getCourse();
         String directory = getModuleFileDirectory();
         if (directory == null) {
@@ -86,7 +86,7 @@ class StepikJavaTaskBuilder extends JavaModuleBuilder implements TaskBuilder {
 
         createTaskFiles(myTask, src.getPath());
 
-        SupportedLanguages currentLang = SupportedLanguages.langOf(myTask.getCurrentLang());
+        SupportedLanguages currentLang = myTask.getCurrentLang();
 
         if (currentLang != null)
             moveFromHide(currentLang.getMainFileName(), src);
