@@ -67,7 +67,7 @@ public abstract class StudyBasePluginConfigurator implements StudyPluginConfigur
             }
 
             private void setTaskText(@Nullable final Task task, @Nullable final VirtualFile taskDirectory) {
-                String text = StudyUtils.getTaskTextFromTask(taskDirectory, task, project);
+                String text = StudyUtils.getTaskTextFromTask(task);
                 if (text == null) {
                     toolWindow.setEmptyText(project);
                     return;

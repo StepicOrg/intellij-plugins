@@ -16,7 +16,7 @@ class ActionUtils {
         String srcPath = String.join("/", task.getPath(), EduNames.SRC);
         VirtualFile src = project.getBaseDir().findFileByRelativePath(srcPath);
         if (src == null) {
-            logger.warn("Can't find SRC vf");
+            logger.warn("Can't find VF for: " + srcPath);
             return false;
         }
 

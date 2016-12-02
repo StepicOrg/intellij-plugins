@@ -11,9 +11,9 @@ import org.jetbrains.annotations.NotNull;
 
 public class TaskFile {
     @Expose
-    public String name;
+    private String name;
     @Expose
-    public String text;
+    private String text;
     @Transient
     private Task myTask;
 
@@ -31,5 +31,21 @@ public class TaskFile {
 
     public static void copy(@NotNull final TaskFile source, @NotNull final TaskFile target) {
         target.name = source.name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
     }
 }

@@ -41,7 +41,6 @@ public class StudyTaskManager implements PersistentStateComponent<Element>, Dumb
     public static final int CURRENT_VERSION = 5;
     public int VERSION = CURRENT_VERSION;
 
-
     @Transient
     private final Project myProject;
 
@@ -94,7 +93,7 @@ public class StudyTaskManager implements PersistentStateComponent<Element>, Dumb
                     state = StudySerializationUtils.Xml.convertToFifthVersion(state, myProject);
                     //uncomment for future versions
                     //case 5:
-                    //state = StudySerializationUtils.Xml.convertToSixVersion(state, myProject);
+                    //state = StudySerializationUtils.Xml.convertToSixthVersion(state, myProject);
             }
             XmlSerializer.deserializeInto(this, state.getChild(StudySerializationUtils.Xml.MAIN_ELEMENT));
             VERSION = CURRENT_VERSION;

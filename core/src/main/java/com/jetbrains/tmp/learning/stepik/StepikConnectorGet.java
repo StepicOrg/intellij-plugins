@@ -342,21 +342,19 @@ public class StepikConnectorGet {
 
         setTimeLimits(task, step);
 
-        String templateForTask;
-        templateForTask = step.options.codeTemplates.getTemplateForLanguage("java8");
-        if (templateForTask != null) {
-            final TaskFile taskFile = new TaskFile();
-            taskFile.name = "Main.java";
-            taskFile.text = templateForTask;
-            task.taskFiles.put(taskFile.name, taskFile);
-        }
+        task.getSupportedLanguages().forEach(
+                lang -> setTemplate(task, step, lang)
+        );
+    }
 
-        templateForTask = step.options.codeTemplates.getTemplateForLanguage("python3");
+    private static void setTemplate(Task task, StepikWrappers.Step step, String lang) {
+        String templateForTask;
+        templateForTask = step.options.codeTemplates.getTemplateForLanguage(lang);
         if (templateForTask != null) {
             final TaskFile taskFile = new TaskFile();
-            taskFile.name = "main.py";
-            taskFile.text = templateForTask;
-            task.taskFiles.put(taskFile.name, taskFile);
+            taskFile.setName(SupportedLanguages.langOf(lang).getMainFileName());
+            taskFile.setText(templateForTask);
+            task.taskFiles.put(taskFile.getName(), taskFile);
         }
     }
 
@@ -374,7 +372,7 @@ public class StepikConnectorGet {
         StepikWrappers.LimitsWrapper limits = step.options.limits;
         for (Field field : limits.getClass().getDeclaredFields()) {
             String curLang = field.getName();
-            if (langSet.contains(curLang)){
+            if (langSet.contains(curLang)) {
                 try {
                     putIfNotNull(timeLimits, curLang, field.get(limits).toString());
                 } catch (IllegalAccessException e) {

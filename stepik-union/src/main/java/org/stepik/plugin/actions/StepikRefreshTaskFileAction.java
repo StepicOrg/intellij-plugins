@@ -103,12 +103,10 @@ public class StepikRefreshTaskFileAction extends StudyActionWithShortcut {
             @NotNull final Document document,
             @NotNull final TaskFile taskFile,
             @NotNull Project project) {
-        StudyUtils.deleteGuardedBlocks(document);
-
         CommandProcessor.getInstance().executeCommand(project,
                 () -> ApplicationManager
                         .getApplication()
-                        .runWriteAction(() -> document.setText(taskFile.text)),
+                        .runWriteAction(() -> document.setText(taskFile.getText())),
                 "Stepik refresh task", "Stepik refresh task"
         );
         return true;

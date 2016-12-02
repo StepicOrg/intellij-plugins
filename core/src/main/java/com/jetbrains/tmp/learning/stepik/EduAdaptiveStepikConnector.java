@@ -229,14 +229,14 @@ class EduAdaptiveStepikConnector {
                         final Map<String, TaskFile> taskFiles = task.getTaskFiles();
                         if (taskFiles.size() == 1) {
                             final TaskFile taskFile = editor.getTaskFile();
-                            taskFile.text = ((TaskFile) taskFiles.values().toArray()[0]).text;
+                            taskFile.setText(((TaskFile) taskFiles.values().toArray()[0]).getText());
                             ApplicationManager.getApplication().invokeLater(() ->
                                     ApplicationManager.getApplication().runWriteAction(() ->
                                             editor.getEditor()
                                                     .getDocument()
                                                     .setText(
                                                             taskFiles.get(
-                                                                    EduStepikNames.DEFAULT_TASKFILE_NAME).text)));
+                                                                    EduStepikNames.DEFAULT_TASKFILE_NAME).getText())));
                         } else {
                             logger.warn("Got task without unexpected number of task files: " + taskFiles.size());
                         }
@@ -297,9 +297,8 @@ class EduAdaptiveStepikConnector {
                 final VirtualFile taskDir = VfsUtil.findFileByIoFile(new File(lessonDir.getCanonicalPath(),
                         unsolvedTask.getDirectory()), true);
                 final File resourceRoot = new File(course.getCourseDirectory(), lessonDir.getName());
-                File newResourceRoot = null;
                 if (taskDir != null) {
-                    newResourceRoot = new File(resourceRoot, taskDir.getName());
+                    File newResourceRoot = new File(resourceRoot, taskDir.getName());
                     File[] filesInTask = newResourceRoot.listFiles();
                     if (filesInTask != null) {
                         for (File file : filesInTask) {
@@ -355,11 +354,11 @@ class EduAdaptiveStepikConnector {
         task.taskFiles = new HashMap<>();      // TODO: it looks like we don't need taskFiles as map anymore
         if (step.options.files != null) {
             for (TaskFile taskFile : step.options.files) {
-                task.taskFiles.put(taskFile.name, taskFile);
+                task.taskFiles.put(taskFile.getName(), taskFile);
             }
         } else {
             final TaskFile taskFile = new TaskFile();
-            taskFile.name = "code";
+            taskFile.setName("code");
             task.taskFiles.put("code.py", taskFile);
         }
         return task;

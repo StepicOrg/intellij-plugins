@@ -96,17 +96,17 @@ public class StepikWrappers {
                     assert ideaDir != null;
                     EduUtils.createStudentFileFromAnswer(project, ideaDir, taskDir, entry.getKey());
                 });
-                taskFile.name = entry.getKey();
+                taskFile.setName(entry.getKey());
 
                 VirtualFile ideaDir = project.getBaseDir().findChild(".idea");
                 if (ideaDir == null) return null;
-                final VirtualFile file = ideaDir.findChild(taskFile.name);
+                final VirtualFile file = ideaDir.findChild(taskFile.getName());
                 try {
                     if (file != null) {
-                        if (EduUtils.isImage(taskFile.name)) {
-                            taskFile.text = Base64.encodeBase64URLSafeString(FileUtil.loadBytes(file.getInputStream()));
+                        if (EduUtils.isImage(taskFile.getName())) {
+                            taskFile.setText(Base64.encodeBase64URLSafeString(FileUtil.loadBytes(file.getInputStream())));
                         } else {
-                            taskFile.text = FileUtil.loadTextAndClose(file.getInputStream());
+                            taskFile.setText(FileUtil.loadTextAndClose(file.getInputStream()));
                         }
                     }
                 } catch (IOException e) {

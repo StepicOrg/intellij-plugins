@@ -238,10 +238,10 @@ public class StudyProjectGenerator {
             FileUtil.createIfDoesntExist(file);
 
             try {
-                if (EduUtils.isImage(taskFile.name)) {
-                    FileUtil.writeToFile(file, Base64.decodeBase64(taskFile.text));
+                if (EduUtils.isImage(taskFile.getName())) {
+                    FileUtil.writeToFile(file, Base64.decodeBase64(taskFile.getText()));
                 } else {
-                    FileUtil.writeToFile(file, taskFile.text);
+                    FileUtil.writeToFile(file, taskFile.getText());
                 }
             } catch (IOException e) {
                 logger.error("ERROR copying file " + name);
