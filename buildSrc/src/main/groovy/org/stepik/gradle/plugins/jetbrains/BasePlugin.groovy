@@ -16,8 +16,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.stepik.gradle.plugins.jetbrains.dependency.DependencyManager
 
-import java.nio.file.Files
-
 /**
  * @author meanmail
  */
@@ -131,8 +129,9 @@ abstract class BasePlugin implements Plugin<Project> {
 
         try {
             url = new URL(repository)
-            def tempDirectory = Files.createTempDirectory("product")
-            file = tempDirectory.resolve(ideVersion + ".zip").toFile()
+            def dir = extension.getIdePath().parentFile
+            dir.mkdirs()
+            file = new File(dir, "${ideVersion}.zip")
 
             def bis
             try {
@@ -244,8 +243,10 @@ abstract class BasePlugin implements Plugin<Project> {
             it.systemProperties(extension.systemProperties)
             it.systemProperties(Utils.getProductSystemProperties(configDirectory, systemDirectory, pluginsDirectory))
             it.jvmArgs = Utils.getProductJvmArgs(it, it.jvmArgs, extension.idePath)
-            it.classpath += project.files("$extension.dependency.classes/lib/resources.jar",
-                    "$extension.dependency.classes/lib/idea.jar")
+            if (extension.dependency != null) {
+                it.classpath += project.files("$extension.dependency.classes/lib/resources.jar",
+                        "$extension.dependency.classes/lib/idea.jar")
+            }
             it.outputs.dir(systemDirectory)
             it.outputs.dir(configDirectory)
             it.dependsOn(project.getTasksByName(prepareTestSandboxTaskName, false))

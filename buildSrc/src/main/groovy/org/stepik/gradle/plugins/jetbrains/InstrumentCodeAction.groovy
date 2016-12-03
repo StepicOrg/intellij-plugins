@@ -11,7 +11,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 class InstrumentCodeAction implements Action<AbstractCompile> {
-    private static final Logger LOG = LoggerFactory.getLogger(BasePlugin)
+    private static final Logger LOG = LoggerFactory.getLogger(InstrumentCodeAction)
 
     private static final String FILTER_ANNOTATION_REGEXP_CLASS = 'com.intellij.ant.ClassFilterAnnotationRegexp'
     private static final LOADER_REF = "java2.loader"
