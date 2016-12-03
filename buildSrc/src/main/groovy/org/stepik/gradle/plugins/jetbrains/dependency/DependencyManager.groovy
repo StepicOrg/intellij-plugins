@@ -20,7 +20,6 @@ class DependencyManager {
             @NotNull ProductPluginExtension extension,
             @NotNull File idePath,
             @NotNull String productName) {
-        println "resolveLocal $idePath"
         if (!idePath.exists() || !idePath.isDirectory()) {
             throw new BuildException("Specified idePath '$idePath' is not path to $productName", null)
         }
@@ -30,15 +29,16 @@ class DependencyManager {
 
     @NotNull
     private static ProductDependency createCompileDependency(
-            String version,
-            File classesDirectory,
-            Project project) {
+            @NotNull String version,
+            @NotNull File classesDirectory,
+            @NotNull Project project) {
         return new ProductDependency(version,
                 version,
                 classesDirectory,
                 !hasKotlinDependency(project))
     }
 
+    @NotNull
     private static Boolean hasKotlinDependency(@NotNull Project project) {
         def configurations = project.configurations
         def closure = {
@@ -64,11 +64,13 @@ class DependencyManager {
             it.artifactPattern("${dependency.classes.path}/[artifact].[ext]")
         }
 
-        def map = new LinkedHashMap<>(4)
-        map["group"] = "com.jetbrains"
-        map["name"] = productName
-        map["version"] = dependency.getVersion()
-        map["configuration"] = "compile"
+        def map = [
+                group        : "com.jetbrains",
+                name         : productName,
+                version      : dependency.version,
+                configuration: "compile"
+        ]
+
         project.dependencies.add(JavaPlugin.COMPILE_CONFIGURATION_NAME, map)
     }
 
@@ -77,14 +79,15 @@ class DependencyManager {
             @NotNull final String productName) {
         def ivyFile = new File(dependency.classes, "${dependency.getFqn(productName)}.xml")
         if (!ivyFile.exists()) {
-            final def generator = new IvyDescriptorFileGenerator(new DefaultIvyPublicationIdentity(
-                    "com.jetbrains",
-                    productName,
-                    dependency.version))
+            final def version = dependency.version
+            final def identity = new DefaultIvyPublicationIdentity("com.jetbrains", productName, version)
+            final def generator = new IvyDescriptorFileGenerator(identity)
             generator.addConfiguration(new DefaultIvyConfiguration("default"))
             generator.addConfiguration(new DefaultIvyConfiguration("compile"))
             generator.addConfiguration(new DefaultIvyConfiguration("sources"))
-            dependency.jarFiles.each { generator.addArtifact(createJarCompileDependency(it, dependency.classes)) }
+            dependency.jarFiles.each {
+                generator.addArtifact(createJarCompileDependency(it, dependency.classes))
+            }
 
             generator.writeTo(ivyFile)
         }
@@ -93,10 +96,10 @@ class DependencyManager {
     }
 
     @NotNull
-    private static DefaultIvyArtifact createJarCompileDependency(File file, File baseDir) {
+    private static DefaultIvyArtifact createJarCompileDependency(@NotNull File file, @NotNull File baseDir) {
         def relativePath = baseDir.toURI().relativize(file.toURI()).path
 
-        String name = relativePath.endsWith(".jar") ? relativePath - ".jar" : relativePath
+        def name = relativePath - ".jar"
 
         def artifact = new DefaultIvyArtifact(file, name, "jar", "jar", null)
         artifact.conf = "compile"

@@ -34,12 +34,14 @@ class PatchPluginXmlTask extends ConventionTask {
 
     @Input
     @Optional
+    @Nullable
     String getPluginDescription() {
         return extension != null ? extension.pluginDescription : null
     }
 
     @Input
     @Optional
+    @Nullable
     String getSinceBuild() {
         if (!extension) {
             return null
@@ -50,6 +52,7 @@ class PatchPluginXmlTask extends ConventionTask {
 
     @Input
     @Optional
+    @Nullable
     String getUntilBuild() {
         if (!extension) {
             return null
@@ -77,6 +80,7 @@ class PatchPluginXmlTask extends ConventionTask {
                 if (pluginXml == null) {
                     return
                 }
+
                 patchSinceUntilBuild(pluginXml, sinceBuild, untilBuild)
                 patchElement(pluginXml, "description", pluginDescription)
                 patchElement(pluginXml, "change-notes", changeNotes)
@@ -90,21 +94,23 @@ class PatchPluginXmlTask extends ConventionTask {
         }
     }
 
-    private void patchSinceUntilBuild(
+    void patchSinceUntilBuild(
             @NotNull Document pluginXml,
             @Nullable String sinceBuild,
             @Nullable String untilBuild) {
-        if (extension.updateSinceUntilBuild) {
-            def result = pluginXml.getRootElement().getChild("idea-version")
+        if (!extension.updateSinceUntilBuild) {
+            return
+        }
 
-            if (result != null) {
-                Utils.setAttributeValue(result, "since-build", sinceBuild)
-                Utils.setAttributeValue(result, "until-build", untilBuild)
-            }
+        def result = pluginXml.getRootElement().getChild("idea-version")
+
+        if (result != null) {
+            Utils.setAttributeValue(result, "since-build", sinceBuild)
+            Utils.setAttributeValue(result, "until-build", untilBuild)
         }
     }
 
-    private static void patchElement(@NotNull Document pluginXml, @NotNull String name, @Nullable String value) {
+    static void patchElement(@NotNull Document pluginXml, @NotNull String name, @Nullable String value) {
         if (value != null) {
             def result = pluginXml.getRootElement().getChild(name)
 

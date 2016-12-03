@@ -15,7 +15,7 @@ class PyCharmPlugin extends BasePlugin {
         extensionName = EXTENSION_NAME
         productName = PRODUCT_NAME
         productType = "CE"
-        productGroup = "org.jetbrains.python"
+        productGroup = "com.jetbrains.python"
         tasksGroupName = EXTENSION_NAME
         runTaskClass = RunPyCharmTask
     }

@@ -33,16 +33,17 @@ class ProductDependency implements Serializable {
     @NotNull
     private Collection<File> collectJarFiles() {
         if (classes.isDirectory()) {
-            println classes
             File lib = new File(classes, "lib")
-            def jars = new ArrayList();
-
             if (lib.isDirectory()) {
-                lib.eachFile {
-                    if (withKotlin || "kotlin-runtime.jar" != it.name && "kotlin-reflect.jar" != it.name) {
-                        jars.add(it)
+                return Arrays.asList(lib.listFiles(new FileFilter() {
+                    @Override
+                    boolean accept(File file) {
+                        if (!file.getName().endsWith(".jar")) {
+                            return false
+                        }
+                        withKotlin || "kotlin-runtime.jar" != file.name && "kotlin-reflect.jar" != file.name
                     }
-                }
+                }))
             }
         }
         return Collections.emptySet()
