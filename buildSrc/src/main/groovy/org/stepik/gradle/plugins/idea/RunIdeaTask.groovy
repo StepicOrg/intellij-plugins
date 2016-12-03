@@ -1,14 +1,14 @@
-package org.stepik.gradle.plugins.idea;
+package org.stepik.gradle.plugins.idea
 
-import org.stepik.gradle.plugins.jetbrains.BaseRunTask;
+import org.stepik.gradle.plugins.jetbrains.BaseRunTask
 
 /**
  * @author meanmail
  */
-public class RunIdeaTask extends BaseRunTask {
+class RunIdeaTask extends BaseRunTask {
     @Override
     protected String[] getLibs() {
-        return new String[]{
+        return [
                 "idea_rt.jar",
                 "idea.jar",
                 "bootstrap.jar",
@@ -18,12 +18,12 @@ public class RunIdeaTask extends BaseRunTask {
                 "trove4j.jar",
                 "jdom.jar",
                 "log4j.jar"
-        };
+        ]
     }
 
     @Override
     protected String getPlatformPrefix() {
-        return "Idea";
+        return "Idea"
     }
 
 }

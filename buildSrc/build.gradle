@@ -2,15 +2,13 @@ plugins {
     id 'java-gradle-plugin'
 }
 
-apply plugin: 'java'
-
 repositories {
     mavenCentral()
 }
 
 dependencies {
     compile gradleApi()
-    compile 'org.jetbrains:annotations:15.0'
+    compile 'org.jetbrains:annotations:13.0'
     compile 'org.jdom:jdom2:2.0.6'
 
 
