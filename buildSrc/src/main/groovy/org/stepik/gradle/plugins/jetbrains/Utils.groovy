@@ -60,6 +60,12 @@ class Utils {
     }
 
     @NotNull
+    private static SourceSet testSourceSet(@NotNull Project project) {
+        def javaConvention = project.getConvention().getPlugin(JavaPluginConvention.class)
+        return javaConvention.getSourceSets().getByName(SourceSet.TEST_SOURCE_SET_NAME)
+    }
+
+    @NotNull
     static FileCollection sourcePluginXmlFiles(@NotNull Project project) {
         final def result = new HashSet<>()
         mainSourceSet(project).getResources().getSrcDirs().each {

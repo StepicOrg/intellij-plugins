@@ -18,6 +18,7 @@ class PyCharmPlugin extends BasePlugin {
         productGroup = "com.jetbrains.python"
         tasksGroupName = EXTENSION_NAME
         runTaskClass = RunPyCharmTask
+        extensionInstrumentCode = false
     }
 
     @Override

@@ -3,8 +3,10 @@ package org.stepik.gradle.plugins.jetbrains
 import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.tasks.compile.AbstractCompile
 import org.gradle.api.tasks.testing.Test
 import org.gradle.internal.jvm.Jvm
 import org.gradle.language.jvm.tasks.ProcessResources
@@ -32,6 +34,7 @@ abstract class BasePlugin implements Plugin<Project> {
     private String prepareTestSandboxTaskName
     private String patchPluginXmlTaskName
     private String pluginXmlDirName
+    protected boolean extensionInstrumentCode
 
     @Override
     void apply(Project project) {
@@ -44,6 +47,7 @@ abstract class BasePlugin implements Plugin<Project> {
             repository = getRepositoryTemplate()
             extensionProject = project
             plugin = this
+            instrumentCode = extensionInstrumentCode
         }
 
         configureTasks(project, extension)
@@ -77,6 +81,7 @@ abstract class BasePlugin implements Plugin<Project> {
         }
 
         configureDependency(project, extension)
+        configureInstrumentation(project, extension)
         configureTestTasks(project, extension)
     }
 
@@ -211,6 +216,23 @@ abstract class BasePlugin implements Plugin<Project> {
         }
     }
 
+    private void configureInstrumentation(@NotNull Project project, @NotNull ProductPluginExtension extension) {
+        LOG.info("Configuring IntelliJ compile tasks")
+        def abstractCompileDependencies = { String taskName ->
+            project.tasks.findByName(taskName).collect {
+                it.taskDependencies.getDependencies(it).findAll { it instanceof AbstractCompile }
+            }.flatten() as Collection<AbstractCompile>
+        }
+        abstractCompileDependencies(JavaPlugin.CLASSES_TASK_NAME).each {
+            it.inputs.property("intellijIdeaDependency", extension.dependency.toString())
+            it.doLast(new InstrumentCodeAction(false, extensionName) as Action<? super Task>)
+        }
+        abstractCompileDependencies(JavaPlugin.TEST_CLASSES_TASK_NAME).each {
+            it.inputs.property("intellijIdeaDependency", extension.dependency.toString())
+            it.doLast(new InstrumentCodeAction(true, extensionName) as Action<? super Task>)
+        }
+    }
+
     private void configureTestTasks(@NotNull Project project, @NotNull ProductPluginExtension extension) {
         LOG.info("Configuring IntelliJ tests tasks")
         project.tasks.withType(Test).each {
@@ -226,7 +248,7 @@ abstract class BasePlugin implements Plugin<Project> {
                     "$extension.dependency.classes/lib/idea.jar")
             it.outputs.dir(systemDirectory)
             it.outputs.dir(configDirectory)
-            it.dependsOn(project.getTasksByName(this.getPrepareTestSandboxTaskName(), false))
+            it.dependsOn(project.getTasksByName(prepareTestSandboxTaskName, false))
         }
     }
 
@@ -256,5 +278,9 @@ abstract class BasePlugin implements Plugin<Project> {
 
     String getProductType() {
         return productType
+    }
+
+    String getExtensionName() {
+        return extensionName
     }
 }

@@ -19,6 +19,7 @@ class IdeaPlugin extends BasePlugin {
         productGroup = "com.jetbrains.intellij.idea"
         tasksGroupName = EXTENSION_NAME
         runTaskClass = RunIdeaTask
+        extensionInstrumentCode = true
     }
 
     @Override

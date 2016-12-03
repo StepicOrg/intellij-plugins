@@ -30,6 +30,7 @@ class ProductPluginExtension {
     private String changeNotes
     private Project project
     private BasePlugin plugin
+    boolean instrumentCode
 
     String getType() {
         return type
