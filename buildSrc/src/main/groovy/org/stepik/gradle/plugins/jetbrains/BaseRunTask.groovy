@@ -7,7 +7,6 @@ import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.internal.jvm.Jvm
 import org.gradle.internal.os.OperatingSystem
-import org.gradle.process.JavaForkOptions
 import org.jetbrains.annotations.NotNull
 
 /**
@@ -21,43 +20,6 @@ abstract class BaseRunTask extends JavaExec {
         main = "com.intellij.idea.Main"
         enableAssertions = true
         outputs.upToDateWhen({ false })
-    }
-
-    @NotNull
-    private static Map<String, String> getProductSystemProperties(
-            @NotNull File configDirectory,
-            @NotNull File systemDirectory,
-            @NotNull File pluginsDirectory) {
-        def map = new LinkedHashMap<>(3)
-        map["idea.config.path"] = configDirectory.absolutePath
-        map["idea.system.path"] = systemDirectory.absolutePath
-        map["idea.plugins.path"] = pluginsDirectory.absolutePath
-
-        map
-    }
-
-    @NotNull
-    private List<String> getProductJvmArgs(
-            @NotNull JavaForkOptions options,
-            @NotNull List<String> originalArguments) {
-        if (options.maxHeapSize == null) {
-            options.maxHeapSize = "512m"
-        }
-        if (options.minHeapSize == null) {
-            options.minHeapSize = "256m"
-        }
-        boolean hasPermSizeArg = false
-        def result = []
-        for (String arg : originalArguments) {
-            if (arg.startsWith("-XX:MaxPermSize")) {
-                hasPermSizeArg = true
-            }
-            result += arg
-        }
-
-        result += "-Xbootclasspath/a:${idePath.absolutePath}/lib/boot.jar"
-        if (!hasPermSizeArg) result += "-XX:MaxPermSize=250m"
-        return result
     }
 
     @SuppressWarnings("WeakerAccess")
@@ -123,7 +85,7 @@ abstract class BaseRunTask extends JavaExec {
 
     private void configureSystemProperties() {
         systemProperties(extension.systemProperties)
-        systemProperties(getProductSystemProperties(configDirectory, systemDirectory, pluginsDirectory))
+        systemProperties(Utils.getProductSystemProperties(configDirectory, systemDirectory, pluginsDirectory))
         def operatingSystem = OperatingSystem.current()
         if (operatingSystem.isMacOsX()) {
             systemProperty("idea.smooth.progress", false)
@@ -141,7 +103,7 @@ abstract class BaseRunTask extends JavaExec {
     }
 
     private void configureJvmArgs() {
-        jvmArgs = getProductJvmArgs(this, jvmArgs)
+        jvmArgs = Utils.getProductJvmArgs(this, jvmArgs, idePath)
     }
 
     void setExtension(ProductPluginExtension extension) {

@@ -5,6 +5,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.tasks.testing.Test
 import org.gradle.internal.jvm.Jvm
 import org.gradle.language.jvm.tasks.ProcessResources
 import org.jetbrains.annotations.NotNull
@@ -28,6 +29,7 @@ abstract class BasePlugin implements Plugin<Project> {
     protected Class<BaseRunTask> runTaskClass
     private String productName
     private String prepareSandboxTaskName
+    private String prepareTestSandboxTaskName
     private String patchPluginXmlTaskName
     private String pluginXmlDirName
 
@@ -75,6 +77,7 @@ abstract class BasePlugin implements Plugin<Project> {
         }
 
         configureDependency(project, extension)
+        configureTestTasks(project, extension)
     }
 
     private void configureDependency(@NotNull Project project, @NotNull ProductPluginExtension extension) {
@@ -208,6 +211,25 @@ abstract class BasePlugin implements Plugin<Project> {
         }
     }
 
+    private void configureTestTasks(@NotNull Project project, @NotNull ProductPluginExtension extension) {
+        LOG.info("Configuring IntelliJ tests tasks")
+        project.tasks.withType(Test).each {
+            def configDirectory = project.file("${extension.sandboxDirectory}/config-test")
+            def systemDirectory = project.file("${extension.sandboxDirectory}/system-test")
+            def pluginsDirectory = project.file("${extension.sandboxDirectory}/plugins-test")
+
+            it.enableAssertions = true
+            it.systemProperties(extension.systemProperties)
+            it.systemProperties(Utils.getProductSystemProperties(configDirectory, systemDirectory, pluginsDirectory))
+            it.jvmArgs = Utils.getProductJvmArgs(it, it.jvmArgs, extension.idePath)
+            it.classpath += project.files("$extension.dependency.classes/lib/resources.jar",
+                    "$extension.dependency.classes/lib/idea.jar")
+            it.outputs.dir(systemDirectory)
+            it.outputs.dir(configDirectory)
+            it.dependsOn(project.getTasksByName(this.getPrepareTestSandboxTaskName(), false))
+        }
+    }
+
     String getProductName() {
         return productName
     }
@@ -215,6 +237,7 @@ abstract class BasePlugin implements Plugin<Project> {
     protected void setProductName(String productName) {
         this.productName = productName
         this.prepareSandboxTaskName = "prepare${productName}Sandbox"
+        this.prepareTestSandboxTaskName = "prepare${productName}TestSandbox"
         this.patchPluginXmlTaskName = "patch${productName}PluginXml"
         this.pluginXmlDirName = "patched${productName}PluginXmlFiles"
     }
@@ -225,6 +248,10 @@ abstract class BasePlugin implements Plugin<Project> {
 
     String getPrepareSandboxTaskName() {
         return prepareSandboxTaskName
+    }
+
+    String getPrepareTestSandboxTaskName() {
+        return prepareTestSandboxTaskName
     }
 
     String getProductType() {

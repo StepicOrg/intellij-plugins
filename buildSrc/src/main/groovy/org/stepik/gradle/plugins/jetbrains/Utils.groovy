@@ -5,6 +5,7 @@ import org.gradle.api.Task
 import org.gradle.api.file.FileCollection
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.SourceSet
+import org.gradle.process.JavaForkOptions
 import org.jdom2.Attribute
 import org.jdom2.Document
 import org.jdom2.Element
@@ -238,5 +239,43 @@ class Utils {
             Files.deleteIfExists(pluginPath)
         } catch (DirectoryNotEmptyException ignore) {
         }
+    }
+
+    @NotNull
+    static Map<String, String> getProductSystemProperties(
+            @NotNull File configDirectory,
+            @NotNull File systemDirectory,
+            @NotNull File pluginsDirectory) {
+        def map = new LinkedHashMap<>(3)
+        map["idea.config.path"] = configDirectory.absolutePath
+        map["idea.system.path"] = systemDirectory.absolutePath
+        map["idea.plugins.path"] = pluginsDirectory.absolutePath
+
+        map
+    }
+
+    @NotNull
+    static List<String> getProductJvmArgs(
+            @NotNull JavaForkOptions options,
+            @NotNull List<String> originalArguments,
+            @NotNull File idePath) {
+        if (options.maxHeapSize == null) {
+            options.maxHeapSize = "512m"
+        }
+        if (options.minHeapSize == null) {
+            options.minHeapSize = "256m"
+        }
+        boolean hasPermSizeArg = false
+        def result = []
+        for (String arg : originalArguments) {
+            if (arg.startsWith("-XX:MaxPermSize")) {
+                hasPermSizeArg = true
+            }
+            result += arg
+        }
+
+        result += "-Xbootclasspath/a:${idePath.absolutePath}/lib/boot.jar"
+        if (!hasPermSizeArg) result += "-XX:MaxPermSize=250m"
+        return result
     }
 }
