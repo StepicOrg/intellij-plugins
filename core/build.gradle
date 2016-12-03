@@ -5,12 +5,10 @@ intellij {
     version = project.getProperties().get('ideaVersion')
     sandboxDirectory = project.getProperties().get('ideaSandboxDir')
     idePath = project.getProperties().get('ideaPath')
-    repository = 'file:///home/meanmail/repositories/${productName}/${productType}/${version}.zip'
 }
 
 pycharm {
     version = project.getProperties().get('pyCharmVersion')
     sandboxDirectory = project.getProperties().get('pyCharmSandboxDir')
     idePath = project.getProperties().get('pyCharmPath')
-    repository = 'file:///home/meanmail/repositories/${productName}/${productType}/${version}.zip'
 }
