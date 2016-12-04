@@ -3,6 +3,7 @@ package org.stepik.gradle.plugins.jetbrains
 import org.gradle.api.Project
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
+import org.gradle.api.tasks.Input
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.Nullable
 import org.stepik.gradle.plugins.jetbrains.dependency.ProductDependency
@@ -31,6 +32,8 @@ class ProductPluginExtension {
     private Project project
     private BasePlugin plugin
     boolean instrumentCode
+
+    RepositoryType repositoryType
 
     String getType() {
         return type
@@ -122,9 +125,10 @@ class ProductPluginExtension {
         if (repository == null) {
             return null
         }
-        repository = repository.replaceAll('\\$\\{productName}', plugin.productName)
-        repository = repository.replaceAll('\\$\\{productType}', plugin.productType)
-        repository = repository.replaceAll('\\$\\{version}', version)
+        repository = repository.replaceAll('\\[productName]', plugin.productName)
+        repository = repository.replaceAll('\\[productName\\.toLowerCase\\(\\)]', plugin.productName.toLowerCase())
+        repository = repository.replaceAll('\\[productType]', plugin.productType)
+        repository = repository.replaceAll('\\[version]', version)
 
         return repository
     }
@@ -227,5 +231,19 @@ class ProductPluginExtension {
 
     void setPlugin(BasePlugin plugin) {
         this.plugin = plugin
+    }
+
+    @Input
+    @NotNull
+    RepositoryType getRepositoryType() {
+        return repositoryType
+    }
+
+    void setRepositoryType(@Nullable Object repositoryType) {
+        if (repositoryType == null) {
+            this.repositoryType = RepositoryType.DIRECTORY
+        } else {
+            this.repositoryType = RepositoryType.fromString(repositoryType.toString())
+        }
     }
 }

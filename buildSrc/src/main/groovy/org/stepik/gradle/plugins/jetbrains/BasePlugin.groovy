@@ -33,6 +33,7 @@ abstract class BasePlugin implements Plugin<Project> {
     private String patchPluginXmlTaskName
     private String pluginXmlDirName
     protected boolean extensionInstrumentCode
+    RepositoryType repositoryType
 
     @Override
     void apply(Project project) {
@@ -46,6 +47,7 @@ abstract class BasePlugin implements Plugin<Project> {
             extensionProject = project
             plugin = this
             instrumentCode = extensionInstrumentCode
+            repositoryType = this.repositoryType
         }
 
         configureTasks(project, extension)
@@ -90,25 +92,39 @@ abstract class BasePlugin implements Plugin<Project> {
 
         def ideVersion = extension.getVersion()
 
+        def dependency = null
         if (!idePath.exists()) {
-            System.out.println("Download $extension.repository")
+            if (extension.repositoryType == RepositoryType.MAVEN) {
+                dependency = DependencyManager.resolveRemoteMaven(project, this, extension)
+            } else {
+                LOG.info("Download {}", extension.repository)
+                System.out.println("Download $extension.repository")
 
-            def file = downloadProduct(extension, ideVersion)
+                def file = downloadProduct(extension, ideVersion)
 
-            if (!file) {
-                System.out.println("$productName not loaded")
-                LOG.warn("{} not loaded from {}", productName, extension.getRepository())
-                return
+                if (!file) {
+                    System.out.println("$productName not loaded")
+                    LOG.warn("{} not loaded from {}", productName, extension.repository)
+                    return
+                }
+
+                LOG.info("{} loaded", productName)
+                System.out.println("$productName Loaded")
+                LOG.info("Start Unzip  {}", productName)
+                System.out.println("Start Unzip ${productName}...")
+                project.copy {
+                    it.from(project.zipTree(file))
+                    it.into(idePath)
+                }
+                LOG.info("Unzipped {} to {}", productName, idePath)
+                System.out.println("Unzipped $productName to $idePath")
             }
-
-            System.out.println("$productName Loaded")
-            System.out.println("Start Unzip ${productName}...")
-
-            UnZipper.unZip(file, idePath)
-            System.out.println("Unzipped $productName to $idePath")
         }
 
-        def dependency = DependencyManager.resolveLocal(project, extension, idePath, productName)
+        if (dependency == null) {
+            dependency = DependencyManager.resolveLocal(project, extension, idePath, productName)
+        }
+
         extension.dependency = dependency
         DependencyManager.register(project, dependency, productName)
 

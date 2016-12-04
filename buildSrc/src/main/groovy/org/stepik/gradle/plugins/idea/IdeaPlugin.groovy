@@ -1,6 +1,7 @@
 package org.stepik.gradle.plugins.idea
 
 import org.stepik.gradle.plugins.jetbrains.BasePlugin
+import org.stepik.gradle.plugins.jetbrains.RepositoryType
 
 /**
  * @author meanmail
@@ -8,9 +9,7 @@ import org.stepik.gradle.plugins.jetbrains.BasePlugin
 class IdeaPlugin extends BasePlugin {
     private static final def PRODUCT_NAME = "Idea"
     private static final def EXTENSION_NAME = "intellij"
-    private static final def DEFAULT_REPO =
-            'https://www.jetbrains.com/intellij-repository/releases/com/jetbrains/intellij/${productName}' +
-                    '/${productName}${productType}/${version}/${productName}${productType}-${version}.zip'
+    private static final def DEFAULT_REPO = 'https://www.jetbrains.com/intellij-repository/releases'
 
     IdeaPlugin() {
         extensionName = EXTENSION_NAME
@@ -20,6 +19,7 @@ class IdeaPlugin extends BasePlugin {
         tasksGroupName = EXTENSION_NAME
         runTaskClass = RunIdeaTask
         extensionInstrumentCode = true
+        repositoryType = RepositoryType.MAVEN
     }
 
     @Override

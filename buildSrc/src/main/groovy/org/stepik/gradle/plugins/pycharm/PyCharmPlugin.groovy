@@ -1,6 +1,7 @@
 package org.stepik.gradle.plugins.pycharm
 
 import org.stepik.gradle.plugins.jetbrains.BasePlugin
+import org.stepik.gradle.plugins.jetbrains.RepositoryType
 
 /**
  * @author meanmail
@@ -19,6 +20,7 @@ class PyCharmPlugin extends BasePlugin {
         tasksGroupName = EXTENSION_NAME
         runTaskClass = RunPyCharmTask
         extensionInstrumentCode = false
+        repositoryType = RepositoryType.DIRECTORY
     }
 
     @Override

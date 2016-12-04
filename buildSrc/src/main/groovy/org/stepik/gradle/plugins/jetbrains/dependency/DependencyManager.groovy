@@ -1,6 +1,7 @@
 package org.stepik.gradle.plugins.jetbrains.dependency
 
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.publish.ivy.internal.artifact.DefaultIvyArtifact
 import org.gradle.api.publish.ivy.internal.publication.DefaultIvyConfiguration
@@ -8,12 +9,61 @@ import org.gradle.api.publish.ivy.internal.publication.DefaultIvyPublicationIden
 import org.gradle.api.publish.ivy.internal.publisher.IvyDescriptorFileGenerator
 import org.gradle.tooling.BuildException
 import org.jetbrains.annotations.NotNull
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import org.stepik.gradle.plugins.jetbrains.BasePlugin
 import org.stepik.gradle.plugins.jetbrains.ProductPluginExtension
 
 /**
  * @author meanmail
  */
 class DependencyManager {
+    private static final Logger LOG = LoggerFactory.getLogger(DependencyManager)
+
+    @NotNull
+    static ProductDependency resolveRemoteMaven(
+            @NotNull Project project,
+            @NotNull BasePlugin plugin,
+            @NotNull ProductPluginExtension extension) {
+        LOG.debug("Adding $plugin.productName repository")
+        project.repositories.maven { it.url = extension.repository }
+
+        LOG.debug("Adding $plugin.productName dependency")
+        def libraryType = extension.type
+        def version = extension.version
+        def group = plugin.productGroup
+        def name = plugin.productName.toLowerCase()
+        def dependency = project.dependencies.create("$group:$name$libraryType:$version")
+        def configuration = project.configurations.detachedConfiguration(dependency)
+
+        def classesDirectory = getClassesDirectory(project, configuration)
+        extension.idePath = classesDirectory
+        return createCompileDependency(extension.version, classesDirectory, project)
+    }
+
+    @NotNull
+    private static File getClassesDirectory(@NotNull Project project,
+                                            @NotNull Configuration configuration) {
+        File zipFile = configuration.singleFile
+        LOG.debug("Product zip: " + zipFile.path)
+        def directoryName = zipFile.name - ".zip"
+
+        def cacheDirectory = new File(zipFile.parent, directoryName)
+        def markerFile = new File(cacheDirectory, "markerFile")
+        if (!markerFile.exists()) {
+            if (cacheDirectory.exists()) cacheDirectory.deleteDir()
+            cacheDirectory.mkdir()
+            LOG.debug("Unzipping idea")
+            project.copy {
+                it.from(project.zipTree(zipFile))
+                it.into(cacheDirectory)
+            }
+            markerFile.createNewFile()
+            LOG.debug("Unzipped")
+        }
+        return cacheDirectory
+    }
+
     @NotNull
     static ProductDependency resolveLocal(
             @NotNull Project project,
