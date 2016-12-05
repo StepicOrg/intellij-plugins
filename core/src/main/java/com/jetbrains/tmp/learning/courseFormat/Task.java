@@ -36,12 +36,12 @@ public class Task implements StudyItem {
     @SerializedName("task_files")
     public Map<String, TaskFile> taskFiles = new HashMap<>();
     @Expose
-    private Map<String, String> timeLimits = new HashMap<>();
+    private Map<SupportedLanguages, String> timeLimits = new HashMap<>();
     @Expose
     private Set<SupportedLanguages> supportedLanguages = new HashSet<>();
     @NotNull
     @Expose
-    private SupportedLanguages currentLang;
+    private SupportedLanguages currentLang = SupportedLanguages.INVALID;
     @Transient
     @NotNull
     private String directory = "";
@@ -204,19 +204,19 @@ public class Task implements StudyItem {
     }
 
     public String getDescription() {
-        return text + getTimeLimit(currentLang.getName());
+        return text + getTimeLimit(currentLang);
     }
 
-    public Map<String, String> getTimeLimits() {
+    public Map<SupportedLanguages, String> getTimeLimits() {
         return timeLimits;
     }
 
-    public void setTimeLimits(Map<String, String> timeLimits) {
+    public void setTimeLimits(Map<SupportedLanguages, String> timeLimits) {
         this.timeLimits = timeLimits;
     }
 
     @NotNull
-    private String getTimeLimit(String lang) {
+    private String getTimeLimit(SupportedLanguages lang) {
         if (timeLimits == null) return "";
         return timeLimits.getOrDefault(lang, "");
     }
@@ -233,6 +233,7 @@ public class Task implements StudyItem {
         this.supportedLanguages = supportedLanguages;
     }
 
+    @NotNull
     public SupportedLanguages getCurrentLang() {
         return currentLang;
     }

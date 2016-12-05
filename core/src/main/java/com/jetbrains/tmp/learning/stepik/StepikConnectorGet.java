@@ -366,13 +366,13 @@ public class StepikConnectorGet {
     }
 
     private static void setTimeLimits(Task task, StepikWrappers.Step step) {
-        Map<String, String> timeLimits = new HashMap<>();
+        Map<SupportedLanguages, String> timeLimits = new HashMap<>();
         Set<SupportedLanguages> langSet = task.getSupportedLanguages();
 
         StepikWrappers.LimitsWrapper limits = step.options.limits;
         for (Field field : limits.getClass().getDeclaredFields()) {
-            String curLang = field.getName();
-            if (langSet.contains(SupportedLanguages.langOf(curLang))) {
+            SupportedLanguages curLang = SupportedLanguages.langOf(field.getName());
+            if (langSet.contains(curLang)) {
                 try {
                     putIfNotNull(timeLimits, curLang, field.get(limits).toString());
                 } catch (IllegalAccessException e) {
@@ -383,7 +383,7 @@ public class StepikConnectorGet {
         task.setTimeLimits(timeLimits);
     }
 
-    private static void putIfNotNull(Map<String, String> timeLimits, String lang, String limit) {
+    private static void putIfNotNull(Map<SupportedLanguages, String> timeLimits, SupportedLanguages lang, String limit) {
         if (limit != null && lang != null) {
             timeLimits.put(lang, limit);
         }
