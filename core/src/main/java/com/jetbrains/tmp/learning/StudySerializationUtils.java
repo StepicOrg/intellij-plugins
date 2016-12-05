@@ -335,6 +335,17 @@ public class StudySerializationUtils {
         }
 
         public static Element getChildWithName(Element parent, String name) throws StudyUnrecognizedFormatException {
+            Element child = getChildWithNameOrNull(parent, name);
+            if (child != null) {
+                return child;
+            } else {
+                StudyUnrecognizedFormatException e = new StudyUnrecognizedFormatException();
+                logger.warn(e);
+                throw e;
+            }
+        }
+
+        public static Element getChildWithNameOrNull(Element parent, String name) {
             for (Element child : parent.getChildren()) {
                 Attribute attribute = child.getAttribute(NAME);
                 if (attribute == null) {
@@ -344,7 +355,7 @@ public class StudySerializationUtils {
                     return child;
                 }
             }
-            throw new StudyUnrecognizedFormatException();
+            return null;
         }
 
         public static <K, V> Map<K, V> getChildMap(
@@ -409,6 +420,8 @@ public class StudySerializationUtils {
             });
 
             addChildList(courseElement, SECTIONS, list);
+            logger.info("Remove lessons is " + courseElement.removeContent(getChildWithName(courseElement, "lessons")));
+            logger.info("Remove sectionsNames is " + courseElement.removeContent(getChildWithName(courseElement, "sectionsNames")));
 
             return state;
         }
@@ -424,7 +437,7 @@ public class StudySerializationUtils {
                         Element langSetting = element.getValue();
 
                         Element currentLangElement = getChildWithNameOrNull(langSetting, "currentLang");
-                        String currentLang = currentLangElement == null ? "" : currentLangElement.getValue();
+                        String currentLang = currentLangElement == null ? "" : currentLangElement.getAttribute("value").getValue();
 
                         Set<Element> supportLangs = getChildSet(langSetting, "supportLangs");
                         Set<String> taskLangs = new HashSet<>();
@@ -448,31 +461,27 @@ public class StudySerializationUtils {
                 for (Element lesson : lessons) {
                     List<Element> taskList = getChildList(lesson, TASK_LIST);
                     for (Element task : taskList) {
-                        Pair<String, Set<String>> ls = mapIdLangSetting.get(
-                                getChildWithName(task, "stepId").getAttributeValue("value"));
+                        String stepId = getChildWithName(task, "stepId").getAttribute("value").getValue();
+                        Pair<String, Set<String>> ls = mapIdLangSetting.get(stepId);
                         if (ls != null) {
-                            addChildWithName(task, "currentLang", ls.first);
                             Element set = new Element("set");
                             ls.second.forEach(suppLang -> {
                                 Element child = new Element(OPTION);
                                 child.setAttribute(VALUE, suppLang);
                                 set.addContent(child);
                             });
+                            addChildWithName(task, "currentLang", ls.first);
                             addChildWithName(task, "supportedLanguages", set);
+                        } else {
+                            logger.warn(String.format("step with id :%s is not found", stepId));
                         }
                     }
                 }
             }
-            return state;
-        }
 
-        private static Element getChildWithNameOrNull(Element element, String name) {
-            try {
-                return getChildWithName(element, name);
-            } catch (StudyUnrecognizedFormatException e) {
-                logger.warn(e);
-                return null;
-            }
+            logger.info("Remove lang mamager is " + taskManagerElement.removeContent(getChildWithName(taskManagerElement,
+                    "langManager")));
+            return state;
         }
     }
 
