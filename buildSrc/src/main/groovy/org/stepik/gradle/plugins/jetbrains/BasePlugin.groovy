@@ -93,35 +93,33 @@ abstract class BasePlugin implements Plugin<Project> {
         def ideVersion = extension.getVersion()
 
         def dependency = null
-        if (!idePath.exists()) {
-            if (extension.repositoryType == RepositoryType.MAVEN) {
-                dependency = DependencyManager.resolveRemoteMaven(project, this, extension)
-            } else {
-                LOG.info("Download {}", extension.repository)
-                System.out.println("Download $extension.repository")
+        if (extension.repositoryType == RepositoryType.MAVEN) {
+            dependency = DependencyManager.resolveRemoteMaven(project, this, extension)
+        } else if (!idePath.exists()) {
+            LOG.info("Download {}", extension.repository)
+            System.out.println("Download $extension.repository")
 
-                def file = downloadProduct(extension, ideVersion)
+            def file = downloadProduct(extension, ideVersion)
 
-                if (!file) {
-                    System.out.println("$productName not loaded")
-                    LOG.warn("{} not loaded from {}", productName, extension.repository)
-                    return
-                }
-
-                LOG.info("{} loaded", productName)
-                System.out.println("$productName Loaded")
-                LOG.info("Start Unzip  {}", productName)
-                System.out.println("Start Unzip ${productName}...")
-                project.copy {
-                    it.from(project.zipTree(file))
-                    it.into(idePath)
-                }
-                LOG.info("Unzipped {} to {}", productName, idePath)
-                System.out.println("Unzipped $productName to $idePath")
+            if (!file) {
+                System.out.println("$productName not loaded")
+                LOG.warn("{} not loaded from {}", productName, extension.repository)
+                return
             }
+
+            LOG.info("{} loaded", productName)
+            System.out.println("$productName Loaded")
+            LOG.info("Start Unzip  {}", productName)
+            System.out.println("Start Unzip ${productName}...")
+            project.copy {
+                it.from(project.zipTree(file))
+                it.into(idePath)
+            }
+            LOG.info("Unzipped {} to {}", productName, idePath)
+            System.out.println("Unzipped $productName to $idePath")
         }
 
-        if (dependency == null) {
+        if (!dependency) {
             dependency = DependencyManager.resolveLocal(project, extension, idePath, productName)
         }
 
