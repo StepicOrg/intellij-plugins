@@ -10,7 +10,7 @@ class PyCharmPlugin extends BasePlugin {
     private static final def PRODUCT_NAME = "PyCharm"
     private static final def EXTENSION_NAME = "pycharm"
     private static final def DEFAULT_REPO =
-            'https://download-cf.jetbrains.com/python/pycharm-community-${version}.zip'
+            'https://download-cf.jetbrains.com/python/pycharm-community-[version].zip'
 
     PyCharmPlugin() {
         extensionName = EXTENSION_NAME
