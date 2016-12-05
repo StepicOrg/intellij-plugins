@@ -349,7 +349,7 @@ public class StepikConnectorGet {
 
     private static void setTemplate(Task task, StepikWrappers.Step step, SupportedLanguages lang) {
         String templateForTask;
-        templateForTask = step.options.codeTemplates.getTemplateForLanguage(lang.getName());
+        templateForTask = step.options.codeTemplates.getTemplateForLanguage(lang);
         if (templateForTask != null) {
             final TaskFile taskFile = new TaskFile();
             taskFile.setName(lang.getMainFileName());

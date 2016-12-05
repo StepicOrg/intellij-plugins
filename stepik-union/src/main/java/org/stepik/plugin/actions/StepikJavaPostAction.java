@@ -74,9 +74,6 @@ public class StepikJavaPostAction extends StudyCheckAction {
                     String attemptId = Integer.toString(intAttemptId);
 
                     SupportedLanguages currentLang = task.getCurrentLang();
-                    if (currentLang == null) {
-                        return;
-                    }
                     String activateFileName = currentLang.getMainFileName();
 
                     String mainFilePath = String.join("/", task.getPath(), EduNames.SRC, activateFileName);

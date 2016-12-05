@@ -75,9 +75,6 @@ public class InsertStepikDirectives extends StudyActionWithShortcut {
         }
 
         SupportedLanguages currentLang = targetTask.getCurrentLang();
-        if (currentLang == null) {
-            return;
-        }
         VirtualFile src = studyState.getTaskDir();
         VirtualFile file = src.findChild(currentLang.getMainFileName());
         if (file == null) {

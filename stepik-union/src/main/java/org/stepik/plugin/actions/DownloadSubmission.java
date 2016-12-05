@@ -93,9 +93,6 @@ public class DownloadSubmission extends StudyActionWithShortcut {
         StepikConnectorPost.postMetric(metric);
 
         SupportedLanguages currentLang = targetTask.getCurrentLang();
-        if (currentLang == null) {
-            return;
-        }
         String activateFileName = currentLang.getMainFileName();
         String code = null;
         for (StepikWrappers.SubmissionContainer.Submission submission : submissions) {

@@ -21,7 +21,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.jetbrains.tmp.learning.core.EduNames;
+import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.core.EduUtils;
 import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.Lesson;
@@ -121,28 +121,17 @@ public class StepikWrappers {
 
     static class CodeTemplatesWrapper {
         String python3;
-        String python27;
-        String java;
         String java8;
 
         @Nullable
-        public String getTemplateForLanguage(@NotNull final String language) {
-            if (language.equals(EduNames.PYTHON27)) {
-                return python27;
-            }
-
-            if (language.equals(EduNames.PYTHON3)) {
+        public String getTemplateForLanguage(@NotNull final SupportedLanguages language) {
+            if (language == SupportedLanguages.PYTHON) {
                 return python3;
             }
 
-            if (language.equals(EduNames.JAVA)) {
-                return java;
-            }
-
-            if (language.equals(EduNames.JAVA8)) {
+            if (language == SupportedLanguages.JAVA) {
                 return java8;
             }
-
             return null;
         }
     }
@@ -154,7 +143,7 @@ public class StepikWrappers {
         Limit python3;
     }
 
-    static class Limit{
+    static class Limit {
         int time;
         int memory;
 

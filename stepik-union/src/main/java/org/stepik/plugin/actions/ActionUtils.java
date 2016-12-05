@@ -21,7 +21,7 @@ class ActionUtils {
         }
 
         Optional<SupportedLanguages> lang = Optional.of(task.getCurrentLang());
-        if (src.findChild(lang.get().getMainFileName()) == null) {
+        if (src.findChild(task.getCurrentLang().getMainFileName()) == null) {
             lang = task.getSupportedLanguages()
                     .stream()
                     .filter(x -> src.findChild(x.getMainFileName()) != null)

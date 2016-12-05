@@ -86,10 +86,6 @@ public class SwitchLanguage extends StudyActionWithShortcut {
             return;
         }
         SupportedLanguages currentLang = targetTask.getCurrentLang();
-        if (currentLang == null) {
-            return;
-        }
-
         SupportedLanguages secondLang;
         if (currentLang == SupportedLanguages.JAVA) {
             secondLang = SupportedLanguages.PYTHON;
