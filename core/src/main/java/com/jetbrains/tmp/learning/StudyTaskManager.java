@@ -35,7 +35,8 @@ public class StudyTaskManager implements PersistentStateComponent<Element>, Dumb
     private StudyToolWindow.StudyToolWindowMode myToolWindowMode = StudyToolWindow.StudyToolWindowMode.TEXT;
     private boolean myTurnEditingMode = false;
     private boolean showHint = true;
-    private String defaultLang;
+    @NotNull
+    private SupportedLanguages defaultLang = SupportedLanguages.INVALID;
 
     // must be public
     public static final int CURRENT_VERSION = 5;
@@ -142,12 +143,12 @@ public class StudyTaskManager implements PersistentStateComponent<Element>, Dumb
         myUser = user;
     }
 
-    public void setDefaultLang(String defaultLang) {
+    public void setDefaultLang(@NotNull SupportedLanguages defaultLang) {
         this.defaultLang = defaultLang;
     }
 
-    @Nullable
-    public String getDefaultLang() {
+    @NotNull
+    public SupportedLanguages getDefaultLang() {
         return defaultLang;
     }
 

@@ -241,4 +241,11 @@ public class Task implements StudyItem {
     public void setCurrentLang(@NotNull SupportedLanguages currentLang) {
         this.currentLang = currentLang;
     }
+
+//    public void setCurrentLangWithCheck(@NotNull SupportedLanguages currentLang) {
+//        if (!supportedLanguages.contains(currentLang)){
+////            supportedLanguages
+//        }
+//        this.currentLang = currentLang;
+//    }
 }

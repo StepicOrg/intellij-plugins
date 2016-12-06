@@ -8,6 +8,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import com.jetbrains.tmp.learning.StudyUtils;
+import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.stepik.CourseInfo;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorGet;
@@ -21,9 +22,9 @@ import static com.jetbrains.tmp.learning.StudyUtils.execCancelable;
 
 public class StepikProjectGenerator extends EduProjectGenerator {
     private static final Logger logger = Logger.getInstance(StepikProjectGenerator.class);
-    private String defaultLang;
+    private SupportedLanguages defaultLang;
 
-    protected static final String CACHE_NAME = "enrolledCourseNames.txt";
+    private static final String CACHE_NAME = "enrolledCourseNames.txt";
 
     public List<CourseInfo> getCourses(boolean force) {
         if (OUR_COURSES_DIR.exists()) {
@@ -145,11 +146,11 @@ public class StepikProjectGenerator extends EduProjectGenerator {
         }
     }
 
-    public String getDefaultLang() {
+    public SupportedLanguages getDefaultLang() {
         return defaultLang;
     }
 
-    public void setDefaultLang(String defaultLang) {
+    public void setDefaultLang(SupportedLanguages defaultLang) {
         this.defaultLang = defaultLang;
     }
 }
