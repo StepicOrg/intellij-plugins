@@ -420,8 +420,10 @@ public class StudySerializationUtils {
             });
 
             addChildList(courseElement, SECTIONS, list);
-            logger.info("Remove lessons is " + courseElement.removeContent(getChildWithName(courseElement, "lessons")));
-            logger.info("Remove sectionsNames is " + courseElement.removeContent(getChildWithName(courseElement, "sectionsNames")));
+            if (courseElement.removeContent(getChildWithName(courseElement, "lessons")))
+                logger.info("lessons was removed from STM.xml");
+            if (courseElement.removeContent(getChildWithName(courseElement, "sectionsNames")))
+                logger.info("sectionsNames was removed from STM.xml");
 
             return state;
         }
@@ -472,7 +474,6 @@ public class StudySerializationUtils {
                             });
                             addChildWithName(task, "currentLang", ls.first);
                             addChildWithName(task, "supportedLanguages", list);
-                            logger.info("format:\n" + new XMLOutputter().outputString(task));
                         } else {
                             logger.warn(String.format("step with id :%s is not found", stepId));
                         }
@@ -480,8 +481,9 @@ public class StudySerializationUtils {
                 }
             }
 
-            logger.info("Remove lang mamager is " + taskManagerElement.removeContent(getChildWithName(taskManagerElement,
-                    "langManager")));
+            if (taskManagerElement.removeContent(getChildWithName(taskManagerElement, "langManager"))){
+                logger.info("LangManager was removed from STM.xml");
+            }
             return state;
         }
     }
