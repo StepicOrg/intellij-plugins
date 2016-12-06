@@ -4,16 +4,6 @@ buildscript {
     }
 }
 
-plugins {
-    id "org.jetbrains.intellij" version "0.1.10"
-}
-
-apply plugin: 'org.jetbrains.intellij'
-
-intellij {
-    version ideaVersion //IntelliJ IDEA dependency
-}
-
 subprojects {
     apply plugin: "java"
 
@@ -22,26 +12,33 @@ subprojects {
     }
 
     dependencies {
-        testCompile 'junit:junit:4.12'
-        testCompile 'org.mockito:mockito-all:2.0.2-beta'
-        testCompile 'org.powermock:powermock-api-mockito:1.6.5'
-        testCompile 'org.powermock:powermock-module-junit4:1.6.5'
+        testCompile 'org.hamcrest:java-hamcrest:2.0.0.0'
+
+        testCompile (group: 'junit', name: 'junit', version: '4+') {
+            exclude group: 'org.hamcrest'
+        }
+
+        testCompile ('org.mockito:mockito-all:2.0.2-beta') {
+            exclude group: 'org.hamcrest'
+        }
+
+        testCompile ('org.powermock:powermock-api-mockito:1.6.5') {
+            exclude group: 'org.hamcrest'
+        }
+        testCompile ('org.powermock:powermock-module-junit4:1.6.5') {
+            exclude group: 'org.hamcrest'
+        }
     }
 
     apply plugin: 'idea'
-    apply plugin: 'org.jetbrains.intellij'
 
     tasks.withType(JavaCompile) {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-
-    intellij {
-        version ideaVersion //IntelliJ IDEA dependency
-        updateSinceUntilBuild false
+        def javaVersion = project.getProperties().get('javaVersion')?: JavaVersion.current()
+        sourceCompatibility = javaVersion
+        targetCompatibility = javaVersion
     }
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = "3.1"
+    gradleVersion = project.getProperties().get('gradleVersion')?: gradle.gradleVersion
 }

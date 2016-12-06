@@ -1,6 +1,16 @@
+apply plugin: 'org.stepik.gradle.plugins.pycharm'
+apply plugin: 'org.stepik.gradle.plugins.idea'
+
 intellij {
-    pluginName 'stepik-union'
-    sandboxDirectory ideaSandboxDir
+    version = project.getProperties().get('ideaVersion')
+    sandboxDirectory = project.getProperties().get('ideaSandboxDir')
+    idePath = project.getProperties().get('ideaPath')
+}
+
+pycharm {
+    version = project.getProperties().get('pyCharmVersion')
+    sandboxDirectory = project.getProperties().get('pyCharmSandboxDir')
+    idePath = project.getProperties().get('pyCharmPath')
 }
 
 dependencies {
@@ -17,6 +27,6 @@ jar {
 }
 
 group 'org.stepik'
-version pluginVersion // This version will path to plugin.xml
+version project.getProperties().get('pluginVersion')?:'SNAPSHOT'
 
 defaultTasks "runIdea"
