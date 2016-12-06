@@ -15,6 +15,8 @@ import org.jdom2.output.Format
 import org.jdom2.output.XMLOutputter
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.Nullable
+import org.rauschig.jarchivelib.Archiver
+import org.rauschig.jarchivelib.ArchiverFactory
 
 import java.nio.charset.Charset
 import java.nio.file.*
@@ -209,6 +211,13 @@ class Utils {
         return new File("$gradleHomePath/$defaultRelativePath/$version")
     }
 
+    @NotNull
+    static File getArchivePath(@NotNull Project project,
+                               @NotNull ProductPluginExtension extension) {
+        final def gradleHomePath = project.getGradle().getGradleUserHomeDir().getAbsolutePath()
+        return new File("$gradleHomePath/caches/modules-2/files-2.1/$extension.type-$extension.version.$extension.archiveType")
+    }
+
     static void deleteDirectory(Path pluginPath) throws IOException {
         if (!Files.exists(pluginPath)) {
             return
@@ -283,5 +292,25 @@ class Utils {
         result += "-Xbootclasspath/a:${idePath.absolutePath}/lib/boot.jar"
         if (!hasPermSizeArg) result += "-XX:MaxPermSize=250m"
         return result
+    }
+
+    static void Untgz(File archive, File destination) {
+        destination.parentFile.mkdirs()
+
+        Archiver archiver = ArchiverFactory.createArchiver("tar", "gz")
+        archiver.extract(archive, destination)
+
+        def target = destination.listFiles()[0]
+        File[] content = target.listFiles()
+        for (int i = 0; i < content.length; i++) {
+            content[i].renameTo(new File(destination, content[i].name))
+        }
+    }
+
+    static void Unzip(File archive, File destination) {
+        destination.parentFile.mkdirs()
+
+        Archiver archiver = ArchiverFactory.createArchiver("zip")
+        archiver.extract(archive, destination)
     }
 }

@@ -6,16 +6,19 @@ intellij {
     version = project.getProperties().get('ideaVersion')
     sandboxDirectory = project.getProperties().get('ideaSandboxDir')
     idePath = project.getProperties().get('ideaPath')
+    archiveType = project.getProperties().get('ideaArchiveType')
 }
 
 pycharm {
     version = project.getProperties().get('pyCharmVersion')
     sandboxDirectory = project.getProperties().get('pyCharmSandboxDir')
     idePath = project.getProperties().get('pyCharmPath')
+    archiveType = project.getProperties().get('pyCharmArchiveType')
 }
 
 clion {
     version = project.getProperties().get('cLionVersion')
     sandboxDirectory = project.getProperties().get('cLionSandboxDir')
     idePath = project.getProperties().get('cLionPath')
+    archiveType = project.getProperties().get('cLionArchiveType')
 }

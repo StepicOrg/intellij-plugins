@@ -89,19 +89,21 @@ abstract class BasePlugin implements Plugin<Project> {
         LOG.info("Configuring {} dependency", productName)
 
         def idePath = extension.getIdePath()
-
-        def ideVersion = extension.getVersion()
+        def ideArchiveType = extension.getArchiveType()
 
         def dependency = null
         if (extension.repositoryType == RepositoryType.MAVEN) {
             dependency = DependencyManager.resolveRemoteMaven(project, this, extension)
         } else if (!idePath.exists()) {
-            LOG.info("Download {}", extension.repository)
-            System.out.println("Download $extension.repository")
+            def archive = Utils.getArchivePath(project, extension)
+            if (!archive.exists()) {
+                LOG.info("Download {}", extension.repository)
+                System.out.println("Download $extension.repository")
 
-            def file = downloadProduct(extension, ideVersion)
+                archive = downloadProduct(extension, archive)
+            }
 
-            if (!file) {
+            if (!archive) {
                 System.out.println("$productName not loaded")
                 LOG.warn("{} not loaded from {}", productName, extension.repository)
                 return
@@ -109,14 +111,15 @@ abstract class BasePlugin implements Plugin<Project> {
 
             LOG.info("{} loaded", productName)
             System.out.println("$productName Loaded")
-            LOG.info("Start Unzip  {}", productName)
-            System.out.println("Start Unzip ${productName}...")
-            project.copy {
-                it.from(project.zipTree(file))
-                it.into(idePath)
+
+            if (ideArchiveType == "zip") {
+                println("Start Unzip ${productName}...")
+                Utils.Unzip(archive, idePath)
+            } else if (ideArchiveType == "tar.gz") {
+                println("Start Untgz ${productName}...")
+                Utils.Untgz(archive, idePath)
             }
-            LOG.info("Unzipped {} to {}", productName, idePath)
-            System.out.println("Unzipped $productName to $idePath")
+            System.out.println("Unarchivated $productName to $idePath")
         }
 
         if (!dependency) {
@@ -133,9 +136,9 @@ abstract class BasePlugin implements Plugin<Project> {
     }
 
     @Nullable
-    private File downloadProduct(@NotNull ProductPluginExtension extension, @NotNull String ideVersion) {
+    private File downloadProduct(
+            @NotNull ProductPluginExtension extension, @NotNull File archive) {
         URL url
-        File file
         def repository = extension.getRepository()
         if (!repository) {
             return null
@@ -143,16 +146,15 @@ abstract class BasePlugin implements Plugin<Project> {
 
         try {
             url = new URL(repository)
-            def dir = extension.getIdePath().parentFile
+            def dir = archive.parentFile
             dir.mkdirs()
-            file = new File(dir, "${ideVersion}.zip")
 
             def bis
             try {
                 bis = new BufferedInputStream(url.openStream())
                 def fis
                 try {
-                    fis = new FileOutputStream(file)
+                    fis = new FileOutputStream(archive)
                     byte[] buffer = new byte[1024]
                     int count
                     while ((count = bis.read(buffer, 0, 1024)) != -1) {
@@ -172,7 +174,7 @@ abstract class BasePlugin implements Plugin<Project> {
             LOG.error("Failure download {} from {}", productName, repository)
             return null
         }
-        return file
+        return archive
     }
 
     private void configurePrepareSandboxTask(
