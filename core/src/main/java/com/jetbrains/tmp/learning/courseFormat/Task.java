@@ -14,10 +14,10 @@ import com.jetbrains.tmp.learning.core.EduNames;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class Task implements StudyItem {
     private int myIndex;
@@ -37,8 +37,9 @@ public class Task implements StudyItem {
     public Map<String, TaskFile> taskFiles = new HashMap<>();
     @Expose
     private Map<SupportedLanguages, String> timeLimits = new HashMap<>();
+    @NotNull
     @Expose
-    private Set<SupportedLanguages> supportedLanguages = new HashSet<>();
+    private List<SupportedLanguages> supportedLanguages = new ArrayList<>();
     @NotNull
     @Expose
     private SupportedLanguages currentLang = SupportedLanguages.INVALID;
@@ -225,11 +226,12 @@ public class Task implements StudyItem {
         supportedLanguages.add(lang);
     }
 
-    public Set<SupportedLanguages> getSupportedLanguages() {
+    @NotNull
+    public List<SupportedLanguages> getSupportedLanguages() {
         return supportedLanguages;
     }
 
-    public void setSupportedLanguages(Set<SupportedLanguages> supportedLanguages) {
+    public void setSupportedLanguages(@NotNull List<SupportedLanguages> supportedLanguages) {
         this.supportedLanguages = supportedLanguages;
     }
 
@@ -242,10 +244,15 @@ public class Task implements StudyItem {
         this.currentLang = currentLang;
     }
 
-//    public void setCurrentLangWithCheck(@NotNull SupportedLanguages currentLang) {
-//        if (!supportedLanguages.contains(currentLang)){
-////            supportedLanguages
-//        }
-//        this.currentLang = currentLang;
-//    }
+    public void setCurrentLangWithCheck(@NotNull SupportedLanguages currentLang) {
+        this.currentLang = supportedLanguages.contains(currentLang) ? currentLang : getFirstSupportLang();
+    }
+
+    private SupportedLanguages getFirstSupportLang() {
+        if (supportedLanguages.isEmpty()) {
+            return SupportedLanguages.INVALID;
+        } else {
+            return supportedLanguages.get(0);
+        }
+    }
 }

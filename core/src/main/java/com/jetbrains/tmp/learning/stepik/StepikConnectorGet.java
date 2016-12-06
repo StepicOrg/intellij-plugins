@@ -52,7 +52,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class StepikConnectorGet {
@@ -367,12 +366,12 @@ public class StepikConnectorGet {
 
     private static void setTimeLimits(Task task, StepikWrappers.Step step) {
         Map<SupportedLanguages, String> timeLimits = new HashMap<>();
-        Set<SupportedLanguages> langSet = task.getSupportedLanguages();
+        List<SupportedLanguages> langList = task.getSupportedLanguages();
 
         StepikWrappers.LimitsWrapper limits = step.options.limits;
         for (Field field : limits.getClass().getDeclaredFields()) {
             SupportedLanguages curLang = SupportedLanguages.langOf(field.getName());
-            if (langSet.contains(curLang)) {
+            if (langList.contains(curLang)) {
                 try {
                     putIfNotNull(timeLimits, curLang, field.get(limits).toString());
                 } catch (IllegalAccessException e) {

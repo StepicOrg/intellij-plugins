@@ -464,14 +464,15 @@ public class StudySerializationUtils {
                         String stepId = getChildWithName(task, "stepId").getAttribute("value").getValue();
                         Pair<String, Set<String>> ls = mapIdLangSetting.get(stepId);
                         if (ls != null) {
-                            Element set = new Element("set");
+                            Element list = new Element("list");
                             ls.second.forEach(suppLang -> {
                                 Element child = new Element(OPTION);
                                 child.setAttribute(VALUE, suppLang);
-                                set.addContent(child);
+                                list.addContent(child);
                             });
                             addChildWithName(task, "currentLang", ls.first);
-                            addChildWithName(task, "supportedLanguages", set);
+                            addChildWithName(task, "supportedLanguages", list);
+                            logger.info("format:\n" + new XMLOutputter().outputString(task));
                         } else {
                             logger.warn(String.format("step with id :%s is not found", stepId));
                         }
