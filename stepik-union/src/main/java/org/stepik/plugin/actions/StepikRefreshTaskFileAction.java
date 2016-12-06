@@ -61,8 +61,7 @@ public class StepikRefreshTaskFileAction extends StudyActionWithShortcut {
             @NotNull final Project project) {
         final Editor editor = studyState.getEditor();
         final TaskFile taskFile = studyState.getTaskFile();
-        if (!resetTaskFile(editor.getDocument(), project, taskFile,
-                studyState.getVirtualFile().getName())) {
+        if (!resetTaskFile(editor.getDocument(), project, taskFile)) {
             Messages.showInfoMessage("The initial text of task file is unavailable",
                     "Failed to Refresh Task File");
             return;
@@ -77,9 +76,8 @@ public class StepikRefreshTaskFileAction extends StudyActionWithShortcut {
     private static boolean resetTaskFile(
             @NotNull final Document document,
             @NotNull final Project project,
-            TaskFile taskFile,
-            String name) {
-        if (!resetDocument(document, taskFile, name, project)) {
+            TaskFile taskFile) {
+        if (!resetDocument(document, taskFile, project)) {
             return false;
         }
         taskFile.getTask().setStatus(StudyStatus.Unchecked);
@@ -104,18 +102,11 @@ public class StepikRefreshTaskFileAction extends StudyActionWithShortcut {
     private static boolean resetDocument(
             @NotNull final Document document,
             @NotNull final TaskFile taskFile,
-            String fileName,
             @NotNull Project project) {
-        final Document patternDocument = StudyUtils.getPatternDocument(taskFile, fileName);
-        if (patternDocument == null) {
-            return false;
-        }
-        StudyUtils.deleteGuardedBlocks(document);
-
         CommandProcessor.getInstance().executeCommand(project,
                 () -> ApplicationManager
                         .getApplication()
-                        .runWriteAction(() -> document.setText(patternDocument.getCharsSequence())),
+                        .runWriteAction(() -> document.setText(taskFile.getText())),
                 "Stepik refresh task", "Stepik refresh task"
         );
         return true;

@@ -10,10 +10,8 @@ import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.jetbrains.tmp.learning.LangManager;
-import com.jetbrains.tmp.learning.LangSetting;
-import com.jetbrains.tmp.learning.StudyTaskManager;
 import com.jetbrains.tmp.learning.StudyUtils;
+import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.actions.StudyCheckAction;
 import com.jetbrains.tmp.learning.checker.StudyCheckUtils;
 import com.jetbrains.tmp.learning.core.EduNames;
@@ -23,12 +21,13 @@ import com.jetbrains.tmp.learning.stepik.StepikConnectorGet;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorPost;
 import com.jetbrains.tmp.learning.stepik.StepikWrappers;
 import org.jetbrains.annotations.NotNull;
-import org.stepik.plugin.collective.SupportedLanguages;
 import org.stepik.plugin.utils.DirectivesUtils;
 import org.stepik.plugin.utils.NotificationUtils;
 
 import java.io.IOException;
 import java.util.List;
+
+import static org.stepik.plugin.actions.ActionUtils.checkLangSettings;
 
 public class StepikJavaPostAction extends StudyCheckAction {
     private static final Logger logger = Logger.getInstance(StepikJavaPostAction.class);
@@ -56,7 +55,11 @@ public class StepikJavaPostAction extends StudyCheckAction {
                         return;
                     }
 
-                    int intAttemptId = 0;
+                    if (!checkLangSettings(task, project)){
+                        return;
+                    }
+
+                    int intAttemptId;
                     try {
                         intAttemptId = StepikConnectorPost.getAttempt(task.getStepId()).attempts.get(0).id;
                     } catch (IOException e) {
@@ -70,12 +73,7 @@ public class StepikJavaPostAction extends StudyCheckAction {
                     }
                     String attemptId = Integer.toString(intAttemptId);
 
-                    LangManager langManager = StudyTaskManager.getInstance(project).getLangManager();
-                    LangSetting taskLangSetting = langManager.getLangSetting(task);
-                    SupportedLanguages currentLang = SupportedLanguages.langOf(taskLangSetting.getCurrentLang());
-                    if (currentLang == null) {
-                        return;
-                    }
+                    SupportedLanguages currentLang = task.getCurrentLang();
                     String activateFileName = currentLang.getMainFileName();
 
                     String mainFilePath = String.join("/", task.getPath(), EduNames.SRC, activateFileName);

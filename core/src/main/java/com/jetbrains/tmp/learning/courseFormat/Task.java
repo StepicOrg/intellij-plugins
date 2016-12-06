@@ -9,11 +9,14 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.xmlb.annotations.Transient;
 import com.jetbrains.tmp.learning.StudyUtils;
+import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.core.EduNames;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Task implements StudyItem {
@@ -29,10 +32,17 @@ public class Task implements StudyItem {
     private String name;
     @Expose
     private int stepId;
-
     @Expose
     @SerializedName("task_files")
     public Map<String, TaskFile> taskFiles = new HashMap<>();
+    @Expose
+    private Map<SupportedLanguages, String> timeLimits = new HashMap<>();
+    @NotNull
+    @Expose
+    private List<SupportedLanguages> supportedLanguages = new ArrayList<>();
+    @NotNull
+    @Expose
+    private SupportedLanguages currentLang = SupportedLanguages.INVALID;
     @Transient
     @NotNull
     private String directory = "";
@@ -192,5 +202,57 @@ public class Task implements StudyItem {
 
     public void setPosition(int position) {
         this.position = position;
+    }
+
+    public String getDescription() {
+        return text + getTimeLimit(currentLang);
+    }
+
+    public Map<SupportedLanguages, String> getTimeLimits() {
+        return timeLimits;
+    }
+
+    public void setTimeLimits(Map<SupportedLanguages, String> timeLimits) {
+        this.timeLimits = timeLimits;
+    }
+
+    @NotNull
+    private String getTimeLimit(SupportedLanguages lang) {
+        if (timeLimits == null) return "";
+        return timeLimits.getOrDefault(lang, "");
+    }
+
+    public void addLang(SupportedLanguages lang) {
+        supportedLanguages.add(lang);
+    }
+
+    @NotNull
+    public List<SupportedLanguages> getSupportedLanguages() {
+        return supportedLanguages;
+    }
+
+    public void setSupportedLanguages(@NotNull List<SupportedLanguages> supportedLanguages) {
+        this.supportedLanguages = supportedLanguages;
+    }
+
+    @NotNull
+    public SupportedLanguages getCurrentLang() {
+        return currentLang;
+    }
+
+    public void setCurrentLang(@NotNull SupportedLanguages currentLang) {
+        this.currentLang = currentLang;
+    }
+
+    public void setCurrentLangWithCheck(@NotNull SupportedLanguages currentLang) {
+        this.currentLang = supportedLanguages.contains(currentLang) ? currentLang : getFirstSupportLang();
+    }
+
+    private SupportedLanguages getFirstSupportLang() {
+        if (supportedLanguages.isEmpty()) {
+            return SupportedLanguages.INVALID;
+        } else {
+            return supportedLanguages.get(0);
+        }
     }
 }

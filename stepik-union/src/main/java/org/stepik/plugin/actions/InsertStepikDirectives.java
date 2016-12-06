@@ -11,21 +11,22 @@ import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.jetbrains.tmp.learning.LangSetting;
 import com.jetbrains.tmp.learning.StudyState;
 import com.jetbrains.tmp.learning.StudyTaskManager;
 import com.jetbrains.tmp.learning.StudyUtils;
+import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.actions.StudyActionWithShortcut;
 import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.editor.StudyEditor;
 import org.jetbrains.annotations.NotNull;
-import org.stepik.plugin.collective.SupportedLanguages;
 import org.stepik.plugin.utils.DirectivesUtils;
 import org.stepik.plugin.utils.ReformatUtils;
 
 import javax.swing.*;
 
-import static org.stepik.plugin.utils.DirectivesUtils.*;
+import static org.stepik.plugin.utils.DirectivesUtils.insertAmbientCode;
+import static org.stepik.plugin.utils.DirectivesUtils.removeAmbientCode;
+import static org.stepik.plugin.utils.DirectivesUtils.writeInToFile;
 
 
 public class InsertStepikDirectives extends StudyActionWithShortcut {
@@ -66,9 +67,6 @@ public class InsertStepikDirectives extends StudyActionWithShortcut {
             return;
         }
 
-        StudyTaskManager taskManager = StudyTaskManager.getInstance(project);
-        LangSetting langSetting = taskManager.getLangManager().getLangSetting(targetTask);
-
         FileDocumentManager documentManager = FileDocumentManager.getInstance();
         for (VirtualFile file : FileEditorManager.getInstance(project).getOpenFiles()) {
             Document document = documentManager.getDocument(file);
@@ -76,10 +74,7 @@ public class InsertStepikDirectives extends StudyActionWithShortcut {
                 documentManager.saveDocument(document);
         }
 
-        SupportedLanguages currentLang = SupportedLanguages.langOf(langSetting.getCurrentLang());
-        if (currentLang == null) {
-            return;
-        }
+        SupportedLanguages currentLang = targetTask.getCurrentLang();
         VirtualFile src = studyState.getTaskDir();
         VirtualFile file = src.findChild(currentLang.getMainFileName());
         if (file == null) {

@@ -3,7 +3,13 @@ package com.jetbrains.tmp.learning;
 import com.intellij.ide.ui.UISettings;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
-import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.ActionGroup;
+import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.actionSystem.KeyboardShortcut;
+import com.intellij.openapi.actionSystem.Shortcut;
 import com.intellij.openapi.actionSystem.ex.AnActionListener;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ProjectComponent;
@@ -293,7 +299,7 @@ public class StudyProjectComponent implements ProjectComponent {
                         final TaskFile taskFile = new TaskFile();
                         taskFile.initTaskFile(task);
                         final String name = createdFile.getName();
-                        taskFile.name = name;
+                        taskFile.setName(name);
                         task.getTaskFiles().put(name, taskFile);
                     }
                 }

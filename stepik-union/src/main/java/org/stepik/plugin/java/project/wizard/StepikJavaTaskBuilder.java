@@ -12,27 +12,24 @@ import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.jetbrains.tmp.learning.LangSetting;
 import com.jetbrains.tmp.learning.StudyTaskManager;
+import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.core.EduNames;
+import com.jetbrains.tmp.learning.core.EduUtils;
 import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.Task;
+import com.jetbrains.tmp.learning.courseFormat.TaskFile;
+import org.apache.commons.codec.binary.Base64;
 import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.stepik.from.edu.intellij.utils.generation.builders.TaskBuilder;
-import org.stepik.plugin.collective.SupportedLanguages;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 class StepikJavaTaskBuilder extends JavaModuleBuilder implements TaskBuilder {
     private static final Logger logger = Logger.getInstance(StepikJavaTaskBuilder.class);
@@ -63,11 +60,7 @@ class StepikJavaTaskBuilder extends JavaModuleBuilder implements TaskBuilder {
 
     private boolean createTaskContent() throws IOException {
         StudyTaskManager taskManager = StudyTaskManager.getInstance(project);
-        String defaultLangName = taskManager.getDefaultLang();
-        SupportedLanguages defaultLang = null;
-        if (defaultLangName != null) {
-            defaultLang = SupportedLanguages.langOf(defaultLangName);
-        }
+        myTask.setCurrentLangWithCheck(taskManager.getDefaultLang());
         Course course = myTask.getLesson().getSection().getCourse();
         String directory = getModuleFileDirectory();
         if (directory == null) {
@@ -86,32 +79,33 @@ class StepikJavaTaskBuilder extends JavaModuleBuilder implements TaskBuilder {
                 myTask.getLesson().getDirectory(), myTask.getDirectory());
         FileUtil.copyDirContent(new File(taskResourcesPath), new File(FileUtil.join(src.getPath(), EduNames.HIDE)));
 
-        Set<SupportedLanguages> supportedLang = getSupportedLang(taskResourcesPath);
-        SupportedLanguages currentLang;
-        if (supportedLang.contains(defaultLang)) {
-            currentLang = defaultLang;
-        } else {
-            currentLang = getPopularLang(supportedLang);
-        }
 
-        taskManager.getLangManager().setLangSetting(myTask,
-                new LangSetting(currentLang != null ? currentLang.getName() : null,
-                        supportedLang.stream()
-                                .map(SupportedLanguages::getName)
-                                .collect(Collectors.toSet())));
-        if (currentLang != null)
-            moveFromHide(currentLang.getMainFileName(), src);
-        moveFromHide("task.html", src);
+        createTaskFiles(myTask, src.getPath());
 
+        SupportedLanguages currentLang = myTask.getCurrentLang();
+
+        moveFromHide(currentLang.getMainFileName(), src);
         return true;
     }
 
-    @Nullable
-    private SupportedLanguages getPopularLang(@NotNull Set<SupportedLanguages> supportedLang) {
-        for (SupportedLanguages lang : SupportedLanguages.values())
-            if (supportedLang.contains(lang))
-                return lang;
-        return null;
+    private void createTaskFiles(Task task, String src) {
+        src = String.format("%s/%s", src, EduNames.HIDE);
+        for (Map.Entry<String, TaskFile> taskFileEntry : task.taskFiles.entrySet()) {
+            final String name = taskFileEntry.getKey();
+            final TaskFile taskFile = taskFileEntry.getValue();
+            final File file = new File(src, name);
+            FileUtil.createIfDoesntExist(file);
+
+            try {
+                if (EduUtils.isImage(taskFile.getName())) {
+                    FileUtil.writeToFile(file, Base64.decodeBase64(taskFile.getText()));
+                } else {
+                    FileUtil.writeToFile(file, taskFile.getText());
+                }
+            } catch (IOException e) {
+                logger.error("ERROR copying file " + name);
+            }
+        }
     }
 
     private void moveFromHide(@NotNull String filename, @NotNull VirtualFile src) throws IOException {
@@ -123,28 +117,5 @@ class StepikJavaTaskBuilder extends JavaModuleBuilder implements TaskBuilder {
     public Module createTask(@NotNull ModifiableModuleModel moduleModel) throws InvalidDataException,
             IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
         return createModule(moduleModel);
-    }
-
-    @NotNull
-    private Set<SupportedLanguages> getSupportedLang(@NotNull String path) {
-        Set<SupportedLanguages> supportedLang = new HashSet<>();
-        Path dir = Paths.get(path);
-
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir, "*.java")) {
-            if (stream.iterator().hasNext()) {
-                supportedLang.add(SupportedLanguages.JAVA);
-            }
-        } catch (IOException e) {
-            logger.warn(e.getMessage());
-        }
-
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir, "*.py")) {
-            if (stream.iterator().hasNext()) {
-                supportedLang.add(SupportedLanguages.PYTHON);
-            }
-        } catch (IOException e) {
-            logger.warn(e.getMessage());
-        }
-        return supportedLang;
     }
 }

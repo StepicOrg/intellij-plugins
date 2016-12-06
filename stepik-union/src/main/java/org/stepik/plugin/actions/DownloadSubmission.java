@@ -11,10 +11,9 @@ import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.jetbrains.tmp.learning.LangManager;
-import com.jetbrains.tmp.learning.LangSetting;
 import com.jetbrains.tmp.learning.StudyTaskManager;
 import com.jetbrains.tmp.learning.StudyUtils;
+import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.actions.StudyActionWithShortcut;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.Task;
@@ -25,11 +24,12 @@ import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.stepik.plugin.collective.SupportedLanguages;
 
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.stepik.plugin.actions.ActionUtils.checkLangSettings;
 
 public class DownloadSubmission extends StudyActionWithShortcut {
     private static final String ACTION_ID = "STEPIK.DownloadSubmission";
@@ -68,6 +68,10 @@ public class DownloadSubmission extends StudyActionWithShortcut {
             return;
         }
 
+        if (!checkLangSettings(targetTask, project)){
+            return;
+        }
+
         String stepId = Integer.toString(targetTask.getStepId());
         String userId = Integer.toString(StudyTaskManager.getInstance(project).getUser().getId());
 
@@ -88,12 +92,7 @@ public class DownloadSubmission extends StudyActionWithShortcut {
                 targetTask.getStepId());
         StepikConnectorPost.postMetric(metric);
 
-        LangManager langManager = StudyTaskManager.getInstance(project).getLangManager();
-        LangSetting langSetting = langManager.getLangSetting(targetTask);
-        SupportedLanguages currentLang = SupportedLanguages.langOf(langSetting.getCurrentLang());
-        if (currentLang == null) {
-            return;
-        }
+        SupportedLanguages currentLang = targetTask.getCurrentLang();
         String activateFileName = currentLang.getMainFileName();
         String code = null;
         for (StepikWrappers.SubmissionContainer.Submission submission : submissions) {

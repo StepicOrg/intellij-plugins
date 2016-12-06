@@ -21,7 +21,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.jetbrains.tmp.learning.core.EduNames;
+import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.core.EduUtils;
 import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.Lesson;
@@ -79,6 +79,8 @@ public class StepikWrappers {
         //    @Expose Map<String, String> codeTemplates;
         @Expose
         CodeTemplatesWrapper codeTemplates;
+        @Expose
+        LimitsWrapper limits;
 
         public static StepOptions fromTask(final Project project, @NotNull final Task task) {
             final StepOptions source = new StepOptions();
@@ -94,17 +96,17 @@ public class StepikWrappers {
                     assert ideaDir != null;
                     EduUtils.createStudentFileFromAnswer(project, ideaDir, taskDir, entry.getKey());
                 });
-                taskFile.name = entry.getKey();
+                taskFile.setName(entry.getKey());
 
                 VirtualFile ideaDir = project.getBaseDir().findChild(".idea");
                 if (ideaDir == null) return null;
-                final VirtualFile file = ideaDir.findChild(taskFile.name);
+                final VirtualFile file = ideaDir.findChild(taskFile.getName());
                 try {
                     if (file != null) {
-                        if (EduUtils.isImage(taskFile.name)) {
-                            taskFile.text = Base64.encodeBase64URLSafeString(FileUtil.loadBytes(file.getInputStream()));
+                        if (EduUtils.isImage(taskFile.getName())) {
+                            taskFile.setText(Base64.encodeBase64URLSafeString(FileUtil.loadBytes(file.getInputStream())));
                         } else {
-                            taskFile.text = FileUtil.loadTextAndClose(file.getInputStream());
+                            taskFile.setText(FileUtil.loadTextAndClose(file.getInputStream()));
                         }
                     }
                 } catch (IOException e) {
@@ -119,29 +121,35 @@ public class StepikWrappers {
 
     static class CodeTemplatesWrapper {
         String python3;
-        String python27;
-        String java;
         String java8;
 
         @Nullable
-        public String getTemplateForLanguage(@NotNull final String language) {
-            if (language.equals(EduNames.PYTHON27)) {
-                return python27;
-            }
-
-            if (language.equals(EduNames.PYTHON3)) {
+        public String getTemplateForLanguage(@NotNull final SupportedLanguages language) {
+            if (language == SupportedLanguages.PYTHON) {
                 return python3;
             }
 
-            if (language.equals(EduNames.JAVA)) {
-                return java;
-            }
-
-            if (language.equals(EduNames.JAVA8)) {
+            if (language == SupportedLanguages.JAVA) {
                 return java8;
             }
-
             return null;
+        }
+    }
+
+    static class LimitsWrapper {
+        @Expose
+        Limit java8;
+        @Expose
+        Limit python3;
+    }
+
+    static class Limit {
+        int time;
+        int memory;
+
+        @Override
+        public String toString() {
+            return String.format("<b>Memory limit</b>: %d Mb<br><b>Time limit</b>: %ds<br><br>", memory, time);
         }
     }
 

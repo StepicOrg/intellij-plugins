@@ -1,6 +1,13 @@
 package com.jetbrains.tmp.learning.courseGeneration;
 
-import com.google.gson.*;
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.JsonReader;
 import com.intellij.facet.ui.ValidationResult;
 import com.intellij.ide.projectView.ProjectView;
@@ -40,8 +47,23 @@ import org.apache.commons.codec.binary.Base64;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.Reader;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static com.jetbrains.tmp.learning.StudyUtils.execCancelable;
 
@@ -56,7 +78,7 @@ public class StudyProjectGenerator {
     private static final String CACHE_NAME = "courseNames.txt";
     private final List<SettingsListener> myListeners = ContainerUtil.newArrayList();
     @Nullable
-    public StepikUser myUser;
+    private StepikUser myUser;
     protected List<CourseInfo> myCourses = new ArrayList<>();
     protected CourseInfo mySelectedCourseInfo;
 
@@ -153,18 +175,11 @@ public class StudyProjectGenerator {
 
     private static void openFirstTask(@NotNull final Course course, @NotNull final Project project) {
         LocalFileSystem.getInstance().refresh(false);
-        final Section firstSection = StudyUtils.getFirst(course.getSections());
-        if (firstSection == null) {
-            return;
-        }
-        final Lesson firstLesson = StudyUtils.getFirst(firstSection.getLessons());
-        if (firstLesson == null) {
-            return;
-        }
-        final Task firstTask = StudyUtils.getFirst(firstLesson.getTaskList());
+        final Task firstTask = getFirstTask(course);
         if (firstTask == null) {
             return;
         }
+
         final VirtualFile taskDir = firstTask.getTaskDir(project);
         if (taskDir == null) {
             return;
@@ -198,19 +213,10 @@ public class StudyProjectGenerator {
         final File courseDirectory = StudyUtils.getCourseDirectory(project, course);
         FileUtil.createDirectory(courseDirectory);
         flushCourseJson(course, courseDirectory);
-
-        int lessonIndex = 1;
-        for (Section section : course.getSections()) {
-            for (Lesson lesson : section.getLessons()) {
-                if (!lesson.getName().equals(EduNames.PYCHARM_ADDITIONAL)) {
-                    lesson.setIndex(lessonIndex++);
-                    final File lessonDirectory = new File(courseDirectory, lesson.getDirectory());
-                    flushLesson(lessonDirectory, lesson);
-                }
-            }
-        }
     }
 
+    // mock for adaptive course
+    @Deprecated
     public static void flushLesson(@NotNull final File lessonDirectory, @NotNull final Lesson lesson) {
         FileUtil.createDirectory(lessonDirectory);
         int taskIndex = 1;
@@ -221,6 +227,8 @@ public class StudyProjectGenerator {
         }
     }
 
+    // mock for adaptive course
+    @Deprecated
     public static void flushTask(@NotNull final Task task, @NotNull final File taskDirectory) {
         FileUtil.createDirectory(taskDirectory);
         for (Map.Entry<String, TaskFile> taskFileEntry : task.taskFiles.entrySet()) {
@@ -230,21 +238,14 @@ public class StudyProjectGenerator {
             FileUtil.createIfDoesntExist(file);
 
             try {
-                if (EduUtils.isImage(taskFile.name)) {
-                    FileUtil.writeToFile(file, Base64.decodeBase64(taskFile.text));
+                if (EduUtils.isImage(taskFile.getName())) {
+                    FileUtil.writeToFile(file, Base64.decodeBase64(taskFile.getText()));
                 } else {
-                    FileUtil.writeToFile(file, taskFile.text);
+                    FileUtil.writeToFile(file, taskFile.getText());
                 }
             } catch (IOException e) {
                 logger.error("ERROR copying file " + name);
             }
-        }
-        final File taskText = new File(taskDirectory, "task.html");
-        FileUtil.createIfDoesntExist(taskText);
-        try {
-            FileUtil.writeToFile(taskText, task.getText());
-        } catch (IOException e) {
-            logger.error("ERROR copying tests file");
         }
     }
 
@@ -359,7 +360,7 @@ public class StudyProjectGenerator {
         }
     }
 
-    public static List<CourseInfo> getBundledIntro() {
+    protected static List<CourseInfo> getBundledIntro() {
         final File introCourse = new File(OUR_COURSES_DIR, "Introduction to Python");
         if (introCourse.exists()) {
             final CourseInfo courseInfo = getCourseInfo(introCourse);
@@ -502,5 +503,17 @@ public class StudyProjectGenerator {
             StudyUtils.closeSilently(reader);
         }
         return courseInfo;
+    }
+
+    private static Task getFirstTask(Course course) {
+        final Section firstSection = StudyUtils.getFirst(course.getSections());
+        if (firstSection == null) {
+            return null;
+        }
+        final Lesson firstLesson = StudyUtils.getFirst(firstSection.getLessons());
+        if (firstLesson == null) {
+            return null;
+        }
+        return StudyUtils.getFirst(firstLesson.getTaskList());
     }
 }

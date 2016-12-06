@@ -22,6 +22,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.jetbrains.tmp.learning.StudySerializationUtils;
+import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.Lesson;
@@ -42,6 +43,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -49,12 +51,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class StepikConnectorGet {
     private static final Logger logger = Logger.getInstance(StepikConnectorGet.class.getName());
-    public static final String PYCHARM_PREFIX = "pycharm";
-    public static final String CODE_PREFIX = "code";
+    private static final String PYCHARM_PREFIX = "pycharm";
+    private static final String CODE_PREFIX = "code";
 
     static final private Gson GSON =
             new GsonBuilder().registerTypeAdapter(TaskFile.class,
@@ -66,7 +69,7 @@ public class StepikConnectorGet {
         return getFromStepik(link, container, StepikConnectorLogin.getHttpClient());
     }
 
-    static <T> T getFromStepikUnLogin(String link, final Class<T> container) throws IOException {
+    private static <T> T getFromStepikUnLogin(String link, final Class<T> container) throws IOException {
         return getFromStepik(link, container, StepikConnectorInit.getHttpClient());
     }
 
@@ -165,7 +168,7 @@ public class StepikConnectorGet {
         return coursesContainer.meta.containsKey("has_next") && coursesContainer.meta.get("has_next") == Boolean.TRUE;
     }
 
-    public static boolean addCoursesFromStepik(List<CourseInfo> result, int pageNumber, List<NameValuePair> nvps)
+    private static boolean addCoursesFromStepik(List<CourseInfo> result, int pageNumber, List<NameValuePair> nvps)
             throws IOException {
         final String url = pageNumber == 0 ?
                 EduStepikNames.COURSES :
@@ -305,9 +308,6 @@ public class StepikConnectorGet {
                 case (CODE_PREFIX):
                     createCodeTask(task, stepSource.block);
                     break;
-                case (PYCHARM_PREFIX):
-                    createPyCharmTask(task, stepSource.block);
-                    break;
             }
             lesson.addTask(task);
         });
@@ -317,17 +317,6 @@ public class StepikConnectorGet {
         return CODE_PREFIX.equals(name) || PYCHARM_PREFIX.equals(name);
     }
 
-    private static void createPyCharmTask(Task task, StepikWrappers.Step step) {
-        task.setName(step.options != null ? step.options.title : PYCHARM_PREFIX);
-        task.setText(step.text);
-
-        task.taskFiles = new HashMap<>();      // TODO: it looks like we don't need taskFiles as map anymore
-        if (step.options.files != null) {
-            for (TaskFile taskFile : step.options.files) {
-                task.taskFiles.put(taskFile.name, taskFile);
-            }
-        }
-    }
 
     private static void createCodeTask(Task task, StepikWrappers.Step step) {
         final StringBuilder stringBuilder = new StringBuilder();
@@ -346,45 +335,69 @@ public class StepikConnectorGet {
                             .append("<br><br>"));
         }
 
-        if (step.options.executionMemoryLimit != null && step.options.executionTimeLimit != null) {
-            stringBuilder.append("<b>Memory limit</b>: ")
-                    .append(step.options.executionMemoryLimit).append(" Mb")
-                    .append("<br>")
-                    .append("<b>Time limit</b>: ")
-                    .append(step.options.executionTimeLimit).append("s")
-                    .append("<br><br>");
-        }
         task.setText(stringBuilder.toString());
 
-        String templateForTask;
-        templateForTask = step.options.codeTemplates.getTemplateForLanguage("java8");
-        if (templateForTask != null) {
-            final TaskFile taskFile = new TaskFile();
-            taskFile.name = "Main.java";
-            taskFile.text = templateForTask;
-            task.taskFiles.put(taskFile.name, taskFile);
-        }
+        setSupportedLang(task, step);
 
-        templateForTask = step.options.codeTemplates.getTemplateForLanguage("python3");
+        setTimeLimits(task, step);
+
+        task.getSupportedLanguages().forEach(
+                lang -> setTemplate(task, step, lang)
+        );
+    }
+
+    private static void setTemplate(Task task, StepikWrappers.Step step, SupportedLanguages lang) {
+        String templateForTask;
+        templateForTask = step.options.codeTemplates.getTemplateForLanguage(lang);
         if (templateForTask != null) {
             final TaskFile taskFile = new TaskFile();
-            taskFile.name = "main.py";
-            taskFile.text = templateForTask;
-            task.taskFiles.put(taskFile.name, taskFile);
+            taskFile.setName(lang.getMainFileName());
+            taskFile.setText(templateForTask);
+            task.taskFiles.put(taskFile.getName(), taskFile);
         }
     }
 
+    private static void setSupportedLang(Task task, StepikWrappers.Step step) {
+        if (step.options.codeTemplates.java8 != null)
+            task.addLang(SupportedLanguages.JAVA);
+        if (step.options.codeTemplates.python3 != null)
+            task.addLang(SupportedLanguages.PYTHON);
+    }
 
-    public static StepikWrappers.StepContainer getSteps(List<Integer> steps) throws IOException {
+    private static void setTimeLimits(Task task, StepikWrappers.Step step) {
+        Map<SupportedLanguages, String> timeLimits = new HashMap<>();
+        List<SupportedLanguages> langList = task.getSupportedLanguages();
+
+        StepikWrappers.LimitsWrapper limits = step.options.limits;
+        for (Field field : limits.getClass().getDeclaredFields()) {
+            SupportedLanguages curLang = SupportedLanguages.langOf(field.getName());
+            if (langList.contains(curLang)) {
+                try {
+                    putIfNotNull(timeLimits, curLang, field.get(limits).toString());
+                } catch (IllegalAccessException e) {
+                    logger.warn(e);
+                }
+            }
+        }
+        task.setTimeLimits(timeLimits);
+    }
+
+    private static void putIfNotNull(Map<SupportedLanguages, String> timeLimits, SupportedLanguages lang, String limit) {
+        if (limit != null && lang != null) {
+            timeLimits.put(lang, limit);
+        }
+    }
+
+    private static StepikWrappers.StepContainer getSteps(List<Integer> steps) throws IOException {
         return getFromStepik(EduStepikNames.STEPS + "/" + getIdQuery(steps), StepikWrappers.StepContainer.class);
     }
 
-    public static StepikWrappers.Step getStep(Integer step) throws IOException {
+    static StepikWrappers.Step getStep(Integer step) throws IOException {
         return getFromStepik(EduStepikNames.STEPS + "/" + String.valueOf(step),
                 StepikWrappers.StepContainer.class).steps.get(0).block;
     }
 
-    public static StepikWrappers.AuthorWrapper getCurrentUser() {
+    static StepikWrappers.AuthorWrapper getCurrentUser() {
         try {
             return getFromStepik(EduStepikNames.CURRENT_USER, StepikWrappers.AuthorWrapper.class);
         } catch (IOException e) {

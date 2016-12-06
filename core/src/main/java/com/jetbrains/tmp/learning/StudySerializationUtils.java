@@ -1,10 +1,19 @@
 package com.jetbrains.tmp.learning;
 
-import com.google.gson.*;
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -23,8 +32,10 @@ import java.io.File;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class StudySerializationUtils {
 
@@ -47,6 +58,7 @@ public class StudySerializationUtils {
     public static class StudyUnrecognizedFormatException extends Exception {}
 
     public static class Xml {
+        private static final Logger logger = Logger.getInstance(StudySerializationUtils.class);
         public final static String COURSE_ELEMENT = "courseElement";
         public final static String MAIN_ELEMENT = "StepikStudyTaskManager";
         public static final String MAP = "map";
@@ -310,7 +322,30 @@ public class StudySerializationUtils {
             return Collections.emptyList();
         }
 
+        @NotNull
+        public static Set<Element> getChildSet(Element parent, String name) {
+            Element listParent = getChildWithNameOrNull(parent, name);
+            if (listParent != null) {
+                Element list = listParent.getChild("set");
+                if (list != null) {
+                    return new HashSet<>(list.getChildren());
+                }
+            }
+            return Collections.emptySet();
+        }
+
         public static Element getChildWithName(Element parent, String name) throws StudyUnrecognizedFormatException {
+            Element child = getChildWithNameOrNull(parent, name);
+            if (child != null) {
+                return child;
+            } else {
+                StudyUnrecognizedFormatException e = new StudyUnrecognizedFormatException();
+                logger.warn(e);
+                throw e;
+            }
+        }
+
+        public static Element getChildWithNameOrNull(Element parent, String name) {
             for (Element child : parent.getChildren()) {
                 Attribute attribute = child.getAttribute(NAME);
                 if (attribute == null) {
@@ -320,7 +355,7 @@ public class StudySerializationUtils {
                     return child;
                 }
             }
-            throw new StudyUnrecognizedFormatException();
+            return null;
         }
 
         public static <K, V> Map<K, V> getChildMap(
@@ -346,7 +381,7 @@ public class StudySerializationUtils {
             return Collections.emptyMap();
         }
 
-        public static Element convertToForthVersion(Element state, Project project)
+        static Element convertToForthVersion(Element state, Project project)
                 throws StudyUnrecognizedFormatException {
             Element taskManagerElement = state.getChild(MAIN_ELEMENT);
 
@@ -385,7 +420,70 @@ public class StudySerializationUtils {
             });
 
             addChildList(courseElement, SECTIONS, list);
+            if (courseElement.removeContent(getChildWithName(courseElement, "lessons")))
+                logger.info("lessons was removed from STM.xml");
+            if (courseElement.removeContent(getChildWithName(courseElement, "sectionsNames")))
+                logger.info("sectionsNames was removed from STM.xml");
 
+            return state;
+        }
+
+        static Element convertToFifthVersion(Element state, Project project)
+                throws StudyUnrecognizedFormatException {
+            Element taskManagerElement = state.getChild(MAIN_ELEMENT);
+
+            Element langManager = getChildWithName(taskManagerElement, "langManager").getChild("LangManager");
+            Map<String, Element> langSettingsMap = getChildMap(langManager, "langSettingsMap");
+            Map<String, Pair<String, Set<String>>> mapIdLangSetting = new java.util.HashMap<>();
+            langSettingsMap.entrySet().forEach(element -> {
+                        Element langSetting = element.getValue();
+
+                        Element currentLangElement = getChildWithNameOrNull(langSetting, "currentLang");
+                        String currentLang = currentLangElement == null ? "" : currentLangElement.getAttribute("value").getValue();
+
+                        Set<Element> supportLangs = getChildSet(langSetting, "supportLangs");
+                        Set<String> taskLangs = new HashSet<>();
+
+                        supportLangs.forEach(lang -> taskLangs.add(lang.getAttribute("value").getValue()));
+
+                        Pair<String, Set<String>> ls = Pair.create(currentLang, taskLangs);
+                        mapIdLangSetting.put(element.getKey(), ls);
+                    }
+            );
+
+            Element courseElement = getChildWithName(taskManagerElement, COURSE).getChild(COURSE_TITLED);
+            if (courseElement == null) {
+                logger.info("courseElement is null");
+                return state;
+            }
+
+            List<Element> sections = getChildList(courseElement, SECTIONS);
+            for (Element section : sections) {
+                List<Element> lessons = getChildList(section, LESSONS);
+                for (Element lesson : lessons) {
+                    List<Element> taskList = getChildList(lesson, TASK_LIST);
+                    for (Element task : taskList) {
+                        String stepId = getChildWithName(task, "stepId").getAttribute("value").getValue();
+                        Pair<String, Set<String>> ls = mapIdLangSetting.get(stepId);
+                        if (ls != null) {
+                            Element list = new Element("list");
+                            ls.second.forEach(suppLang -> {
+                                Element child = new Element(OPTION);
+                                child.setAttribute(VALUE, suppLang);
+                                list.addContent(child);
+                            });
+                            addChildWithName(task, "currentLang", ls.first);
+                            addChildWithName(task, "supportedLanguages", list);
+                        } else {
+                            logger.warn(String.format("step with id :%s is not found", stepId));
+                        }
+                    }
+                }
+            }
+
+            if (taskManagerElement.removeContent(getChildWithName(taskManagerElement, "langManager"))){
+                logger.info("LangManager was removed from STM.xml");
+            }
             return state;
         }
     }

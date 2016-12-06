@@ -11,7 +11,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.util.xmlb.XmlSerializer;
 import com.intellij.util.xmlb.annotations.Transient;
-import com.jetbrains.tmp.learning.courseFormat.*;
+import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.stepik.StepikUser;
 import com.jetbrains.tmp.learning.ui.StudyToolWindow;
 import org.jdom.Element;
@@ -29,18 +29,18 @@ import java.io.File;
 @State(name = "StepikStudySettings", storages = @Storage("stepik_study_project.xml"))
 public class StudyTaskManager implements PersistentStateComponent<Element>, DumbAware {
     private static final Logger logger = Logger.getInstance(StudyTaskManager.class);
-    public static final int CURRENT_VERSION = 4;
     private StepikUser myUser = new StepikUser();
     private Course myCourse;
-    public int VERSION = CURRENT_VERSION;
-
-    private LangManager langManager = new LangManager();
 
     private StudyToolWindow.StudyToolWindowMode myToolWindowMode = StudyToolWindow.StudyToolWindowMode.TEXT;
     private boolean myTurnEditingMode = false;
     private boolean showHint = true;
+    @NotNull
+    private SupportedLanguages defaultLang = SupportedLanguages.INVALID;
 
-    private String defaultLang;
+    // must be public
+    public static final int CURRENT_VERSION = 5;
+    public int VERSION = CURRENT_VERSION;
 
     @Transient
     private final Project myProject;
@@ -90,9 +90,11 @@ public class StudyTaskManager implements PersistentStateComponent<Element>, Dumb
                     state = StudySerializationUtils.Xml.convertToThirdVersion(state, myProject);
                 case 3:
                     state = StudySerializationUtils.Xml.convertToForthVersion(state, myProject);
+                case 4:
+                    state = StudySerializationUtils.Xml.convertToFifthVersion(state, myProject);
                     //uncomment for future versions
-                    //case 4:
-                    //state = StudySerializationUtils.Xml.convertToFifthVersion(state, myProject);
+                    //case 5:
+                    //state = StudySerializationUtils.Xml.convertToSixthVersion(state, myProject);
             }
             XmlSerializer.deserializeInto(this, state.getChild(StudySerializationUtils.Xml.MAIN_ELEMENT));
             VERSION = CURRENT_VERSION;
@@ -141,21 +143,13 @@ public class StudyTaskManager implements PersistentStateComponent<Element>, Dumb
         myUser = user;
     }
 
-    public void setDefaultLang(String defaultLang) {
+    public void setDefaultLang(@NotNull SupportedLanguages defaultLang) {
         this.defaultLang = defaultLang;
     }
 
-    @Nullable
-    public String getDefaultLang() {
+    @NotNull
+    public SupportedLanguages getDefaultLang() {
         return defaultLang;
-    }
-
-    public LangManager getLangManager() {
-        return langManager;
-    }
-
-    public void setLangManager(LangManager langManager) {
-        this.langManager = langManager;
     }
 
     public boolean getShowHint() {

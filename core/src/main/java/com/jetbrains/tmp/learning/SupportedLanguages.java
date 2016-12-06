@@ -1,4 +1,4 @@
-package org.stepik.plugin.collective;
+package com.jetbrains.tmp.learning;
 
 import com.jetbrains.tmp.learning.core.EduNames;
 import org.jetbrains.annotations.NotNull;
@@ -6,7 +6,8 @@ import org.jetbrains.annotations.Nullable;
 
 public enum SupportedLanguages {
     JAVA(EduNames.JAVA8, "Main.java", "//", new String[]{"class Main {"}, new String[]{"}"}),
-    PYTHON(EduNames.PYTHON3, "main.py", "#", null, null);
+    PYTHON(EduNames.PYTHON3, "main.py", "#", null, null),
+    INVALID("", "", "", null, null);
 
     private final String name;
     private final String comment;
@@ -76,5 +77,13 @@ public enum SupportedLanguages {
     @Override
     public String toString() {
         return name;
+    }
+
+    public static SupportedLanguages type(String token) {
+        return SupportedLanguages.langOf(token);
+    }
+
+    public static String token(SupportedLanguages t) {
+        return t.name();
     }
 }
