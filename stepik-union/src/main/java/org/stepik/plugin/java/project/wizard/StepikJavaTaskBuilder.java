@@ -88,13 +88,12 @@ class StepikJavaTaskBuilder extends JavaModuleBuilder implements TaskBuilder {
 
         SupportedLanguages currentLang = myTask.getCurrentLang();
 
-        if (currentLang != null)
-            moveFromHide(currentLang.getMainFileName(), src);
+        moveFromHide(currentLang.getMainFileName(), src);
         return true;
     }
 
     private void createTaskFiles(Task task, String src) {
-        src = src + "/" + EduNames.HIDE;
+        src = String.format("%s/%s", src, EduNames.HIDE);
         for (Map.Entry<String, TaskFile> taskFileEntry : task.taskFiles.entrySet()) {
             final String name = taskFileEntry.getKey();
             final TaskFile taskFile = taskFileEntry.getValue();
