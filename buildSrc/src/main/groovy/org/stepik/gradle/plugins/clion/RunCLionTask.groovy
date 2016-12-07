@@ -1,11 +1,11 @@
-package org.stepik.gradle.plugins.pycharm
+package org.stepik.gradle.plugins.clion
 
 import org.stepik.gradle.plugins.jetbrains.BaseRunTask
 
 /**
  * @author meanmail
  */
-class RunPyCharmTask extends BaseRunTask {
+class RunCLionTask extends BaseRunTask {
     @Override
     String[] getLibs() {
         return [
@@ -21,6 +21,6 @@ class RunPyCharmTask extends BaseRunTask {
 
     @Override
     protected String getPlatformPrefix() {
-        return "PyCharmCore"
+        return "CLion"
     }
 }

@@ -1,5 +1,6 @@
 apply plugin: 'org.stepik.gradle.plugins.pycharm'
 apply plugin: 'org.stepik.gradle.plugins.idea'
+apply plugin: 'org.stepik.gradle.plugins.clion'
 
 intellij {
     version = project.getProperties().get('ideaVersion')
@@ -11,6 +12,12 @@ pycharm {
     version = project.getProperties().get('pyCharmVersion')
     sandboxDirectory = project.getProperties().get('pyCharmSandboxDir')
     idePath = project.getProperties().get('pyCharmPath')
+}
+
+clion {
+    version = project.getProperties().get('cLionVersion')
+    sandboxDirectory = project.getProperties().get('cLionSandboxDir')
+    idePath = project.getProperties().get('cLionPath')
 }
 
 dependencies {

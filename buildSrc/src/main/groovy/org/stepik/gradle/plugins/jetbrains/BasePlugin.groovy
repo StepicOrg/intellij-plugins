@@ -11,7 +11,6 @@ import org.gradle.api.tasks.testing.Test
 import org.gradle.internal.jvm.Jvm
 import org.gradle.language.jvm.tasks.ProcessResources
 import org.jetbrains.annotations.NotNull
-import org.jetbrains.annotations.Nullable
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.stepik.gradle.plugins.jetbrains.dependency.DependencyManager
@@ -20,7 +19,7 @@ import org.stepik.gradle.plugins.jetbrains.dependency.DependencyManager
  * @author meanmail
  */
 abstract class BasePlugin implements Plugin<Project> {
-    private static final Logger LOG = LoggerFactory.getLogger(BasePlugin)
+    private static final Logger logger = LoggerFactory.getLogger(BasePlugin)
 
     protected String extensionName
     protected String productType
@@ -56,7 +55,7 @@ abstract class BasePlugin implements Plugin<Project> {
     protected abstract String getRepositoryTemplate()
 
     private void configureTasks(@NotNull Project project, @NotNull ProductPluginExtension extension) {
-        LOG.info("Configuring {} gradle plugin", productName)
+        logger.info("Configuring {} gradle plugin", productName)
         configurePatchPluginXmlTask(project, extension)
         configurePrepareSandboxTask(project, extension)
         configureRunTask(project, extension)
@@ -86,41 +85,16 @@ abstract class BasePlugin implements Plugin<Project> {
     }
 
     private void configureDependency(@NotNull Project project, @NotNull ProductPluginExtension extension) {
-        LOG.info("Configuring {} dependency", productName)
-
-        def idePath = extension.getIdePath()
-
-        def ideVersion = extension.getVersion()
-
-        def dependency = null
+        logger.info("Configuring {} dependency", productName)
+        def dependency
         if (extension.repositoryType == RepositoryType.MAVEN) {
             dependency = DependencyManager.resolveRemoteMaven(project, this, extension)
-        } else if (!idePath.exists()) {
-            LOG.info("Download {}", extension.repository)
-            System.out.println("Download $extension.repository")
-
-            def file = downloadProduct(extension, ideVersion)
-
-            if (!file) {
-                System.out.println("$productName not loaded")
-                LOG.warn("{} not loaded from {}", productName, extension.repository)
-                return
-            }
-
-            LOG.info("{} loaded", productName)
-            System.out.println("$productName Loaded")
-            LOG.info("Start Unzip  {}", productName)
-            System.out.println("Start Unzip ${productName}...")
-            project.copy {
-                it.from(project.zipTree(file))
-                it.into(idePath)
-            }
-            LOG.info("Unzipped {} to {}", productName, idePath)
-            System.out.println("Unzipped $productName to $idePath")
+        } else {
+            dependency = DependencyManager.resolveLocalCashRepository(project, this, extension)
         }
 
         if (!dependency) {
-            dependency = DependencyManager.resolveLocal(project, extension, idePath, productName)
+            dependency = DependencyManager.resolveLocal(project, extension, productName)
         }
 
         extension.dependency = dependency
@@ -132,53 +106,10 @@ abstract class BasePlugin implements Plugin<Project> {
         }
     }
 
-    @Nullable
-    private File downloadProduct(@NotNull ProductPluginExtension extension, @NotNull String ideVersion) {
-        URL url
-        File file
-        def repository = extension.getRepository()
-        if (!repository) {
-            return null
-        }
-
-        try {
-            url = new URL(repository)
-            def dir = extension.getIdePath().parentFile
-            dir.mkdirs()
-            file = new File(dir, "${ideVersion}.zip")
-
-            def bis
-            try {
-                bis = new BufferedInputStream(url.openStream())
-                def fis
-                try {
-                    fis = new FileOutputStream(file)
-                    byte[] buffer = new byte[1024]
-                    int count
-                    while ((count = bis.read(buffer, 0, 1024)) != -1) {
-                        fis.write(buffer, 0, count)
-                    }
-                } finally {
-                    if (fis) {
-                        fis.close()
-                    }
-                }
-            } finally {
-                if (bis) {
-                    bis.close()
-                }
-            }
-        } catch (IOException ignored) {
-            LOG.error("Failure download {} from {}", productName, repository)
-            return null
-        }
-        return file
-    }
-
     private void configurePrepareSandboxTask(
             @NotNull Project project,
             @NotNull ProductPluginExtension ext) {
-        LOG.info("Configuring prepare {} sandbox task", productName)
+        logger.info("Configuring prepare {} sandbox task", productName)
 
         project.getTasks().create(prepareSandboxTaskName, PrepareSandboxTask).with {
             group = tasksGroupName
@@ -195,7 +126,7 @@ abstract class BasePlugin implements Plugin<Project> {
     private void configurePatchPluginXmlTask(
             @NotNull Project project,
             @NotNull ProductPluginExtension ext) {
-        LOG.info("Configuring patch plugin.xml task")
+        logger.info("Configuring patch plugin.xml task")
 
         project.getTasks().create(patchPluginXmlTaskName, PatchPluginXmlTask).with {
             group = tasksGroupName
@@ -206,7 +137,7 @@ abstract class BasePlugin implements Plugin<Project> {
     }
 
     private void configureRunTask(@NotNull Project project, @NotNull ProductPluginExtension ext) {
-        LOG.info("Configuring run {} task", productName)
+        logger.info("Configuring run {} task", productName)
 
         project.getTasks().create("run$productName", runTaskClass).with {
             group = tasksGroupName
@@ -218,7 +149,7 @@ abstract class BasePlugin implements Plugin<Project> {
     }
 
     private void configureProcessResources(@NotNull Project project) {
-        LOG.info("Configuring {} resources task", productName)
+        logger.info("Configuring {} resources task", productName)
 
         def processResourcesTask = project.tasks.findByName(JavaPlugin.PROCESS_RESOURCES_TASK_NAME) as ProcessResources
         if (processResourcesTask) {
@@ -230,7 +161,7 @@ abstract class BasePlugin implements Plugin<Project> {
     }
 
     private void configureInstrumentation(@NotNull Project project, @NotNull ProductPluginExtension extension) {
-        LOG.info("Configuring IntelliJ compile tasks")
+        logger.info("Configuring IntelliJ compile tasks")
         def abstractCompileDependencies = { String taskName ->
             project.tasks.findByName(taskName).collect {
                 it.taskDependencies.getDependencies(it).findAll { it instanceof AbstractCompile }
@@ -247,7 +178,7 @@ abstract class BasePlugin implements Plugin<Project> {
     }
 
     private void configureTestTasks(@NotNull Project project, @NotNull ProductPluginExtension extension) {
-        LOG.info("Configuring IntelliJ tests tasks")
+        logger.info("Configuring IntelliJ tests tasks")
         project.tasks.withType(Test).each {
             def configDirectory = project.file("${extension.sandboxDirectory}/config-test")
             def systemDirectory = project.file("${extension.sandboxDirectory}/system-test")

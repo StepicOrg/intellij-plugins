@@ -15,9 +15,11 @@ class ProductPluginExtension {
     private static final Logger LOG = Logging.getLogger(ProductPluginExtension.class)
 
     static final String DEFAULT_VERSION = "LATEST-EAP-SNAPSHOT"
+    static final String DEFAULT_ARCHIVE_TYPE = Utils.getDefaultArchiveType()
     private final def systemProperties = new HashMap<String, Object>()
     private File idePath
     private String version = DEFAULT_VERSION
+    private String archiveType = DEFAULT_ARCHIVE_TYPE
     private String type
     private String pluginName
     private File sandboxDirectory
@@ -49,6 +51,15 @@ class ProductPluginExtension {
 
     void setVersion(String version) {
         this.version = version != null ? version : DEFAULT_VERSION
+    }
+
+    @NotNull
+    String getArchiveType() {
+        return archiveType
+    }
+
+    void setArchiveType(String archiveType) {
+        this.archiveType = archiveType != null ? archiveType : DEFAULT_ARCHIVE_TYPE
     }
 
     Map<String, Object> getSystemProperties() {
@@ -101,7 +112,7 @@ class ProductPluginExtension {
             return idePath
         }
 
-        return Utils.getDefaultIdePath(project, plugin, type, version)
+        return Utils.getDefaultIdePath(project, plugin, type, version, archiveType)
     }
 
     void setIdePath(Object idePath) {
@@ -129,6 +140,7 @@ class ProductPluginExtension {
         repository = repository.replaceAll('\\[productName\\.toLowerCase\\(\\)]', plugin.productName.toLowerCase())
         repository = repository.replaceAll('\\[productType]', plugin.productType)
         repository = repository.replaceAll('\\[version]', version)
+        repository = repository.replaceAll('\\[archiveType]', archiveType)
 
         return repository
     }

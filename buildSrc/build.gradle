@@ -10,10 +10,11 @@ dependencies {
     compile gradleApi()
     compile 'org.jetbrains:annotations:13.0'
     compile 'org.jdom:jdom2:2.0.6'
+    compile group: 'org.rauschig', name: 'jarchivelib', version: '0.7.1'
 
     testCompile 'org.hamcrest:java-hamcrest:2.0.0.0'
 
-    testCompile ('junit:junit:4+') {
+    testCompile('junit:junit:4+') {
         exclude group: 'org.hamcrest'
     }
 }
@@ -31,6 +32,10 @@ gradlePlugin {
         ideaPlugin {
             id = 'org.stepik.gradle.plugins.idea'
             implementationClass = "org.stepik.gradle.plugins.idea.IdeaPlugin"
+        }
+        cLionPlugin {
+            id = 'org.stepik.gradle.plugins.clion'
+            implementationClass = "org.stepik.gradle.plugins.clion.CLionPlugin"
         }
     }
 }

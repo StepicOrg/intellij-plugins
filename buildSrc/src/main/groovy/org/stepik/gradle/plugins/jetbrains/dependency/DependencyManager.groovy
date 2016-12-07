@@ -1,5 +1,6 @@
 package org.stepik.gradle.plugins.jetbrains.dependency
 
+import org.gradle.api.Nullable
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.plugins.JavaPlugin
@@ -13,22 +14,23 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.stepik.gradle.plugins.jetbrains.BasePlugin
 import org.stepik.gradle.plugins.jetbrains.ProductPluginExtension
+import org.stepik.gradle.plugins.jetbrains.Utils
 
 /**
  * @author meanmail
  */
 class DependencyManager {
-    private static final Logger LOG = LoggerFactory.getLogger(DependencyManager)
+    private static final Logger logger = LoggerFactory.getLogger(DependencyManager)
 
     @NotNull
     static ProductDependency resolveRemoteMaven(
             @NotNull Project project,
             @NotNull BasePlugin plugin,
             @NotNull ProductPluginExtension extension) {
-        LOG.debug("Adding $plugin.productName repository")
+        logger.debug("Adding $plugin.productName repository")
         project.repositories.maven { it.url = extension.repository }
 
-        LOG.debug("Adding $plugin.productName dependency")
+        logger.debug("Adding $plugin.productName dependency")
         def libraryType = extension.type
         def version = extension.version
         def group = plugin.productGroup
@@ -43,9 +45,9 @@ class DependencyManager {
 
     @NotNull
     private static File getClassesDirectory(@NotNull Project project,
-                                            @NotNull Configuration configuration) {
+            @NotNull Configuration configuration) {
         File zipFile = configuration.singleFile
-        LOG.debug("Product zip: " + zipFile.path)
+        logger.debug("Product zip: " + zipFile.path)
         def directoryName = zipFile.name - ".zip"
 
         def cacheDirectory = new File(zipFile.parent, directoryName)
@@ -53,13 +55,13 @@ class DependencyManager {
         if (!markerFile.exists()) {
             if (cacheDirectory.exists()) cacheDirectory.deleteDir()
             cacheDirectory.mkdir()
-            LOG.debug("Unzipping idea")
+            logger.debug("Unzipping...")
             project.copy {
                 it.from(project.zipTree(zipFile))
                 it.into(cacheDirectory)
             }
             markerFile.createNewFile()
-            LOG.debug("Unzipped")
+            logger.debug("Unzipped")
         }
         return cacheDirectory
     }
@@ -68,8 +70,8 @@ class DependencyManager {
     static ProductDependency resolveLocal(
             @NotNull Project project,
             @NotNull ProductPluginExtension extension,
-            @NotNull File idePath,
             @NotNull String productName) {
+        def idePath = extension.idePath
         if (!idePath.exists() || !idePath.isDirectory()) {
             throw new BuildException("Specified idePath '$idePath' is not path to $productName", null)
         }
@@ -154,5 +156,46 @@ class DependencyManager {
         def artifact = new DefaultIvyArtifact(file, name, "jar", "jar", null)
         artifact.conf = "compile"
         return artifact
+    }
+
+    @Nullable
+    static ProductDependency resolveLocalCashRepository(
+            @NotNull Project project,
+            @NotNull BasePlugin basePlugin,
+            @NotNull ProductPluginExtension extension) {
+        def idePath = extension.getIdePath()
+        def ideArchiveType = extension.getArchiveType()
+        def productName = basePlugin.productName
+
+        if (!idePath.exists()) {
+            def archive = Utils.getArchivePath(project, basePlugin, extension)
+            if (!archive.exists()) {
+                logger.info("Download {}", extension.repository)
+                println("Download $extension.repository")
+
+                archive = Utils.downloadProduct(basePlugin, extension, archive)
+            }
+
+            if (!archive) {
+                println("$productName not loaded from $extension.repository")
+                logger.warn("{} not loaded from {}", productName, extension.repository)
+                return null
+            }
+
+            logger.info("{} loaded", productName)
+            println("$productName Loaded")
+
+            if (ideArchiveType == "zip") {
+                println("Start Unzip ${productName}...")
+                Utils.Unzip(archive, idePath)
+            } else if (ideArchiveType == "tar.gz") {
+                println("Start Untgz ${productName}...")
+                Utils.Untgz(archive, idePath)
+            }
+            logger.info("Unarchivated $productName to $idePath")
+            println("Unarchivated $productName to $idePath")
+        }
+
+        return DependencyManager.resolveLocal(project, extension, productName)
     }
 }

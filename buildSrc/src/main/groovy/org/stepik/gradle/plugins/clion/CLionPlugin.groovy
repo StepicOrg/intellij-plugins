@@ -1,4 +1,4 @@
-package org.stepik.gradle.plugins.pycharm
+package org.stepik.gradle.plugins.clion
 
 import org.stepik.gradle.plugins.jetbrains.BasePlugin
 import org.stepik.gradle.plugins.jetbrains.RepositoryType
@@ -6,19 +6,19 @@ import org.stepik.gradle.plugins.jetbrains.RepositoryType
 /**
  * @author meanmail
  */
-class PyCharmPlugin extends BasePlugin {
-    private static final def PRODUCT_NAME = "PyCharm"
-    private static final def EXTENSION_NAME = "pycharm"
+class CLionPlugin extends BasePlugin {
+    private static final def PRODUCT_NAME = "CLion"
+    private static final def EXTENSION_NAME = "clion"
     private static final def DEFAULT_REPO =
-            'https://download-cf.jetbrains.com/python/pycharm-community-[version].[archiveType]'
+            'http://download.jetbrains.com/cpp/CLion-[version].[archiveType]'
 
-    PyCharmPlugin() {
+    CLionPlugin() {
         extensionName = EXTENSION_NAME
         productName = PRODUCT_NAME
-        productType = "CE"
-        productGroup = "com.jetbrains.python"
+        productType = "CL"
+        productGroup = "com.jetbrains.clion"
         tasksGroupName = EXTENSION_NAME
-        runTaskClass = RunPyCharmTask
+        runTaskClass = RunCLionTask
         extensionInstrumentCode = false
         repositoryType = RepositoryType.DIRECTORY
     }
