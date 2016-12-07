@@ -11,7 +11,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 class InstrumentCodeAction implements Action<AbstractCompile> {
-    private static final Logger LOG = LoggerFactory.getLogger(InstrumentCodeAction)
+    private static final Logger logger = LoggerFactory.getLogger(InstrumentCodeAction)
 
     private static final String FILTER_ANNOTATION_REGEXP_CLASS = 'com.intellij.ant.ClassFilterAnnotationRegexp'
     private static final LOADER_REF = "java2.loader"
@@ -39,7 +39,7 @@ class InstrumentCodeAction implements Action<AbstractCompile> {
                 loaderref: LOADER_REF,
                 classname: 'com.intellij.ant.InstrumentIdeaExtensions')
 
-        LOG.info("Compiling forms and instrumenting code with nullability preconditions")
+        logger.info("Compiling forms and instrumenting code with nullability preconditions")
         //noinspection GroovyAssignabilityCheck
         boolean instrumentNotNull = prepareNotNullInstrumenting(task, classpath)
         def sourceSet = testInstrumentation ?
@@ -57,14 +57,14 @@ class InstrumentCodeAction implements Action<AbstractCompile> {
     }
 
     private static boolean prepareNotNullInstrumenting(@NotNull Task compileTask,
-                                                       @NotNull ConfigurableFileCollection classpath) {
+            @NotNull ConfigurableFileCollection classpath) {
         try {
             compileTask.project.ant.typedef(name: 'skip', classpath: classpath.asPath, loaderref: LOADER_REF,
                     classname: FILTER_ANNOTATION_REGEXP_CLASS)
         } catch (BuildException e) {
             def cause = e.getCause()
             if (cause instanceof ClassNotFoundException && FILTER_ANNOTATION_REGEXP_CLASS == cause.getMessage()) {
-                LOG.info("Old version of Javac2 is used, " +
+                logger.info("Old version of Javac2 is used, " +
                         "instrumenting code with nullability will be skipped. Use IDEA >14 SDK (139.*) to fix this")
                 return false
             } else {
@@ -75,8 +75,8 @@ class InstrumentCodeAction implements Action<AbstractCompile> {
     }
 
     private static void instrumentCode(@NotNull AbstractCompile compileTask,
-                                       @NotNull Collection<File> srcDirs,
-                                       boolean instrumentNotNull) {
+            @NotNull Collection<File> srcDirs,
+            boolean instrumentNotNull) {
         def headlessOldValue = System.setProperty('java.awt.headless', 'true')
         compileTask.project.ant.instrumentIdeaExtensions(srcdir: compileTask.project.files(srcDirs).asPath,
                 destdir: compileTask.destinationDir, classpath: compileTask.classpath.asPath,

@@ -14,7 +14,7 @@ dependencies {
 
     testCompile 'org.hamcrest:java-hamcrest:2.0.0.0'
 
-    testCompile ('junit:junit:4+') {
+    testCompile('junit:junit:4+') {
         exclude group: 'org.hamcrest'
     }
 }

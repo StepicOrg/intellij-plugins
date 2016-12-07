@@ -17,6 +17,8 @@ import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.Nullable
 import org.rauschig.jarchivelib.Archiver
 import org.rauschig.jarchivelib.ArchiverFactory
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import java.nio.charset.Charset
 import java.nio.file.*
@@ -26,6 +28,7 @@ import java.nio.file.attribute.BasicFileAttributes
  * @author meanmail
  */
 class Utils {
+    private static final Logger logger = LoggerFactory.getLogger(Utils)
     private static final String APPLICATION = "application"
     private static final String COMPONENT = "component"
     private static final String NAME = "name"
@@ -56,13 +59,13 @@ class Utils {
     }
 
     @NotNull
-    private static SourceSet mainSourceSet(@NotNull Project project) {
+    static SourceSet mainSourceSet(@NotNull Project project) {
         def javaConvention = project.getConvention().getPlugin(JavaPluginConvention.class)
         return javaConvention.getSourceSets().getByName(SourceSet.MAIN_SOURCE_SET_NAME)
     }
 
     @NotNull
-    private static SourceSet testSourceSet(@NotNull Project project) {
+    static SourceSet testSourceSet(@NotNull Project project) {
         def javaConvention = project.getConvention().getPlugin(JavaPluginConvention.class)
         return javaConvention.getSourceSets().getByName(SourceSet.TEST_SOURCE_SET_NAME)
     }
@@ -213,9 +216,10 @@ class Utils {
 
     @NotNull
     static File getArchivePath(@NotNull Project project,
-                               @NotNull ProductPluginExtension extension) {
+            @NotNull ProductPluginExtension extension) {
         final def gradleHomePath = project.getGradle().getGradleUserHomeDir().getAbsolutePath()
-        return new File("$gradleHomePath/caches/modules-2/files-2.1/$extension.type-$extension.version.$extension.archiveType")
+        return new File(
+                "$gradleHomePath/caches/modules-2/files-2.1/$extension.type-$extension.version.$extension.archiveType")
     }
 
     static void deleteDirectory(Path pluginPath) throws IOException {
@@ -312,5 +316,50 @@ class Utils {
 
         Archiver archiver = ArchiverFactory.createArchiver("zip")
         archiver.extract(archive, destination)
+    }
+
+    @Nullable
+    static File downloadProduct(
+            @NotNull BasePlugin basePlugin,
+            @NotNull ProductPluginExtension extension,
+            @NotNull File archive) {
+        URL url
+        def repository = extension.getRepository()
+        if (!repository) {
+            return null
+        }
+
+        try {
+            url = new URL(repository)
+            def dir = archive.parentFile
+            dir.mkdirs()
+
+            def bis
+            try {
+                bis = new BufferedInputStream(url.openStream())
+                def fis
+                try {
+                    fis = new FileOutputStream(archive)
+                    byte[] buffer = new byte[1024]
+                    int count
+                    while ((count = bis.read(buffer, 0, 1024)) != -1) {
+                        fis.write(buffer, 0, count)
+                    }
+                } finally {
+                    if (fis) {
+                        fis.close()
+                    }
+                }
+            } finally {
+                if (bis) {
+                    bis.close()
+                }
+            }
+        } catch (IOException ignored) {
+            logger.error("Failure download ${basePlugin.productName} from ${repository}")
+            println("Failure download ${basePlugin.productName} from ${repository}")
+            return null
+        }
+        return archive
     }
 }
