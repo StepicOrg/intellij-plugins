@@ -1,6 +1,3 @@
 <idea-plugin version="2">
 
-    <extensions defaultExtensionNs="com.intellij">
-        <navbar implementation="org.stepik.plugin.projectView.StepikNavBarModelExtension"/>
-    </extensions>
 </idea-plugin>

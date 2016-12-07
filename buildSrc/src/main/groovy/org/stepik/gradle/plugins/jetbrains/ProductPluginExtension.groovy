@@ -15,7 +15,7 @@ class ProductPluginExtension {
     private static final Logger LOG = Logging.getLogger(ProductPluginExtension.class)
 
     static final String DEFAULT_VERSION = "LATEST-EAP-SNAPSHOT"
-    static final String DEFAULT_ARCHIVE_TYPE = "zip"
+    static final String DEFAULT_ARCHIVE_TYPE = Utils.getDefaultArchiveType()
     private final def systemProperties = new HashMap<String, Object>()
     private File idePath
     private String version = DEFAULT_VERSION
@@ -46,13 +46,14 @@ class ProductPluginExtension {
     }
 
     String getVersion() {
-        return version.startsWith("CE-") || version.startsWith("IC-") ? version.substring(3) : version
+        return version.startsWith("CE-") || version.startsWith("IC-") || version.startsWith("CL-") ? version.substring(3) : version
     }
 
     void setVersion(String version) {
         this.version = version != null ? version : DEFAULT_VERSION
     }
 
+    @NotNull
     String getArchiveType() {
         return archiveType
     }
@@ -111,7 +112,7 @@ class ProductPluginExtension {
             return idePath
         }
 
-        return Utils.getDefaultIdePath(project, plugin, type, version)
+        return Utils.getDefaultIdePath(project, plugin, type, version, archiveType)
     }
 
     void setIdePath(Object idePath) {

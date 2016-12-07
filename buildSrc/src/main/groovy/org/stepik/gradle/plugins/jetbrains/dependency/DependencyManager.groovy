@@ -168,7 +168,7 @@ class DependencyManager {
         def productName = basePlugin.productName
 
         if (!idePath.exists()) {
-            def archive = Utils.getArchivePath(project, extension)
+            def archive = Utils.getArchivePath(project, basePlugin, extension)
             if (!archive.exists()) {
                 logger.info("Download {}", extension.repository)
                 println("Download $extension.repository")
@@ -177,7 +177,7 @@ class DependencyManager {
             }
 
             if (!archive) {
-                println("$productName not loaded")
+                println("$productName not loaded from $extension.repository")
                 logger.warn("{} not loaded from {}", productName, extension.repository)
                 return null
             }

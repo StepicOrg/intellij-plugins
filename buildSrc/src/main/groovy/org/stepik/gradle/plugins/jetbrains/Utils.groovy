@@ -206,20 +206,27 @@ class Utils {
             @NotNull Project project,
             @NotNull BasePlugin plugin,
             @NotNull String type,
-            @NotNull String version) {
+            @NotNull String version,
+            @NotNull String archiveType) {
         final def gradleHomePath = project.getGradle().getGradleUserHomeDir().getAbsolutePath()
         final def name = plugin.getProductName().toLowerCase()
         final def defaultRelativePath = "caches/modules-2/files-2.1/$plugin.productGroup/$name/$name$type"
 
-        return new File("$gradleHomePath/$defaultRelativePath/$version")
+        return new File("$gradleHomePath/$defaultRelativePath/$version/$archiveType")
     }
 
     @NotNull
     static File getArchivePath(@NotNull Project project,
+            @NotNull BasePlugin plugin,
             @NotNull ProductPluginExtension extension) {
-        final def gradleHomePath = project.getGradle().getGradleUserHomeDir().getAbsolutePath()
-        return new File(
-                "$gradleHomePath/caches/modules-2/files-2.1/$extension.type-$extension.version.$extension.archiveType")
+        def defaultIdePath = getDefaultIdePath(
+                project,
+                plugin,
+                extension.type,
+                extension.version,
+                extension.archiveType)
+        final def name = plugin.getProductName().toLowerCase()
+        return new File(defaultIdePath.parentFile, "$name$extension.type-$extension.version.$extension.archiveType")
     }
 
     static void deleteDirectory(Path pluginPath) throws IOException {
@@ -298,7 +305,7 @@ class Utils {
         return result
     }
 
-    static void Untgz(File archive, File destination) {
+    static void Untgz(@NotNull File archive, @NotNull File destination) {
         destination.parentFile.mkdirs()
 
         Archiver archiver = ArchiverFactory.createArchiver("tar", "gz")
@@ -309,9 +316,10 @@ class Utils {
         for (int i = 0; i < content.length; i++) {
             content[i].renameTo(new File(destination, content[i].name))
         }
+        target.delete()
     }
 
-    static void Unzip(File archive, File destination) {
+    static void Unzip(@NotNull File archive, @NotNull File destination) {
         destination.parentFile.mkdirs()
 
         Archiver archiver = ArchiverFactory.createArchiver("zip")
@@ -361,5 +369,13 @@ class Utils {
             return null
         }
         return archive
+    }
+
+    static String getDefaultArchiveType() {
+        if (System.properties['os.name'].toLowerCase().contains('windows')) {
+            return  "zip"
+        } else {
+            return  "tar.gz"
+        }
     }
 }

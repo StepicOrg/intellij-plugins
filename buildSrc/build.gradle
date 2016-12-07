@@ -33,7 +33,7 @@ gradlePlugin {
             id = 'org.stepik.gradle.plugins.idea'
             implementationClass = "org.stepik.gradle.plugins.idea.IdeaPlugin"
         }
-        cLion {
+        cLionPlugin {
             id = 'org.stepik.gradle.plugins.clion'
             implementationClass = "org.stepik.gradle.plugins.clion.CLionPlugin"
         }
