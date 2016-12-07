@@ -364,8 +364,9 @@ class Utils {
                 }
             }
         } catch (IOException ignored) {
-            logger.error("Failure download ${basePlugin.productName} from ${repository}")
+            logger.error("Failure download ${basePlugin.productName} from ${repository}", ignored)
             println("Failure download ${basePlugin.productName} from ${repository}")
+            ignored.printStackTrace()
             return null
         }
         return archive
