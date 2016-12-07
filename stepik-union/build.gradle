@@ -6,7 +6,6 @@ intellij {
     version = project.getProperties().get('ideaVersion')
     sandboxDirectory = project.getProperties().get('ideaSandboxDir')
     idePath = project.getProperties().get('ideaPath')
-    archiveType = project.getProperties().get('ideaArchiveType')
 }
 
 pycharm {
