@@ -23,5 +23,4 @@ class RunPyCharmTask extends BaseRunTask {
     protected String getPlatformPrefix() {
         return "PyCharmCore"
     }
-
 }

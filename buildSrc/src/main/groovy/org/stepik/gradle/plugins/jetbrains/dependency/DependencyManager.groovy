@@ -55,7 +55,7 @@ class DependencyManager {
         if (!markerFile.exists()) {
             if (cacheDirectory.exists()) cacheDirectory.deleteDir()
             cacheDirectory.mkdir()
-            logger.debug("Unzipping idea")
+            logger.debug("Unzipping...")
             project.copy {
                 it.from(project.zipTree(zipFile))
                 it.into(cacheDirectory)

@@ -46,7 +46,7 @@ class ProductPluginExtension {
     }
 
     String getVersion() {
-        return version.startsWith("CE-") || version.startsWith("IC-") || version.startsWith("CL-") ? version.substring(3) : version
+        return version.startsWith("CE-") || version.startsWith("IC-") ? version.substring(3) : version
     }
 
     void setVersion(String version) {

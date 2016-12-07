@@ -23,5 +23,4 @@ class RunCLionTask extends BaseRunTask {
     protected String getPlatformPrefix() {
         return "CLion"
     }
-
 }

@@ -25,5 +25,4 @@ class RunIdeaTask extends BaseRunTask {
     protected String getPlatformPrefix() {
         return "Idea"
     }
-
 }
