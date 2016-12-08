@@ -21,7 +21,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.jetbrains.tmp.learning.core.EduNames;
+import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.core.EduUtils;
 import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.Lesson;
@@ -33,10 +33,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class StepikWrappers {
     private static final Logger logger = Logger.getInstance(StepOptions.class);
@@ -81,10 +79,11 @@ public class StepikWrappers {
         //    @Expose Map<String, String> codeTemplates;
         @Expose
         CodeTemplatesWrapper codeTemplates;
+        @Expose
+        LimitsWrapper limits;
 
         public static StepOptions fromTask(final Project project, @NotNull final Task task) {
             final StepOptions source = new StepOptions();
-            setTests(task, source, project);
             source.files = new ArrayList<>();
             source.title = task.getName();
             for (final Map.Entry<String, TaskFile> entry : task.getTaskFiles().entrySet()) {
@@ -95,19 +94,19 @@ public class StepikWrappers {
                     assert taskDir != null;
                     VirtualFile ideaDir = project.getBaseDir().findChild(".idea");
                     assert ideaDir != null;
-                    EduUtils.createStudentFileFromAnswer(project, ideaDir, taskDir, entry.getKey(), taskFile);
+                    EduUtils.createStudentFileFromAnswer(project, ideaDir, taskDir, entry.getKey());
                 });
-                taskFile.name = entry.getKey();
+                taskFile.setName(entry.getKey());
 
                 VirtualFile ideaDir = project.getBaseDir().findChild(".idea");
                 if (ideaDir == null) return null;
-                final VirtualFile file = ideaDir.findChild(taskFile.name);
+                final VirtualFile file = ideaDir.findChild(taskFile.getName());
                 try {
                     if (file != null) {
-                        if (EduUtils.isImage(taskFile.name)) {
-                            taskFile.text = Base64.encodeBase64URLSafeString(FileUtil.loadBytes(file.getInputStream()));
+                        if (EduUtils.isImage(taskFile.getName())) {
+                            taskFile.setText(Base64.encodeBase64URLSafeString(FileUtil.loadBytes(file.getInputStream())));
                         } else {
-                            taskFile.text = FileUtil.loadTextAndClose(file.getInputStream());
+                            taskFile.setText(FileUtil.loadTextAndClose(file.getInputStream()));
                         }
                     }
                 } catch (IOException e) {
@@ -118,52 +117,39 @@ public class StepikWrappers {
             }
             return source;
         }
-
-        private static void setTests(
-                @NotNull final Task task,
-                @NotNull final StepOptions source,
-                @NotNull final Project project) {
-            final Map<String, String> testsText = task.getTestsText();
-            if (testsText.isEmpty()) {
-                ApplicationManager.getApplication().runReadAction(() -> {
-                    source.test = Collections.singletonList(new TestFileWrapper(EduNames.TESTS_FILE,
-                            task.getTestsText(project)));
-                });
-            } else {
-                source.test = new ArrayList<>();
-                source.test.addAll(testsText.entrySet()
-                        .stream()
-                        .map(entry -> new TestFileWrapper(entry.getKey(), entry.getValue()))
-                        .collect(Collectors.toList()));
-            }
-        }
     }
 
     static class CodeTemplatesWrapper {
         String python3;
-        String python27;
-        String java;
         String java8;
 
         @Nullable
-        public String getTemplateForLanguage(@NotNull final String langauge) {
-            if (langauge.equals(EduAdaptiveStepikConnector.PYTHON27)) {
-                return python27;
-            }
-
-            if (langauge.equals(EduAdaptiveStepikConnector.PYTHON3)) {
+        public String getTemplateForLanguage(@NotNull final SupportedLanguages language) {
+            if (language == SupportedLanguages.PYTHON) {
                 return python3;
             }
 
-            if (langauge.equals("java")) {
-                return java;
-            }
-
-            if (langauge.equals("java8")) {
+            if (language == SupportedLanguages.JAVA) {
                 return java8;
             }
-
             return null;
+        }
+    }
+
+    static class LimitsWrapper {
+        @Expose
+        Limit java8;
+        @Expose
+        Limit python3;
+    }
+
+    static class Limit {
+        int time;
+        int memory;
+
+        @Override
+        public String toString() {
+            return String.format("<b>Memory limit</b>: %d Mb<br><b>Time limit</b>: %ds<br><br>", memory, time);
         }
     }
 

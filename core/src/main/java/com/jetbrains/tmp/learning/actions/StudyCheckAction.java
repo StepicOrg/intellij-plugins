@@ -3,14 +3,12 @@ package com.jetbrains.tmp.learning.actions;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.actionSystem.Presentation;
-import com.intellij.openapi.extensions.Extensions;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.util.Ref;
-import com.jetbrains.tmp.learning.StudyActionListener;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.checker.StudyCheckUtils;
 import icons.InteractiveLearningIcons;
@@ -19,9 +17,9 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 
 public abstract class StudyCheckAction extends StudyActionWithShortcut {
-    public static final String SHORTCUT = "ctrl alt pressed ENTER";
+    private static final String SHORTCUT = "ctrl alt pressed ENTER";
 
-    protected final Ref<Boolean> myCheckInProgress = new Ref<>(false);
+    private final Ref<Boolean> myCheckInProgress = new Ref<>(false);
 
     public StudyCheckAction() {
         super("Check Task (" + KeymapUtil.getShortcutText(new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT),
@@ -43,9 +41,6 @@ public abstract class StudyCheckAction extends StudyActionWithShortcut {
             return;
         }
         FileDocumentManager.getInstance().saveAllDocuments();
-        for (StudyActionListener listener : Extensions.getExtensions(StudyActionListener.EP_NAME)) {
-            listener.beforeCheck(e);
-        }
         check(project);
     }
 

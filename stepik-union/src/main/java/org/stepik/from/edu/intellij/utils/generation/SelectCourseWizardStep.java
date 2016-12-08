@@ -20,7 +20,7 @@ import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorPost;
 import com.jetbrains.tmp.learning.stepik.StepikWrappers;
 import org.jetbrains.annotations.NotNull;
-import org.stepik.plugin.collective.SupportedLanguages;
+import com.jetbrains.tmp.learning.SupportedLanguages;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -279,8 +279,7 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
 
     @Override
     public void onStepLeaving() {
-        String selectedLang = ((SupportedLanguages) langComboBox.getSelectedItem()).getName();
-//        StudyTaskManager.getInstance(project).setDefaultLang(selectedLang);
+        SupportedLanguages selectedLang = (SupportedLanguages) langComboBox.getSelectedItem();
         myGenerator.setDefaultLang(selectedLang);
         if (selectedCourse != null) {
             myGenerator.setSelectedCourse(selectedCourse);

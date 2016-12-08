@@ -3,7 +3,13 @@ package com.jetbrains.tmp.learning;
 import com.intellij.ide.ui.UISettings;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
-import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.ActionGroup;
+import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.actionSystem.KeyboardShortcut;
+import com.intellij.openapi.actionSystem.Shortcut;
 import com.intellij.openapi.actionSystem.ex.AnActionListener;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ProjectComponent;
@@ -33,7 +39,6 @@ import com.jetbrains.tmp.learning.courseFormat.Lesson;
 import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.courseFormat.TaskFile;
 import com.jetbrains.tmp.learning.editor.StudyEditorFactoryListener;
-import com.jetbrains.tmp.learning.statistics.EduUsagesCollector;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import com.jetbrains.tmp.learning.ui.StudyToolWindow;
 import com.jetbrains.tmp.learning.ui.StudyToolWindowFactory;
@@ -47,7 +52,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 
 public class StudyProjectComponent implements ProjectComponent {
     private static final Logger logger = Logger.getInstance(StudyProjectComponent.class.getName());
@@ -81,9 +85,6 @@ public class StudyProjectComponent implements ProjectComponent {
                                 UISettings.getInstance().fireUISettingsChanged();
                                 logger.info("register Shortcuts");
                                 registerShortcuts();
-                                EduUsagesCollector.projectTypeOpened(course.isAdaptive() ?
-                                        EduNames.ADAPTIVE :
-                                        EduNames.STUDY);
                                 StepikConnectorLogin.loginFromDialog(myProject);
                             }
                         }));
@@ -143,35 +144,20 @@ public class StudyProjectComponent implements ProjectComponent {
         if (!resourceDirectory.exists()) {
             return;
         }
-        StudyLanguageManager manager = StudyUtils.getLanguageManager(course);
-        if (manager == null) {
-            logger.info("Study Language Manager is null for " + course.getLanguageById().getDisplayName());
-            return;
-        }
         final File[] files = resourceDirectory.listFiles();
         if (files == null) return;
         for (File file : files) {
-            String testHelper = manager.getTestHelperFileName();
-            if (file.getName().equals(testHelper)) {
-                copyFile(file, new File(myProject.getBasePath(), testHelper));
-            }
             if (file.getName().startsWith(EduNames.LESSON)) {
                 final File[] tasks = file.listFiles();
                 if (tasks == null) continue;
                 for (File task : tasks) {
                     final File taskDescrFrom = StudyUtils.createTaskDescriptionFile(task);
                     if (taskDescrFrom != null) {
-                        String testFileName = manager.getTestFileName();
-                        final File taskTests = new File(task, testFileName);
                         final File taskDescrTo =
                                 StudyUtils.createTaskDescriptionFile(new File(new File(myProject.getBasePath(),
                                         file.getName()), task.getName()));
                         if (taskDescrTo != null) {
                             copyFile(taskDescrFrom, taskDescrTo);
-                            copyFile(taskTests,
-                                    new File(new File(new File(myProject.getBasePath(), file.getName()),
-                                            task.getName()),
-                                            testFileName));
                         }
                     }
                 }
@@ -281,7 +267,6 @@ public class StudyProjectComponent implements ProjectComponent {
     @NotNull
     @Override
     public String getComponentName() {
-        //return "StudyTaskManager";
         return "StepikTaskManager";
     }
 
@@ -312,10 +297,9 @@ public class StudyProjectComponent implements ProjectComponent {
                     if (StudyUtils.indexIsValid(taskIndex, tasks)) {
                         final Task task = tasks.get(taskIndex);
                         final TaskFile taskFile = new TaskFile();
-                        taskFile.initTaskFile(task, false);
-                        taskFile.setUserCreated(true);
+                        taskFile.initTaskFile(task);
                         final String name = createdFile.getName();
-                        taskFile.name = name;
+                        taskFile.setName(name);
                         task.getTaskFiles().put(name, taskFile);
                     }
                 }

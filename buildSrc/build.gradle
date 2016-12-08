@@ -1,0 +1,46 @@
+plugins {
+    id 'java-gradle-plugin'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile gradleApi()
+    compile 'org.jetbrains:annotations:13.0'
+    compile 'org.jdom:jdom2:2.0.6'
+    compile group: 'org.rauschig', name: 'jarchivelib', version: '0.7.1'
+
+    testCompile 'org.hamcrest:java-hamcrest:2.0.0.0'
+
+    testCompile('junit:junit:4+') {
+        exclude group: 'org.hamcrest'
+    }
+}
+
+version = '0.1'
+group = 'org.stepik.gradle.plugins'
+
+gradlePlugin {
+    //noinspection GroovyAssignabilityCheck
+    plugins {
+        pyCharmPlugin {
+            id = 'org.stepik.gradle.plugins.pycharm'
+            implementationClass = "org.stepik.gradle.plugins.pycharm.PyCharmPlugin"
+        }
+        ideaPlugin {
+            id = 'org.stepik.gradle.plugins.idea'
+            implementationClass = "org.stepik.gradle.plugins.idea.IdeaPlugin"
+        }
+        cLionPlugin {
+            id = 'org.stepik.gradle.plugins.clion'
+            implementationClass = "org.stepik.gradle.plugins.clion.CLionPlugin"
+        }
+    }
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}

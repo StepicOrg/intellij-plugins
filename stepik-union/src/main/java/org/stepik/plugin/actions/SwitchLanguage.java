@@ -14,17 +14,17 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.refactoring.move.moveFilesOrDirectories.MoveFilesOrDirectoriesUtil;
-import com.jetbrains.tmp.learning.LangSetting;
-import com.jetbrains.tmp.learning.StudyTaskManager;
 import com.jetbrains.tmp.learning.StudyUtils;
+import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.actions.StudyActionWithShortcut;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.Task;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.stepik.plugin.collective.SupportedLanguages;
 
 import javax.swing.*;
+
+import static org.stepik.plugin.actions.ActionUtils.checkLangSettings;
 
 public class SwitchLanguage extends StudyActionWithShortcut {
     private static final String ACTION_ID = "STEPIK.SwitchLanguage";
@@ -50,9 +50,11 @@ public class SwitchLanguage extends StudyActionWithShortcut {
             return;
         }
 
-        StudyTaskManager taskManager = StudyTaskManager.getInstance(project);
-        LangSetting langSetting = taskManager.getLangManager().getLangSetting(targetTask);
-        if (langSetting.getSupportLangs().size() == 1) {
+        if (targetTask.getSupportedLanguages().size() == 1) {
+            return;
+        }
+
+        if (!checkLangSettings(targetTask, project)){
             return;
         }
 
@@ -79,16 +81,12 @@ public class SwitchLanguage extends StudyActionWithShortcut {
         if (hide == null) {
             return;
         }
-        PsiDirectory scrPsi = PsiManager.getInstance(project).findDirectory(src);
-        if (scrPsi == null) {
+        PsiDirectory srcPsi = PsiManager.getInstance(project).findDirectory(src);
+        if (srcPsi == null) {
             return;
         }
-        SupportedLanguages currentLang = SupportedLanguages.langOf(langSetting.getCurrentLang());
-        if (currentLang == null) {
-            return;
-        }
+        SupportedLanguages currentLang = targetTask.getCurrentLang();
         SupportedLanguages secondLang;
-
         if (currentLang == SupportedLanguages.JAVA) {
             secondLang = SupportedLanguages.PYTHON;
         } else {
@@ -119,10 +117,10 @@ public class SwitchLanguage extends StudyActionWithShortcut {
 
         ApplicationManager.getApplication().runWriteAction(() -> {
             MoveFilesOrDirectoriesUtil.doMoveFile(first, hide);
-            MoveFilesOrDirectoriesUtil.doMoveFile(second, scrPsi);
+            MoveFilesOrDirectoriesUtil.doMoveFile(second, srcPsi);
         });
         String activateFileName = secondLang.getMainFileName();
-        langSetting.setCurrentLang(secondLang.getName());
+        targetTask.setCurrentLang(secondLang);
 
         VirtualFile vf = src.findChild(activateFileName);
         if (vf != null)

@@ -4,8 +4,6 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.jetbrains.tmp.learning.StudyTaskManager;
-import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.Lesson;
@@ -33,7 +31,7 @@ public class StudyGenerator {
      * @param resourceRoot directory where original task file stored
      * @throws IOException
      */
-    public static void createTaskFile(
+    private static void createTaskFile(
             @NotNull final VirtualFile taskDir, @NotNull final File resourceRoot,
             @NotNull final String name) throws IOException {
         String systemIndependentName = FileUtil.toSystemIndependentName(name);
@@ -60,11 +58,7 @@ public class StudyGenerator {
             @NotNull final Project project) throws IOException {
         VirtualFile taskDir = lessonDir.createChildDirectory(project, task.getDirectory());
         File newResourceRoot = new File(resourceRoot, taskDir.getName());
-        int i = 0;
         for (Map.Entry<String, TaskFile> taskFile : task.getTaskFiles().entrySet()) {
-            TaskFile taskFileContent = taskFile.getValue();
-            taskFileContent.setIndex(i);
-            i++;
             createTaskFile(taskDir, newResourceRoot, taskFile.getKey());
         }
         File[] filesInTask = newResourceRoot.listFiles();
@@ -75,10 +69,6 @@ public class StudyGenerator {
                     File resourceFile = new File(newResourceRoot, fileName);
                     File fileInProject = new File(taskDir.getCanonicalPath(), fileName);
                     FileUtil.copy(resourceFile, fileInProject);
-                    if (!StudyUtils.isTestsFile(project, fileName) && !StudyUtils.isTaskDescriptionFile(fileName)) {
-                        StudyTaskManager.getInstance(project)
-                                .addInvisibleFiles(FileUtil.toSystemIndependentName(fileInProject.getPath()));
-                    }
                 }
             }
         }
@@ -91,7 +81,7 @@ public class StudyGenerator {
      * @param resourceRoot directory where original lesson stored
      * @throws IOException
      */
-    public static void createLesson(
+    private static void createLesson(
             @NotNull final Lesson lesson,
             @NotNull final VirtualFile courseDir,
             @NotNull final File resourceRoot,

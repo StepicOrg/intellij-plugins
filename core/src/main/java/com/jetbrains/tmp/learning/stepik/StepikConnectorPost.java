@@ -23,18 +23,15 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.tmp.learning.StudySerializationUtils;
 import com.jetbrains.tmp.learning.core.EduNames;
-import com.jetbrains.tmp.learning.core.EduUtils;
 import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.Lesson;
 import com.jetbrains.tmp.learning.courseFormat.Section;
 import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.courseFormat.TaskFile;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
@@ -160,7 +157,7 @@ public class StepikConnectorPost {
             final Map<String, TaskFile> taskFiles = task.getTaskFiles();
             final ArrayList<StepikWrappers.SolutionFile> files = taskFiles.values()
                     .stream()
-                    .map(fileEntry -> new StepikWrappers.SolutionFile(fileEntry.name, fileEntry.text))
+                    .map(fileEntry -> new StepikWrappers.SolutionFile(fileEntry.getName(), fileEntry.getText()))
                     .collect(Collectors.toCollection(ArrayList::new));
             postSubmission(true, attempt, files);
         } catch (IOException e) {
@@ -199,7 +196,6 @@ public class StepikConnectorPost {
         return false;
     }
 
-    // used by StudyCheckTask
     @Deprecated
     public static void postAttempt(
             @NotNull final Task task,
@@ -224,7 +220,7 @@ public class StepikConnectorPost {
             final Map<String, TaskFile> taskFiles = task.getTaskFiles();
             final ArrayList<StepikWrappers.SolutionFile> files = taskFiles.values()
                     .stream()
-                    .map(fileEntry -> new StepikWrappers.SolutionFile(fileEntry.name, fileEntry.text))
+                    .map(fileEntry -> new StepikWrappers.SolutionFile(fileEntry.getName(), fileEntry.getText()))
                     .collect(Collectors.toCollection(ArrayList::new));
             postSubmission(passed, attempt, files);
         } catch (IOException e) {
@@ -323,20 +319,6 @@ public class StepikConnectorPost {
             task.setName(EduNames.PYCHARM_ADDITIONAL);
             task.setIndex(1);
             task.setText(EduNames.PYCHARM_ADDITIONAL);
-            for (VirtualFile file : files) {
-                try {
-                    if (file != null) {
-                        if (EduUtils.isImage(file.getName())) {
-                            task.addTestsTexts(file.getName(),
-                                    Base64.encodeBase64URLSafeString(FileUtil.loadBytes(file.getInputStream())));
-                        } else {
-                            task.addTestsTexts(file.getName(), FileUtil.loadTextAndClose(file.getInputStream()));
-                        }
-                    }
-                } catch (IOException e) {
-                    logger.error("Can't find file " + file.getPath());
-                }
-            }
             lesson.addTask(task);
             lesson.setIndex(1);
             final int lessonId = postLesson(project, lesson, indicator);

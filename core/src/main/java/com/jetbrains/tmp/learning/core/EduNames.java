@@ -15,7 +15,6 @@
  */
 package com.jetbrains.tmp.learning.core;
 
-import com.intellij.openapi.util.text.StringUtil;
 import org.jetbrains.annotations.NonNls;
 
 @NonNls
@@ -25,18 +24,8 @@ public class EduNames {
     public static final String HINTS = "hints";
     public static final String LESSON = "lesson";
     public static final String SECTION = "section";
-    public static final String LESSON_TITLED = StringUtil.toTitleCase(LESSON);
     public static final String TASK = "task";
-    public static final String TASK_TITLED = StringUtil.toTitleCase(TASK);
     public static final String COURSE = "course";
-    public static final String TEST_TAB_NAME = "test";
-    public static final String USER_TEST_INPUT = "input";
-    public static final String USER_TEST_OUTPUT = "output";
-    public static final String WINDOW_POSTFIX = "_window.";
-    public static final String WINDOWS_POSTFIX = "_windows";
-    public static final String ANSWERS_POSTFIX = "_answers";
-    public static final String USER_TESTS = "userTests";
-    public static final String TESTS_FILE = "tests.py";
     public static final String TEST_HELPER = "test_helper.py";
 
     public static final String SANDBOX_DIR = "Sandbox";
@@ -45,16 +34,16 @@ public class EduNames {
     public static final String PYCHARM = "PyCharm";
 
     public static final String STUDY = "Study";
-    public static final String ADAPTIVE = "Adaptive";
     public static final String STEPIK_CODE = "stepik_code";
 
-    public static final String ANSWER_PLACEHOLDER = "Answer Placeholder";
-    public static final String PLACEHOLDER = "placeholder";
     public static final String SRC = "src";
 
-    public static final String SEPARATOR = "#/*";
     public static final java.lang.String UTIL = "util";
     public static final String HIDE = "hide";
+    public static final String PYTHON27 = "python27";
+    public static final String PYTHON3 = "python3";
+    public static final String JAVA = "java";
+    public static final String JAVA8 = "java8";
 
     private EduNames() {
     }
