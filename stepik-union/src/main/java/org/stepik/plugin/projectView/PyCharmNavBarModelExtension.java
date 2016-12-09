@@ -12,7 +12,6 @@ public class PyCharmNavBarModelExtension extends DefaultNavBarExtension {
     @Override
     public String getPresentableText(@Nullable final Object object) {
         String text = NavBarModelExtensionUtils.getPresentableText(object);
-
         return text != null ? text : super.getPresentableText(object);
     }
 
@@ -20,7 +19,6 @@ public class PyCharmNavBarModelExtension extends DefaultNavBarExtension {
     @Override
     public PsiElement adjustElement(final PsiElement psiElement) {
         PsiElement element = NavBarModelExtensionUtils.adjustElement(psiElement);
-
         return element == null ? null : super.adjustElement(psiElement);
     }
 }

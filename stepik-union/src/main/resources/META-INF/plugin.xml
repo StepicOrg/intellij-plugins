@@ -40,8 +40,7 @@
         <action id="STEPIK.DownloadSubmission" class="org.stepik.plugin.actions.DownloadSubmission"/>
         <action id="STEPIK.SwitchLanguage" class="org.stepik.plugin.actions.SwitchLanguage"/>
         <action id="STEPIK.InsertStepikDirectives" class="org.stepik.plugin.actions.InsertStepikDirectives"/>
-        <action id="STEPIK.RefreshTaskAction" class="org.stepik.plugin.actions.StepikRefreshTaskFileAction"
-                text="Reset Task File" description="Refresh current task"/>
+        <action id="STEPIK.RefreshTaskAction" class="org.stepik.plugin.actions.StepikRefreshTaskFileAction" text="Reset Task File" description="Refresh current task"/>
     </actions>
 
     <!--______________________ CORE ________________________________________-->
@@ -59,16 +58,12 @@
     </application-components>
 
     <extensionPoints>
-        <extensionPoint qualifiedName="SCore.studyPluginConfigurator"
-                        interface="com.jetbrains.tmp.learning.StudyPluginConfigurator"/>
+        <extensionPoint qualifiedName="SCore.studyPluginConfigurator" interface="com.jetbrains.tmp.learning.StudyPluginConfigurator"/>
     </extensionPoints>
 
     <extensions defaultExtensionNs="com.intellij">
-        <projectService serviceInterface="com.intellij.codeInsight.documentation.DocumentationManager"
-                        serviceImplementation="com.jetbrains.tmp.learning.StudyDocumentationManager" overrides="true"/>
-        <toolWindow id="Task Description" anchor="right"
-                    factoryClass="com.jetbrains.tmp.learning.ui.StudyToolWindowFactory"
-                    conditionClass="com.jetbrains.tmp.learning.ui.StudyCondition"/>
+        <projectService serviceInterface="com.intellij.codeInsight.documentation.DocumentationManager" serviceImplementation="com.jetbrains.tmp.learning.StudyDocumentationManager" overrides="true"/>
+        <toolWindow id="Task Description" anchor="right" factoryClass="com.jetbrains.tmp.learning.ui.StudyToolWindowFactory" conditionClass="com.jetbrains.tmp.learning.ui.StudyCondition"/>
         <fileEditorProvider implementation="com.jetbrains.tmp.learning.editor.StudyFileEditorProvider"/>
         <projectService serviceImplementation="com.jetbrains.tmp.learning.StudyTaskManager"/>
         <applicationService serviceImplementation="com.jetbrains.tmp.learning.stepik.StepikUpdateSettings"/>

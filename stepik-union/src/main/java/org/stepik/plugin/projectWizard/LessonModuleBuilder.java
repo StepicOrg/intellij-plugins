@@ -25,7 +25,8 @@ class LessonModuleBuilder extends AbstractModuleBuilder {
         this.project = project;
         String lessonName = lesson.getDirectory();
         setName(lessonName);
-        setModuleFilePath(FileUtil.join(moduleDir, lessonName, lessonName + ModuleFileType.DOT_DEFAULT_EXTENSION));
+        String path = FileUtil.join(moduleDir, lessonName, lessonName + ModuleFileType.DOT_DEFAULT_EXTENSION);
+        setModuleFilePath(path);
     }
 
     @NotNull

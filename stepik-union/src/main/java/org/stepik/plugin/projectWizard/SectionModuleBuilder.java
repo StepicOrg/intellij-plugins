@@ -9,6 +9,7 @@ class SectionModuleBuilder extends AbstractModuleBuilder {
     SectionModuleBuilder(@NotNull String moduleDir, @NotNull Section section) {
         String sectionName = section.getDirectory();
         setName(sectionName);
-        setModuleFilePath(FileUtil.join(moduleDir, sectionName, sectionName + ModuleFileType.DOT_DEFAULT_EXTENSION));
+        String path = FileUtil.join(moduleDir, sectionName, sectionName + ModuleFileType.DOT_DEFAULT_EXTENSION);
+        setModuleFilePath(path);
     }
 }
