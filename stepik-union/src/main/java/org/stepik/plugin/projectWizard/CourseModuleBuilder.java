@@ -1,23 +1,17 @@
-package org.stepik.plugin.java.project.wizard;
+package org.stepik.plugin.projectWizard;
 
-import com.intellij.ide.util.projectWizard.JavaModuleBuilder;
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
-import com.intellij.ide.util.projectWizard.ProjectWizardStepFactory;
-import com.intellij.ide.util.projectWizard.SettingsStep;
 import com.intellij.ide.util.projectWizard.WizardContext;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.ModifiableModuleModel;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.module.ModuleWithNameAlreadyExists;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.DumbModePermission;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.ui.configuration.ModulesProvider;
-import com.intellij.openapi.util.Conditions;
 import com.intellij.openapi.util.InvalidDataException;
 import com.jetbrains.tmp.learning.StudyProjectComponent;
 import com.jetbrains.tmp.learning.StudyTaskManager;
@@ -28,19 +22,16 @@ import com.jetbrains.tmp.learning.courseFormat.Section;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.stepik.from.edu.intellij.utils.generation.EduProjectGenerator;
 import org.stepik.from.edu.intellij.utils.generation.JavaSandboxModuleBuilder;
 import org.stepik.from.edu.intellij.utils.generation.SelectCourseWizardStep;
 import org.stepik.from.edu.intellij.utils.generation.StepikProjectGenerator;
 import org.stepik.from.edu.intellij.utils.generation.builders.CourseBuilder;
-import org.stepik.from.edu.intellij.utils.generation.builders.LessonBuilder;
 
 import java.io.IOException;
-import java.util.Collections;
 
-class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilder {
-    private static final Logger logger = Logger.getInstance(JavaCourseBuilder.class);
+class CourseModuleBuilder extends AbstractModuleBuilder implements CourseBuilder {
+    private static final Logger logger = Logger.getInstance(CourseModuleBuilder.class);
     private StepikProjectGenerator generator;
 
     @Override
@@ -78,7 +69,8 @@ class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilder {
     }
 
     @Override
-    public void createLessonModules(@NotNull ModifiableModuleModel moduleModel,
+    public void createLessonModules(
+            @NotNull ModifiableModuleModel moduleModel,
             @NotNull Course course,
             @NotNull String moduleDir,
             @NotNull Project project
@@ -87,27 +79,15 @@ class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilder {
         int lessonIndex = 1;
         for (Section section : course.getSections()) {
             section.setIndex(++sectionIndex);
-            LessonBuilder sectionBuilder = new StepikJavaSectionBuilder(moduleDir, section);
-            sectionBuilder.createLesson(moduleModel);
+            SectionModuleBuilder sectionBuilder = new SectionModuleBuilder(moduleDir, section);
+            sectionBuilder.createModule(moduleModel);
             for (Lesson lesson : section.getLessons()) {
                 lesson.setIndex(lessonIndex++);
                 String sectionDir = moduleDir + "/" + section.getDirectory();
-                LessonBuilder lessonBuilder = new StepikJavaLessonBuilder(sectionDir, lesson, project);
-                lessonBuilder.createLesson(moduleModel);
+                LessonModuleBuilder lessonBuilder = new LessonModuleBuilder(sectionDir, lesson, project);
+                lessonBuilder.createModule(moduleModel);
             }
         }
-    }
-
-    @Override
-    public ModuleType getModuleType() {
-        return StepikModuleType.STEPIK_MODULE_TYPE;
-    }
-
-    @Nullable
-    @Override
-    public ModuleWizardStep modifySettingsStep(@NotNull SettingsStep settingsStep) {
-        return ProjectWizardStepFactory.getInstance()
-                .createJavaSettingsStep(settingsStep, this, Conditions.alwaysTrue());
     }
 
     @NotNull
@@ -139,11 +119,5 @@ class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilder {
             generator = new StepikProjectGenerator();
         }
         return generator;
-    }
-
-    @Override
-    public void setupRootModel(@NotNull ModifiableRootModel rootModel) throws ConfigurationException {
-        setSourcePaths(Collections.emptyList());
-        super.setupRootModel(rootModel);
     }
 }
