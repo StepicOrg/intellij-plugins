@@ -6,7 +6,6 @@ import com.intellij.ide.util.treeView.AbstractTreeNode;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.jetbrains.tmp.learning.StudyTaskManager;
@@ -21,7 +20,7 @@ import java.util.Collection;
 import static org.stepik.plugin.utils.PresentationDataUtils.isVisibleDirectory;
 import static org.stepik.plugin.utils.PresentationDataUtils.isVisibleFile;
 
-public class StepikTreeStructureProvider implements TreeStructureProvider, DumbAware {
+abstract class StepikTreeStructureProvider implements TreeStructureProvider, DumbAware {
     private static final Logger logger = Logger.getInstance(StepikTreeStructureProvider.class);
 
     @NotNull
@@ -47,13 +46,15 @@ public class StepikTreeStructureProvider implements TreeStructureProvider, DumbA
                     if (isVisibleFile((PsiFile) value)) {
                         nodes.add(node);
                     }
-                } else if (value instanceof PsiClass) {
+                } else if (shouldAdd(value)) {
                     nodes.add(node);
                 }
             }
         }
         return nodes;
     }
+
+    protected abstract boolean shouldAdd(@NotNull Object object);
 
     private boolean needModify(@NotNull final AbstractTreeNode parent) {
         final Project project = parent.getProject();
