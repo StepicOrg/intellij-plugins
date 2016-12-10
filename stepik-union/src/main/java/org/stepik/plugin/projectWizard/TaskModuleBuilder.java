@@ -7,11 +7,8 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleWithNameAlreadyExists;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.ContentEntry;
-import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.io.FileUtil;
-import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.tmp.learning.StudyTaskManager;
@@ -32,7 +29,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Map;
 
-class TaskModuleBuilder extends AbstractModuleBuilder {
+class TaskModuleBuilder extends ModuleBuilderWithSrc {
     private static final Logger logger = Logger.getInstance(TaskModuleBuilder.class);
     private final Task myTask;
     private final Project project;
@@ -112,24 +109,5 @@ class TaskModuleBuilder extends AbstractModuleBuilder {
     private void moveFromHide(@NotNull String filename, @NotNull VirtualFile src) throws IOException {
         Files.move(Paths.get(src.getPath(), EduNames.HIDE, filename),
                 Paths.get(src.getPath(), filename), StandardCopyOption.REPLACE_EXISTING);
-    }
-
-    @Override
-    public void setupRootModel(ModifiableRootModel rootModel) throws ConfigurationException {
-        super.setupRootModel(rootModel);
-
-        ContentEntry contentEntry = this.doAddContentEntry(rootModel);
-        String moduleLibraryPath;
-        if (contentEntry != null) {
-            moduleLibraryPath = this.getContentEntryPath() + File.separator + "src";
-            //noinspection ResultOfMethodCallIgnored
-            (new File(moduleLibraryPath)).mkdirs();
-            LocalFileSystem localFS = LocalFileSystem.getInstance();
-            String name = FileUtil.toSystemIndependentName(moduleLibraryPath);
-            VirtualFile sourceLibraryPath = localFS.refreshAndFindFileByPath(name);
-            if (sourceLibraryPath != null) {
-                contentEntry.addSourceFolder(sourceLibraryPath, false, "");
-            }
-        }
     }
 }
