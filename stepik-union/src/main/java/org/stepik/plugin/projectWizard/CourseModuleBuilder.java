@@ -23,19 +23,16 @@ import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.from.edu.intellij.utils.generation.EduProjectGenerator;
-import org.stepik.from.edu.intellij.utils.generation.JavaSandboxModuleBuilder;
 import org.stepik.from.edu.intellij.utils.generation.SelectCourseWizardStep;
 import org.stepik.from.edu.intellij.utils.generation.StepikProjectGenerator;
-import org.stepik.from.edu.intellij.utils.generation.builders.CourseBuilder;
 
 import java.io.IOException;
 
-class CourseModuleBuilder extends AbstractModuleBuilder implements CourseBuilder {
+class CourseModuleBuilder extends AbstractModuleBuilder {
     private static final Logger logger = Logger.getInstance(CourseModuleBuilder.class);
     private StepikProjectGenerator generator;
 
-    @Override
-    public void createCourseFromGenerator(
+    private void createCourseFromGenerator(
             @NotNull ModifiableModuleModel moduleModel,
             @NotNull Project project,
             @NotNull EduProjectGenerator generator)
@@ -57,7 +54,7 @@ class CourseModuleBuilder extends AbstractModuleBuilder implements CourseBuilder
         }
 
         logger.info("Module dir = " + moduleDir);
-        new JavaSandboxModuleBuilder(moduleDir).createModule(moduleModel);
+        new SandboxModuleBuilder(moduleDir).createModule(moduleModel);
 
         createLessonModules(moduleModel, course, moduleDir, project);
 
@@ -68,8 +65,7 @@ class CourseModuleBuilder extends AbstractModuleBuilder implements CourseBuilder
                                         .registerStudyToolWindow(course))));
     }
 
-    @Override
-    public void createLessonModules(
+    private void createLessonModules(
             @NotNull ModifiableModuleModel moduleModel,
             @NotNull Course course,
             @NotNull String moduleDir,
