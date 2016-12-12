@@ -11,11 +11,8 @@ import com.google.gson.JsonParseException;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.EditorFactory;
-import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
-import com.intellij.openapi.util.io.FileUtil;
-import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.containers.hash.HashMap;
 import com.jetbrains.tmp.learning.core.EduNames;
@@ -509,44 +506,6 @@ public class StudySerializationUtils {
                     JsonElement json,
                     Type typeOfT,
                     JsonDeserializationContext context) throws JsonParseException {
-                JsonObject courseObject = json.getAsJsonObject();
-                JsonArray lessons = courseObject.getAsJsonArray(LESSONS);
-                for (int lessonIndex = 1; lessonIndex <= lessons.size(); lessonIndex++) {
-                    JsonObject lessonObject = lessons.get(lessonIndex - 1).getAsJsonObject();
-                    JsonArray tasks = lessonObject.getAsJsonArray(TASK_LIST);
-                    for (int taskIndex = 1; taskIndex <= tasks.size(); taskIndex++) {
-                        JsonObject taskObject = tasks.get(taskIndex - 1).getAsJsonObject();
-                        for (Map.Entry<String, JsonElement> taskFile : taskObject.getAsJsonObject(TASK_FILES)
-                                .entrySet()) {
-                            String name = taskFile.getKey();
-                            String filePath = FileUtil.join(myCourseFile.getParent(),
-                                    EduNames.LESSON + lessonIndex,
-                                    EduNames.TASK + taskIndex,
-                                    name);
-                            VirtualFile resourceFile = LocalFileSystem.getInstance()
-                                    .refreshAndFindFileByIoFile(new File(filePath));
-                            if (resourceFile == null) {
-                                continue;
-                            }
-                            Document document = FileDocumentManager.getInstance().getDocument(resourceFile);
-                            if (document == null) {
-                                continue;
-                            }
-                            JsonObject taskFileObject = taskFile.getValue().getAsJsonObject();
-                            JsonArray placeholders = taskFileObject.getAsJsonArray(PLACEHOLDERS);
-                            for (JsonElement placeholder : placeholders) {
-                                JsonObject placeholderObject = placeholder.getAsJsonObject();
-                                if (placeholderObject.getAsJsonPrimitive(OFFSET) != null) {
-                                    break;
-                                }
-                                int line = placeholderObject.getAsJsonPrimitive(LINE).getAsInt();
-                                int start = placeholderObject.getAsJsonPrimitive(START).getAsInt();
-                                int offset = document.getLineStartOffset(line) + start;
-                                placeholderObject.addProperty(OFFSET, offset);
-                            }
-                        }
-                    }
-                }
                 return new GsonBuilder().create().fromJson(json, Course.class);
             }
         }
