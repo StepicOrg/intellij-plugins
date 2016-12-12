@@ -2,6 +2,7 @@ package org.stepik.plugin.projectView;
 
 import com.intellij.ide.navigationToolbar.DefaultNavBarExtension;
 import com.intellij.psi.PsiElement;
+import com.intellij.util.Processor;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -20,5 +21,10 @@ public class PyCharmNavBarModelExtension extends DefaultNavBarExtension {
     public PsiElement adjustElement(final PsiElement psiElement) {
         PsiElement element = NavBarModelExtensionUtils.adjustElement(psiElement);
         return element == null ? null : super.adjustElement(psiElement);
+    }
+
+    @Override
+    public boolean processChildren(Object object, Object rootElement, Processor<Object> processor) {
+        return true;
     }
 }
