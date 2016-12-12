@@ -11,7 +11,7 @@ import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.Alarm;
 import com.intellij.util.text.DateFormatUtil;
-import com.jetbrains.tmp.learning.courseGeneration.StudyProjectGenerator;
+import com.jetbrains.tmp.learning.courseGeneration.StepikProjectGenerator;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -68,9 +68,9 @@ public class EduStepikUpdater {
                 return;
             }
 
-            StudyProjectGenerator.flushCache(courses);
+            StepikProjectGenerator.flushCache(courses);
 
-            final List<CourseInfo> cachedCourses = StudyProjectGenerator.getCoursesFromCache();
+            final List<CourseInfo> cachedCourses = StepikProjectGenerator.getCoursesFromCache();
             courses.removeAll(cachedCourses);
 
             if (!courses.isEmpty() && !cachedCourses.isEmpty()) {
@@ -100,7 +100,7 @@ public class EduStepikUpdater {
     }
 
     private static boolean checkNeeded() {
-        final List<CourseInfo> courses = StudyProjectGenerator.getCoursesFromCache();
+        final List<CourseInfo> courses = StepikProjectGenerator.getCoursesFromCache();
         if (courses.isEmpty()) {
             return true;
         }

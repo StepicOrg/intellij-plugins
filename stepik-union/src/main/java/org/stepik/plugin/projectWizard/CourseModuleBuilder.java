@@ -22,9 +22,8 @@ import com.jetbrains.tmp.learning.courseFormat.Section;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
-import org.stepik.from.edu.intellij.utils.generation.EduProjectGenerator;
+import com.jetbrains.tmp.learning.courseGeneration.StepikProjectGenerator;
 import org.stepik.from.edu.intellij.utils.generation.SelectCourseWizardStep;
-import org.stepik.from.edu.intellij.utils.generation.StepikProjectGenerator;
 
 import java.io.IOException;
 
@@ -35,7 +34,7 @@ class CourseModuleBuilder extends AbstractModuleBuilder {
     private void createCourseFromGenerator(
             @NotNull ModifiableModuleModel moduleModel,
             @NotNull Project project,
-            @NotNull EduProjectGenerator generator)
+            @NotNull StepikProjectGenerator generator)
             throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
         generator.generateProject(project, project.getBaseDir());
 

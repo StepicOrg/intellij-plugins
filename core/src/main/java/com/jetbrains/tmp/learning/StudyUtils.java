@@ -32,7 +32,7 @@ import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.Lesson;
 import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.courseFormat.TaskFile;
-import com.jetbrains.tmp.learning.courseGeneration.StudyProjectGenerator;
+import com.jetbrains.tmp.learning.courseGeneration.StepikProjectGenerator;
 import com.jetbrains.tmp.learning.editor.StudyEditor;
 import com.jetbrains.tmp.learning.ui.StudyToolWindow;
 import com.jetbrains.tmp.learning.ui.StudyToolWindowFactory;
@@ -350,15 +350,7 @@ public class StudyUtils {
 
     @NotNull
     public static File getCourseDirectory(@NotNull Project project, Course course) {
-        final File courseDirectory;
-        if (course.isAdaptive()) {
-            courseDirectory = new File(StudyProjectGenerator.OUR_COURSES_DIR,
-                    StudyProjectGenerator.ADAPTIVE_COURSE_PREFIX + course.getName()
-                            + "_" + StudyTaskManager.getInstance(project).getUser().getEmail());
-        } else {
-            courseDirectory = new File(StudyProjectGenerator.OUR_COURSES_DIR, Integer.toString(course.getId()));
-        }
-        return courseDirectory;
+        return new File(StepikProjectGenerator.OUR_COURSES_DIR, Integer.toString(course.getId()));
     }
 
     public static boolean hasJavaFx() {
