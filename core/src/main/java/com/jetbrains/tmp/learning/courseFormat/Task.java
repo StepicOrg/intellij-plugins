@@ -21,7 +21,9 @@ import java.util.Map;
 
 public class Task implements StudyItem {
     private int index;
+    @Expose
     private int position;
+    @Expose
     private String text;
     private StudyStatus status = StudyStatus.UNCHECKED;
 
