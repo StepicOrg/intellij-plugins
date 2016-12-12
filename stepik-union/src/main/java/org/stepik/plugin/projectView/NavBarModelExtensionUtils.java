@@ -42,6 +42,12 @@ class NavBarModelExtensionUtils {
 
     @Nullable
     static PsiElement adjustElement(final PsiElement psiElement) {
+        Project project = psiElement.getProject();
+        StudyTaskManager studyTaskManager = StudyTaskManager.getInstance(project);
+        Course course = studyTaskManager.getCourse();
+        if (course == null)
+            return psiElement;
+
         if (psiElement instanceof PsiDirectory) {
             if (!isVisibleDirectory((PsiDirectory) psiElement))
                 return null;
