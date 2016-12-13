@@ -21,7 +21,6 @@ import com.google.gson.GsonBuilder;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
-import com.jetbrains.tmp.learning.StudySerializationUtils;
 import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.Course;
@@ -58,12 +57,9 @@ public class StepikConnectorGet {
     private static final Logger logger = Logger.getInstance(StepikConnectorGet.class.getName());
     private static final String PYCHARM_PREFIX = "pycharm";
     private static final String CODE_PREFIX = "code";
-
-    static final private Gson GSON =
-            new GsonBuilder().registerTypeAdapter(TaskFile.class,
-                    new StudySerializationUtils.Json.StepikTaskFileAdapter())
-                    .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
-
+    private static final Gson GSON = new GsonBuilder()
+            .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+            .create();
 
     static <T> T getFromStepik(String link, final Class<T> container) throws IOException {
         return getFromStepik(link, container, StepikConnectorLogin.getHttpClient());
@@ -382,7 +378,10 @@ public class StepikConnectorGet {
         task.setTimeLimits(timeLimits);
     }
 
-    private static void putIfNotNull(Map<SupportedLanguages, String> timeLimits, SupportedLanguages lang, String limit) {
+    private static void putIfNotNull(
+            Map<SupportedLanguages, String> timeLimits,
+            SupportedLanguages lang,
+            String limit) {
         if (limit != null && lang != null) {
             timeLimits.put(lang, limit);
         }

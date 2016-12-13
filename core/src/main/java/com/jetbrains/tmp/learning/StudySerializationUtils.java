@@ -1,34 +1,26 @@
 package com.jetbrains.tmp.learning;
 
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.containers.hash.HashMap;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.core.EduUtils;
-import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
-import com.jetbrains.tmp.learning.courseFormat.TaskFile;
 import org.jdom.Attribute;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,7 +31,6 @@ import java.util.Set;
 
 public class StudySerializationUtils {
 
-    private static final String PLACEHOLDERS = "placeholders";
     private static final String LINE = "line";
     private static final String START = "start";
     private static final String OFFSET = "offset";
@@ -55,49 +46,49 @@ public class StudySerializationUtils {
     private StudySerializationUtils() {
     }
 
-    public static class StudyUnrecognizedFormatException extends Exception {}
+    static class StudyUnrecognizedFormatException extends Exception {}
 
-    public static class Xml {
+    static class Xml {
         private static final Logger logger = Logger.getInstance(StudySerializationUtils.class);
-        public final static String COURSE_ELEMENT = "courseElement";
-        public final static String MAIN_ELEMENT = "StepikStudyTaskManager";
-        public static final String MAP = "map";
-        public static final String KEY = "key";
-        public static final String VALUE = "value";
-        public static final String NAME = "name";
-        public static final String LIST = "list";
-        public static final String OPTION = "option";
-        public static final String INDEX = "index";
-        public static final String STUDY_STATUS_MAP = "myStudyStatusMap";
-        public static final String TASK_STATUS_MAP = "myTaskStatusMap";
-        public static final String LENGTH = "length";
-        public static final String ANSWER_PLACEHOLDERS = "answerPlaceholders";
-        public static final String TASK_LIST = "taskList";
-        public static final String TASK_FILES = "taskFiles";
-        public static final String INITIAL_STATE = "initialState";
-        public static final String MY_INITIAL_STATE = "MyInitialState";
-        public static final String MY_LINE = "myLine";
-        public static final String MY_START = "myStart";
-        public static final String MY_LENGTH = "myLength";
-        public static final String HINTS = "hints";
-        public static final String HINT = "hint";
-        public static final String AUTHOR_TITLED = "Author";
-        public static final String FIRST_NAME = "first_name";
-        public static final String SECOND_NAME = "second_name";
-        public static final String MY_INITIAL_LINE = "myInitialLine";
-        public static final String MY_INITIAL_LENGTH = "myInitialLength";
-        public static final String ANSWER_PLACEHOLDER = "AnswerPlaceholder";
-        public static final String TASK_WINDOWS = "taskWindows";
-        public static final String RESOURCE_PATH = "resourcePath";
-        public static final String COURSE_DIRECTORY = "courseDirectory";
-        public static final String SECTIONS = "sections";
-        public static final String SECTION_TITLED = "Section";
-        public static final String SECTIONS_NAMES = "sectionsNames";
+        final static String COURSE_ELEMENT = "courseElement";
+        final static String MAIN_ELEMENT = "StepikStudyTaskManager";
+        static final String MAP = "map";
+        static final String KEY = "key";
+        static final String VALUE = "value";
+        static final String NAME = "name";
+        static final String LIST = "list";
+        static final String OPTION = "option";
+        static final String INDEX = "index";
+        static final String STUDY_STATUS_MAP = "myStudyStatusMap";
+        static final String TASK_STATUS_MAP = "myTaskStatusMap";
+        static final String LENGTH = "length";
+        static final String ANSWER_PLACEHOLDERS = "answerPlaceholders";
+        static final String TASK_LIST = "taskList";
+        static final String TASK_FILES = "taskFiles";
+        static final String INITIAL_STATE = "initialState";
+        static final String MY_INITIAL_STATE = "MyInitialState";
+        static final String MY_LINE = "myLine";
+        static final String MY_START = "myStart";
+        static final String MY_LENGTH = "myLength";
+        static final String HINTS = "hints";
+        static final String HINT = "hint";
+        static final String AUTHOR_TITLED = "Author";
+        static final String FIRST_NAME = "first_name";
+        static final String SECOND_NAME = "second_name";
+        static final String MY_INITIAL_LINE = "myInitialLine";
+        static final String MY_INITIAL_LENGTH = "myInitialLength";
+        static final String ANSWER_PLACEHOLDER = "AnswerPlaceholder";
+        static final String TASK_WINDOWS = "taskWindows";
+        static final String RESOURCE_PATH = "resourcePath";
+        static final String COURSE_DIRECTORY = "courseDirectory";
+        static final String SECTIONS = "sections";
+        static final String SECTION_TITLED = "Section";
+        static final String SECTIONS_NAMES = "sectionsNames";
 
         private Xml() {
         }
 
-        public static int getVersion(Element element) throws StudyUnrecognizedFormatException {
+        static int getVersion(Element element) throws StudyUnrecognizedFormatException {
             if (element.getChild(COURSE_ELEMENT) != null) {
                 return 1;
             }
@@ -112,7 +103,7 @@ public class StudySerializationUtils {
             return Integer.valueOf(versionElement.getAttributeValue(VALUE));
         }
 
-        public static Element convertToSecondVersion(Element element) throws StudyUnrecognizedFormatException {
+        static Element convertToSecondVersion(Element element) throws StudyUnrecognizedFormatException {
             final Element oldCourseElement = element.getChild(COURSE_ELEMENT);
             Element state = new Element(MAIN_ELEMENT);
 
@@ -164,7 +155,7 @@ public class StudySerializationUtils {
             return element;
         }
 
-        public static Map<String, String> fillStatusMap(
+        static Map<String, String> fillStatusMap(
                 Element taskManagerElement,
                 String mapName,
                 XMLOutputter outputter)
@@ -181,7 +172,7 @@ public class StudySerializationUtils {
             return destMap;
         }
 
-        public static Element convertToThirdVersion(
+        static Element convertToThirdVersion(
                 Element state,
                 Project project) throws StudyUnrecognizedFormatException {
             Element taskManagerElement = state.getChild(MAIN_ELEMENT);
@@ -228,7 +219,7 @@ public class StudySerializationUtils {
             return state;
         }
 
-        public static String addStatus(
+        static String addStatus(
                 XMLOutputter outputter,
                 Map<String, String> placeholderTextToStatus,
                 String taskStatus,
@@ -244,7 +235,7 @@ public class StudySerializationUtils {
             return taskStatus;
         }
 
-        public static void addInitialState(
+        static void addInitialState(
                 Document document,
                 Element placeholder) throws StudyUnrecognizedFormatException {
             Element initialState = getChildWithName(placeholder, INITIAL_STATE).getChild(MY_INITIAL_STATE);
@@ -255,14 +246,14 @@ public class StudySerializationUtils {
             renameElement(getChildWithName(initialState, MY_LENGTH), LENGTH);
         }
 
-        public static void addOffset(Document document, Element placeholder) throws StudyUnrecognizedFormatException {
+        static void addOffset(Document document, Element placeholder) throws StudyUnrecognizedFormatException {
             int line = getAsInt(placeholder, LINE);
             int start = getAsInt(placeholder, START);
             int offset = document.getLineStartOffset(line) + start;
             addChildWithName(placeholder, OFFSET, offset);
         }
 
-        public static void addHints(@NotNull Element placeholder) throws StudyUnrecognizedFormatException {
+        static void addHints(@NotNull Element placeholder) throws StudyUnrecognizedFormatException {
             final String hint = getChildWithName(placeholder, HINT).getAttribute(VALUE).getValue();
             Element listElement = new Element(LIST);
             final Element hintElement = new Element(OPTION);
@@ -271,25 +262,25 @@ public class StudySerializationUtils {
             addChildWithName(placeholder, HINTS, listElement);
         }
 
-        public static int getAsInt(Element element, String name) throws StudyUnrecognizedFormatException {
+        static int getAsInt(Element element, String name) throws StudyUnrecognizedFormatException {
             return Integer.valueOf(getChildWithName(element, name).getAttributeValue(VALUE));
         }
 
-        public static void incrementIndex(Element element) throws StudyUnrecognizedFormatException {
+        static void incrementIndex(Element element) throws StudyUnrecognizedFormatException {
             Element index = getChildWithName(element, INDEX);
             int indexValue = Integer.parseInt(index.getAttributeValue(VALUE));
             changeValue(index, indexValue + 1);
         }
 
-        public static void renameElement(Element element, String newName) {
+        static void renameElement(Element element, String newName) {
             element.setAttribute(NAME, newName);
         }
 
-        public static void changeValue(Element element, Object newValue) {
+        static void changeValue(Element element, Object newValue) {
             element.setAttribute(VALUE, newValue.toString());
         }
 
-        public static Element addChildWithName(Element parent, String name, Element value) {
+        static Element addChildWithName(Element parent, String name, Element value) {
             Element child = new Element(OPTION);
             child.setAttribute(NAME, name);
             child.addContent(value);
@@ -297,7 +288,7 @@ public class StudySerializationUtils {
             return value;
         }
 
-        public static Element addChildWithName(Element parent, String name, Object value) {
+        static Element addChildWithName(Element parent, String name, Object value) {
             Element child = new Element(OPTION);
             child.setAttribute(NAME, name);
             child.setAttribute(VALUE, value.toString());
@@ -305,13 +296,13 @@ public class StudySerializationUtils {
             return child;
         }
 
-        public static Element addChildList(Element parent, String name, List<Element> elements) {
+        static Element addChildList(Element parent, String name, List<Element> elements) {
             Element listElement = new Element(LIST);
             elements.forEach(listElement::addContent);
             return addChildWithName(parent, name, listElement);
         }
 
-        public static List<Element> getChildList(Element parent, String name) throws StudyUnrecognizedFormatException {
+        static List<Element> getChildList(Element parent, String name) throws StudyUnrecognizedFormatException {
             Element listParent = getChildWithName(parent, name);
             if (listParent != null) {
                 Element list = listParent.getChild(LIST);
@@ -323,7 +314,7 @@ public class StudySerializationUtils {
         }
 
         @NotNull
-        public static Set<Element> getChildSet(Element parent, String name) {
+        static Set<Element> getChildSet(Element parent, String name) {
             Element listParent = getChildWithNameOrNull(parent, name);
             if (listParent != null) {
                 Element list = listParent.getChild("set");
@@ -334,7 +325,7 @@ public class StudySerializationUtils {
             return Collections.emptySet();
         }
 
-        public static Element getChildWithName(Element parent, String name) throws StudyUnrecognizedFormatException {
+        static Element getChildWithName(Element parent, String name) throws StudyUnrecognizedFormatException {
             Element child = getChildWithNameOrNull(parent, name);
             if (child != null) {
                 return child;
@@ -345,7 +336,7 @@ public class StudySerializationUtils {
             }
         }
 
-        public static Element getChildWithNameOrNull(Element parent, String name) {
+        static Element getChildWithNameOrNull(Element parent, String name) {
             for (Element child : parent.getChildren()) {
                 Attribute attribute = child.getAttribute(NAME);
                 if (attribute == null) {
@@ -358,7 +349,7 @@ public class StudySerializationUtils {
             return null;
         }
 
-        public static <K, V> Map<K, V> getChildMap(
+        static <K, V> Map<K, V> getChildMap(
                 Element element,
                 String name) throws StudyUnrecognizedFormatException {
             Element mapParent = getChildWithName(element, name);
@@ -491,60 +482,10 @@ public class StudySerializationUtils {
     }
 
     public static class Json {
-
-        public static final String TASK_LIST = "task_list";
-        public static final String TASK_FILES = "task_files";
-
         private Json() {
         }
 
-        public static class CourseTypeAdapter implements JsonDeserializer<Course> {
-
-            private final File myCourseFile;
-
-            public CourseTypeAdapter(File courseFile) {
-                myCourseFile = courseFile;
-            }
-
-            @Override
-            public Course deserialize(
-                    JsonElement json,
-                    Type typeOfT,
-                    JsonDeserializationContext context) throws JsonParseException {
-                return new GsonBuilder().create().fromJson(json, Course.class);
-            }
-        }
-
-        @Deprecated
-        public static class StepikTaskFileAdapter implements JsonDeserializer<TaskFile> {
-
-            @Override
-            public TaskFile deserialize(
-                    JsonElement json,
-                    Type typeOfT,
-                    JsonDeserializationContext context) throws JsonParseException {
-                JsonObject taskFileObject = json.getAsJsonObject();
-                JsonArray placeholders = taskFileObject.getAsJsonArray(PLACEHOLDERS);
-                for (JsonElement placeholder : placeholders) {
-                    JsonObject placeholderObject = placeholder.getAsJsonObject();
-                    int line = placeholderObject.getAsJsonPrimitive(LINE).getAsInt();
-                    int start = placeholderObject.getAsJsonPrimitive(START).getAsInt();
-                    if (line == -1) {
-                        placeholderObject.addProperty(OFFSET, start);
-                    } else {
-                        Document document = EditorFactory.getInstance()
-                                .createDocument(taskFileObject.getAsJsonPrimitive(TEXT).getAsString());
-                        placeholderObject.addProperty(OFFSET, document.getLineStartOffset(line) + start);
-                    }
-                }
-                return new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-                        .create()
-                        .fromJson(json, TaskFile.class);
-            }
-        }
-
-        public static class SupportedLanguagesSerializer implements JsonSerializer<SupportedLanguages>
-        {
+        public static class SupportedLanguagesSerializer implements JsonSerializer<SupportedLanguages> {
             @Override
             public JsonElement serialize(SupportedLanguages src, Type typeOfSrc, JsonSerializationContext context) {
                 return new JsonPrimitive(src.toString());
@@ -552,18 +493,18 @@ public class StudySerializationUtils {
         }
 
         public static class SupportedLanguagesDeserializer implements JsonDeserializer<SupportedLanguages> {
-            private final Logger logger = Logger.getInstance(SupportedLanguagesDeserializer.class);
-
             @Override
             public SupportedLanguages deserialize(
                     JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
                 String data = json.getAsString();
-                logger.info("json = " + data);
 
                 switch (data) {
-                    case ("java8") : return SupportedLanguages.JAVA;
-                    case ("python3") : return SupportedLanguages.PYTHON;
-                    default: return SupportedLanguages.INVALID;
+                    case ("java8"):
+                        return SupportedLanguages.JAVA;
+                    case ("python3"):
+                        return SupportedLanguages.PYTHON;
+                    default:
+                        return SupportedLanguages.INVALID;
                 }
             }
         }
