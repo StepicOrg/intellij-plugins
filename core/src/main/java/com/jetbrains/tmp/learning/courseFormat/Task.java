@@ -240,7 +240,11 @@ public class Task implements StudyItem {
 
     @NotNull
     public SupportedLanguages getCurrentLang() {
-        return currentLang;
+        if (currentLang == SupportedLanguages.INVALID){
+            return getFirstSupportLang();
+        } else {
+            return currentLang;
+        }
     }
 
     public void setCurrentLang(@NotNull SupportedLanguages currentLang) {

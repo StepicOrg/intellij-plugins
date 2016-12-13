@@ -16,7 +16,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.jetbrains.tmp.learning.StudySerializationUtils;
+import com.jetbrains.tmp.learning.StudySerializationUtils.Json.SupportedLanguagesDeserializer;
 import com.jetbrains.tmp.learning.StudyTaskManager;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.SupportedLanguages;
@@ -42,7 +42,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -105,19 +104,16 @@ public class StepikProjectGenerator {
 
     @Nullable
     private static Course readCourseFromCache(@NotNull File courseFile, boolean isAdaptive) {
-        Reader reader = null;
-        try {
-            reader = new InputStreamReader(new FileInputStream(courseFile), "UTF-8");
-            Gson gson =
-                    new GsonBuilder().registerTypeAdapter(Course.class,
-                            new StudySerializationUtils.Json.CourseTypeAdapter(courseFile)).create();
-            final Course course = gson.fromJson(reader, Course.class);
+        try (BufferedReader bufferedReader =
+                new BufferedReader(new InputStreamReader(new FileInputStream(courseFile), "UTF-8"))){
+            Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation()
+                    .registerTypeAdapter(SupportedLanguages.class, new SupportedLanguagesDeserializer())
+                    .create();
+            final Course course = gson.fromJson(bufferedReader, Course.class);
             course.initCourse(isAdaptive);
             return course;
-        } catch (UnsupportedEncodingException | FileNotFoundException e) {
+        } catch (IOException e) {
             logger.warn(e.getMessage());
-        } finally {
-            StudyUtils.closeSilently(reader);
         }
         return null;
     }
