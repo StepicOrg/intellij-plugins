@@ -17,6 +17,7 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.ui.EnumComboBoxModel;
 import com.intellij.ui.HyperlinkAdapter;
+import com.jetbrains.tmp.learning.StudySerializationUtils.Json.SupportedLanguagesSerializer;
 import com.jetbrains.tmp.learning.StudyTaskManager;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.SupportedLanguages;
@@ -321,7 +322,7 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
                 }
                 return course;
             });
-        }, "Creating Course", true, project);
+        }, "Downloading Course", true, project);
     }
 
     private static void flushCourse(@NotNull final Project project, @NotNull final Course course) {
@@ -331,7 +332,10 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
     }
 
     private static void flushCourseJson(@NotNull final Course course, @NotNull final File courseDirectory) {
-        final Gson gson = new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
+        final Gson gson = new GsonBuilder().setPrettyPrinting()
+                .registerTypeAdapter(SupportedLanguages.class, new SupportedLanguagesSerializer())
+                .excludeFieldsWithoutExposeAnnotation()
+                .create();
         final String json = gson.toJson(course);
         final File courseJson = new File(courseDirectory, EduNames.COURSE_META_FILE);
         final FileOutputStream fileOutputStream;
@@ -351,7 +355,7 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
                 }
             }
         } catch (FileNotFoundException | UnsupportedEncodingException e) {
-            logger.info(e);
+            logger.warn(e);
         }
     }
 }

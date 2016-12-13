@@ -8,6 +8,9 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.EditorFactory;
@@ -436,7 +439,9 @@ public class StudySerializationUtils {
                         Element langSetting = element.getValue();
 
                         Element currentLangElement = getChildWithNameOrNull(langSetting, "currentLang");
-                        String currentLang = currentLangElement == null ? "" : currentLangElement.getAttribute("value").getValue();
+                        String currentLang = currentLangElement == null ?
+                                "" :
+                                currentLangElement.getAttribute("value").getValue();
 
                         Set<Element> supportLangs = getChildSet(langSetting, "supportLangs");
                         Set<String> taskLangs = new HashSet<>();
@@ -478,7 +483,7 @@ public class StudySerializationUtils {
                 }
             }
 
-            if (taskManagerElement.removeContent(getChildWithName(taskManagerElement, "langManager"))){
+            if (taskManagerElement.removeContent(getChildWithName(taskManagerElement, "langManager"))) {
                 logger.info("LangManager was removed from STM.xml");
             }
             return state;
@@ -510,6 +515,7 @@ public class StudySerializationUtils {
             }
         }
 
+        @Deprecated
         public static class StepikTaskFileAdapter implements JsonDeserializer<TaskFile> {
 
             @Override
@@ -534,6 +540,31 @@ public class StudySerializationUtils {
                 return new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
                         .create()
                         .fromJson(json, TaskFile.class);
+            }
+        }
+
+        public static class SupportedLanguagesSerializer implements JsonSerializer<SupportedLanguages>
+        {
+            @Override
+            public JsonElement serialize(SupportedLanguages src, Type typeOfSrc, JsonSerializationContext context) {
+                return new JsonPrimitive(src.toString());
+            }
+        }
+
+        public static class SupportedLanguagesDeserializer implements JsonDeserializer<SupportedLanguages> {
+            private final Logger logger = Logger.getInstance(SupportedLanguagesDeserializer.class);
+
+            @Override
+            public SupportedLanguages deserialize(
+                    JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+                String data = json.getAsString();
+                logger.info("json = " + data);
+
+                switch (data) {
+                    case ("java8") : return SupportedLanguages.JAVA;
+                    case ("python3") : return SupportedLanguages.PYTHON;
+                    default: return SupportedLanguages.INVALID;
+                }
             }
         }
     }

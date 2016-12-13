@@ -152,4 +152,12 @@ public class Lesson implements StudyItem {
     public void setSection(Section section) {
         this.section = section;
     }
+
+    @Override
+    public String toString() {
+        return "Lesson{" +
+                "myId=" + myId +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }
