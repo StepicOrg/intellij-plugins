@@ -2,7 +2,10 @@ package com.jetbrains.tmp.learning.stepik.entities;
 
 import com.google.gson.annotations.Expose;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.TimeZone;
 
 /**
  * @author meanmail
@@ -40,9 +43,21 @@ public class Submission {
         return reply;
     }
 
+    private final static SimpleDateFormat timeISOFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+    private final static SimpleDateFormat timeOutFormat = new SimpleDateFormat("d MMM yyyy HH:mm:ss");
+
     @Override
     public String toString() {
-        return "#" + id + " " + time;
+        String localTime;
+        try {
+            TimeZone tz = TimeZone.getTimeZone("UTC");
+            timeISOFormat.setTimeZone(tz);
+            localTime = timeOutFormat.format(timeISOFormat.parse(time));
+        } catch (ParseException e) {
+            localTime = time;
+        }
+
+        return "#" + id + " " + status + " " + localTime;
     }
 
     public int getAttempt() {
