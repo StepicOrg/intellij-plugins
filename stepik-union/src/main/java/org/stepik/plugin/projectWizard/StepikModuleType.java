@@ -1,4 +1,4 @@
-package org.stepik.plugin.java.project.wizard;
+package org.stepik.plugin.projectWizard;
 
 import com.intellij.ide.util.projectWizard.ModuleBuilder;
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
@@ -17,24 +17,39 @@ import org.jetbrains.jps.model.java.JavaModuleSourceRootTypes;
 
 import javax.swing.*;
 
-public class StepikModuleType extends ModuleType<JavaCourseBuilder> {
-    private static final String MODULE_NAME = "Stepik Union";
+public class StepikModuleType extends ModuleType<CourseModuleBuilder> {
+    static final String MODULE_NAME = "Stepik Union";
     static final StepikModuleType STEPIK_MODULE_TYPE;
+    private static final String ID = "STEPIK_MODULE_TYPE";
 
     static {
-        STEPIK_MODULE_TYPE = (StepikModuleType) instantiate("org.stepik.plugin.java.project.wizard.StepikModuleType");
+        STEPIK_MODULE_TYPE = instantiate();
     }
-
-    private static final String ID = "STEPIK_MODULE_TYPE";
 
     public StepikModuleType() {
         super(ID);
     }
 
     @NotNull
+    private static StepikModuleType instantiate() {
+        try {
+            return (StepikModuleType) Class.forName("org.stepik.plugin.projectWizard.StepikModuleType").newInstance();
+        } catch (Exception e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    private static boolean isValidJavaSdk(@NotNull Module module) {
+        if (ModuleRootManager.getInstance(module).getSourceRoots(JavaModuleSourceRootTypes.SOURCES).isEmpty())
+            return true;
+        return JavaPsiFacade.getInstance(module.getProject()).findClass(CommonClassNames.JAVA_LANG_OBJECT,
+                module.getModuleWithLibrariesScope()) != null;
+    }
+
+    @NotNull
     @Override
-    public JavaCourseBuilder createModuleBuilder() {
-        return new JavaCourseBuilder();
+    public CourseModuleBuilder createModuleBuilder() {
+        return new CourseModuleBuilder();
     }
 
     @NotNull
@@ -59,15 +74,6 @@ public class StepikModuleType extends ModuleType<JavaCourseBuilder> {
         return IconLoader.getIcon("/icons/stepik_logotype_13x13-2.png");
     }
 
-    @NotNull
-    private static ModuleType instantiate(String className) {
-        try {
-            return (ModuleType) Class.forName(className).newInstance();
-        } catch (Exception e) {
-            throw new IllegalArgumentException(e);
-        }
-    }
-
     @Nullable
     @Override
     public ModuleWizardStep modifyProjectTypeStep(
@@ -80,12 +86,5 @@ public class StepikModuleType extends ModuleType<JavaCourseBuilder> {
     @Override
     public boolean isValidSdk(@NotNull final Module module, final Sdk projectSdk) {
         return isValidJavaSdk(module);
-    }
-
-    private static boolean isValidJavaSdk(@NotNull Module module) {
-        if (ModuleRootManager.getInstance(module).getSourceRoots(JavaModuleSourceRootTypes.SOURCES).isEmpty())
-            return true;
-        return JavaPsiFacade.getInstance(module.getProject()).findClass(CommonClassNames.JAVA_LANG_OBJECT,
-                module.getModuleWithLibrariesScope()) != null;
     }
 }

@@ -1,6 +1,5 @@
 package org.stepik.plugin.projectView;
 
-import com.intellij.ide.navigationToolbar.JavaNavBarExtension;
 import com.intellij.ide.projectView.PresentationData;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
@@ -17,11 +16,9 @@ import static org.stepik.plugin.utils.PresentationDataUtils.updatePresentationDa
 /**
  * @author meanmail
  */
-public class StepikNavBarModelExtension extends JavaNavBarExtension {
-
+class NavBarModelExtensionUtils {
     @Nullable
-    @Override
-    public String getPresentableText(@Nullable final Object object) {
+    static String getPresentableText(@Nullable final Object object) {
         if (object instanceof Project) {
             Project project = (Project) object;
             StudyTaskManager studyTaskManager = StudyTaskManager.getInstance(project);
@@ -40,12 +37,17 @@ public class StepikNavBarModelExtension extends JavaNavBarExtension {
                 return text;
         }
 
-        return super.getPresentableText(object);
+        return null;
     }
 
     @Nullable
-    @Override
-    public PsiElement adjustElement(final PsiElement psiElement) {
+    static PsiElement adjustElement(final PsiElement psiElement) {
+        Project project = psiElement.getProject();
+        StudyTaskManager studyTaskManager = StudyTaskManager.getInstance(project);
+        Course course = studyTaskManager.getCourse();
+        if (course == null)
+            return psiElement;
+
         if (psiElement instanceof PsiDirectory) {
             if (!isVisibleDirectory((PsiDirectory) psiElement))
                 return null;
@@ -54,6 +56,6 @@ public class StepikNavBarModelExtension extends JavaNavBarExtension {
                 return null;
         }
 
-        return super.adjustElement(psiElement);
+        return psiElement;
     }
 }

@@ -1,43 +1,32 @@
-package org.stepik.plugin.java.project.wizard;
+package org.stepik.plugin.projectWizard;
 
 import com.intellij.ide.highlighter.ModuleFileType;
-import com.intellij.ide.util.projectWizard.JavaModuleBuilder;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.ModifiableModuleModel;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleWithNameAlreadyExists;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.InvalidDataException;
-import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.io.FileUtil;
 import com.jetbrains.tmp.learning.courseFormat.Lesson;
 import com.jetbrains.tmp.learning.courseFormat.Task;
-import org.stepik.from.edu.intellij.utils.generation.builders.LessonBuilder;
-import org.stepik.from.edu.intellij.utils.generation.builders.TaskBuilder;
 import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.List;
 
-class StepikJavaLessonBuilder extends JavaModuleBuilder implements LessonBuilder {
-    private static final Logger logger = Logger.getInstance(StepikJavaLessonBuilder.class);
+class LessonModuleBuilder extends AbstractModuleBuilder {
     private final Lesson myLesson;
     private final Project project;
 
-    StepikJavaLessonBuilder(@NotNull String moduleDir, @NotNull Lesson lesson, @NotNull Project project) {
+    LessonModuleBuilder(@NotNull String moduleDir, @NotNull Lesson lesson, @NotNull Project project) {
         myLesson = lesson;
         this.project = project;
         String lessonName = lesson.getDirectory();
         setName(lessonName);
-        setModuleFilePath(FileUtil.join(moduleDir, lessonName, lessonName + ModuleFileType.DOT_DEFAULT_EXTENSION));
-    }
-
-    @Override
-    public Module createLesson(@NotNull ModifiableModuleModel moduleModel)
-            throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
-        return createModule(moduleModel);
+        String path = FileUtil.join(moduleDir, lessonName, lessonName + ModuleFileType.DOT_DEFAULT_EXTENSION);
+        setModuleFilePath(path);
     }
 
     @NotNull
@@ -58,12 +47,7 @@ class StepikJavaLessonBuilder extends JavaModuleBuilder implements LessonBuilder
             @NotNull ModifiableModuleModel moduleModel,
             @NotNull Task task)
             throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
-        TaskBuilder taskModuleBuilder = new StepikJavaTaskBuilder(getModuleFileDirectory(), getName(), task, project);
-        taskModuleBuilder.createTask(moduleModel);
-    }
-
-    @Override
-    public List<Pair<String, String>> getSourcePaths() {
-        return null;
+        TaskModuleBuilder taskModuleBuilder = new TaskModuleBuilder(getModuleFileDirectory(), getName(), task, project);
+        taskModuleBuilder.createModule(moduleModel);
     }
 }

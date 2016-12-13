@@ -1,12 +1,12 @@
-package org.stepik.from.edu.intellij.utils.generation;
+package org.stepik.plugin.projectWizard;
 
 import com.intellij.ide.highlighter.ModuleFileType;
-import com.intellij.ide.util.projectWizard.JavaModuleBuilder;
 import com.intellij.openapi.util.io.FileUtil;
 import com.jetbrains.tmp.learning.core.EduNames;
+import org.jetbrains.annotations.NotNull;
 
-public class JavaSandboxModuleBuilder extends JavaModuleBuilder {
-    public JavaSandboxModuleBuilder(String moduleDir) {
+class SandboxModuleBuilder extends ModuleBuilderWithSrc {
+    SandboxModuleBuilder(@NotNull String moduleDir) {
         super();
         setName(EduNames.SANDBOX_DIR);
         setModuleFilePath(FileUtil.join(moduleDir,

@@ -1,7 +1,6 @@
-package org.stepik.plugin.java.project.wizard;
+package org.stepik.plugin.projectWizard;
 
 import com.intellij.ide.highlighter.ModuleFileType;
-import com.intellij.ide.util.projectWizard.JavaModuleBuilder;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.ModifiableModuleModel;
 import com.intellij.openapi.module.Module;
@@ -22,7 +21,6 @@ import com.jetbrains.tmp.learning.courseFormat.TaskFile;
 import org.apache.commons.codec.binary.Base64;
 import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
-import org.stepik.from.edu.intellij.utils.generation.builders.TaskBuilder;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,12 +29,12 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Map;
 
-class StepikJavaTaskBuilder extends JavaModuleBuilder implements TaskBuilder {
-    private static final Logger logger = Logger.getInstance(StepikJavaTaskBuilder.class);
+class TaskModuleBuilder extends ModuleBuilderWithSrc {
+    private static final Logger logger = Logger.getInstance(TaskModuleBuilder.class);
     private final Task myTask;
     private final Project project;
 
-    StepikJavaTaskBuilder(String moduleDir, @NotNull String name, @NotNull Task task, @NotNull Project project) {
+    TaskModuleBuilder(String moduleDir, @NotNull String name, @NotNull Task task, @NotNull Project project) {
         myTask = task;
         this.project = project;
         String taskName = task.getDirectory();
@@ -111,11 +109,5 @@ class StepikJavaTaskBuilder extends JavaModuleBuilder implements TaskBuilder {
     private void moveFromHide(@NotNull String filename, @NotNull VirtualFile src) throws IOException {
         Files.move(Paths.get(src.getPath(), EduNames.HIDE, filename),
                 Paths.get(src.getPath(), filename), StandardCopyOption.REPLACE_EXISTING);
-    }
-
-    @Override
-    public Module createTask(@NotNull ModifiableModuleModel moduleModel) throws InvalidDataException,
-            IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
-        return createModule(moduleModel);
     }
 }
