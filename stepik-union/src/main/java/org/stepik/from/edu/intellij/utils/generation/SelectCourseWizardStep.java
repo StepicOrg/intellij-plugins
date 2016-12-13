@@ -46,22 +46,23 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
     private JLabel nameLabel;
     private JLabel userName;
     private JLabel buildLabel;
-    private JTextPane courseDescription;
     private JComboBox<String> buildType;
 
     private JPanel myCardPanel;
 
-    private JPanel courseSelecter;
+    private JPanel panelWithCourseComboBox;
     private JLabel courseLabel;
     private JComboBox<CourseInfo> courseComboBox;
+    private JTextPane courseDescriptionByComboBox;
 
     private JButton refreshButton;
-    private JPanel courseLinker;
+    private JPanel panelWithCourseLink;
     private JLabel courseLinkLabel;
     private JTextField courseLinkFiled;
     private JButton checkCourseLinkButton;
     private JLabel langLabel;
     private JComboBox<SupportedLanguages> langComboBox;
+    private JTextPane courseDescriptionByLink;
 
     private final StepikProjectGenerator myGenerator;
     private CourseInfo selectedCourse;
@@ -87,9 +88,14 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
         buildType.addItem(COURSE_LINK);
         buildType.setSelectedItem(COURSE_LIST);
 
-        courseDescription.setEditable(false);
-        courseDescription.setContentType("text/html");
-        courseDescription.addHyperlinkListener(new HyperlinkAdapter() {
+        setupDescriptionField(courseDescriptionByLink);
+        setupDescriptionField(courseDescriptionByComboBox);
+    }
+
+    private void setupDescriptionField(JTextPane textPane) {
+        textPane.setEditable(false);
+        textPane.setContentType("text/html");
+        textPane.addHyperlinkListener(new HyperlinkAdapter() {
             @Override
             protected void hyperlinkActivated(final HyperlinkEvent e) {
                 BrowserUtil.browse(e.getURL());
@@ -101,13 +107,7 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
         buildType.addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 String item = e.getItem().toString();
-                if (COURSE_LIST.equals(item)) {
-                    courseDescription.setText("");
-                    ((CardLayout) myCardPanel.getLayout()).show(myCardPanel, COURSE_LIST);
-                } else if (COURSE_LINK.equals(item)) {
-                    courseDescription.setText("");
-                    ((CardLayout) myCardPanel.getLayout()).show(myCardPanel, COURSE_LINK);
-                }
+                ((CardLayout) myCardPanel.getLayout()).show(myCardPanel, item);
             }
         });
 
@@ -117,7 +117,7 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
         courseComboBox.addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 selectedCourse = (CourseInfo) e.getItem();
-                courseDescription.setText(selectedCourse.getDescription());
+                getCourseDescriptionFiled().setText(selectedCourse.getDescription());
             }
         });
     }
@@ -140,7 +140,7 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
 
         selectedCourse = StudyUtils.getFirst(myAvailableCourses);
         myGenerator.setSelectedCourse(selectedCourse);
-        courseDescription.setText(selectedCourse.getDescription());
+        getCourseDescriptionFiled().setText(selectedCourse.getDescription());
 
         langComboBox.setModel(new EnumComboBoxModel<>(SupportedLanguages.class));
         langComboBox.setSelectedItem(SupportedLanguages.JAVA);
@@ -154,7 +154,7 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
     private class RefreshActionListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            courseDescription.setText("");
+            getCourseDescriptionFiled().setText("");
             final java.util.List<CourseInfo> courses = ProgressManager.getInstance()
                     .runProcessWithProgressSynchronously(() -> {
                         ProgressManager.getInstance().getProgressIndicator()
@@ -176,7 +176,7 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
             addCoursesToCombobox(courses);
             selectedCourse = StudyUtils.getFirst(courses);
             myGenerator.setSelectedCourse(selectedCourse);
-            courseDescription.setText(selectedCourse.getDescription());
+            getCourseDescriptionFiled().setText(selectedCourse.getDescription());
 
             myGenerator.setCourses(courses);
             myAvailableCourses = courses;
@@ -200,13 +200,13 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
             StepikWrappers.CoursesContainer coursesContainer;
             if ("-1".equals(courseId) ||
                     (coursesContainer = StepikConnectorGet.getCourseInfos(courseId)) == null) {
-                courseDescription.setText("Wrong link");
+                getCourseDescriptionFiled().setText("Wrong link");
                 return;
             }
 
             selectedCourse = coursesContainer.courses.get(0);
             myGenerator.setSelectedCourse(selectedCourse);
-            courseDescription.setText(String.format("<b>Course:</b> %s<br><br>%s",
+            getCourseDescriptionFiled().setText(String.format("<b>Course:</b> %s<br><br>%s",
                     selectedCourse.toString(), selectedCourse.getDescription()));
         }
 
@@ -291,6 +291,14 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
         super.onWizardFinished();
         if (buildType.getSelectedItem().equals(COURSE_LINK)) {
             StepikConnectorPost.enrollToCourse(selectedCourse.getId());
+        }
+    }
+
+    private JTextPane getCourseDescriptionFiled(){
+        if (buildType.getSelectedItem().equals(COURSE_LIST)){
+            return courseDescriptionByComboBox;
+        } else {
+            return courseDescriptionByLink;
         }
     }
 }
