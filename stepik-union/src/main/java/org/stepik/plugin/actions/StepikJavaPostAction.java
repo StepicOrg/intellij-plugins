@@ -20,6 +20,8 @@ import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorGet;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorPost;
 import com.jetbrains.tmp.learning.stepik.StepikWrappers;
+import com.jetbrains.tmp.learning.stepik.entities.Submission;
+import com.jetbrains.tmp.learning.stepik.entities.SubmissionContainer;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.plugin.utils.DirectivesUtils;
 import org.stepik.plugin.utils.NotificationUtils;
@@ -86,18 +88,18 @@ public class StepikJavaPostAction extends StudyCheckAction {
                     String solution = DirectivesUtils.getTextUnderDirectives(text, currentLang);
                     StepikWrappers.SubmissionToPostWrapper postWrapper =
                             new StepikWrappers.SubmissionToPostWrapper(attemptId, currentLang.getName(), solution);
-                    StepikWrappers.SubmissionContainer container = StepikConnectorPost.postSubmission(postWrapper);
+                    SubmissionContainer container = StepikConnectorPost.postSubmission(postWrapper);
                     if (container == null) {
                         return;
                     }
-                    List<StepikWrappers.SubmissionContainer.Submission> submissions = container.submissions;
+                    List<Submission> submissions = container.getSubmissions();
                     StepikWrappers.MetricsWrapper metric = new StepikWrappers.MetricsWrapper(
                             StepikWrappers.MetricsWrapper.PluginNames.STEPIK_UNION,
                             StepikWrappers.MetricsWrapper.MetricActions.POST,
                             task.getLesson().getSection().getCourse().getId(),
                             task.getStepId());
                     StepikConnectorPost.postMetric(metric);
-                    int submissionId = submissions.get(0).id;
+                    int submissionId = submissions.get(0).getId();
                     logger.info("submissionId = " + submissionId);
 
                     final Application application = ApplicationManager.getApplication();

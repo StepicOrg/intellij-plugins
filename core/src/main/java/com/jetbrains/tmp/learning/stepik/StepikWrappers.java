@@ -309,51 +309,8 @@ public class StepikWrappers {
         public List<AttemptWrapper.Attempt> attempts;
     }
 
-    static class SolutionFile {
-        String name;
-        String text;
-
-        public SolutionFile(String name, String text) {
-            this.name = name;
-            this.text = text;
-        }
-    }
-
     public static class AuthorWrapper {
         public List<StepikUser> users;
-    }
-
-    public static class SubmissionContainer {
-        public List<Submission> submissions;
-
-
-        public SubmissionContainer(int attempt, String score, ArrayList<SolutionFile> files) {
-            submissions = new ArrayList<>();
-            submissions.add(new Submission(score, attempt, files));
-        }
-
-        public static class Submission {
-            public int id;
-            public int attempt;
-            public final Reply reply;
-
-            public Submission(String score, int attempt, ArrayList<SolutionFile> files) {
-                reply = new Reply(files, score);
-                this.attempt = attempt;
-            }
-
-            public static class Reply {
-                String score;
-                List<SolutionFile> solution;
-                public String code;
-                public String language;
-
-                public Reply(ArrayList<SolutionFile> files, String score) {
-                    this.score = score;
-                    solution = files;
-                }
-            }
-        }
     }
 
     static class UserWrapper {
