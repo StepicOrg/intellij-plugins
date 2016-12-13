@@ -38,11 +38,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -338,23 +336,11 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
                 .create();
         final String json = gson.toJson(course);
         final File courseJson = new File(courseDirectory, EduNames.COURSE_META_FILE);
-        final FileOutputStream fileOutputStream;
-        try {
-            fileOutputStream = new FileOutputStream(courseJson);
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, "UTF-8");
-            try {
-                outputStreamWriter.write(json);
-            } catch (IOException e) {
-                Messages.showErrorDialog(e.getMessage(), "Failed to Generate Json");
-                logger.info(e);
-            } finally {
-                try {
-                    outputStreamWriter.close();
-                } catch (IOException e) {
-                    logger.info(e);
-                }
-            }
-        } catch (FileNotFoundException | UnsupportedEncodingException e) {
+        try (OutputStreamWriter outputStreamWriter =
+                new OutputStreamWriter(new FileOutputStream(courseJson), "UTF-8")) {
+            outputStreamWriter.write(json);
+        } catch (IOException e) {
+            Messages.showErrorDialog(e.getMessage(), "Failed to Generate Json");
             logger.warn(e);
         }
     }
