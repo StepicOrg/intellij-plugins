@@ -1,10 +1,12 @@
 package com.jetbrains.tmp.learning.stepik.entities;
 
 import com.google.gson.annotations.Expose;
+import org.jetbrains.annotations.NotNull;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.TimeZone;
 
 /**
@@ -43,16 +45,23 @@ public class Submission {
         return reply;
     }
 
-    private final static SimpleDateFormat timeISOFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+    private final static SimpleDateFormat timeISOFormat = getTimeISOFormat();
     private final static SimpleDateFormat timeOutFormat = new SimpleDateFormat("d MMM yyyy HH:mm:ss");
+
+    @NotNull
+    private static SimpleDateFormat getTimeISOFormat() {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        TimeZone tz = TimeZone.getTimeZone("UTC");
+        format.setTimeZone(tz);
+        return format;
+    }
 
     @Override
     public String toString() {
         String localTime;
         try {
-            TimeZone tz = TimeZone.getTimeZone("UTC");
-            timeISOFormat.setTimeZone(tz);
-            localTime = timeOutFormat.format(timeISOFormat.parse(time));
+            Date utcTime = timeISOFormat.parse(time);
+            localTime = timeOutFormat.format(utcTime);
         } catch (ParseException e) {
             localTime = time;
         }
