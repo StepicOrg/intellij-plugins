@@ -5,12 +5,10 @@ import com.google.gson.GsonBuilder;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
-import com.intellij.ide.util.projectWizard.WizardContext;
 import com.intellij.ide.wizard.CommitStepException;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.progress.ProgressManager;
-import com.intellij.openapi.project.DefaultProjectFactory;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.Messages;
@@ -78,11 +76,9 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
 
     public SelectCourseWizardStep(
             @NotNull final StepikProjectGenerator generator,
-            @NotNull WizardContext wizardContext) {
-        this.projectGenerator = generator;
-        project = wizardContext.getProject() == null ?
-                DefaultProjectFactory.getInstance().getDefaultProject() :
-                wizardContext.getProject();
+            @NotNull Project project) {
+        this.myGenerator = generator;
+        this.project = project;
 
         layoutPanel();
         initListeners();

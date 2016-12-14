@@ -8,6 +8,7 @@ import com.intellij.openapi.module.ModifiableModuleModel;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleWithNameAlreadyExists;
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.project.DefaultProjectFactory;
 import com.intellij.openapi.project.DumbModePermission;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
@@ -19,10 +20,10 @@ import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.Lesson;
 import com.jetbrains.tmp.learning.courseFormat.Section;
+import com.jetbrains.tmp.learning.courseGeneration.StepikProjectGenerator;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
-import com.jetbrains.tmp.learning.courseGeneration.StepikProjectGenerator;
 import org.stepik.from.edu.intellij.utils.generation.SelectCourseWizardStep;
 
 import java.io.IOException;
@@ -104,7 +105,10 @@ class CourseModuleBuilder extends AbstractModuleBuilder {
         ModuleWizardStep[] previousWizardSteps = super.createWizardSteps(wizardContext, modulesProvider);
         ModuleWizardStep[] wizardSteps = new ModuleWizardStep[previousWizardSteps.length + 1];
 
-        wizardSteps[0] = new SelectCourseWizardStep(getGenerator(), wizardContext);
+        Project project = wizardContext.getProject() == null ?
+                DefaultProjectFactory.getInstance().getDefaultProject() :
+                wizardContext.getProject();
+        wizardSteps[0] = new SelectCourseWizardStep(getGenerator(), project);
 
         return wizardSteps;
     }
