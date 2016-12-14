@@ -33,7 +33,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -45,11 +44,6 @@ import java.util.stream.Collectors;
 public class DownloadSubmission extends StudyActionWithShortcut {
     private static final String ACTION_ID = "STEPIK.DownloadSubmission";
     private static final String SHORTCUT = "ctrl alt pressed PAGE_DOWN";
-    private static final Color CORRECT_BACKGROUND = new Color(146, 250, 154);
-    private static final Color WRONG_BACKGROUND = new Color(255, 146, 141);
-    private static final Color SELECT_BACKGROUND = new Color(47, 101, 202);
-    private static final Color EVALUATION_BACKGROUND = Color.YELLOW;
-    private static final CellRenderer CELL_RENDER = new CellRenderer();
 
     public DownloadSubmission() {
         super("Download submission from the List(" + KeymapUtil.getShortcutText(
@@ -128,34 +122,6 @@ public class DownloadSubmission extends StudyActionWithShortcut {
                 .collect(Collectors.toList());
     }
 
-    private static class CellRenderer extends DefaultListCellRenderer {
-        @Override
-        public Component getListCellRendererComponent(
-                JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-            super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-
-            if (!(value instanceof Submission)) {
-                return this;
-            }
-
-            if (isSelected) {
-                setBackground(SELECT_BACKGROUND);
-                return this;
-            }
-
-            Submission submission = (Submission) value;
-
-            if (submission.isCorrect()) {
-                setBackground(CORRECT_BACKGROUND);
-            } else if (submission.isEvaluation()) {
-                setBackground(EVALUATION_BACKGROUND);
-            } else {
-                setBackground(WRONG_BACKGROUND);
-            }
-            return this;
-        }
-    }
-
     private void showPopup(
             @NotNull Project project,
             @NotNull Task task,
@@ -169,7 +135,6 @@ public class DownloadSubmission extends StudyActionWithShortcut {
             list = new JList<>(submissions.toArray(new Submission[submissions.size()]));
             builder = popupFactory.createListPopupBuilder(list)
                     .addListener(new Listener(list, project, task, currentLang));
-            list.setCellRenderer(CELL_RENDER);
         } else {
             JList<String> emptyList = new JList<>(new String[]{"Empty"});
             builder = popupFactory.createListPopupBuilder(emptyList);

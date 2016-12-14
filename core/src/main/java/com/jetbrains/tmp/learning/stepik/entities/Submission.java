@@ -144,12 +144,4 @@ public class Submission {
     public void setId(int id) {
         this.id = id;
     }
-
-    public boolean isCorrect() {
-        return "correct".equals(status);
-    }
-
-    public boolean isEvaluation() {
-        return "evaluation".equals(status);
-    }
 }
