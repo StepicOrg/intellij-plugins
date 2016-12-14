@@ -114,9 +114,6 @@ class CourseModuleBuilder extends AbstractModuleBuilder {
     }
 
     private StepikProjectGenerator getGenerator() {
-        if (generator == null) {
-            generator = new StepikProjectGenerator();
-        }
-        return generator;
+        return StepikProjectGenerator.getInstance();
     }
 }

@@ -7,9 +7,12 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.project.DefaultProjectFactory;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.roots.ModuleRootModificationUtil;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.jetbrains.python.configuration.PyConfigurableInterpreterList;
 import com.jetbrains.python.newProject.PyNewProjectSettings;
 import com.jetbrains.python.newProject.PythonProjectGenerator;
 import com.jetbrains.python.remote.PyProjectSynchronizer;
@@ -21,18 +24,19 @@ import org.stepik.from.edu.intellij.utils.generation.SelectCourseWizardStep;
 
 import javax.swing.*;
 import java.io.File;
+import java.util.List;
 
 
 public class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettings> {
     private static final Logger LOG = Logger.getInstance(StepikPyProjectGenerator.class.getName());
     private final StepikProjectGenerator myGenerator;
     private static final String NO_PYTHON_INTERPRETER = "<html><u>Add</u> python interpreter.</html>";
-    public ValidationResult myValidationResult = new ValidationResult("selected course is not valid");
+    private ValidationResult myValidationResult = new ValidationResult("selected course is not valid");
     private SelectCourseWizardStep courseWizardStep;
 
     public StepikPyProjectGenerator() {
         super(true);
-        myGenerator = new StepikProjectGenerator();
+        myGenerator = StepikProjectGenerator.getInstance();
         courseWizardStep = new SelectCourseWizardStep(myGenerator, DefaultProjectFactory.getInstance().getDefaultProject() );
     }
 
@@ -47,7 +51,6 @@ public class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjec
     @Nullable
     public JComponent getSettingsPanel(File baseDir) throws ProcessCanceledException {
         return courseWizardStep.getComponent();
-//        return null;
     }
 
     @Override
@@ -59,7 +62,6 @@ public class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjec
     @Override
     public Icon getLogo() {
         return IconLoader.getIcon("/icons/stepik_logotype_13x13-2.png");
-//        return null;
     }
 
     @Override
@@ -72,12 +74,13 @@ public class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjec
 
     @NotNull
     @Override
-    public ValidationResult validate(@NotNull String baseDirPath) {
-    /*if (PythonSdkType.isRemote(myProjectAction.getSdk())) {
-      if (PythonRemoteInterpreterManager.getInstance() == null) {
-        return new ValidationResult(PythonRemoteInterpreterManager.WEB_DEPLOYMENT_PLUGIN_IS_DISABLED);
-      }
-    }*/
-        return ValidationResult.OK;
+    public ValidationResult validate(@NotNull String s) {
+        final Project project = ProjectManager.getInstance().getDefaultProject();
+        final List<Sdk> sdks = PyConfigurableInterpreterList.getInstance(project).getAllPythonSdks();
+        if (sdks.isEmpty()) {
+            myValidationResult = new ValidationResult(NO_PYTHON_INTERPRETER);
+        }
+
+        return myValidationResult;
     }
 }

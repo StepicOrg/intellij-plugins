@@ -16,6 +16,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.jetbrains.tmp.learning.StudySerializationUtils;
 import com.jetbrains.tmp.learning.StudySerializationUtils.Json.SupportedLanguagesDeserializer;
 import com.jetbrains.tmp.learning.StudyTaskManager;
 import com.jetbrains.tmp.learning.StudyUtils;
@@ -42,7 +43,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -53,27 +53,44 @@ import java.util.Set;
 import static com.jetbrains.tmp.learning.StudyUtils.execCancelable;
 
 public class StepikProjectGenerator {
+    public static final File OUR_COURSES_DIR = new File(PathManager.getConfigPath(), "courses");
+
     private static final Logger logger = Logger.getInstance(StepikProjectGenerator.class);
     private static final String AUTHOR_ATTRIBUTE = "authors";
     private static final String LANGUAGE_ATTRIBUTE = "language";
-    public static final File OUR_COURSES_DIR = new File(PathManager.getConfigPath(), "courses");
     private static final String COURSE_NAME_ATTRIBUTE = "name";
     private static final String COURSE_DESCRIPTION = "description";
     private static final String CACHE_NAME = "enrolledCourseNames.txt";
-    private SupportedLanguages defaultLang;
-    @Nullable
+    @NotNull
+    private SupportedLanguages defaultLang = SupportedLanguages.INVALID;
+    @NotNull
     private List<CourseInfo> myCourses = new ArrayList<>();
     private CourseInfo mySelectedCourseInfo;
 
-    public void setCourses(List<CourseInfo> courses) {
+    private static StepikProjectGenerator instance;
+
+    private StepikProjectGenerator(){}
+
+    public static StepikProjectGenerator getInstance() {
+        if (instance != null){
+            instance = new StepikProjectGenerator();
+        }
+        return instance;
+    }
+
+    /**
+    *    Non-static methods
+    */
+
+    public void setCourses(@NotNull List<CourseInfo> courses) {
         myCourses = courses;
     }
 
-    public void setSelectedCourse(final CourseInfo courseName) {
-        if (courseName == null) {
+    public void setSelectedCourse(@Nullable CourseInfo courseInfo) {
+        if (courseInfo == null) {
             mySelectedCourseInfo = CourseInfo.INVALID_COURSE;
         } else {
-            mySelectedCourseInfo = courseName;
+            mySelectedCourseInfo = courseInfo;
         }
     }
 
@@ -85,7 +102,6 @@ public class StepikProjectGenerator {
         }
         //need this not to update builders
         //when we update builders we don't know anything about modules, so we create folders for lessons directly
-        course.setUpToDate(true);
         StudyTaskManager.getInstance(project).setCourse(course);
         course.setCourseDirectory(new File(OUR_COURSES_DIR,
                 Integer.toString(mySelectedCourseInfo.getId())).getAbsolutePath());
@@ -102,6 +118,60 @@ public class StepikProjectGenerator {
         return null;
     }
 
+    public List<CourseInfo> getCourses(boolean force) {
+        if (OUR_COURSES_DIR.exists()) {
+            myCourses = getCoursesFromCache();
+        }
+        if (force || myCourses.isEmpty()) {
+            List<CourseInfo> tmp = execCancelable(StepikConnectorGet::getEnrolledCourses);
+            if (tmp == null) tmp = new ArrayList<>();
+            myCourses = tmp;
+            flushCache(myCourses);
+        }
+        if (myCourses.isEmpty()) {
+            myCourses = getBundledIntro();
+        }
+        return myCourses;
+    }
+
+    @NotNull
+    public List<CourseInfo> getCoursesUnderProgress(
+            boolean force,
+            @NotNull final String progressTitle,
+            @NotNull final Project project) {
+        try {
+            return ProgressManager.getInstance()
+                    .runProcessWithProgressSynchronously(() -> {
+                        ProgressManager.getInstance().getProgressIndicator().setIndeterminate(true);
+                        return getCourses(force);
+                    }, progressTitle, true, project);
+        } catch (RuntimeException e) {
+            return Collections.singletonList(CourseInfo.INVALID_COURSE);
+        }
+    }
+
+    public SupportedLanguages getDefaultLang() {
+        return defaultLang;
+    }
+
+    public void setDefaultLang(@NotNull SupportedLanguages defaultLang) {
+        this.defaultLang = defaultLang;
+    }
+
+    /**
+     *    Static methods
+     */
+
+    private static List<CourseInfo> getBundledIntro() {
+        final File introCourse = new File(OUR_COURSES_DIR, "Introduction to Python");
+        if (introCourse.exists()) {
+            final CourseInfo courseInfo = getCourseInfo(introCourse);
+
+            return Collections.singletonList(courseInfo);
+        }
+        return Collections.emptyList();
+    }
+
     @Nullable
     private static Course readCourseFromCache(@NotNull File courseFile, boolean isAdaptive) {
         try (BufferedReader bufferedReader =
@@ -116,12 +186,6 @@ public class StepikProjectGenerator {
             logger.warn(e.getMessage());
         }
         return null;
-    }
-
-    protected static void flushCourse(@NotNull final Project project, @NotNull final Course course) {
-        final File courseDirectory = StudyUtils.getCourseDirectory(project, course);
-        FileUtil.createDirectory(courseDirectory);
-        flushCourseJson(course, courseDirectory);
     }
 
     // mock for adaptive course
@@ -155,31 +219,6 @@ public class StepikProjectGenerator {
             } catch (IOException e) {
                 logger.error("ERROR copying file " + name);
             }
-        }
-    }
-
-    public static void flushCourseJson(@NotNull final Course course, @NotNull final File courseDirectory) {
-        final Gson gson = new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
-        final String json = gson.toJson(course);
-        final File courseJson = new File(courseDirectory, EduNames.COURSE_META_FILE);
-        final FileOutputStream fileOutputStream;
-        try {
-            fileOutputStream = new FileOutputStream(courseJson);
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, "UTF-8");
-            try {
-                outputStreamWriter.write(json);
-            } catch (IOException e) {
-                Messages.showErrorDialog(e.getMessage(), "Failed to Generate Json");
-                logger.info(e);
-            } finally {
-                try {
-                    outputStreamWriter.close();
-                } catch (IOException e) {
-                    logger.info(e);
-                }
-            }
-        } catch (FileNotFoundException | UnsupportedEncodingException e) {
-            logger.info(e);
         }
     }
 
@@ -228,46 +267,7 @@ public class StepikProjectGenerator {
         return true;
     }
 
-    public List<CourseInfo> getCourses(boolean force) {
-        if (OUR_COURSES_DIR.exists()) {
-            myCourses = getCoursesFromCache();
-        }
-        if (force || myCourses.isEmpty()) {
-            myCourses = execCancelable(StepikConnectorGet::getEnrolledCourses);
-            flushCache(myCourses);
-        }
-        if (myCourses.isEmpty()) {
-            myCourses = getBundledIntro();
-        }
-        return myCourses;
-    }
-
     @NotNull
-    public List<CourseInfo> getCoursesUnderProgress(
-            boolean force,
-            @NotNull final String progressTitle,
-            @NotNull final Project project) {
-        try {
-            return ProgressManager.getInstance()
-                    .runProcessWithProgressSynchronously(() -> {
-                        ProgressManager.getInstance().getProgressIndicator().setIndeterminate(true);
-                        return getCourses(force);
-                    }, progressTitle, true, project);
-        } catch (RuntimeException e) {
-            return Collections.singletonList(CourseInfo.INVALID_COURSE);
-        }
-    }
-
-    private static List<CourseInfo> getBundledIntro() {
-        final File introCourse = new File(OUR_COURSES_DIR, "Introduction to Python");
-        if (introCourse.exists()) {
-            final CourseInfo courseInfo = getCourseInfo(introCourse);
-
-            return Collections.singletonList(courseInfo);
-        }
-        return Collections.emptyList();
-    }
-
     public static List<CourseInfo> getCoursesFromCache() {
         List<CourseInfo> courses = new ArrayList<>();
         final File cacheFile = new File(OUR_COURSES_DIR, CACHE_NAME);
@@ -349,11 +349,39 @@ public class StepikProjectGenerator {
         return courseInfo;
     }
 
-    public SupportedLanguages getDefaultLang() {
-        return defaultLang;
+    public static void downloadAndFlushCourse(Project project, CourseInfo courseInfo) {
+        ProgressManager.getInstance().runProcessWithProgressSynchronously(() -> {
+            ProgressManager.getInstance().getProgressIndicator().setIndeterminate(true);
+            return execCancelable(() -> {
+                final Course course = StepikConnectorGet.getCourse(project, courseInfo);
+                if (course != null) {
+                    flushCourse(project, course);
+                    course.initCourse(false);
+                }
+                return course;
+            });
+        }, "Downloading Course", true, project);
     }
 
-    public void setDefaultLang(SupportedLanguages defaultLang) {
-        this.defaultLang = defaultLang;
+    private static void flushCourse(@NotNull final Project project, @NotNull final Course course) {
+        final File courseDirectory = StudyUtils.getCourseDirectory(project, course);
+        FileUtil.createDirectory(courseDirectory);
+        flushCourseJson(course, courseDirectory);
+    }
+
+    private static void flushCourseJson(@NotNull final Course course, @NotNull final File courseDirectory) {
+        final Gson gson = new GsonBuilder().setPrettyPrinting()
+                .registerTypeAdapter(SupportedLanguages.class, new StudySerializationUtils.Json.SupportedLanguagesSerializer())
+                .excludeFieldsWithoutExposeAnnotation()
+                .create();
+        final String json = gson.toJson(course);
+        final File courseJson = new File(courseDirectory, EduNames.COURSE_META_FILE);
+        try (OutputStreamWriter outputStreamWriter =
+                new OutputStreamWriter(new FileOutputStream(courseJson), "UTF-8")) {
+            outputStreamWriter.write(json);
+        } catch (IOException e) {
+            Messages.showErrorDialog(e.getMessage(), "Failed to Generate Json");
+            logger.warn(e);
+        }
     }
 }
