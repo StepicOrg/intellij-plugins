@@ -45,8 +45,9 @@ import java.util.stream.Collectors;
 public class DownloadSubmission extends StudyActionWithShortcut {
     private static final String ACTION_ID = "STEPIK.DownloadSubmission";
     private static final String SHORTCUT = "ctrl alt pressed PAGE_DOWN";
-    private static final Color CORRECT_BACKGROUND = new Color(102, 204, 102);
-    private static final Color WRONG_BACKGROUND = new Color(197, 32, 38);
+    private static final Color CORRECT_BACKGROUND = new Color(146, 250, 154);
+    private static final Color WRONG_BACKGROUND = new Color(255, 146, 141);
+    private static final Color SELECT_BACKGROUND = new Color(47, 101, 202);
     private static final Color EVALUATION_BACKGROUND = Color.YELLOW;
     private static final CellRenderer CELL_RENDER = new CellRenderer();
 
@@ -114,13 +115,6 @@ public class DownloadSubmission extends StudyActionWithShortcut {
             return null;
         }
 
-        StepikWrappers.MetricsWrapper metric = new StepikWrappers.MetricsWrapper(
-                StepikWrappers.MetricsWrapper.PluginNames.STEPIK_UNION,
-                StepikWrappers.MetricsWrapper.MetricActions.DOWNLOAD,
-                task.getLesson().getSection().getCourse().getId(),
-                task.getStepId());
-        StepikConnectorPost.postMetric(metric);
-
         return submissionContainer.getSubmissions();
     }
 
@@ -141,6 +135,11 @@ public class DownloadSubmission extends StudyActionWithShortcut {
             super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
             if (!(value instanceof Submission)) {
+                return this;
+            }
+
+            if (isSelected) {
+                setBackground(SELECT_BACKGROUND);
                 return this;
             }
 
@@ -198,6 +197,13 @@ public class DownloadSubmission extends StudyActionWithShortcut {
         }
 
         final String finalCode = submission.getReply().getCode();
+
+        StepikWrappers.MetricsWrapper metric = new StepikWrappers.MetricsWrapper(
+                StepikWrappers.MetricsWrapper.PluginNames.STEPIK_UNION,
+                StepikWrappers.MetricsWrapper.MetricActions.DOWNLOAD,
+                task.getLesson().getSection().getCourse().getId(),
+                task.getStepId());
+        StepikConnectorPost.postMetric(metric);
 
         CommandProcessor.getInstance().executeCommand(project,
                 () -> ApplicationManager.getApplication().runWriteAction(

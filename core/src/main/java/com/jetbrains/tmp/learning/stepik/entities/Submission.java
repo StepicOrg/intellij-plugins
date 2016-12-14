@@ -46,7 +46,7 @@ public class Submission {
     }
 
     private final static SimpleDateFormat timeISOFormat = getTimeISOFormat();
-    private final static SimpleDateFormat timeOutFormat = new SimpleDateFormat("d MMM yyyy HH:mm:ss");
+    private final static SimpleDateFormat timeOutFormat = new SimpleDateFormat("dd MMM yyyy HH:mm:ss");
 
     @NotNull
     private static SimpleDateFormat getTimeISOFormat() {
@@ -66,7 +66,7 @@ public class Submission {
             localTime = time;
         }
 
-        return "#" + id + " " + status + " " + localTime;
+        return String.format("#%d %s %s", id, status, localTime);
     }
 
     public int getAttempt() {
