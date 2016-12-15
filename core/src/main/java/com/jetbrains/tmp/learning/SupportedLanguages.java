@@ -74,16 +74,9 @@ public enum SupportedLanguages {
         return line.trim().startsWith(comment);
     }
 
+    @NotNull
     @Override
     public String toString() {
         return name;
-    }
-
-    public static SupportedLanguages type(String token) {
-        return SupportedLanguages.langOf(token);
-    }
-
-    public static String token(SupportedLanguages t) {
-        return t.name();
     }
 }

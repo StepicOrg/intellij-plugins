@@ -1,6 +1,7 @@
 package com.jetbrains.tmp.learning.courseFormat;
 
 import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 import com.intellij.lang.Language;
 import com.intellij.util.xmlb.annotations.Transient;
 import com.jetbrains.tmp.learning.core.EduNames;
@@ -22,11 +23,10 @@ public class Course implements StudyItem {
     private String courseDirectory = "";
     @Expose
     private int id;
+    // rewrite using Date to optimize download project
     private boolean upToDate;
     @Expose
     private boolean isAdaptive = false;
-    @Expose
-    private String language = "Python";
     @Expose
     private List<Section> sections = new ArrayList<>();
 
@@ -93,19 +93,7 @@ public class Course implements StudyItem {
     }
 
     public void setUpToDate(boolean upToDate) {
-        this.upToDate = upToDate;
-    }
-
-    public Language getLanguageById() {
-        return Language.findLanguageByID(language);
-    }
-
-    public String getLanguage() {
-        return language;
-    }
-
-    public void setLanguage(@NotNull final String language) {
-        this.language = language;
+        myUpToDate = upToDate;
     }
 
     public void setAuthors(@NotNull List<StepikUser> authors) {

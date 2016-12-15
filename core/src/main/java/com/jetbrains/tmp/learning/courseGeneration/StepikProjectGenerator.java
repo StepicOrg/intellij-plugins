@@ -53,7 +53,7 @@ import java.util.Set;
 import static com.jetbrains.tmp.learning.StudyUtils.execCancelable;
 
 public class StepikProjectGenerator {
-    public static final File OUR_COURSES_DIR = new File(PathManager.getConfigPath(), "courses");
+    public static final File CONFIG_COURSES_DIR = new File(PathManager.getConfigPath(), "courses");
 
     private static final Logger logger = Logger.getInstance(StepikProjectGenerator.class);
     private static final String AUTHOR_ATTRIBUTE = "authors";
@@ -64,8 +64,8 @@ public class StepikProjectGenerator {
     @NotNull
     private SupportedLanguages defaultLang = SupportedLanguages.INVALID;
     @NotNull
-    private List<CourseInfo> myCourses = new ArrayList<>();
-    private CourseInfo mySelectedCourseInfo;
+    private List<CourseInfo> courses = new ArrayList<>();
+    private CourseInfo selectedCourseInfo;
 
     private static StepikProjectGenerator instance;
 
@@ -83,14 +83,14 @@ public class StepikProjectGenerator {
     */
 
     public void setCourses(@NotNull List<CourseInfo> courses) {
-        myCourses = courses;
+        this.courses = courses;
     }
 
     public void setSelectedCourse(@Nullable CourseInfo courseInfo) {
         if (courseInfo == null) {
-            mySelectedCourseInfo = CourseInfo.INVALID_COURSE;
+            selectedCourseInfo = CourseInfo.INVALID_COURSE;
         } else {
-            mySelectedCourseInfo = courseInfo;
+            selectedCourseInfo = courseInfo;
         }
     }
 
@@ -100,17 +100,15 @@ public class StepikProjectGenerator {
             logger.warn("StepikProjectGenerator: Failed to get builders");
             return;
         }
-        //need this not to update builders
-        //when we update builders we don't know anything about modules, so we create folders for lessons directly
         StudyTaskManager.getInstance(project).setCourse(course);
-        course.setCourseDirectory(new File(OUR_COURSES_DIR,
-                Integer.toString(mySelectedCourseInfo.getId())).getAbsolutePath());
+        course.setCourseDirectory(new File(CONFIG_COURSES_DIR,
+                Integer.toString(selectedCourseInfo.getId())).getAbsolutePath());
     }
 
     @Nullable
     protected Course getCourse(@NotNull final Project project) {
 
-        final File courseFile = new File(new File(OUR_COURSES_DIR, Integer.toString(mySelectedCourseInfo.getId())),
+        final File courseFile = new File(new File(CONFIG_COURSES_DIR, Integer.toString(selectedCourseInfo.getId())),
                 EduNames.COURSE_META_FILE);
         if (courseFile.exists()) {
             return readCourseFromCache(courseFile, false);
@@ -119,19 +117,19 @@ public class StepikProjectGenerator {
     }
 
     public List<CourseInfo> getCourses(boolean force) {
-        if (OUR_COURSES_DIR.exists()) {
-            myCourses = getCoursesFromCache();
+        if (CONFIG_COURSES_DIR.exists()) {
+            courses = getCoursesFromCache();
         }
-        if (force || myCourses.isEmpty()) {
+        if (force || courses.isEmpty()) {
             List<CourseInfo> tmp = execCancelable(StepikConnectorGet::getEnrolledCourses);
             if (tmp == null) tmp = new ArrayList<>();
-            myCourses = tmp;
-            flushCache(myCourses);
+            courses = tmp;
+            flushCache(courses);
         }
-        if (myCourses.isEmpty()) {
-            myCourses = getBundledIntro();
+        if (courses.isEmpty()) {
+            courses = getBundledIntro();
         }
-        return myCourses;
+        return courses;
     }
 
     @NotNull
@@ -150,6 +148,7 @@ public class StepikProjectGenerator {
         }
     }
 
+    @NotNull
     public SupportedLanguages getDefaultLang() {
         return defaultLang;
     }
@@ -163,7 +162,7 @@ public class StepikProjectGenerator {
      */
 
     private static List<CourseInfo> getBundledIntro() {
-        final File introCourse = new File(OUR_COURSES_DIR, "Introduction to Python");
+        final File introCourse = new File(CONFIG_COURSES_DIR, "Introduction to Python");
         if (introCourse.exists()) {
             final CourseInfo courseInfo = getCourseInfo(introCourse);
 
@@ -227,7 +226,7 @@ public class StepikProjectGenerator {
      */
     @SuppressWarnings("IOResourceOpenedButNotSafelyClosed")
     public static void flushCache(List<CourseInfo> courses) {
-        File cacheFile = new File(OUR_COURSES_DIR, CACHE_NAME);
+        File cacheFile = new File(CONFIG_COURSES_DIR, CACHE_NAME);
         PrintWriter writer = null;
         try {
             if (!createCacheFile(cacheFile)) return;
@@ -235,8 +234,6 @@ public class StepikProjectGenerator {
 
             final Set<CourseInfo> courseInfos = new HashSet<>();
             courseInfos.addAll(courses);
-//            courseInfos.addAll(getCoursesFromCache());
-
             writer = new PrintWriter(cacheFile);
             for (CourseInfo courseInfo : courseInfos) {
                 final String json = gson.toJson(courseInfo);
@@ -250,8 +247,8 @@ public class StepikProjectGenerator {
     }
 
     private static boolean createCacheFile(File cacheFile) throws IOException {
-        if (!OUR_COURSES_DIR.exists()) {
-            final boolean created = OUR_COURSES_DIR.mkdirs();
+        if (!CONFIG_COURSES_DIR.exists()) {
+            final boolean created = CONFIG_COURSES_DIR.mkdirs();
             if (!created) {
                 logger.error("Cannot flush courses cache. Can't create courses directory");
                 return false;
@@ -270,7 +267,7 @@ public class StepikProjectGenerator {
     @NotNull
     public static List<CourseInfo> getCoursesFromCache() {
         List<CourseInfo> courses = new ArrayList<>();
-        final File cacheFile = new File(OUR_COURSES_DIR, CACHE_NAME);
+        final File cacheFile = new File(CONFIG_COURSES_DIR, CACHE_NAME);
         if (!cacheFile.exists()) {
             return courses;
         }
@@ -364,7 +361,7 @@ public class StepikProjectGenerator {
     }
 
     private static void flushCourse(@NotNull final Project project, @NotNull final Course course) {
-        final File courseDirectory = StudyUtils.getCourseDirectory(project, course);
+        final File courseDirectory = StudyUtils.getCacheDirectory(project, course);
         FileUtil.createDirectory(courseDirectory);
         flushCourseJson(course, courseDirectory);
     }

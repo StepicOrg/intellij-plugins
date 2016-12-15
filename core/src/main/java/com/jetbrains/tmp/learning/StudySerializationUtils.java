@@ -486,6 +486,7 @@ public class StudySerializationUtils {
         }
 
         public static class SupportedLanguagesSerializer implements JsonSerializer<SupportedLanguages> {
+            @NotNull
             @Override
             public JsonElement serialize(SupportedLanguages src, Type typeOfSrc, JsonSerializationContext context) {
                 return new JsonPrimitive(src.toString());
@@ -493,19 +494,14 @@ public class StudySerializationUtils {
         }
 
         public static class SupportedLanguagesDeserializer implements JsonDeserializer<SupportedLanguages> {
+            @NotNull
             @Override
             public SupportedLanguages deserialize(
                     JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
                 String data = json.getAsString();
 
-                switch (data) {
-                    case ("java8"):
-                        return SupportedLanguages.JAVA;
-                    case ("python3"):
-                        return SupportedLanguages.PYTHON;
-                    default:
-                        return SupportedLanguages.INVALID;
-                }
+                SupportedLanguages lang = SupportedLanguages.langOf(data);
+                return lang != null ? lang : SupportedLanguages.INVALID;
             }
         }
     }
