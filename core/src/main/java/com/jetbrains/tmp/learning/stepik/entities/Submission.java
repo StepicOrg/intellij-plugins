@@ -1,6 +1,7 @@
 package com.jetbrains.tmp.learning.stepik.entities;
 
 import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.ParseException;
@@ -28,7 +29,8 @@ public class Submission {
     @Expose
     private Reply reply;
     @Expose
-    private String reply_url;
+    @SerializedName("reply_url")
+    private String replyUrl;
     @Expose
     private int attempt;
     @Expose
@@ -113,12 +115,12 @@ public class Submission {
         this.time = time;
     }
 
-    public String getReply_url() {
-        return reply_url;
+    public String getReplyUrl() {
+        return replyUrl;
     }
 
-    public void setReply_url(String reply_url) {
-        this.reply_url = reply_url;
+    public void setReplyUrl(String replyUrl) {
+        this.replyUrl = replyUrl;
     }
 
     public String getSession() {
