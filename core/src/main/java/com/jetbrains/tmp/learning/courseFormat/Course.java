@@ -3,7 +3,6 @@ package com.jetbrains.tmp.learning.courseFormat;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.intellij.lang.Language;
-import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.xmlb.annotations.Transient;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.core.EduUtils;
@@ -53,21 +52,6 @@ public class Course implements StudyItem {
     @NotNull
     public List<StepikUser> getAuthors() {
         return authors;
-    }
-
-    @NotNull
-    public static String getAuthorsString(@NotNull List<StepikUser> authors) {
-        return StringUtil.join(authors, StepikUser::getName, ", ");
-    }
-
-    public void setAuthors(String[] authors) {
-        this.authors = new ArrayList<>();
-        for (String name : authors) {
-            final List<String> pair = StringUtil.split(name, " ");
-            if (!pair.isEmpty()) {
-                this.authors.add(new StepikUser(pair.get(0), pair.size() > 1 ? pair.get(1) : ""));
-            }
-        }
     }
 
     public String getName() {

@@ -25,10 +25,12 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.util.text.StringUtil;
-import com.jetbrains.tmp.learning.StudySerializationUtils;
 import com.jetbrains.tmp.learning.StudyTaskManager;
-import com.jetbrains.tmp.learning.courseFormat.TaskFile;
-import org.apache.http.*;
+import org.apache.http.Consts;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpStatus;
+import org.apache.http.NameValuePair;
+import org.apache.http.StatusLine;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -198,15 +200,11 @@ public class StepikConnectorLogin {
 
     private static StepikWrappers.TokenInfo postCredentials(List<NameValuePair> nvps) {
         final Gson gson = new GsonBuilder()
-                .registerTypeAdapter(TaskFile.class, new StudySerializationUtils.Json.StepikTaskFileAdapter())
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
                 .create();
 
         final HttpPost request = new HttpPost(EduStepikNames.TOKEN_URL);
         request.setEntity(new UrlEncodedFormEntity(nvps, Consts.UTF_8));
-        //for (NameValuePair pair : nvps){
-        //  logger.info(pair.getName() + " " + pair.getValue());
-        //}
 
         try {
             final CloseableHttpResponse response = StepikConnectorInit.getHttpClient().execute(request);

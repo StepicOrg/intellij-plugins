@@ -1,5 +1,7 @@
 package org.stepik.from.edu.intellij.utils.generation;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
@@ -10,32 +12,38 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.DefaultProjectFactory;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.ui.EnumComboBoxModel;
 import com.intellij.ui.HyperlinkAdapter;
+import com.jetbrains.tmp.learning.StudySerializationUtils.Json.SupportedLanguagesSerializer;
 import com.jetbrains.tmp.learning.StudyTaskManager;
 import com.jetbrains.tmp.learning.StudyUtils;
+import com.jetbrains.tmp.learning.SupportedLanguages;
+import com.jetbrains.tmp.learning.core.EduNames;
+import com.jetbrains.tmp.learning.courseFormat.Course;
+import com.jetbrains.tmp.learning.courseGeneration.StepikProjectGenerator;
 import com.jetbrains.tmp.learning.stepik.CourseInfo;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorGet;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorPost;
 import com.jetbrains.tmp.learning.stepik.StepikWrappers;
 import org.jetbrains.annotations.NotNull;
-import com.jetbrains.tmp.learning.SupportedLanguages;
 
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.JTextPane;
+import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
-import java.awt.CardLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.Arrays;
 import java.util.List;
+
+import static com.jetbrains.tmp.learning.StudyUtils.execCancelable;
 
 public class SelectCourseWizardStep extends ModuleWizardStep {
     private static final Logger logger = Logger.getInstance(SelectCourseWizardStep.class);
@@ -291,6 +299,39 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
         super.onWizardFinished();
         if (buildType.getSelectedItem().equals(COURSE_LINK)) {
             StepikConnectorPost.enrollToCourse(selectedCourse.getId());
+        }
+        ProgressManager.getInstance().runProcessWithProgressSynchronously(() -> {
+            ProgressManager.getInstance().getProgressIndicator().setIndeterminate(true);
+            return execCancelable(() -> {
+                final Course course = StepikConnectorGet.getCourse(project, selectedCourse);
+                if (course != null) {
+                    flushCourse(project, course);
+                    course.initCourse(false);
+                }
+                return course;
+            });
+        }, "Downloading Course", true, project);
+    }
+
+    private static void flushCourse(@NotNull final Project project, @NotNull final Course course) {
+        final File courseDirectory = StudyUtils.getCourseDirectory(project, course);
+        FileUtil.createDirectory(courseDirectory);
+        flushCourseJson(course, courseDirectory);
+    }
+
+    private static void flushCourseJson(@NotNull final Course course, @NotNull final File courseDirectory) {
+        final Gson gson = new GsonBuilder().setPrettyPrinting()
+                .registerTypeAdapter(SupportedLanguages.class, new SupportedLanguagesSerializer())
+                .excludeFieldsWithoutExposeAnnotation()
+                .create();
+        final String json = gson.toJson(course);
+        final File courseJson = new File(courseDirectory, EduNames.COURSE_META_FILE);
+        try (OutputStreamWriter outputStreamWriter =
+                new OutputStreamWriter(new FileOutputStream(courseJson), "UTF-8")) {
+            outputStreamWriter.write(json);
+        } catch (IOException e) {
+            Messages.showErrorDialog(e.getMessage(), "Failed to Generate Json");
+            logger.warn(e);
         }
     }
 }

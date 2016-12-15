@@ -23,8 +23,8 @@ import com.jetbrains.tmp.learning.courseFormat.Lesson;
 import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
 import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.courseFormat.TaskFile;
+import com.jetbrains.tmp.learning.courseGeneration.StepikProjectGenerator;
 import com.jetbrains.tmp.learning.courseGeneration.StudyGenerator;
-import com.jetbrains.tmp.learning.courseGeneration.StudyProjectGenerator;
 import com.jetbrains.tmp.learning.editor.StudyEditor;
 import com.jetbrains.tmp.learning.ui.StudyToolWindow;
 import org.apache.http.HttpEntity;
@@ -244,8 +244,8 @@ class EduAdaptiveStepikConnector {
                         final File lessonDirectory = new File(course.getCourseDirectory(), adaptive.getDirectory());
                         final File taskDirectory = new File(lessonDirectory,
                                 EduNames.TASK + String.valueOf(adaptive.getTaskList().size()));
-                        StudyProjectGenerator.flushTask(task, taskDirectory);
-                        StudyProjectGenerator.flushCourseJson(course, new File(course.getCourseDirectory()));
+                        StepikProjectGenerator.flushTask(task, taskDirectory);
+                        StepikProjectGenerator.flushCourseJson(course, new File(course.getCourseDirectory()));
                         final VirtualFile lessonDir = project.getBaseDir().findChild(adaptive.getDirectory());
 
                         if (lessonDir != null) {
@@ -275,8 +275,8 @@ class EduAdaptiveStepikConnector {
                         }
 
                         final File lessonDirectory = new File(course.getCourseDirectory(), adaptive.getDirectory());
-                        StudyProjectGenerator.flushLesson(lessonDirectory, adaptive);
-                        StudyProjectGenerator.flushCourseJson(course, new File(course.getCourseDirectory()));
+                        StepikProjectGenerator.flushLesson(lessonDirectory, adaptive);
+                        StepikProjectGenerator.flushCourseJson(course, new File(course.getCourseDirectory()));
                         course.initCourse(true);
                     }
                 }

@@ -21,8 +21,11 @@ import java.util.Map;
 
 public class Task implements StudyItem {
     private int myIndex;
+    @Expose
     private int position;
+    @Expose
     private String text;
+    @Expose
     private StudyStatus myStatus = StudyStatus.Unchecked;
 
     @Transient
