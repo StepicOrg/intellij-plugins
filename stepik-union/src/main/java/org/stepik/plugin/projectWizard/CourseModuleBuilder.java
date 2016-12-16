@@ -35,6 +35,18 @@ class CourseModuleBuilder extends AbstractModuleBuilder {
     private static final Logger logger = Logger.getInstance(CourseModuleBuilder.class);
     private StepikProjectGenerator generator = StepikProjectGenerator.getInstance();
 
+    @NotNull
+    @Override
+    public Module createModule(@NotNull ModifiableModuleModel moduleModel)
+            throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
+        Module baseModule = super.createModule(moduleModel);
+        Project project = baseModule.getProject();
+        logger.info("create module - login");
+        StepikConnectorLogin.loginFromDialog(project);
+        createCourseFromGenerator(moduleModel, project);
+        return baseModule;
+    }
+
     private void createCourseFromGenerator(
             @NotNull ModifiableModuleModel moduleModel,
             @NotNull Project project)
@@ -95,18 +107,6 @@ class CourseModuleBuilder extends AbstractModuleBuilder {
                 }
             }
         }
-    }
-
-    @NotNull
-    @Override
-    public Module createModule(@NotNull ModifiableModuleModel moduleModel)
-            throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
-        Module baseModule = super.createModule(moduleModel);
-        Project project = baseModule.getProject();
-        logger.info("create module - login");
-        StepikConnectorLogin.loginFromDialog(project);
-        createCourseFromGenerator(moduleModel, project);
-        return baseModule;
     }
 
     @Override

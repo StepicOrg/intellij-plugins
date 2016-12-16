@@ -94,6 +94,9 @@ public class StepikProjectGenerator {
         }
     }
 
+    /**
+     * get course from cache and set it in StudyTaskManager
+     */
     public void generateProject(@NotNull Project project, @NotNull VirtualFile baseDir) {
         final Course course = getCourse(project);
         if (course == null) {
@@ -106,7 +109,7 @@ public class StepikProjectGenerator {
     }
 
     @Nullable
-    protected Course getCourse(@NotNull final Project project) {
+    private Course getCourse(@NotNull final Project project) {
 
         final File courseFile = new File(new File(CONFIG_COURSES_DIR, Integer.toString(selectedCourseInfo.getId())),
                 EduNames.COURSE_META_FILE);
@@ -116,7 +119,7 @@ public class StepikProjectGenerator {
         return null;
     }
 
-    public List<CourseInfo> getCourses(boolean force) {
+    private List<CourseInfo> getCourses(boolean force) {
         if (CONFIG_COURSES_DIR.exists()) {
             courses = getCoursesFromCache();
         }

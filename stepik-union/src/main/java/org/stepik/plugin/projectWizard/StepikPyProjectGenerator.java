@@ -1,4 +1,4 @@
-package org.stepik.plugin.projectWizard.pycharm;
+package org.stepik.plugin.projectWizard;
 
 import com.intellij.facet.ui.ValidationResult;
 import com.intellij.openapi.application.ApplicationManager;

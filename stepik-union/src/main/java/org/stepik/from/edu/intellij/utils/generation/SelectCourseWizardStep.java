@@ -5,8 +5,6 @@ import com.intellij.ide.BrowserUtil;
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.ide.wizard.CommitStepException;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.options.ConfigurationException;
-import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.ui.EnumComboBoxModel;
@@ -63,9 +61,9 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
     private final Project project;
 
     public SelectCourseWizardStep(
-            @NotNull final StepikProjectGenerator generator,
+            @NotNull final StepikProjectGenerator projectGenerator,
             @NotNull Project project) {
-        this.myGenerator = generator;
+        this.projectGenerator = projectGenerator;
         this.project = project;
 
         layoutPanel();
@@ -113,11 +111,11 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
         StepikConnectorLogin.loginFromDialog(project);
         userName.setText(StudyTaskManager.getInstance(project).getUser().getName());
 
-        List<CourseInfo> courses = projectGenerator.getCoursesUnderProgress(false,
+        List<CourseInfo> courses = generator.getCoursesUnderProgress(false,
                 "Getting Available Courses",
                 ProjectManager.getInstance().getDefaultProject());
         addCoursesToComboBox(courses);
-        projectGenerator.setSelectedCourse(selectedCourse);
+        generator.setSelectedCourse(selectedCourse);
         courseDescription.setText(selectedCourse.getDescription());
     }
 
@@ -129,12 +127,10 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
         @Override
         public void actionPerformed(ActionEvent e) {
             courseDescription.setText("");
-            final java.util.List<CourseInfo> courses = ProgressManager.getInstance()
-                    .runProcessWithProgressSynchronously(() -> {
-                        ProgressManager.getInstance().getProgressIndicator()
-                                .setIndeterminate(true);
-                        return projectGenerator.getCourses(true);
-                    }, "Refreshing Course List", true, project);
+            final List<CourseInfo> courses =
+                    generator.getCoursesUnderProgress(true,
+                            "Refreshing Course List",
+                            project);
 
             if (!courses.contains(CourseInfo.INVALID_COURSE)) {
                 refreshCoursesList(courses);
@@ -182,6 +178,7 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
                 courseDescription.setText("Wrong link");
                 return;
             }
+
             selectedCourse = coursesContainer.courses.get(0);
             courseComboBox.setSelectedItem(selectedCourse);
             projectGenerator.setSelectedCourse(selectedCourse);
