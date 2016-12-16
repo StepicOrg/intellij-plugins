@@ -29,6 +29,7 @@ import com.jetbrains.tmp.learning.courseFormat.Lesson;
 import com.jetbrains.tmp.learning.courseFormat.Section;
 import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.courseFormat.TaskFile;
+import com.jetbrains.tmp.learning.stepik.entities.SubmissionContainer;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
@@ -439,10 +440,10 @@ public class StepikConnectorGet {
         return Collections.emptyList();
     }
 
-    public static StepikWrappers.SubmissionContainer getSubmissions(List<NameValuePair> nvps) {
+    public static SubmissionContainer getSubmissions(List<NameValuePair> nvps) {
         try {
             return getFromStepik(EduStepikNames.SUBMISSIONS,
-                    StepikWrappers.SubmissionContainer.class,
+                    SubmissionContainer.class,
                     StepikConnectorLogin.getHttpClient(),
                     nvps);
         } catch (IOException e) {

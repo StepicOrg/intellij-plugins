@@ -32,6 +32,8 @@ import com.jetbrains.tmp.learning.courseFormat.Lesson;
 import com.jetbrains.tmp.learning.courseFormat.Section;
 import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.courseFormat.TaskFile;
+import com.jetbrains.tmp.learning.stepik.entities.SolutionFile;
+import com.jetbrains.tmp.learning.stepik.entities.SubmissionContainer;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
@@ -112,21 +114,21 @@ public class StepikConnectorPost {
     }
 
     @Deprecated
-    public static StepikWrappers.SubmissionContainer postSubmission(String text, String attemptId) {
+    public static SubmissionContainer postSubmission(String text, String attemptId) {
         String requestBody = new Gson().toJson(new StepikWrappers.SubmissionToPostWrapper(attemptId, "java8", text));
         try {
-            return postToStepik(EduStepikNames.SUBMISSIONS, StepikWrappers.SubmissionContainer.class, requestBody);
+            return postToStepik(EduStepikNames.SUBMISSIONS, SubmissionContainer.class, requestBody);
         } catch (IOException e) {
             logger.warn("Can not post Submission\n" + e.toString());
             return null;
         }
     }
 
-    public static StepikWrappers.SubmissionContainer postSubmission(
+    public static SubmissionContainer postSubmission(
             StepikWrappers.SubmissionToPostWrapper submissionToPostWrapper) {
         String requestBody = new Gson().toJson(submissionToPostWrapper);
         try {
-            return postToStepik(EduStepikNames.SUBMISSIONS, StepikWrappers.SubmissionContainer.class, requestBody);
+            return postToStepik(EduStepikNames.SUBMISSIONS, SubmissionContainer.class, requestBody);
         } catch (IOException e) {
             logger.warn("Can not post Submission\n" + e.toString());
             return null;
@@ -155,9 +157,9 @@ public class StepikConnectorPost {
                     new Gson().fromJson(attemptResponseString, StepikWrappers.AttemptContainer.class).attempts.get(0);
 
             final Map<String, TaskFile> taskFiles = task.getTaskFiles();
-            final ArrayList<StepikWrappers.SolutionFile> files = taskFiles.values()
+            final ArrayList<SolutionFile> files = taskFiles.values()
                     .stream()
-                    .map(fileEntry -> new StepikWrappers.SolutionFile(fileEntry.getName(), fileEntry.getText()))
+                    .map(fileEntry -> new SolutionFile(fileEntry.getName(), fileEntry.getText()))
                     .collect(Collectors.toCollection(ArrayList::new));
             postSubmission(true, attempt, files);
         } catch (IOException e) {
@@ -169,10 +171,10 @@ public class StepikConnectorPost {
     private static void postSubmission(
             boolean passed,
             StepikWrappers.AttemptWrapper.Attempt attempt,
-            ArrayList<StepikWrappers.SolutionFile> files) throws IOException {
+            ArrayList<SolutionFile> files) throws IOException {
         final HttpPost request = new HttpPost(EduStepikNames.STEPIK_API_URL + EduStepikNames.SUBMISSIONS);
         String score = passed ? "1" : "0";
-        StepikWrappers.SubmissionContainer container = new StepikWrappers.SubmissionContainer(attempt.id, score, files);
+        SubmissionContainer container = new SubmissionContainer(attempt.id, score, files);
         String requestBody = new Gson().toJson(container);
         request.setEntity(new StringEntity(requestBody, ContentType.APPLICATION_JSON));
         final CloseableHttpResponse response = StepikConnectorLogin.getHttpClient().execute(request);
@@ -218,9 +220,9 @@ public class StepikConnectorPost {
                     new Gson().fromJson(attemptResponseString, StepikWrappers.AttemptContainer.class).attempts.get(0);
 
             final Map<String, TaskFile> taskFiles = task.getTaskFiles();
-            final ArrayList<StepikWrappers.SolutionFile> files = taskFiles.values()
+            final ArrayList<SolutionFile> files = taskFiles.values()
                     .stream()
-                    .map(fileEntry -> new StepikWrappers.SolutionFile(fileEntry.getName(), fileEntry.getText()))
+                    .map(fileEntry -> new SolutionFile(fileEntry.getName(), fileEntry.getText()))
                     .collect(Collectors.toCollection(ArrayList::new));
             postSubmission(passed, attempt, files);
         } catch (IOException e) {
