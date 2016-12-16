@@ -14,18 +14,21 @@ import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ui.configuration.ModulesProvider;
 import com.intellij.openapi.util.InvalidDataException;
+import com.intellij.openapi.util.io.FileUtil;
 import com.jetbrains.tmp.learning.StudyProjectComponent;
 import com.jetbrains.tmp.learning.StudyTaskManager;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.Lesson;
 import com.jetbrains.tmp.learning.courseFormat.Section;
+import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.courseGeneration.StepikProjectGenerator;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.from.edu.intellij.utils.generation.SelectCourseWizardStep;
 
+import java.io.File;
 import java.io.IOException;
 
 class CourseModuleBuilder extends AbstractModuleBuilder {
@@ -56,13 +59,44 @@ class CourseModuleBuilder extends AbstractModuleBuilder {
         logger.info("Module dir = " + moduleDir);
         new SandboxModuleBuilder(moduleDir).createModule(moduleModel);
 
-        createLessonModules(moduleModel, course, moduleDir, project);
+//        createLessonModules(moduleModel, course, moduleDir, project);
+        createSubDirectories(course, moduleModel, project);
 
         ApplicationManager.getApplication().invokeLater(
                 () -> DumbService.allowStartingDumbModeInside(DumbModePermission.MAY_START_BACKGROUND,
                         () -> ApplicationManager.getApplication().runWriteAction(
                                 () -> StudyProjectComponent.getInstance(project)
                                         .registerStudyToolWindow(course))));
+    }
+
+    private void createSubDirectories(
+            @NotNull Course course,
+            @NotNull ModifiableModuleModel moduleModel,
+            @NotNull Project project) {
+        int sectionIndex = 0;
+        int lessonIndex = 1;
+        for (Section section : course.getSections()) {
+            section.setIndex(++sectionIndex);
+            FileUtil.createDirectory(new File(project.getBasePath(), section.getPath()));
+            for (Lesson lesson : section.getLessons()) {
+                lesson.setIndex(lessonIndex++);
+                FileUtil.createDirectory(new File(project.getBasePath(), lesson.getPath()));
+                int taskIndex = 1;
+                for (Task task : lesson.getTaskList()){
+                    task.setIndex(taskIndex++);
+                    logger.info("task Path = " + task.getPath());
+                    TaskModuleBuilder taskModuleBuilder = new TaskModuleBuilder(project.getBasePath() + lesson.getPath(),
+                            task.getDirectory(),
+                            task,
+                            project);
+                    try {
+                        taskModuleBuilder.createModule(moduleModel);
+                    } catch (IOException | ModuleWithNameAlreadyExists | JDOMException | ConfigurationException e) {
+                        logger.warn("Cannot create task: " + task.getDirectory(), e);
+                    }
+                }
+            }
+        }
     }
 
     private void createLessonModules(
@@ -94,7 +128,7 @@ class CourseModuleBuilder extends AbstractModuleBuilder {
         Project project = baseModule.getProject();
         logger.info("create module - login");
         StepikConnectorLogin.loginFromDialog(project);
-        createCourseFromGenerator(moduleModel, project, getGenerator());
+        createCourseFromGenerator(moduleModel, project, generator);
         return baseModule;
     }
 
@@ -108,12 +142,8 @@ class CourseModuleBuilder extends AbstractModuleBuilder {
         Project project = wizardContext.getProject() == null ?
                 DefaultProjectFactory.getInstance().getDefaultProject() :
                 wizardContext.getProject();
-        wizardSteps[0] = new SelectCourseWizardStep(getGenerator(), project);
+        wizardSteps[0] = new SelectCourseWizardStep(generator, project);
 
         return wizardSteps;
-    }
-
-    private StepikProjectGenerator getGenerator() {
-        return StepikProjectGenerator.getInstance();
     }
 }

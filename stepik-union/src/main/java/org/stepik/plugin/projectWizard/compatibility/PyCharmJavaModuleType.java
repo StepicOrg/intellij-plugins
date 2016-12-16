@@ -1,4 +1,4 @@
-package org.stepik.plugin.projectWizard.pycharm;
+package org.stepik.plugin.projectWizard.compatibility;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.module.Module;
@@ -18,7 +18,7 @@ public class PyCharmJavaModuleType extends ModuleType<PyCharmJavaModuleBuilder> 
     static {
         try {
             JAVA_MODULE = (PyCharmJavaModuleType) Class.forName(
-                    "org.stepik.plugin.projectWizard.pycharm.PyCharmJavaModuleType").newInstance();
+                    "org.stepik.plugin.projectWizard.compatibility.PyCharmJavaModuleType").newInstance();
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }

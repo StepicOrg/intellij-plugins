@@ -336,6 +336,7 @@ public class StepikConnectorGet {
         }
     }
 
+    //    TODO make it scalable
     private static void setSupportedLang(Task task, StepikWrappers.Step step) {
         if (step.options.codeTemplates.java8 != null)
             task.addLang(SupportedLanguages.JAVA);

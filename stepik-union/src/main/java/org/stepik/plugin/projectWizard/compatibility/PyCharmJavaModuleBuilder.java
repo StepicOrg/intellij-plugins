@@ -1,4 +1,4 @@
-package org.stepik.plugin.projectWizard.pycharm;
+package org.stepik.plugin.projectWizard.compatibility;
 
 import com.intellij.ide.util.projectWizard.ModuleBuilder;
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
