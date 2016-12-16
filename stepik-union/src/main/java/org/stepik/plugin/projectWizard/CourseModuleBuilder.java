@@ -59,7 +59,6 @@ class CourseModuleBuilder extends AbstractModuleBuilder {
         logger.info("Module dir = " + moduleDir);
         new SandboxModuleBuilder(moduleDir).createModule(moduleModel);
 
-//        createLessonModules(moduleModel, course, moduleDir, project);
         createSubDirectories(course, moduleModel, project);
 
         ApplicationManager.getApplication().invokeLater(
@@ -86,7 +85,7 @@ class CourseModuleBuilder extends AbstractModuleBuilder {
                     task.setIndex(taskIndex++);
                     logger.info("task Path = " + task.getPath());
                     TaskModuleBuilder taskModuleBuilder = new TaskModuleBuilder(project.getBasePath() + lesson.getPath(),
-                            task.getDirectory(),
+                            lesson.getDirectory(),
                             task,
                             project);
                     try {
@@ -95,27 +94,6 @@ class CourseModuleBuilder extends AbstractModuleBuilder {
                         logger.warn("Cannot create task: " + task.getDirectory(), e);
                     }
                 }
-            }
-        }
-    }
-
-    private void createLessonModules(
-            @NotNull ModifiableModuleModel moduleModel,
-            @NotNull Course course,
-            @NotNull String moduleDir,
-            @NotNull Project project
-    ) throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
-        int sectionIndex = 0;
-        int lessonIndex = 1;
-        for (Section section : course.getSections()) {
-            section.setIndex(++sectionIndex);
-            SectionModuleBuilder sectionBuilder = new SectionModuleBuilder(moduleDir, section);
-            sectionBuilder.createModule(moduleModel);
-            for (Lesson lesson : section.getLessons()) {
-                lesson.setIndex(lessonIndex++);
-                String sectionDir = moduleDir + "/" + section.getDirectory();
-                LessonModuleBuilder lessonBuilder = new LessonModuleBuilder(sectionDir, lesson, project);
-                lessonBuilder.createModule(moduleModel);
             }
         }
     }
