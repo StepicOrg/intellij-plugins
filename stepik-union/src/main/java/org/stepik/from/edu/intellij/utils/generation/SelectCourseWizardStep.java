@@ -28,6 +28,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.Arrays;
 import java.util.List;
 
@@ -89,28 +90,10 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
     }
 
     private void initListeners() {
-        buildType.addItemListener(e -> {
-            if (e.getStateChange() == ItemEvent.SELECTED) {
-                String item = e.getItem().toString();
-                if (COURSE_LIST.equals(item)) {
-                    courseDescription.setText("");
-                    ((CardLayout) cardPanel.getLayout()).show(cardPanel, COURSE_LIST);
-                } else if (COURSE_LINK.equals(item)) {
-                    courseDescription.setText("");
-                    ((CardLayout) cardPanel.getLayout()).show(cardPanel, COURSE_LINK);
-                }
-            }
-        });
-
+        buildType.addItemListener(new BuildTypeListener());
         refreshButton.addActionListener(new RefreshActionListener());
         checkCourseLinkButton.addActionListener(new CheckCourseLinkListener());
-
-        courseComboBox.addItemListener(e -> {
-            if (e.getStateChange() == ItemEvent.SELECTED) {
-                selectedCourse = (CourseInfo) e.getItem();
-                courseDescription.setText(selectedCourse.getDescription());
-            }
-        });
+        courseComboBox.addItemListener(new CourseComboBoxListener());
     }
 
     @Override
@@ -120,6 +103,13 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
 
     @Override
     public void updateStep() {
+        setupGeneralSettings();
+
+        langComboBox.setModel(new EnumComboBoxModel<>(SupportedLanguages.class));
+        langComboBox.setSelectedItem(SupportedLanguages.JAVA);
+    }
+
+    private void setupGeneralSettings(){
         StepikConnectorLogin.loginFromDialog(project);
         userName.setText(StudyTaskManager.getInstance(project).getUser().getName());
 
@@ -129,10 +119,6 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
         addCoursesToComboBox(courses);
         projectGenerator.setSelectedCourse(selectedCourse);
         courseDescription.setText(selectedCourse.getDescription());
-
-        //noinspection unchecked
-        langComboBox.setModel(new EnumComboBoxModel<>(SupportedLanguages.class));
-        langComboBox.setSelectedItem(SupportedLanguages.JAVA);
     }
 
     @Override
@@ -272,6 +258,32 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
 
         private boolean isFillOfInt(@NotNull String link) {
             return link.matches("[0-9]+");
+        }
+    }
+
+    private class BuildTypeListener implements ItemListener {
+        @Override
+        public void itemStateChanged(ItemEvent e) {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                String item = e.getItem().toString();
+                if (COURSE_LIST.equals(item)) {
+                    courseDescription.setText("");
+                    ((CardLayout) myCardPanel.getLayout()).show(myCardPanel, COURSE_LIST);
+                } else if (COURSE_LINK.equals(item)) {
+                    courseDescription.setText("");
+                    ((CardLayout) myCardPanel.getLayout()).show(myCardPanel, COURSE_LINK);
+                }
+            }
+        }
+    }
+
+    private class CourseComboBoxListener implements ItemListener {
+        @Override
+        public void itemStateChanged(ItemEvent e) {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                selectedCourse = (CourseInfo) e.getItem();
+                courseDescription.setText(selectedCourse.getDescription());
+            }
         }
     }
 

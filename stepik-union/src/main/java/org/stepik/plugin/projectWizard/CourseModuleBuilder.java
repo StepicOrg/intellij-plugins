@@ -37,13 +37,12 @@ class CourseModuleBuilder extends AbstractModuleBuilder {
 
     private void createCourseFromGenerator(
             @NotNull ModifiableModuleModel moduleModel,
-            @NotNull Project project,
-            @NotNull StepikProjectGenerator generator)
+            @NotNull Project project)
             throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
         generator.generateProject(project, project.getBaseDir());
 
         StudyTaskManager taskManager = StudyTaskManager.getInstance(project);
-        taskManager.setDefaultLang(this.generator.getDefaultLang());
+        taskManager.setDefaultLang(generator.getDefaultLang());
         Course course = taskManager.getCourse();
         if (course == null) {
             logger.info("failed to generate builders");
@@ -106,7 +105,7 @@ class CourseModuleBuilder extends AbstractModuleBuilder {
         Project project = baseModule.getProject();
         logger.info("create module - login");
         StepikConnectorLogin.loginFromDialog(project);
-        createCourseFromGenerator(moduleModel, project, generator);
+        createCourseFromGenerator(moduleModel, project);
         return baseModule;
     }
 
