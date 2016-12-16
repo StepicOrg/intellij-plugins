@@ -500,8 +500,11 @@ public class StudySerializationUtils {
                     JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
                 String data = json.getAsString();
 
-                SupportedLanguages lang = SupportedLanguages.langOf(data);
-                return lang != null ? lang : SupportedLanguages.INVALID;
+                try {
+                    return SupportedLanguages.langOf(data);
+                } catch (IllegalArgumentException e){
+                    return SupportedLanguages.INVALID;
+                }
             }
         }
     }

@@ -30,7 +30,7 @@ import java.io.IOException;
 
 class CourseModuleBuilder extends AbstractModuleBuilder {
     private static final Logger logger = Logger.getInstance(CourseModuleBuilder.class);
-    private StepikProjectGenerator generator;
+    private StepikProjectGenerator generator = StepikProjectGenerator.getInstance();
 
     private void createCourseFromGenerator(
             @NotNull ModifiableModuleModel moduleModel,

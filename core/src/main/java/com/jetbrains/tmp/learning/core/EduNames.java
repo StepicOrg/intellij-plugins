@@ -44,6 +44,7 @@ public class EduNames {
     public static final String PYTHON3 = "python3";
     public static final String JAVA = "java";
     public static final String JAVA8 = "java8";
+    public static final String INVALID = "invalid";
 
     private EduNames() {
     }

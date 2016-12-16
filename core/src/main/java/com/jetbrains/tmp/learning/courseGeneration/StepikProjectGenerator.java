@@ -72,7 +72,7 @@ public class StepikProjectGenerator {
     private StepikProjectGenerator(){}
 
     public static StepikProjectGenerator getInstance() {
-        if (instance != null){
+        if (instance == null){
             instance = new StepikProjectGenerator();
         }
         return instance;

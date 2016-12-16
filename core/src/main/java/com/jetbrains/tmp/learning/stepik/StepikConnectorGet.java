@@ -198,7 +198,7 @@ public class StepikConnectorGet {
         course.setUpToDate(true);  // TODO: get from stepik
 
         if (course.isAdaptive()) {
-            course = getAdaptiveCourse(project, course);
+//            course = getAdaptiveCourse(project, course);
         } else {
             course = getRegularCourse(course, info);
         }
@@ -244,24 +244,6 @@ public class StepikConnectorGet {
         Iterator<StepikWrappers.Section> iterator = sectionContainer.sections.iterator();
         if (iterator.hasNext()) {
             return iterator.next();
-        }
-
-        return null;
-    }
-
-    private static Course getAdaptiveCourse(
-            @NotNull final Project project,
-            @NotNull Course course) {
-        final Lesson lesson = new Lesson();
-        lesson.setName("Adaptive");
-        Section section = new Section();
-        section.setName(lesson.getName());
-        section.addLesson(lesson);
-        course.addSectionWithSetIndex(section);
-        final Task recommendation = EduAdaptiveStepikConnector.getNextRecommendation(project, course);
-        if (recommendation != null) {
-            lesson.addTask(recommendation);
-            return course;
         }
 
         return null;
