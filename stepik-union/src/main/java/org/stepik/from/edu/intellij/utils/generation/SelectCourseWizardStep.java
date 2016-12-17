@@ -304,4 +304,8 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
         }
         StepikProjectGenerator.downloadAndFlushCourse(project, selectedCourse);
     }
+
+    public CourseInfo getSelectedCourse() {
+        return selectedCourse;
+    }
 }

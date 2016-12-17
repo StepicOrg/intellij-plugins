@@ -51,7 +51,7 @@ class CourseModuleBuilder extends AbstractModuleBuilder {
             @NotNull ModifiableModuleModel moduleModel,
             @NotNull Project project)
             throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
-        generator.generateProject(project, project.getBaseDir());
+        generator.generateProject(project);
 
         StudyTaskManager taskManager = StudyTaskManager.getInstance(project);
         taskManager.setDefaultLang(generator.getDefaultLang());

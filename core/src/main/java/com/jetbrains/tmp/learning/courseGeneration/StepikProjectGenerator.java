@@ -15,22 +15,16 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.io.FileUtil;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.tmp.learning.StudySerializationUtils;
 import com.jetbrains.tmp.learning.StudySerializationUtils.Json.SupportedLanguagesDeserializer;
 import com.jetbrains.tmp.learning.StudyTaskManager;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.core.EduNames;
-import com.jetbrains.tmp.learning.core.EduUtils;
 import com.jetbrains.tmp.learning.courseFormat.Course;
-import com.jetbrains.tmp.learning.courseFormat.Lesson;
-import com.jetbrains.tmp.learning.courseFormat.Task;
-import com.jetbrains.tmp.learning.courseFormat.TaskFile;
 import com.jetbrains.tmp.learning.stepik.CourseInfo;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorGet;
 import com.jetbrains.tmp.learning.stepik.StepikUser;
-import org.apache.commons.codec.binary.Base64;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -47,7 +41,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import static com.jetbrains.tmp.learning.StudyUtils.execCancelable;
@@ -97,7 +90,7 @@ public class StepikProjectGenerator {
     /**
      * get course from cache and set it in StudyTaskManager
      */
-    public void generateProject(@NotNull Project project, @NotNull VirtualFile baseDir) {
+    public void generateProject(@NotNull Project project) {
         final Course course = getCourse(project);
         if (course == null) {
             logger.warn("StepikProjectGenerator: Failed to get builders");
@@ -188,40 +181,6 @@ public class StepikProjectGenerator {
             logger.warn(e.getMessage());
         }
         return null;
-    }
-
-    // mock for adaptive course
-    @Deprecated
-    public static void flushLesson(@NotNull final File lessonDirectory, @NotNull final Lesson lesson) {
-        FileUtil.createDirectory(lessonDirectory);
-        int taskIndex = 1;
-        for (Task task : lesson.getTaskList()) {
-            task.setIndex(taskIndex++);
-            final File taskDirectory = new File(lessonDirectory, task.getDirectory());
-            flushTask(task, taskDirectory);
-        }
-    }
-
-    // mock for adaptive course
-    @Deprecated
-    public static void flushTask(@NotNull final Task task, @NotNull final File taskDirectory) {
-        FileUtil.createDirectory(taskDirectory);
-        for (Map.Entry<String, TaskFile> taskFileEntry : task.taskFiles.entrySet()) {
-            final String name = taskFileEntry.getKey();
-            final TaskFile taskFile = taskFileEntry.getValue();
-            final File file = new File(taskDirectory, name);
-            FileUtil.createIfDoesntExist(file);
-
-            try {
-                if (EduUtils.isImage(taskFile.getName())) {
-                    FileUtil.writeToFile(file, Base64.decodeBase64(taskFile.getText()));
-                } else {
-                    FileUtil.writeToFile(file, taskFile.getText());
-                }
-            } catch (IOException e) {
-                logger.error("ERROR copying file " + name);
-            }
-        }
     }
 
     /**
