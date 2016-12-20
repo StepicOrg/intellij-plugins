@@ -6,6 +6,7 @@ import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.ide.util.projectWizard.WizardContext;
 import com.intellij.ide.wizard.CommitStepException;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.DefaultProjectFactory;
 import com.intellij.openapi.project.Project;
@@ -13,7 +14,6 @@ import com.intellij.openapi.project.ProjectManager;
 import com.intellij.ui.EnumComboBoxModel;
 import com.intellij.ui.HyperlinkAdapter;
 import com.jetbrains.tmp.learning.StudyTaskManager;
-import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.stepik.CourseInfo;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorGet;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
@@ -49,9 +49,9 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
     private JTextPane courseDescription;
     private JComboBox<String> buildType;
 
-    private JPanel myCardPanel;
+    private JPanel cardPanel;
 
-    private JPanel courseSelecter;
+    private JPanel courseSelector;
     private JLabel courseLabel;
     private JComboBox<CourseInfo> courseComboBox;
 
@@ -63,15 +63,14 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
     private JLabel langLabel;
     private JComboBox<SupportedLanguages> langComboBox;
 
-    private final StepikProjectGenerator myGenerator;
+    private final StepikProjectGenerator projectGenerator;
     private CourseInfo selectedCourse;
     private final Project project;
-    private List<CourseInfo> myAvailableCourses;
 
     public SelectCourseWizardStep(
             @NotNull final StepikProjectGenerator generator,
-            WizardContext wizardContext) {
-        this.myGenerator = generator;
+            @NotNull WizardContext wizardContext) {
+        this.projectGenerator = generator;
         project = wizardContext.getProject() == null ?
                 DefaultProjectFactory.getInstance().getDefaultProject() :
                 wizardContext.getProject();
@@ -103,10 +102,10 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
                 String item = e.getItem().toString();
                 if (COURSE_LIST.equals(item)) {
                     courseDescription.setText("");
-                    ((CardLayout) myCardPanel.getLayout()).show(myCardPanel, COURSE_LIST);
+                    ((CardLayout) cardPanel.getLayout()).show(cardPanel, COURSE_LIST);
                 } else if (COURSE_LINK.equals(item)) {
                     courseDescription.setText("");
-                    ((CardLayout) myCardPanel.getLayout()).show(myCardPanel, COURSE_LINK);
+                    ((CardLayout) cardPanel.getLayout()).show(cardPanel, COURSE_LINK);
                 }
             }
         });
@@ -124,7 +123,6 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
 
     @Override
     public JComponent getComponent() {
-
         return mainPanel;
     }
 
@@ -133,22 +131,24 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
         StepikConnectorLogin.loginFromDialog(project);
         userName.setText(StudyTaskManager.getInstance(project).getUser().getName());
 
-        myAvailableCourses = myGenerator.getCoursesUnderProgress(false,
+        List<CourseInfo> courses = projectGenerator.getCoursesUnderProgress(false,
                 "Getting Available Courses",
                 ProjectManager.getInstance().getDefaultProject());
-        myAvailableCourses.forEach(courseComboBox::addItem);
-
-        selectedCourse = StudyUtils.getFirst(myAvailableCourses);
-        myGenerator.setSelectedCourse(selectedCourse);
+        addCoursesToComboBox(courses);
+        if (courseComboBox.getItemCount() > 0) {
+            courseComboBox.setSelectedIndex(0);
+        }
+        selectedCourse = courseComboBox.getItemAt(0);
+        projectGenerator.setSelectedCourse(selectedCourse);
         courseDescription.setText(selectedCourse.getDescription());
 
+        //noinspection unchecked
         langComboBox.setModel(new EnumComboBoxModel<>(SupportedLanguages.class));
         langComboBox.setSelectedItem(SupportedLanguages.JAVA);
     }
 
     @Override
     public void updateDataModel() {
-
     }
 
     private class RefreshActionListener implements ActionListener {
@@ -159,7 +159,7 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
                     .runProcessWithProgressSynchronously(() -> {
                         ProgressManager.getInstance().getProgressIndicator()
                                 .setIndeterminate(true);
-                        return myGenerator.getCourses(true);
+                        return projectGenerator.getCourses(true);
                     }, "Refreshing Course List", true, project);
 
             if (!courses.contains(CourseInfo.INVALID_COURSE)) {
@@ -167,27 +167,32 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
             }
         }
 
-        private void refreshCoursesList(@NotNull final java.util.List<CourseInfo> courses) {
+        private void refreshCoursesList(@NotNull final List<CourseInfo> courses) {
             if (courses.isEmpty()) {
                 return;
             }
             courseComboBox.removeAllItems();
-
-            addCoursesToCombobox(courses);
-            selectedCourse = StudyUtils.getFirst(courses);
-            myGenerator.setSelectedCourse(selectedCourse);
+            addCoursesToComboBox(courses);
+            if (courseComboBox.getItemCount() > 0) {
+                courseComboBox.setSelectedIndex(0);
+            }
+            selectedCourse = courseComboBox.getItemAt(0);
+            projectGenerator.setSelectedCourse(selectedCourse);
             courseDescription.setText(selectedCourse.getDescription());
-
-            myGenerator.setCourses(courses);
-            myAvailableCourses = courses;
+            projectGenerator.setCourses(courses);
             StepikProjectGenerator.flushCache(courses);
         }
+    }
 
-        private void addCoursesToCombobox(@NotNull java.util.List<CourseInfo> courses) {
-            for (CourseInfo courseInfo : courses) {
-                courseComboBox.addItem(courseInfo);
-            }
-        }
+    private void addCoursesToComboBox(@NotNull java.util.List<CourseInfo> courses) {
+        courses.stream()
+                .filter(course -> !course.isAdaptive())
+                .forEach(courseComboBox::addItem);
+    }
+
+    @Override
+    public boolean validate() throws ConfigurationException {
+        return !selectedCourse.isAdaptive();
     }
 
     private class CheckCourseLinkListener implements ActionListener {
@@ -203,11 +208,16 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
                 courseDescription.setText("Wrong link");
                 return;
             }
-
             selectedCourse = coursesContainer.courses.get(0);
-            myGenerator.setSelectedCourse(selectedCourse);
-            courseDescription.setText(String.format("<b>Course:</b> %s<br><br>%s",
-                    selectedCourse.toString(), selectedCourse.getDescription()));
+            courseComboBox.setSelectedItem(selectedCourse);
+            projectGenerator.setSelectedCourse(selectedCourse);
+            String description = String.format("<b>Course:</b> %s<br><br>%s",
+                    selectedCourse.toString(), selectedCourse.getDescription());
+            if (selectedCourse.isAdaptive()) {
+                description += "<p style='font-weight: bold;'>This course is adaptive.<br>" +
+                        "Sorry, but we don't support adaptive courses yet</p>";
+            }
+            courseDescription.setText(description);
         }
 
         @NotNull
@@ -280,17 +290,20 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
     @Override
     public void onStepLeaving() {
         SupportedLanguages selectedLang = (SupportedLanguages) langComboBox.getSelectedItem();
-        myGenerator.setDefaultLang(selectedLang);
+        projectGenerator.setDefaultLang(selectedLang);
         if (selectedCourse != null) {
-            myGenerator.setSelectedCourse(selectedCourse);
+            projectGenerator.setSelectedCourse(selectedCourse);
         }
     }
 
     @Override
     public void onWizardFinished() throws CommitStepException {
         super.onWizardFinished();
-        if (buildType.getSelectedItem().equals(COURSE_LINK)) {
-            StepikConnectorPost.enrollToCourse(selectedCourse.getId());
+        if (COURSE_LINK.equals(buildType.getSelectedItem())) {
+            int id = selectedCourse.getId();
+            StepikConnectorPost.enrollToCourse(id);
+            logger.info(String.format("Finished the project wizard with the selected course: id = %s, name = %s",
+                    id, selectedCourse.getName()));
         }
     }
 }
