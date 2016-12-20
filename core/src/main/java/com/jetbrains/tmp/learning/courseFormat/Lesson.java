@@ -23,8 +23,7 @@ public class Lesson implements StudyItem {
     private Section section = null;
 
     @Expose
-    @SerializedName("id")
-    private int myId;
+    private int id;
 
     @Expose
     @SerializedName("title")
@@ -35,7 +34,7 @@ public class Lesson implements StudyItem {
     private List<Task> taskList = new ArrayList<>();
 
     // index is visible to user number of lesson from 1 to lesson number
-    private int myIndex = -1;
+    private int index = -1;
     @Transient
     @NotNull
     private String directory = "";
@@ -61,12 +60,12 @@ public class Lesson implements StudyItem {
     }
 
     public int getIndex() {
-        return myIndex;
+        return index;
     }
 
     public void setIndex(int index) {
-        myIndex = index;
-        directory = EduNames.LESSON + myIndex;
+        this.index = index;
+        directory = EduNames.LESSON + this.index;
         updatePath();
     }
 
@@ -137,11 +136,11 @@ public class Lesson implements StudyItem {
     }
 
     public int getId() {
-        return myId;
+        return id;
     }
 
     public void setId(int id) {
-        this.myId = id;
+        this.id = id;
     }
 
     @Transient

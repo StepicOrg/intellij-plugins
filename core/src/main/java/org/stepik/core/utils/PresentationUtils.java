@@ -12,7 +12,6 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.HashMap;
 
 import static org.stepik.core.utils.ProjectFilesUtils.getParent;
 import static org.stepik.core.utils.ProjectFilesUtils.isHideDir;
@@ -30,38 +29,63 @@ import static org.stepik.core.utils.ProjectFilesUtils.isWithinUtil;
  */
 public class PresentationUtils {
 
-    private static HashMap<Object, HashMap<StudyStatus, Icon>> iconMap = null;
+    private static Icon[][] icons = null;
     private static final JBColor SOLVED_COLOR = new JBColor(new Color(0, 134, 0), new Color(98, 150, 85));
 
     @Nullable
-    public static HashMap<StudyStatus, Icon> getIconMap(@NotNull Class subjectClass) {
-        if (iconMap == null) {
-            iconMap = new HashMap<>();
-            HashMap<StudyStatus, Icon> map = new HashMap<>();
-            map.put(StudyStatus.UNCHECKED, InteractiveLearningIcons.Course);
-            map.put(StudyStatus.SOLVED, InteractiveLearningIcons.CourseCompl);
-            map.put(StudyStatus.FAILED, InteractiveLearningIcons.Course);
-            iconMap.put(Course.class, map);
-
-            map = new HashMap<>();
-            map.put(StudyStatus.UNCHECKED, InteractiveLearningIcons.Section);
-            map.put(StudyStatus.SOLVED, InteractiveLearningIcons.SectionCompl);
-            map.put(StudyStatus.FAILED, InteractiveLearningIcons.Section);
-            iconMap.put(Section.class, map);
-
-            map = new HashMap<>();
-            map.put(StudyStatus.UNCHECKED, InteractiveLearningIcons.Lesson);
-            map.put(StudyStatus.SOLVED, InteractiveLearningIcons.LessonCompl);
-            map.put(StudyStatus.FAILED, InteractiveLearningIcons.Lesson);
-            iconMap.put(Lesson.class, map);
-
-            map = new HashMap<>();
-            map.put(StudyStatus.UNCHECKED, InteractiveLearningIcons.Task);
-            map.put(StudyStatus.SOLVED, InteractiveLearningIcons.TaskCompl);
-            map.put(StudyStatus.FAILED, InteractiveLearningIcons.TaskProbl);
-            iconMap.put(Task.class, map);
+    public static Icon getIcon(@NotNull Object subjectClass, StudyStatus status) {
+        if (icons == null) {
+            icons = getIcons();
         }
-        return iconMap.get(subjectClass);
+
+        Icon[] set;
+
+        if (subjectClass == Task.class) {
+            set = icons[3];
+        } else if (subjectClass == Lesson.class) {
+            set = icons[2];
+        } else if (subjectClass == Section.class) {
+            set = icons[1];
+        } else if (subjectClass == Course.class) {
+            set = icons[0];
+        } else
+            return null;
+
+        switch (status) {
+            case UNCHECKED:
+                return set[0];
+            case SOLVED:
+                return set[1];
+            case FAILED:
+                return set[2];
+        }
+        return null;
+    }
+
+    @NotNull
+    private static Icon[][] getIcons() {
+        return new Icon[][]{
+                {
+                        InteractiveLearningIcons.Course,
+                        InteractiveLearningIcons.CourseCompl,
+                        InteractiveLearningIcons.Course
+                },
+                {
+                        InteractiveLearningIcons.Section,
+                        InteractiveLearningIcons.SectionCompl,
+                        InteractiveLearningIcons.Section
+                },
+                {
+                        InteractiveLearningIcons.Lesson,
+                        InteractiveLearningIcons.LessonCompl,
+                        InteractiveLearningIcons.Lesson
+                },
+                {
+                        InteractiveLearningIcons.Task,
+                        InteractiveLearningIcons.TaskCompl,
+                        InteractiveLearningIcons.TaskProbl
+                }
+        };
     }
 
     @NotNull

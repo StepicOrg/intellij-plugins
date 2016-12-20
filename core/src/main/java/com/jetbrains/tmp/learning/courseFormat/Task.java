@@ -20,13 +20,13 @@ import java.util.List;
 import java.util.Map;
 
 public class Task implements StudyItem {
-    private int myIndex;
+    private int index;
     private int position;
     private String text;
-    private StudyStatus myStatus = StudyStatus.UNCHECKED;
+    private StudyStatus status = StudyStatus.UNCHECKED;
 
     @Transient
-    private Lesson myLesson;
+    private Lesson lesson;
 
     @Expose
     private String name;
@@ -53,7 +53,9 @@ public class Task implements StudyItem {
 
     void initTask(final Lesson lesson, boolean isRestarted) {
         setLesson(lesson);
-        if (!isRestarted) myStatus = StudyStatus.UNCHECKED;
+        if (!isRestarted) {
+            status = StudyStatus.UNCHECKED;
+        }
         for (TaskFile taskFile : getTaskFiles().values()) {
             taskFile.initTaskFile(this);
         }
@@ -76,12 +78,12 @@ public class Task implements StudyItem {
     }
 
     public int getIndex() {
-        return myIndex;
+        return index;
     }
 
     public void setIndex(int index) {
-        myIndex = index;
-        directory = EduNames.TASK + myIndex;
+        this.index = index;
+        directory = EduNames.TASK + this.index;
         updatePath();
     }
 
@@ -105,19 +107,19 @@ public class Task implements StudyItem {
 
     @Transient
     public Lesson getLesson() {
-        return myLesson;
+        return lesson;
     }
 
     @Transient
     public void setLesson(Lesson lesson) {
-        myLesson = lesson;
+        this.lesson = lesson;
     }
 
     @Nullable
     public VirtualFile getTaskDir(@NotNull final Project project) {
         VirtualFile courseDir = project.getBaseDir();
         if (courseDir != null) {
-            VirtualFile lessonDir = courseDir.findChild(myLesson.getDirectory());
+            VirtualFile lessonDir = courseDir.findChild(lesson.getDirectory());
             if (lessonDir != null) {
                 return lessonDir.findChild(getDirectory());
             }
@@ -148,7 +150,7 @@ public class Task implements StudyItem {
 
         Task task = (Task) o;
 
-        if (myIndex != task.myIndex) return false;
+        if (index != task.index) return false;
         if (name != null ? !name.equals(task.name) : task.name != null) return false;
         if (taskFiles != null ? !taskFiles.equals(task.taskFiles) : task.taskFiles != null) return false;
         return text != null ? !text.equals(task.text) : task.text != null;
@@ -158,7 +160,7 @@ public class Task implements StudyItem {
     @Override
     public int hashCode() {
         int result = name != null ? name.hashCode() : 0;
-        result = 31 * result + myIndex;
+        result = 31 * result + index;
         result = 31 * result + (taskFiles != null ? taskFiles.hashCode() : 0);
         result = 31 * result + (text != null ? text.hashCode() : 0);
         return result;
@@ -175,7 +177,7 @@ public class Task implements StudyItem {
     @Override
     @NotNull
     public StudyStatus getStatus() {
-        return myStatus;
+        return status;
     }
 
     @NotNull
@@ -188,16 +190,16 @@ public class Task implements StudyItem {
     @Override
     public String getPath() {
         if (path == null) {
-            path = myLesson.getPath() + "/" + getDirectory();
+            path = lesson.getPath() + "/" + getDirectory();
         }
         return path;
     }
 
     public void setStatus(@Nullable StudyStatus status) {
         if (status == null) {
-            myStatus = StudyStatus.UNCHECKED;
+            this.status = StudyStatus.UNCHECKED;
         } else {
-            myStatus = status;
+            this.status = status;
         }
     }
 

@@ -1,7 +1,6 @@
 package com.jetbrains.tmp.learning.courseFormat;
 
 import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
 import com.intellij.lang.Language;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.xmlb.annotations.Transient;
@@ -21,15 +20,14 @@ public class Course implements StudyItem {
     private String description;
     @Expose
     private String name;
-    private String myCourseDirectory = "";
+    private String courseDirectory = "";
     @Expose
     private int id;
-    private boolean myUpToDate;
+    private boolean upToDate;
     @Expose
     private boolean isAdaptive = false;
     @Expose
-    @SerializedName("language")
-    private String myLanguage = "Python";
+    private String language = "Python";
     @Expose
     private List<Section> sections = new ArrayList<>();
 
@@ -91,11 +89,11 @@ public class Course implements StudyItem {
     }
 
     public String getCourseDirectory() {
-        return myCourseDirectory;
+        return courseDirectory;
     }
 
     public void setCourseDirectory(@NotNull final String courseDirectory) {
-        myCourseDirectory = courseDirectory;
+        this.courseDirectory = courseDirectory;
     }
 
     public String getDescription() {
@@ -107,23 +105,23 @@ public class Course implements StudyItem {
     }
 
     public boolean isUpToDate() {
-        return myUpToDate;
+        return upToDate;
     }
 
     public void setUpToDate(boolean upToDate) {
-        myUpToDate = upToDate;
+        this.upToDate = upToDate;
     }
 
     public Language getLanguageById() {
-        return Language.findLanguageByID(myLanguage);
+        return Language.findLanguageByID(language);
     }
 
     public String getLanguage() {
-        return myLanguage;
+        return language;
     }
 
     public void setLanguage(@NotNull final String language) {
-        myLanguage = language;
+        this.language = language;
     }
 
     public void setAuthors(@NotNull List<StepikUser> authors) {

@@ -21,7 +21,7 @@ public class Section implements StudyItem {
     @Expose
     private int id;
     @Transient
-    private Course myCourse = null;
+    private Course course = null;
     @Transient
     @NotNull
     private String directory = "";
@@ -107,19 +107,19 @@ public class Section implements StudyItem {
     @Override
     public String getPath() {
         if (path == null) {
-            path = myCourse.getPath() + "/" + getDirectory();
+            path = course.getPath() + "/" + getDirectory();
         }
         return path;
     }
 
     @Transient
     public void setCourse(Course course) {
-        this.myCourse = course;
+        this.course = course;
     }
 
     @Transient
     public Course getCourse() {
-        return myCourse;
+        return course;
     }
 
     @Override
