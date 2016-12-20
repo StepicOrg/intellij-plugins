@@ -1,4 +1,4 @@
-package org.stepik.plugin.projectWizard;
+package org.stepik.plugin.projectWizard.idea;
 
 import com.intellij.ide.util.projectWizard.ModuleBuilder;
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
@@ -33,7 +33,7 @@ public class StepikModuleType extends ModuleType<CourseModuleBuilder> {
     @NotNull
     private static StepikModuleType instantiate() {
         try {
-            return (StepikModuleType) Class.forName("org.stepik.plugin.projectWizard.StepikModuleType").newInstance();
+            return (StepikModuleType) Class.forName("org.stepik.plugin.projectWizard.idea.StepikModuleType").newInstance();
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }

@@ -1,4 +1,4 @@
-package org.stepik.plugin.projectWizard;
+package org.stepik.plugin.projectWizard.pycharm;
 
 import com.intellij.facet.ui.ValidationResult;
 import com.intellij.openapi.application.ApplicationManager;
@@ -27,7 +27,6 @@ import com.jetbrains.tmp.learning.courseGeneration.StepikProjectGenerator;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.stepik.from.edu.intellij.utils.generation.SelectCourseWizardStep;
 
 import javax.swing.*;
 import java.io.BufferedWriter;

@@ -1,4 +1,4 @@
-package org.stepik.plugin.projectWizard;
+package org.stepik.plugin.projectWizard.idea;
 
 import com.intellij.ide.highlighter.ModuleFileType;
 import com.intellij.openapi.diagnostic.Logger;

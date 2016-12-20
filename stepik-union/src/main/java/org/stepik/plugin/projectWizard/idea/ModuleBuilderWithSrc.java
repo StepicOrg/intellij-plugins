@@ -1,4 +1,4 @@
-package org.stepik.plugin.projectWizard;
+package org.stepik.plugin.projectWizard.idea;
 
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.roots.ContentEntry;

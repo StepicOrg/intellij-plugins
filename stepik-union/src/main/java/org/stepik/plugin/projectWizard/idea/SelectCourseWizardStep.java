@@ -1,4 +1,4 @@
-package org.stepik.from.edu.intellij.utils.generation;
+package org.stepik.plugin.projectWizard.idea;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.BrowserUtil;

@@ -1,4 +1,4 @@
-package org.stepik.plugin.projectWizard;
+package org.stepik.plugin.projectWizard.idea;
 
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.ide.util.projectWizard.WizardContext;
@@ -26,7 +26,6 @@ import com.jetbrains.tmp.learning.courseGeneration.StepikProjectGenerator;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
-import org.stepik.from.edu.intellij.utils.generation.SelectCourseWizardStep;
 
 import java.io.File;
 import java.io.IOException;
