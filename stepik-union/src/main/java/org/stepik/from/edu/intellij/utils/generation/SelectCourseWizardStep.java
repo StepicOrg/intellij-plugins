@@ -135,10 +135,6 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
                 "Getting Available Courses",
                 ProjectManager.getInstance().getDefaultProject());
         addCoursesToComboBox(courses);
-        if (courseComboBox.getItemCount() > 0) {
-            courseComboBox.setSelectedIndex(0);
-        }
-        selectedCourse = courseComboBox.getItemAt(0);
         projectGenerator.setSelectedCourse(selectedCourse);
         courseDescription.setText(selectedCourse.getDescription());
 
@@ -173,10 +169,6 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
             }
             courseComboBox.removeAllItems();
             addCoursesToComboBox(courses);
-            if (courseComboBox.getItemCount() > 0) {
-                courseComboBox.setSelectedIndex(0);
-            }
-            selectedCourse = courseComboBox.getItemAt(0);
             projectGenerator.setSelectedCourse(selectedCourse);
             courseDescription.setText(selectedCourse.getDescription());
             projectGenerator.setCourses(courses);
@@ -188,6 +180,10 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
         courses.stream()
                 .filter(course -> !course.isAdaptive())
                 .forEach(courseComboBox::addItem);
+        if (courseComboBox.getItemCount() > 0) {
+            courseComboBox.setSelectedIndex(0);
+        }
+        selectedCourse = courseComboBox.getItemAt(0);
     }
 
     @Override
