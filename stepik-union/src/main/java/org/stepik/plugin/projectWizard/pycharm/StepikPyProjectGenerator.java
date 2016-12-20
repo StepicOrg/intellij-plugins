@@ -24,6 +24,7 @@ import com.jetbrains.tmp.learning.courseFormat.Lesson;
 import com.jetbrains.tmp.learning.courseFormat.Section;
 import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.courseGeneration.StepikProjectGenerator;
+import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -38,14 +39,16 @@ import java.io.IOException;
 public class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettings> {
     private static final Logger logger = Logger.getInstance(StepikPyProjectGenerator.class.getName());
     private final StepikProjectGenerator generator;
-    private SelectCourseWizardStep courseWizardStep;
+    private PyCourseCreatorSettingPanel pySPanel;
 
     public StepikPyProjectGenerator() {
         super(true);
+        Project defaultProject = DefaultProjectFactory.getInstance().getDefaultProject();
         generator = StepikProjectGenerator.getInstance();
-        courseWizardStep = new SelectCourseWizardStep(generator,
-                DefaultProjectFactory.getInstance().getDefaultProject());
-        courseWizardStep.setupPyCharmSetting();
+        pySPanel = new PyCourseCreatorSettingPanel(generator, defaultProject);
+        pySPanel.init();
+
+        StepikConnectorLogin.loginFromDialog(defaultProject);
     }
 
     @NotNull
@@ -58,7 +61,7 @@ public class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjec
     @Override
     @Nullable
     public JComponent getSettingsPanel(File baseDir) throws ProcessCanceledException {
-        return courseWizardStep.getComponent();
+        return pySPanel.getMainPanel();
     }
 
     @Override
@@ -75,7 +78,11 @@ public class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjec
     @NotNull
     @Override
     public ValidationResult validate(@NotNull String s) {
-        return ValidationResult.OK;
+        if (pySPanel.validateCoursePanel()) {
+            return ValidationResult.OK;
+        } else {
+            return new ValidationResult("Not, yet");
+        }
     }
 
     @Override
@@ -86,8 +93,8 @@ public class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjec
         super.configureProject(project, baseDir, settings, module, synchronizer);
         ApplicationManager.getApplication()
                 .runWriteAction(() -> ModuleRootModificationUtil.setModuleSdk(module, settings.getSdk()));
-        courseWizardStep.onStepLeaving();
-        StepikProjectGenerator.downloadAndFlushCourse(project, courseWizardStep.getSelectedCourse());
+        pySPanel.onStepLeaving();
+        StepikProjectGenerator.downloadAndFlushCourse(project, pySPanel.getSelectedCourse());
         createCourseFromGenerator(project);
     }
 
