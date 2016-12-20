@@ -213,11 +213,11 @@ public class Course implements StudyItem {
     @Override
     public StudyStatus getStatus() {
         for (Section section : sections) {
-            if (section.getStatus() != StudyStatus.Solved)
-                return StudyStatus.Unchecked;
+            if (section.getStatus() != StudyStatus.SOLVED)
+                return StudyStatus.UNCHECKED;
         }
 
-        return StudyStatus.Solved;
+        return StudyStatus.SOLVED;
     }
 
     @NotNull

@@ -225,7 +225,7 @@ class EduAdaptiveStepikConnector {
                         unsolvedTask.setName(task.getName());
                         unsolvedTask.setStepId(task.getStepId());
                         unsolvedTask.setText(task.getText());
-                        unsolvedTask.setStatus(StudyStatus.Unchecked);
+                        unsolvedTask.setStatus(StudyStatus.UNCHECKED);
                         final Map<String, TaskFile> taskFiles = task.getTaskFiles();
                         if (taskFiles.size() == 1) {
                             final TaskFile taskFile = editor.getTaskFile();
@@ -327,7 +327,7 @@ class EduAdaptiveStepikConnector {
         task.setName(name);
         task.setStepId(lessonID);
         task.setText(step.text);
-        task.setStatus(StudyStatus.Unchecked);
+        task.setStatus(StudyStatus.UNCHECKED);
         if (step.options.samples != null) {
             final StringBuilder builder = new StringBuilder();
             step.options.samples.stream().filter(sample -> sample.size() == 2).forEach(sample -> {

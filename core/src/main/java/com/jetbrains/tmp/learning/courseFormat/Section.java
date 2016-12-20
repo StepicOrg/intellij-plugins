@@ -79,11 +79,11 @@ public class Section implements StudyItem {
     @Override
     public StudyStatus getStatus() {
         for (Lesson lesson : lessons) {
-            if (lesson.getIndex() != -1 && lesson.getStatus() != StudyStatus.Solved)
-                return StudyStatus.Unchecked;
+            if (lesson.getIndex() != -1 && lesson.getStatus() != StudyStatus.SOLVED)
+                return StudyStatus.UNCHECKED;
         }
 
-        return StudyStatus.Solved;
+        return StudyStatus.SOLVED;
     }
 
     @Override

@@ -30,58 +30,48 @@ import static org.stepik.core.utils.ProjectFilesUtils.isWithinUtil;
  */
 public class PresentationUtils {
 
-    private static final HashMap<Object, HashMap<StudyStatus, Icon>> iconMap = new HashMap<>();
+    private static HashMap<Object, HashMap<StudyStatus, Icon>> iconMap = null;
     private static final JBColor SOLVED_COLOR = new JBColor(new Color(0, 134, 0), new Color(98, 150, 85));
 
     @Nullable
-    public static HashMap<StudyStatus, Icon> getIconMap(@Nullable Object subject) {
-        HashMap<StudyStatus, Icon> result = iconMap.get(subject);
-        if (result != null)
-            return result;
+    public static HashMap<StudyStatus, Icon> getIconMap(@NotNull Class subjectClass) {
+        if (iconMap == null) {
+            iconMap = new HashMap<>();
+            HashMap<StudyStatus, Icon> map = new HashMap<>();
+            map.put(StudyStatus.UNCHECKED, InteractiveLearningIcons.Course);
+            map.put(StudyStatus.SOLVED, InteractiveLearningIcons.CourseCompl);
+            map.put(StudyStatus.FAILED, InteractiveLearningIcons.Course);
+            iconMap.put(Course.class, map);
 
-        if (subject instanceof Course) {
-            HashMap<StudyStatus, Icon> map = new HashMap<>();
-            map.put(StudyStatus.Unchecked, InteractiveLearningIcons.Course);
-            map.put(StudyStatus.Solved, InteractiveLearningIcons.CourseCompl);
-            map.put(StudyStatus.Failed, InteractiveLearningIcons.Course);
-            iconMap.put(subject, map);
-            return map;
+            map = new HashMap<>();
+            map.put(StudyStatus.UNCHECKED, InteractiveLearningIcons.Section);
+            map.put(StudyStatus.SOLVED, InteractiveLearningIcons.SectionCompl);
+            map.put(StudyStatus.FAILED, InteractiveLearningIcons.Section);
+            iconMap.put(Section.class, map);
+
+            map = new HashMap<>();
+            map.put(StudyStatus.UNCHECKED, InteractiveLearningIcons.Lesson);
+            map.put(StudyStatus.SOLVED, InteractiveLearningIcons.LessonCompl);
+            map.put(StudyStatus.FAILED, InteractiveLearningIcons.Lesson);
+            iconMap.put(Lesson.class, map);
+
+            map = new HashMap<>();
+            map.put(StudyStatus.UNCHECKED, InteractiveLearningIcons.Task);
+            map.put(StudyStatus.SOLVED, InteractiveLearningIcons.TaskCompl);
+            map.put(StudyStatus.FAILED, InteractiveLearningIcons.TaskProbl);
+            iconMap.put(Task.class, map);
         }
-        if (subject instanceof Section) {
-            HashMap<StudyStatus, Icon> map = new HashMap<>();
-            map.put(StudyStatus.Unchecked, InteractiveLearningIcons.Section);
-            map.put(StudyStatus.Solved, InteractiveLearningIcons.SectionCompl);
-            map.put(StudyStatus.Failed, InteractiveLearningIcons.Section);
-            iconMap.put(subject, map);
-            return map;
-        }
-        if (subject instanceof Lesson) {
-            HashMap<StudyStatus, Icon> map = new HashMap<>();
-            map.put(StudyStatus.Unchecked, InteractiveLearningIcons.Lesson);
-            map.put(StudyStatus.Solved, InteractiveLearningIcons.LessonCompl);
-            map.put(StudyStatus.Failed, InteractiveLearningIcons.Lesson);
-            iconMap.put(subject, map);
-            return map;
-        }
-        if (subject instanceof Task) {
-            HashMap<StudyStatus, Icon> map = new HashMap<>();
-            map.put(StudyStatus.Unchecked, InteractiveLearningIcons.Task);
-            map.put(StudyStatus.Solved, InteractiveLearningIcons.TaskCompl);
-            map.put(StudyStatus.Failed, InteractiveLearningIcons.TaskProbl);
-            iconMap.put(subject, map);
-            return map;
-        }
-        return null;
+        return iconMap.get(subjectClass);
     }
 
     @NotNull
     public static JBColor getColor(@NotNull StudyStatus status) {
         switch (status) {
-            case Unchecked:
+            case UNCHECKED:
                 return JBColor.BLACK;
-            case Solved:
+            case SOLVED:
                 return SOLVED_COLOR;
-            case Failed:
+            case FAILED:
                 return JBColor.RED;
         }
         return JBColor.BLACK;

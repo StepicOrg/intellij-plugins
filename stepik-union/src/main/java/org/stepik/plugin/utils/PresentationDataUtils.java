@@ -83,7 +83,7 @@ public class PresentationDataUtils {
 
     private static void setAttributes(@NotNull PresentationData data, @NotNull StudyItem item) {
         String text = item.getName();
-        HashMap<StudyStatus, Icon> iconMap = getIconMap(item);
+        HashMap<StudyStatus, Icon> iconMap = getIconMap(item.getClass());
         StudyStatus status = item.getStatus();
         JBColor color = getColor(status);
         Icon icon = iconMap != null ? iconMap.get(status) : null;

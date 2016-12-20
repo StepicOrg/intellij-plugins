@@ -22,7 +22,6 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.ex.EditorEx;
-import com.intellij.openapi.extensions.Extensions;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.project.Project;
@@ -288,7 +287,7 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
 
     private static long getSolvedTasks(@NotNull final Lesson lesson) {
         return lesson.getTaskList().stream()
-                .filter(task -> task.getStatus() == StudyStatus.Solved)
+                .filter(task -> task.getStatus() == StudyStatus.SOLVED)
                 .count();
     }
 }

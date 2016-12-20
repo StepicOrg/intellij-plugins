@@ -114,11 +114,11 @@ public class Lesson implements StudyItem {
     @Override
     public StudyStatus getStatus() {
         for (Task task : taskList) {
-            if (task.getStatus() != StudyStatus.Solved) {
-                return StudyStatus.Unchecked;
+            if (task.getStatus() != StudyStatus.SOLVED) {
+                return StudyStatus.UNCHECKED;
             }
         }
-        return StudyStatus.Solved;
+        return StudyStatus.SOLVED;
     }
 
     @NotNull

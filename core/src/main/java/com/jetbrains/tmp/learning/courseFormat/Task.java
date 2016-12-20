@@ -23,7 +23,7 @@ public class Task implements StudyItem {
     private int myIndex;
     private int position;
     private String text;
-    private StudyStatus myStatus = StudyStatus.Unchecked;
+    private StudyStatus myStatus = StudyStatus.UNCHECKED;
 
     @Transient
     private Lesson myLesson;
@@ -53,7 +53,7 @@ public class Task implements StudyItem {
 
     void initTask(final Lesson lesson, boolean isRestarted) {
         setLesson(lesson);
-        if (!isRestarted) myStatus = StudyStatus.Unchecked;
+        if (!isRestarted) myStatus = StudyStatus.UNCHECKED;
         for (TaskFile taskFile : getTaskFiles().values()) {
             taskFile.initTaskFile(this);
         }
@@ -173,6 +173,7 @@ public class Task implements StudyItem {
     }
 
     @Override
+    @NotNull
     public StudyStatus getStatus() {
         return myStatus;
     }
@@ -192,8 +193,12 @@ public class Task implements StudyItem {
         return path;
     }
 
-    public void setStatus(StudyStatus status) {
-        myStatus = status;
+    public void setStatus(@Nullable StudyStatus status) {
+        if (status == null) {
+            myStatus = StudyStatus.UNCHECKED;
+        } else {
+            myStatus = status;
+        }
     }
 
     public int getPosition() {
