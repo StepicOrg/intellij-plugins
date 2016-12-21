@@ -21,10 +21,9 @@ import org.stepik.core.utils.PresentationUtils;
 import org.stepik.core.utils.ProjectFilesUtils;
 
 import javax.swing.*;
-import java.util.HashMap;
 
 import static org.stepik.core.utils.PresentationUtils.getColor;
-import static org.stepik.core.utils.PresentationUtils.getIconMap;
+import static org.stepik.core.utils.PresentationUtils.getIcon;
 import static org.stepik.plugin.utils.ProjectPsiFilesUtils.getRelativePath;
 
 /**
@@ -83,10 +82,9 @@ public class PresentationDataUtils {
 
     private static void setAttributes(@NotNull PresentationData data, @NotNull StudyItem item) {
         String text = item.getName();
-        HashMap<StudyStatus, Icon> iconMap = getIconMap(item);
         StudyStatus status = item.getStatus();
         JBColor color = getColor(status);
-        Icon icon = iconMap != null ? iconMap.get(status) : null;
+        Icon icon = getIcon(item.getClass(), status);
         setAttributes(data, text, color, icon);
     }
 

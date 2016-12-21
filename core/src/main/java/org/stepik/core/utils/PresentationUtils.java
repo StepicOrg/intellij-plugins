@@ -12,7 +12,6 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.HashMap;
 
 import static org.stepik.core.utils.ProjectFilesUtils.getParent;
 import static org.stepik.core.utils.ProjectFilesUtils.isHideDir;
@@ -30,58 +29,73 @@ import static org.stepik.core.utils.ProjectFilesUtils.isWithinUtil;
  */
 public class PresentationUtils {
 
-    private static final HashMap<Object, HashMap<StudyStatus, Icon>> iconMap = new HashMap<>();
+    private static Icon[][] icons = null;
     private static final JBColor SOLVED_COLOR = new JBColor(new Color(0, 134, 0), new Color(98, 150, 85));
 
     @Nullable
-    public static HashMap<StudyStatus, Icon> getIconMap(@Nullable Object subject) {
-        HashMap<StudyStatus, Icon> result = iconMap.get(subject);
-        if (result != null)
-            return result;
+    public static Icon getIcon(@NotNull Object subjectClass, StudyStatus status) {
+        if (icons == null) {
+            icons = getIcons();
+        }
 
-        if (subject instanceof Course) {
-            HashMap<StudyStatus, Icon> map = new HashMap<>();
-            map.put(StudyStatus.Unchecked, InteractiveLearningIcons.Course);
-            map.put(StudyStatus.Solved, InteractiveLearningIcons.CourseCompl);
-            map.put(StudyStatus.Failed, InteractiveLearningIcons.Course);
-            iconMap.put(subject, map);
-            return map;
-        }
-        if (subject instanceof Section) {
-            HashMap<StudyStatus, Icon> map = new HashMap<>();
-            map.put(StudyStatus.Unchecked, InteractiveLearningIcons.Section);
-            map.put(StudyStatus.Solved, InteractiveLearningIcons.SectionCompl);
-            map.put(StudyStatus.Failed, InteractiveLearningIcons.Section);
-            iconMap.put(subject, map);
-            return map;
-        }
-        if (subject instanceof Lesson) {
-            HashMap<StudyStatus, Icon> map = new HashMap<>();
-            map.put(StudyStatus.Unchecked, InteractiveLearningIcons.Lesson);
-            map.put(StudyStatus.Solved, InteractiveLearningIcons.LessonCompl);
-            map.put(StudyStatus.Failed, InteractiveLearningIcons.Lesson);
-            iconMap.put(subject, map);
-            return map;
-        }
-        if (subject instanceof Task) {
-            HashMap<StudyStatus, Icon> map = new HashMap<>();
-            map.put(StudyStatus.Unchecked, InteractiveLearningIcons.Task);
-            map.put(StudyStatus.Solved, InteractiveLearningIcons.TaskCompl);
-            map.put(StudyStatus.Failed, InteractiveLearningIcons.TaskProbl);
-            iconMap.put(subject, map);
-            return map;
+        Icon[] set;
+
+        if (subjectClass == Task.class) {
+            set = icons[3];
+        } else if (subjectClass == Lesson.class) {
+            set = icons[2];
+        } else if (subjectClass == Section.class) {
+            set = icons[1];
+        } else if (subjectClass == Course.class) {
+            set = icons[0];
+        } else
+            return null;
+
+        switch (status) {
+            case UNCHECKED:
+                return set[0];
+            case SOLVED:
+                return set[1];
+            case FAILED:
+                return set[2];
         }
         return null;
     }
 
     @NotNull
+    private static Icon[][] getIcons() {
+        return new Icon[][]{
+                {
+                        InteractiveLearningIcons.Course,
+                        InteractiveLearningIcons.CourseCompl,
+                        InteractiveLearningIcons.Course
+                },
+                {
+                        InteractiveLearningIcons.Section,
+                        InteractiveLearningIcons.SectionCompl,
+                        InteractiveLearningIcons.Section
+                },
+                {
+                        InteractiveLearningIcons.Lesson,
+                        InteractiveLearningIcons.LessonCompl,
+                        InteractiveLearningIcons.Lesson
+                },
+                {
+                        InteractiveLearningIcons.Task,
+                        InteractiveLearningIcons.TaskCompl,
+                        InteractiveLearningIcons.TaskProbl
+                }
+        };
+    }
+
+    @NotNull
     public static JBColor getColor(@NotNull StudyStatus status) {
         switch (status) {
-            case Unchecked:
+            case UNCHECKED:
                 return JBColor.BLACK;
-            case Solved:
+            case SOLVED:
                 return SOLVED_COLOR;
-            case Failed:
+            case FAILED:
                 return JBColor.RED;
         }
         return JBColor.BLACK;

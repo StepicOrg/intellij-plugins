@@ -1,5 +1,6 @@
 package org.stepik.plugin.actions;
 
+import com.intellij.ide.projectView.ProjectView;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.application.ApplicationManager;
@@ -21,6 +22,7 @@ import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.actions.StudyActionWithShortcut;
 import com.jetbrains.tmp.learning.core.EduNames;
+import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
 import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorGet;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorPost;
@@ -178,7 +180,9 @@ public class DownloadSubmission extends StudyActionWithShortcut {
 
                             if (document != null) {
                                 document.setText(finalCode);
+                                task.setStatus(StudyStatus.of(submission.getStatus()));
                                 FileEditorManager.getInstance(project).openFile(mainFile, true);
+                                ProjectView.getInstance(project).refresh();
                             }
                         }),
                 "Download submission",

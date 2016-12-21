@@ -21,7 +21,7 @@ public class Section implements StudyItem {
     @Expose
     private int id;
     @Transient
-    private Course myCourse = null;
+    private Course course = null;
     @Transient
     @NotNull
     private String directory = "";
@@ -79,11 +79,11 @@ public class Section implements StudyItem {
     @Override
     public StudyStatus getStatus() {
         for (Lesson lesson : lessons) {
-            if (lesson.getIndex() != -1 && lesson.getStatus() != StudyStatus.Solved)
-                return StudyStatus.Unchecked;
+            if (lesson.getIndex() != -1 && lesson.getStatus() != StudyStatus.SOLVED)
+                return StudyStatus.UNCHECKED;
         }
 
-        return StudyStatus.Solved;
+        return StudyStatus.SOLVED;
     }
 
     @Override
@@ -107,19 +107,19 @@ public class Section implements StudyItem {
     @Override
     public String getPath() {
         if (path == null) {
-            path = myCourse.getPath() + "/" + getDirectory();
+            path = course.getPath() + "/" + getDirectory();
         }
         return path;
     }
 
     @Transient
     public void setCourse(Course course) {
-        this.myCourse = course;
+        this.course = course;
     }
 
     @Transient
     public Course getCourse() {
-        return myCourse;
+        return course;
     }
 
     @Override

@@ -12,7 +12,6 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.MessageType;
-import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.ui.popup.Balloon;
 import com.intellij.openapi.ui.popup.BalloonBuilder;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
@@ -61,11 +60,7 @@ public class StepikRefreshTaskFileAction extends StudyActionWithShortcut {
             @NotNull final Project project) {
         final Editor editor = studyState.getEditor();
         final TaskFile taskFile = studyState.getTaskFile();
-        if (!resetTaskFile(editor.getDocument(), project, taskFile)) {
-            Messages.showInfoMessage("The initial text of task file is unavailable",
-                    "Failed to Refresh Task File");
-            return;
-        }
+        resetTaskFile(editor.getDocument(), project, taskFile);
         WolfTheProblemSolver.getInstance(project).clearProblems(studyState.getVirtualFile());
         ApplicationManager.getApplication().invokeLater(
                 () -> IdeFocusManager.getInstance(project)
@@ -73,17 +68,14 @@ public class StepikRefreshTaskFileAction extends StudyActionWithShortcut {
         showBalloon(project, MessageType.INFO);
     }
 
-    private static boolean resetTaskFile(
+    private static void resetTaskFile(
             @NotNull final Document document,
             @NotNull final Project project,
             TaskFile taskFile) {
-        if (!resetDocument(document, taskFile, project)) {
-            return false;
-        }
-        taskFile.getTask().setStatus(StudyStatus.Unchecked);
+        resetDocument(document, taskFile, project);
+        taskFile.getTask().setStatus(StudyStatus.UNCHECKED);
         ProjectView.getInstance(project).refresh();
         StudyUtils.updateToolWindows(project);
-        return true;
     }
 
     private static void showBalloon(
@@ -99,7 +91,7 @@ public class StepikRefreshTaskFileAction extends StudyActionWithShortcut {
         Disposer.register(project, balloon);
     }
 
-    private static boolean resetDocument(
+    private static void resetDocument(
             @NotNull final Document document,
             @NotNull final TaskFile taskFile,
             @NotNull Project project) {
@@ -109,7 +101,6 @@ public class StepikRefreshTaskFileAction extends StudyActionWithShortcut {
                         .runWriteAction(() -> document.setText(taskFile.getText())),
                 "Stepik refresh task", "Stepik refresh task"
         );
-        return true;
     }
 
     public void actionPerformed(@NotNull AnActionEvent event) {

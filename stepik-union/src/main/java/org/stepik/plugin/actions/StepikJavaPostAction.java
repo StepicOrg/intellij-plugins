@@ -134,11 +134,11 @@ public class StepikJavaPostAction extends StudyCheckAction {
                                 if ("correct".equals(taskStatus)) {
                                     notificationType = NotificationType.INFORMATION;
                                     hint = "Success!";
-                                    task.setStatus(StudyStatus.Solved);
+                                    task.setStatus(StudyStatus.SOLVED);
                                 } else {
                                     notificationType = NotificationType.WARNING;
-                                    if (task.getStatus() != StudyStatus.Solved)
-                                        task.setStatus(StudyStatus.Failed);
+                                    if (task.getStatus() != StudyStatus.SOLVED)
+                                        task.setStatus(StudyStatus.FAILED);
                                 }
                                 Notification notification = new Notification(
                                         "Step.sending",

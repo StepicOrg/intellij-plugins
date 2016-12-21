@@ -86,7 +86,7 @@ public class StepikAdaptiveReactionsPanel extends JPanel {
             @Override
             public void selectionChanged(@NotNull FileEditorManagerEvent event) {
                 final com.jetbrains.tmp.learning.courseFormat.Task task = StudyUtils.getTaskFromSelectedEditor(myProject);
-                final boolean isEnabled = task != null && task.getStatus() != StudyStatus.Solved;
+                final boolean isEnabled = task != null && task.getStatus() != StudyStatus.SOLVED;
                 StepikAdaptiveReactionsPanel.this.setEnabledRecursive(isEnabled);
             }
         };
@@ -104,7 +104,7 @@ public class StepikAdaptiveReactionsPanel extends JPanel {
                 @NotNull final String enabledTooltip,
                 int reaction) {
             com.jetbrains.tmp.learning.courseFormat.Task task = StudyUtils.getTaskFromSelectedEditor(myProject);
-            final boolean isEnabled = task != null && task.getStatus() != StudyStatus.Solved;
+            final boolean isEnabled = task != null && task.getStatus() != StudyStatus.SOLVED;
 
             myLabel = new JLabel(text);
 
@@ -154,7 +154,7 @@ public class StepikAdaptiveReactionsPanel extends JPanel {
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 1) {
                     final com.jetbrains.tmp.learning.courseFormat.Task task = StudyUtils.getCurrentTask(myProject);
-                    if (task != null && task.getStatus() != StudyStatus.Solved) {
+                    if (task != null && task.getStatus() != StudyStatus.SOLVED) {
                         final ProgressIndicatorBase progress = new ProgressIndicatorBase();
                         progress.setText("Loading Next Recommendation");
                         ProgressManager.getInstance().run(new Task.Backgroundable(myProject,
@@ -177,7 +177,7 @@ public class StepikAdaptiveReactionsPanel extends JPanel {
             @Override
             public void mouseEntered(MouseEvent e) {
                 final com.jetbrains.tmp.learning.courseFormat.Task task = StudyUtils.getCurrentTask(myProject);
-                if (task != null && task.getStatus() != StudyStatus.Solved && myPanel.isEnabled()) {
+                if (task != null && task.getStatus() != StudyStatus.SOLVED && myPanel.isEnabled()) {
                     setBackground(UIUtil.getButtonSelectColor());
                 }
             }

@@ -173,7 +173,7 @@ public class StudySerializationUtils {
             Map<String, String> destMap = new HashMap<>();
             for (Map.Entry<Element, String> entry : sourceMap.entrySet()) {
                 String status = entry.getValue();
-                if (status.equals(StudyStatus.Unchecked.toString())) {
+                if (StudyStatus.of(status) == StudyStatus.UNCHECKED) {
                     continue;
                 }
                 destMap.put(outputter.outputString(entry.getKey()), status);
@@ -203,7 +203,7 @@ public class StudySerializationUtils {
                         Element taskFileElement = entry.getValue();
                         String taskFileText = outputter.outputString(taskFileElement);
                         String taskFileStatus = taskFileToStatusMap.get(taskFileText);
-                        if (taskFileStatus != null && (taskStatus == null || taskFileStatus.equals(StudyStatus.Failed.toString()))) {
+                        if (taskFileStatus != null && (taskStatus == null || StudyStatus.of(taskFileStatus) == StudyStatus.FAILED)) {
                             taskStatus = taskFileStatus;
                         }
                         Document document = StudyUtils.getDocument(project.getBasePath(),
@@ -237,7 +237,7 @@ public class StudySerializationUtils {
             String status = placeholderTextToStatus.get(placeholderText);
             if (status != null) {
                 addChildWithName(placeholder, STATUS, status);
-                if (taskStatus == null || status.equals(StudyStatus.Failed.toString())) {
+                if (taskStatus == null || StudyStatus.of(status) == StudyStatus.FAILED) {
                     taskStatus = status;
                 }
             }
