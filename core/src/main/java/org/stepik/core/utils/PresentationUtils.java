@@ -21,7 +21,7 @@ import static org.stepik.core.utils.ProjectFilesUtils.isTaskHtmlFile;
 import static org.stepik.core.utils.ProjectFilesUtils.isUtilDir;
 import static org.stepik.core.utils.ProjectFilesUtils.isWithinHideDir;
 import static org.stepik.core.utils.ProjectFilesUtils.isWithinSandbox;
-import static org.stepik.core.utils.ProjectFilesUtils.isSubTask;
+import static org.stepik.core.utils.ProjectFilesUtils.isWithinSrc;
 import static org.stepik.core.utils.ProjectFilesUtils.isWithinUtil;
 
 /**
@@ -110,7 +110,7 @@ public class PresentationUtils {
             return true;
         }
 
-        return isSubTask(relPath) || isWithinSandbox(relPath) || isWithinUtil(relPath);
+        return isWithinSrc(relPath) || isWithinSandbox(relPath) || isWithinUtil(relPath);
     }
 
     public static boolean isVisibleFile(@NotNull String relFilePath) {
@@ -119,6 +119,6 @@ public class PresentationUtils {
             return false;
         }
 
-        return isSubTask(relFilePath) || isWithinSandbox(relFilePath) || isWithinUtil(relFilePath);
+        return isWithinSrc(relFilePath) || isWithinSandbox(relFilePath) || isWithinUtil(relFilePath);
     }
 }

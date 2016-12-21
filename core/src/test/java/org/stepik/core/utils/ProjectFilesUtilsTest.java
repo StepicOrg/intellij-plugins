@@ -143,7 +143,7 @@ public class ProjectFilesUtilsTest {
     @Test
     public void isWithinSrc() throws Exception {
         String within = join(SECTION1_LESSON1_TASK1_SRC, "other");
-        assertTrue(ProjectFilesUtils.isSubTask(within));
+        assertTrue(ProjectFilesUtils.isWithinSrc(within));
     }
 
     @Test

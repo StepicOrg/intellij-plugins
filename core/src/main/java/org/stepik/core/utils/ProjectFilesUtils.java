@@ -22,14 +22,14 @@ public class ProjectFilesUtils {
     private static final String LESSON_PATH_EXPR = SECTION_EXPR + SEPARATOR + EduNames.LESSON + "[0-9]+";
     private static final String TASK_PATH_EXPR = LESSON_PATH_EXPR + SEPARATOR + EduNames.TASK + "[0-9]+";
     private static final String SRC_PATH_EXPR = TASK_PATH_EXPR + SEPARATOR + EduNames.SRC;
-    private static final String COURSE_DIRECTORIES = "\\.|" + SECTION_EXPR + "|" + LESSON_PATH_EXPR + "|" + TASK_PATH_EXPR ;
+    private static final String COURSE_DIRECTORIES = "\\.|" + SECTION_EXPR + "|" + LESSON_PATH_EXPR + "|" + TASK_PATH_EXPR + "|" + SRC_PATH_EXPR; ;
     private static final String HIDE_PATH_EXPR = SRC_PATH_EXPR + SEPARATOR + EduNames.HIDE;
 
     public static boolean isCanNotBeTarget(String targetPath) {
         if (isHideDir(targetPath) || isWithinHideDir(targetPath)) {
             return true;
         }
-        return !(isSubTask(targetPath) || isWithinSandbox(targetPath) || isSandbox(targetPath) || isSrc(targetPath));
+        return !(isWithinSrc(targetPath) || isWithinSandbox(targetPath) || isSandbox(targetPath) || isSrc(targetPath));
     }
 
     private static boolean isTaskFile(@NotNull Course course, @NotNull String path) {
@@ -53,7 +53,7 @@ public class ProjectFilesUtils {
     }
 
     public static boolean isNotMovableOrRenameElement(@NotNull Course course, @NotNull String path) {
-        if (isSubTask(path)) {
+        if (isWithinSrc(path)) {
             return isHideDir(path) || isWithinHideDir(path) || isTaskHtmlFile(path) || isTaskFile(course, path);
         }
 
@@ -80,8 +80,8 @@ public class ProjectFilesUtils {
         return path.matches(EduNames.UTIL + SEPARATOR + ".*");
     }
 
-    static boolean isSubTask(@NotNull String path) {
-        return path.matches(TASK_PATH_EXPR + SEPARATOR + ".*");
+    static boolean isWithinSrc(@NotNull String path) {
+        return path.matches(SRC_PATH_EXPR + SEPARATOR + ".*");
     }
 
     @NotNull
