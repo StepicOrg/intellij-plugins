@@ -25,6 +25,7 @@ public class Task implements StudyItem {
     private int position;
     @Expose
     private String text;
+    @Expose
     private StudyStatus status = StudyStatus.UNCHECKED;
 
     @Transient

@@ -5,12 +5,12 @@ import com.intellij.ide.BrowserUtil;
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.ide.wizard.CommitStepException;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.ui.EnumComboBoxModel;
 import com.intellij.ui.HyperlinkAdapter;
 import com.jetbrains.tmp.learning.StudyTaskManager;
-import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.courseGeneration.StepikProjectGenerator;
 import com.jetbrains.tmp.learning.stepik.CourseInfo;
@@ -60,7 +60,7 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
     private CourseInfo selectedCourse;
     private final Project project;
 
-    public SelectCourseWizardStep(
+    SelectCourseWizardStep(
             @NotNull final StepikProjectGenerator projectGenerator,
             @NotNull Project project) {
         this.projectGenerator = projectGenerator;
@@ -108,14 +108,14 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
     }
 
     private void setupGeneralSettings() {
-//        StepikConnectorLogin.loginFromDialog(project);
+        StepikConnectorLogin.loginFromDialog(project);
         userName.setText(StudyTaskManager.getInstance(project).getUser().getName());
 
-        List<CourseInfo> courses = generator.getCoursesUnderProgress(false,
+        List<CourseInfo> courses = projectGenerator.getCoursesUnderProgress(false,
                 "Getting Available Courses",
                 ProjectManager.getInstance().getDefaultProject());
         addCoursesToComboBox(courses);
-        generator.setSelectedCourse(selectedCourse);
+        projectGenerator.setSelectedCourse(selectedCourse);
         courseDescription.setText(selectedCourse.getDescription());
     }
 
@@ -128,7 +128,7 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
         public void actionPerformed(ActionEvent e) {
             courseDescription.setText("");
             final List<CourseInfo> courses =
-                    generator.getCoursesUnderProgress(true,
+                    projectGenerator.getCoursesUnderProgress(true,
                             "Refreshing Course List",
                             project);
 
@@ -265,10 +265,10 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
                 String item = e.getItem().toString();
                 if (COURSE_LIST.equals(item)) {
                     courseDescription.setText("");
-                    ((CardLayout) myCardPanel.getLayout()).show(myCardPanel, COURSE_LIST);
+                    ((CardLayout) cardPanel.getLayout()).show(cardPanel, COURSE_LIST);
                 } else if (COURSE_LINK.equals(item)) {
                     courseDescription.setText("");
-                    ((CardLayout) myCardPanel.getLayout()).show(myCardPanel, COURSE_LINK);
+                    ((CardLayout) cardPanel.getLayout()).show(cardPanel, COURSE_LINK);
                 }
             }
         }

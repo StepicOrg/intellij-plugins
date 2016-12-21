@@ -19,6 +19,7 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.intellij.openapi.diagnostic.Logger;
+import com.jetbrains.tmp.learning.stepik.entities.SubmissionContainer;
 import org.apache.http.HttpEntity;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -36,7 +37,7 @@ public class StepikConnectorPost {
             new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
 
     // TODO All methods must be rewrite as it
-    static void postToStepik(String link, AbstractHttpEntity entity) throws IOException {
+    private static void postToStepik(String link, AbstractHttpEntity entity) throws IOException {
         final HttpPost request = new HttpPost(EduStepikNames.STEPIK_API_URL + link);
         request.setEntity(entity);
 

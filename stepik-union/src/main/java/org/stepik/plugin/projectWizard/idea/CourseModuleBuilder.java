@@ -93,7 +93,6 @@ class CourseModuleBuilder extends AbstractModuleBuilder {
                 int taskIndex = 1;
                 for (Task task : lesson.getTaskList()){
                     task.setIndex(taskIndex++);
-                    logger.info("task Path = " + task.getPath());
                     TaskModuleBuilder taskModuleBuilder = new TaskModuleBuilder(project.getBasePath() + lesson.getPath(),
                             lesson.getDirectory(),
                             task,

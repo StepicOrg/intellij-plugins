@@ -1,8 +1,6 @@
 package com.jetbrains.tmp.learning.courseFormat;
 
 import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
-import com.intellij.lang.Language;
 import com.intellij.util.xmlb.annotations.Transient;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.core.EduUtils;
@@ -93,7 +91,7 @@ public class Course implements StudyItem {
     }
 
     public void setUpToDate(boolean upToDate) {
-        myUpToDate = upToDate;
+        this.upToDate = upToDate;
     }
 
     public void setAuthors(@NotNull List<StepikUser> authors) {
