@@ -20,11 +20,13 @@ import com.jetbrains.python.newProject.PythonProjectGenerator;
 import com.jetbrains.python.remote.PyProjectSynchronizer;
 import com.jetbrains.tmp.learning.StudyProjectComponent;
 import com.jetbrains.tmp.learning.StudyTaskManager;
+import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.Lesson;
 import com.jetbrains.tmp.learning.courseFormat.Section;
 import com.jetbrains.tmp.learning.courseFormat.Task;
+import com.jetbrains.tmp.learning.courseFormat.TaskFile;
 import com.jetbrains.tmp.learning.courseGeneration.StepikProjectGenerator;
 import com.jetbrains.tmp.learning.stepik.CourseInfo;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
@@ -153,12 +155,16 @@ public class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjec
                 int taskIndex = 1;
                 for (Task task : lesson.getTaskList()) {
                     task.setIndex(taskIndex++);
+                    task.setCurrentLang(SupportedLanguages.PYTHON);
 //                    logger.info("task Path = " + task.getPath());
                     File taskDir = new File(project.getBasePath(), task.getPath());
                     FileUtil.createDirectory(taskDir);
 
                     try (BufferedWriter writer = new BufferedWriter(new FileWriter(new File(taskDir, "main.py")))) {
-                        writer.write(task.getFile("main.py").getText());
+                        TaskFile taskFile = task.getFile("main.py");
+                        if (taskFile != null) {
+                            writer.write(taskFile.getText());
+                        }
                     } catch (IOException e) {
                         logger.warn(e);
                     }

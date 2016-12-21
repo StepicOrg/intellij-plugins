@@ -57,8 +57,7 @@ public class StepikProjectGenerator {
     @NotNull
     private SupportedLanguages defaultLang = SupportedLanguages.INVALID;
     @NotNull
-    private List<CourseInfo> courses = new ArrayList<>();
-    private CourseInfo selectedCourseInfo;
+    private CourseInfo selectedCourseInfo = CourseInfo.INVALID_COURSE;
 
     private static StepikProjectGenerator instance;
 
@@ -72,12 +71,8 @@ public class StepikProjectGenerator {
     }
 
     /**
-    *    Non-static methods
+    *    Non-static methods -----------------------------------------
     */
-
-    public void setCourses(@NotNull List<CourseInfo> courses) {
-        this.courses = courses;
-    }
 
     public void setSelectedCourse(@Nullable CourseInfo courseInfo) {
         if (courseInfo == null) {
@@ -112,7 +107,21 @@ public class StepikProjectGenerator {
         return null;
     }
 
-    private List<CourseInfo> getCourses(boolean force) {
+    @NotNull
+    public SupportedLanguages getDefaultLang() {
+        return defaultLang;
+    }
+
+    public void setDefaultLang(@NotNull SupportedLanguages defaultLang) {
+        this.defaultLang = defaultLang;
+    }
+
+    /**
+     *    Static methods --------------------------------------------
+     */
+
+    private static List<CourseInfo> getCourses(boolean force) {
+        List<CourseInfo> courses = new ArrayList<>();
         if (CONFIG_COURSES_DIR.exists()) {
             courses = getCoursesFromCache();
         }
@@ -129,7 +138,7 @@ public class StepikProjectGenerator {
     }
 
     @NotNull
-    public List<CourseInfo> getCoursesUnderProgress(
+    public static List<CourseInfo> getCoursesUnderProgress(
             boolean force,
             @NotNull final String progressTitle,
             @NotNull final Project project) {
@@ -143,19 +152,6 @@ public class StepikProjectGenerator {
             return Collections.singletonList(CourseInfo.INVALID_COURSE);
         }
     }
-
-    @NotNull
-    public SupportedLanguages getDefaultLang() {
-        return defaultLang;
-    }
-
-    public void setDefaultLang(@NotNull SupportedLanguages defaultLang) {
-        this.defaultLang = defaultLang;
-    }
-
-    /**
-     *    Static methods
-     */
 
     private static List<CourseInfo> getBundledIntro() {
         final File introCourse = new File(CONFIG_COURSES_DIR, "Introduction to Python");

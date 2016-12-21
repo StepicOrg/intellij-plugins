@@ -106,7 +106,7 @@ public class PyCourseCreatorSettingPanel extends JPanel implements PanelWithAnch
     private void setupGeneralSettings() {
         userName.setText(StudyTaskManager.getInstance(project).getUser().getName());
 
-        myAvailableCourses = generator.getCoursesUnderProgress(
+        myAvailableCourses = StepikProjectGenerator.getCoursesUnderProgress(
                 false,
                 "Getting Available Courses",
                 ProjectManager.getInstance().getDefaultProject());
@@ -160,7 +160,7 @@ public class PyCourseCreatorSettingPanel extends JPanel implements PanelWithAnch
         public void actionPerformed(ActionEvent e) {
             courseLinkDescription.setText("");
             final List<CourseInfo> courses =
-                    generator.getCoursesUnderProgress(true,
+                    StepikProjectGenerator.getCoursesUnderProgress(true,
                             "Refreshing Course List",
                             project);
 
@@ -180,7 +180,6 @@ public class PyCourseCreatorSettingPanel extends JPanel implements PanelWithAnch
             generator.setSelectedCourse(selectedCourse);
             courseLinkDescription.setText(selectedCourse.getDescription());
 
-            generator.setCourses(courses);
             myAvailableCourses = courses;
             StepikProjectGenerator.flushCache(courses);
         }

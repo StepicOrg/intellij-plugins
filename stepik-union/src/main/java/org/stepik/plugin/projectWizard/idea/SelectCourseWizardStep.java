@@ -111,7 +111,7 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
         StepikConnectorLogin.loginFromDialog(project);
         userName.setText(StudyTaskManager.getInstance(project).getUser().getName());
 
-        List<CourseInfo> courses = projectGenerator.getCoursesUnderProgress(false,
+        List<CourseInfo> courses = StepikProjectGenerator.getCoursesUnderProgress(false,
                 "Getting Available Courses",
                 ProjectManager.getInstance().getDefaultProject());
         addCoursesToComboBox(courses);
@@ -128,7 +128,7 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
         public void actionPerformed(ActionEvent e) {
             courseDescription.setText("");
             final List<CourseInfo> courses =
-                    projectGenerator.getCoursesUnderProgress(true,
+                    StepikProjectGenerator.getCoursesUnderProgress(true,
                             "Refreshing Course List",
                             project);
 
@@ -145,7 +145,6 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
             addCoursesToComboBox(courses);
             projectGenerator.setSelectedCourse(selectedCourse);
             courseDescription.setText(selectedCourse.getDescription());
-            projectGenerator.setCourses(courses);
             StepikProjectGenerator.flushCache(courses);
         }
     }
