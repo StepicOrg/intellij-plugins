@@ -107,8 +107,8 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
         langComboBox.setSelectedItem(SupportedLanguages.JAVA);
     }
 
-    private void setupGeneralSettings(){
-        StepikConnectorLogin.loginFromDialog(project);
+    private void setupGeneralSettings() {
+//        StepikConnectorLogin.loginFromDialog(project);
         userName.setText(StudyTaskManager.getInstance(project).getUser().getName());
 
         List<CourseInfo> courses = generator.getCoursesUnderProgress(false,
@@ -303,9 +303,5 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
                     id, selectedCourse.getName()));
         }
         StepikProjectGenerator.downloadAndFlushCourse(project, selectedCourse);
-    }
-
-    public CourseInfo getSelectedCourse() {
-        return selectedCourse;
     }
 }

@@ -89,9 +89,11 @@ public class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjec
         return generator -> {
             final CourseInfo courseInfo = pySPanel.getSelectedCourse();
             if (courseInfo == null) return false;
-            if (PyCourseCreatorSettingPanel.COURSE_LINK.equals(pySPanel.getBuildType()) ) {
+            if (PyCourseCreatorSettingPanel.COURSE_LINK.equals(pySPanel.getBuildType())) {
                 StepikConnectorPost.enrollToCourse(courseInfo.getId());
             }
+            StepikProjectGenerator.downloadAndFlushCourse(DefaultProjectFactory.getInstance().getDefaultProject(),
+                    courseInfo);
             return true;
         };
     }
@@ -109,7 +111,6 @@ public class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjec
         StepikConnectorLogin.loginFromDialog(project);
         ApplicationManager.getApplication()
                 .runWriteAction(() -> ModuleRootModificationUtil.setModuleSdk(module, settings.getSdk()));
-        StepikProjectGenerator.downloadAndFlushCourse(project, pySPanel.getSelectedCourse());
         createCourseFromGenerator(project);
     }
 

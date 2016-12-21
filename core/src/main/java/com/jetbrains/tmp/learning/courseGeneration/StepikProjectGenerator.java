@@ -315,9 +315,8 @@ public class StepikProjectGenerator {
                 final Course course = StepikConnectorGet.getCourse(project, courseInfo);
                 if (course != null) {
                     flushCourse(project, course);
-                    course.initCourse(false);
                 }
-                return course;
+                return null;
             });
         }, "Downloading Course", true, project);
     }
