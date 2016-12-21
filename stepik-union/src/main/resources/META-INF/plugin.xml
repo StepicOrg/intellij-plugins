@@ -64,7 +64,8 @@
         <projectService serviceInterface="com.intellij.codeInsight.documentation.DocumentationManager" serviceImplementation="com.jetbrains.tmp.learning.StudyDocumentationManager" overrides="true"/>
         <toolWindow id="Task Description" anchor="right" factoryClass="com.jetbrains.tmp.learning.ui.StudyToolWindowFactory" conditionClass="com.jetbrains.tmp.learning.ui.StudyCondition"/>
         <fileEditorProvider implementation="com.jetbrains.tmp.learning.editor.StudyFileEditorProvider"/>
-        <projectService serviceImplementation="com.jetbrains.tmp.learning.StudyTaskManager"/>
+        <projectService serviceInterface="com.jetbrains.tmp.learning.StudyTaskManager"
+                serviceImplementation="com.jetbrains.tmp.learning.StudyTaskManager"/>
         <applicationService serviceImplementation="com.jetbrains.tmp.learning.stepik.StepikUpdateSettings"/>
     </extensions>
 </idea-plugin>

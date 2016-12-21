@@ -3,7 +3,6 @@ package org.stepik.plugin.projectWizard.pycharm;
 import com.intellij.facet.ui.FacetValidatorsManager;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.BrowserUtil;
-import com.intellij.ide.wizard.CommitStepException;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
@@ -13,7 +12,6 @@ import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.courseGeneration.StepikProjectGenerator;
 import com.jetbrains.tmp.learning.stepik.CourseInfo;
-import com.jetbrains.tmp.learning.stepik.StepikConnectorPost;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -28,7 +26,7 @@ import java.util.List;
 public class PyCourseCreatorSettingPanel extends JPanel {
     private static final Logger logger = Logger.getInstance(PyCourseCreatorSettingPanel.class);
     private final static String COURSE_LIST = "Course list";
-    private final static String COURSE_LINK = "Course link";
+    final static String COURSE_LINK = "Course link";
 
     private JPanel mainPanel;
     private JLabel nameLabel;
@@ -51,23 +49,17 @@ public class PyCourseCreatorSettingPanel extends JPanel {
 
     private final StepikProjectGenerator generator;
     private CourseInfo selectedCourse;
-    private final Project project;
+    private Project project;
     private List<CourseInfo> myAvailableCourses;
     private FacetValidatorsManager validationManager;
 
-    public PyCourseCreatorSettingPanel(
-            @NotNull final StepikProjectGenerator generator,
-            @NotNull Project project) {
+    PyCourseCreatorSettingPanel(
+            @NotNull final StepikProjectGenerator generator) {
         this.generator = generator;
-        this.project = project;
-
-
     }
 
-    /**
-     * Called in PyCharm
-     */
-    public void init() {
+    void init(Project project) {
+        this.project = project;
         layoutPanel();
         initListeners();
         setupGeneralSettings();
@@ -99,11 +91,10 @@ public class PyCourseCreatorSettingPanel extends JPanel {
         buildType.addItemListener(new BuildTypeListener());
         refreshListButton.addActionListener(new RefreshActionListener());
 //        checkCourseLinkButton.addActionListener(new CheckCourseLinkListener());
-        courseListComboBox.addItemListener(new CourseComboBoxListener());
+        courseListComboBox.addItemListener(new CourseListComboBoxListener());
     }
 
     private void setupGeneralSettings() {
-//        StepikConnectorLogin.loginFromDialog(project);
         userName.setText(StudyTaskManager.getInstance(project).getUser().getName());
 
         myAvailableCourses = generator.getCoursesUnderProgress(
@@ -170,45 +161,38 @@ public class PyCourseCreatorSettingPanel extends JPanel {
         }
     }
 
-    private class CourseComboBoxListener implements ItemListener {
+    private class CourseListComboBoxListener implements ItemListener {
         @Override
         public void itemStateChanged(ItemEvent e) {
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 selectedCourse = (CourseInfo) e.getItem();
-                courseLinkDescription.setText(selectedCourse.getDescription());
+                courseListDescription.setText(selectedCourse.getDescription());
             }
         }
     }
 
-    //    @Override
-    public void onStepLeaving() {
-        generator.setDefaultLang(SupportedLanguages.PYTHON);
-        if (selectedCourse != null) {
-            generator.setSelectedCourse(selectedCourse);
-        }
-    }
-
-    public void onWizardFinished() throws CommitStepException {
-//        super.onWizardFinished();
-        if (buildType.getSelectedItem().equals(COURSE_LINK)) {
-            StepikConnectorPost.enrollToCourse(selectedCourse.getId());
-        }
-        StepikProjectGenerator.downloadAndFlushCourse(project, selectedCourse);
-    }
-
-    public CourseInfo getSelectedCourse() {
+    CourseInfo getSelectedCourse() {
         return selectedCourse;
     }
 
-    public JPanel getMainPanel() {
+    JPanel getMainPanel() {
         return mainPanel;
     }
 
-    public boolean validateCoursePanel(){
+    boolean validateCoursePanel(){
+        generator.setDefaultLang(SupportedLanguages.PYTHON);
+        if (selectedCourse == null|| selectedCourse == CourseInfo.INVALID_COURSE ) {
+            return false;
+        }
+        generator.setSelectedCourse(selectedCourse);
         return true;
     }
 
     public JComboBox<CourseInfo> getCourseListComboBox() {
         return courseListComboBox;
+    }
+
+    String getBuildType() {
+        return (String) buildType.getSelectedItem();
     }
 }

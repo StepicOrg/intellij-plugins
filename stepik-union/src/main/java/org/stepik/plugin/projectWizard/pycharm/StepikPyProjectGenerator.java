@@ -9,10 +9,12 @@ import com.intellij.openapi.project.DefaultProjectFactory;
 import com.intellij.openapi.project.DumbModePermission;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.roots.ModuleRootModificationUtil;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.util.BooleanFunction;
 import com.jetbrains.python.newProject.PyNewProjectSettings;
 import com.jetbrains.python.newProject.PythonProjectGenerator;
 import com.jetbrains.python.remote.PyProjectSynchronizer;
@@ -24,7 +26,9 @@ import com.jetbrains.tmp.learning.courseFormat.Lesson;
 import com.jetbrains.tmp.learning.courseFormat.Section;
 import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.courseGeneration.StepikProjectGenerator;
+import com.jetbrains.tmp.learning.stepik.CourseInfo;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
+import com.jetbrains.tmp.learning.stepik.StepikConnectorPost;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -43,12 +47,14 @@ public class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjec
 
     public StepikPyProjectGenerator() {
         super(true);
-        Project defaultProject = DefaultProjectFactory.getInstance().getDefaultProject();
         generator = StepikProjectGenerator.getInstance();
-        pySPanel = new PyCourseCreatorSettingPanel(generator, defaultProject);
-        pySPanel.init();
+        pySPanel = new PyCourseCreatorSettingPanel(generator);
+    }
 
-        StepikConnectorLogin.loginFromDialog(defaultProject);
+    @Nullable
+    @Override
+    public Icon getLogo() {
+        return IconLoader.getIcon("/icons/stepik_logotype_13x13-2.png");
     }
 
     @NotNull
@@ -61,18 +67,10 @@ public class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjec
     @Override
     @Nullable
     public JComponent getSettingsPanel(File baseDir) throws ProcessCanceledException {
+        Project defaultProject = DefaultProjectFactory.getInstance().getDefaultProject();
+        StepikConnectorLogin.loginFromDialog(defaultProject);
+        pySPanel.init(defaultProject);
         return pySPanel.getMainPanel();
-    }
-
-    @Override
-    public Object getProjectSettings() {
-        return new PyNewProjectSettings();
-    }
-
-    @Nullable
-    @Override
-    public Icon getLogo() {
-        return IconLoader.getIcon("/icons/stepik_logotype_13x13-2.png");
     }
 
     @NotNull
@@ -85,15 +83,32 @@ public class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjec
         }
     }
 
+    @Nullable
+    @Override
+    public BooleanFunction<PythonProjectGenerator> beforeProjectGenerated(@Nullable Sdk sdk) {
+        return generator -> {
+            final CourseInfo courseInfo = pySPanel.getSelectedCourse();
+            if (courseInfo == null) return false;
+            if (PyCourseCreatorSettingPanel.COURSE_LINK.equals(pySPanel.getBuildType()) ) {
+                StepikConnectorPost.enrollToCourse(courseInfo.getId());
+            }
+            return true;
+        };
+    }
+
+    @Override
+    public Object getProjectSettings() {
+        return new PyNewProjectSettings();
+    }
+
     @Override
     public void configureProject(
             @NotNull final Project project, @NotNull VirtualFile baseDir, @NotNull final PyNewProjectSettings settings,
             @NotNull final Module module, @Nullable final PyProjectSynchronizer synchronizer) {
-        // Super should be called according to its contract unless we sync project explicitly (we do not, so we call super)
         super.configureProject(project, baseDir, settings, module, synchronizer);
+        StepikConnectorLogin.loginFromDialog(project);
         ApplicationManager.getApplication()
                 .runWriteAction(() -> ModuleRootModificationUtil.setModuleSdk(module, settings.getSdk()));
-        pySPanel.onStepLeaving();
         StepikProjectGenerator.downloadAndFlushCourse(project, pySPanel.getSelectedCourse());
         createCourseFromGenerator(project);
     }
@@ -111,8 +126,7 @@ public class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjec
         }
         course.setCourseMode(EduNames.STEPIK_CODE);
 
-        logger.info("Module dir = " + new File(project.getBasePath(), "Sandbox").getAbsolutePath());
-//        new SandboxModuleBuilder(moduleDir).createModule(moduleModel);
+//        logger.info("Module dir = " + new File(project.getBasePath(), "Sandbox").getAbsolutePath());
         FileUtil.createDirectory(new File(project.getBasePath(), "Sandbox"));
 
         createSubDirectories(course, project);
@@ -138,7 +152,7 @@ public class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjec
                 int taskIndex = 1;
                 for (Task task : lesson.getTaskList()) {
                     task.setIndex(taskIndex++);
-                    logger.info("task Path = " + task.getPath());
+//                    logger.info("task Path = " + task.getPath());
                     File taskDir = new File(project.getBasePath(), task.getPath());
                     FileUtil.createDirectory(taskDir);
 
