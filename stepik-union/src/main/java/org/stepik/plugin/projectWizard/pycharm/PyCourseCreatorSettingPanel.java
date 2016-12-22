@@ -4,16 +4,14 @@ import com.intellij.icons.AllIcons;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
 import com.intellij.ui.HyperlinkAdapter;
 import com.intellij.ui.PanelWithAnchor;
 import com.jetbrains.tmp.learning.StudyTaskManager;
-import com.jetbrains.tmp.learning.StudyUtils;
-import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.courseGeneration.StepikProjectGenerator;
 import com.jetbrains.tmp.learning.stepik.CourseInfo;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorGet;
 import com.jetbrains.tmp.learning.stepik.StepikWrappers;
+import org.apache.commons.lang.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -54,7 +52,6 @@ public class PyCourseCreatorSettingPanel extends JPanel implements PanelWithAnch
     private final StepikProjectGenerator generator;
     private CourseInfo selectedCourse;
     private Project project;
-    private List<CourseInfo> myAvailableCourses;
 
     private boolean isInit = false;
 
@@ -64,9 +61,8 @@ public class PyCourseCreatorSettingPanel extends JPanel implements PanelWithAnch
     }
 
     void init(Project project) {
-        refreshListButton.setIcon(AllIcons.Actions.Refresh);
+        this.project = project;
         if (!isInit) {
-            this.project = project;
             layoutPanel();
             initListeners();
             isInit = true;
@@ -75,6 +71,7 @@ public class PyCourseCreatorSettingPanel extends JPanel implements PanelWithAnch
     }
 
     private void layoutPanel() {
+        refreshListButton.setIcon(AllIcons.Actions.Refresh);
         buildType.addItem(COURSE_LIST);
         buildType.addItem(COURSE_LINK);
         buildType.setSelectedItem(COURSE_LIST);
@@ -97,23 +94,13 @@ public class PyCourseCreatorSettingPanel extends JPanel implements PanelWithAnch
     private void initListeners() {
         buildType.addItemListener(new BuildTypeListener());
         refreshListButton.addActionListener(new RefreshActionListener());
-//        checkCourseLinkButton.addActionListener(new CheckCourseLinkListener());
         courseLinkFiled.addActionListener(new CourseLinkListener());
         courseListComboBox.addItemListener(new CourseListComboBoxListener());
     }
 
     private void setupGeneralSettings() {
+        refreshCourseList(false);
         userName.setText(StudyTaskManager.getInstance(project).getUser().getName());
-
-        myAvailableCourses = StepikProjectGenerator.getCoursesUnderProgress(
-                false,
-                "Getting Available Courses",
-                ProjectManager.getInstance().getDefaultProject());
-        myAvailableCourses.forEach(courseListComboBox::addItem);
-
-        selectedCourse = StudyUtils.getFirst(myAvailableCourses);
-        generator.setSelectedCourse(selectedCourse);
-        courseListDescription.setText(selectedCourse.getDescription());
     }
 
     @Override
@@ -133,25 +120,35 @@ public class PyCourseCreatorSettingPanel extends JPanel implements PanelWithAnch
         return mainPanel;
     }
 
-    boolean validateCoursePanel() {
-        generator.setDefaultLang(SupportedLanguages.PYTHON);
-        if (selectedCourse == null || selectedCourse == CourseInfo.INVALID_COURSE) {
-            return false;
-        }
-        generator.setSelectedCourse(selectedCourse);
-        return true;
-    }
-
-    public JComboBox<CourseInfo> getCourseListComboBox() {
-        return courseListComboBox;
-    }
-
     String getBuildType() {
         return (String) buildType.getSelectedItem();
     }
 
-    private void createUIComponents() {
-        // TODO: place custom component creation code here
+    private void refreshCourseList(boolean force) {
+        courseLinkDescription.setText("");
+        final List<CourseInfo> courses =
+                StepikProjectGenerator.getCoursesUnderProgress(force,
+                        "Refreshing Course List",
+                        project);
+
+        addCoursesToComboBox(courses);
+        selectedCourse = courseListComboBox.getItemAt(0);
+        if (selectedCourse == null) selectedCourse = CourseInfo.INVALID_COURSE;
+        generator.setSelectedCourse(selectedCourse);
+        courseLinkDescription.setText(selectedCourse.getDescription());
+    }
+
+    private void addCoursesToComboBox(@NotNull List<CourseInfo> courses) {
+        courses.stream()
+                .filter(course -> !course.isAdaptive())
+                .filter(course ->
+                        ArrayUtils.contains(course.getTags(), 22872) ||
+                                ArrayUtils.contains(course.getTags(), 22760)
+                )
+                .forEach(courseListComboBox::addItem);
+        if (courseListComboBox.getItemCount() > 0) {
+            courseListComboBox.setSelectedIndex(0);
+        }
     }
 
     /**
@@ -161,36 +158,7 @@ public class PyCourseCreatorSettingPanel extends JPanel implements PanelWithAnch
     private class RefreshActionListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            courseLinkDescription.setText("");
-            final List<CourseInfo> courses =
-                    StepikProjectGenerator.getCoursesUnderProgress(true,
-                            "Refreshing Course List",
-                            project);
-
-            if (!courses.contains(CourseInfo.INVALID_COURSE)) {
-                refreshCoursesList(courses);
-            }
-        }
-
-        private void refreshCoursesList(@NotNull final List<CourseInfo> courses) {
-            if (courses.isEmpty()) {
-                return;
-            }
-            courseListComboBox.removeAllItems();
-
-            addCoursesToCombobox(courses);
-            selectedCourse = StudyUtils.getFirst(courses);
-            generator.setSelectedCourse(selectedCourse);
-            courseLinkDescription.setText(selectedCourse.getDescription());
-
-            myAvailableCourses = courses;
-            StepikProjectGenerator.flushCache(courses);
-        }
-
-        private void addCoursesToCombobox(@NotNull List<CourseInfo> courses) {
-            for (CourseInfo courseInfo : courses) {
-                courseListComboBox.addItem(courseInfo);
-            }
+            refreshCourseList(true);
         }
     }
 

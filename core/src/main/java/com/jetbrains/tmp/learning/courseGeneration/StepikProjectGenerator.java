@@ -147,6 +147,7 @@ public class StepikProjectGenerator {
                     .runProcessWithProgressSynchronously(() -> {
                         ProgressManager.getInstance().getProgressIndicator().setIndeterminate(true);
                         List<CourseInfo> courses = getCourses(force);
+                        if (courses.isEmpty()) courses.add(CourseInfo.INVALID_COURSE);
                         flushCache(courses);
                         return courses;
                     }, progressTitle, true, project);

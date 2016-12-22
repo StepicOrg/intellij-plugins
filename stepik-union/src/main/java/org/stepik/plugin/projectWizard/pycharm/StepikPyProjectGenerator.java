@@ -78,11 +78,7 @@ public class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjec
     @NotNull
     @Override
     public ValidationResult validate(@NotNull String s) {
-        if (pySPanel.validateCoursePanel()) {
-            return ValidationResult.OK;
-        } else {
-            return new ValidationResult("Not, yet");
-        }
+        return ValidationResult.OK;
     }
 
     @Nullable

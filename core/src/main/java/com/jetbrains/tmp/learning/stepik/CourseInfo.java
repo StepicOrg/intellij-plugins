@@ -13,13 +13,14 @@ import java.util.stream.Collectors;
  * and when project is being created
  */
 public class CourseInfo {
-    public static final CourseInfo INVALID_COURSE = new CourseInfo();
+    public static final CourseInfo INVALID_COURSE = new CourseInfo("INVALID", "Please, press refresh button");
 
     @SerializedName("title")
     private String myName;
     int id;
     boolean isAdaptive;
     boolean isPublic;
+    int[] tags;
     List<Integer> sections;
     List<Integer> instructors = new ArrayList<>();
 
@@ -31,6 +32,13 @@ public class CourseInfo {
     //= "pycharm Python"; //course type in format "pycharm <language>"
     @Nullable
     private String username;
+
+    public CourseInfo(){}
+
+    private CourseInfo(String name, String description) {
+        myName = name;
+        myDescription = description;
+    }
 
     public String getName() {
         return myName;
@@ -129,5 +137,13 @@ public class CourseInfo {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public int[] getTags() {
+        return tags;
+    }
+
+    public void setTags(int[] tags) {
+        this.tags = tags;
     }
 }

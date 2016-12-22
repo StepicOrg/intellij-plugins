@@ -18,6 +18,7 @@ import com.jetbrains.tmp.learning.stepik.StepikConnectorGet;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorPost;
 import com.jetbrains.tmp.learning.stepik.StepikWrappers;
+import org.apache.commons.lang.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -152,6 +153,10 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
     private void addCoursesToComboBox(@NotNull java.util.List<CourseInfo> courses) {
         courses.stream()
                 .filter(course -> !course.isAdaptive())
+                .filter(course ->
+                        ArrayUtils.contains(course.getTags(), 22872) ||
+                                ArrayUtils.contains(course.getTags(), 22760)
+                )
                 .forEach(courseComboBox::addItem);
         if (courseComboBox.getItemCount() > 0) {
             courseComboBox.setSelectedIndex(0);
