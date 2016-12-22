@@ -66,9 +66,9 @@ public class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjec
         return "Stepik Union";
     }
 
-    @Override
     @Nullable
-    public JComponent getSettingsPanel(File baseDir) throws ProcessCanceledException {
+    @Override
+    public JPanel extendBasePanel() throws ProcessCanceledException {
         Project defaultProject = DefaultProjectFactory.getInstance().getDefaultProject();
         StepikConnectorLogin.loginFromDialog(defaultProject);
         pySPanel.init(defaultProject);

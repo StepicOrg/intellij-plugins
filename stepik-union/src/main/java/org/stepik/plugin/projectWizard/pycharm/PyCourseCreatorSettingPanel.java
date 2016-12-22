@@ -64,6 +64,7 @@ public class PyCourseCreatorSettingPanel extends JPanel implements PanelWithAnch
     }
 
     void init(Project project) {
+        refreshListButton.setIcon(AllIcons.Actions.Refresh);
         if (!isInit) {
             this.project = project;
             layoutPanel();
@@ -74,8 +75,6 @@ public class PyCourseCreatorSettingPanel extends JPanel implements PanelWithAnch
     }
 
     private void layoutPanel() {
-        refreshListButton.setIcon(AllIcons.Actions.Refresh);
-
         buildType.addItem(COURSE_LIST);
         buildType.addItem(COURSE_LINK);
         buildType.setSelectedItem(COURSE_LIST);
@@ -151,9 +150,13 @@ public class PyCourseCreatorSettingPanel extends JPanel implements PanelWithAnch
         return (String) buildType.getSelectedItem();
     }
 
+    private void createUIComponents() {
+        // TODO: place custom component creation code here
+    }
+
     /**
-    *  Listeners
-    */
+     * Listeners
+     */
 
     private class RefreshActionListener implements ActionListener {
         @Override

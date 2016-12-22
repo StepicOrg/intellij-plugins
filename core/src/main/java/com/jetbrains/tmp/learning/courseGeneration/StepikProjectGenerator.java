@@ -132,7 +132,7 @@ public class StepikProjectGenerator {
             flushCache(courses);
         }
         if (courses.isEmpty()) {
-            courses = getBundledIntro();
+            courses.add(CourseInfo.INVALID_COURSE);
         }
         return courses;
     }
@@ -153,16 +153,6 @@ public class StepikProjectGenerator {
         } catch (RuntimeException e) {
             return Collections.singletonList(CourseInfo.INVALID_COURSE);
         }
-    }
-
-    private static List<CourseInfo> getBundledIntro() {
-        final File introCourse = new File(CONFIG_COURSES_DIR, "Introduction to Python");
-        if (introCourse.exists()) {
-            final CourseInfo courseInfo = getCourseInfo(introCourse);
-
-            return Collections.singletonList(courseInfo);
-        }
-        return Collections.emptyList();
     }
 
     @Nullable
