@@ -158,9 +158,11 @@ public class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjec
                     task.setCurrentLang(SupportedLanguages.PYTHON);
 //                    logger.info("task Path = " + task.getPath());
                     File taskDir = new File(project.getBasePath(), task.getPath());
+                    File srcDir = new File(taskDir, "src");
                     FileUtil.createDirectory(taskDir);
+                    FileUtil.createDirectory(srcDir);
 
-                    try (BufferedWriter writer = new BufferedWriter(new FileWriter(new File(taskDir, "main.py")))) {
+                    try (BufferedWriter writer = new BufferedWriter(new FileWriter(new File(srcDir, "main.py")))) {
                         TaskFile taskFile = task.getFile("main.py");
                         if (taskFile != null) {
                             writer.write(taskFile.getText());
