@@ -50,7 +50,7 @@ public class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjec
     public StepikPyProjectGenerator() {
         super(true);
         generator = StepikProjectGenerator.getInstance();
-        pySPanel = new PyCourseCreatorSettingPanel(generator);
+        pySPanel = new PyCourseCreatorSettingPanel();
     }
 
     @Nullable
@@ -86,7 +86,8 @@ public class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjec
     public BooleanFunction<PythonProjectGenerator> beforeProjectGenerated(@Nullable Sdk sdk) {
         return generator -> {
             final CourseInfo courseInfo = pySPanel.getSelectedCourse();
-            if (courseInfo == null) return false;
+            if (courseInfo == null || courseInfo == CourseInfo.INVALID_COURSE) return false;
+            this.generator.setSelectedCourse(courseInfo);
             if (PyCourseCreatorSettingPanel.COURSE_LINK.equals(pySPanel.getBuildType())) {
                 StepikConnectorPost.enrollToCourse(courseInfo.getId());
             }

@@ -41,23 +41,21 @@ public class PyCourseCreatorSettingPanel extends JPanel implements PanelWithAnch
     private JPanel courseLinkPanel;
     private JLabel courseLinkLabel;
     private JTextField courseLinkFiled;
-    private JTextPane courseListDescription;
+    private JTextPane courseLinkDescription;
 
     private JPanel courseListPanel;
     private JLabel courseListLabel;
     private JComboBox<CourseInfo> courseListComboBox;
     private JButton refreshListButton;
-    private JTextPane courseLinkDescription;
+    private JTextPane courseListDescription;
 
-    private final StepikProjectGenerator generator;
     private CourseInfo selectedCourse;
     private Project project;
 
     private boolean isInit = false;
+    private CourseInfo courseFromLink = CourseInfo.INVALID_COURSE;
 
-    PyCourseCreatorSettingPanel(
-            @NotNull final StepikProjectGenerator generator) {
-        this.generator = generator;
+    PyCourseCreatorSettingPanel() {
     }
 
     void init(Project project) {
@@ -125,7 +123,7 @@ public class PyCourseCreatorSettingPanel extends JPanel implements PanelWithAnch
     }
 
     private void refreshCourseList(boolean force) {
-        courseLinkDescription.setText("");
+        courseListDescription.setText("");
         final List<CourseInfo> courses =
                 StepikProjectGenerator.getCoursesUnderProgress(force,
                         "Refreshing Course List",
@@ -134,8 +132,7 @@ public class PyCourseCreatorSettingPanel extends JPanel implements PanelWithAnch
         addCoursesToComboBox(courses);
         selectedCourse = courseListComboBox.getItemAt(0);
         if (selectedCourse == null) selectedCourse = CourseInfo.INVALID_COURSE;
-        generator.setSelectedCourse(selectedCourse);
-        courseLinkDescription.setText(selectedCourse.getDescription());
+        courseListDescription.setText(selectedCourse.getDescription());
     }
 
     private void addCoursesToComboBox(@NotNull List<CourseInfo> courses) {
@@ -169,8 +166,10 @@ public class PyCourseCreatorSettingPanel extends JPanel implements PanelWithAnch
                 String item = e.getItem().toString();
                 if (COURSE_LIST.equals(item)) {
                     ((CardLayout) courseSelectPanel.getLayout()).show(courseSelectPanel, COURSE_LIST);
+                    selectedCourse = (CourseInfo) courseListComboBox.getSelectedItem();
                 } else if (COURSE_LINK.equals(item)) {
                     ((CardLayout) courseSelectPanel.getLayout()).show(courseSelectPanel, COURSE_LINK);
+                    selectedCourse = courseFromLink;
                 }
             }
         }
@@ -197,11 +196,12 @@ public class PyCourseCreatorSettingPanel extends JPanel implements PanelWithAnch
             if ("-1".equals(courseId) ||
                     (coursesContainer = StepikConnectorGet.getCourseInfos(courseId)) == null) {
                 courseLinkDescription.setText("Wrong link");
+                courseFromLink = CourseInfo.INVALID_COURSE;
                 return;
             }
 
             selectedCourse = coursesContainer.courses.get(0);
-            generator.setSelectedCourse(selectedCourse);
+            courseFromLink = selectedCourse;
             courseLinkDescription.setText(String.format("<b>Course:</b> %s<br><br>%s",
                     selectedCourse.toString(), selectedCourse.getDescription()));
         }
