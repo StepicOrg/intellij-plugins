@@ -50,12 +50,6 @@
         </component>
     </project-components>
 
-    <application-components>
-        <component>
-            <implementation-class>com.jetbrains.tmp.learning.stepik.EduStepikUpdater</implementation-class>
-        </component>
-    </application-components>
-
     <extensionPoints>
         <extensionPoint qualifiedName="SCore.studyPluginConfigurator" interface="com.jetbrains.tmp.learning.StudyPluginConfigurator"/>
     </extensionPoints>
