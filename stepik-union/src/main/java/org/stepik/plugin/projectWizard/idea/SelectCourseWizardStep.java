@@ -58,6 +58,7 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
     private final StepikProjectGenerator projectGenerator;
     @NotNull
     private CourseInfo selectedCourse = CourseInfo.INVALID_COURSE;
+    @NotNull
     private CourseInfo courseFromLink = CourseInfo.INVALID_COURSE;
     private final Project project;
 
@@ -101,22 +102,22 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
 
     @Override
     public void updateStep() {
-        setupGeneralSettings();
-
-        langComboBox.setModel(new EnumComboBoxModel<>(SupportedLanguages.class));
-        langComboBox.setSelectedItem(SupportedLanguages.JAVA);
-    }
-
-    private void setupGeneralSettings() {
         StepikConnectorLogin.loginFromDialog(project);
         userName.setText(StudyTaskManager.getInstance(project).getUser().getName());
         refreshCourseList(false);
+
+        langComboBox.setModel(new EnumComboBoxModel<>(SupportedLanguages.class));
+        langComboBox.setSelectedItem(SupportedLanguages.JAVA);
     }
 
     @Override
     public void updateDataModel() {
     }
 
+    @Override
+    public boolean validate() throws ConfigurationException {
+        return !selectedCourse.isAdaptive();
+    }
 
     @Override
     public void onStepLeaving() {
@@ -133,11 +134,6 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
         logger.info(String.format("Finished the project wizard with the selected course: id = %s, name = %s",
                 id, selectedCourse.getName()));
         StepikProjectGenerator.downloadAndFlushCourse(project, selectedCourse);
-    }
-
-    @Override
-    public boolean validate() throws ConfigurationException {
-        return !selectedCourse.isAdaptive();
     }
 
     private void refreshCourseList(boolean force) {
