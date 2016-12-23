@@ -7,7 +7,6 @@ import com.intellij.ide.wizard.CommitStepException;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
 import com.intellij.ui.EnumComboBoxModel;
 import com.intellij.ui.HyperlinkAdapter;
 import com.jetbrains.tmp.learning.StudyTaskManager;
@@ -58,7 +57,9 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
     private JComboBox<SupportedLanguages> langComboBox;
 
     private final StepikProjectGenerator projectGenerator;
-    private CourseInfo selectedCourse;
+    @NotNull
+    private CourseInfo selectedCourse = CourseInfo.INVALID_COURSE;
+    private CourseInfo courseFromLink = CourseInfo.INVALID_COURSE;
     private final Project project;
 
     SelectCourseWizardStep(
@@ -73,7 +74,6 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
 
     private void layoutPanel() {
         refreshButton.setIcon(AllIcons.Actions.Refresh);
-
         buildType.addItem(COURSE_LIST);
         buildType.addItem(COURSE_LINK);
         buildType.setSelectedItem(COURSE_LIST);
@@ -111,46 +111,56 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
     private void setupGeneralSettings() {
         StepikConnectorLogin.loginFromDialog(project);
         userName.setText(StudyTaskManager.getInstance(project).getUser().getName());
-
-        List<CourseInfo> courses = StepikProjectGenerator.getCoursesUnderProgress(false,
-                "Getting Available Courses",
-                ProjectManager.getInstance().getDefaultProject());
-        addCoursesToComboBox(courses);
-        projectGenerator.setSelectedCourse(selectedCourse);
-        courseDescription.setText(selectedCourse.getDescription());
+        refreshCourseList(false);
     }
 
     @Override
     public void updateDataModel() {
     }
 
-    private class RefreshActionListener implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            courseDescription.setText("");
-            final List<CourseInfo> courses =
-                    StepikProjectGenerator.getCoursesUnderProgress(true,
-                            "Refreshing Course List",
-                            project);
 
-            if (!courses.contains(CourseInfo.INVALID_COURSE)) {
-                refreshCoursesList(courses);
-            }
-        }
-
-        private void refreshCoursesList(@NotNull final List<CourseInfo> courses) {
-            if (courses.isEmpty()) {
-                return;
-            }
-            courseComboBox.removeAllItems();
-            addCoursesToComboBox(courses);
-            projectGenerator.setSelectedCourse(selectedCourse);
-            courseDescription.setText(selectedCourse.getDescription());
-            StepikProjectGenerator.flushCache(courses);
-        }
+    @Override
+    public void onStepLeaving() {
+        SupportedLanguages selectedLang = (SupportedLanguages) langComboBox.getSelectedItem();
+        projectGenerator.setDefaultLang(selectedLang);
+        projectGenerator.setSelectedCourse(selectedCourse);
     }
 
-    private void addCoursesToComboBox(@NotNull java.util.List<CourseInfo> courses) {
+    @Override
+    public void onWizardFinished() throws CommitStepException {
+        super.onWizardFinished();
+        if (COURSE_LINK.equals(buildType.getSelectedItem())) {
+            int id = selectedCourse.getId();
+            StepikConnectorPost.enrollToCourse(id);
+            logger.info(String.format("Finished the project wizard with the selected course: id = %s, name = %s",
+                    id, selectedCourse.getName()));
+        }
+        StepikProjectGenerator.downloadAndFlushCourse(project, selectedCourse);
+    }
+
+    @Override
+    public boolean validate() throws ConfigurationException {
+        return !selectedCourse.isAdaptive();
+    }
+
+    private void refreshCourseList(boolean force) {
+        courseDescription.setText("");
+        final List<CourseInfo> courses =
+                StepikProjectGenerator.getCoursesUnderProgress(force,
+                        "Refreshing Course List",
+                        project);
+
+        addCoursesToComboBox(courses);
+
+        if (courseComboBox.getItemAt(0) == null) {
+            selectedCourse = CourseInfo.INVALID_COURSE;
+        } else {
+            selectedCourse = courseComboBox.getItemAt(0);
+        }
+        courseDescription.setText(selectedCourse.getDescription());
+    }
+
+    private void addCoursesToComboBox(@NotNull List<CourseInfo> courses) {
         courses.stream()
                 .filter(course -> !course.isAdaptive())
                 .filter(course ->
@@ -161,12 +171,13 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
         if (courseComboBox.getItemCount() > 0) {
             courseComboBox.setSelectedIndex(0);
         }
-        selectedCourse = courseComboBox.getItemAt(0);
     }
 
-    @Override
-    public boolean validate() throws ConfigurationException {
-        return !selectedCourse.isAdaptive();
+    private class RefreshActionListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            refreshCourseList(true);
+        }
     }
 
     private class CheckCourseLinkListener implements ActionListener {
@@ -180,12 +191,12 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
             if ("-1".equals(courseId) ||
                     (coursesContainer = StepikConnectorGet.getCourseInfos(courseId)) == null) {
                 courseDescription.setText("Wrong link");
+                courseFromLink = CourseInfo.INVALID_COURSE;
                 return;
             }
 
             selectedCourse = coursesContainer.courses.get(0);
-            courseComboBox.setSelectedItem(selectedCourse);
-            projectGenerator.setSelectedCourse(selectedCourse);
+            courseFromLink = selectedCourse;
             String description = String.format("<b>Course:</b> %s<br><br>%s",
                     selectedCourse.toString(), selectedCourse.getDescription());
             if (selectedCourse.isAdaptive()) {
@@ -268,12 +279,13 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 String item = e.getItem().toString();
                 if (COURSE_LIST.equals(item)) {
-                    courseDescription.setText("");
                     ((CardLayout) cardPanel.getLayout()).show(cardPanel, COURSE_LIST);
+                    selectedCourse = (CourseInfo) courseComboBox.getSelectedItem();
                 } else if (COURSE_LINK.equals(item)) {
-                    courseDescription.setText("");
                     ((CardLayout) cardPanel.getLayout()).show(cardPanel, COURSE_LINK);
+                    selectedCourse = courseFromLink;
                 }
+                courseDescription.setText(selectedCourse.getDescription());
             }
         }
     }
@@ -286,26 +298,5 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
                 courseDescription.setText(selectedCourse.getDescription());
             }
         }
-    }
-
-    @Override
-    public void onStepLeaving() {
-        SupportedLanguages selectedLang = (SupportedLanguages) langComboBox.getSelectedItem();
-        projectGenerator.setDefaultLang(selectedLang);
-        if (selectedCourse != null) {
-            projectGenerator.setSelectedCourse(selectedCourse);
-        }
-    }
-
-    @Override
-    public void onWizardFinished() throws CommitStepException {
-        super.onWizardFinished();
-        if (COURSE_LINK.equals(buildType.getSelectedItem())) {
-            int id = selectedCourse.getId();
-            StepikConnectorPost.enrollToCourse(id);
-            logger.info(String.format("Finished the project wizard with the selected course: id = %s, name = %s",
-                    id, selectedCourse.getName()));
-        }
-        StepikProjectGenerator.downloadAndFlushCourse(project, selectedCourse);
     }
 }

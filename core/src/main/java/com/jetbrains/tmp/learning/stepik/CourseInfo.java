@@ -18,13 +18,13 @@ public class CourseInfo {
     @SerializedName("title")
     private String myName;
     int id;
-    boolean isAdaptive;
-    boolean isPublic;
-    int[] tags;
+    private boolean isAdaptive;
+    private boolean isPublic;
+    private int[] tags;
     List<Integer> sections;
     List<Integer> instructors = new ArrayList<>();
 
-    List<StepikUser> myAuthors = new ArrayList<>();
+    private List<StepikUser> myAuthors = new ArrayList<>();
     @SerializedName("summary")
     private String myDescription;
     @SerializedName("course_format")
@@ -33,11 +33,12 @@ public class CourseInfo {
     @Nullable
     private String username;
 
-    public CourseInfo(){}
+    public CourseInfo() {}
 
     private CourseInfo(String name, String description) {
         myName = name;
         myDescription = description;
+        isAdaptive = true;
     }
 
     public String getName() {
@@ -45,7 +46,7 @@ public class CourseInfo {
     }
 
     @NotNull
-    public List<StepikUser> getAuthors() {
+    List<StepikUser> getAuthors() {
         return myAuthors;
     }
 
@@ -100,7 +101,7 @@ public class CourseInfo {
                 .collect(Collectors.toList()));
     }
 
-    public void addAuthor(StepikUser author) {
+    void addAuthor(StepikUser author) {
         if (myAuthors == null) {
             myAuthors = new ArrayList<>();
         }
