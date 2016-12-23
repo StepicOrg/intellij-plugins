@@ -24,8 +24,8 @@ import java.awt.event.ItemListener;
 import java.util.Arrays;
 import java.util.List;
 
-public class PyCourseCreatorSettingPanel extends JPanel implements PanelWithAnchor {
-    private static final Logger logger = Logger.getInstance(PyCourseCreatorSettingPanel.class);
+public class PyCCSettingPanel extends JPanel implements PanelWithAnchor {
+    private static final Logger logger = Logger.getInstance(PyCCSettingPanel.class);
     private final static String COURSE_LIST = "Course list";
     final static String COURSE_LINK = "Course link";
 
@@ -54,7 +54,7 @@ public class PyCourseCreatorSettingPanel extends JPanel implements PanelWithAnch
     private boolean isInit = false;
     private CourseInfo courseFromLink = CourseInfo.INVALID_COURSE;
 
-    PyCourseCreatorSettingPanel() {
+    PyCCSettingPanel() {
     }
 
     void init(Project project) {

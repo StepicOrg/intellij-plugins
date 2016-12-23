@@ -45,12 +45,12 @@ import java.io.IOException;
 public class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettings> {
     private static final Logger logger = Logger.getInstance(StepikPyProjectGenerator.class.getName());
     private final StepikProjectGenerator generator;
-    private PyCourseCreatorSettingPanel pySPanel;
+    private PyCCSettingPanel pySPanel;
 
     public StepikPyProjectGenerator() {
         super(true);
         generator = StepikProjectGenerator.getInstance();
-        pySPanel = new PyCourseCreatorSettingPanel();
+        pySPanel = new PyCCSettingPanel();
     }
 
     @Nullable
@@ -88,7 +88,7 @@ public class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjec
             final CourseInfo courseInfo = pySPanel.getSelectedCourse();
             if (courseInfo == null || courseInfo == CourseInfo.INVALID_COURSE) return false;
             this.generator.setSelectedCourse(courseInfo);
-            if (PyCourseCreatorSettingPanel.COURSE_LINK.equals(pySPanel.getBuildType())) {
+            if (PyCCSettingPanel.COURSE_LINK.equals(pySPanel.getBuildType())) {
                 StepikConnectorPost.enrollToCourse(courseInfo.getId());
             }
             StepikProjectGenerator.downloadAndFlushCourse(DefaultProjectFactory.getInstance().getDefaultProject(),

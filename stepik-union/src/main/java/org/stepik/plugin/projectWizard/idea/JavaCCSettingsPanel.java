@@ -29,31 +29,32 @@ import java.awt.event.ItemListener;
 import java.util.Arrays;
 import java.util.List;
 
-public class SelectCourseWizardStep extends ModuleWizardStep {
-    private static final Logger logger = Logger.getInstance(SelectCourseWizardStep.class);
+public class JavaCCSettingsPanel extends ModuleWizardStep {
+    private static final Logger logger = Logger.getInstance(JavaCCSettingsPanel.class);
     private final static String COURSE_LIST = "Course list";
     private final static String COURSE_LINK = "Course link";
 
     private JPanel mainPanel;
+
     private JLabel nameLabel;
     private JLabel userName;
-    private JLabel buildLabel;
-    private JTextPane courseDescription;
-    private JComboBox<String> buildType;
-
-    private JPanel cardPanel;
-
-    private JPanel courseSelector;
-    private JLabel courseLabel;
-    private JComboBox<CourseInfo> courseComboBox;
-
-    private JButton refreshButton;
-    private JPanel courseLinker;
-    private JLabel courseLinkLabel;
-    private JTextField courseLinkFiled;
-    private JButton checkCourseLinkButton;
     private JLabel langLabel;
     private JComboBox<SupportedLanguages> langComboBox;
+    private JLabel buildLabel;
+    private JComboBox<String> buildType;
+
+    private JPanel courseSelectPanel;
+
+    private JPanel courseListPanel;
+    private JLabel courseListLabel;
+    private JComboBox<CourseInfo> courseListComboBox;
+    private JButton refreshListButton;
+    private JTextPane courseListDescription;
+
+    private JPanel courseLinkPanel;
+    private JLabel courseLinkLabel;
+    private JTextField courseLinkFiled;
+    private JTextPane courseLinkDescription;
 
     private final StepikProjectGenerator projectGenerator;
     @NotNull
@@ -62,7 +63,7 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
     private CourseInfo courseFromLink = CourseInfo.INVALID_COURSE;
     private final Project project;
 
-    SelectCourseWizardStep(
+    JavaCCSettingsPanel(
             @NotNull final StepikProjectGenerator projectGenerator,
             @NotNull Project project) {
         this.projectGenerator = projectGenerator;
@@ -73,14 +74,19 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
     }
 
     private void layoutPanel() {
-        refreshButton.setIcon(AllIcons.Actions.Refresh);
+        refreshListButton.setIcon(AllIcons.Actions.Refresh);
         buildType.addItem(COURSE_LIST);
         buildType.addItem(COURSE_LINK);
         buildType.setSelectedItem(COURSE_LIST);
 
-        courseDescription.setEditable(false);
-        courseDescription.setContentType("text/html");
-        courseDescription.addHyperlinkListener(new HyperlinkAdapter() {
+        setupDescriptionSettings(courseListDescription);
+        setupDescriptionSettings(courseLinkDescription);
+    }
+
+    private void setupDescriptionSettings(JTextPane jTextPane) {
+        jTextPane.setEditable(false);
+        jTextPane.setContentType("text/html");
+        jTextPane.addHyperlinkListener(new HyperlinkAdapter() {
             @Override
             protected void hyperlinkActivated(final HyperlinkEvent e) {
                 BrowserUtil.browse(e.getURL());
@@ -90,9 +96,9 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
 
     private void initListeners() {
         buildType.addItemListener(new BuildTypeListener());
-        refreshButton.addActionListener(new RefreshActionListener());
-        checkCourseLinkButton.addActionListener(new CheckCourseLinkListener());
-        courseComboBox.addItemListener(new CourseComboBoxListener());
+        refreshListButton.addActionListener(new RefreshActionListener());
+        courseLinkFiled.addActionListener(new CourseLinkListener());
+        courseListComboBox.addItemListener(new CourseListComboBoxListener());
     }
 
     @Override
@@ -116,7 +122,7 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
 
     @Override
     public boolean validate() throws ConfigurationException {
-        return !selectedCourse.isAdaptive();
+        return !selectedCourse.isAdaptive() || selectedCourse != CourseInfo.INVALID_COURSE;
     }
 
     @Override
@@ -137,27 +143,27 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
     }
 
     private void refreshCourseList(boolean force) {
-        courseDescription.setText("");
+        courseListDescription.setText("");
         final List<CourseInfo> courses =
                 StepikProjectGenerator.getCoursesUnderProgress(force,
                         "Refreshing Course List",
                         project);
 
-        courseComboBox.removeAllItems();
+        courseListComboBox.removeAllItems();
         addCoursesToComboBox(courses);
 
-        if (courseComboBox.getItemAt(0) == null) {
+        if (courseListComboBox.getItemAt(0) == null) {
             selectedCourse = CourseInfo.INVALID_COURSE;
         } else {
-            selectedCourse = courseComboBox.getItemAt(0);
+            selectedCourse = courseListComboBox.getItemAt(0);
         }
-        courseDescription.setText(selectedCourse.getDescription());
+        courseListDescription.setText(selectedCourse.getDescription());
     }
 
     private void addCoursesToComboBox(@NotNull List<CourseInfo> courses) {
-        courses.forEach(courseComboBox::addItem);
-        if (courseComboBox.getItemCount() > 0) {
-            courseComboBox.setSelectedIndex(0);
+        courses.forEach(courseListComboBox::addItem);
+        if (courseListComboBox.getItemCount() > 0) {
+            courseListComboBox.setSelectedIndex(0);
         }
     }
 
@@ -168,7 +174,33 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
         }
     }
 
-    private class CheckCourseLinkListener implements ActionListener {
+    private class BuildTypeListener implements ItemListener {
+        @Override
+        public void itemStateChanged(ItemEvent e) {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                String item = e.getItem().toString();
+                if (COURSE_LIST.equals(item)) {
+                    ((CardLayout) courseSelectPanel.getLayout()).show(courseSelectPanel, COURSE_LIST);
+                    selectedCourse = (CourseInfo) courseListComboBox.getSelectedItem();
+                } else if (COURSE_LINK.equals(item)) {
+                    ((CardLayout) courseSelectPanel.getLayout()).show(courseSelectPanel, COURSE_LINK);
+                    selectedCourse = courseFromLink;
+                }
+            }
+        }
+    }
+
+    private class CourseListComboBoxListener implements ItemListener {
+        @Override
+        public void itemStateChanged(ItemEvent e) {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                selectedCourse = (CourseInfo) e.getItem();
+                courseListDescription.setText(selectedCourse.getDescription());
+            }
+        }
+    }
+
+    private class CourseLinkListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -178,20 +210,15 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
             StepikWrappers.CoursesContainer coursesContainer;
             if ("-1".equals(courseId) ||
                     (coursesContainer = StepikConnectorGet.getCourseInfos(courseId)) == null) {
-                courseDescription.setText("Wrong link");
+                courseLinkDescription.setText("Wrong link");
                 courseFromLink = CourseInfo.INVALID_COURSE;
                 return;
             }
 
             selectedCourse = coursesContainer.courses.get(0);
             courseFromLink = selectedCourse;
-            String description = String.format("<b>Course:</b> %s<br><br>%s",
-                    selectedCourse.toString(), selectedCourse.getDescription());
-            if (selectedCourse.isAdaptive()) {
-                description += "<p style='font-weight: bold;'>This course is adaptive.<br>" +
-                        "Sorry, but we don't support adaptive courses yet</p>";
-            }
-            courseDescription.setText(description);
+            courseLinkDescription.setText(String.format("<b>Course:</b> %s<br><br>%s",
+                    selectedCourse.toString(), selectedCourse.getDescription()));
         }
 
         @NotNull
@@ -258,33 +285,6 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
 
         private boolean isFillOfInt(@NotNull String link) {
             return link.matches("[0-9]+");
-        }
-    }
-
-    private class BuildTypeListener implements ItemListener {
-        @Override
-        public void itemStateChanged(ItemEvent e) {
-            if (e.getStateChange() == ItemEvent.SELECTED) {
-                String item = e.getItem().toString();
-                if (COURSE_LIST.equals(item)) {
-                    ((CardLayout) cardPanel.getLayout()).show(cardPanel, COURSE_LIST);
-                    selectedCourse = (CourseInfo) courseComboBox.getSelectedItem();
-                } else if (COURSE_LINK.equals(item)) {
-                    ((CardLayout) cardPanel.getLayout()).show(cardPanel, COURSE_LINK);
-                    selectedCourse = courseFromLink;
-                }
-                courseDescription.setText(selectedCourse.getDescription());
-            }
-        }
-    }
-
-    private class CourseComboBoxListener implements ItemListener {
-        @Override
-        public void itemStateChanged(ItemEvent e) {
-            if (e.getStateChange() == ItemEvent.SELECTED) {
-                selectedCourse = (CourseInfo) e.getItem();
-                courseDescription.setText(selectedCourse.getDescription());
-            }
         }
     }
 }
