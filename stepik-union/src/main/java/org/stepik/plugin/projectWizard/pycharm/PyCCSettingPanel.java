@@ -102,7 +102,7 @@ public class PyCCSettingPanel extends JPanel implements PanelWithAnchor {
 
     @Override
     public JComponent getAnchor() {
-        return mainPanel;
+        return courseListComboBox;
     }
 
     @Override
