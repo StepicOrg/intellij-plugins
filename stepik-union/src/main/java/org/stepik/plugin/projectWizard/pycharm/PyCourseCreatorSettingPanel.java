@@ -11,7 +11,6 @@ import com.jetbrains.tmp.learning.courseGeneration.StepikProjectGenerator;
 import com.jetbrains.tmp.learning.stepik.CourseInfo;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorGet;
 import com.jetbrains.tmp.learning.stepik.StepikWrappers;
-import org.apache.commons.lang.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -129,6 +128,7 @@ public class PyCourseCreatorSettingPanel extends JPanel implements PanelWithAnch
                         "Refreshing Course List",
                         project);
 
+        courseListComboBox.removeAllItems();
         addCoursesToComboBox(courses);
         selectedCourse = courseListComboBox.getItemAt(0);
         if (selectedCourse == null) selectedCourse = CourseInfo.INVALID_COURSE;
@@ -136,13 +136,7 @@ public class PyCourseCreatorSettingPanel extends JPanel implements PanelWithAnch
     }
 
     private void addCoursesToComboBox(@NotNull List<CourseInfo> courses) {
-        courses.stream()
-                .filter(course -> !course.isAdaptive())
-                .filter(course ->
-                        ArrayUtils.contains(course.getTags(), 22872) ||
-                                ArrayUtils.contains(course.getTags(), 22760)
-                )
-                .forEach(courseListComboBox::addItem);
+        courses.forEach(courseListComboBox::addItem);
         if (courseListComboBox.getItemCount() > 0) {
             courseListComboBox.setSelectedIndex(0);
         }

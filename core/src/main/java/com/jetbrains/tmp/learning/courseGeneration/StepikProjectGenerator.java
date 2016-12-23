@@ -38,6 +38,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -61,18 +62,18 @@ public class StepikProjectGenerator {
 
     private static StepikProjectGenerator instance;
 
-    private StepikProjectGenerator(){}
+    private StepikProjectGenerator() {}
 
     public static StepikProjectGenerator getInstance() {
-        if (instance == null){
+        if (instance == null) {
             instance = new StepikProjectGenerator();
         }
         return instance;
     }
 
     /**
-    *    Non-static methods -----------------------------------------
-    */
+     * Non-static methods -----------------------------------------
+     */
 
     public void setSelectedCourse(@Nullable CourseInfo courseInfo) {
         if (courseInfo == null) {
@@ -117,7 +118,7 @@ public class StepikProjectGenerator {
     }
 
     /**
-     *    Static methods --------------------------------------------
+     * Static methods --------------------------------------------
      */
 
     private static List<CourseInfo> getCourses(boolean force) {
@@ -126,15 +127,17 @@ public class StepikProjectGenerator {
             courses = getCoursesFromCache();
         }
         if (force || courses.isEmpty()) {
-            List<CourseInfo> tmp = execCancelable(StepikConnectorGet::getEnrolledCourses);
-            if (tmp == null) tmp = new ArrayList<>();
-            courses = tmp;
+            courses = StepikConnectorGet.getCourses(getHardcodedCoursesId());
             flushCache(courses);
         }
         if (courses.isEmpty()) {
             courses.add(CourseInfo.INVALID_COURSE);
         }
         return courses;
+    }
+
+    private static List<Integer> getHardcodedCoursesId() {
+        return Arrays.asList(187, 67, 512, 401, 217, 150, 125, 126, 1127);
     }
 
     @NotNull
@@ -159,7 +162,7 @@ public class StepikProjectGenerator {
     @Nullable
     private static Course readCourseFromCache(@NotNull File courseFile, boolean isAdaptive) {
         try (BufferedReader bufferedReader =
-                new BufferedReader(new InputStreamReader(new FileInputStream(courseFile), "UTF-8"))){
+                new BufferedReader(new InputStreamReader(new FileInputStream(courseFile), "UTF-8"))) {
             Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation()
                     .registerTypeAdapter(SupportedLanguages.class, new SupportedLanguagesDeserializer())
                     .create();
@@ -318,7 +321,8 @@ public class StepikProjectGenerator {
 
     private static void flushCourseJson(@NotNull final Course course, @NotNull final File courseDirectory) {
         final Gson gson = new GsonBuilder().setPrettyPrinting()
-                .registerTypeAdapter(SupportedLanguages.class, new StudySerializationUtils.Json.SupportedLanguagesSerializer())
+                .registerTypeAdapter(SupportedLanguages.class,
+                        new StudySerializationUtils.Json.SupportedLanguagesSerializer())
                 .excludeFieldsWithoutExposeAnnotation()
                 .create();
         final String json = gson.toJson(course);

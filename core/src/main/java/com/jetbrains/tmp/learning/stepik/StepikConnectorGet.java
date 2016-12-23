@@ -62,7 +62,7 @@ public class StepikConnectorGet {
             .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
             .create();
 
-    static <T> T getFromStepik(String link, final Class<T> container) throws IOException {
+    private static <T> T getFromStepik(String link, final Class<T> container) throws IOException {
         return getFromStepik(link, container, StepikConnectorLogin.getHttpClient());
     }
 
@@ -110,7 +110,7 @@ public class StepikConnectorGet {
     }
 
     @NotNull
-    public static List<CourseInfo> getCourses() {
+    static List<CourseInfo> getCourses() {
         try {
             List<CourseInfo> result = new ArrayList<>();
             int pageNumber = 1;
@@ -249,7 +249,7 @@ public class StepikConnectorGet {
         return null;
     }
 
-    public static List<Lesson> getLessons(int sectionId) throws IOException {
+    private static List<Lesson> getLessons(int sectionId) throws IOException {
         final StepikWrappers.SectionContainer
                 sectionContainer = getFromStepik(EduStepikNames.SECTIONS + sectionId,
                 StepikWrappers.SectionContainer.class);
@@ -459,5 +459,23 @@ public class StepikConnectorGet {
             logger.warn("Can't get courses Info\n" + e.getMessage());
             return null;
         }
+    }
+
+    @NotNull
+    public static List<CourseInfo> getCourses(List<Integer> coursesIds) {
+        try {
+            if (coursesIds.size() > 20){
+                logger.warn("to match hardcoded courses");
+            }
+            StepikWrappers.CoursesContainer
+                    coursesContainer = getFromStepik(EduStepikNames.COURSES + getIdQuery(coursesIds),
+                    StepikWrappers.CoursesContainer.class);
+            return coursesContainer.courses;
+        } catch (IOException e) {
+            logger.warn(e);
+        }
+        List<CourseInfo> result = Collections.emptyList();
+        result.add(CourseInfo.INVALID_COURSE);
+        return result;
     }
 }

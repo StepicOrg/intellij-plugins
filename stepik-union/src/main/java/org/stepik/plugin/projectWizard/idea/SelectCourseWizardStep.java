@@ -17,7 +17,6 @@ import com.jetbrains.tmp.learning.stepik.StepikConnectorGet;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorPost;
 import com.jetbrains.tmp.learning.stepik.StepikWrappers;
-import org.apache.commons.lang.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -129,12 +128,10 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
     @Override
     public void onWizardFinished() throws CommitStepException {
         super.onWizardFinished();
-        if (COURSE_LINK.equals(buildType.getSelectedItem())) {
-            int id = selectedCourse.getId();
-            StepikConnectorPost.enrollToCourse(id);
-            logger.info(String.format("Finished the project wizard with the selected course: id = %s, name = %s",
-                    id, selectedCourse.getName()));
-        }
+        int id = selectedCourse.getId();
+        StepikConnectorPost.enrollToCourse(id);
+        logger.info(String.format("Finished the project wizard with the selected course: id = %s, name = %s",
+                id, selectedCourse.getName()));
         StepikProjectGenerator.downloadAndFlushCourse(project, selectedCourse);
     }
 
@@ -150,6 +147,7 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
                         "Refreshing Course List",
                         project);
 
+        courseComboBox.removeAllItems();
         addCoursesToComboBox(courses);
 
         if (courseComboBox.getItemAt(0) == null) {
@@ -161,13 +159,7 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
     }
 
     private void addCoursesToComboBox(@NotNull List<CourseInfo> courses) {
-        courses.stream()
-                .filter(course -> !course.isAdaptive())
-                .filter(course ->
-                        ArrayUtils.contains(course.getTags(), 22872) ||
-                                ArrayUtils.contains(course.getTags(), 22760)
-                )
-                .forEach(courseComboBox::addItem);
+        courses.forEach(courseComboBox::addItem);
         if (courseComboBox.getItemCount() > 0) {
             courseComboBox.setSelectedIndex(0);
         }
