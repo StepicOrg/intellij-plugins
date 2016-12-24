@@ -265,7 +265,7 @@ public class PyCCSettingPanel extends JPanel {
     }
 
     private FacetValidatorsManager myValidationManager;
-    private ValidationResult invalidCourse = new ValidationResult("Please, select a course");
+    private ValidationResult invalidCourse = new ValidationResult("Please select a course");
     private ValidationResult adaptiveCourse = new ValidationResult("Sorry, but we don't support adaptive courses yet");
 
     ValidationResult check(){

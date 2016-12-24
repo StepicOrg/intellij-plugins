@@ -97,14 +97,15 @@ public class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjec
     @Override
     public BooleanFunction<PythonProjectGenerator> beforeProjectGenerated(@Nullable Sdk sdk) {
         return generator -> {
+            Project defaultProject = DefaultProjectFactory.getInstance().getDefaultProject();
+            StepikConnectorLogin.loginFromDialog(defaultProject);
             final CourseInfo courseInfo = pySPanel.getSelectedCourse();
             if (courseInfo == null || courseInfo == CourseInfo.INVALID_COURSE) return false;
             this.generator.setSelectedCourse(courseInfo);
             if (PyCCSettingPanel.COURSE_LINK.equals(pySPanel.getBuildType())) {
                 StepikConnectorPost.enrollToCourse(courseInfo.getId());
             }
-            StepikProjectGenerator.downloadAndFlushCourse(DefaultProjectFactory.getInstance().getDefaultProject(),
-                    courseInfo);
+            StepikProjectGenerator.downloadAndFlushCourse(defaultProject, courseInfo);
             return true;
         };
     }
