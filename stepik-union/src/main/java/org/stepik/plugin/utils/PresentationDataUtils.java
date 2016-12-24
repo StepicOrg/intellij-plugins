@@ -15,7 +15,7 @@ import com.jetbrains.tmp.learning.courseFormat.Section;
 import com.jetbrains.tmp.learning.courseFormat.StudyItem;
 import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
 import com.jetbrains.tmp.learning.courseFormat.Task;
-import icons.InteractiveLearningIcons;
+import icons.AllStepikIcons;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.core.utils.PresentationUtils;
 import org.stepik.core.utils.ProjectFilesUtils;
@@ -73,7 +73,7 @@ public class PresentationDataUtils {
             PsiDirectory parent = psiDirectory.getParent();
             if (parent != null) {
                 if (!parent.getName().contains(EduNames.SANDBOX_DIR)) {
-                    setAttributes(data, EduNames.SANDBOX_DIR, JBColor.BLACK, InteractiveLearningIcons.Sandbox);
+                    setAttributes(data, EduNames.SANDBOX_DIR, JBColor.BLACK, AllStepikIcons.ProjectTree.sandbox);
                 }
             }
         } else

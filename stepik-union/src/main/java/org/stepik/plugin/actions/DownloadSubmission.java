@@ -28,7 +28,7 @@ import com.jetbrains.tmp.learning.stepik.StepikConnectorPost;
 import com.jetbrains.tmp.learning.stepik.StepikWrappers;
 import com.jetbrains.tmp.learning.stepik.entities.Submission;
 import com.jetbrains.tmp.learning.stepik.entities.SubmissionContainer;
-import icons.InteractiveLearningIcons;
+import icons.AllStepikIcons;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.jetbrains.annotations.NotNull;
@@ -50,7 +50,7 @@ public class DownloadSubmission extends StudyActionWithShortcut {
     public DownloadSubmission() {
         super("Download submission from the List(" + KeymapUtil.getShortcutText(
                 new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT), null)) + ")",
-                "Download submission from the List", InteractiveLearningIcons.Download);
+                "Download submission from the List", AllStepikIcons.ToolWindow.download);
     }
 
     @NotNull

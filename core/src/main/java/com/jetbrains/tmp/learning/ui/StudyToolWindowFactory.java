@@ -11,7 +11,7 @@ import com.intellij.ui.content.ContentManager;
 import com.jetbrains.tmp.learning.StudyTaskManager;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.courseFormat.Course;
-import icons.InteractiveLearningIcons;
+import icons.AllStepikIcons;
 import org.jetbrains.annotations.NotNull;
 
 public class StudyToolWindowFactory implements ToolWindowFactory, DumbAware {
@@ -21,7 +21,7 @@ public class StudyToolWindowFactory implements ToolWindowFactory, DumbAware {
 
     @Override
     public void createToolWindowContent(@NotNull final Project project, @NotNull final ToolWindow toolWindow) {
-        toolWindow.setIcon(InteractiveLearningIcons.TaskDescription);
+        toolWindow.setIcon(AllStepikIcons.ToolWindow.taskDescription);
         StudyTaskManager taskManager = StudyTaskManager.getInstance(project);
         final Course course = taskManager.getCourse();
         if (course != null || !taskManager.getUser().getEmail().isEmpty()) {

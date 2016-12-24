@@ -6,7 +6,7 @@ import com.jetbrains.tmp.learning.courseFormat.Lesson;
 import com.jetbrains.tmp.learning.courseFormat.Section;
 import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
 import com.jetbrains.tmp.learning.courseFormat.Task;
-import icons.InteractiveLearningIcons;
+import icons.AllStepikIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -66,24 +66,24 @@ public class PresentationUtils {
     private static Icon[][] getIcons() {
         return new Icon[][]{
                 {
-                        InteractiveLearningIcons.Course,
-                        InteractiveLearningIcons.CourseCorrect,
-                        InteractiveLearningIcons.Course
+                        AllStepikIcons.ProjectTree.course,
+                        AllStepikIcons.ProjectTree.courseCorrect,
+                        AllStepikIcons.ProjectTree.course
                 },
                 {
-                        InteractiveLearningIcons.Module,
-                        InteractiveLearningIcons.ModuleCorrect,
-                        InteractiveLearningIcons.Module
+                        AllStepikIcons.ProjectTree.module,
+                        AllStepikIcons.ProjectTree.moduleCorrect,
+                        AllStepikIcons.ProjectTree.module
                 },
                 {
-                        InteractiveLearningIcons.Lesson,
-                        InteractiveLearningIcons.LessonCorrect,
-                        InteractiveLearningIcons.Lesson
+                        AllStepikIcons.ProjectTree.lesson,
+                        AllStepikIcons.ProjectTree.lessonCorrect,
+                        AllStepikIcons.ProjectTree.lesson
                 },
                 {
-                        InteractiveLearningIcons.Step,
-                        InteractiveLearningIcons.StepCorrect,
-                        InteractiveLearningIcons.StepWrong
+                        AllStepikIcons.ProjectTree.step,
+                        AllStepikIcons.ProjectTree.stepCorrect,
+                        AllStepikIcons.ProjectTree.stepWrong
                 }
         };
     }

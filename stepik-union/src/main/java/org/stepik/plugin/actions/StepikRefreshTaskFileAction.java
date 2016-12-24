@@ -24,7 +24,7 @@ import com.jetbrains.tmp.learning.actions.StudyActionWithShortcut;
 import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
 import com.jetbrains.tmp.learning.courseFormat.TaskFile;
 import com.jetbrains.tmp.learning.editor.StudyEditor;
-import icons.InteractiveLearningIcons;
+import icons.AllStepikIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -39,7 +39,7 @@ public class StepikRefreshTaskFileAction extends StudyActionWithShortcut {
     public StepikRefreshTaskFileAction() {
         super("Reset Task File (" + KeymapUtil.getShortcutText(
                 new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT), null)) + ")",
-                "Refresh current task", InteractiveLearningIcons.ResetTaskFile);
+                "Refresh current task", AllStepikIcons.ToolWindow.resetTaskFile);
     }
 
     private static void refresh(@NotNull final Project project) {

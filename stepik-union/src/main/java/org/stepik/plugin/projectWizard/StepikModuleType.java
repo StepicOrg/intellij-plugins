@@ -8,9 +8,9 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.roots.ModuleRootManager;
-import com.intellij.openapi.util.IconLoader;
 import com.intellij.psi.CommonClassNames;
 import com.intellij.psi.JavaPsiFacade;
+import icons.AllStepikIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jps.model.java.JavaModuleSourceRootTypes;
@@ -66,12 +66,12 @@ public class StepikModuleType extends ModuleType<CourseModuleBuilder> {
 
     @Override
     public Icon getBigIcon() {
-        return IconLoader.getIcon("/icons/stepik_logo_green.png");
+        return AllStepikIcons.stepikLogo;
     }
 
     @Override
     public Icon getNodeIcon(@Deprecated boolean b) {
-        return IconLoader.getIcon("/icons/stepik_logotype_13x13-2.png");
+        return AllStepikIcons.stepikLogo;
     }
 
     @Nullable

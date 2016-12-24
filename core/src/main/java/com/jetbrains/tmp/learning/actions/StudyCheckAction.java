@@ -11,7 +11,7 @@ import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.util.Ref;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.checker.StudyCheckUtils;
-import icons.InteractiveLearningIcons;
+import icons.AllStepikIcons;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -23,7 +23,7 @@ public abstract class StudyCheckAction extends StudyActionWithShortcut {
 
     public StudyCheckAction() {
         super("Check Task (" + KeymapUtil.getShortcutText(new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT),
-                null)) + ")", "Check current task", InteractiveLearningIcons.CheckTask);
+                null)) + ")", "Check current task", AllStepikIcons.ToolWindow.checkTask);
     }
 
     public abstract void check(@NotNull final Project project);
