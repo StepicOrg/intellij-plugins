@@ -1,5 +1,6 @@
 package org.stepik.plugin.actions;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.project.Project;
@@ -9,7 +10,6 @@ import com.jetbrains.tmp.learning.courseFormat.Lesson;
 import com.jetbrains.tmp.learning.courseFormat.Section;
 import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.navigation.StudyNavigator;
-import icons.InteractiveLearningIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,7 +22,7 @@ public class StepikPreviousTaskAction extends StepikTaskNavigationAction {
 
     public StepikPreviousTaskAction() {
         super("Previous Task (" + KeymapUtil.getShortcutText(new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT),
-                null)) + ")", "Navigate to the previous task", InteractiveLearningIcons.Prev);
+                null)) + ")", "Navigate to the previous task", AllIcons.Actions.Back);
     }
 
     @Override

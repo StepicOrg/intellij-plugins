@@ -15,7 +15,6 @@ import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.ui.popup.JBPopupListener;
 import com.intellij.openapi.ui.popup.LightweightWindowEvent;
 import com.intellij.openapi.ui.popup.PopupChooserBuilder;
-import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.tmp.learning.StudyTaskManager;
 import com.jetbrains.tmp.learning.StudyUtils;
@@ -29,6 +28,7 @@ import com.jetbrains.tmp.learning.stepik.StepikConnectorPost;
 import com.jetbrains.tmp.learning.stepik.StepikWrappers;
 import com.jetbrains.tmp.learning.stepik.entities.Submission;
 import com.jetbrains.tmp.learning.stepik.entities.SubmissionContainer;
+import icons.InteractiveLearningIcons;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.jetbrains.annotations.NotNull;
@@ -50,7 +50,7 @@ public class DownloadSubmission extends StudyActionWithShortcut {
     public DownloadSubmission() {
         super("Download submission from the List(" + KeymapUtil.getShortcutText(
                 new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT), null)) + ")",
-                "Download submission from the List", IconLoader.getIcon("/icons/arrow-down.png"));
+                "Download submission from the List", InteractiveLearningIcons.Download);
     }
 
     @NotNull

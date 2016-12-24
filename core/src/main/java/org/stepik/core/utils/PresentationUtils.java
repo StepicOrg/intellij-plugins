@@ -67,23 +67,23 @@ public class PresentationUtils {
         return new Icon[][]{
                 {
                         InteractiveLearningIcons.Course,
-                        InteractiveLearningIcons.CourseCompl,
+                        InteractiveLearningIcons.CourseCorrect,
                         InteractiveLearningIcons.Course
                 },
                 {
-                        InteractiveLearningIcons.Section,
-                        InteractiveLearningIcons.SectionCompl,
-                        InteractiveLearningIcons.Section
+                        InteractiveLearningIcons.Module,
+                        InteractiveLearningIcons.ModuleCorrect,
+                        InteractiveLearningIcons.Module
                 },
                 {
                         InteractiveLearningIcons.Lesson,
-                        InteractiveLearningIcons.LessonCompl,
+                        InteractiveLearningIcons.LessonCorrect,
                         InteractiveLearningIcons.Lesson
                 },
                 {
-                        InteractiveLearningIcons.Task,
-                        InteractiveLearningIcons.TaskCompl,
-                        InteractiveLearningIcons.TaskProbl
+                        InteractiveLearningIcons.Step,
+                        InteractiveLearningIcons.StepCorrect,
+                        InteractiveLearningIcons.StepWrong
                 }
         };
     }
