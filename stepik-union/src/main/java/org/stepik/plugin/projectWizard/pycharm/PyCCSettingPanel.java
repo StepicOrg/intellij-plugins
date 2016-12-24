@@ -1,5 +1,7 @@
 package org.stepik.plugin.projectWizard.pycharm;
 
+import com.intellij.facet.ui.FacetValidatorsManager;
+import com.intellij.facet.ui.ValidationResult;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.diagnostic.Logger;
@@ -139,6 +141,7 @@ public class PyCCSettingPanel extends JPanel {
         @Override
         public void actionPerformed(ActionEvent e) {
             refreshCourseList(true);
+            check();
         }
     }
 
@@ -154,6 +157,7 @@ public class PyCCSettingPanel extends JPanel {
                     ((CardLayout) courseSelectPanel.getLayout()).show(courseSelectPanel, COURSE_LINK);
                     selectedCourse = courseFromLink;
                 }
+                check();
             }
         }
     }
@@ -165,6 +169,7 @@ public class PyCCSettingPanel extends JPanel {
                 selectedCourse = (CourseInfo) e.getItem();
                 courseListDescription.setText(selectedCourse.getDescription());
             }
+            check();
         }
     }
 
@@ -180,6 +185,8 @@ public class PyCCSettingPanel extends JPanel {
                     (coursesContainer = StepikConnectorGet.getCourseInfos(courseId)) == null) {
                 courseLinkDescription.setText("Wrong link");
                 courseFromLink = CourseInfo.INVALID_COURSE;
+                selectedCourse = CourseInfo.INVALID_COURSE;
+                check();
                 return;
             }
 
@@ -187,6 +194,7 @@ public class PyCCSettingPanel extends JPanel {
             courseFromLink = selectedCourse;
             courseLinkDescription.setText(String.format("<b>Course:</b> %s<br><br>%s",
                     selectedCourse.toString(), selectedCourse.getDescription()));
+            check();
         }
 
         @NotNull
@@ -254,5 +262,39 @@ public class PyCCSettingPanel extends JPanel {
         private boolean isFillOfInt(@NotNull String link) {
             return link.matches("[0-9]+");
         }
+    }
+
+    private FacetValidatorsManager myValidationManager;
+    private ValidationResult invalidCourse = new ValidationResult("Please, select a course");
+    private ValidationResult adaptiveCourse = new ValidationResult("Sorry, but we don't support adaptive courses yet");
+
+    ValidationResult check(){
+        if (selectedCourse.isAdaptive()){
+            return setError(adaptiveCourse);
+        }
+        if (selectedCourse == CourseInfo.INVALID_COURSE){
+            return setError(invalidCourse);
+        }
+        return setOK();
+    }
+
+    private ValidationResult setError(@NotNull ValidationResult result) {
+        StepikProjectGenerator.getInstance().fireStateChanged(result);
+        if (myValidationManager != null) {
+            myValidationManager.validate();
+        }
+        return result;
+    }
+
+    private ValidationResult setOK() {
+        StepikProjectGenerator.getInstance().fireStateChanged(ValidationResult.OK);
+        if (myValidationManager != null) {
+            myValidationManager.validate();
+        }
+        return ValidationResult.OK;
+    }
+
+    void registerValidators(FacetValidatorsManager manager) {
+        myValidationManager = manager;
     }
 }

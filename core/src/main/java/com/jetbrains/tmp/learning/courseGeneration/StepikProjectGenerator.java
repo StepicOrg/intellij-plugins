@@ -9,12 +9,14 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.JsonReader;
+import com.intellij.facet.ui.ValidationResult;
 import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.io.FileUtil;
+import com.intellij.util.containers.ContainerUtil;
 import com.jetbrains.tmp.learning.StudySerializationUtils;
 import com.jetbrains.tmp.learning.StudySerializationUtils.Json.SupportedLanguagesDeserializer;
 import com.jetbrains.tmp.learning.StudyTaskManager;
@@ -179,7 +181,7 @@ public class StepikProjectGenerator {
      * Writes courses to cache file {@link StepikProjectGenerator#CACHE_NAME}
      */
     @SuppressWarnings("IOResourceOpenedButNotSafelyClosed")
-    public static void flushCache(List<CourseInfo> courses) {
+    private static void flushCache(List<CourseInfo> courses) {
         File cacheFile = new File(CONFIG_COURSES_DIR, CACHE_NAME);
         PrintWriter writer = null;
         try {
@@ -219,7 +221,7 @@ public class StepikProjectGenerator {
     }
 
     @NotNull
-    public static List<CourseInfo> getCoursesFromCache() {
+    private static List<CourseInfo> getCoursesFromCache() {
         List<CourseInfo> courses = new ArrayList<>();
         final File cacheFile = new File(CONFIG_COURSES_DIR, CACHE_NAME);
         if (!cacheFile.exists()) {
@@ -333,6 +335,22 @@ public class StepikProjectGenerator {
         } catch (IOException e) {
             Messages.showErrorDialog(e.getMessage(), "Failed to Generate Json");
             logger.warn(e);
+        }
+    }
+
+    private final List<SettingsListener> listeners = ContainerUtil.newArrayList();
+
+    public void addSettingsStateListener(@NotNull SettingsListener listener) {
+        listeners.add(listener);
+    }
+
+    public interface SettingsListener {
+        void stateChanged(ValidationResult result);
+    }
+
+    public void fireStateChanged(ValidationResult result) {
+        for (SettingsListener listener : listeners) {
+            listener.stateChanged(result);
         }
     }
 }

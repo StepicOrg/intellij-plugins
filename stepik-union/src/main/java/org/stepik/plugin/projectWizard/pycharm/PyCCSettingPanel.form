@@ -19,7 +19,7 @@
         </constraints>
         <properties>
           <text value="Stepik user:"/>
-          <verticalAlignment value="3"/>
+          <verticalAlignment value="0"/>
           <verticalTextPosition value="0"/>
         </properties>
       </component>
@@ -29,7 +29,7 @@
         </constraints>
         <properties>
           <text value="[empty]"/>
-          <verticalAlignment value="3"/>
+          <verticalAlignment value="0"/>
         </properties>
       </component>
       <grid id="9249e" binding="courseSelectPanel" layout-manager="CardLayout" hgap="0" vgap="0">

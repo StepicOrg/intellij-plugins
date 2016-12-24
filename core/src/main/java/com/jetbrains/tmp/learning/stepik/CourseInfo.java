@@ -38,7 +38,6 @@ public class CourseInfo {
     private CourseInfo(String name, String description) {
         myName = name;
         myDescription = description;
-        isAdaptive = true;
     }
 
     public String getName() {

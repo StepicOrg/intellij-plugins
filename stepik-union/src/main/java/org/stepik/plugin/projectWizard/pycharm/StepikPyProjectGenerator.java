@@ -1,5 +1,7 @@
 package org.stepik.plugin.projectWizard.pycharm;
 
+import com.intellij.facet.ui.FacetEditorValidator;
+import com.intellij.facet.ui.FacetValidatorsManager;
 import com.intellij.facet.ui.ValidationResult;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
@@ -51,6 +53,16 @@ public class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjec
         super(true);
         generator = StepikProjectGenerator.getInstance();
         pySPanel = new PyCCSettingPanel();
+
+        pySPanel.registerValidators(new FacetValidatorsManager() {
+            public void registerValidator(FacetEditorValidator validator, JComponent... componentsToWatch) {
+                throw new UnsupportedOperationException();
+            }
+
+            public void validate() {
+                ApplicationManager.getApplication().invokeLater(() -> fireStateChanged());
+            }
+        });
     }
 
     @Nullable
@@ -78,7 +90,7 @@ public class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjec
     @NotNull
     @Override
     public ValidationResult validate(@NotNull String s) {
-        return ValidationResult.OK;
+        return pySPanel.check();
     }
 
     @Nullable
