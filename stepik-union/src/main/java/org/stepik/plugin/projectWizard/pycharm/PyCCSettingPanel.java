@@ -5,14 +5,12 @@ import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.HyperlinkAdapter;
-import com.intellij.ui.PanelWithAnchor;
 import com.jetbrains.tmp.learning.StudyTaskManager;
 import com.jetbrains.tmp.learning.courseGeneration.StepikProjectGenerator;
 import com.jetbrains.tmp.learning.stepik.CourseInfo;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorGet;
 import com.jetbrains.tmp.learning.stepik.StepikWrappers;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
@@ -24,7 +22,7 @@ import java.awt.event.ItemListener;
 import java.util.Arrays;
 import java.util.List;
 
-public class PyCCSettingPanel extends JPanel implements PanelWithAnchor {
+public class PyCCSettingPanel extends JPanel {
     private static final Logger logger = Logger.getInstance(PyCCSettingPanel.class);
     private final static String COURSE_LIST = "Course list";
     final static String COURSE_LINK = "Course link";
@@ -98,15 +96,6 @@ public class PyCCSettingPanel extends JPanel implements PanelWithAnchor {
     private void setupGeneralSettings() {
         refreshCourseList(false);
         userName.setText(StudyTaskManager.getInstance(project).getUser().getName());
-    }
-
-    @Override
-    public JComponent getAnchor() {
-        return courseListComboBox;
-    }
-
-    @Override
-    public void setAnchor(@Nullable JComponent jComponent) {
     }
 
     CourseInfo getSelectedCourse() {

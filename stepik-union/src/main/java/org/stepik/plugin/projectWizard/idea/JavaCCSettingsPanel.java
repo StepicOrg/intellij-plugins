@@ -7,7 +7,6 @@ import com.intellij.ide.wizard.CommitStepException;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.EnumComboBoxModel;
 import com.intellij.ui.HyperlinkAdapter;
 import com.jetbrains.tmp.learning.StudyTaskManager;
 import com.jetbrains.tmp.learning.SupportedLanguages;
@@ -112,7 +111,8 @@ public class JavaCCSettingsPanel extends ModuleWizardStep {
         userName.setText(StudyTaskManager.getInstance(project).getUser().getName());
         refreshCourseList(false);
 
-        langComboBox.setModel(new EnumComboBoxModel<>(SupportedLanguages.class));
+        langComboBox.addItem(SupportedLanguages.PYTHON);
+        langComboBox.addItem(SupportedLanguages.JAVA);
         langComboBox.setSelectedItem(SupportedLanguages.JAVA);
     }
 
