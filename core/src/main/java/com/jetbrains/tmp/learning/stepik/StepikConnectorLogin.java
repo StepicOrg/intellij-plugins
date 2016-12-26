@@ -25,10 +25,12 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.util.text.StringUtil;
-import com.jetbrains.tmp.learning.StudySerializationUtils;
 import com.jetbrains.tmp.learning.StudyTaskManager;
-import com.jetbrains.tmp.learning.courseFormat.TaskFile;
-import org.apache.http.*;
+import org.apache.http.Consts;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpStatus;
+import org.apache.http.NameValuePair;
+import org.apache.http.StatusLine;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -49,7 +51,7 @@ public class StepikConnectorLogin {
     private static StepikUser currentUser;
 
     // TODO sing_in
-    public static CloseableHttpClient getHttpClient() {
+    static CloseableHttpClient getHttpClient() {
         if (ourClient == null) {
             List<BasicHeader> headers = new ArrayList<>();
             if (currentUser != null && currentUser.getAccessToken() != null && !currentUser.getAccessToken()
@@ -116,31 +118,33 @@ public class StepikConnectorLogin {
     }
 
     public static boolean loginFromDialog(@NotNull final Project project) {
+        Project defaultProject = ProjectManager.getInstance().getDefaultProject();
         StepikUser user = StudyTaskManager.getInstance(project).getUser();
-        StepikUser defaultUser = StudyTaskManager.getInstance(ProjectManager.getInstance().getDefaultProject())
+        StepikUser defaultUser = StudyTaskManager.getInstance(defaultProject)
                 .getUser();
         final String email = user.getEmail();
-        logger.info("after get email");
         if (StringUtil.isEmptyOrSpaces(email)) {
             if (StringUtil.isEmptyOrSpaces(defaultUser.getEmail())) {
                 return showLoginDialog();
             } else {
                 defaultUser = minorLogin(defaultUser);
                 StudyTaskManager.getInstance(project).setUser(defaultUser);
+                logger.info("set default user");
             }
         } else {
             if ((user = minorLogin(user)) == null) {
                 return showLoginDialog();
             }
             if (user.getEmail().equals(defaultUser.getEmail()) || defaultUser.getEmail().isEmpty()) {
-                StudyTaskManager.getInstance(ProjectManager.getInstance().getDefaultProject()).setUser(user);
+                StudyTaskManager.getInstance(defaultProject).setUser(user);
             }
             StudyTaskManager.getInstance(project).setUser(user);
+            logger.info("set current user");
         }
         return true;
     }
 
-    public static boolean showLoginDialog() {
+    private static boolean showLoginDialog() {
         final boolean[] logged = {false};
         ApplicationManager.getApplication().invokeAndWait(() -> {
             final LoginDialog dialog = new LoginDialog();
@@ -150,12 +154,12 @@ public class StepikConnectorLogin {
         return logged[0];
     }
 
-    public static void resetClient() {
+    private static void resetClient() {
         ourClient = null;
         currentUser = null;
     }
 
-    public static StepikUser minorLogin(StepikUser basicUser) {
+    static StepikUser minorLogin(StepikUser basicUser) {
         String refreshToken;
         StepikWrappers.TokenInfo tokenInfo = null;
         List<NameValuePair> nvps = new ArrayList<NameValuePair>();
@@ -198,15 +202,11 @@ public class StepikConnectorLogin {
 
     private static StepikWrappers.TokenInfo postCredentials(List<NameValuePair> nvps) {
         final Gson gson = new GsonBuilder()
-                .registerTypeAdapter(TaskFile.class, new StudySerializationUtils.Json.StepikTaskFileAdapter())
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
                 .create();
 
         final HttpPost request = new HttpPost(EduStepikNames.TOKEN_URL);
         request.setEntity(new UrlEncodedFormEntity(nvps, Consts.UTF_8));
-        //for (NameValuePair pair : nvps){
-        //  logger.info(pair.getName() + " " + pair.getValue());
-        //}
 
         try {
             final CloseableHttpResponse response = StepikConnectorInit.getHttpClient().execute(request);

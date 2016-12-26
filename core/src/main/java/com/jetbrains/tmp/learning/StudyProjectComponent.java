@@ -1,8 +1,6 @@
 package com.jetbrains.tmp.learning;
 
 import com.intellij.ide.ui.UISettings;
-import com.intellij.notification.Notification;
-import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;
@@ -22,7 +20,6 @@ import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.DumbAwareRunnable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
-import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileAdapter;
 import com.intellij.openapi.vfs.VirtualFileEvent;
@@ -47,8 +44,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -69,11 +64,6 @@ public class StudyProjectComponent implements ProjectComponent {
         // Check if user has javafx lib in his JDK. Now bundled JDK doesn't have this lib inside.
         if (StudyUtils.hasJavaFx()) {
             Platform.setImplicitExit(false);
-        }
-
-        if (course != null && !course.isUpToDate()) {
-            course.setUpToDate(true);
-            updateCourse();
         }
 
         registerStudyToolWindow(course);
@@ -132,53 +122,6 @@ public class StudyProjectComponent implements ProjectComponent {
                     ToolWindowAnchor.RIGHT,
                     myProject,
                     true);
-        }
-    }
-
-    private void updateCourse() {
-        final Course course = StudyTaskManager.getInstance(myProject).getCourse();
-        if (course == null) {
-            return;
-        }
-        final File resourceDirectory = new File(course.getCourseDirectory());
-        if (!resourceDirectory.exists()) {
-            return;
-        }
-        final File[] files = resourceDirectory.listFiles();
-        if (files == null) return;
-        for (File file : files) {
-            if (file.getName().startsWith(EduNames.LESSON)) {
-                final File[] tasks = file.listFiles();
-                if (tasks == null) continue;
-                for (File task : tasks) {
-                    final File taskDescrFrom = StudyUtils.createTaskDescriptionFile(task);
-                    if (taskDescrFrom != null) {
-                        final File taskDescrTo =
-                                StudyUtils.createTaskDescriptionFile(new File(new File(myProject.getBasePath(),
-                                        file.getName()), task.getName()));
-                        if (taskDescrTo != null) {
-                            copyFile(taskDescrFrom, taskDescrTo);
-                        }
-                    }
-                }
-            }
-        }
-
-        final Notification notification =
-                new Notification("Update.course",
-                        "Course update",
-                        "Current course is synchronized",
-                        NotificationType.INFORMATION);
-        notification.notify(myProject);
-    }
-
-    private static void copyFile(@NotNull final File from, @NotNull final File to) {
-        if (from.exists()) {
-            try {
-                FileUtil.copy(from, to);
-            } catch (IOException e) {
-                logger.warn("Failed to copy " + from.getName());
-            }
         }
     }
 

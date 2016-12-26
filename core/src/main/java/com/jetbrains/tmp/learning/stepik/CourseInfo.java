@@ -13,17 +13,18 @@ import java.util.stream.Collectors;
  * and when project is being created
  */
 public class CourseInfo {
-    public static final CourseInfo INVALID_COURSE = new CourseInfo();
+    public static final CourseInfo INVALID_COURSE = new CourseInfo("INVALID", "Please, press refresh button");
 
     @SerializedName("title")
     private String myName;
     int id;
-    boolean isAdaptive;
-    boolean isPublic;
+    private boolean isAdaptive;
+    private boolean isPublic;
+    private int[] tags;
     List<Integer> sections;
     List<Integer> instructors = new ArrayList<>();
 
-    List<StepikUser> myAuthors = new ArrayList<>();
+    private List<StepikUser> myAuthors = new ArrayList<>();
     @SerializedName("summary")
     private String myDescription;
     @SerializedName("course_format")
@@ -32,12 +33,19 @@ public class CourseInfo {
     @Nullable
     private String username;
 
+    public CourseInfo() {}
+
+    private CourseInfo(String name, String description) {
+        myName = name;
+        myDescription = description;
+    }
+
     public String getName() {
         return myName;
     }
 
     @NotNull
-    public List<StepikUser> getAuthors() {
+    List<StepikUser> getAuthors() {
         return myAuthors;
     }
 
@@ -92,7 +100,7 @@ public class CourseInfo {
                 .collect(Collectors.toList()));
     }
 
-    public void addAuthor(StepikUser author) {
+    void addAuthor(StepikUser author) {
         if (myAuthors == null) {
             myAuthors = new ArrayList<>();
         }
@@ -129,5 +137,13 @@ public class CourseInfo {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public int[] getTags() {
+        return tags;
+    }
+
+    public void setTags(int[] tags) {
+        this.tags = tags;
     }
 }
