@@ -13,7 +13,6 @@ import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.roots.ModuleRootModificationUtil;
-import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.BooleanFunction;
@@ -33,6 +32,7 @@ import com.jetbrains.tmp.learning.courseGeneration.StepikProjectGenerator;
 import com.jetbrains.tmp.learning.stepik.CourseInfo;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorPost;
+import icons.AllStepikIcons;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -69,7 +69,7 @@ public class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjec
     @Nullable
     @Override
     public Icon getLogo() {
-        return IconLoader.getIcon("/icons/stepik_logotype_13x13-2.png");
+        return AllStepikIcons.stepikLogo;
     }
 
     @NotNull
