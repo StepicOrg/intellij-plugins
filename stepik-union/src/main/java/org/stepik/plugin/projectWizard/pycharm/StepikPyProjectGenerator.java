@@ -46,6 +46,7 @@ import java.io.IOException;
 
 public class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettings> {
     private static final Logger logger = Logger.getInstance(StepikPyProjectGenerator.class.getName());
+    private static final String MODULE_NAME = "Stepik";
     private final StepikProjectGenerator generator;
     private PyCCSettingPanel pySPanel;
 
@@ -75,7 +76,7 @@ public class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjec
     @Nls
     @Override
     public String getName() {
-        return "Stepik";
+        return MODULE_NAME;
     }
 
     @Nullable
