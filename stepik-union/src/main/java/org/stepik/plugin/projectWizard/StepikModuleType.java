@@ -66,7 +66,7 @@ public class StepikModuleType extends ModuleType<CourseModuleBuilder> {
 
     @Override
     public Icon getBigIcon() {
-        return AllStepikIcons.stepikLogo;
+        return AllStepikIcons.stepikLogoBig;
     }
 
     @Override

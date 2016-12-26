@@ -31,6 +31,7 @@ public class PresentationUtils {
 
     private static Icon[][] icons = null;
     private static final JBColor SOLVED_COLOR = new JBColor(new Color(0, 134, 0), new Color(98, 150, 85));
+    private static final JBColor WRONG_COLOR = new JBColor(new Color(175, 65, 45), new Color(175, 75, 60));
 
     @Nullable
     public static Icon getIcon(@NotNull Object subjectClass, StudyStatus status) {
@@ -96,7 +97,7 @@ public class PresentationUtils {
             case SOLVED:
                 return SOLVED_COLOR;
             case FAILED:
-                return JBColor.RED;
+                return WRONG_COLOR;
         }
         return JBColor.BLACK;
     }

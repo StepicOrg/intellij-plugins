@@ -11,6 +11,7 @@ public class AllStepikIcons {
     }
 
     public static final Icon stepikLogo = load("/icons/stepikLogo.png"); // 16x16
+    public static final Icon stepikLogoBig = load("/icons/stepikLogoBig.png"); // 24x24
     public static final Icon stepikLogoSmall = load("/icons/stepikLogoSmall.png"); // 13x13
 
     public static class ProjectTree {

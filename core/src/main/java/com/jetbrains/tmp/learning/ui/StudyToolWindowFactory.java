@@ -21,7 +21,7 @@ public class StudyToolWindowFactory implements ToolWindowFactory, DumbAware {
 
     @Override
     public void createToolWindowContent(@NotNull final Project project, @NotNull final ToolWindow toolWindow) {
-        toolWindow.setIcon(AllStepikIcons.ToolWindow.taskDescription);
+        toolWindow.setIcon(AllStepikIcons.stepikLogoSmall);
         StudyTaskManager taskManager = StudyTaskManager.getInstance(project);
         final Course course = taskManager.getCourse();
         if (course != null || !taskManager.getUser().getEmail().isEmpty()) {
