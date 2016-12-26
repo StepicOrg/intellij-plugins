@@ -16,14 +16,13 @@
     ]]></description>
 
     <depends>com.intellij.modules.lang</depends>
-    <depends optional="true">PythonCore</depends>
     <depends optional="true" config-file="idea.xml">com.intellij.modules.java</depends>
     <depends optional="true" config-file="pycharm.xml">com.intellij.modules.python</depends>
     <depends optional="true" config-file="clion.xml">com.intellij.modules.clion</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <applicationConfigurable instance="org.stepik.plugin.collective.ui.StepikSettingsConfigurable"/>
-        <moduleType id="STEPIK_MODULE_TYPE" implementationClass="org.stepik.plugin.projectWizard.StepikModuleType"/>
+        <moduleType id="STEPIK_MODULE_TYPE" implementationClass="org.stepik.plugin.projectWizard.idea.StepikModuleType"/>
         <refactoring.moveHandler implementation="org.stepik.plugin.refactoring.move.StepikMoveHandlerDelegate" order="first"/>
         <renamePsiElementProcessor implementation="org.stepik.plugin.refactoring.rename.StepikRenamePsiElementProcessor" order="first"/>
         <refactoring.safeDeleteProcessor implementation="org.stepik.plugin.refactoring.safeDelete.StepikSafeDeleteProcessorDelegate" order="first"/>
@@ -51,12 +50,6 @@
         </component>
     </project-components>
 
-    <application-components>
-        <component>
-            <implementation-class>com.jetbrains.tmp.learning.stepik.EduStepikUpdater</implementation-class>
-        </component>
-    </application-components>
-
     <extensionPoints>
         <extensionPoint qualifiedName="SCore.studyPluginConfigurator" interface="com.jetbrains.tmp.learning.StudyPluginConfigurator"/>
     </extensionPoints>
@@ -65,7 +58,8 @@
         <projectService serviceInterface="com.intellij.codeInsight.documentation.DocumentationManager" serviceImplementation="com.jetbrains.tmp.learning.StudyDocumentationManager" overrides="true"/>
         <toolWindow id="Task Description" anchor="right" factoryClass="com.jetbrains.tmp.learning.ui.StudyToolWindowFactory" conditionClass="com.jetbrains.tmp.learning.ui.StudyCondition"/>
         <fileEditorProvider implementation="com.jetbrains.tmp.learning.editor.StudyFileEditorProvider"/>
-        <projectService serviceImplementation="com.jetbrains.tmp.learning.StudyTaskManager"/>
+        <projectService serviceInterface="com.jetbrains.tmp.learning.StudyTaskManager"
+                serviceImplementation="com.jetbrains.tmp.learning.StudyTaskManager"/>
         <applicationService serviceImplementation="com.jetbrains.tmp.learning.stepik.StepikUpdateSettings"/>
     </extensions>
 </idea-plugin>

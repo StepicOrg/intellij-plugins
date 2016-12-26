@@ -32,7 +32,7 @@ import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.Lesson;
 import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.courseFormat.TaskFile;
-import com.jetbrains.tmp.learning.courseGeneration.StudyProjectGenerator;
+import com.jetbrains.tmp.learning.courseGeneration.StepikProjectGenerator;
 import com.jetbrains.tmp.learning.editor.StudyEditor;
 import com.jetbrains.tmp.learning.ui.StudyToolWindow;
 import com.jetbrains.tmp.learning.ui.StudyToolWindowFactory;
@@ -61,26 +61,6 @@ public class StudyUtils {
 
     private static final Logger logger = Logger.getInstance(StudyUtils.class.getName());
     private static final String EMPTY_TASK_TEXT = "Please, open any task to see task description";
-    private static final String ourPrefix = "<html><head><script type=\"text/x-mathjax-config\">\n" +
-            "            MathJax.Hub.Config({\n" +
-            "                tex2jax: {\n" +
-            "                    inlineMath: [ ['$','$'], [\"\\\\(\",\"\\\\)\"] ],\n" +
-            "                    displayMath: [ ['$$','$$'], [\"\\\\[\",\"\\\\]\"] ],\n" +
-            "                    processEscapes: true,\n" +
-            "                    processEnvironments: true\n" +
-            "                },\n" +
-            "                displayAlign: 'center',\n" +
-            "                \"HTML-CSS\": {\n" +
-            "                    styles: {'#mydiv': {\"font-size\": %s}},\n" +
-            "                    preferredFont: null,\n" +
-            "                    linebreaks: { automatic: true }\n" +
-            "                }\n" +
-            "            });\n" +
-            "</script><script type=\"text/javascript\"\n" +
-            " src=\"http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML-full\">\n" +
-            " </script></head><body><div id=\"mydiv\">";
-
-    private static final String ourPostfix = "</div></body></html>";
 
     public static void closeSilently(@Nullable final Closeable stream) {
         if (stream != null) {
@@ -349,16 +329,8 @@ public class StudyUtils {
     }
 
     @NotNull
-    public static File getCourseDirectory(@NotNull Project project, Course course) {
-        final File courseDirectory;
-        if (course.isAdaptive()) {
-            courseDirectory = new File(StudyProjectGenerator.OUR_COURSES_DIR,
-                    StudyProjectGenerator.ADAPTIVE_COURSE_PREFIX + course.getName()
-                            + "_" + StudyTaskManager.getInstance(project).getUser().getEmail());
-        } else {
-            courseDirectory = new File(StudyProjectGenerator.OUR_COURSES_DIR, Integer.toString(course.getId()));
-        }
-        return courseDirectory;
+    public static File getCacheDirectory(@NotNull Project project, Course course) {
+        return new File(StepikProjectGenerator.CONFIG_COURSES_DIR, Integer.toString(course.getId()));
     }
 
     public static boolean hasJavaFx() {

@@ -21,7 +21,6 @@ import com.google.gson.GsonBuilder;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
-import com.jetbrains.tmp.learning.StudySerializationUtils;
 import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.Course;
@@ -59,14 +58,11 @@ public class StepikConnectorGet {
     private static final Logger logger = Logger.getInstance(StepikConnectorGet.class.getName());
     private static final String PYCHARM_PREFIX = "pycharm";
     private static final String CODE_PREFIX = "code";
+    private static final Gson GSON = new GsonBuilder()
+            .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+            .create();
 
-    static final private Gson GSON =
-            new GsonBuilder().registerTypeAdapter(TaskFile.class,
-                    new StudySerializationUtils.Json.StepikTaskFileAdapter())
-                    .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
-
-
-    static <T> T getFromStepik(String link, final Class<T> container) throws IOException {
+    private static <T> T getFromStepik(String link, final Class<T> container) throws IOException {
         return getFromStepik(link, container, StepikConnectorLogin.getHttpClient());
     }
 
@@ -114,7 +110,7 @@ public class StepikConnectorGet {
     }
 
     @NotNull
-    public static List<CourseInfo> getCourses() {
+    static List<CourseInfo> getCourses() {
         try {
             List<CourseInfo> result = new ArrayList<>();
             int pageNumber = 1;
@@ -202,7 +198,7 @@ public class StepikConnectorGet {
         course.setUpToDate(true);  // TODO: get from stepik
 
         if (course.isAdaptive()) {
-            course = getAdaptiveCourse(project, course);
+//            course = getAdaptiveCourse(project, course);
         } else {
             course = getRegularCourse(course, info);
         }
@@ -253,25 +249,7 @@ public class StepikConnectorGet {
         return null;
     }
 
-    private static Course getAdaptiveCourse(
-            @NotNull final Project project,
-            @NotNull Course course) {
-        final Lesson lesson = new Lesson();
-        lesson.setName("Adaptive");
-        Section section = new Section();
-        section.setName(lesson.getName());
-        section.addLesson(lesson);
-        course.addSectionWithSetIndex(section);
-        final Task recommendation = EduAdaptiveStepikConnector.getNextRecommendation(project, course);
-        if (recommendation != null) {
-            lesson.addTask(recommendation);
-            return course;
-        }
-
-        return null;
-    }
-
-    public static List<Lesson> getLessons(int sectionId) throws IOException {
+    private static List<Lesson> getLessons(int sectionId) throws IOException {
         final StepikWrappers.SectionContainer
                 sectionContainer = getFromStepik(EduStepikNames.SECTIONS + sectionId,
                 StepikWrappers.SectionContainer.class);
@@ -358,6 +336,7 @@ public class StepikConnectorGet {
         }
     }
 
+    //    TODO make it scalable
     private static void setSupportedLang(Task task, StepikWrappers.Step step) {
         if (step.options.codeTemplates.java8 != null)
             task.addLang(SupportedLanguages.JAVA);
@@ -383,7 +362,10 @@ public class StepikConnectorGet {
         task.setTimeLimits(timeLimits);
     }
 
-    private static void putIfNotNull(Map<SupportedLanguages, String> timeLimits, SupportedLanguages lang, String limit) {
+    private static void putIfNotNull(
+            Map<SupportedLanguages, String> timeLimits,
+            SupportedLanguages lang,
+            String limit) {
         if (limit != null && lang != null) {
             timeLimits.put(lang, limit);
         }
@@ -477,5 +459,23 @@ public class StepikConnectorGet {
             logger.warn("Can't get courses Info\n" + e.getMessage());
             return null;
         }
+    }
+
+    @NotNull
+    public static List<CourseInfo> getCourses(List<Integer> coursesIds) {
+        try {
+            if (coursesIds.size() > 20){
+                logger.warn("to match hardcoded courses");
+            }
+            StepikWrappers.CoursesContainer
+                    coursesContainer = getFromStepik(EduStepikNames.COURSES + getIdQuery(coursesIds),
+                    StepikWrappers.CoursesContainer.class);
+            return coursesContainer.courses;
+        } catch (IOException e) {
+            logger.warn(e);
+        }
+        List<CourseInfo> result = Collections.emptyList();
+        result.add(CourseInfo.INVALID_COURSE);
+        return result;
     }
 }

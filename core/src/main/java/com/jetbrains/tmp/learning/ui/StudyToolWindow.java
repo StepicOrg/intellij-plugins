@@ -17,7 +17,11 @@ package com.jetbrains.tmp.learning.ui;
 
 import com.intellij.ide.browsers.WebBrowserManager;
 import com.intellij.openapi.Disposable;
-import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.ActionGroup;
+import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.ActionToolbar;
+import com.intellij.openapi.actionSystem.DataProvider;
+import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.EditorFactory;
@@ -32,10 +36,16 @@ import com.intellij.ui.JBCardLayout;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.OnePixelSplitter;
 import com.intellij.util.ui.JBUI;
-import com.jetbrains.tmp.learning.*;
+import com.jetbrains.tmp.learning.StudyBasePluginConfigurator;
+import com.jetbrains.tmp.learning.StudyPluginConfigurator;
+import com.jetbrains.tmp.learning.StudyTaskManager;
+import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.core.EduNames;
-import com.jetbrains.tmp.learning.courseFormat.*;
-import com.jetbrains.tmp.learning.stepik.StepikAdaptiveReactionsPanel;
+import com.jetbrains.tmp.learning.courseFormat.Course;
+import com.jetbrains.tmp.learning.courseFormat.Lesson;
+import com.jetbrains.tmp.learning.courseFormat.Section;
+import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
+import com.jetbrains.tmp.learning.courseFormat.TaskFile;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -72,9 +82,6 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
 
         final JPanel panel = new JPanel(new BorderLayout());
         final Course course = StudyTaskManager.getInstance(project).getCourse();
-        if (isToolwindow && course != null && course.isAdaptive()) {
-            panel.add(new StepikAdaptiveReactionsPanel(project), BorderLayout.NORTH);
-        }
 
         JComponent taskInfoPanel = createTaskInfoPanel(project);
         panel.add(taskInfoPanel, BorderLayout.CENTER);

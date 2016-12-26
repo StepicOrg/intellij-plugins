@@ -18,10 +18,10 @@ public class Lesson implements StudyItem {
     @Transient
     boolean is_public;
     @Transient
-    int position;
-    @Transient
     private Section section = null;
 
+    @Expose
+    private int position;
     @Expose
     private int id;
 
@@ -151,5 +151,18 @@ public class Lesson implements StudyItem {
     @Transient
     public void setSection(Section section) {
         this.section = section;
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
+    }
+
+    @Override
+    public String toString() {
+        return "Lesson {id=" + id + ", name='" + name + "\'}";
     }
 }
