@@ -75,7 +75,7 @@ public class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjec
     @Nls
     @Override
     public String getName() {
-        return "Stepik Union";
+        return "Stepik";
     }
 
     @Nullable
