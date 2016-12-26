@@ -1,19 +1,22 @@
-package org.stepik.plugin.projectWizard.pycharm;
+package org.stepik.plugin.projectWizard.idea;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.BrowserUtil;
+import com.intellij.ide.util.projectWizard.ModuleWizardStep;
+import com.intellij.ide.wizard.CommitStepException;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.HyperlinkAdapter;
-import com.intellij.ui.PanelWithAnchor;
 import com.jetbrains.tmp.learning.StudyTaskManager;
+import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.courseGeneration.StepikProjectGenerator;
 import com.jetbrains.tmp.learning.stepik.CourseInfo;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorGet;
+import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
+import com.jetbrains.tmp.learning.stepik.StepikConnectorPost;
 import com.jetbrains.tmp.learning.stepik.StepikWrappers;
-import org.apache.commons.lang.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
@@ -25,23 +28,21 @@ import java.awt.event.ItemListener;
 import java.util.Arrays;
 import java.util.List;
 
-public class PyCourseCreatorSettingPanel extends JPanel implements PanelWithAnchor {
-    private static final Logger logger = Logger.getInstance(PyCourseCreatorSettingPanel.class);
+public class JavaCCSettingsPanel extends ModuleWizardStep {
+    private static final Logger logger = Logger.getInstance(JavaCCSettingsPanel.class);
     private final static String COURSE_LIST = "Course list";
-    final static String COURSE_LINK = "Course link";
+    private final static String COURSE_LINK = "Course link";
 
     private JPanel mainPanel;
+
     private JLabel nameLabel;
     private JLabel userName;
+    private JLabel langLabel;
+    private JComboBox<SupportedLanguages> langComboBox;
     private JLabel buildLabel;
     private JComboBox<String> buildType;
 
     private JPanel courseSelectPanel;
-
-    private JPanel courseLinkPanel;
-    private JLabel courseLinkLabel;
-    private JTextField courseLinkFiled;
-    private JTextPane courseLinkDescription;
 
     private JPanel courseListPanel;
     private JLabel courseListLabel;
@@ -49,23 +50,26 @@ public class PyCourseCreatorSettingPanel extends JPanel implements PanelWithAnch
     private JButton refreshListButton;
     private JTextPane courseListDescription;
 
-    private CourseInfo selectedCourse;
-    private Project project;
+    private JPanel courseLinkPanel;
+    private JLabel courseLinkLabel;
+    private JTextField courseLinkFiled;
+    private JTextPane courseLinkDescription;
 
-    private boolean isInit = false;
+    private final StepikProjectGenerator projectGenerator;
+    @NotNull
+    private CourseInfo selectedCourse = CourseInfo.INVALID_COURSE;
+    @NotNull
     private CourseInfo courseFromLink = CourseInfo.INVALID_COURSE;
+    private final Project project;
 
-    PyCourseCreatorSettingPanel() {
-    }
-
-    void init(Project project) {
+    JavaCCSettingsPanel(
+            @NotNull final StepikProjectGenerator projectGenerator,
+            @NotNull Project project) {
+        this.projectGenerator = projectGenerator;
         this.project = project;
-        if (!isInit) {
-            layoutPanel();
-            initListeners();
-            isInit = true;
-        }
-        setupGeneralSettings();
+
+        layoutPanel();
+        initListeners();
     }
 
     private void layoutPanel() {
@@ -74,8 +78,8 @@ public class PyCourseCreatorSettingPanel extends JPanel implements PanelWithAnch
         buildType.addItem(COURSE_LINK);
         buildType.setSelectedItem(COURSE_LIST);
 
-        setupDescriptionSettings(courseLinkDescription);
         setupDescriptionSettings(courseListDescription);
+        setupDescriptionSettings(courseLinkDescription);
     }
 
     private void setupDescriptionSettings(JTextPane jTextPane) {
@@ -96,30 +100,46 @@ public class PyCourseCreatorSettingPanel extends JPanel implements PanelWithAnch
         courseListComboBox.addItemListener(new CourseListComboBoxListener());
     }
 
-    private void setupGeneralSettings() {
-        refreshCourseList(false);
+    @Override
+    public JComponent getComponent() {
+        return mainPanel;
+    }
+
+    @Override
+    public void updateStep() {
+        StepikConnectorLogin.loginFromDialog(project);
         userName.setText(StudyTaskManager.getInstance(project).getUser().getName());
+        refreshCourseList(false);
+
+        langComboBox.addItem(SupportedLanguages.PYTHON);
+        langComboBox.addItem(SupportedLanguages.JAVA);
+        langComboBox.setSelectedItem(SupportedLanguages.JAVA);
     }
 
     @Override
-    public JComponent getAnchor() {
-        return mainPanel;
+    public void updateDataModel() {
     }
 
     @Override
-    public void setAnchor(@Nullable JComponent jComponent) {
+    public boolean validate() throws ConfigurationException {
+        return !selectedCourse.isAdaptive() || selectedCourse != CourseInfo.INVALID_COURSE;
     }
 
-    CourseInfo getSelectedCourse() {
-        return selectedCourse;
+    @Override
+    public void onStepLeaving() {
+        SupportedLanguages selectedLang = (SupportedLanguages) langComboBox.getSelectedItem();
+        projectGenerator.setDefaultLang(selectedLang);
+        projectGenerator.setSelectedCourse(selectedCourse);
     }
 
-    JPanel getMainPanel() {
-        return mainPanel;
-    }
-
-    String getBuildType() {
-        return (String) buildType.getSelectedItem();
+    @Override
+    public void onWizardFinished() throws CommitStepException {
+        super.onWizardFinished();
+        int id = selectedCourse.getId();
+        StepikConnectorPost.enrollToCourse(id);
+        logger.info(String.format("Finished the project wizard with the selected course: id = %s, name = %s",
+                id, selectedCourse.getName()));
+        StepikProjectGenerator.downloadAndFlushCourse(project, selectedCourse);
     }
 
     private void refreshCourseList(boolean force) {
@@ -129,28 +149,23 @@ public class PyCourseCreatorSettingPanel extends JPanel implements PanelWithAnch
                         "Refreshing Course List",
                         project);
 
+        courseListComboBox.removeAllItems();
         addCoursesToComboBox(courses);
-        selectedCourse = courseListComboBox.getItemAt(0);
-        if (selectedCourse == null) selectedCourse = CourseInfo.INVALID_COURSE;
+
+        if (courseListComboBox.getItemAt(0) == null) {
+            selectedCourse = CourseInfo.INVALID_COURSE;
+        } else {
+            selectedCourse = courseListComboBox.getItemAt(0);
+        }
         courseListDescription.setText(selectedCourse.getDescription());
     }
 
     private void addCoursesToComboBox(@NotNull List<CourseInfo> courses) {
-        courses.stream()
-                .filter(course -> !course.isAdaptive())
-                .filter(course ->
-                        ArrayUtils.contains(course.getTags(), 22872) ||
-                                ArrayUtils.contains(course.getTags(), 22760)
-                )
-                .forEach(courseListComboBox::addItem);
+        courses.forEach(courseListComboBox::addItem);
         if (courseListComboBox.getItemCount() > 0) {
             courseListComboBox.setSelectedIndex(0);
         }
     }
-
-    /**
-     * Listeners
-     */
 
     private class RefreshActionListener implements ActionListener {
         @Override

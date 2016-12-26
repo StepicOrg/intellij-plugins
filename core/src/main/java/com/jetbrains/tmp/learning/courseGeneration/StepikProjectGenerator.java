@@ -9,12 +9,14 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.JsonReader;
+import com.intellij.facet.ui.ValidationResult;
 import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.io.FileUtil;
+import com.intellij.util.containers.ContainerUtil;
 import com.jetbrains.tmp.learning.StudySerializationUtils;
 import com.jetbrains.tmp.learning.StudySerializationUtils.Json.SupportedLanguagesDeserializer;
 import com.jetbrains.tmp.learning.StudyTaskManager;
@@ -38,6 +40,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -61,18 +64,18 @@ public class StepikProjectGenerator {
 
     private static StepikProjectGenerator instance;
 
-    private StepikProjectGenerator(){}
+    private StepikProjectGenerator() {}
 
     public static StepikProjectGenerator getInstance() {
-        if (instance == null){
+        if (instance == null) {
             instance = new StepikProjectGenerator();
         }
         return instance;
     }
 
     /**
-    *    Non-static methods -----------------------------------------
-    */
+     * Non-static methods -----------------------------------------
+     */
 
     public void setSelectedCourse(@Nullable CourseInfo courseInfo) {
         if (courseInfo == null) {
@@ -117,7 +120,7 @@ public class StepikProjectGenerator {
     }
 
     /**
-     *    Static methods --------------------------------------------
+     * Static methods --------------------------------------------
      */
 
     private static List<CourseInfo> getCourses(boolean force) {
@@ -126,15 +129,17 @@ public class StepikProjectGenerator {
             courses = getCoursesFromCache();
         }
         if (force || courses.isEmpty()) {
-            List<CourseInfo> tmp = execCancelable(StepikConnectorGet::getEnrolledCourses);
-            if (tmp == null) tmp = new ArrayList<>();
-            courses = tmp;
+            courses = StepikConnectorGet.getCourses(getHardcodedCoursesId());
             flushCache(courses);
         }
         if (courses.isEmpty()) {
             courses.add(CourseInfo.INVALID_COURSE);
         }
         return courses;
+    }
+
+    private static List<Integer> getHardcodedCoursesId() {
+        return Arrays.asList(187, 67, 512, 401, 217, 150, 125, 126, 1127);
     }
 
     @NotNull
@@ -159,7 +164,7 @@ public class StepikProjectGenerator {
     @Nullable
     private static Course readCourseFromCache(@NotNull File courseFile, boolean isAdaptive) {
         try (BufferedReader bufferedReader =
-                new BufferedReader(new InputStreamReader(new FileInputStream(courseFile), "UTF-8"))){
+                new BufferedReader(new InputStreamReader(new FileInputStream(courseFile), "UTF-8"))) {
             Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation()
                     .registerTypeAdapter(SupportedLanguages.class, new SupportedLanguagesDeserializer())
                     .create();
@@ -176,7 +181,7 @@ public class StepikProjectGenerator {
      * Writes courses to cache file {@link StepikProjectGenerator#CACHE_NAME}
      */
     @SuppressWarnings("IOResourceOpenedButNotSafelyClosed")
-    public static void flushCache(List<CourseInfo> courses) {
+    private static void flushCache(List<CourseInfo> courses) {
         File cacheFile = new File(CONFIG_COURSES_DIR, CACHE_NAME);
         PrintWriter writer = null;
         try {
@@ -216,7 +221,7 @@ public class StepikProjectGenerator {
     }
 
     @NotNull
-    public static List<CourseInfo> getCoursesFromCache() {
+    private static List<CourseInfo> getCoursesFromCache() {
         List<CourseInfo> courses = new ArrayList<>();
         final File cacheFile = new File(CONFIG_COURSES_DIR, CACHE_NAME);
         if (!cacheFile.exists()) {
@@ -318,7 +323,8 @@ public class StepikProjectGenerator {
 
     private static void flushCourseJson(@NotNull final Course course, @NotNull final File courseDirectory) {
         final Gson gson = new GsonBuilder().setPrettyPrinting()
-                .registerTypeAdapter(SupportedLanguages.class, new StudySerializationUtils.Json.SupportedLanguagesSerializer())
+                .registerTypeAdapter(SupportedLanguages.class,
+                        new StudySerializationUtils.Json.SupportedLanguagesSerializer())
                 .excludeFieldsWithoutExposeAnnotation()
                 .create();
         final String json = gson.toJson(course);
@@ -329,6 +335,22 @@ public class StepikProjectGenerator {
         } catch (IOException e) {
             Messages.showErrorDialog(e.getMessage(), "Failed to Generate Json");
             logger.warn(e);
+        }
+    }
+
+    private final List<SettingsListener> listeners = ContainerUtil.newArrayList();
+
+    public void addSettingsStateListener(@NotNull SettingsListener listener) {
+        listeners.add(listener);
+    }
+
+    public interface SettingsListener {
+        void stateChanged(ValidationResult result);
+    }
+
+    public void fireStateChanged(ValidationResult result) {
+        for (SettingsListener listener : listeners) {
+            listener.stateChanged(result);
         }
     }
 }

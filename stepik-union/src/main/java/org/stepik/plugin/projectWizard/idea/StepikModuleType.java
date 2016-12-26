@@ -18,7 +18,7 @@ import org.jetbrains.jps.model.java.JavaModuleSourceRootTypes;
 import javax.swing.*;
 
 public class StepikModuleType extends ModuleType<CourseModuleBuilder> {
-    static final String MODULE_NAME = "Stepik Union";
+    static final String MODULE_NAME = "Stepik";
     static final StepikModuleType STEPIK_MODULE_TYPE;
     private static final String ID = "STEPIK_MODULE_TYPE";
 

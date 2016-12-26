@@ -1,5 +1,7 @@
 package org.stepik.plugin.projectWizard.pycharm;
 
+import com.intellij.facet.ui.FacetEditorValidator;
+import com.intellij.facet.ui.FacetValidatorsManager;
 import com.intellij.facet.ui.ValidationResult;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
@@ -44,13 +46,24 @@ import java.io.IOException;
 
 public class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettings> {
     private static final Logger logger = Logger.getInstance(StepikPyProjectGenerator.class.getName());
+    private static final String MODULE_NAME = "Stepik";
     private final StepikProjectGenerator generator;
-    private PyCourseCreatorSettingPanel pySPanel;
+    private PyCCSettingPanel pySPanel;
 
     public StepikPyProjectGenerator() {
         super(true);
         generator = StepikProjectGenerator.getInstance();
-        pySPanel = new PyCourseCreatorSettingPanel();
+        pySPanel = new PyCCSettingPanel();
+
+        pySPanel.registerValidators(new FacetValidatorsManager() {
+            public void registerValidator(FacetEditorValidator validator, JComponent... componentsToWatch) {
+                throw new UnsupportedOperationException();
+            }
+
+            public void validate() {
+                ApplicationManager.getApplication().invokeLater(() -> fireStateChanged());
+            }
+        });
     }
 
     @Nullable
@@ -63,7 +76,7 @@ public class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjec
     @Nls
     @Override
     public String getName() {
-        return "Stepik Union";
+        return MODULE_NAME;
     }
 
     @Nullable
@@ -78,21 +91,22 @@ public class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjec
     @NotNull
     @Override
     public ValidationResult validate(@NotNull String s) {
-        return ValidationResult.OK;
+        return pySPanel.check();
     }
 
     @Nullable
     @Override
     public BooleanFunction<PythonProjectGenerator> beforeProjectGenerated(@Nullable Sdk sdk) {
         return generator -> {
+            Project defaultProject = DefaultProjectFactory.getInstance().getDefaultProject();
+            StepikConnectorLogin.loginFromDialog(defaultProject);
             final CourseInfo courseInfo = pySPanel.getSelectedCourse();
             if (courseInfo == null || courseInfo == CourseInfo.INVALID_COURSE) return false;
             this.generator.setSelectedCourse(courseInfo);
-            if (PyCourseCreatorSettingPanel.COURSE_LINK.equals(pySPanel.getBuildType())) {
+            if (PyCCSettingPanel.COURSE_LINK.equals(pySPanel.getBuildType())) {
                 StepikConnectorPost.enrollToCourse(courseInfo.getId());
             }
-            StepikProjectGenerator.downloadAndFlushCourse(DefaultProjectFactory.getInstance().getDefaultProject(),
-                    courseInfo);
+            StepikProjectGenerator.downloadAndFlushCourse(defaultProject, courseInfo);
             return true;
         };
     }
