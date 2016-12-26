@@ -67,7 +67,7 @@ public class StepikSettingsPanel {
     private boolean myCredentialsModified;
     private boolean myHintCheckBoxModified;
 
-    public StepikSettingsPanel() {
+    StepikSettingsPanel() {
         initProjectOfSettings();
         mySignupTextField.addHyperlinkListener(new HyperlinkAdapter() {
             @Override
@@ -150,16 +150,16 @@ public class StepikSettingsPanel {
         myCredentialsModified = true;
     }
 
-    public JComponent getPanel() {
+    JComponent getPanel() {
         return myPane;
     }
 
     @NotNull
-    public String getEmail() {
+    private String getEmail() {
         return myEmailTextField.getText().trim();
     }
 
-    public void setLogin(@Nullable final String login) {
+    private void setLogin(@Nullable final String login) {
         myEmailTextField.setText(login);
     }
 
@@ -184,7 +184,7 @@ public class StepikSettingsPanel {
         myPasswordField.setText(StringUtil.isEmpty(password) ? null : password);
     }
 
-    public void reset() {
+    void reset() {
         initProjectOfSettings();
         final StepikUser user = StudyTaskManager.getInstance(settingsProject).getUser();
         setLogin(user.getEmail());
@@ -192,7 +192,7 @@ public class StepikSettingsPanel {
         resetCredentialsModification();
     }
 
-    public void apply() {
+    void apply() {
         if (myCredentialsModified) {
             initProjectOfSettings();
             StudyTaskManager manager = StudyTaskManager.getInstance(settingsProject);
@@ -211,11 +211,11 @@ public class StepikSettingsPanel {
         resetCredentialsModification();
     }
 
-    public boolean isModified() {
+    boolean isModified() {
         return myCredentialsModified || myHintCheckBoxModified;
     }
 
-    public void resetCredentialsModification() {
+    private void resetCredentialsModification() {
         myCredentialsModified = false;
         myHintCheckBoxModified = false;
     }
