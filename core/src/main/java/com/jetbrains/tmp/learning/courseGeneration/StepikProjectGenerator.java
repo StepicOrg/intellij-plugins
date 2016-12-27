@@ -61,11 +61,15 @@ public class StepikProjectGenerator {
     @NotNull
     private static List<CourseInfo> getCourses(boolean force) {
         List<CourseInfo> courses = new ArrayList<>();
-        if (!force && CONFIG_COURSES_DIR.exists()) {
+        if (CONFIG_COURSES_DIR.exists()) {
             courses = getCoursesFromCache();
         }
         if (force || courses.isEmpty()) {
-            courses = StepikConnectorGet.getCourses(getHardcodedCoursesId());
+            try {
+                courses = StepikConnectorGet.getCourses(getHardcodedCoursesId());
+            } catch (Throwable t) {
+                logger.error(t.toString());
+            }
             flushCache(courses);
         }
         if (courses.isEmpty()) {
@@ -120,9 +124,15 @@ public class StepikProjectGenerator {
      */
     private static void flushCache(List<CourseInfo> courses) {
         File cacheFile = new File(CONFIG_COURSES_DIR, CACHE_NAME);
+        try {
+            if (!createCacheFile(cacheFile)) {
+                return;
+            }
+        } catch (IOException e) {
+            logger.error(e);
+        }
 
         try (PrintWriter writer = new PrintWriter(cacheFile)) {
-            if (!createCacheFile(cacheFile)) return;
             Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
 
             final Set<CourseInfo> courseInfos = new HashSet<>();

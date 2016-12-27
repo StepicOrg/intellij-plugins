@@ -22,7 +22,7 @@ public class CourseInfo {
     private boolean isAdaptive;
     private boolean isPublic;
     private int[] tags;
-    private List<StepikUser> authors = new ArrayList<>();
+    private List<StepikUser> courseAuthors = new ArrayList<>();
     @SerializedName("summary")
     private String description;
     @SerializedName("course_format")
@@ -47,13 +47,13 @@ public class CourseInfo {
     }
 
     @NotNull
-    List<StepikUser> getAuthors() {
-        return authors;
+    List<StepikUser> getCourseAuthors() {
+        return courseAuthors;
     }
 
-    public void setAuthors(List<StepikUser> authors) {
-        this.authors = authors;
-        instructors.addAll(authors.stream()
+    public void setCourseAuthors(List<StepikUser> courseAuthors) {
+        this.courseAuthors = courseAuthors;
+        instructors.addAll(courseAuthors.stream()
                 .filter(author -> author.getId() > 0)
                 .map(StepikUser::getId)
                 .collect(Collectors.toList()));
@@ -108,10 +108,10 @@ public class CourseInfo {
     }
 
     void addAuthor(StepikUser author) {
-        if (authors == null) {
-            authors = new ArrayList<>();
+        if (courseAuthors == null) {
+            courseAuthors = new ArrayList<>();
         }
-        authors.add(author);
+        courseAuthors.add(author);
     }
 
     public boolean isAdaptive() {

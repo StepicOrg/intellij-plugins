@@ -104,7 +104,7 @@ public class StepikConnectorGet {
     public static Course getCourse(@NotNull final CourseInfo info) {
         Course course = new Course();
         course.setName(info.getName());
-        course.setAuthors(info.getAuthors());
+        course.setAuthors(info.getCourseAuthors());
         course.setDescription(info.getDescription());
         course.setAdaptive(info.isAdaptive());
         course.setId(info.id);
