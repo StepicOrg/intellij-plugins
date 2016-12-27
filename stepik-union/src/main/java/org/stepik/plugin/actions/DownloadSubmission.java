@@ -17,13 +17,14 @@ import com.intellij.openapi.ui.popup.LightweightWindowEvent;
 import com.intellij.openapi.ui.popup.PopupChooserBuilder;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.jetbrains.tmp.learning.StudyTaskManager;
+import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.actions.StudyActionWithShortcut;
 import com.jetbrains.tmp.learning.core.EduNames;
+import com.jetbrains.tmp.learning.courseFormat.Course;
+import com.jetbrains.tmp.learning.courseFormat.Step;
 import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
-import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorGet;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorPost;
 import com.jetbrains.tmp.learning.stepik.StepikWrappers;
@@ -75,30 +76,30 @@ public class DownloadSubmission extends StudyActionWithShortcut {
             return;
         }
 
-        Task task = StudyUtils.getSelectedTask(project);
-        if (task == null) {
+        Step step = StudyUtils.getSelectedStep(project);
+        if (step == null) {
             return;
         }
 
-        List<Submission> submissions = getSubmissions(project, task);
+        List<Submission> submissions = getSubmissions(project, step);
 
         if (submissions == null) {
             return;
         }
 
-        SupportedLanguages currentLang = task.getCurrentLang();
+        SupportedLanguages currentLang = step.getCurrentLang();
 
         submissions = filterSubmissions(submissions, currentLang);
 
-        showPopup(project, task, submissions, currentLang);
+        showPopup(project, step, submissions, currentLang);
     }
 
     @Nullable
     private List<Submission> getSubmissions(
             @NotNull Project project,
-            @NotNull Task task) {
-        String stepId = Integer.toString(task.getStepId());
-        String userId = Integer.toString(StudyTaskManager.getInstance(project).getUser().getId());
+            @NotNull Step step) {
+        String stepId = Integer.toString(step.getId());
+        String userId = Integer.toString(StepikProjectManager.getInstance(project).getUser().getId());
 
         List<NameValuePair> nvps = new ArrayList<>();
         nvps.add(new BasicNameValuePair("step", stepId));
@@ -126,7 +127,7 @@ public class DownloadSubmission extends StudyActionWithShortcut {
 
     private void showPopup(
             @NotNull Project project,
-            @NotNull Task task,
+            @NotNull Step step,
             @NotNull List<Submission> submissions,
             @NotNull SupportedLanguages currentLang) {
         JBPopupFactory popupFactory = JBPopupFactory.getInstance();
@@ -136,7 +137,7 @@ public class DownloadSubmission extends StudyActionWithShortcut {
             JList<Submission> list;
             list = new JList<>(submissions.toArray(new Submission[submissions.size()]));
             builder = popupFactory.createListPopupBuilder(list)
-                    .addListener(new Listener(list, project, task, currentLang));
+                    .addListener(new Listener(list, project, step, currentLang));
         } else {
             JList<String> emptyList = new JList<>(new String[]{"Empty"});
             builder = popupFactory.createListPopupBuilder(emptyList);
@@ -152,12 +153,12 @@ public class DownloadSubmission extends StudyActionWithShortcut {
     private void loadSubmission(
             @NotNull Project project,
             @NotNull SupportedLanguages currentLang,
-            @NotNull Task task,
+            @NotNull Step step,
             @NotNull Submission submission) {
 
         String fileName = currentLang.getMainFileName();
 
-        String mainFilePath = String.join("/", task.getPath(), EduNames.SRC, fileName);
+        String mainFilePath = String.join("/", step.getPath(), EduNames.SRC, fileName);
         VirtualFile mainFile = project.getBaseDir().findFileByRelativePath(mainFilePath);
         if (mainFile == null) {
             return;
@@ -165,11 +166,12 @@ public class DownloadSubmission extends StudyActionWithShortcut {
 
         final String finalCode = submission.getReply().getCode();
 
+        Course course = step.getCourse();
         StepikWrappers.MetricsWrapper metric = new StepikWrappers.MetricsWrapper(
                 StepikWrappers.MetricsWrapper.PluginNames.STEPIK_UNION,
                 StepikWrappers.MetricsWrapper.MetricActions.DOWNLOAD,
-                task.getLesson().getSection().getCourse().getId(),
-                task.getStepId());
+                course == null ? 0 : course.getId(),
+                step.getId());
         StepikConnectorPost.postMetric(metric);
 
         CommandProcessor.getInstance().executeCommand(project,
@@ -180,7 +182,7 @@ public class DownloadSubmission extends StudyActionWithShortcut {
 
                             if (document != null) {
                                 document.setText(finalCode);
-                                task.setStatus(StudyStatus.of(submission.getStatus()));
+                                step.setStatus(StudyStatus.of(submission.getStatus()));
                                 FileEditorManager.getInstance(project).openFile(mainFile, true);
                                 ProjectView.getInstance(project).refresh();
                             }
@@ -198,24 +200,24 @@ public class DownloadSubmission extends StudyActionWithShortcut {
             return;
         }
 
-        Task targetTask = StudyUtils.getSelectedTask(project);
-        e.getPresentation().setEnabled(targetTask != null);
+        Step targetStep = StudyUtils.getSelectedStep(project);
+        e.getPresentation().setEnabled(targetStep != null);
     }
 
     private class Listener implements JBPopupListener {
         private final JList<Submission> list;
         private final Project project;
-        private final Task task;
+        private final Step step;
         private final SupportedLanguages currentLang;
 
         Listener(
                 @NotNull JList<Submission> list,
                 @NotNull Project project,
-                @NotNull Task task,
+                @NotNull Step step,
                 @NotNull SupportedLanguages currentLang) {
             this.list = list;
             this.project = project;
-            this.task = task;
+            this.step = step;
             this.currentLang = currentLang;
         }
 
@@ -235,7 +237,7 @@ public class DownloadSubmission extends StudyActionWithShortcut {
                 return;
             }
 
-            loadSubmission(project, currentLang, task, submission);
+            loadSubmission(project, currentLang, step, submission);
         }
     }
 }

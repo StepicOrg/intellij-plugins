@@ -16,7 +16,7 @@ select bad repository and click on `Update`
 
 2. Find Stepik Union plugin and press Install.<br>
 
-3. To support Python code task in plugin, install also Python plugin from repository.<br>
+3. To support Python code step in plugin, install also Python plugin from repository.<br>
 
 And then restart IDEA.<br>
 
@@ -25,4 +25,4 @@ And then restart IDEA.<br>
 1. Open `Default settings | Other Settings | Stepik `, authorise in this window. Press `Ok`
 2. Create new project with "Stepik Union" module type.
 
-To send your code to the platform use actions in the "Task Description" tool window.
+To send your code to the platform use actions in the "Step Description" tool window.

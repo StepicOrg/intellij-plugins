@@ -1,71 +1,112 @@
 package com.jetbrains.tmp.learning.navigation;
 
-import com.jetbrains.tmp.learning.StudyUtils;
-import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.Lesson;
-import com.jetbrains.tmp.learning.courseFormat.Task;
+import com.jetbrains.tmp.learning.courseFormat.Section;
+import com.jetbrains.tmp.learning.courseFormat.Step;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
+import org.jetbrains.annotations.Nullable;
 
 public class StudyNavigator {
     private StudyNavigator() {
     }
 
-    public static Task nextTask(@NotNull final Task task) {
-        Lesson currentLesson = task.getLesson();
-        List<Task> taskList = currentLesson.getTaskList();
-        if (task.getIndex() < taskList.size()) {
-            return taskList.get(task.getIndex());
-        }
-        Lesson nextLesson = nextLesson(currentLesson);
-        if (nextLesson == null) {
+    @Nullable
+    private static Step navigate(@NotNull final Step step, @NotNull Direction direction) {
+        Lesson lesson = step.getLesson();
+        if (lesson == null) {
             return null;
         }
-        return StudyUtils.getFirst(nextLesson.getTaskList());
+        Step item = null;
+        switch (direction) {
+            case BACK:
+                item = lesson.getPrevStep(step);
+                break;
+            case FORWARD:
+                item = lesson.getNextStep(step);
+                break;
+        }
+        if (item != null) {
+            return item;
+        }
+
+        while ((lesson = navigate(lesson, direction)) != null) {
+            switch (direction) {
+                case BACK:
+                    item = lesson.getLastStep();
+                    break;
+                case FORWARD:
+                    item = lesson.getFirstStep();
+                    break;
+            }
+            if (item != null) {
+                return item;
+            }
+        }
+        return null;
     }
 
-    public static Task previousTask(@NotNull final Task task) {
-        Lesson currentLesson = task.getLesson();
-        int prevTaskIndex = task.getIndex() - 2;
-        if (prevTaskIndex >= 0) {
-            return currentLesson.getTaskList().get(prevTaskIndex);
-        }
-        Lesson prevLesson = previousLesson(currentLesson);
-        if (prevLesson == null) {
+    @Nullable
+    private static Lesson navigate(@NotNull final Lesson lesson, @NotNull Direction direction) {
+        Section section = lesson.getSection();
+        if (section == null) {
             return null;
         }
-        //getting last task in previous lesson
-        return prevLesson.getTaskList().get(prevLesson.getTaskList().size() - 1);
+        Lesson item = null;
+        switch (direction) {
+            case BACK:
+                item = section.getPrevLesson(lesson);
+                break;
+            case FORWARD:
+                item = section.getNextLesson(lesson);
+                break;
+        }
+        if (item != null) {
+            return item;
+        }
+
+        while ((section = navigate(section, direction)) != null) {
+            switch (direction) {
+                case BACK:
+                    item = section.getLastLesson();
+                    break;
+                case FORWARD:
+                    item = section.getFirstLesson();
+                    break;
+            }
+            if (item != null) {
+                return item;
+            }
+        }
+        return null;
     }
 
-    private static Lesson nextLesson(@NotNull final Lesson lesson) {
-        Course course = lesson.getSection().getCourse();
+    @Nullable
+    private static Section navigate(@NotNull final Section section, @NotNull Direction direction) {
+        Course course = section.getCourse();
         if (course == null) {
             return null;
         }
-
-        int index = lesson.getIndex();
-
-        Lesson nextLesson = course.getLessonOfIndex(index + 1);
-
-        if (nextLesson == null || EduNames.PYCHARM_ADDITIONAL.equals(nextLesson.getName())) {
-            return null;
+        switch (direction) {
+            case BACK:
+                return course.getPrevSection(section);
+            case FORWARD:
+                return course.getNextSection(section);
         }
-        return nextLesson;
+        return null;
     }
 
-    private static Lesson previousLesson(@NotNull final Lesson lesson) {
-        Course course = lesson.getSection().getCourse();
-        if (course == null)
-            return null;
+    @Nullable
+    public static Step nextStep(@NotNull final Step step) {
+        return navigate(step, Direction.FORWARD);
+    }
 
-        int index = lesson.getIndex();
-        if (index <= 0) {
-            return null;
-        }
+    @Nullable
+    public static Step previousStep(@NotNull final Step step) {
+        return navigate(step, Direction.BACK);
+    }
 
-        return course.getLessonOfIndex(index - 1);
+    private enum Direction {
+        BACK, FORWARD
     }
 }

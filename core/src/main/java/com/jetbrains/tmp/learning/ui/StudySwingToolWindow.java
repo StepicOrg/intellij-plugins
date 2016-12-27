@@ -31,17 +31,17 @@ import javax.swing.text.html.HTMLEditorKit;
 import java.awt.*;
 
 public class StudySwingToolWindow extends StudyToolWindow {
-    private JTextPane myTaskTextPane;
+    private JTextPane stepTextPane;
 
-    public StudySwingToolWindow() {
+    StudySwingToolWindow() {
         super();
     }
 
     @Override
-    public JComponent createTaskInfoPanel(Project project) {
-        myTaskTextPane = new JTextPane();
-        final JBScrollPane scrollPane = new JBScrollPane(myTaskTextPane);
-        myTaskTextPane.setContentType(new HTMLEditorKit().getContentType());
+    public JComponent createStepInfoPanel(Project project) {
+        stepTextPane = new JTextPane();
+        final JBScrollPane scrollPane = new JBScrollPane(stepTextPane);
+        stepTextPane.setContentType(new HTMLEditorKit().getContentType());
         final EditorColorsScheme editorColorsScheme = EditorColorsManager.getInstance().getGlobalScheme();
         int fontSize = editorColorsScheme.getEditorFontSize();
         final String fontName = editorColorsScheme.getEditorFontName();
@@ -52,18 +52,18 @@ public class StudySwingToolWindow extends StudyToolWindow {
                 + ColorUtil.toHex(ColorUtil.dimmer(UIUtil.getPanelBackground())) + ";}" +
                 "code {font-family: Courier; display: flex; float: left; background-color:"
                 + ColorUtil.toHex(ColorUtil.dimmer(UIUtil.getPanelBackground())) + ";}";
-        ((HTMLDocument) myTaskTextPane.getDocument()).getStyleSheet().addRule(bodyRule);
-        myTaskTextPane.setEditable(false);
+        ((HTMLDocument) stepTextPane.getDocument()).getStyleSheet().addRule(bodyRule);
+        stepTextPane.setEditable(false);
         if (!UIUtil.isUnderDarcula()) {
-            myTaskTextPane.setBackground(EditorColorsManager.getInstance().getGlobalScheme().getDefaultBackground());
+            stepTextPane.setBackground(EditorColorsManager.getInstance().getGlobalScheme().getDefaultBackground());
         }
-        myTaskTextPane.setBorder(new EmptyBorder(20, 20, 0, 10));
-        myTaskTextPane.addHyperlinkListener(BrowserHyperlinkListener.INSTANCE);
+        stepTextPane.setBorder(new EmptyBorder(20, 20, 0, 10));
+        stepTextPane.addHyperlinkListener(BrowserHyperlinkListener.INSTANCE);
         return scrollPane;
     }
 
     public void setText(@NotNull String text) {
-        myTaskTextPane.setText(text);
+        stepTextPane.setText(text);
     }
 }
 

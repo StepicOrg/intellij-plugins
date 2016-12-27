@@ -21,8 +21,9 @@ import com.intellij.problems.WolfTheProblemSolver;
 import com.jetbrains.tmp.learning.StudyState;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.actions.StudyActionWithShortcut;
+import com.jetbrains.tmp.learning.courseFormat.Step;
+import com.jetbrains.tmp.learning.courseFormat.StepFile;
 import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
-import com.jetbrains.tmp.learning.courseFormat.TaskFile;
 import com.jetbrains.tmp.learning.editor.StudyEditor;
 import icons.InteractiveLearningIcons;
 import org.jetbrains.annotations.NotNull;
@@ -30,16 +31,16 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
-public class StepikRefreshTaskFileAction extends StudyActionWithShortcut {
-    private static final String ACTION_ID = "STEPIK.RefreshTaskAction";
+public class StepikResetStepAction extends StudyActionWithShortcut {
+    private static final String ACTION_ID = "STEPIK.ResetStepAction";
     private static final String SHORTCUT = "ctrl shift pressed X";
     private static final Logger logger = Logger
-            .getInstance(StepikRefreshTaskFileAction.class.getName());
+            .getInstance(StepikResetStepAction.class.getName());
 
-    public StepikRefreshTaskFileAction() {
-        super("Reset Task File (" + KeymapUtil.getShortcutText(
+    public StepikResetStepAction() {
+        super("Reset Step File (" + KeymapUtil.getShortcutText(
                 new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT), null)) + ")",
-                "Refresh current task", InteractiveLearningIcons.ResetTaskFile);
+                "Reset current step", InteractiveLearningIcons.ResetStepFile);
     }
 
     private static void refresh(@NotNull final Project project) {
@@ -48,7 +49,7 @@ public class StepikRefreshTaskFileAction extends StudyActionWithShortcut {
                     StudyEditor studyEditor = StudyUtils.getSelectedStudyEditor(project);
                     StudyState studyState = new StudyState(studyEditor);
                     if (studyEditor == null || !studyState.isValid()) {
-                        logger.info("RefreshTaskFileAction was invoked outside of Study Editor");
+                        logger.info("ResetStepAction was invoked outside of Study Editor");
                         return;
                     }
                     refreshFile(studyState, project);
@@ -59,30 +60,32 @@ public class StepikRefreshTaskFileAction extends StudyActionWithShortcut {
             @NotNull final StudyState studyState,
             @NotNull final Project project) {
         final Editor editor = studyState.getEditor();
-        final TaskFile taskFile = studyState.getTaskFile();
-        resetTaskFile(editor.getDocument(), project, taskFile);
+        final StepFile stepFile = studyState.getStepFile();
+        resetStepFile(editor.getDocument(), project, stepFile);
         WolfTheProblemSolver.getInstance(project).clearProblems(studyState.getVirtualFile());
         ApplicationManager.getApplication().invokeLater(
                 () -> IdeFocusManager.getInstance(project)
                         .requestFocus(editor.getContentComponent(), true));
-        showBalloon(project, MessageType.INFO);
+        showBalloon(project);
     }
 
-    private static void resetTaskFile(
+    private static void resetStepFile(
             @NotNull final Document document,
             @NotNull final Project project,
-            TaskFile taskFile) {
-        resetDocument(document, taskFile, project);
-        taskFile.getTask().setStatus(StudyStatus.UNCHECKED);
+            StepFile stepFile) {
+        resetDocument(document, stepFile, project);
+        Step step = stepFile.getStep();
+        if (step != null) {
+            step.setStatus(StudyStatus.UNCHECKED);
+        }
         ProjectView.getInstance(project).refresh();
         StudyUtils.updateToolWindows(project);
     }
 
     private static void showBalloon(
-            @NotNull final Project project,
-            @NotNull final MessageType messageType) {
+            @NotNull final Project project) {
         BalloonBuilder balloonBuilder = JBPopupFactory.getInstance()
-                .createHtmlTextBalloonBuilder("You can start again now", messageType, null);
+                .createHtmlTextBalloonBuilder("You can start again now", MessageType.INFO, null);
         final Balloon balloon = balloonBuilder.createBalloon();
         StudyEditor selectedStudyEditor = StudyUtils.getSelectedStudyEditor(project);
         assert selectedStudyEditor != null;
@@ -93,13 +96,13 @@ public class StepikRefreshTaskFileAction extends StudyActionWithShortcut {
 
     private static void resetDocument(
             @NotNull final Document document,
-            @NotNull final TaskFile taskFile,
+            @NotNull final StepFile stepFile,
             @NotNull Project project) {
         CommandProcessor.getInstance().executeCommand(project,
                 () -> ApplicationManager
                         .getApplication()
-                        .runWriteAction(() -> document.setText(taskFile.getText())),
-                "Stepik refresh task", "Stepik refresh task"
+                        .runWriteAction(() -> document.setText(stepFile.getText())),
+                "Stepik refresh step", "Stepik refresh step"
         );
     }
 

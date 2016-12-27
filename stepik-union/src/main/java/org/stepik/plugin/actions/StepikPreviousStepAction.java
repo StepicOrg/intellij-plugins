@@ -3,11 +3,11 @@ package org.stepik.plugin.actions;
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.project.Project;
-import com.jetbrains.tmp.learning.StudyTaskManager;
+import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.Lesson;
 import com.jetbrains.tmp.learning.courseFormat.Section;
-import com.jetbrains.tmp.learning.courseFormat.Task;
+import com.jetbrains.tmp.learning.courseFormat.Step;
 import com.jetbrains.tmp.learning.navigation.StudyNavigator;
 import icons.InteractiveLearningIcons;
 import org.jetbrains.annotations.NotNull;
@@ -16,24 +16,24 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.util.List;
 
-public class StepikPreviousTaskAction extends StepikTaskNavigationAction {
-    private static final String ACTION_ID = "STEPIK.PreviousTaskAction";
+public class StepikPreviousStepAction extends StepikStepNavigationAction {
+    private static final String ACTION_ID = "STEPIK.PreviousStepAction";
     private static final String SHORTCUT = "ctrl pressed COMMA";
 
-    public StepikPreviousTaskAction() {
-        super("Previous Task (" + KeymapUtil.getShortcutText(new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT),
-                null)) + ")", "Navigate to the previous task", InteractiveLearningIcons.Prev);
+    public StepikPreviousStepAction() {
+        super("Previous Step (" + KeymapUtil.getShortcutText(new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT),
+                null)) + ")", "Navigate to the previous step", InteractiveLearningIcons.Prev);
     }
 
     @Override
-    protected Task getTargetTask(@NotNull final Task sourceTask) {
-        return StudyNavigator.previousTask(sourceTask);
+    protected Step getTargetStep(@NotNull final Step sourceStep) {
+        return StudyNavigator.previousStep(sourceStep);
     }
 
     @Nullable
     @Override
-    protected Task getDefaultTask(@NotNull final Project project) {
-        Course course = StudyTaskManager.getInstance(project).getCourse();
+    protected Step getDefaultStep(@NotNull final Project project) {
+        Course course = StepikProjectManager.getInstance(project).getCourse();
         if (course == null) {
             return null;
         }
@@ -44,9 +44,9 @@ public class StepikPreviousTaskAction extends StepikTaskNavigationAction {
             List<Lesson> lessons = sections.get(i).getLessons();
             for (int j = lessons.size() - 1; i >= 0; i--) {
                 Lesson lesson = lessons.get(j);
-                List<Task> tasks = lesson.getTaskList();
-                if (tasks.size() > 0) {
-                    return lesson.getTaskList().get(tasks.size() - 1);
+                Step step = lesson.getLastStep();
+                if (step != null) {
+                    return step;
                 }
             }
         }

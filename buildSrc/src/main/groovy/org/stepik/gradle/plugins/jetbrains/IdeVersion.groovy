@@ -11,11 +11,11 @@ class IdeVersion {
     private static final String FALLBACK_VERSION = "999.SNAPSHOT"
     private static final int SNAPSHOT_VALUE = Integer.MAX_VALUE
 
-    private final int[] myComponents
+    private final int[] components
 
 
     private IdeVersion(int ... components) {
-        myComponents = components
+        this.components = components
     }
 
     @Nullable
@@ -29,7 +29,7 @@ class IdeVersion {
             if (fallback == null) {
                 return null
             }
-            return new IdeVersion(fallback.myComponents)
+            return new IdeVersion(fallback.components)
         }
 
         def code = version
@@ -147,10 +147,10 @@ class IdeVersion {
     }
 
     int getBaselineVersion() {
-        return myComponents[0]
+        return components[0]
     }
 
     int getBuild() {
-        return myComponents[1]
+        return components[1]
     }
 }

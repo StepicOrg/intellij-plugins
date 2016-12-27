@@ -11,7 +11,7 @@ import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.problems.WolfTheProblemSolver;
 import com.jetbrains.tmp.learning.StudyUtils;
-import com.jetbrains.tmp.learning.courseFormat.TaskFile;
+import com.jetbrains.tmp.learning.courseFormat.StepFile;
 import com.jetbrains.tmp.learning.ui.StudyToolWindowFactory;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,8 +27,8 @@ public class StudyEditorFactoryListener implements EditorFactoryListener {
         final Document document = editor.getDocument();
         final VirtualFile openedFile = FileDocumentManager.getInstance().getFile(document);
         if (openedFile != null) {
-            final TaskFile taskFile = StudyUtils.getTaskFile(project, openedFile);
-            if (taskFile != null) {
+            final StepFile stepFile = StudyUtils.getStepFile(project, openedFile);
+            if (stepFile != null) {
                 WolfTheProblemSolver.getInstance(project).clearProblems(openedFile);
                 final ToolWindow studyToolWindow = ToolWindowManager.getInstance(project)
                         .getToolWindow(StudyToolWindowFactory.STUDY_TOOL_WINDOW);

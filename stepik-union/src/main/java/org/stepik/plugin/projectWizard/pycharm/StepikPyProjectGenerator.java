@@ -20,15 +20,14 @@ import com.intellij.util.BooleanFunction;
 import com.jetbrains.python.newProject.PyNewProjectSettings;
 import com.jetbrains.python.newProject.PythonProjectGenerator;
 import com.jetbrains.python.remote.PyProjectSynchronizer;
+import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.StudyProjectComponent;
-import com.jetbrains.tmp.learning.StudyTaskManager;
 import com.jetbrains.tmp.learning.SupportedLanguages;
-import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.Lesson;
 import com.jetbrains.tmp.learning.courseFormat.Section;
-import com.jetbrains.tmp.learning.courseFormat.Task;
-import com.jetbrains.tmp.learning.courseFormat.TaskFile;
+import com.jetbrains.tmp.learning.courseFormat.Step;
+import com.jetbrains.tmp.learning.courseFormat.StepFile;
 import com.jetbrains.tmp.learning.courseGeneration.StepikProjectGenerator;
 import com.jetbrains.tmp.learning.stepik.CourseInfo;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
@@ -44,12 +43,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 
-public class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettings> {
+class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettings> {
     private static final Logger logger = Logger.getInstance(StepikPyProjectGenerator.class.getName());
     private final StepikProjectGenerator generator;
-    private PyCCSettingPanel pySPanel;
+    private final PyCCSettingPanel pySPanel;
 
-    public StepikPyProjectGenerator() {
+    private StepikPyProjectGenerator() {
         super(true);
         generator = StepikProjectGenerator.getInstance();
         pySPanel = new PyCCSettingPanel();
@@ -130,16 +129,14 @@ public class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjec
             @NotNull Project project) {
         generator.generateProject(project);
 
-        StudyTaskManager taskManager = StudyTaskManager.getInstance(project);
-        taskManager.setDefaultLang(generator.getDefaultLang());
-        Course course = taskManager.getCourse();
+        StepikProjectManager stepManager = StepikProjectManager.getInstance(project);
+        stepManager.setDefaultLang(generator.getDefaultLang());
+        Course course = stepManager.getCourse();
         if (course == null) {
             logger.warn("failed to generate builders");
             return;
         }
-        course.setCourseMode(EduNames.STEPIK_CODE);
 
-//        logger.info("Module dir = " + new File(project.getBasePath(), "Sandbox").getAbsolutePath());
         FileUtil.createDirectory(new File(project.getBasePath(), "Sandbox"));
 
         createSubDirectories(course, project);
@@ -154,28 +151,21 @@ public class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjec
     private void createSubDirectories(
             @NotNull Course course,
             @NotNull Project project) {
-        int sectionIndex = 0;
-        int lessonIndex = 1;
         for (Section section : course.getSections()) {
-            section.setIndex(++sectionIndex);
             FileUtil.createDirectory(new File(project.getBasePath(), section.getPath()));
             for (Lesson lesson : section.getLessons()) {
-                lesson.setIndex(lessonIndex++);
                 FileUtil.createDirectory(new File(project.getBasePath(), lesson.getPath()));
-                int taskIndex = 1;
-                for (Task task : lesson.getTaskList()) {
-                    task.setIndex(taskIndex++);
-                    task.setCurrentLang(SupportedLanguages.PYTHON);
-//                    logger.info("task Path = " + task.getPath());
-                    File taskDir = new File(project.getBasePath(), task.getPath());
-                    File srcDir = new File(taskDir, "src");
-                    FileUtil.createDirectory(taskDir);
+                for (Step step : lesson.getStepList()) {
+                    step.setCurrentLang(SupportedLanguages.PYTHON);
+                    File stepDir = new File(project.getBasePath(), step.getPath());
+                    File srcDir = new File(stepDir, "src");
+                    FileUtil.createDirectory(stepDir);
                     FileUtil.createDirectory(srcDir);
 
                     try (BufferedWriter writer = new BufferedWriter(new FileWriter(new File(srcDir, "main.py")))) {
-                        TaskFile taskFile = task.getFile("main.py");
-                        if (taskFile != null) {
-                            writer.write(taskFile.getText());
+                        StepFile stepFile = step.getFile("main.py");
+                        if (stepFile != null) {
+                            writer.write(stepFile.getText());
                         }
                     } catch (IOException e) {
                         logger.warn(e);

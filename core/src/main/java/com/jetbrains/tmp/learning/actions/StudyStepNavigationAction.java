@@ -5,17 +5,14 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.openapi.wm.ToolWindowId;
-import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.util.ui.tree.TreeUtil;
+import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.StudyState;
-import com.jetbrains.tmp.learning.StudyTaskManager;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.Course;
-import com.jetbrains.tmp.learning.courseFormat.Task;
-import com.jetbrains.tmp.learning.courseFormat.TaskFile;
+import com.jetbrains.tmp.learning.courseFormat.Step;
+import com.jetbrains.tmp.learning.courseFormat.StepFile;
 import com.jetbrains.tmp.learning.editor.StudyEditor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,49 +24,9 @@ import java.util.List;
 import java.util.Map;
 
 
-abstract public class StudyTaskNavigationAction extends StudyActionWithShortcut {
-    public StudyTaskNavigationAction(@Nullable String text, @Nullable String description, @Nullable Icon icon) {
+abstract public class StudyStepNavigationAction extends StudyActionWithShortcut {
+    public StudyStepNavigationAction(@Nullable String text, @Nullable String description, @Nullable Icon icon) {
         super(text, description, icon);
-    }
-
-    public void navigateTask(@NotNull final Project project) {
-        StudyEditor studyEditor = StudyUtils.getSelectedStudyEditor(project);
-        StudyState studyState = new StudyState(studyEditor);
-        if (!studyState.isValid()) {
-            return;
-        }
-        Task targetTask = getTargetTask(studyState.getTask());
-        if (targetTask == null) {
-            return;
-        }
-        for (VirtualFile file : FileEditorManager.getInstance(project).getOpenFiles()) {
-            FileEditorManager.getInstance(project).closeFile(file);
-        }
-        Map<String, TaskFile> nextTaskFiles = targetTask.getTaskFiles();
-        VirtualFile projectDir = project.getBaseDir();
-        if (projectDir == null) {
-            return;
-        }
-        VirtualFile lessonDir = projectDir.findChild(targetTask.getLesson().getDirectory());
-        if (lessonDir == null) {
-            return;
-        }
-        VirtualFile taskDir = lessonDir.findChild(targetTask.getDirectory());
-        if (taskDir == null) {
-            return;
-        }
-        if (nextTaskFiles.isEmpty()) {
-            ProjectView.getInstance(project).select(taskDir, taskDir, false);
-            return;
-        }
-        VirtualFile shouldBeActive = getFileToActivate(project, nextTaskFiles, taskDir);
-
-        updateProjectView(project, shouldBeActive);
-
-        ToolWindow runToolWindow = ToolWindowManager.getInstance(project).getToolWindow(ToolWindowId.RUN);
-        if (runToolWindow != null) {
-            runToolWindow.hide(null);
-        }
     }
 
     protected static void updateProjectView(@NotNull Project project, VirtualFile shouldBeActive) {
@@ -108,35 +65,38 @@ abstract public class StudyTaskNavigationAction extends StudyActionWithShortcut 
     }
 
     @Nullable
-    protected VirtualFile getFileToActivate(
-            @NotNull Project project,
-            Map<String, TaskFile> nextTaskFiles,
-            VirtualFile taskDir) {
-        VirtualFile shouldBeActive = null;
-        for (Map.Entry<String, TaskFile> entry : nextTaskFiles.entrySet()) {
-            String name = entry.getKey();
-            VirtualFile srcDir = taskDir.findChild(EduNames.SRC);
-            VirtualFile vf = srcDir == null ? taskDir.findChild(name) : srcDir.findChild(name);
-            if (vf != null) {
-                if (shouldBeActive != null) {
-                    FileEditorManager.getInstance(project).openFile(vf, true);
-                }
-                if (shouldBeActive == null) {
-                    shouldBeActive = vf;
-                }
-            }
-        }
-        return shouldBeActive != null ? shouldBeActive : getFirstTaskFile(taskDir, project);
-    }
-
-    @Nullable
-    protected static VirtualFile getFirstTaskFile(@NotNull final VirtualFile taskDir, @NotNull final Project project) {
-        for (VirtualFile virtualFile : taskDir.getChildren()) {
-            if (StudyUtils.getTaskFile(project, virtualFile) != null) {
+    private static VirtualFile getFirstStepFile(@NotNull final VirtualFile stepDir, @NotNull final Project project) {
+        for (VirtualFile virtualFile : stepDir.getChildren()) {
+            if (StudyUtils.getStepFile(project, virtualFile) != null) {
                 return virtualFile;
             }
         }
         return null;
+    }
+
+    public abstract void navigateStep(@NotNull final Project project);
+
+    @Nullable
+    protected VirtualFile getFileToActivate(
+            @NotNull Project project,
+            @NotNull Map<String, StepFile> nextStepFiles,
+            @NotNull VirtualFile stepDir) {
+        VirtualFile shouldBeActive = null;
+        VirtualFile srcDir = stepDir.findChild(EduNames.SRC);
+
+        for (Map.Entry<String, StepFile> entry : nextStepFiles.entrySet()) {
+            String name = entry.getKey();
+
+            VirtualFile vf = srcDir != null ? srcDir.findChild(name) : null;
+            if (vf != null) {
+                if (shouldBeActive != null) {
+                    FileEditorManager.getInstance(project).openFile(vf, true);
+                } else {
+                    shouldBeActive = vf;
+                }
+            }
+        }
+        return shouldBeActive != null ? shouldBeActive : getFirstStepFile(stepDir, project);
     }
 
     @Override
@@ -145,10 +105,10 @@ abstract public class StudyTaskNavigationAction extends StudyActionWithShortcut 
         if (project == null) {
             return;
         }
-        navigateTask(project);
+        navigateStep(project);
     }
 
-    protected abstract Task getTargetTask(@NotNull final Task sourceTask);
+    protected abstract Step getTargetStep(@NotNull final Step sourceStep);
 
     @Override
     public void update(AnActionEvent e) {
@@ -160,14 +120,14 @@ abstract public class StudyTaskNavigationAction extends StudyActionWithShortcut 
 
         StudyEditor studyEditor = StudyUtils.getSelectedStudyEditor(project);
         StudyState studyState = new StudyState(studyEditor);
-        Course course = StudyTaskManager.getInstance(project).getCourse();
+        Course course = StepikProjectManager.getInstance(project).getCourse();
 
         if (!studyState.isValid() && course != null) {
             e.getPresentation().setEnabled(true);
             return;
         }
 
-        if (getTargetTask(studyState.getTask()) == null) {
+        if (getTargetStep(studyState.getStep()) == null) {
             e.getPresentation().setEnabled(false);
         }
     }

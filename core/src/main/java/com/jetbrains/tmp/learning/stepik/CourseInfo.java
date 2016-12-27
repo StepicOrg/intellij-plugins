@@ -14,21 +14,19 @@ import java.util.stream.Collectors;
  */
 public class CourseInfo {
     public static final CourseInfo INVALID_COURSE = new CourseInfo("INVALID", "Please, press refresh button");
-
-    @SerializedName("title")
-    private String myName;
     int id;
+    List<Integer> sections;
+    List<Integer> instructors = new ArrayList<>();
+    @SerializedName("title")
+    private String name;
     private boolean isAdaptive;
     private boolean isPublic;
     private int[] tags;
-    List<Integer> sections;
-    List<Integer> instructors = new ArrayList<>();
-
-    private List<StepikUser> myAuthors = new ArrayList<>();
+    private List<StepikUser> authors = new ArrayList<>();
     @SerializedName("summary")
-    private String myDescription;
+    private String description;
     @SerializedName("course_format")
-    private String myType;
+    private String type;
     //= "pycharm Python"; //course type in format "pycharm <language>"
     @Nullable
     private String username;
@@ -36,25 +34,45 @@ public class CourseInfo {
     public CourseInfo() {}
 
     private CourseInfo(String name, String description) {
-        myName = name;
-        myDescription = description;
+        this.name = name;
+        this.description = description;
     }
 
     public String getName() {
-        return myName;
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     @NotNull
     List<StepikUser> getAuthors() {
-        return myAuthors;
+        return authors;
+    }
+
+    public void setAuthors(List<StepikUser> authors) {
+        this.authors = authors;
+        instructors.addAll(authors.stream()
+                .filter(author -> author.getId() > 0)
+                .map(StepikUser::getId)
+                .collect(Collectors.toList()));
     }
 
     public String getDescription() {
-        return myDescription;
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getType() {
-        return myType;
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     @Override
@@ -69,13 +87,13 @@ public class CourseInfo {
         CourseInfo that = (CourseInfo) o;
         if (that.getName() == null || that.getDescription() == null) return false;
         return that.getName().equals(getName())
-                && that.getDescription().equals(myDescription);
+                && that.getDescription().equals(description);
     }
 
     @Override
     public int hashCode() {
         int result = getName() != null ? getName().hashCode() : 0;
-        result = 31 * result + (myDescription != null ? myDescription.hashCode() : 0);
+        result = 31 * result + (description != null ? description.hashCode() : 0);
         return result;
     }
 
@@ -88,31 +106,11 @@ public class CourseInfo {
         this.username = username;
     }
 
-    public void setName(String name) {
-        myName = name;
-    }
-
-    public void setAuthors(List<StepikUser> authors) {
-        myAuthors = authors;
-        instructors.addAll(authors.stream()
-                .filter(author -> author.getId() > 0)
-                .map(StepikUser::getId)
-                .collect(Collectors.toList()));
-    }
-
     void addAuthor(StepikUser author) {
-        if (myAuthors == null) {
-            myAuthors = new ArrayList<>();
+        if (authors == null) {
+            authors = new ArrayList<>();
         }
-        myAuthors.add(author);
-    }
-
-    public void setDescription(String description) {
-        myDescription = description;
-    }
-
-    public void setType(String type) {
-        myType = type;
+        authors.add(author);
     }
 
     public boolean isAdaptive() {

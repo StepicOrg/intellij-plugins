@@ -7,14 +7,14 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.SimpleTextAttributes;
-import com.jetbrains.tmp.learning.StudyTaskManager;
+import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.Lesson;
 import com.jetbrains.tmp.learning.courseFormat.Section;
+import com.jetbrains.tmp.learning.courseFormat.Step;
 import com.jetbrains.tmp.learning.courseFormat.StudyItem;
 import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
-import com.jetbrains.tmp.learning.courseFormat.Task;
 import icons.InteractiveLearningIcons;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.core.utils.PresentationUtils;
@@ -34,8 +34,8 @@ public class PresentationDataUtils {
     public static void updatePresentationData(@NotNull PresentationData data, @NotNull PsiDirectory psiDirectory) {
         Project project = psiDirectory.getProject();
         String valueName = psiDirectory.getName();
-        StudyTaskManager studyTaskManager = StudyTaskManager.getInstance(project);
-        Course course = studyTaskManager.getCourse();
+        StepikProjectManager stepikProjectManager = StepikProjectManager.getInstance(project);
+        Course course = stepikProjectManager.getCourse();
         if (course == null) {
             return;
         }
@@ -43,14 +43,14 @@ public class PresentationDataUtils {
         String name = baseDir.getName();
         if (valueName.equals(name)) {
             setAttributes(data, course);
-        } else if (valueName.startsWith(EduNames.TASK)) {
+        } else if (valueName.startsWith(EduNames.STEP)) {
             PsiDirectory lessonDirectory = psiDirectory.getParent();
             if (lessonDirectory != null) {
                 Lesson lesson = course.getLessonByDirName(lessonDirectory.getName());
                 if (lesson != null) {
-                    Task task = lesson.getTask(psiDirectory.getName());
-                    if (task != null) {
-                        setAttributes(data, task);
+                    Step step = lesson.getStep(psiDirectory.getName());
+                    if (step != null) {
+                        setAttributes(data, step);
                     }
                 }
             }

@@ -18,7 +18,7 @@ import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.actions.StudyActionWithShortcut;
 import com.jetbrains.tmp.learning.core.EduNames;
-import com.jetbrains.tmp.learning.courseFormat.Task;
+import com.jetbrains.tmp.learning.courseFormat.Step;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,16 +45,16 @@ public class SwitchLanguage extends StudyActionWithShortcut {
         if (project == null) {
             return;
         }
-        Task targetTask = StudyUtils.getSelectedTask(project);
-        if (targetTask == null) {
+        Step targetStep = StudyUtils.getSelectedStep(project);
+        if (targetStep == null) {
             return;
         }
 
-        if (targetTask.getSupportedLanguages().size() == 1) {
+        if (targetStep.getSupportedLanguages().size() == 1) {
             return;
         }
 
-        if (!checkLangSettings(targetTask, project)){
+        if (!checkLangSettings(targetStep, project)) {
             return;
         }
 
@@ -68,7 +68,7 @@ public class SwitchLanguage extends StudyActionWithShortcut {
             editorManager.closeFile(file);
         }
 
-        String srcPath = String.join("/", targetTask.getPath(), EduNames.SRC);
+        String srcPath = String.join("/", targetStep.getPath(), EduNames.SRC);
         VirtualFile src = project.getBaseDir().findFileByRelativePath(srcPath);
         if (src == null) {
             return;
@@ -85,7 +85,7 @@ public class SwitchLanguage extends StudyActionWithShortcut {
         if (srcPsi == null) {
             return;
         }
-        SupportedLanguages currentLang = targetTask.getCurrentLang();
+        SupportedLanguages currentLang = targetStep.getCurrentLang();
         SupportedLanguages secondLang;
         if (currentLang == SupportedLanguages.JAVA) {
             secondLang = SupportedLanguages.PYTHON;
@@ -120,7 +120,7 @@ public class SwitchLanguage extends StudyActionWithShortcut {
             MoveFilesOrDirectoriesUtil.doMoveFile(second, srcPsi);
         });
         String activateFileName = secondLang.getMainFileName();
-        targetTask.setCurrentLang(secondLang);
+        targetStep.setCurrentLang(secondLang);
 
         VirtualFile vf = src.findChild(activateFileName);
         if (vf != null)
@@ -136,8 +136,8 @@ public class SwitchLanguage extends StudyActionWithShortcut {
             return;
         }
 
-        Task targetTask = StudyUtils.getSelectedTask(project);
-        e.getPresentation().setEnabled(targetTask != null);
+        Step targetStep = StudyUtils.getSelectedStep(project);
+        e.getPresentation().setEnabled(targetStep != null);
     }
 
     @NotNull

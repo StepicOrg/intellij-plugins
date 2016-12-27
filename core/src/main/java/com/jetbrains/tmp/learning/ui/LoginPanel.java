@@ -15,10 +15,10 @@ import java.awt.event.MouseEvent;
 
 public class LoginPanel {
 
-    private JPanel myContentPanel;
-    private JPasswordField myPasswordField;
-    private JTextField myLoginField;
-    private JBLabel mySignUpLabel;
+    private JPanel contentPanel;
+    private JPasswordField passwordField;
+    private JTextField loginField;
+    private JBLabel signUpLabel;
 
     public LoginPanel(final LoginDialog dialog) {
         DocumentListener listener = new DocumentAdapter() {
@@ -28,10 +28,10 @@ public class LoginPanel {
             }
         };
 
-        myLoginField.getDocument().addDocumentListener(listener);
-        myPasswordField.getDocument().addDocumentListener(listener);
+        loginField.getDocument().addDocumentListener(listener);
+        passwordField.getDocument().addDocumentListener(listener);
 
-        mySignUpLabel.addMouseListener(new MouseAdapter() {
+        signUpLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 BrowserUtil.browse(EduStepikNames.STEPIK_SIGN_IN_LINK);
@@ -50,22 +50,22 @@ public class LoginPanel {
     }
 
     public JPanel getContentPanel() {
-        return myContentPanel;
+        return contentPanel;
     }
 
     public JTextField getLoginField() {
-        return myLoginField;
+        return loginField;
     }
 
     public String getPassword() {
-        return String.valueOf(myPasswordField.getPassword());
+        return String.valueOf(passwordField.getPassword());
     }
 
     public String getLogin() {
-        return myLoginField.getText();
+        return loginField.getText();
     }
 
     public JComponent getPreferableFocusComponent() {
-        return myLoginField;
+        return loginField;
     }
 }

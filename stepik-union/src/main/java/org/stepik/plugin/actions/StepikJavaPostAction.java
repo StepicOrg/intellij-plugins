@@ -15,8 +15,9 @@ import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.actions.StudyCheckAction;
 import com.jetbrains.tmp.learning.checker.StudyCheckUtils;
 import com.jetbrains.tmp.learning.core.EduNames;
+import com.jetbrains.tmp.learning.courseFormat.Course;
+import com.jetbrains.tmp.learning.courseFormat.Step;
 import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
-import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorGet;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorPost;
 import com.jetbrains.tmp.learning.stepik.StepikWrappers;
@@ -24,7 +25,6 @@ import com.jetbrains.tmp.learning.stepik.entities.Submission;
 import com.jetbrains.tmp.learning.stepik.entities.SubmissionContainer;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.plugin.utils.DirectivesUtils;
-import org.stepik.plugin.utils.NotificationUtils;
 
 import java.io.IOException;
 import java.util.List;
@@ -52,33 +52,33 @@ public class StepikJavaPostAction extends StudyCheckAction {
                         return;
                     }
 
-                    Task task = StudyUtils.getSelectedTask(project);
-                    if (task == null) {
+                    Step step = StudyUtils.getSelectedStep(project);
+                    if (step == null) {
                         return;
                     }
 
-                    if (!checkLangSettings(task, project)){
+                    if (!checkLangSettings(step, project)) {
                         return;
                     }
 
                     int intAttemptId;
                     try {
-                        intAttemptId = StepikConnectorPost.getAttempt(task.getStepId()).attempts.get(0).id;
+                        intAttemptId = StepikConnectorPost.getAttempt(step.getId()).attempts.get(0).id;
                     } catch (IOException e) {
                         Notification notification = new Notification(
                                 "Step.sending",
-                                task.getName() + " IOException",
+                                step.getName() + " IOException",
                                 "Did't send",
                                 NotificationType.ERROR);
-                        NotificationUtils.showNotification(notification, project);
+                        notification.notify(project);
                         return;
                     }
                     String attemptId = Integer.toString(intAttemptId);
 
-                    SupportedLanguages currentLang = task.getCurrentLang();
+                    SupportedLanguages currentLang = step.getCurrentLang();
                     String activateFileName = currentLang.getMainFileName();
 
-                    String mainFilePath = String.join("/", task.getPath(), EduNames.SRC, activateFileName);
+                    String mainFilePath = String.join("/", step.getPath(), EduNames.SRC, activateFileName);
                     VirtualFile mainFile = project.getBaseDir().findFileByRelativePath(mainFilePath);
                     if (mainFile == null) {
                         return;
@@ -93,11 +93,12 @@ public class StepikJavaPostAction extends StudyCheckAction {
                         return;
                     }
                     List<Submission> submissions = container.getSubmissions();
+                    Course course = step.getCourse();
                     StepikWrappers.MetricsWrapper metric = new StepikWrappers.MetricsWrapper(
                             StepikWrappers.MetricsWrapper.PluginNames.STEPIK_UNION,
                             StepikWrappers.MetricsWrapper.MetricActions.POST,
-                            task.getLesson().getSection().getCourse().getId(),
-                            task.getStepId());
+                            course == null ? 0 : course.getId(),
+                            step.getId());
                     StepikConnectorPost.postMetric(metric);
                     int submissionId = submissions.get(0).getId();
                     logger.info("submissionId = " + submissionId);
@@ -106,17 +107,17 @@ public class StepikJavaPostAction extends StudyCheckAction {
                     final int finalSubmissionId = submissionId;
                     application.executeOnPooledThread(
                             () -> {
-                                String taskStatus = "evaluation";
+                                String stepStatus = "evaluation";
                                 int timer = 0;
                                 String hint = "";
-                                while ("evaluation".equals(taskStatus) && timer < FIVE_MINUTES) {
+                                while ("evaluation".equals(stepStatus) && timer < FIVE_MINUTES) {
                                     try {
                                         Thread.sleep(PERIOD);          //1000 milliseconds is one second.
                                         timer += PERIOD;
                                         StepikWrappers.ResultSubmissionWrapper submissionWrapper =
                                                 StepikConnectorGet.getStatus(finalSubmissionId);
                                         if (submissionWrapper != null) {
-                                            taskStatus = submissionWrapper.submissions[0].status;
+                                            stepStatus = submissionWrapper.submissions[0].status;
                                             hint = submissionWrapper.submissions[0].hint;
                                         }
                                     } catch (InterruptedException e) {
@@ -125,27 +126,27 @@ public class StepikJavaPostAction extends StudyCheckAction {
                                                 "Error",
                                                 "Get Status error",
                                                 NotificationType.ERROR);
-                                        NotificationUtils.showNotification(notification, project);
+                                        notification.notify(project);
                                         return;
                                     }
                                 }
 
                                 NotificationType notificationType;
-                                if ("correct".equals(taskStatus)) {
+                                if ("correct".equals(stepStatus)) {
                                     notificationType = NotificationType.INFORMATION;
                                     hint = "Success!";
-                                    task.setStatus(StudyStatus.SOLVED);
+                                    step.setStatus(StudyStatus.SOLVED);
                                 } else {
                                     notificationType = NotificationType.WARNING;
-                                    if (task.getStatus() != StudyStatus.SOLVED)
-                                        task.setStatus(StudyStatus.FAILED);
+                                    if (step.getStatus() != StudyStatus.SOLVED)
+                                        step.setStatus(StudyStatus.FAILED);
                                 }
                                 Notification notification = new Notification(
                                         "Step.sending",
-                                        task.getName() + " is " + taskStatus,
+                                        step.getName() + " is " + stepStatus,
                                         hint,
                                         notificationType);
-                                NotificationUtils.showNotification(notification, project);
+                                notification.notify(project);
                                 ProjectView.getInstance(project).refresh();
                             }
                     );
@@ -161,7 +162,7 @@ public class StepikJavaPostAction extends StudyCheckAction {
             return;
         }
 
-        Task targetTask = StudyUtils.getSelectedTask(project);
-        e.getPresentation().setEnabled(targetTask != null);
+        Step targetStep = StudyUtils.getSelectedStep(project);
+        e.getPresentation().setEnabled(targetStep != null);
     }
 }

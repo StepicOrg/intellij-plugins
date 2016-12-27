@@ -1,6 +1,8 @@
 package com.jetbrains.tmp.learning.courseFormat;
 
 import com.google.gson.annotations.Expose;
+import com.intellij.openapi.application.PathManager;
+import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.util.xmlb.annotations.Transient;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.core.EduUtils;
@@ -12,26 +14,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Course implements StudyItem {
+    @Nullable
     @Expose
-    private List<StepikUser> authors = new ArrayList<>();
+    private List<StepikUser> authors;
+    @Nullable
     @Expose
     private String description;
+    @Nullable
     @Expose
     private String name;
-    private String courseDirectory = "";
     @Expose
     private int id;
-    // rewrite using Date to optimize download project
-    private boolean upToDate;
     @Expose
     private boolean isAdaptive = false;
+    @Nullable
     @Expose
-    private List<Section> sections = new ArrayList<>();
-
-    //this field is used to distinguish ordinary and CheckIO projects,
-    //"PyCharm" is used here for historical reasons
-    private String courseType = EduNames.PYCHARM;
-    private String courseMode = EduNames.STUDY; //this field is used to distinguish study and course creator modes
+    private List<Section> sections;
 
     public Course() {
     }
@@ -45,66 +43,54 @@ public class Course implements StudyItem {
         }
     }
 
+    @SuppressWarnings("unused")
     @NotNull
     public List<StepikUser> getAuthors() {
+        if (authors == null) {
+            authors = new ArrayList<>();
+        }
         return authors;
     }
 
+    public void setAuthors(@Nullable List<StepikUser> authors) {
+        this.authors = authors;
+    }
+
+    @NotNull
+    @Override
     public String getName() {
+        if (name == null) {
+            name = "";
+        }
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(@Nullable String name) {
         this.name = name;
     }
 
     @Transient
     @Override
-    public int getIndex() {
-        throw new UnsupportedOperationException("Course not support getIndex()");
+    public int getPosition() {
+        throw new UnsupportedOperationException("Course not support getPosition()");
     }
 
     @Transient
     @Override
-    public void setIndex(int index) {
-        throw new UnsupportedOperationException("Course not support setIndex()");
-    }
-
-    public String getCourseDirectory() {
-        return courseDirectory;
-    }
-
-    public void setCourseDirectory(@NotNull final String courseDirectory) {
-        this.courseDirectory = courseDirectory;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public boolean isUpToDate() {
-        return upToDate;
-    }
-
-    public void setUpToDate(boolean upToDate) {
-        this.upToDate = upToDate;
-    }
-
-    public void setAuthors(@NotNull List<StepikUser> authors) {
-        this.authors = authors;
+    public void setPosition(int position) {
+        throw new UnsupportedOperationException("Course not support setPosition()");
     }
 
     @NotNull
-    public String getCourseType() {
-        return courseType;
+    public String getDescription() {
+        if (description == null) {
+            description = "";
+        }
+        return description;
     }
 
-    public void setCourseType(@NotNull String courseType) {
-        this.courseType = courseType;
+    public void setDescription(@Nullable String description) {
+        this.description = description;
     }
 
     public boolean isAdaptive() {
@@ -115,56 +101,42 @@ public class Course implements StudyItem {
         isAdaptive = adaptive;
     }
 
+    @Override
     public int getId() {
         return id;
     }
 
+    @Override
     public void setId(int id) {
         this.id = id;
     }
 
-    public String getCourseMode() {
-        return courseMode;
-    }
-
-    public void setCourseMode(String courseMode) {
-        this.courseMode = courseMode;
+    @Transient
+    @Nullable
+    @Override
+    public Course getCourse() {
+        return this;
     }
 
     public void addSection(@NotNull Section section) {
-        sections.add(section);
-    }
-
-    public void setSections(@Nullable List<Section> sections) {
-        if (sections == null)
-            sections = new ArrayList<>();
-
-        this.sections = sections;
+        getSections().add(section);
+        getSections().sort(StudyItemComparator.getInstance());
     }
 
     @Nullable
-    private Section getSectionOfIndex(int index) {
-        for (Section section : sections) {
-            if (section.getIndex() == index)
+    public Section getSectionById(int id) {
+        for (Section section : getSections()) {
+            if (section.getId() == id)
                 return section;
         }
         return null;
     }
 
-    @NotNull
-    public List<Section> getSections() {
-        return sections;
-    }
-
-    public void addSectionWithSetIndex(Section section) {
-        section.setIndex(sections.size() + 1);
-        sections.add(section);
-    }
-
-    public Lesson getLessonOfIndex(int index) {
+    @Nullable
+    public Lesson getLessonById(int id) {
         for (Section section : getSections()) {
             for (Lesson lesson : section.getLessons()) {
-                if (lesson.getIndex() == index) {
+                if (lesson.getId() == id) {
                     return lesson;
                 }
             }
@@ -172,15 +144,49 @@ public class Course implements StudyItem {
         return null;
     }
 
+    @Nullable
+    public Step getStepById(int id) {
+        for (Section section : getSections()) {
+            for (Lesson lesson : section.getLessons()) {
+                for (Step step : lesson.getStepList()) {
+                    if (step.getId() == id) {
+                        return step;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    @NotNull
+    public List<Section> getSections() {
+        if (sections == null) {
+            sections = new ArrayList<>();
+        }
+        return sections;
+    }
+
+    @SuppressWarnings("unused")
+    public void setSections(@Nullable List<Section> sections) {
+        this.sections = sections;
+    }
+
+    @Nullable
+    public Section getSectionByDirName(@NotNull String dirName) {
+        int id = EduUtils.parseDirName(dirName, EduNames.SECTION);
+        return getSectionById(id);
+    }
+
     public Lesson getLessonByDirName(@NotNull String name) {
-        int index = EduUtils.getIndex(name, EduNames.LESSON);
-        return getLessonOfIndex(index);
+        int id = EduUtils.parseDirName(name, EduNames.LESSON);
+        return getLessonById(id);
     }
 
     @Transient
+    @NotNull
     @Override
     public StudyStatus getStatus() {
-        for (Section section : sections) {
+        for (Section section : getSections()) {
             if (section.getStatus() != StudyStatus.SOLVED)
                 return StudyStatus.UNCHECKED;
         }
@@ -188,12 +194,14 @@ public class Course implements StudyItem {
         return StudyStatus.SOLVED;
     }
 
+    @Transient
     @NotNull
     @Override
     public String getDirectory() {
         return "";
     }
 
+    @Transient
     @NotNull
     @Override
     public String getPath() {
@@ -202,11 +210,38 @@ public class Course implements StudyItem {
 
     @Override
     public void updatePath() {
-        sections.forEach(StudyItem::updatePath);
+        getSections().forEach(StudyItem::updatePath);
     }
 
-    public Section getSectionByDirName(@NotNull String valueName) {
-        int index = EduUtils.getIndex(valueName, EduNames.SECTION);
-        return getSectionOfIndex(index);
+    @Transient
+    @Nullable
+    public Section getPrevSection(@NotNull Section section) {
+        int position = section.getPosition();
+        List<Section> children = getSections();
+        for (int i = children.size() - 1; i >= 0; i--) {
+            Section item = children.get(i);
+            if (item.getPosition() < position) {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    @Transient
+    @Nullable
+    public Section getNextSection(@NotNull Section section) {
+        int position = section.getPosition();
+        for (Section item : getSections()) {
+            if (item.getPosition() > position) {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    @Transient
+    @NotNull
+    public String getCacheDirectory() {
+        return FileUtil.join(PathManager.getConfigPath(), "courses", Integer.toString(id));
     }
 }

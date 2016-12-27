@@ -2,7 +2,6 @@ package org.stepik.plugin.projectView;
 
 import com.intellij.ide.navigationToolbar.JavaNavBarExtension;
 import com.intellij.psi.PsiElement;
-import com.jetbrains.tmp.learning.StudyTaskManager;
 import org.jetbrains.annotations.Nullable;
 
 /**

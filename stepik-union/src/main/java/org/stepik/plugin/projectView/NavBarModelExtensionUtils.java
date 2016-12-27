@@ -5,7 +5,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.jetbrains.tmp.learning.StudyTaskManager;
+import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.courseFormat.Course;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,8 +21,8 @@ class NavBarModelExtensionUtils {
     static String getPresentableText(@Nullable final Object object) {
         if (object instanceof Project) {
             Project project = (Project) object;
-            StudyTaskManager studyTaskManager = StudyTaskManager.getInstance(project);
-            Course course = studyTaskManager.getCourse();
+            StepikProjectManager stepikProjectManager = StepikProjectManager.getInstance(project);
+            Course course = stepikProjectManager.getCourse();
             if (course == null)
                 return null;
             return course.getName();
@@ -43,8 +43,8 @@ class NavBarModelExtensionUtils {
     @Nullable
     static PsiElement adjustElement(final PsiElement psiElement) {
         Project project = psiElement.getProject();
-        StudyTaskManager studyTaskManager = StudyTaskManager.getInstance(project);
-        Course course = studyTaskManager.getCourse();
+        StepikProjectManager stepikProjectManager = StepikProjectManager.getInstance(project);
+        Course course = stepikProjectManager.getCourse();
         if (course == null)
             return psiElement;
 
