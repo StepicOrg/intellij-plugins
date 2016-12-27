@@ -2,7 +2,7 @@
     <id>org.stepik.plugin.union</id>
     <name>Stepik Union</name>
     <version>SNAPSHOT</version>
-    <idea-version since-build="162.0"/>
+    <idea-version since-build="163.8233.8"/>
     <vendor email="petr.bogdanov@stepik.org" url="http://www.stepik.org">Stepik</vendor>
 
     <description><![CDATA[
