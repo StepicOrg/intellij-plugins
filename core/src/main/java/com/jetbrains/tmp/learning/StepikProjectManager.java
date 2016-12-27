@@ -85,7 +85,7 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
                 course.initCourse(true);
             }
         } catch (StudySerializationUtils.StudyUnrecognizedFormatException e) {
-            logger.error("Failed deserialization StepikProjectManager", e.getMessage());
+            logger.warn("Failed deserialization StepikProjectManager \n"+ e.getMessage());
         }
     }
 
