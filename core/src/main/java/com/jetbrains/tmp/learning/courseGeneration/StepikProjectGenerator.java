@@ -65,11 +65,7 @@ public class StepikProjectGenerator {
             courses = getCoursesFromCache();
         }
         if (force || courses.isEmpty()) {
-            try {
-                courses = StepikConnectorGet.getCourses(getHardcodedCoursesId());
-            } catch (Throwable t) {
-                logger.error(t.toString());
-            }
+            courses = StepikConnectorGet.getCourses(getHardcodedCoursesId());
             flushCache(courses);
         }
         if (courses.isEmpty()) {
