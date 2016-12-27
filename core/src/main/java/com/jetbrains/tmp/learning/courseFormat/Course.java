@@ -126,8 +126,9 @@ public class Course implements StudyItem {
     @Nullable
     public Section getSectionById(int id) {
         for (Section section : getSections()) {
-            if (section.getId() == id)
+            if (section.getId() == id) {
                 return section;
+            }
         }
         return null;
     }
