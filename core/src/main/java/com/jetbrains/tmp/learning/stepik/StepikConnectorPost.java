@@ -27,7 +27,10 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.AbstractHttpEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 
@@ -36,12 +39,15 @@ public class StepikConnectorPost {
     static final private Gson GSON =
             new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
 
-    // TODO All methods must be rewrite as it
-    private static void postToStepik(String link, AbstractHttpEntity entity) throws IOException {
+    private static void postToStepik(@NotNull String link, AbstractHttpEntity entity) throws IOException {
         final HttpPost request = new HttpPost(EduStepikNames.STEPIK_API_URL + link);
         request.setEntity(entity);
 
-        final CloseableHttpResponse response = StepikConnectorLogin.getHttpClient().execute(request);
+        CloseableHttpClient client = StepikConnectorLogin.getHttpClient();
+        if (client == null) {
+            throw new IOException("httpClient is null");
+        }
+        final CloseableHttpResponse response = client.execute(request);
         final StatusLine statusLine = response.getStatusLine();
         final HttpEntity responseEntity = response.getEntity();
         final String responseString = responseEntity != null ? EntityUtils.toString(responseEntity) : "";
@@ -50,11 +56,19 @@ public class StepikConnectorPost {
         }
     }
 
-    private static <T> T postToStepik(String link, final Class<T> container, String requestBody) throws IOException {
+    @NotNull
+    private static <T> T postToStepik(
+            @NotNull String link,
+            @NotNull final Class<T> container,
+            @NotNull String requestBody) throws IOException {
         final HttpPost request = new HttpPost(EduStepikNames.STEPIK_API_URL + link);
         request.setEntity(new StringEntity(requestBody, ContentType.APPLICATION_JSON));
 
-        final CloseableHttpResponse response = StepikConnectorLogin.getHttpClient().execute(request);
+        CloseableHttpClient client = StepikConnectorLogin.getHttpClient();
+        if (client == null) {
+            throw new IOException("httpClient is null");
+        }
+        final CloseableHttpResponse response = client.execute(request);
         final StatusLine statusLine = response.getStatusLine();
         final HttpEntity responseEntity = response.getEntity();
         final String responseString = responseEntity != null ? EntityUtils.toString(responseEntity) : "";
@@ -64,11 +78,15 @@ public class StepikConnectorPost {
         return GSON.fromJson(responseString, container);
     }
 
-    private static void postToStepikVoid(String link, String requestBody) throws IOException {
+    private static void postToStepikVoid(@NotNull String link, @NotNull String requestBody) throws IOException {
         final HttpPost request = new HttpPost(EduStepikNames.STEPIK_API_URL + link);
         request.setEntity(new StringEntity(requestBody, ContentType.APPLICATION_JSON));
 
-        final CloseableHttpResponse response = StepikConnectorLogin.getHttpClient().execute(request);
+        CloseableHttpClient client = StepikConnectorLogin.getHttpClient();
+        if (client == null) {
+            throw new IOException("httpClient is null");
+        }
+        final CloseableHttpResponse response = client.execute(request);
         final StatusLine statusLine = response.getStatusLine();
         final HttpEntity responseEntity = response.getEntity();
         final String responseString = responseEntity != null ? EntityUtils.toString(responseEntity) : "";
@@ -77,6 +95,7 @@ public class StepikConnectorPost {
         }
     }
 
+    @NotNull
     public static StepikWrappers.AttemptContainer getAttempt(int stepId) throws IOException {
         String requestBody = new Gson().toJson(new StepikWrappers.AttemptWrapper(stepId));
         try {
@@ -87,19 +106,9 @@ public class StepikConnectorPost {
         }
     }
 
-    @Deprecated
-    public static SubmissionContainer postSubmission(String text, String attemptId) {
-        String requestBody = new Gson().toJson(new StepikWrappers.SubmissionToPostWrapper(attemptId, "java8", text));
-        try {
-            return postToStepik(EduStepikNames.SUBMISSIONS, SubmissionContainer.class, requestBody);
-        } catch (IOException e) {
-            logger.warn("Can not post Submission\n" + e.toString());
-            return null;
-        }
-    }
-
+    @Nullable
     public static SubmissionContainer postSubmission(
-            StepikWrappers.SubmissionToPostWrapper submissionToPostWrapper) {
+            @Nullable StepikWrappers.SubmissionToPostWrapper submissionToPostWrapper) {
         String requestBody = new Gson().toJson(submissionToPostWrapper);
         try {
             return postToStepik(EduStepikNames.SUBMISSIONS, SubmissionContainer.class, requestBody);
@@ -121,7 +130,7 @@ public class StepikConnectorPost {
         return false;
     }
 
-    public static void postMetric(StepikWrappers.MetricsWrapper metric) {
+    public static void postMetric(@Nullable StepikWrappers.MetricsWrapper metric) {
         String requestBody = GSON.toJson(metric);
         logger.info(requestBody);
         try {
@@ -130,5 +139,4 @@ public class StepikConnectorPost {
             logger.warn("Can't post a metric\n" + e.toString());
         }
     }
-
 }

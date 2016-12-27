@@ -5,18 +5,18 @@ import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.project.ProjectUtil;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.util.text.StringUtil;
-import com.jetbrains.tmp.learning.StudyTaskManager;
+import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.ui.LoginPanel;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 
 public class LoginDialog extends DialogWrapper {
-    protected final LoginPanel myLoginPanel;
+    private final LoginPanel loginPanel;
 
-    public LoginDialog() {
+    LoginDialog() {
         super(false);
-        myLoginPanel = new LoginPanel(this);
+        loginPanel = new LoginPanel(this);
         setTitle("Login to Stepik");
         setOKButtonText("Login");
         init();
@@ -29,7 +29,7 @@ public class LoginDialog extends DialogWrapper {
 
     @Override
     protected JComponent createCenterPanel() {
-        return myLoginPanel.getContentPanel();
+        return loginPanel.getContentPanel();
     }
 
     @Override
@@ -39,41 +39,41 @@ public class LoginDialog extends DialogWrapper {
 
     @Override
     public JComponent getPreferredFocusedComponent() {
-        return myLoginPanel.getPreferableFocusComponent();
+        return loginPanel.getPreferableFocusComponent();
     }
 
     @Override
     protected void doOKAction() {
         if (!validateLoginAndPasswordFields()) return;
-        StepikUser basicUser = new StepikUser(myLoginPanel.getLogin(), myLoginPanel.getPassword());
+        StepikUser basicUser = new StepikUser(loginPanel.getLogin(), loginPanel.getPassword());
         final StepikUser user = StepikConnectorLogin.minorLogin(basicUser);
         if (user != null) {
             doJustOkAction();
-            final Project project = ProjectUtil.guessCurrentProject(myLoginPanel.getContentPanel());
-            StudyTaskManager.getInstance(project).setUser(user);
+            final Project project = ProjectUtil.guessCurrentProject(loginPanel.getContentPanel());
+            StepikProjectManager.getInstance(project).setUser(user);
 
             Project defaultProject = ProjectManager.getInstance().getDefaultProject();
-            if (StudyTaskManager.getInstance(defaultProject).getUser().getEmail().isEmpty()){
-                StudyTaskManager.getInstance(defaultProject).setUser(user);
+            if (StepikProjectManager.getInstance(defaultProject).getUser().getEmail().isEmpty()) {
+                StepikProjectManager.getInstance(defaultProject).setUser(user);
             }
         } else {
             setErrorText("Login failed");
         }
     }
 
-    public boolean validateLoginAndPasswordFields() {
-        if (StringUtil.isEmptyOrSpaces(myLoginPanel.getLogin())) {
+    private boolean validateLoginAndPasswordFields() {
+        if (StringUtil.isEmptyOrSpaces(loginPanel.getLogin())) {
             setErrorText("Please, enter your login");
             return false;
         }
-        if (StringUtil.isEmptyOrSpaces(myLoginPanel.getPassword())) {
+        if (StringUtil.isEmptyOrSpaces(loginPanel.getPassword())) {
             setErrorText("Please, enter your password");
             return false;
         }
         return true;
     }
 
-    protected void doJustOkAction() {
+    private void doJustOkAction() {
         super.doOKAction();
     }
 

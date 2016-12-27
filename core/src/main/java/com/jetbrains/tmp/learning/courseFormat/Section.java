@@ -4,6 +4,7 @@ import com.google.gson.annotations.Expose;
 import com.intellij.util.xmlb.annotations.Transient;
 import com.jetbrains.tmp.learning.core.EduNames;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,73 +14,85 @@ import java.util.List;
  */
 public class Section implements StudyItem {
     @Expose
+    @Nullable
     private String name;
     @Expose
-    private List<Lesson> lessons = new ArrayList<>();
+    @Nullable
+    private List<Lesson> lessons;
     @Expose
-    private int index;
+    private int position;
     @Expose
     private int id;
     @Transient
-    private Course course = null;
+    @Nullable
+    private Course course;
     @Transient
-    @NotNull
-    private String directory = "";
+    @Nullable
+    private String directory;
     @Transient
+    @Nullable
     private String path;
 
     public Section() {
     }
 
-    public void initSection(final Course course, boolean isRestarted) {
+    void initSection(@Nullable final Course course, boolean isRestarted) {
         setCourse(course);
         for (Lesson lesson : getLessons()) {
             lesson.initLesson(this, isRestarted);
         }
     }
 
+    @NotNull
     @Override
     public String getName() {
+        if (name == null) {
+            name = "";
+        }
         return name;
     }
 
     @Override
-    public void setName(String name) {
+    public void setName(@Nullable String name) {
         this.name = name;
     }
 
     @Override
-    public int getIndex() {
-        return index;
+    public int getPosition() {
+        return position;
     }
 
     @Override
-    public void setIndex(int index) {
-        this.index = index;
-        directory = EduNames.SECTION + index;
-        updatePath();
+    public void setPosition(int position) {
+        this.position = position;
     }
 
-    public void addLesson(Lesson lesson) {
-        lessons.add(lesson);
-    }
-
-    public void setLessons(List<Lesson> lessons) {
-        this.lessons = lessons;
+    void addLesson(@NotNull Lesson lesson) {
+        getLessons().add(lesson);
     }
 
     public void addLessons(@NotNull List<Lesson> lessons) {
-        this.lessons.addAll(lessons);
+        getLessons().addAll(lessons);
     }
 
+    @NotNull
     public List<Lesson> getLessons() {
+        if (lessons == null) {
+            lessons = new ArrayList<>();
+        }
         return lessons;
     }
 
+    @SuppressWarnings("unused")
+    public void setLessons(@Nullable List<Lesson> lessons) {
+        this.lessons = lessons;
+    }
+
+    @NotNull
     @Override
     public StudyStatus getStatus() {
-        for (Lesson lesson : lessons) {
-            if (lesson.getIndex() != -1 && lesson.getStatus() != StudyStatus.SOLVED)
+        for (Lesson lesson : getLessons()) {
+            if (lesson.getPosition() != -1 && lesson.getStatus() != StudyStatus.SOLVED)
                 return StudyStatus.UNCHECKED;
         }
 
@@ -88,18 +101,18 @@ public class Section implements StudyItem {
 
     @Override
     public void updatePath() {
-        if (path == null) {
-            return;
-        }
-
         path = null;
 
-        lessons.forEach(StudyItem::updatePath);
+        getLessons().forEach(StudyItem::updatePath);
     }
 
     @NotNull
     @Override
     public String getDirectory() {
+        if (directory == null) {
+            directory = EduNames.SECTION + id;
+            updatePath();
+        }
         return directory;
     }
 
@@ -107,19 +120,86 @@ public class Section implements StudyItem {
     @Override
     public String getPath() {
         if (path == null) {
-            path = course.getPath() + "/" + getDirectory();
+            if (course != null) {
+                path = course.getPath() + "/" + getDirectory();
+            } else {
+                path = getDirectory();
+            }
         }
         return path;
     }
 
     @Transient
-    public void setCourse(Course course) {
-        this.course = course;
+    @Nullable
+    public Course getCourse() {
+        return course;
     }
 
     @Transient
-    public Course getCourse() {
-        return course;
+    public void setCourse(@Nullable Course course) {
+        this.course = course;
+    }
+
+    @Override
+    public int getId() {
+        return id;
+    }
+
+    @Override
+    public void setId(int id) {
+        this.id = id;
+        directory = null;
+        updatePath();
+    }
+
+    @Transient
+    @Nullable
+    public Lesson getLastLesson() {
+        List<Lesson> children = getLessons();
+        int lessonsCount = children.size();
+
+        if (lessonsCount == 0) {
+            return null;
+        }
+
+        return children.get(lessonsCount - 1);
+    }
+
+    @Transient
+    @Nullable
+    public Lesson getFirstLesson() {
+        List<Lesson> children = getLessons();
+        if (children.size() == 0) {
+            return null;
+        }
+
+        return children.get(0);
+    }
+
+    @Transient
+    @Nullable
+    public Lesson getPrevLesson(@NotNull Lesson lesson) {
+        int position = lesson.getPosition();
+        List<Lesson> children = getLessons();
+        for (int i = children.size() - 1; i >= 0; i--) {
+            Lesson item = children.get(i);
+            if (item.getPosition() < position) {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    @Transient
+    @Nullable
+    public Lesson getNextLesson(@NotNull Lesson lesson) {
+        int position = lesson.getPosition();
+        for (Lesson item : getLessons()) {
+            if (item.getPosition() > position) {
+                return item;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -129,19 +209,21 @@ public class Section implements StudyItem {
 
         Section section = (Section) o;
 
-        return id == section.id;
+        if (position != section.position) return false;
+        if (id != section.id) return false;
+        if (name != null ? !name.equals(section.name) : section.name != null) return false;
+        //noinspection SimplifiableIfStatement
+        if (lessons != null ? !lessons.equals(section.lessons) : section.lessons != null) return false;
+        return course != null ? course.equals(section.course) : section.course == null;
     }
 
     @Override
     public int hashCode() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getId() {
-        return id;
+        int result = name != null ? name.hashCode() : 0;
+        result = 31 * result + (lessons != null ? lessons.hashCode() : 0);
+        result = 31 * result + position;
+        result = 31 * result + id;
+        result = 31 * result + (course != null ? course.hashCode() : 0);
+        return result;
     }
 }

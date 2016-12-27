@@ -2,7 +2,6 @@
     <extensions defaultExtensionNs="com.intellij">
         <treeStructureProvider implementation="org.stepik.plugin.projectView.PyCharmTreeStructureProvider"/>
         <navbar implementation="org.stepik.plugin.projectView.PyCharmNavBarModelExtension"/>
-        <moduleType id="JAVA_MODULE" implementationClass="org.stepik.plugin.projectWizard.pycharm.compatibility.PyCharmJavaModuleType"/>
         <directoryProjectGenerator implementation="org.stepik.plugin.projectWizard.pycharm.StepikPyProjectGenerator"/>
     </extensions>
 </idea-plugin>

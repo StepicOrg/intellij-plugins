@@ -3,13 +3,11 @@ package org.stepik.plugin.projectView;
 import com.intellij.ide.projectView.TreeStructureProvider;
 import com.intellij.ide.projectView.ViewSettings;
 import com.intellij.ide.util.treeView.AbstractTreeNode;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
-import com.jetbrains.tmp.learning.StudyTaskManager;
-import com.jetbrains.tmp.learning.core.EduNames;
+import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.courseFormat.Course;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -21,8 +19,6 @@ import static org.stepik.plugin.utils.PresentationDataUtils.isVisibleDirectory;
 import static org.stepik.plugin.utils.PresentationDataUtils.isVisibleFile;
 
 abstract class StepikTreeStructureProvider implements TreeStructureProvider, DumbAware {
-    private static final Logger logger = Logger.getInstance(StepikTreeStructureProvider.class);
-
     @NotNull
     @Override
     public Collection<AbstractTreeNode> modify(
@@ -61,9 +57,9 @@ abstract class StepikTreeStructureProvider implements TreeStructureProvider, Dum
         if (project == null) {
             return false;
         }
-        final StudyTaskManager studyTaskManager = StudyTaskManager.getInstance(project);
-        Course course = studyTaskManager.getCourse();
-        return course != null && EduNames.STEPIK_CODE.equals(course.getCourseMode());
+        final StepikProjectManager stepikProjectManager = StepikProjectManager.getInstance(project);
+        Course course = stepikProjectManager.getCourse();
+        return course != null;
     }
 
     @Nullable

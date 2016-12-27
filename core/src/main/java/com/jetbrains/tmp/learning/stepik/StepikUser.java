@@ -1,23 +1,19 @@
 package com.jetbrains.tmp.learning.stepik;
 
+import com.intellij.credentialStore.CredentialAttributes;
 import com.intellij.ide.passwordSafe.PasswordSafe;
-import com.intellij.ide.passwordSafe.PasswordSafeException;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.xmlb.annotations.Transient;
-import com.jetbrains.tmp.learning.StudyTaskManager;
+import com.jetbrains.tmp.learning.StepikProjectManager;
 import org.jetbrains.annotations.NotNull;
 
 public class StepikUser {
-    private static final String STEPIK_SETTINGS_PASSWORD_KEY = "STEPIK_SETTINGS_PASSWORD_KEY";
-    private static final Logger logger = Logger.getInstance(StepikUser.class);
-    private int id = -1;
+    private int id;
     private String firstName = "";
     private String lastName = "";
     private String email = "";
     private String accessToken = "";
     private String refreshToken = "";
-
 
     public StepikUser() {
     }
@@ -27,38 +23,37 @@ public class StepikUser {
         setPassword(password);
     }
 
-    public StepikUser(StepikUser basicUser) {
+    StepikUser(StepikUser basicUser) {
         this.email = basicUser.getEmail();
-//    setPassword(basicUser.getPassword());
-    }
-
-    public StepikUser(StepikWrappers.TokenInfo tokenInfo) {
-        this.accessToken = tokenInfo.accessToken;
-        this.refreshToken = tokenInfo.refreshToken;
     }
 
     public int getId() {
         return id;
     }
 
+    @SuppressWarnings("unused")
     public void setId(int id) {
         this.id = id;
     }
 
+    @SuppressWarnings("WeakerAccess")
     @NotNull
     public String getFirstName() {
         return firstName;
     }
 
+    @SuppressWarnings("unused")
     public void setFirstName(@NotNull final String firstName) {
         this.firstName = firstName;
     }
 
+    @SuppressWarnings("WeakerAccess")
     @NotNull
     public String getLastName() {
         return lastName;
     }
 
+    @SuppressWarnings("unused")
     public void setLastName(@NotNull final String last_name) {
         this.lastName = last_name;
     }
@@ -68,6 +63,7 @@ public class StepikUser {
         return email;
     }
 
+    @SuppressWarnings("unused")
     public void setEmail(@NotNull final String email) {
         this.email = email;
     }
@@ -78,27 +74,26 @@ public class StepikUser {
         final String email = getEmail();
         if (StringUtil.isEmptyOrSpaces(email)) return "";
 
-        String password;
-        try {
-            password = PasswordSafe.getInstance()
-                    .getPassword(null, StudyTaskManager.class, STEPIK_SETTINGS_PASSWORD_KEY + email);
-        } catch (PasswordSafeException e) {
-            logger.info("Couldn't get password for key [" + STEPIK_SETTINGS_PASSWORD_KEY + "]", e);
-            password = "";
-        }
+        String serviceName = StepikProjectManager.class.getName();
+        CredentialAttributes attributes = new CredentialAttributes(serviceName,
+                email,
+                StepikProjectManager.class,
+                false);
+        String password = PasswordSafe.getInstance().getPassword(attributes);
 
         return StringUtil.notNullize(password);
     }
 
     @Transient
-    public void setPassword(@NotNull final String password) {
+    private void setPassword(@NotNull final String password) {
         if (password.isEmpty()) return;
-        try {
-            PasswordSafe.getInstance()
-                    .storePassword(null, StudyTaskManager.class, STEPIK_SETTINGS_PASSWORD_KEY + getEmail(), password);
-        } catch (PasswordSafeException e) {
-            logger.info("Couldn't set password for key [" + STEPIK_SETTINGS_PASSWORD_KEY + getEmail() + "]", e);
-        }
+
+        String serviceName = StepikProjectManager.class.getName();
+        CredentialAttributes attributes = new CredentialAttributes(serviceName,
+                email,
+                StepikProjectManager.class,
+                false);
+        PasswordSafe.getInstance().setPassword(attributes, password);
     }
 
     @NotNull
@@ -110,6 +105,7 @@ public class StepikUser {
         return accessToken;
     }
 
+    @SuppressWarnings("unused")
     public void setAccessToken(String accessToken) {
         this.accessToken = accessToken;
     }
@@ -118,11 +114,12 @@ public class StepikUser {
         return refreshToken;
     }
 
+    @SuppressWarnings("unused")
     public void setRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
     }
 
-    public void setupTokenInfo(StepikWrappers.TokenInfo tokenInfo) {
+    void setupTokenInfo(StepikWrappers.TokenInfo tokenInfo) {
         accessToken = tokenInfo.getAccessToken();
         refreshToken = tokenInfo.getRefreshToken();
     }

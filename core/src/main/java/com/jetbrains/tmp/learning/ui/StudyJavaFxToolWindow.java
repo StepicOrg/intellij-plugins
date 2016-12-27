@@ -24,25 +24,25 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 
 public class StudyJavaFxToolWindow extends StudyToolWindow {
-    private StudyBrowserWindow myBrowserWindow;
+    private StudyBrowserWindow browserWindow;
 
-    public StudyJavaFxToolWindow() {
+    StudyJavaFxToolWindow() {
         super();
     }
 
     @Override
-    public JComponent createTaskInfoPanel(Project project) {
-        myBrowserWindow = new StudyBrowserWindow(true, false);
-        myBrowserWindow.addBackAndOpenButtons();
+    public JComponent createStepInfoPanel(Project project) {
+        browserWindow = new StudyBrowserWindow(true, false);
+        browserWindow.addBackAndOpenButtons();
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
-        panel.add(myBrowserWindow.getPanel());
+        panel.add(browserWindow.getPanel());
         return panel;
     }
 
     @Override
     public void setText(@NotNull String text) {
         StudyPluginConfigurator configurator = StudyUtils.getConfigurator(ProjectUtil.guessCurrentProject(this));
-        myBrowserWindow.loadContent(text, configurator);
+        browserWindow.loadContent(text, configurator);
     }
 }

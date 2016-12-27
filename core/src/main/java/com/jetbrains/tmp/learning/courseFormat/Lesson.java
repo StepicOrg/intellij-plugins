@@ -6,114 +6,101 @@ import com.intellij.util.xmlb.annotations.Transient;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.core.EduUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Lesson implements StudyItem {
     @Transient
-    public List<Integer> steps;
+    @Nullable
+    private List<Integer> steps;
     @Transient
-    public List<String> tags;
-    @Transient
-    boolean is_public;
-    @Transient
-    private Section section = null;
-
+    @Nullable
+    private Section section;
     @Expose
-    private int position;
+    private int position = -1;
     @Expose
     private int id;
-
     @Expose
+    @Nullable
     @SerializedName("title")
     private String name;
-
     @Expose
-    @SerializedName("task_list")
-    private List<Task> taskList = new ArrayList<>();
-
-    // index is visible to user number of lesson from 1 to lesson number
-    private int index = -1;
+    @Nullable
+    @SerializedName("step_list")
+    private List<Step> stepList;
     @Transient
-    @NotNull
-    private String directory = "";
+    @Nullable
+    private String directory;
     @Transient
+    @Nullable
     private String path;
 
     public Lesson() {
     }
 
-    public void initLesson(final Section section, boolean isRestarted) {
+    void initLesson(@Nullable final Section section, boolean isRestarted) {
         setSection(section);
-        for (Task task : taskList) {
-            task.initTask(this, isRestarted);
+        for (Step step : getStepList()) {
+            step.initStep(this, isRestarted);
         }
     }
 
+    @NotNull
+    @Override
     public String getName() {
+        if (name == null) {
+            name = "";
+        }
         return name;
     }
 
-    public void setName(String name) {
+    @Override
+    public void setName(@Nullable String name) {
         this.name = name;
-    }
-
-    public int getIndex() {
-        return index;
-    }
-
-    public void setIndex(int index) {
-        this.index = index;
-        directory = EduNames.LESSON + this.index;
-        updatePath();
     }
 
     @Override
     public void updatePath() {
-        if (path == null) {
-            return;
-        }
-
         path = null;
 
-        taskList.forEach(StudyItem::updatePath);
+        getStepList().forEach(StudyItem::updatePath);
     }
 
-    public List<Task> getTaskList() {
-        return taskList;
-    }
-
-    public void setTaskList(List<Task> taskList) {
-        if (taskList == null) {
-            this.taskList = new ArrayList<>();
-        } else {
-            this.taskList = taskList;
+    @NotNull
+    public List<Step> getStepList() {
+        if (stepList == null) {
+            stepList = new ArrayList<>();
         }
+        return stepList;
     }
 
-    public void addTask(@NotNull final Task task) {
-        taskList.add(task);
+    @SuppressWarnings("unused")
+    public void setStepList(@Nullable List<Step> stepList) {
+        this.stepList = stepList;
     }
 
-    public Task getTask(@NotNull final String name) {
-        int index = EduUtils.getIndex(name, EduNames.TASK) - 1;
-        List<Task> tasks = getTaskList();
-        if (!EduUtils.indexIsValid(index, tasks)) {
-            return null;
-        }
-        for (Task task : tasks) {
-            if (task.getIndex() - 1 == index) {
-                return task;
+    public void addStep(@NotNull final Step step) {
+        getStepList().add(step);
+    }
+
+    @Nullable
+    public Step getStep(@NotNull final String name) {
+        int id = EduUtils.parseDirName(name, EduNames.STEP);
+        for (Step step : getStepList()) {
+            if (step.getId() == id) {
+                return step;
             }
         }
         return null;
     }
 
+    @NotNull
     @Override
     public StudyStatus getStatus() {
-        for (Task task : taskList) {
-            if (task.getStatus() != StudyStatus.SOLVED) {
+        for (Step step : getStepList()) {
+            if (step.getStatus() != StudyStatus.SOLVED) {
                 return StudyStatus.UNCHECKED;
             }
         }
@@ -123,6 +110,10 @@ public class Lesson implements StudyItem {
     @NotNull
     @Override
     public String getDirectory() {
+        if (directory == null) {
+            directory = EduNames.LESSON + id;
+            updatePath();
+        }
         return directory;
     }
 
@@ -130,7 +121,11 @@ public class Lesson implements StudyItem {
     @Override
     public String getPath() {
         if (path == null) {
-            path = section.getPath() + "/" + getDirectory();
+            if (section != null) {
+                path = section.getPath() + "/" + getDirectory();
+            } else {
+                path = getDirectory();
+            }
         }
         return path;
     }
@@ -141,15 +136,27 @@ public class Lesson implements StudyItem {
 
     public void setId(int id) {
         this.id = id;
+        directory = null;
+        updatePath();
     }
 
+    @Nullable
+    @Override
+    public Course getCourse() {
+        if (section == null) {
+            return null;
+        }
+        return section.getCourse();
+    }
+
+    @Nullable
     @Transient
     public Section getSection() {
         return section;
     }
 
     @Transient
-    public void setSection(Section section) {
+    public void setSection(@Nullable Section section) {
         this.section = section;
     }
 
@@ -164,5 +171,65 @@ public class Lesson implements StudyItem {
     @Override
     public String toString() {
         return "Lesson {id=" + id + ", name='" + name + "\'}";
+    }
+
+    @NotNull
+    public List<Integer> getSteps() {
+        if (steps == null) {
+            steps = new ArrayList<>();
+        }
+        return steps;
+    }
+
+    @SuppressWarnings("unused")
+    public void setSteps(@Nullable ArrayList<Integer> steps) {
+        this.steps = steps;
+    }
+
+    @Transient
+    @Nullable
+    public Step getLastStep() {
+        int stepsCount = getStepList().size();
+        if (stepsCount == 0) {
+            return null;
+        }
+        return getStepList().get(stepsCount - 1);
+    }
+
+    @Transient
+    @Nullable
+    public Step getFirstStep() {
+        List<Step> children = getStepList();
+        if (children.size() == 0) {
+            return null;
+        }
+
+        return children.get(0);
+    }
+
+    @Transient
+    @Nullable
+    public Step getPrevStep(@NotNull Step step) {
+        int position = step.getPosition();
+        List<Step> children = getStepList();
+        for (int i = children.size() - 1; i >= 0; i--) {
+            Step item = children.get(i);
+            if (item.getPosition() < position) {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    @Transient
+    @Nullable
+    public Step getNextStep(@NotNull Step lesson) {
+        int position = lesson.getPosition();
+        for (Step item : getStepList()) {
+            if (item.getPosition() > position) {
+                return item;
+            }
+        }
+        return null;
     }
 }

@@ -24,8 +24,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.DialogWrapper;
-import com.intellij.openapi.util.text.StringUtil;
-import com.jetbrains.tmp.learning.StudyTaskManager;
+import com.jetbrains.tmp.learning.StepikProjectManager;
 import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
@@ -35,10 +34,12 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -46,11 +47,12 @@ import java.util.List;
 
 public class StepikConnectorLogin {
     private static final Logger logger = Logger.getInstance(StepikConnectorLogin.class.getName());
-    private static CloseableHttpClient ourClient;
     private static final String CLIENT_ID = "hUCWcq3hZHCmz0DKrDtwOWITLcYutzot7p4n59vU";
+    private static CloseableHttpClient ourClient;
     private static StepikUser currentUser;
 
     // TODO sing_in
+    @Nullable
     static CloseableHttpClient getHttpClient() {
         if (ourClient == null) {
             List<BasicHeader> headers = new ArrayList<>();
@@ -64,83 +66,47 @@ public class StepikConnectorLogin {
                 headers.add(new BasicHeader("Authorization", "Bearer " + currentUser.getAccessToken()));
                 headers.add(new BasicHeader("Content-type", EduStepikNames.CONTENT_TYPE_APPL_JSON));
             }
-            ourClient = StepikConnectorInit.getBuilder().setDefaultHeaders(headers).build();
+            HttpClientBuilder builder = StepikConnectorInit.getBuilder();
+            if (builder != null) {
+                ourClient = builder.setDefaultHeaders(headers).build();
+            }
         }
         return ourClient;
     }
 
-    @Deprecated
-    public static boolean login(@NotNull final Project project) {
-        logger.info("login");
-        resetClient();
-        StepikUser user = StudyTaskManager.getInstance(project).getUser();
-        String email = user.getEmail();
-        if (StringUtil.isEmptyOrSpaces(email)) {
-            logger.info("current project user is empty");
-            Project defaultProject = ProjectManager.getInstance().getDefaultProject();
-            StepikUser defaultUser = StudyTaskManager.getInstance(defaultProject).getUser();
-            String defaultEmail = defaultUser.getEmail();
-            if (StringUtil.isEmptyOrSpaces(defaultEmail)) {
-                throw new StepikAuthorizationException("Please authorize in the main menu.");
-            } else {
-                StudyTaskManager.getInstance(project).setUser(defaultUser);
-            }
-        }
-
-        try {
-            logger.info("minor login");
-            minorLogin(user);
-        } catch (StepikAuthorizationException e) {
-            logger.warn(e.getMessage());
-            return false;
-        }
-
-        return true;
-    }
-
-    public static boolean loginFromSettings(@NotNull final Project project, StepikUser basicUser) {
+    public static boolean loginFromSettings(
+            @NotNull final Project project,
+            @NotNull StepikUser basicUser) {
         resetClient();
         StepikUser user = minorLogin(basicUser);
 
         if (user == null) {
             return false;
         } else {
-            StudyTaskManager.getInstance(project).setUser(user);
+            StepikProjectManager.getInstance(project).setUser(user);
 
             Project defaultProject = ProjectManager.getInstance().getDefaultProject();
-            if (defaultProject != project && (StudyTaskManager.getInstance(defaultProject)).getUser()
-                    .getEmail()
-                    .isEmpty()) {
-                StudyTaskManager.getInstance(defaultProject).setUser(user);
+            if (defaultProject != project) {
+                StepikProjectManager.getInstance(defaultProject).setUser(user);
             }
             return true;
         }
     }
 
     public static boolean loginFromDialog(@NotNull final Project project) {
+        StepikUser user = StepikProjectManager.getInstance(project).getUser();
         Project defaultProject = ProjectManager.getInstance().getDefaultProject();
-        StepikUser user = StudyTaskManager.getInstance(project).getUser();
-        StepikUser defaultUser = StudyTaskManager.getInstance(defaultProject)
-                .getUser();
-        final String email = user.getEmail();
-        if (StringUtil.isEmptyOrSpaces(email)) {
-            if (StringUtil.isEmptyOrSpaces(defaultUser.getEmail())) {
-                return showLoginDialog();
-            } else {
-                defaultUser = minorLogin(defaultUser);
-                StudyTaskManager.getInstance(project).setUser(defaultUser);
-                logger.info("set default user");
-            }
-        } else {
-            if ((user = minorLogin(user)) == null) {
+        StepikUser defaultUser = StepikProjectManager.getInstance(defaultProject).getUser();
+
+        if (minorLogin(user) == null) {
+            if (minorLogin(defaultUser) == null) {
                 return showLoginDialog();
             }
-            if (user.getEmail().equals(defaultUser.getEmail()) || defaultUser.getEmail().isEmpty()) {
-                StudyTaskManager.getInstance(defaultProject).setUser(user);
-            }
-            StudyTaskManager.getInstance(project).setUser(user);
-            logger.info("set current user");
         }
+
+        StepikProjectManager.getInstance(project).setUser(currentUser);
+        StepikProjectManager.getInstance(defaultProject).setUser(currentUser);
+
         return true;
     }
 
@@ -159,10 +125,11 @@ public class StepikConnectorLogin {
         currentUser = null;
     }
 
-    static StepikUser minorLogin(StepikUser basicUser) {
+    @Nullable
+    static StepikUser minorLogin(@NotNull StepikUser basicUser) {
         String refreshToken;
         StepikWrappers.TokenInfo tokenInfo = null;
-        List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+        List<NameValuePair> nvps = new ArrayList<>();
 
         if (!(refreshToken = basicUser.getRefreshToken()).isEmpty()) {
             logger.info("refresh_token auth");
@@ -191,16 +158,18 @@ public class StepikConnectorLogin {
         if (tokenInfo == null) {
             return null;
         }
-        StepikUser user = new StepikUser(basicUser);
-        user.setupTokenInfo(tokenInfo);
-        currentUser = user;
-        StepikUser userInfo = StepikConnectorGet.getCurrentUser().users.get(0);
-        user.update(userInfo);
-        currentUser = user;
-        return user;
+        currentUser = new StepikUser(basicUser);
+        currentUser.setupTokenInfo(tokenInfo);
+        StepikWrappers.AuthorWrapper userWrapper = StepikConnectorGet.getCurrentUser();
+        if (userWrapper != null) {
+            currentUser.update(userWrapper.users.get(0));
+        } else {
+            return null;
+        }
+        return currentUser;
     }
 
-    private static StepikWrappers.TokenInfo postCredentials(List<NameValuePair> nvps) {
+    private static StepikWrappers.TokenInfo postCredentials(@NotNull List<NameValuePair> nvps) {
         final Gson gson = new GsonBuilder()
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
                 .create();
@@ -209,7 +178,12 @@ public class StepikConnectorLogin {
         request.setEntity(new UrlEncodedFormEntity(nvps, Consts.UTF_8));
 
         try {
-            final CloseableHttpResponse response = StepikConnectorInit.getHttpClient().execute(request);
+            CloseableHttpClient client = StepikConnectorInit.getHttpClient();
+            if (client == null) {
+                logger.warn("Failed to Login: httpClient is null");
+                return null;
+            }
+            final CloseableHttpResponse response = client.execute(request);
             final StatusLine statusLine = response.getStatusLine();
             final HttpEntity responseEntity = response.getEntity();
             final String responseString = responseEntity != null ? EntityUtils.toString(responseEntity) : "";

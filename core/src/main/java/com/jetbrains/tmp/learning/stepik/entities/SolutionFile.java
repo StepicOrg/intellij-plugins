@@ -5,7 +5,7 @@ import com.google.gson.annotations.Expose;
 /**
  * @author meanmail
  */
-public class SolutionFile {
+class SolutionFile {
     @Expose
     private String name;
     @Expose

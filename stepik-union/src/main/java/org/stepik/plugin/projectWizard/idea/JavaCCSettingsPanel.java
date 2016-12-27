@@ -8,7 +8,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.HyperlinkAdapter;
-import com.jetbrains.tmp.learning.StudyTaskManager;
+import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.courseGeneration.StepikProjectGenerator;
 import com.jetbrains.tmp.learning.stepik.CourseInfo;
@@ -28,39 +28,33 @@ import java.awt.event.ItemListener;
 import java.util.Arrays;
 import java.util.List;
 
-public class JavaCCSettingsPanel extends ModuleWizardStep {
+class JavaCCSettingsPanel extends ModuleWizardStep {
     private static final Logger logger = Logger.getInstance(JavaCCSettingsPanel.class);
     private final static String COURSE_LIST = "Course list";
     private final static String COURSE_LINK = "Course link";
-
+    private final StepikProjectGenerator projectGenerator;
+    private final Project project;
     private JPanel mainPanel;
-
     private JLabel nameLabel;
     private JLabel userName;
     private JLabel langLabel;
     private JComboBox<SupportedLanguages> langComboBox;
     private JLabel buildLabel;
     private JComboBox<String> buildType;
-
     private JPanel courseSelectPanel;
-
     private JPanel courseListPanel;
     private JLabel courseListLabel;
     private JComboBox<CourseInfo> courseListComboBox;
     private JButton refreshListButton;
     private JTextPane courseListDescription;
-
     private JPanel courseLinkPanel;
     private JLabel courseLinkLabel;
     private JTextField courseLinkFiled;
     private JTextPane courseLinkDescription;
-
-    private final StepikProjectGenerator projectGenerator;
     @NotNull
     private CourseInfo selectedCourse = CourseInfo.INVALID_COURSE;
     @NotNull
     private CourseInfo courseFromLink = CourseInfo.INVALID_COURSE;
-    private final Project project;
 
     JavaCCSettingsPanel(
             @NotNull final StepikProjectGenerator projectGenerator,
@@ -108,7 +102,7 @@ public class JavaCCSettingsPanel extends ModuleWizardStep {
     @Override
     public void updateStep() {
         StepikConnectorLogin.loginFromDialog(project);
-        userName.setText(StudyTaskManager.getInstance(project).getUser().getName());
+        userName.setText(StepikProjectManager.getInstance(project).getUser().getName());
         refreshCourseList(false);
 
         langComboBox.addItem(SupportedLanguages.PYTHON);
@@ -146,7 +140,6 @@ public class JavaCCSettingsPanel extends ModuleWizardStep {
         courseListDescription.setText("");
         final List<CourseInfo> courses =
                 StepikProjectGenerator.getCoursesUnderProgress(force,
-                        "Refreshing Course List",
                         project);
 
         courseListComboBox.removeAllItems();

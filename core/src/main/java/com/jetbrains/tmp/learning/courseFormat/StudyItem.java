@@ -1,16 +1,20 @@
 package com.jetbrains.tmp.learning.courseFormat;
 
+import com.intellij.util.xmlb.annotations.Transient;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public interface StudyItem {
+    @NotNull
     String getName();
 
-    void setName(String name);
+    void setName(@Nullable String name);
 
-    int getIndex();
+    int getPosition();
 
-    void setIndex(int index);
+    void setPosition(int position);
 
+    @NotNull
     StudyStatus getStatus();
 
     @NotNull
@@ -20,4 +24,12 @@ public interface StudyItem {
     String getPath();
 
     void updatePath();
+
+    int getId();
+
+    void setId(int id);
+
+    @Nullable
+    @Transient
+    Course getCourse();
 }

@@ -5,22 +5,22 @@ import com.intellij.openapi.fileEditor.impl.text.TextEditorProvider;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.tmp.learning.StudyUtils;
-import com.jetbrains.tmp.learning.courseFormat.TaskFile;
+import com.jetbrains.tmp.learning.courseFormat.StepFile;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Implementation of StudyEditor which has panel with special buttons and task text
+ * Implementation of StudyEditor which has panel with special buttons and step text
  * also @see {@link StudyFileEditorProvider}
  */
 public class StudyEditor extends PsiAwareTextEditorImpl {
-    private final TaskFile myTaskFile;
+    private final StepFile stepFile;
 
-    public StudyEditor(@NotNull final Project project, @NotNull final VirtualFile file) {
+    StudyEditor(@NotNull final Project project, @NotNull final VirtualFile file) {
         super(project, file, TextEditorProvider.getInstance());
-        myTaskFile = StudyUtils.getTaskFile(project, file);
+        stepFile = StudyUtils.getStepFile(project, file);
     }
 
-    public TaskFile getTaskFile() {
-        return myTaskFile;
+    public StepFile getStepFile() {
+        return stepFile;
     }
 }

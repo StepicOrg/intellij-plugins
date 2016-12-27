@@ -11,14 +11,15 @@ import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.StudyState;
-import com.jetbrains.tmp.learning.StudyTaskManager;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.actions.StudyActionWithShortcut;
-import com.jetbrains.tmp.learning.courseFormat.Task;
+import com.jetbrains.tmp.learning.courseFormat.Step;
 import com.jetbrains.tmp.learning.editor.StudyEditor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.stepik.plugin.utils.DirectivesUtils;
 import org.stepik.plugin.utils.ReformatUtils;
 
@@ -34,7 +35,6 @@ public class InsertStepikDirectives extends StudyActionWithShortcut {
     private static final String ACTION_ID = "STEPIK.InsertStepikDirectives";
 
     public InsertStepikDirectives() {
-
         super("Repair standard template(" + KeymapUtil.getShortcutText(
                 new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT), null)) + ")",
                 "Insert Stepik directives. Repair ordinary template if it is possible.",
@@ -47,6 +47,7 @@ public class InsertStepikDirectives extends StudyActionWithShortcut {
         return ACTION_ID;
     }
 
+    @Nullable
     @Override
     public String[] getShortcuts() {
         return new String[]{SHORTCUT};
@@ -62,8 +63,8 @@ public class InsertStepikDirectives extends StudyActionWithShortcut {
         if (!studyState.isValid()) {
             return;
         }
-        Task targetTask = studyState.getTask();
-        if (targetTask == null) {
+        Step targetStep = studyState.getStep();
+        if (targetStep == null) {
             return;
         }
 
@@ -74,8 +75,8 @@ public class InsertStepikDirectives extends StudyActionWithShortcut {
                 documentManager.saveDocument(document);
         }
 
-        SupportedLanguages currentLang = targetTask.getCurrentLang();
-        VirtualFile src = studyState.getTaskDir();
+        SupportedLanguages currentLang = targetStep.getCurrentLang();
+        VirtualFile src = studyState.getStepDir();
         VirtualFile file = src.findChild(currentLang.getMainFileName());
         if (file == null) {
             return;
@@ -83,7 +84,7 @@ public class InsertStepikDirectives extends StudyActionWithShortcut {
         String[] text = DirectivesUtils.getFileText(file);
 
         Pair<Integer, Integer> locations = DirectivesUtils.findDirectives(text, currentLang);
-        boolean showHint = StudyTaskManager.getInstance(project).getShowHint();
+        boolean showHint = StepikProjectManager.getInstance(project).getShowHint();
         boolean needInsert = locations.first == -1 && locations.second == text.length;
         if (needInsert) {
             text = insertAmbientCode(text, currentLang, showHint);

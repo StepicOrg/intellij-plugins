@@ -4,35 +4,27 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
-import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.popup.Balloon;
-import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.util.Disposer;
-import com.intellij.openapi.util.io.FileUtil;
-import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.awt.RelativePoint;
 import com.intellij.ui.content.Content;
-import com.intellij.util.ObjectUtils;
 import com.intellij.util.TimeoutUtil;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.core.EduUtils;
 import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.Lesson;
-import com.jetbrains.tmp.learning.courseFormat.Task;
-import com.jetbrains.tmp.learning.courseFormat.TaskFile;
-import com.jetbrains.tmp.learning.courseGeneration.StepikProjectGenerator;
+import com.jetbrains.tmp.learning.courseFormat.Step;
+import com.jetbrains.tmp.learning.courseFormat.StepFile;
 import com.jetbrains.tmp.learning.editor.StudyEditor;
 import com.jetbrains.tmp.learning.ui.StudyToolWindow;
 import com.jetbrains.tmp.learning.ui.StudyToolWindowFactory;
@@ -43,12 +35,6 @@ import org.stepik.core.utils.ProjectFilesUtils;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.Closeable;
-import java.io.File;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -56,34 +42,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StudyUtils {
-    private StudyUtils() {
-    }
-
     private static final Logger logger = Logger.getInstance(StudyUtils.class.getName());
-    private static final String EMPTY_TASK_TEXT = "Please, open any task to see task description";
+    private static final String EMPTY_STEP_TEXT = "Please, open any step to see step description";
+    private static Pattern stepPathPattern;
 
-    public static void closeSilently(@Nullable final Closeable stream) {
-        if (stream != null) {
-            try {
-                stream.close();
-            } catch (IOException e) {
-                // close silently
-            }
-        }
-    }
-
-    @Nullable
-    public static <T> T getFirst(@NotNull final Iterable<T> container) {
-        Iterator<T> iterator = container.iterator();
-        if (!iterator.hasNext()) {
-            return null;
-        }
-        return iterator.next();
-    }
-
-    static boolean indexIsValid(int index, @NotNull final Collection collection) {
-        int size = collection.size();
-        return index >= 0 && index < size;
+    private StudyUtils() {
     }
 
     public static void updateAction(@NotNull final AnActionEvent e) {
@@ -101,13 +64,12 @@ public class StudyUtils {
     public static void updateToolWindows(@NotNull final Project project) {
         final StudyToolWindow studyToolWindow = getStudyToolWindow(project);
         if (studyToolWindow != null) {
-            String taskText = getTaskText(project);
-            if (taskText != null) {
-                studyToolWindow.setTaskText(taskText, null, project);
+            String stepText = getStepText(project);
+            if (stepText != null) {
+                studyToolWindow.setStepText(stepText);
             } else {
-                logger.warn("Task text is null");
+                logger.warn("Step text is null");
             }
-            studyToolWindow.updateCourseProgress(project);
         }
     }
 
@@ -122,7 +84,7 @@ public class StudyUtils {
     }
 
     @Nullable
-    public static StudyToolWindow getStudyToolWindow(@NotNull final Project project) {
+    static StudyToolWindow getStudyToolWindow(@NotNull final Project project) {
         ToolWindow toolWindow = ToolWindowManager.getInstance(project)
                 .getToolWindow(StudyToolWindowFactory.STUDY_TOOL_WINDOW);
         if (toolWindow != null) {
@@ -138,7 +100,7 @@ public class StudyUtils {
     }
 
     /**
-     * shows pop up in the center of "check task" button in study editor
+     * shows pop up in the center of "check step" button in study editor
      */
     public static void showCheckPopUp(@NotNull final Project project, @NotNull final Balloon balloon) {
         final StudyEditor studyEditor = getSelectedStudyEditor(project);
@@ -157,38 +119,30 @@ public class StudyUtils {
     }
 
     @Nullable
-    public static TaskFile getTaskFile(@NotNull final Project project, @NotNull final VirtualFile file) {
-        final Course course = StudyTaskManager.getInstance(project).getCourse();
+    public static StepFile getStepFile(@NotNull final Project project, @NotNull final VirtualFile file) {
+        final Course course = StepikProjectManager.getInstance(project).getCourse();
         if (course == null) {
             return null;
         }
-        VirtualFile taskDir = file.getParent();
-        if (taskDir == null) {
+        VirtualFile stepDir = file.getParent();
+        if (stepDir == null) {
             return null;
         }
         //need this because of multi-module generation
-        if (EduNames.SRC.equals(taskDir.getName())) {
-            taskDir = taskDir.getParent();
-            if (taskDir == null) {
+        if (EduNames.SRC.equals(stepDir.getName())) {
+            stepDir = stepDir.getParent();
+            if (stepDir == null) {
                 return null;
             }
         }
-        final String taskDirName = taskDir.getName();
-        if (taskDirName.contains(EduNames.TASK)) {
-            final VirtualFile lessonDir = taskDir.getParent();
-            if (lessonDir != null) {
-                Lesson lesson = course.getLessonByDirName(lessonDir.getName());
-                if (lesson == null) {
-                    return null;
-                }
-                int taskIndex = EduUtils.getIndex(taskDirName, EduNames.TASK) - 1;
-                final List<Task> tasks = lesson.getTaskList();
-                if (!indexIsValid(taskIndex, tasks)) {
-                    return null;
-                }
-                final Task task = tasks.get(taskIndex);
-                return task.getFile(file.getName());
+        final String stepDirName = stepDir.getName();
+        if (stepDirName.contains(EduNames.STEP)) {
+            int stepId = EduUtils.parseDirName(stepDirName, EduNames.STEP);
+            final Step step = course.getStepById(stepId);
+            if (step == null) {
+                return null;
             }
+            return step.getFile(file.getName());
         }
         return null;
     }
@@ -218,36 +172,31 @@ public class StudyUtils {
 
     @Nullable
     @Contract("null -> null")
-    static String getTaskTextFromTask(@Nullable final Task task) {
-        if (task == null) {
+    static String getStepTextFromStep(@Nullable final Step step) {
+        if (step == null) {
             return null;
         }
-        String text = task.getText();
-        if (text != null) {
-            return getTextWithStepLink(task);
-        }
-        return null;
+        return getTextWithStepLink(step);
     }
 
     @NotNull
-    private static String getTextWithStepLink(Task task) {
+    private static String getTextWithStepLink(Step step) {
         StringBuilder stringBuilder = new StringBuilder();
 
-        if (task.getLesson().getId() > 0) {
+        Lesson lesson = step.getLesson();
+        if (lesson != null) {
             stringBuilder.append("<a href=\"https://stepik.org/lesson/")
-                    .append(task.getLesson().getId())
+                    .append(lesson.getId())
                     .append("/step/")
-                    .append(task.getPosition())
+                    .append(step.getPosition())
                     .append("\">View step on Stepik.org</a>");
-        } else {
-            stringBuilder.append("<b>Create project for this course again to see the link to the step.</b>");
         }
 
-        if (!task.getText().startsWith("<p>") && !task.getText().startsWith("<h")) {
+        if (!step.getText().startsWith("<p>") && !step.getText().startsWith("<h")) {
             stringBuilder.append("<br><br>");
         }
 
-        stringBuilder.append(task.getDescription());
+        stringBuilder.append(step.getDescription());
         return stringBuilder.toString();
     }
 
@@ -263,12 +212,12 @@ public class StudyUtils {
     }
 
     @Nullable
-    public static String getTaskText(@NotNull final Project project) {
-        final Task task = getSelectedTask(project);
-        if (task != null) {
-            return getTaskTextFromTask(task);
+    public static String getStepText(@NotNull final Project project) {
+        final Step step = getSelectedStep(project);
+        if (step != null) {
+            return getStepTextFromStep(step);
         }
-        return EMPTY_TASK_TEXT;
+        return EMPTY_STEP_TEXT;
     }
 
     private static String getRelativePath(@NotNull Project project, @NotNull VirtualFile item) {
@@ -283,32 +232,13 @@ public class StudyUtils {
     }
 
     @Nullable
-    public static Task getSelectedTask(@NotNull Project project) {
+    public static Step getSelectedStep(@NotNull Project project) {
         VirtualFile[] files = FileEditorManager.getInstance(project).getSelectedFiles();
         if (files.length == 0) {
             return null;
         }
 
-        return getTask(project, files[0]);
-    }
-
-    @Nullable
-    public static TaskFile getSelectedTaskFile(@NotNull Project project) {
-        VirtualFile[] files = FileEditorManager.getInstance(project).getSelectedFiles();
-        TaskFile taskFile = null;
-        for (VirtualFile file : files) {
-            taskFile = getTaskFile(project, file);
-            if (taskFile != null) {
-                break;
-            }
-        }
-        return taskFile;
-    }
-
-    @Nullable
-    public static Task getCurrentTask(@NotNull final Project project) {
-        final TaskFile taskFile = getSelectedTaskFile(project);
-        return taskFile != null ? taskFile.getTask() : null;
+        return getStep(project, files[0]);
     }
 
     @Nullable
@@ -316,8 +246,9 @@ public class StudyUtils {
         Project studyProject = null;
         Project[] openProjects = ProjectManager.getInstance().getOpenProjects();
         for (Project project : openProjects) {
-            if (StudyTaskManager.getInstance(project).getCourse() != null) {
+            if (StepikProjectManager.getInstance(project).getCourse() != null) {
                 studyProject = project;
+                break;
             }
         }
         if (studyProject == null) {
@@ -326,11 +257,6 @@ public class StudyUtils {
         }
         logger.info("return regular project");
         return studyProject;
-    }
-
-    @NotNull
-    public static File getCacheDirectory(@NotNull Project project, Course course) {
-        return new File(StepikProjectGenerator.CONFIG_COURSES_DIR, Integer.toString(course.getId()));
     }
 
     public static boolean hasJavaFx() {
@@ -342,17 +268,15 @@ public class StudyUtils {
         }
     }
 
-    private static Pattern taskPathPattern;
-
     @Nullable
-    public static Task getTask(@NotNull Project project, @NotNull VirtualFile taskVF) {
-        String path = getRelativePath(project, taskVF);
-        if (taskPathPattern == null) {
-            taskPathPattern = Pattern.compile("^(section[0-9]+)/(lesson[0-9]+)/(task[0-9]+)/src/.*");
+    static Step getStep(@NotNull Project project, @NotNull VirtualFile stepVF) {
+        String path = getRelativePath(project, stepVF);
+        if (stepPathPattern == null) {
+            stepPathPattern = Pattern.compile("^(section[0-9]+)/(lesson[0-9]+)/(step[0-9]+)/src/.*");
         }
-        Matcher matcher = taskPathPattern.matcher(path);
+        Matcher matcher = stepPathPattern.matcher(path);
         if (matcher.matches()) {
-            Course course = StudyTaskManager.getInstance(project).getCourse();
+            Course course = StepikProjectManager.getInstance(project).getCourse();
             if (course == null) {
                 return null;
             }
@@ -360,7 +284,7 @@ public class StudyUtils {
             if (lesson == null) {
                 return null;
             }
-            return lesson.getTask(matcher.group(3));
+            return lesson.getStep(matcher.group(3));
         }
         return null;
     }
@@ -381,51 +305,5 @@ public class StudyUtils {
             logger.warn(e.getMessage());
         }
         return result;
-    }
-
-    @Nullable
-    public static Task getTaskFromSelectedEditor(Project project) {
-        final StudyEditor editor = getSelectedStudyEditor(project);
-        Task task = null;
-        if (editor != null) {
-            final TaskFile file = editor.getTaskFile();
-            task = file.getTask();
-        }
-        return task;
-    }
-
-    @Nullable
-    public static VirtualFile findTaskDescriptionVirtualFile(@NotNull final VirtualFile parent) {
-        return ObjectUtils.chooseNotNull(parent.findChild(EduNames.TASK_HTML), parent.findChild(EduNames.TASK_MD));
-    }
-
-    @Nullable
-    static File createTaskDescriptionFile(@NotNull final File parent) {
-        if (new File(parent, EduNames.TASK_HTML).exists()) {
-            return new File(parent, EduNames.TASK_HTML);
-        } else {
-            return new File(parent, EduNames.TASK_MD);
-        }
-    }
-
-    @Nullable
-    public static Document getDocument(String basePath, int lessonIndex, int taskIndex, String fileName) {
-        String taskPath = FileUtil.join(basePath, EduNames.LESSON + lessonIndex, EduNames.TASK + taskIndex);
-        VirtualFile taskFile = LocalFileSystem.getInstance().findFileByPath(FileUtil.join(taskPath, fileName));
-        if (taskFile == null) {
-            taskFile = LocalFileSystem.getInstance().findFileByPath(FileUtil.join(taskPath, EduNames.SRC, fileName));
-        }
-        if (taskFile == null) {
-            return null;
-        }
-        return FileDocumentManager.getInstance().getDocument(taskFile);
-    }
-
-    public static void showErrorPopupOnToolbar(@NotNull Project project) {
-        final Balloon balloon =
-                JBPopupFactory.getInstance()
-                        .createHtmlTextBalloonBuilder("Couldn't post your reaction", MessageType.ERROR, null)
-                        .createBalloon();
-        showCheckPopUp(project, balloon);
     }
 }

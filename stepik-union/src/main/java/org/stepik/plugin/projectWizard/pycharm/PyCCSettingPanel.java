@@ -4,10 +4,9 @@ import com.intellij.facet.ui.FacetValidatorsManager;
 import com.intellij.facet.ui.ValidationResult;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.BrowserUtil;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.HyperlinkAdapter;
-import com.jetbrains.tmp.learning.StudyTaskManager;
+import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.courseGeneration.StepikProjectGenerator;
 import com.jetbrains.tmp.learning.stepik.CourseInfo;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorGet;
@@ -24,35 +23,32 @@ import java.awt.event.ItemListener;
 import java.util.Arrays;
 import java.util.List;
 
-public class PyCCSettingPanel extends JPanel {
-    private static final Logger logger = Logger.getInstance(PyCCSettingPanel.class);
-    private final static String COURSE_LIST = "Course list";
+class PyCCSettingPanel extends JPanel {
     final static String COURSE_LINK = "Course link";
-
+    private final static String COURSE_LIST = "Course list";
+    private final ValidationResult invalidCourse = new ValidationResult("Please select a course");
+    private final ValidationResult adaptiveCourse = new ValidationResult(
+            "Sorry, but we don't support adaptive courses yet");
     private JPanel mainPanel;
     private JLabel nameLabel;
     private JLabel userName;
     private JLabel buildLabel;
     private JComboBox<String> buildType;
-
     private JPanel courseSelectPanel;
-
     private JPanel courseLinkPanel;
     private JLabel courseLinkLabel;
     private JTextField courseLinkFiled;
     private JTextPane courseLinkDescription;
-
     private JPanel courseListPanel;
     private JLabel courseListLabel;
     private JComboBox<CourseInfo> courseListComboBox;
     private JButton refreshListButton;
     private JTextPane courseListDescription;
-
     private CourseInfo selectedCourse;
     private Project project;
-
     private boolean isInit = false;
     private CourseInfo courseFromLink = CourseInfo.INVALID_COURSE;
+    private FacetValidatorsManager validationManager;
 
     PyCCSettingPanel() {
     }
@@ -97,7 +93,7 @@ public class PyCCSettingPanel extends JPanel {
 
     private void setupGeneralSettings() {
         refreshCourseList(false);
-        userName.setText(StudyTaskManager.getInstance(project).getUser().getName());
+        userName.setText(StepikProjectManager.getInstance(project).getUser().getName());
     }
 
     CourseInfo getSelectedCourse() {
@@ -116,7 +112,6 @@ public class PyCCSettingPanel extends JPanel {
         courseListDescription.setText("");
         final List<CourseInfo> courses =
                 StepikProjectGenerator.getCoursesUnderProgress(force,
-                        "Refreshing Course List",
                         project);
 
         courseListComboBox.removeAllItems();
@@ -131,6 +126,34 @@ public class PyCCSettingPanel extends JPanel {
         if (courseListComboBox.getItemCount() > 0) {
             courseListComboBox.setSelectedIndex(0);
         }
+    }
+
+    ValidationResult check() {
+        if (selectedCourse.isAdaptive()) {
+            return setError(adaptiveCourse);
+        }
+        if (selectedCourse == CourseInfo.INVALID_COURSE) {
+            return setError(invalidCourse);
+        }
+        return setOK();
+    }
+
+    private ValidationResult setError(@NotNull ValidationResult result) {
+        if (validationManager != null) {
+            validationManager.validate();
+        }
+        return result;
+    }
+
+    private ValidationResult setOK() {
+        if (validationManager != null) {
+            validationManager.validate();
+        }
+        return ValidationResult.OK;
+    }
+
+    void registerValidators(FacetValidatorsManager manager) {
+        validationManager = manager;
     }
 
     /**
@@ -262,39 +285,5 @@ public class PyCCSettingPanel extends JPanel {
         private boolean isFillOfInt(@NotNull String link) {
             return link.matches("[0-9]+");
         }
-    }
-
-    private FacetValidatorsManager myValidationManager;
-    private ValidationResult invalidCourse = new ValidationResult("Please select a course");
-    private ValidationResult adaptiveCourse = new ValidationResult("Sorry, but we don't support adaptive courses yet");
-
-    ValidationResult check(){
-        if (selectedCourse.isAdaptive()){
-            return setError(adaptiveCourse);
-        }
-        if (selectedCourse == CourseInfo.INVALID_COURSE){
-            return setError(invalidCourse);
-        }
-        return setOK();
-    }
-
-    private ValidationResult setError(@NotNull ValidationResult result) {
-        StepikProjectGenerator.getInstance().fireStateChanged(result);
-        if (myValidationManager != null) {
-            myValidationManager.validate();
-        }
-        return result;
-    }
-
-    private ValidationResult setOK() {
-        StepikProjectGenerator.getInstance().fireStateChanged(ValidationResult.OK);
-        if (myValidationManager != null) {
-            myValidationManager.validate();
-        }
-        return ValidationResult.OK;
-    }
-
-    void registerValidators(FacetValidatorsManager manager) {
-        myValidationManager = manager;
     }
 }

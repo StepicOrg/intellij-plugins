@@ -4,8 +4,8 @@ import com.intellij.ui.JBColor;
 import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.Lesson;
 import com.jetbrains.tmp.learning.courseFormat.Section;
+import com.jetbrains.tmp.learning.courseFormat.Step;
 import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
-import com.jetbrains.tmp.learning.courseFormat.Task;
 import icons.AllStepikIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -17,12 +17,9 @@ import static org.stepik.core.utils.ProjectFilesUtils.getParent;
 import static org.stepik.core.utils.ProjectFilesUtils.isHideDir;
 import static org.stepik.core.utils.ProjectFilesUtils.isSandbox;
 import static org.stepik.core.utils.ProjectFilesUtils.isStudyItemDir;
-import static org.stepik.core.utils.ProjectFilesUtils.isTaskHtmlFile;
-import static org.stepik.core.utils.ProjectFilesUtils.isUtilDir;
 import static org.stepik.core.utils.ProjectFilesUtils.isWithinHideDir;
 import static org.stepik.core.utils.ProjectFilesUtils.isWithinSandbox;
 import static org.stepik.core.utils.ProjectFilesUtils.isWithinSrc;
-import static org.stepik.core.utils.ProjectFilesUtils.isWithinUtil;
 
 /**
  * @author meanmail
@@ -41,7 +38,7 @@ public class PresentationUtils {
 
         Icon[] set;
 
-        if (subjectClass == Task.class) {
+        if (subjectClass == Step.class) {
             set = icons[3];
         } else if (subjectClass == Lesson.class) {
             set = icons[2];
@@ -107,19 +104,21 @@ public class PresentationUtils {
             return false;
         }
 
-        if (isSandbox(relPath) || isStudyItemDir(relPath) || isUtilDir(relPath)) {
+        //noinspection SimplifiableIfStatement
+        if (isSandbox(relPath) || isStudyItemDir(relPath)) {
             return true;
         }
 
-        return isWithinSrc(relPath) || isWithinSandbox(relPath) || isWithinUtil(relPath);
+        return isWithinSrc(relPath) || isWithinSandbox(relPath);
     }
 
     public static boolean isVisibleFile(@NotNull String relFilePath) {
         String parentDir = getParent(relFilePath);
-        if (parentDir == null || isTaskHtmlFile(relFilePath) || !isVisibleDirectory(parentDir)) {
+        //noinspection SimplifiableIfStatement
+        if (parentDir == null || !isVisibleDirectory(parentDir)) {
             return false;
         }
 
-        return isWithinSrc(relFilePath) || isWithinSandbox(relFilePath) || isWithinUtil(relFilePath);
+        return isWithinSrc(relFilePath) || isWithinSandbox(relFilePath);
     }
 }
