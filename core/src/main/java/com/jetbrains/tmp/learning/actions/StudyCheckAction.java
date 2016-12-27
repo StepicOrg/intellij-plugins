@@ -8,7 +8,7 @@ import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Ref;
 import com.jetbrains.tmp.learning.StudyUtils;
-import icons.InteractiveLearningIcons;
+import icons.AllStepikIcons;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -20,7 +20,7 @@ public abstract class StudyCheckAction extends StudyActionWithShortcut {
 
     public StudyCheckAction() {
         super("Check Step (" + KeymapUtil.getShortcutText(new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT),
-                null)) + ")", "Check current step", InteractiveLearningIcons.CheckStep);
+                null)) + ")", "Check current step", AllStepikIcons.ToolWindow.checkTask);
     }
 
     public abstract void check(@NotNull final Project project);

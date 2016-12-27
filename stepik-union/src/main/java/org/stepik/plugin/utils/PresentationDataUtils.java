@@ -15,7 +15,7 @@ import com.jetbrains.tmp.learning.courseFormat.Section;
 import com.jetbrains.tmp.learning.courseFormat.Step;
 import com.jetbrains.tmp.learning.courseFormat.StudyItem;
 import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
-import icons.InteractiveLearningIcons;
+import icons.AllStepikIcons;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.core.utils.PresentationUtils;
 import org.stepik.core.utils.ProjectFilesUtils;

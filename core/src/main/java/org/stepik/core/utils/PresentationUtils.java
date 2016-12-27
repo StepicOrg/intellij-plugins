@@ -6,7 +6,7 @@ import com.jetbrains.tmp.learning.courseFormat.Lesson;
 import com.jetbrains.tmp.learning.courseFormat.Section;
 import com.jetbrains.tmp.learning.courseFormat.Step;
 import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
-import icons.InteractiveLearningIcons;
+import icons.AllStepikIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -63,24 +63,24 @@ public class PresentationUtils {
     private static Icon[][] getIcons() {
         return new Icon[][]{
                 {
-                        InteractiveLearningIcons.Course,
-                        InteractiveLearningIcons.CourseSolved,
-                        InteractiveLearningIcons.Course
+                        AllStepikIcons.ProjectTree.course,
+                        AllStepikIcons.ProjectTree.courseCorrect,
+                        AllStepikIcons.ProjectTree.course
                 },
                 {
-                        InteractiveLearningIcons.Section,
-                        InteractiveLearningIcons.SectionSolved,
-                        InteractiveLearningIcons.Section
+                        AllStepikIcons.ProjectTree.module,
+                        AllStepikIcons.ProjectTree.moduleCorrect,
+                        AllStepikIcons.ProjectTree.module
                 },
                 {
-                        InteractiveLearningIcons.Lesson,
-                        InteractiveLearningIcons.LessonSolved,
-                        InteractiveLearningIcons.Lesson
+                        AllStepikIcons.ProjectTree.lesson,
+                        AllStepikIcons.ProjectTree.lessonCorrect,
+                        AllStepikIcons.ProjectTree.lesson
                 },
                 {
-                        InteractiveLearningIcons.Step,
-                        InteractiveLearningIcons.StepSolved,
-                        InteractiveLearningIcons.StepFailed
+                        AllStepikIcons.ProjectTree.step,
+                        AllStepikIcons.ProjectTree.stepCorrect,
+                        AllStepikIcons.ProjectTree.stepWrong
                 }
         };
     }
@@ -93,7 +93,7 @@ public class PresentationUtils {
             case SOLVED:
                 return SOLVED_COLOR;
             case FAILED:
-                return JBColor.RED;
+                return WRONG_COLOR;
         }
         return JBColor.BLACK;
     }

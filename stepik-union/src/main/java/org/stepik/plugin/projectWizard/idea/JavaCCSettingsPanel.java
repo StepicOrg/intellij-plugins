@@ -116,7 +116,7 @@ class JavaCCSettingsPanel extends ModuleWizardStep {
 
     @Override
     public boolean validate() throws ConfigurationException {
-        return !selectedCourse.isAdaptive() || selectedCourse != CourseInfo.INVALID_COURSE;
+        return !selectedCourse.isAdaptive() && selectedCourse != CourseInfo.INVALID_COURSE;
     }
 
     @Override
@@ -205,13 +205,23 @@ class JavaCCSettingsPanel extends ModuleWizardStep {
                     (coursesContainer = StepikConnectorGet.getCourseInfos(courseId)) == null) {
                 courseLinkDescription.setText("Wrong link");
                 courseFromLink = CourseInfo.INVALID_COURSE;
+                selectedCourse = CourseInfo.INVALID_COURSE;
                 return;
             }
 
             selectedCourse = coursesContainer.courses.get(0);
             courseFromLink = selectedCourse;
-            courseLinkDescription.setText(String.format("<b>Course:</b> %s<br><br>%s",
-                    selectedCourse.toString(), selectedCourse.getDescription()));
+
+            StringBuilder sb = new StringBuilder();
+            sb.append("<b>Course:</b> ")
+                    .append(selectedCourse.toString())
+                    .append("<br><br>")
+                    .append(selectedCourse.getDescription());
+            if (selectedCourse.isAdaptive()) {
+                sb.append("<p style='font-weight: bold;'>This course is adaptive.<br>")
+                        .append("Sorry, but we don't support adaptive courses yet</p>");
+            }
+            courseLinkDescription.setText(sb.toString());
         }
 
         @NotNull
