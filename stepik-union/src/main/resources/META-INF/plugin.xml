@@ -22,15 +22,10 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <applicationConfigurable instance="org.stepik.plugin.collective.ui.StepikSettingsConfigurable"/>
-        <moduleType id="STEPIK_MODULE_TYPE"
-                    implementationClass="org.stepik.plugin.projectWizard.idea.StepikModuleType"/>
-        <refactoring.moveHandler implementation="org.stepik.plugin.refactoring.move.StepikMoveHandlerDelegate"
-                                 order="first"/>
-        <renamePsiElementProcessor implementation="org.stepik.plugin.refactoring.rename.StepikRenamePsiElementProcessor"
-                                   order="first"/>
-        <refactoring.safeDeleteProcessor
-                implementation="org.stepik.plugin.refactoring.safeDelete.StepikSafeDeleteProcessorDelegate"
-                order="first"/>
+        <moduleType id="STEPIK_MODULE_TYPE" implementationClass="org.stepik.plugin.projectWizard.idea.StepikModuleType"/>
+        <refactoring.moveHandler implementation="org.stepik.plugin.refactoring.move.StepikMoveHandlerDelegate" order="first"/>
+        <renamePsiElementProcessor implementation="org.stepik.plugin.refactoring.rename.StepikRenamePsiElementProcessor" order="first"/>
+        <refactoring.safeDeleteProcessor implementation="org.stepik.plugin.refactoring.safeDelete.StepikSafeDeleteProcessorDelegate" order="first"/>
     </extensions>
 
     <extensions defaultExtensionNs="SCore">
@@ -44,8 +39,7 @@
         <action id="STEPIK.DownloadSubmission" class="org.stepik.plugin.actions.DownloadSubmission"/>
         <action id="STEPIK.SwitchLanguage" class="org.stepik.plugin.actions.SwitchLanguage"/>
         <action id="STEPIK.InsertStepikDirectives" class="org.stepik.plugin.actions.InsertStepikDirectives"/>
-        <action id="STEPIK.RefreshStepAction" class="org.stepik.plugin.actions.StepikResetStepAction"
-                text="Reset Step File" description="Refresh current step"/>
+        <action id="STEPIK.RefreshStepAction" class="org.stepik.plugin.actions.StepikResetStepAction" text="Reset Step File" description="Refresh current step"/>
     </actions>
 
     <!--______________________ CORE ________________________________________-->
@@ -57,19 +51,14 @@
     </project-components>
 
     <extensionPoints>
-        <extensionPoint qualifiedName="SCore.studyPluginConfigurator"
-                        interface="com.jetbrains.tmp.learning.StudyPluginConfigurator"/>
+        <extensionPoint qualifiedName="SCore.studyPluginConfigurator" interface="com.jetbrains.tmp.learning.StudyPluginConfigurator"/>
     </extensionPoints>
 
     <extensions defaultExtensionNs="com.intellij">
-        <projectService serviceInterface="com.intellij.codeInsight.documentation.DocumentationManager"
-                        serviceImplementation="com.jetbrains.tmp.learning.StudyDocumentationManager" overrides="true"/>
-        <toolWindow id="Step Description" anchor="right"
-                    factoryClass="com.jetbrains.tmp.learning.ui.StudyToolWindowFactory"
-                    conditionClass="com.jetbrains.tmp.learning.ui.StudyCondition"/>
+        <projectService serviceInterface="com.intellij.codeInsight.documentation.DocumentationManager" serviceImplementation="com.jetbrains.tmp.learning.StudyDocumentationManager" overrides="true"/>
+        <toolWindow id="Step Description" anchor="right" factoryClass="com.jetbrains.tmp.learning.ui.StudyToolWindowFactory" conditionClass="com.jetbrains.tmp.learning.ui.StudyCondition"/>
         <fileEditorProvider implementation="com.jetbrains.tmp.learning.editor.StudyFileEditorProvider"/>
-        <projectService serviceInterface="com.jetbrains.tmp.learning.StepikProjectManager"
-                        serviceImplementation="com.jetbrains.tmp.learning.StepikProjectManager"/>
+        <projectService serviceInterface="com.jetbrains.tmp.learning.StepikProjectManager" serviceImplementation="com.jetbrains.tmp.learning.StepikProjectManager"/>
         <applicationService serviceImplementation="com.jetbrains.tmp.learning.stepik.StepikUpdateSettings"/>
     </extensions>
 </idea-plugin>
