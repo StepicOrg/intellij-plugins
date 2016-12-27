@@ -85,6 +85,7 @@ public class CourseInfo {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CourseInfo that = (CourseInfo) o;
+        //noinspection SimplifiableIfStatement
         if (that.getName() == null || that.getDescription() == null) return false;
         return that.getName().equals(getName())
                 && that.getDescription().equals(description);

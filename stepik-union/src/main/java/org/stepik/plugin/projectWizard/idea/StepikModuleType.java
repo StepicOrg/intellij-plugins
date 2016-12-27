@@ -40,6 +40,7 @@ public class StepikModuleType extends ModuleType<CourseModuleBuilder> {
     }
 
     private static boolean isValidJavaSdk(@NotNull Module module) {
+        //noinspection SimplifiableIfStatement
         if (ModuleRootManager.getInstance(module).getSourceRoots(JavaModuleSourceRootTypes.SOURCES).isEmpty())
             return true;
         return JavaPsiFacade.getInstance(module.getProject()).findClass(CommonClassNames.JAVA_LANG_OBJECT,

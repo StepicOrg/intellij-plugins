@@ -73,7 +73,7 @@ public class PresentationDataUtils {
             PsiDirectory parent = psiDirectory.getParent();
             if (parent != null) {
                 if (!parent.getName().contains(EduNames.SANDBOX_DIR)) {
-                    setAttributes(data, EduNames.SANDBOX_DIR, JBColor.BLACK, InteractiveLearningIcons.Sandbox);
+                    setAttributes(data, EduNames.SANDBOX_DIR, JBColor.BLACK, AllStepikIcons.ProjectTree.sandbox);
                 }
             }
         } else
