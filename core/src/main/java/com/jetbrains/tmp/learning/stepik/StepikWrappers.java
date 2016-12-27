@@ -126,6 +126,7 @@ public class StepikWrappers {
     public static class Unit {
         public int section;
         int lesson;
+        int position;
     }
 
     public static class UnitContainer {

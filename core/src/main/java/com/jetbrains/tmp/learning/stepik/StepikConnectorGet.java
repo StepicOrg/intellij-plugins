@@ -171,17 +171,20 @@ public class StepikConnectorGet {
                 unitContainer = getFromStepik(EduStepikNames.UNITS + "/" + getIdQuery(unitIds),
                 StepikWrappers.UnitContainer.class);
         List<Integer> lessonsIds = new ArrayList<>();
-        unitContainer.units.forEach(unit -> lessonsIds.add(unit.lesson));
+        Map<Integer, Integer> positions = new HashMap<>();
+        unitContainer.units.forEach(unit -> {
+            lessonsIds.add(unit.lesson);
+            positions.put(unit.lesson, unit.position);
+        });
         StepikWrappers.LessonContainer
                 lessonContainer = getFromStepik(EduStepikNames.LESSONS + getIdQuery(lessonsIds),
                 StepikWrappers.LessonContainer.class);
 
         final List<Lesson> lessons = new ArrayList<>();
-        int position = 1;
         for (Lesson lesson : lessonContainer.lessons) {
             createSteps(lesson, lesson.getSteps());
             if (!lesson.getStepList().isEmpty()) {
-                lesson.setPosition(position++);
+                lesson.setPosition(positions.get(lesson.getId()));
                 lessons.add(lesson);
             }
         }
