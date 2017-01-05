@@ -1,12 +1,12 @@
 package org.stepik.api.actions;
 
 import org.stepik.api.client.StepikApiClient;
-import org.stepik.api.queries.StepikCoursesGetQuery;
+import org.stepik.api.queries.courses.StepikCoursesGetQuery;
 
 /**
  * @author meanmail
  */
-public class StepikCoursesAction extends StepikBaseAction {
+public class StepikCoursesAction extends StepikAbstractAction {
 
     public StepikCoursesAction(StepikApiClient stepikApiClient) {
         super(stepikApiClient);

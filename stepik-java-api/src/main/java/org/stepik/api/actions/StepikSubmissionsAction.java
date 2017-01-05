@@ -1,12 +1,17 @@
 package org.stepik.api.actions;
 
 import org.stepik.api.client.StepikApiClient;
+import org.stepik.api.queries.submissions.StepikSubmissionsGetQuery;
 
 /**
  * @author meanmail
  */
-public class StepikSubmissionsAction extends StepikBaseAction {
+public class StepikSubmissionsAction extends StepikAbstractAction {
     public StepikSubmissionsAction(StepikApiClient stepikApiClient) {
         super(stepikApiClient);
+    }
+
+    public StepikSubmissionsGetQuery get() {
+        return new StepikSubmissionsGetQuery(this);
     }
 }

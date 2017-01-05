@@ -19,3 +19,7 @@ clion {
     sandboxDirectory = project.getProperties().get('cLionSandboxDir')
     idePath = project.getProperties().get('cLionPath')
 }
+
+dependencies {
+    compile project(":stepik-java-api")
+}

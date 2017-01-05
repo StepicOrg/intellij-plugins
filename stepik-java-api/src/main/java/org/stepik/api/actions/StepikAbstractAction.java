@@ -5,10 +5,14 @@ import org.stepik.api.client.StepikApiClient;
 /**
  * @author meanmail
  */
-public class StepikBaseAction {
+public class StepikAbstractAction {
     private final StepikApiClient stepikApiClient;
 
-    public StepikBaseAction(StepikApiClient stepikApiClient) {
+    public StepikAbstractAction(StepikApiClient stepikApiClient) {
         this.stepikApiClient = stepikApiClient;
+    }
+
+    public StepikApiClient getStepikApiClient() {
+        return stepikApiClient;
     }
 }

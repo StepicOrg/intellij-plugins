@@ -5,7 +5,7 @@ import org.stepik.api.client.StepikApiClient;
 /**
  * @author meanmail
  */
-public class StepikReviewsAction extends StepikBaseAction {
+public class StepikReviewsAction extends StepikAbstractAction {
     public StepikReviewsAction(StepikApiClient stepikApiClient) {
         super(stepikApiClient);
     }
