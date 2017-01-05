@@ -62,4 +62,16 @@ public class Lesson {
     @SerializedName("abuse_count")
     private int abuseCount;
     private String vote;
+
+    public int getId() {
+        return id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public int[] getSteps() {
+        return steps;
+    }
 }

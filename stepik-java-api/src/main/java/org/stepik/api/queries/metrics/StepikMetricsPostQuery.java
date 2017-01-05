@@ -1,7 +1,6 @@
 package org.stepik.api.queries.metrics;
 
 import com.google.gson.Gson;
-import com.sun.istack.internal.NotNull;
 import org.stepik.api.actions.StepikAbstractAction;
 import org.stepik.api.objects.metrics.MetricWrapper;
 import org.stepik.api.queries.StepikAbstractPostQuery;
@@ -19,27 +18,39 @@ public class StepikMetricsPostQuery extends StepikAbstractPostQuery<String>{
         super(stepikAction, String.class);
     }
 
-    @NotNull
+    
     public StepikMetricsPostQuery name(String name) {
         metrics.getMetric().setName(name);
         return this;
     }
 
-    @NotNull
+    
     public StepikMetricsPostQuery timestamp(int value) {
         metrics.getMetric().setTimestamp(value);
         return this;
     }
 
-    @NotNull
+    
     public StepikMetricsPostQuery tags(Map<String, String> value) {
         metrics.getMetric().setTags(value);
         return this;
     }
 
-    @NotNull
+    
+    public StepikMetricsPostQuery tags(String key, String value) {
+        metrics.getMetric().addTags(key, value);
+        return this;
+    }
+
+    
     public StepikMetricsPostQuery data(Map<String, Object> value) {
         metrics.getMetric().setData(value);
+        return this;
+    }
+
+    
+    public StepikMetricsPostQuery data(String key, Object value) {
+        metrics.getMetric().addData(key, value);
         return this;
     }
 

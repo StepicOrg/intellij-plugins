@@ -21,4 +21,8 @@ public class Courses extends ObjectsContainer {
 
         return courses.size();
     }
+
+    public boolean isEmpty() {
+        return getCount() == 0;
+    }
 }

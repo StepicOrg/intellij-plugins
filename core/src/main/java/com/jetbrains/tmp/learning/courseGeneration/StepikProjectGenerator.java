@@ -1,55 +1,57 @@
 package com.jetbrains.tmp.learning.courseGeneration;
 
-import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
 import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.Messages;
-import com.intellij.openapi.util.io.FileUtil;
 import com.jetbrains.tmp.learning.StepikProjectManager;
-import com.jetbrains.tmp.learning.StudySerializationUtils;
-import com.jetbrains.tmp.learning.StudySerializationUtils.Json.SupportedLanguagesDeserializer;
 import com.jetbrains.tmp.learning.SupportedLanguages;
-import com.jetbrains.tmp.learning.core.EduNames;
-import com.jetbrains.tmp.learning.courseFormat.Course;
-import com.jetbrains.tmp.learning.stepik.CourseInfo;
-import com.jetbrains.tmp.learning.stepik.StepikConnectorGet;
+import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.api.client.StepikApiClient;
+import org.stepik.api.objects.courses.Course;
+import org.stepik.api.objects.courses.Courses;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Optional;
 
 import static com.jetbrains.tmp.learning.StudyUtils.execCancelable;
 
 public class StepikProjectGenerator {
-    private static final File CONFIG_COURSES_DIR = new File(PathManager.getConfigPath(), "courses");
+    private static final Path CACHE_PATH = Paths.get(PathManager.getConfigPath(), "stepik-union", "cache");
 
     private static final Logger logger = Logger.getInstance(StepikProjectGenerator.class);
-    private static final String CACHE_NAME = "enrolledCourseNames.txt";
+    public static final Course EMPTY_COURSE = initEmptyCourse();
+
+    private static Course initEmptyCourse() {
+        Course course = new Course();
+        course.setTitle("Empty");
+        course.setDescription("Please, press refresh button");
+        return course;
+    }
+
     private static StepikProjectGenerator instance;
     @NotNull
     private SupportedLanguages defaultLang = SupportedLanguages.INVALID;
     @NotNull
-    private CourseInfo selectedCourseInfo = CourseInfo.INVALID_COURSE;
+    private Course selectedCourseInfo = EMPTY_COURSE;
 
-    private StepikProjectGenerator() {}
+    private StepikProjectGenerator() {
+    }
 
     public static StepikProjectGenerator getInstance() {
         if (instance == null) {
@@ -59,17 +61,30 @@ public class StepikProjectGenerator {
     }
 
     @NotNull
-    private static List<CourseInfo> getCourses(boolean force) {
-        List<CourseInfo> courses = new ArrayList<>();
-        if (CONFIG_COURSES_DIR.exists()) {
+    private static List<Course> getCourses(boolean force) {
+        List<Course> courses = new ArrayList<>();
+
+        List<Integer> coursesIds = getHardcodedCoursesId();
+
+        if (!force) {
             courses = getCoursesFromCache();
         }
-        if (force || courses.isEmpty()) {
-            courses = StepikConnectorGet.getCourses(getHardcodedCoursesId());
-            flushCache(courses);
+
+        courses.forEach(course -> coursesIds.remove(course.getId()));
+
+        if (!coursesIds.isEmpty()) {
+            StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
+            List<Course> additional = stepikApiClient.courses()
+                    .get()
+                    .id(coursesIds)
+                    .execute()
+                    .getCourses();
+            courses.addAll(additional);
+            flushCourses(additional);
         }
+
         if (courses.isEmpty()) {
-            courses.add(CourseInfo.INVALID_COURSE);
+            courses.add(EMPTY_COURSE);
         }
         return courses;
     }
@@ -80,160 +95,104 @@ public class StepikProjectGenerator {
     }
 
     @NotNull
-    public static List<CourseInfo> getCoursesUnderProgress(
+    public static List<Course> getCoursesUnderProgress(
             boolean force,
             @NotNull final Project project) {
         try {
             return ProgressManager.getInstance()
                     .runProcessWithProgressSynchronously(() -> {
                         ProgressManager.getInstance().getProgressIndicator().setIndeterminate(true);
-                        List<CourseInfo> courses = getCourses(force);
-                        if (courses.isEmpty()) courses.add(CourseInfo.INVALID_COURSE);
-                        flushCache(courses);
+                        List<Course> courses = getCourses(force);
+                        if (courses.isEmpty()) {
+                            courses.add(EMPTY_COURSE);
+                        }
+                        flushCourses(courses);
                         return courses;
                     }, "Refreshing Course List", true, project);
         } catch (RuntimeException e) {
-            return Collections.singletonList(CourseInfo.INVALID_COURSE);
+            return Collections.singletonList(EMPTY_COURSE);
         }
     }
 
-    @Nullable
-    private static Course readCourseFromCache(
-            @NotNull File courseFile,
-            @SuppressWarnings("SameParameterValue") boolean isAdaptive) {
-        try (BufferedReader bufferedReader =
-                new BufferedReader(new InputStreamReader(new FileInputStream(courseFile), "UTF-8"))) {
-            Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation()
-                    .registerTypeAdapter(SupportedLanguages.class, new SupportedLanguagesDeserializer())
-                    .create();
-            final Course course = gson.fromJson(bufferedReader, Course.class);
-            course.initCourse(isAdaptive);
-            return course;
-        } catch (IOException e) {
-            logger.warn(e.getMessage());
-        }
-        return null;
-    }
-
-    /**
-     * Writes courses to cache file {@link StepikProjectGenerator#CACHE_NAME}
-     */
-    private static void flushCache(List<CourseInfo> courses) {
-        File cacheFile = new File(CONFIG_COURSES_DIR, CACHE_NAME);
-        try {
-            if (!createCacheFile(cacheFile)) {
-                return;
-            }
-        } catch (IOException e) {
-            logger.error(e);
-        }
-
-        try (PrintWriter writer = new PrintWriter(cacheFile)) {
-            Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
-
-            final Set<CourseInfo> courseInfos = new HashSet<>();
-            courseInfos.addAll(courses);
-
-            for (CourseInfo courseInfo : courseInfos) {
-                final String json = gson.toJson(courseInfo);
-                writer.println(json);
-            }
-        } catch (IOException e) {
-            logger.error(e);
-        }
-    }
-
-    private static boolean createCacheFile(@NotNull File cacheFile) throws IOException {
-        if (!CONFIG_COURSES_DIR.exists()) {
-            final boolean created = CONFIG_COURSES_DIR.mkdirs();
-            if (!created) {
-                logger.error("Cannot flush courses cache. Can't create courses directory");
-                return false;
-            }
-        }
-        if (!cacheFile.exists()) {
-            final boolean created = cacheFile.createNewFile();
-            if (!created) {
-                logger.error("Cannot flush courses cache. Can't create " + CACHE_NAME + " file");
-                return false;
-            }
-        }
-        return true;
+    private static void flushCourses(List<Course> courses) {
+        courses.forEach(StepikProjectGenerator::flushCourse);
     }
 
     @NotNull
-    private static List<CourseInfo> getCoursesFromCache() {
-        List<CourseInfo> courses = new ArrayList<>();
-        final File cacheFile = new File(CONFIG_COURSES_DIR, CACHE_NAME);
-        if (!cacheFile.exists()) {
+    private static List<Course> getCoursesFromCache() {
+        List<Course> courses = new ArrayList<>();
+        Path cacheCourses = CACHE_PATH.resolve("courses");
+
+        if (!Files.exists(cacheCourses)) {
             return courses;
         }
-        try (FileInputStream inputStream = new FileInputStream(cacheFile)) {
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
-                try {
-                    GsonBuilder gsonBuilder = new GsonBuilder();
-                    gsonBuilder.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES);
-                    Gson gson = gsonBuilder.create();
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        final CourseInfo courseInfo = gson.fromJson(line, CourseInfo.class);
-                        courses.add(courseInfo);
+
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        Gson gson = gsonBuilder.create();
+
+        try {
+            Files.walkFileTree(cacheCourses, new SimpleFileVisitor<Path>() {
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    Optional<String> content = Files.readAllLines(file)
+                            .stream()
+                            .reduce((line, text) -> text + line);
+
+                    if (content.isPresent()) {
+                        Course course = gson.fromJson(content.get(), Course.class);
+                        courses.add(course);
                     }
-                } catch (IOException | JsonSyntaxException e) {
-                    logger.error(e.getMessage());
+
+                    return FileVisitResult.CONTINUE;
                 }
-            }
+
+                @Override
+                public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+                    return FileVisitResult.CONTINUE;
+                }
+            });
         } catch (IOException e) {
-            logger.error(e.getMessage());
+            return courses;
         }
+
         return courses;
     }
 
-    public static void downloadAndFlushCourse(
-            @Nullable Project project,
-            @NotNull CourseInfo courseInfo) {
+    public static void downloadAndFlushCourse(@Nullable Project project, int id) {
         ProgressManager.getInstance().runProcessWithProgressSynchronously(() -> {
             ProgressManager.getInstance().getProgressIndicator().setIndeterminate(true);
             return execCancelable(() -> {
-                final Course course = StepikConnectorGet.getCourse(courseInfo);
-                if (course != null) {
-                    flushCourse(course);
+                StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
+                Courses courses = stepikApiClient.courses()
+                        .get()
+                        .id(id)
+                        .execute();
+                if (courses.getCount() == 0) {
+                    return null;
                 }
+
+                flushCourse(courses.getCourses().get(0));
                 return null;
             });
         }, "Downloading Course", true, project);
     }
 
-    private static void flushCourse(@NotNull final Course course) {
-        final File cacheDirectory = new File(course.getCacheDirectory());
-        FileUtil.createDirectory(cacheDirectory);
-        flushCourseJson(course, cacheDirectory);
-    }
+    private static void flushCourse(Course course) {
+        Path courseCache = CACHE_PATH.resolve("courses").resolve(course.getId() + ".json");
 
-    private static void flushCourseJson(
-            @NotNull final Course course,
-            @NotNull final File courseDirectory) {
-        final Gson gson = new GsonBuilder().setPrettyPrinting()
-                .registerTypeAdapter(SupportedLanguages.class,
-                        new StudySerializationUtils.Json.SupportedLanguagesSerializer())
-                .excludeFieldsWithoutExposeAnnotation()
-                .create();
-        final String json = gson.toJson(course);
-        final File courseJson = new File(courseDirectory, EduNames.COURSE_META_FILE);
-        try (OutputStreamWriter outputStreamWriter =
-                new OutputStreamWriter(new FileOutputStream(courseJson), "UTF-8")) {
-            outputStreamWriter.write(json);
-        } catch (IOException e) {
-            Messages.showErrorDialog(e.getMessage(), "Failed to Generate Json");
-            logger.warn(e);
+        try {
+            Files.createDirectories(courseCache);
+            Files.write(courseCache, new Gson().toJson(course).getBytes(),
+                    StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+        } catch (IOException ignored) {
         }
     }
 
-    public void setSelectedCourse(@Nullable CourseInfo courseInfo) {
-        if (courseInfo == null) {
-            selectedCourseInfo = CourseInfo.INVALID_COURSE;
+    public void setSelectedCourse(@Nullable Course course) {
+        if (course == null) {
+            selectedCourseInfo = StepikProjectGenerator.EMPTY_COURSE;
         } else {
-            selectedCourseInfo = courseInfo;
+            selectedCourseInfo = course;
         }
     }
 
@@ -246,17 +205,31 @@ public class StepikProjectGenerator {
             logger.warn("StepikProjectGenerator: Failed to get builders");
             return;
         }
-        StepikProjectManager.getInstance(project).setCourse(course);
+        StepikProjectManager stepikProjectManager = StepikProjectManager.getInstance(project);
+        stepikProjectManager.setCourse(com.jetbrains.tmp.learning.courseFormat.Course.fromCourse(course));
     }
 
     @Nullable
     private Course getCourse() {
-        File cacheDirectory = new File(CONFIG_COURSES_DIR, Integer.toString(selectedCourseInfo.getId()));
-        final File courseFile = new File(cacheDirectory, EduNames.COURSE_META_FILE);
-        if (courseFile.exists()) {
-            return readCourseFromCache(courseFile, false);
+        Path courseCache = CACHE_PATH.resolve("courses").resolve(selectedCourseInfo.getId() + ".json");
+
+        if (!Files.exists(courseCache)) {
+            return null;
         }
-        return null;
+
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        Gson gson = gsonBuilder.create();
+
+        Optional<String> content;
+        try {
+            content = Files.readAllLines(courseCache)
+                    .stream()
+                    .reduce((line, text) -> text + line);
+        } catch (IOException e) {
+            return null;
+        }
+
+        return content.map(s -> gson.fromJson(s, Course.class)).orElse(null);
     }
 
     @NotNull

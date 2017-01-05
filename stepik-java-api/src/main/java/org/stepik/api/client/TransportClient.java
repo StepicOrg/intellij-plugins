@@ -1,8 +1,5 @@
 package org.stepik.api.client;
 
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
-
 import java.io.IOException;
 import java.util.Map;
 
@@ -10,15 +7,15 @@ import java.util.Map;
  * @author meanmail
  */
 public interface TransportClient {
-    @NotNull
-    ClientResponse post(@NotNull String url, @Nullable String body) throws IOException;
+   
+    ClientResponse post( String url,  String body) throws IOException;
 
-    @NotNull
-    ClientResponse get(@NotNull String url) throws IOException;
+   
+    ClientResponse get( String url) throws IOException;
 
-    @NotNull
-    ClientResponse post(@NotNull String url, @Nullable String body, @Nullable Map<String, String> headers) throws IOException;
+   
+    ClientResponse post( String url,  String body,  Map<String, String> headers) throws IOException;
 
-    @NotNull
-    ClientResponse get(@NotNull String url, @Nullable Map<String, String> headers) throws IOException;
+   
+    ClientResponse get( String url,  Map<String, String> headers) throws IOException;
 }

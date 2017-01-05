@@ -22,19 +22,18 @@ import com.jetbrains.python.remote.PyProjectSynchronizer;
 import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.StudyProjectComponent;
 import com.jetbrains.tmp.learning.SupportedLanguages;
-import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.Lesson;
 import com.jetbrains.tmp.learning.courseFormat.Section;
 import com.jetbrains.tmp.learning.courseFormat.Step;
 import com.jetbrains.tmp.learning.courseFormat.StepFile;
 import com.jetbrains.tmp.learning.courseGeneration.StepikProjectGenerator;
-import com.jetbrains.tmp.learning.stepik.CourseInfo;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
-import com.jetbrains.tmp.learning.stepik.StepikConnectorPost;
 import icons.AllStepikIcons;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.api.client.StepikApiClient;
+import org.stepik.api.objects.courses.Course;
 
 import javax.swing.*;
 import java.io.BufferedWriter;
@@ -99,13 +98,17 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
         return generator -> {
             Project defaultProject = DefaultProjectFactory.getInstance().getDefaultProject();
             StepikConnectorLogin.loginFromDialog(defaultProject);
-            final CourseInfo courseInfo = pySPanel.getSelectedCourse();
-            if (courseInfo == null || courseInfo == CourseInfo.INVALID_COURSE) return false;
-            this.generator.setSelectedCourse(courseInfo);
+            final Course course = pySPanel.getSelectedCourse();
+            if (course == null || course == StepikProjectGenerator.EMPTY_COURSE) return false;
+            this.generator.setSelectedCourse(course);
             if (PyCCSettingPanel.COURSE_LINK.equals(pySPanel.getBuildType())) {
-                StepikConnectorPost.enrollToCourse(courseInfo.getId());
+                StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
+                stepikApiClient.enrollments()
+                        .post()
+                        .course(course.getId())
+                        .execute();
             }
-            StepikProjectGenerator.downloadAndFlushCourse(defaultProject, courseInfo);
+            StepikProjectGenerator.downloadAndFlushCourse(defaultProject, course.getId());
             return true;
         };
     }
@@ -132,7 +135,7 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
 
         StepikProjectManager stepManager = StepikProjectManager.getInstance(project);
         stepManager.setDefaultLang(generator.getDefaultLang());
-        Course course = stepManager.getCourse();
+        com.jetbrains.tmp.learning.courseFormat.Course course = stepManager.getCourse();
         if (course == null) {
             logger.warn("failed to generate builders");
             return;
@@ -150,7 +153,7 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
     }
 
     private void createSubDirectories(
-            @NotNull Course course,
+            @NotNull com.jetbrains.tmp.learning.courseFormat.Course course,
             @NotNull Project project) {
         for (Section section : course.getSections()) {
             FileUtil.createDirectory(new File(project.getBasePath(), section.getPath()));

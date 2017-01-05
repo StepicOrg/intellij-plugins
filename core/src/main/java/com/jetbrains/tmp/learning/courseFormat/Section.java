@@ -3,15 +3,22 @@ package com.jetbrains.tmp.learning.courseFormat;
 import com.google.gson.annotations.Expose;
 import com.intellij.util.xmlb.annotations.Transient;
 import com.jetbrains.tmp.learning.core.EduNames;
+import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.api.client.StepikApiClient;
+import org.stepik.api.objects.lessons.Lessons;
+import org.stepik.api.objects.units.Units;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author meanmail
  */
+@Deprecated
 public class Section implements StudyItem {
     @Expose
     @Nullable
@@ -224,6 +231,46 @@ public class Section implements StudyItem {
         result = 31 * result + position;
         result = 31 * result + id;
         result = 31 * result + (course != null ? course.hashCode() : 0);
+        return result;
+    }
+
+    public static Section fromSection(org.stepik.api.objects.sections.Section section) {
+        Section result = new Section();
+
+        StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
+
+        result.setId(section.getId());
+
+        int[] unitsIds = section.getUnits();
+
+        Units units = stepikApiClient.units()
+                .get()
+                .id(unitsIds)
+                .execute();
+
+        List<Integer> lessonsIds = new ArrayList<>();
+        Map<Integer, Integer> positions = new HashMap<>();
+
+        units.getUnits().forEach(unit -> {
+            int lessonId = unit.getLesson();
+            lessonsIds.add(lessonId);
+            positions.put(lessonId, unit.getPosition());
+        });
+
+        Lessons lessons = stepikApiClient.lessons()
+                .get()
+                .id(lessonsIds.toArray(new Integer[lessonsIds.size()]))
+                .execute();
+
+        ArrayList<Lesson> lessonsList = new ArrayList<>();
+        for (org.stepik.api.objects.lessons.Lesson lesson : lessons.getLessons()) {
+            lessonsList.add(Lesson.fromLesson(lesson, positions.getOrDefault(lesson.getId(), 0)));
+        }
+
+        result.setLessons(lessonsList);
+        result.setName(section.getTitle());
+        result.setPosition(section.getPosition());
+
         return result;
     }
 }

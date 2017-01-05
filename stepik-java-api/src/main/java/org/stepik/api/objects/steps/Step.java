@@ -43,4 +43,20 @@ public class Step {
     private String discussionProxy;
     @SerializedName("discussion_threads")
     private String[] discussionThreads;
+
+    public BlockView getBlock() {
+        return block;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public String getStatus() {
+        return status;
+    }
 }

@@ -12,10 +12,26 @@ public class Submission {
     private String hint;
     private String feedback;
     private String time;
-    private Object reply;
+    private Reply reply;
     @SerializedName("reply_url")
     private String replyUrl;
     private int attempt;
     private String session;
     private int eta;
+
+    public int getId() {
+        return id;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public String getHint() {
+        return hint;
+    }
+
+    public Reply getReply() {
+        return reply;
+    }
 }

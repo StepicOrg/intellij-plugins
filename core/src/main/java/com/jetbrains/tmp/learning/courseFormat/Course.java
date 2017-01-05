@@ -6,13 +6,19 @@ import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.util.xmlb.annotations.Transient;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.core.EduUtils;
+import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import com.jetbrains.tmp.learning.stepik.StepikUser;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.api.client.StepikApiClient;
+import org.stepik.api.objects.sections.Sections;
+import org.stepik.api.objects.users.User;
+import org.stepik.api.objects.users.Users;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Deprecated
 public class Course implements StudyItem {
     @Nullable
     @Expose
@@ -244,5 +250,46 @@ public class Course implements StudyItem {
     @NotNull
     public String getCacheDirectory() {
         return FileUtil.join(PathManager.getConfigPath(), "courses", Integer.toString(id));
+    }
+
+    public static Course fromCourse(org.stepik.api.objects.courses.Course source) {
+        Course course = new Course();
+
+        StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
+
+        course.setAdaptive(source.isAdaptive());
+
+        int[] authorsIds = source.getAuthors();
+        Users users = stepikApiClient.users()
+                .get()
+                .id(authorsIds)
+                .execute();
+
+        ArrayList<StepikUser> authorsList = new ArrayList<>();
+        for (User user : users.getUsers()) {
+            authorsList.add(StepikUser.fromUser(user));
+        }
+        course.setAuthors(authorsList);
+
+        course.setDescription(source.getDescription());
+        course.setId(source.getId());
+        course.setName(source.getTitle());
+
+        int[] sectionsIds = source.getSections();
+        Sections sections = stepikApiClient.sections()
+                .get()
+                .id(sectionsIds)
+                .execute();
+
+        ArrayList<Section> sectionsList = new ArrayList<>();
+        for (org.stepik.api.objects.sections.Section section : sections.getSections()) {
+            sectionsList.add(Section.fromSection(section));
+        }
+
+        course.setSections(sectionsList);
+
+        course.initCourse(true);
+
+        return course;
     }
 }

@@ -6,6 +6,8 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.xmlb.annotations.Transient;
 import com.jetbrains.tmp.learning.StepikProjectManager;
 import org.jetbrains.annotations.NotNull;
+import org.stepik.api.objects.auth.TokenInfo;
+import org.stepik.api.objects.users.User;
 
 public class StepikUser {
     private int id;
@@ -119,12 +121,12 @@ public class StepikUser {
         this.refreshToken = refreshToken;
     }
 
-    void setupTokenInfo(StepikWrappers.TokenInfo tokenInfo) {
+    void setupTokenInfo(TokenInfo tokenInfo) {
         accessToken = tokenInfo.getAccessToken();
         refreshToken = tokenInfo.getRefreshToken();
     }
 
-    public void update(StepikUser tmpUser) {
+    public void update(User tmpUser) {
         id = tmpUser.getId();
         firstName = tmpUser.getFirstName();
         lastName = tmpUser.getLastName();
@@ -137,5 +139,15 @@ public class StepikUser {
                 ", firstName='" + firstName + '\'' +
                 ", email='" + email + '\'' +
                 '}';
+    }
+
+    public static StepikUser fromUser(User user) {
+        StepikUser result = new StepikUser();
+
+        result.setId(user.getId());
+        result.setFirstName(user.getFirstName());
+        result.setLastName(user.getLastName());
+
+        return result;
     }
 }

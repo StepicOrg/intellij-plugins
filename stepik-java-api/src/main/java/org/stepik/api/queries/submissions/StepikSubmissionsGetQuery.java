@@ -63,4 +63,9 @@ public class StepikSubmissionsGetQuery extends StepikAbstractGetQuery<Submission
     protected String getUrl() {
         return Urls.SUBMISSIONS;
     }
+
+    public StepikSubmissionsGetQuery page(int value) {
+        addParam("page", value);
+        return this;
+    }
 }

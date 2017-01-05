@@ -9,4 +9,8 @@ import java.util.List;
  */
 public class Steps extends ObjectsContainer{
     private List<Step> steps;
+
+    public List<Step> getSteps() {
+        return steps;
+    }
 }

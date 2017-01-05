@@ -18,6 +18,16 @@ public class StepikUnitsQuery extends StepikAbstractGetQuery<Units>{
         return this;
     }
 
+    public StepikUnitsQuery id(int[] values) {
+        addParam("ids[]", values);
+        return this;
+    }
+
+    public StepikUnitsQuery id(int value) {
+        addParam("ids[]", value);
+        return this;
+    }
+
     public StepikUnitsQuery page(int value) {
         addParam("page", value);
         return this;

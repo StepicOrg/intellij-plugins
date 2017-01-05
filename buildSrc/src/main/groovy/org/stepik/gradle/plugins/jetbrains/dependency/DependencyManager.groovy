@@ -131,9 +131,9 @@ class DependencyManager {
             @NotNull final String productName) {
         def ivyFile = new File(dependency.classes, "${dependency.getFqn(productName)}.xml")
         if (!ivyFile.exists()) {
-            final def version = dependency.version
-            final def identity = new DefaultIvyPublicationIdentity("com.jetbrains", productName, version)
-            final def generator = new IvyDescriptorFileGenerator(identity)
+            final version = dependency.version
+            final identity = new DefaultIvyPublicationIdentity("com.jetbrains", productName, version)
+            final generator = new IvyDescriptorFileGenerator(identity)
             generator.addConfiguration(new DefaultIvyConfiguration("default"))
             generator.addConfiguration(new DefaultIvyConfiguration("compile"))
             generator.addConfiguration(new DefaultIvyConfiguration("sources"))
@@ -196,6 +196,6 @@ class DependencyManager {
             println("Unarchivated $productName to $idePath")
         }
 
-        return DependencyManager.resolveLocal(project, extension, productName)
+        return resolveLocal(project, extension, productName)
     }
 }

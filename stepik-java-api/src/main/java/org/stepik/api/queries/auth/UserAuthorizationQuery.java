@@ -1,6 +1,5 @@
 package org.stepik.api.queries.auth;
 
-import com.sun.istack.internal.NotNull;
 import org.stepik.api.actions.StepikAbstractAction;
 import org.stepik.api.auth.GrantTypes;
 import org.stepik.api.objects.auth.TokenInfo;
@@ -11,7 +10,7 @@ import org.stepik.api.urls.Urls;
  * @author meanmail
  */
 public class UserAuthorizationQuery extends StepikAbstractPostQuery<TokenInfo> {
-    public UserAuthorizationQuery(@NotNull StepikAbstractAction stepikAction) {
+    public UserAuthorizationQuery( StepikAbstractAction stepikAction) {
         super(stepikAction, TokenInfo.class);
     }
 
@@ -20,7 +19,7 @@ public class UserAuthorizationQuery extends StepikAbstractPostQuery<TokenInfo> {
         return this;
     }
 
-    @NotNull
+    
     @Override
     protected String getUrl() {
         return Urls.OAUTH_URL;

@@ -38,4 +38,16 @@ public class Unit {
     private String createDate;
     @SerializedName("update_date")
     private String updateDate;
+
+    public int getLesson() {
+        return lesson;
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public int getSection() {
+        return section;
+    }
 }

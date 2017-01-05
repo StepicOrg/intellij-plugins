@@ -18,15 +18,15 @@ import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.Step;
 import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
-import com.jetbrains.tmp.learning.stepik.StepikConnectorGet;
-import com.jetbrains.tmp.learning.stepik.StepikConnectorPost;
-import com.jetbrains.tmp.learning.stepik.StepikWrappers;
-import com.jetbrains.tmp.learning.stepik.entities.Submission;
-import com.jetbrains.tmp.learning.stepik.entities.SubmissionContainer;
+import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
+import org.stepik.api.client.StepikApiClient;
+import org.stepik.api.exceptions.StepikClientException;
+import org.stepik.api.objects.attempts.Attempts;
+import org.stepik.api.objects.submissions.Submission;
+import org.stepik.api.objects.submissions.Submissions;
 import org.stepik.plugin.utils.DirectivesUtils;
 
-import java.io.IOException;
 import java.util.List;
 
 import static org.stepik.plugin.actions.ActionUtils.checkLangSettings;
@@ -60,19 +60,29 @@ public class StepikJavaPostAction extends StudyCheckAction {
                     if (!checkLangSettings(step, project)) {
                         return;
                     }
-
+                    StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
                     int intAttemptId;
+                    StepikClientException exception = null;
+                    Attempts attempts = null;
                     try {
-                        intAttemptId = StepikConnectorPost.getAttempt(step.getId()).attempts.get(0).id;
-                    } catch (IOException e) {
+                        attempts = stepikApiClient.attempts()
+                                .post()
+                                .execute();
+                    } catch (StepikClientException e) {
+                        exception = e;
+                    }
+
+                    if (exception != null || attempts.isEmpty()) {
+                        logger.warn("Failed post attempt ", exception);
                         Notification notification = new Notification(
                                 "Step.sending",
-                                step.getName() + " IOException",
+                                step.getName() + " Failed send",
                                 "Did't send",
                                 NotificationType.ERROR);
                         notification.notify(project);
                         return;
                     }
+                    intAttemptId = attempts.getAttempts().get(0).getId();
                     String attemptId = Integer.toString(intAttemptId);
 
                     SupportedLanguages currentLang = step.getCurrentLang();
@@ -85,22 +95,42 @@ public class StepikJavaPostAction extends StudyCheckAction {
                     }
 
                     String[] text = DirectivesUtils.getFileText(mainFile);
-                    String solution = DirectivesUtils.getTextUnderDirectives(text, currentLang);
-                    StepikWrappers.SubmissionToPostWrapper postWrapper =
-                            new StepikWrappers.SubmissionToPostWrapper(attemptId, currentLang.getName(), solution);
-                    SubmissionContainer container = StepikConnectorPost.postSubmission(postWrapper);
-                    if (container == null) {
+                    String code = DirectivesUtils.getTextUnderDirectives(text, currentLang);
+
+                    Submissions submissions = null;
+                    try {
+                        submissions = stepikApiClient.submissions()
+                                .post()
+                                .attempt(intAttemptId)
+                                .language(currentLang.getName())
+                                .code(code)
+                                .execute();
+                    } catch (StepikClientException e) {
+                        exception = e;
+                    }
+
+                    if (exception != null || submissions.isEmpty()) {
+                        logger.warn("Failed post submission ", exception);
+                        Notification notification = new Notification(
+                                "Step.sending",
+                                step.getName() + " Failed send",
+                                "Did't send",
+                                NotificationType.ERROR);
+                        notification.notify(project);
                         return;
                     }
-                    List<Submission> submissions = container.getSubmissions();
+                    List<Submission> submissionsList = submissions.getSubmissions();
                     Course course = step.getCourse();
-                    StepikWrappers.MetricsWrapper metric = new StepikWrappers.MetricsWrapper(
-                            StepikWrappers.MetricsWrapper.PluginNames.STEPIK_UNION,
-                            StepikWrappers.MetricsWrapper.MetricActions.POST,
-                            course == null ? 0 : course.getId(),
-                            step.getId());
-                    StepikConnectorPost.postMetric(metric);
-                    int submissionId = submissions.get(0).getId();
+                    stepikApiClient.metrics()
+                            .post()
+                            .name("ide_plugin")
+                            .tags("name", "S_Union")
+                            .tags("action", "send")
+                            .data("courseId", course != null ? course.getId() : 0)
+                            .data("stepId", step.getId())
+                            .execute();
+
+                    int submissionId = submissionsList.get(0).getId();
                     logger.info("submissionId = " + submissionId);
 
                     final Application application = ApplicationManager.getApplication();
@@ -112,15 +142,19 @@ public class StepikJavaPostAction extends StudyCheckAction {
                                 String hint = "";
                                 while ("evaluation".equals(stepStatus) && timer < FIVE_MINUTES) {
                                     try {
-                                        Thread.sleep(PERIOD);          //1000 milliseconds is one second.
+                                        Thread.sleep(PERIOD);
                                         timer += PERIOD;
-                                        StepikWrappers.ResultSubmissionWrapper submissionWrapper =
-                                                StepikConnectorGet.getStatus(finalSubmissionId);
-                                        if (submissionWrapper != null) {
-                                            stepStatus = submissionWrapper.submissions[0].status;
-                                            hint = submissionWrapper.submissions[0].hint;
+                                        Submissions submission = stepikApiClient.submissions()
+                                                .get()
+                                                .id(finalSubmissionId)
+                                                .execute();
+
+                                        if (!submission.isEmpty()) {
+                                            Submission currentSubmission = submission.getSubmissions().get(0);
+                                            stepStatus = currentSubmission.getStatus();
+                                            hint = currentSubmission.getHint();
                                         }
-                                    } catch (InterruptedException e) {
+                                    } catch (StepikClientException | InterruptedException e) {
                                         Notification notification = new Notification(
                                                 "Step.sending",
                                                 "Error",

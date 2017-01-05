@@ -1,7 +1,5 @@
 package org.stepik.api.client;
 
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
 import org.stepik.api.actions.StepikAnnouncementsAction;
 import org.stepik.api.actions.StepikAssignmentsAction;
 import org.stepik.api.actions.StepikAttachmentsAction;
@@ -96,444 +94,357 @@ public class StepikApiClient {
     private final TransportClient transportClient;
     private TokenInfo tokenInfo;
 
-    public StepikApiClient(@NotNull TransportClient transportClient) {
+    public StepikApiClient(TransportClient transportClient) {
         this.transportClient = transportClient;
     }
 
-    @NotNull
+    public static String getVersion() {
+        return VERSION;
+    }
+
     public OAuth oauth() {
         return new OAuth(this);
     }
 
-    @NotNull
     public StepikAnnouncementsAction announcements() {
         return new StepikAnnouncementsAction(this);
     }
 
-    @NotNull
     public StepikAssignmentsAction assignments() {
         return new StepikAssignmentsAction(this);
 
     }
 
-    @NotNull
     public StepikAttachmentsAction attachments() {
         return new StepikAttachmentsAction(this);
 
     }
 
-    @NotNull
     public StepikAttemptsAction attempts() {
         return new StepikAttemptsAction(this);
 
     }
 
-    @NotNull
     public StepikCertificatesAction certificates() {
         return new StepikCertificatesAction(this);
     }
 
-    @NotNull
     public StepikCitiesAction cities() {
         return new StepikCitiesAction(this);
     }
 
-    @NotNull
     public StepikCommentsAction comments() {
         return new StepikCommentsAction(this);
     }
 
-    @NotNull
     public StepikCountriesAction countries() {
         return new StepikCountriesAction(this);
     }
 
-    @NotNull
     public StepikCourseGradeBookCsvsAction courseGradeBookCsvs() {
         return new StepikCourseGradeBookCsvsAction(this);
     }
 
-    @NotNull
     public StepikCourseGradesAction courseGrades() {
         return new StepikCourseGradesAction(this);
     }
 
-    @NotNull
     public StepikCourseImagesAction courseImages() {
         return new StepikCourseImagesAction(this);
     }
 
-    @NotNull
     public StepikCoursePeriodStatisticsAction coursePeriodStatistics() {
         return new StepikCoursePeriodStatisticsAction(this);
     }
 
-    @NotNull
     public StepikCourseRemindersAction courseReminders() {
         return new StepikCourseRemindersAction(this);
     }
 
-    @NotNull
     public StepikCourseReviewSummariesAction courseReviewSummaries() {
         return new StepikCourseReviewSummariesAction(this);
     }
 
-    @NotNull
     public StepikCourseReviewsAction courseReviews() {
         return new StepikCourseReviewsAction(this);
     }
 
-    @NotNull
     public StepikCourseSubscriptionsAction courseSubscriptions() {
         return new StepikCourseSubscriptionsAction(this);
     }
 
-    @NotNull
     public StepikCourseTotalStatisticsAction courseTotalStatistics() {
         return new StepikCourseTotalStatisticsAction(this);
     }
 
-    @NotNull
     public StepikCoursesAction courses() {
         return new StepikCoursesAction(this);
     }
 
-    @NotNull
     public StepikDevicesAction devices() {
         return new StepikDevicesAction(this);
     }
 
-    @NotNull
     public StepikDiscussionProxiesAction discussionProxies() {
         return new StepikDiscussionProxiesAction(this);
     }
 
-    @NotNull
     public StepikDiscussionThreadsAction discussionThreads() {
         return new StepikDiscussionThreadsAction(this);
     }
 
-    @NotNull
     public StepikEmailAddressesAction emailAddresses() {
         return new StepikEmailAddressesAction(this);
     }
 
-    @NotNull
     public StepikEmailTemplatesAction emailTemplates() {
         return new StepikEmailTemplatesAction(this);
     }
 
-    @NotNull
     public StepikEnrollmentsAction enrollments() {
         return new StepikEnrollmentsAction(this);
     }
 
-    @NotNull
     public StepikEventsAction events() {
         return new StepikEventsAction(this);
     }
 
-    @NotNull
     public StepikExamSessionsAction examSessions() {
         return new StepikExamSessionsAction(this);
     }
 
-    @NotNull
     public StepikFavoriteCoursesAction favoriteCourses() {
         return new StepikFavoriteCoursesAction(this);
     }
 
-    @NotNull
     public StepikGroupsAction groups() {
         return new StepikGroupsAction(this);
     }
 
-    @NotNull
     public StepikInstructionsAction instructions() {
         return new StepikInstructionsAction(this);
     }
 
-    @NotNull
     public StepikInvitesAction invites() {
         return new StepikInvitesAction(this);
     }
 
-    @NotNull
     public StepikLastStepsAction lastSteps() {
         return new StepikLastStepsAction(this);
     }
 
-    @NotNull
     public StepikLessonImagesAction lessonImages() {
         return new StepikLessonImagesAction(this);
     }
 
-    @NotNull
     public StepikLessonsAction lessons() {
         return new StepikLessonsAction(this);
     }
 
-    @NotNull
     public StepikLicensesAction licenses() {
         return new StepikLicensesAction(this);
     }
 
-    @NotNull
     public StepikLongTaskTemplatesAction longTaskTemplates() {
         return new StepikLongTaskTemplatesAction(this);
     }
 
-    @NotNull
     public StepikLongTasksAction longTasks() {
         return new StepikLongTasksAction(this);
     }
 
-    @NotNull
     public StepikMembersAction members() {
         return new StepikMembersAction(this);
     }
 
-    @NotNull
     public StepikMetricsAction metrics() {
         return new StepikMetricsAction(this);
     }
 
-    @NotNull
     public StepikNotificationStatusesAction notificationStatuses() {
         return new StepikNotificationStatusesAction(this);
     }
 
-    @NotNull
     public StepikNotificationsAction notifications() {
         return new StepikNotificationsAction(this);
     }
 
-    @NotNull
     public StepikPaymentsAction payments() {
         return new StepikPaymentsAction(this);
     }
 
-    @NotNull
     public StepikPlaylistsAction playlists() {
         return new StepikPlaylistsAction(this);
     }
 
-    @NotNull
     public StepikProctorSessionsAction proctorSessions() {
         return new StepikProctorSessionsAction(this);
     }
 
-    @NotNull
     public StepikProfileImagesAction profileImages() {
         return new StepikProfileImagesAction(this);
     }
 
-    @NotNull
     public StepikProfilesAction profiles() {
         return new StepikProfilesAction(this);
     }
 
-    @NotNull
     public StepikProgressesAction progresses() {
         return new StepikProgressesAction(this);
     }
 
-    @NotNull
     public StepikRecommendationReactionsAction recommendationReactions() {
         return new StepikRecommendationReactionsAction(this);
     }
 
-    @NotNull
     public StepikRecommendationsAction recommendations() {
         return new StepikRecommendationsAction(this);
     }
 
-    @NotNull
     public StepikRegionsAction regions() {
         return new StepikRegionsAction(this);
     }
 
-    @NotNull
     public StepikRemindersAction reminders() {
         return new StepikRemindersAction(this);
     }
 
-    @NotNull
     public StepikReviewSessionsAction reviewSessions() {
         return new StepikReviewSessionsAction(this);
     }
 
-    @NotNull
     public StepikReviewsAction reviews() {
         return new StepikReviewsAction(this);
     }
 
-    @NotNull
     public StepikRubricsAction rubrics() {
         return new StepikRubricsAction(this);
     }
 
-    @NotNull
     public StepikScoreFilesAction scoreFiles() {
         return new StepikScoreFilesAction(this);
     }
 
-    @NotNull
     public StepikScriptsAction scripts() {
         return new StepikScriptsAction(this);
     }
 
-    @NotNull
     public StepikSearchResultsAction searchResults() {
         return new StepikSearchResultsAction(this);
     }
 
-    @NotNull
     public StepikSectionsAction sections() {
         return new StepikSectionsAction(this);
     }
 
-    @NotNull
     public StepikShortUrlsAction shortUrls() {
         return new StepikShortUrlsAction(this);
     }
 
-    @NotNull
     public StepikSocialAccountsAction socialAccounts() {
         return new StepikSocialAccountsAction(this);
     }
 
-    @NotNull
     public StepikSocialProfilesAction socialProfiles() {
         return new StepikSocialProfilesAction(this);
     }
 
-    @NotNull
     public StepikSocialProvidersAction socialProviders() {
         return new StepikSocialProvidersAction(this);
     }
 
-    @NotNull
     public StepikStatusServicesAction statusServices() {
         return new StepikStatusServicesAction(this);
     }
 
-    @NotNull
     public StepikStepIssuesAction stepIssues() {
         return new StepikStepIssuesAction(this);
     }
 
-    @NotNull
     public StepikStepSnapshotsAction stepSnapshots() {
         return new StepikStepSnapshotsAction(this);
     }
 
-    @NotNull
     public StepikStepSourcesAction stepSources() {
         return new StepikStepSourcesAction(this);
     }
 
-    @NotNull
     public StepikStepiksAction stepiks() {
         return new StepikStepiksAction(this);
     }
 
-    @NotNull
     public StepikStepsAction steps() {
         return new StepikStepsAction(this);
     }
 
-    @NotNull
     public StepikStripeSubscriptionsAction stripeSubscriptions() {
         return new StepikStripeSubscriptionsAction(this);
     }
 
-    @NotNull
     public StepikSubmissionsAction submissions() {
         return new StepikSubmissionsAction(this);
     }
 
-    @NotNull
     public StepikSubscriptionsAction subscriptions() {
         return new StepikSubscriptionsAction(this);
     }
 
-    @NotNull
     public StepikTagProgressesAction tagProgresses() {
         return new StepikTagProgressesAction(this);
     }
 
-    @NotNull
     public StepikTagSuggestionsAction tagSuggestions() {
         return new StepikTagSuggestionsAction(this);
     }
 
-    @NotNull
     public StepikTagsAction tags() {
         return new StepikTagsAction(this);
     }
 
-    @NotNull
     public StepikTopLessonsAction topLessons() {
         return new StepikTopLessonsAction(this);
     }
 
-    @NotNull
     public StepikTransfersAction transfers() {
         return new StepikTransfersAction(this);
     }
 
-    @NotNull
     public StepikUnitsAction units() {
         return new StepikUnitsAction(this);
     }
 
-    @NotNull
     public StepikUserActivitiesAction userActivities() {
         return new StepikUserActivitiesAction(this);
     }
 
-    @NotNull
     public StepikUsersAction users() {
         return new StepikUsersAction(this);
     }
 
-    @NotNull
     public StepikVideoStatsAction videoStats() {
         return new StepikVideoStatsAction(this);
     }
 
-    @NotNull
     public StepikVideosAction videos() {
         return new StepikVideosAction(this);
     }
 
-    @NotNull
     public StepikViewsAction views() {
         return new StepikViewsAction(this);
     }
 
-    @NotNull
     public StepikVotesAction votes() {
         return new StepikVotesAction(this);
     }
 
-    @NotNull
     public StepikWsAction ws() {
         return new StepikWsAction(this);
     }
 
-    @NotNull
-    public static String getVersion() {
-        return VERSION;
-    }
-
-    @NotNull
     public TransportClient getTransportClient() {
         return transportClient;
     }
 
-    @NotNull
     public TokenInfo getTokenInfo() {
         if (tokenInfo == null) {
             tokenInfo = new TokenInfo();
@@ -541,7 +452,7 @@ public class StepikApiClient {
         return tokenInfo;
     }
 
-    public void setTokenInfo(@Nullable TokenInfo tokenInfo) {
+    public void setTokenInfo(TokenInfo tokenInfo) {
         this.tokenInfo = tokenInfo;
     }
 

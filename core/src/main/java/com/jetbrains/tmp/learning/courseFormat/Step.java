@@ -7,12 +7,16 @@ import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.core.EduNames;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.api.objects.steps.BlockView;
+import org.stepik.api.objects.steps.queezes.code.CodeOptions;
+import org.stepik.api.objects.steps.queezes.code.Limit;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Deprecated
 public class Step implements StudyItem {
     @Expose
     private int position;
@@ -282,5 +286,57 @@ public class Step implements StudyItem {
 
     public void addLanguages(@NotNull List<SupportedLanguages> languages) {
         getSupportedLanguages().addAll(languages);
+    }
+
+    static Step fromStep(org.stepik.api.objects.steps.Step step) {
+        Step result = new Step();
+
+        result.setId(step.getId());
+        result.setName("step" + step.getId());
+        result.setPosition(step.getPosition());
+        result.setStatus(StudyStatus.of(step.getStatus()));
+
+        BlockView block = step.getBlock();
+
+        if (block.getName().equals("code")) {
+            CodeOptions options = block.getOptions(CodeOptions.class);
+            List<SupportedLanguages> languages = new ArrayList<>();
+            Map<String, StepFile> stepFiles = new HashMap<>();
+            Map<String, String> templates = options.getCodeTemplates();
+            templates.entrySet().forEach(entry -> {
+                SupportedLanguages language = SupportedLanguages.langOf(entry.getKey());
+                languages.add(language);
+
+                StepFile stepFile = new StepFile();
+                stepFile.setName(language.getMainFileName());
+                stepFile.setText(entry.getValue());
+                stepFile.setStep(result);
+
+                stepFiles.put(language.getMainFileName(), stepFile);
+            });
+
+            result.setSupportedLanguages(languages);
+            result.setStepFiles(stepFiles);
+
+            Map<String, Limit> limits = options.getLimits();
+
+            Map<SupportedLanguages, String> strLimits = new HashMap<>();
+
+            limits.entrySet().forEach(entry -> {
+                SupportedLanguages language = SupportedLanguages.langOf(entry.getKey());
+
+                int time = entry.getValue().getTime();
+                int memory = entry.getValue().getMemory();
+
+                String limit = time + "s; " + memory + "Mib";
+                strLimits.put(language, limit);
+            });
+
+            result.setTimeLimits(strLimits);
+        }
+
+        result.setText(block.getText());
+
+        return result;
     }
 }

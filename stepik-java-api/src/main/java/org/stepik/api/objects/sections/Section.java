@@ -57,4 +57,24 @@ public class Section {
     private String createDate;
     @SerializedName("update_date")
     private String updateDate;
+
+    public int getId() {
+        return id;
+    }
+
+    public int[] getUnits() {
+        return units;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public int getCourse() {
+        return course;
+    }
 }

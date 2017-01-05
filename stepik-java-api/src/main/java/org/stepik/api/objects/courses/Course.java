@@ -67,8 +67,8 @@ public class Course {
     private Object introVideo;
     @SerializedName("social_providers")
     private String[] socialProviders;
-    private String[] authors;
-    private String[] tags;
+    private int[] authors;
+    private int[] tags;
     @SerializedName("has_tutors")
     private boolean hasTutors;
     @SerializedName("is_enabled")
@@ -76,7 +76,7 @@ public class Course {
     @SerializedName("is_proctored")
     private boolean isProctored;
     @SerializedName("review_summary")
-    private String reviewSummary;
+    private int reviewSummary;
     @SerializedName("certificates_count")
     private int certificatesCount;
     @SerializedName("learners_count")
@@ -131,4 +131,41 @@ public class Course {
     private String discussionProxy;
     @SerializedName("discussion_threads")
     private String[] discussionThreads;
+
+    public int getId() {
+        return id;
+    }
+
+    public boolean isAdaptive() {
+        return isAdaptive;
+    }
+
+    public int[] getAuthors() {
+        return authors;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public int[] getSections() {
+        return sections;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    @Override
+    public String toString() {
+        return title;
+    }
 }

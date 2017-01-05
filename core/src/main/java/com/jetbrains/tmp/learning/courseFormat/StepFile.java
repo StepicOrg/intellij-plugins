@@ -5,6 +5,7 @@ import com.intellij.util.xmlb.annotations.Transient;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+@Deprecated
 public class StepFile {
     @Nullable
     @Expose
@@ -51,5 +52,9 @@ public class StepFile {
 
     public void setText(@Nullable String text) {
         this.text = text;
+    }
+
+    public void setStep(@Nullable Step step) {
+        this.step = step;
     }
 }

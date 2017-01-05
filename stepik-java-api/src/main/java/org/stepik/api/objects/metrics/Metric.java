@@ -1,7 +1,6 @@
 package org.stepik.api.objects.metrics;
 
-import com.sun.istack.internal.NotNull;
-
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -17,7 +16,7 @@ public class Metric<T> {
         this.timestamp = timestamp;
     }
 
-    public void setTags(@NotNull Map<String, String> tags) {
+    public void setTags( Map<String, String> tags) {
         this.tags = tags;
     }
 
@@ -27,5 +26,35 @@ public class Metric<T> {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public void addData(String key, Object value) {
+        getData().put(key, value);
+    }
+
+    public Map<String,Object> getData() {
+        if (data == null) {
+            data = new HashMap<>();
+        }
+        return data;
+    }
+
+    public void addTags(String key, String value) {
+        getTags().put(key, value);
+    }
+
+    public Map<String,String> getTags() {
+        if (tags == null) {
+            tags = new HashMap<>();
+        }
+        return tags;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Integer getTimestamp() {
+        return timestamp;
     }
 }

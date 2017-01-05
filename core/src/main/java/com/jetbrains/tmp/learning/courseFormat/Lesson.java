@@ -5,12 +5,16 @@ import com.google.gson.annotations.SerializedName;
 import com.intellij.util.xmlb.annotations.Transient;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.core.EduUtils;
+import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.api.client.StepikApiClient;
+import org.stepik.api.objects.steps.Steps;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Deprecated
 public class Lesson implements StudyItem {
     @Transient
     @Nullable
@@ -231,5 +235,30 @@ public class Lesson implements StudyItem {
             }
         }
         return null;
+    }
+
+    static Lesson fromLesson(org.stepik.api.objects.lessons.Lesson lesson, int position) {
+        Lesson result = new Lesson();
+
+        StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
+
+        result.setId(lesson.getId());
+        result.setName(lesson.getTitle());
+        result.setPosition(position);
+
+        int[] stepsIds = lesson.getSteps();
+        Steps steps = stepikApiClient.steps()
+                .get()
+                .id(stepsIds)
+                .execute();
+
+        ArrayList<Step> stepList = new ArrayList<>();
+        for (org.stepik.api.objects.steps.Step step : steps.getSteps()) {
+            stepList.add(Step.fromStep(step));
+        }
+
+        result.setStepList(stepList);
+
+        return result;
     }
 }

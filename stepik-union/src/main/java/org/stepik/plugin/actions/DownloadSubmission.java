@@ -24,19 +24,16 @@ import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.Step;
 import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
-import com.jetbrains.tmp.learning.stepik.StepikConnectorGet;
-import com.jetbrains.tmp.learning.stepik.StepikConnectorPost;
-import com.jetbrains.tmp.learning.stepik.StepikWrappers;
-import com.jetbrains.tmp.learning.stepik.entities.Submission;
-import com.jetbrains.tmp.learning.stepik.entities.SubmissionContainer;
+import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import icons.AllStepikIcons;
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.api.client.StepikApiClient;
+import org.stepik.api.objects.submissions.Submission;
+import org.stepik.api.objects.submissions.Submissions;
+import org.stepik.api.queries.Order;
 
 import javax.swing.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -98,21 +95,19 @@ public class DownloadSubmission extends StudyActionWithShortcut {
     private List<Submission> getSubmissions(
             @NotNull Project project,
             @NotNull Step step) {
-        String stepId = Integer.toString(step.getId());
-        String userId = Integer.toString(StepikProjectManager.getInstance(project).getUser().getId());
+        int stepId = step.getId();
+        int userId = StepikProjectManager.getInstance(project).getUser().getId();
 
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair("step", stepId));
-        nvps.add(new BasicNameValuePair("user", userId));
-        nvps.add(new BasicNameValuePair("order", "desc"));
+        StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
 
-        SubmissionContainer submissionContainer = StepikConnectorGet.getSubmissions(nvps);
+        Submissions submissions = stepikApiClient.submissions()
+                .get()
+                .step(stepId)
+                .user(userId)
+                .order(Order.DESC)
+                .execute();
 
-        if (submissionContainer == null) {
-            return null;
-        }
-
-        return submissionContainer.getSubmissions();
+        return submissions.getSubmissions();
     }
 
     @NotNull
@@ -166,13 +161,16 @@ public class DownloadSubmission extends StudyActionWithShortcut {
 
         final String finalCode = submission.getReply().getCode();
 
+        StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
         Course course = step.getCourse();
-        StepikWrappers.MetricsWrapper metric = new StepikWrappers.MetricsWrapper(
-                StepikWrappers.MetricsWrapper.PluginNames.STEPIK_UNION,
-                StepikWrappers.MetricsWrapper.MetricActions.DOWNLOAD,
-                course == null ? 0 : course.getId(),
-                step.getId());
-        StepikConnectorPost.postMetric(metric);
+        stepikApiClient.metrics()
+                .post()
+                .name("ide_plugin")
+                .tags("name", "S_Union")
+                .tags("action", "download")
+                .data("courseId", course != null ? course.getId() : 0)
+                .data("stepId", step.getId())
+                .execute();
 
         CommandProcessor.getInstance().executeCommand(project,
                 () -> ApplicationManager.getApplication().runWriteAction(

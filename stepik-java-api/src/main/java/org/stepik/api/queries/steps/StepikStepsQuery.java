@@ -18,6 +18,11 @@ public class StepikStepsQuery extends StepikAbstractGetQuery<Steps>{
         return this;
     }
 
+    public StepikStepsQuery id(int... values) {
+        addParam("ids[]", values);
+        return this;
+    }
+
     public StepikStepsQuery page(int value) {
         addParam("page", value);
         return this;

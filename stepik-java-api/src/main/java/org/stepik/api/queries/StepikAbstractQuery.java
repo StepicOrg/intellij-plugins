@@ -1,6 +1,5 @@
 package org.stepik.api.queries;
 
-import com.sun.istack.internal.NotNull;
 import org.apache.http.HttpHeaders;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -12,11 +11,10 @@ import org.stepik.api.client.TransportClient;
 import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.auth.TokenInfo;
 
-import javax.activation.MimeType;
-import javax.activation.MimetypesFileTypeMap;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -30,7 +28,7 @@ abstract class StepikAbstractQuery<T> {
 
     private final StepikAbstractAction stepikAction;
     private final Class<T> responseClass;
-    @NotNull
+    
     private final QueryMethod method;
     private Map<String, String[]> params = new HashMap<>();
 
@@ -56,11 +54,29 @@ abstract class StepikAbstractQuery<T> {
         String[] paramValues = Arrays.stream(values)
                 .map(String::valueOf)
                 .collect(Collectors.toList())
-                .toArray(new String[0]);
+                .toArray(new String[values.length]);
         params.put(key, paramValues);
     }
 
-    @NotNull
+    protected void addParam(String key, List<Integer> values) {
+        String[] paramValues = values.stream()
+                .map(String::valueOf)
+                .collect(Collectors.toList())
+                .toArray(new String[values.size()]);
+        params.put(key, paramValues);
+    }
+
+    protected void addParam(String key, int[] values) {
+        String[] paramValues = new String[values.length];
+
+        for (int i = 0; i < values.length; i++) {
+            paramValues[i] = String.valueOf(values[i]);
+        }
+
+        params.put(key, paramValues);
+    }
+
+    
     protected abstract String getUrl();
 
     public T execute() {

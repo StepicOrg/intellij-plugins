@@ -18,6 +18,16 @@ public class StepikSectionsQuery extends StepikAbstractGetQuery<Sections>{
         return this;
     }
 
+    public StepikSectionsQuery id(int[] values) {
+        addParam("ids[]", values);
+        return this;
+    }
+
+    public StepikSectionsQuery id(int values) {
+        addParam("ids[]", values);
+        return this;
+    }
+
     public StepikSectionsQuery page(int value) {
         addParam("page", value);
         return this;

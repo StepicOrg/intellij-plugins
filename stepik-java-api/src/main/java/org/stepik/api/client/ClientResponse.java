@@ -25,4 +25,8 @@ public class ClientResponse {
     public <T> T getBody(Class<T> clazz) {
         return new Gson().fromJson(body, clazz);
     }
+
+    public Map<String, String> getHeaders() {
+        return headers;
+    }
 }

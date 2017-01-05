@@ -16,4 +16,8 @@ public class Attempt {
     private int timeLeft;
     private String step;
     private String user;
+
+    public int getId() {
+        return id;
+    }
 }

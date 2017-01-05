@@ -72,9 +72,9 @@ class Utils {
 
     @NotNull
     static FileCollection sourcePluginXmlFiles(@NotNull Project project) {
-        final def result = new HashSet<>()
+        final result = new HashSet<>()
         mainSourceSet(project).getResources().getSrcDirs().each {
-            final def pluginXml = new File(it, "META-INF/plugin.xml")
+            final pluginXml = new File(it, "META-INF/plugin.xml")
             if (pluginXml.exists()) {
                 if (isPluginXmlFile(pluginXml)) {
                     result.add(pluginXml)
@@ -208,9 +208,9 @@ class Utils {
             @NotNull String type,
             @NotNull String version,
             @NotNull String archiveType) {
-        final def gradleHomePath = project.getGradle().getGradleUserHomeDir().getAbsolutePath()
-        final def name = plugin.getProductName().toLowerCase()
-        final def defaultRelativePath = "caches/modules-2/files-2.1/$plugin.productGroup/$name/$name$type"
+        final gradleHomePath = project.getGradle().getGradleUserHomeDir().getAbsolutePath()
+        final name = plugin.getProductName().toLowerCase()
+        final defaultRelativePath = "caches/modules-2/files-2.1/$plugin.productGroup/$name/$name$type"
 
         return new File("$gradleHomePath/$defaultRelativePath/$version/$archiveType")
     }
@@ -225,7 +225,7 @@ class Utils {
                 extension.type,
                 extension.version,
                 extension.archiveType)
-        final def name = plugin.getProductName().toLowerCase()
+        final name = plugin.getProductName().toLowerCase()
         return new File(defaultIdePath.parentFile, "$name$extension.type-$extension.version.$extension.archiveType")
     }
 
