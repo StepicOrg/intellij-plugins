@@ -34,7 +34,11 @@ import org.stepik.api.objects.submissions.Submissions;
 import org.stepik.api.queries.Order;
 
 import javax.swing.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 /**
@@ -120,6 +124,42 @@ public class DownloadSubmission extends StudyActionWithShortcut {
                 .collect(Collectors.toList());
     }
 
+    private static class SubmissionDecorator {
+        private final Submission submission;
+
+        SubmissionDecorator(Submission submission) {
+            this.submission = submission;
+        }
+
+        private final static SimpleDateFormat timeISOFormat = getTimeISOFormat();
+        private final static SimpleDateFormat timeOutFormat = new SimpleDateFormat("dd MMM yyyy HH:mm:ss");
+
+        private static SimpleDateFormat getTimeISOFormat() {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+            TimeZone tz = TimeZone.getTimeZone("UTC");
+            format.setTimeZone(tz);
+            return format;
+        }
+
+        @Override
+        public String toString() {
+            String localTime;
+            String time = submission.getTime();
+            try {
+                Date utcTime = timeISOFormat.parse(time);
+                localTime = timeOutFormat.format(utcTime);
+            } catch (ParseException e) {
+                localTime = time;
+            }
+
+            return String.format("#%d %-7s %s", submission.getId(), submission.getStatus(), localTime);
+        }
+
+        Submission getSubmission() {
+            return submission;
+        }
+    }
+
     private void showPopup(
             @NotNull Project project,
             @NotNull Step step,
@@ -129,8 +169,11 @@ public class DownloadSubmission extends StudyActionWithShortcut {
 
         PopupChooserBuilder builder;
         if (submissions.size() > 0) {
-            JList<Submission> list;
-            list = new JList<>(submissions.toArray(new Submission[submissions.size()]));
+            JList<SubmissionDecorator> list;
+
+            List<SubmissionDecorator> submissionDecorators = submissions.stream()
+                    .map(SubmissionDecorator::new).collect(Collectors.toList());
+            list = new JList<>(submissionDecorators.toArray(new SubmissionDecorator[submissionDecorators.size()]));
             builder = popupFactory.createListPopupBuilder(list)
                     .addListener(new Listener(list, project, step, currentLang));
         } else {
@@ -203,13 +246,13 @@ public class DownloadSubmission extends StudyActionWithShortcut {
     }
 
     private class Listener implements JBPopupListener {
-        private final JList<Submission> list;
+        private final JList<SubmissionDecorator> list;
         private final Project project;
         private final Step step;
         private final SupportedLanguages currentLang;
 
         Listener(
-                @NotNull JList<Submission> list,
+                @NotNull JList<SubmissionDecorator> list,
                 @NotNull Project project,
                 @NotNull Step step,
                 @NotNull SupportedLanguages currentLang) {
@@ -225,11 +268,11 @@ public class DownloadSubmission extends StudyActionWithShortcut {
 
         @Override
         public void onClosed(LightweightWindowEvent event) {
-            if (!event.isOk()) {
+            if (!event.isOk() || list.isSelectionEmpty()) {
                 return;
             }
 
-            Submission submission = list.getSelectedValue();
+            Submission submission = list.getSelectedValue().getSubmission();
 
             if (submission == null) {
                 return;
