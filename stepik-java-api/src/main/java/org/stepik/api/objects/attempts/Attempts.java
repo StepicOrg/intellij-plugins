@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * @author meanmail
  */
-public class Attempts extends ObjectsContainer{
+public class Attempts extends ObjectsContainer {
     private List<Attempt> attempts;
 
     public List<Attempt> getAttempts() {

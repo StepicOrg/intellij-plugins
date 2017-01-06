@@ -17,7 +17,7 @@ public class Submission {
     private String replyUrl;
     private int attempt;
     private String session;
-    private int eta;
+    private Double eta;
 
     public int getId() {
         return id;
@@ -33,5 +33,9 @@ public class Submission {
 
     public Reply getReply() {
         return reply;
+    }
+
+    public String getTime() {
+        return time;
     }
 }

@@ -13,7 +13,7 @@ public class Stepiks {
     private List<Profile> profiles;
 
     public User getUser() {
-        if (users!= null && users.size() > 0) {
+        if (users != null && users.size() > 0) {
             return users.get(0);
         }
 

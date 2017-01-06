@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * @author meanmail
  */
-public class Users extends ObjectsContainer{
+public class Users extends ObjectsContainer {
     private List<User> users;
 
     public int getCount() {

@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * @author meanmail
  */
-public class Submissions extends ObjectsContainer{
+public class Submissions extends ObjectsContainer {
     private List<Submission> submissions;
 
     public boolean isEmpty() {

@@ -14,19 +14,19 @@ public class Reply {
     private Double[] ordering;
     private String number;
 
-    public void setLanguage(String language) {
-        this.language = language;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
     public String getLanguage() {
         return language;
     }
 
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
     public String getCode() {
         return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 }

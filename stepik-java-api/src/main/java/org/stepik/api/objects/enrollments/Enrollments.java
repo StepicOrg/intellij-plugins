@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * @author meanmail
  */
-public class Enrollments extends ObjectsContainer{
+public class Enrollments extends ObjectsContainer {
     private List<Enrollment> enrollments;
 
 }

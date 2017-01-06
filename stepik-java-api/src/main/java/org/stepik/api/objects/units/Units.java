@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * @author meanmail
  */
-public class Units extends ObjectsContainer{
+public class Units extends ObjectsContainer {
     private List<Unit> units;
 
     public List<Unit> getUnits() {
