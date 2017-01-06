@@ -1,6 +1,8 @@
 dependencies {
     compile 'com.google.code.gson:gson:2.8.0'
     compile 'org.apache.httpcomponents:httpclient:4.5.2'
-    compile 'commons-io:commons-io:2.5'
-    compile 'org.apache.logging.log4j:log4j-core:2.7'
+    compile 'org.slf4j:slf4j-api:1.7.22'
 }
+
+group 'org.stepik'
+version "0.1"

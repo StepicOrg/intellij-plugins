@@ -2,6 +2,7 @@ package org.stepik.gradle.plugins.jetbrains
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
+import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 import org.gradle.api.plugins.JavaPlugin
@@ -15,6 +16,7 @@ import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.Nullable
 
 import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.StandardCopyOption
 
 /**
@@ -84,19 +86,40 @@ class PrepareSandboxTask extends DefaultTask {
             LOG.error("Failed prepare sandbox task: plugins directory is null")
             return
         }
-
-        def source = pluginJar.toPath()
+        def dependenciesJars = getDependenciesJars(project)
+        dependenciesJars.add(pluginJar.toPath())
         def pluginPath = destinationDir.toPath().resolve(pluginName)
-        def target = pluginPath.resolve("lib/" + source.getFileName())
+        def libPath = pluginPath.resolve("lib")
         try {
             Utils.deleteDirectory(pluginPath)
-            Files.createDirectories(target.getParent())
-            Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING)
+            Files.createDirectories(libPath)
+            dependenciesJars.each {
+                def target = libPath.resolve(it.getFileName())
+                Files.copy(it, target, StandardCopyOption.REPLACE_EXISTING)
+            }
         } catch (IOException ignored) {
-            LOG.error("Failed prepare sandbox task: copy from " + source + " to " + target)
+            LOG.error("Failed prepare sandbox task: copy from " + dependenciesJars + " to " + libPath)
             return
         }
         disableIdeUpdate()
+    }
+
+    private static HashSet<Path> getDependenciesJars(@NotNull Project project) {
+        def runtimeConfiguration = project.configurations.getByName(JavaPlugin.RUNTIME_CONFIGURATION_NAME)
+
+        def result = new HashSet<>()
+        runtimeConfiguration.getAllDependencies().each {
+            if (it instanceof ProjectDependency) {
+                Project dependencyProject = it.dependencyProject
+                Jar jarTask = Utils.findTask(dependencyProject, JavaPlugin.JAR_TASK_NAME) as Jar
+
+                if (result.add(jarTask.archivePath.toPath())) {
+                    def dependenciesJars = getDependenciesJars(dependencyProject)
+                    result.addAll(dependenciesJars)
+                }
+            }
+        }
+        result
     }
 
     private void disableIdeUpdate() {

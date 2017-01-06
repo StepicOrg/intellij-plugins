@@ -25,21 +25,6 @@ dependencies {
     compile project(":core")
 }
 
-jar {
-    into('/') {
-        from "${project(":core").getBuildDir()}/classes/main"
-    }
-    into('/') {
-        from "${project(":core").getBuildDir()}/resources/main"
-    }
-    into('/') {
-        from "${project(":stepik-java-api").getBuildDir()}/classes/main"
-    }
-    into('/') {
-        from "${project(":stepik-java-api").getBuildDir()}/resources/main"
-    }
-}
-
 group 'org.stepik'
 version project.getProperties().get('pluginVersion')?:'SNAPSHOT'
 

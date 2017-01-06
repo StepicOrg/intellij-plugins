@@ -23,3 +23,6 @@ clion {
 dependencies {
     compile project(":stepik-java-api")
 }
+
+group 'org.stepik'
+version "0.1"
