@@ -67,6 +67,7 @@ public class StepikJavaPostAction extends StudyCheckAction {
                     try {
                         attempts = stepikApiClient.attempts()
                                 .post()
+                                .step(step.getId())
                                 .execute();
                     } catch (StepikClientException e) {
                         exception = e;
