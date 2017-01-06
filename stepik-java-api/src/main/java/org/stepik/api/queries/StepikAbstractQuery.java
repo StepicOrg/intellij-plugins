@@ -1,8 +1,8 @@
 package org.stepik.api.queries;
 
 import org.apache.http.HttpHeaders;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.stepik.api.Utils;
 import org.stepik.api.actions.StepikAbstractAction;
 import org.stepik.api.client.ClientResponse;
@@ -18,19 +18,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.stepik.api.client.StatusCodes.SC_OK;
-
 /**
  * @author meanmail
  */
 abstract class StepikAbstractQuery<T> {
-    private static final Logger logger = LogManager.getLogger(StepikAbstractQuery.class);
+    private static final Logger logger = LoggerFactory.getLogger(StepikAbstractQuery.class);
 
     private final StepikAbstractAction stepikAction;
     private final Class<T> responseClass;
-    
+
     private final QueryMethod method;
-    private Map<String, String[]> params = new HashMap<>();
+    private final Map<String, String[]> params = new HashMap<>();
 
     StepikAbstractQuery(StepikAbstractAction stepikAction, Class<T> responseClass, QueryMethod method) {
         this.stepikAction = stepikAction;
@@ -76,7 +74,7 @@ abstract class StepikAbstractQuery<T> {
         params.put(key, paramValues);
     }
 
-    
+
     protected abstract String getUrl();
 
     public T execute() {
@@ -112,7 +110,7 @@ abstract class StepikAbstractQuery<T> {
             throw new StepikClientException(message, e);
         }
 
-        if (response.getStatusCode() != SC_OK) {
+        if (response.getStatusCode() / 100 != 2) {
             String message = "Failed query to " + getUrl() + " returned the status code " + response.getStatusCode();
             logger.error(message);
             throw new StepikClientException(message);
