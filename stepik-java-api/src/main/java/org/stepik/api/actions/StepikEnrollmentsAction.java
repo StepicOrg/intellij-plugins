@@ -16,7 +16,7 @@ public class StepikEnrollmentsAction extends StepikAbstractAction {
         return new StepikEnrollmentsGetQuery(this);
     }
 
-    public StepikEnrollmentsPostQuery post(){
+    public StepikEnrollmentsPostQuery post() {
         return new StepikEnrollmentsPostQuery(this);
     }
 }

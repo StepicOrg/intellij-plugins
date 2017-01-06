@@ -10,7 +10,7 @@ import org.stepik.api.urls.Urls;
  * @author meanmail
  */
 public class UserAuthorizationQuery extends StepikAbstractPostQuery<TokenInfo> {
-    public UserAuthorizationQuery( StepikAbstractAction stepikAction) {
+    public UserAuthorizationQuery(StepikAbstractAction stepikAction) {
         super(stepikAction, TokenInfo.class);
     }
 
@@ -19,7 +19,6 @@ public class UserAuthorizationQuery extends StepikAbstractPostQuery<TokenInfo> {
         return this;
     }
 
-    
     @Override
     protected String getUrl() {
         return Urls.OAUTH_URL;

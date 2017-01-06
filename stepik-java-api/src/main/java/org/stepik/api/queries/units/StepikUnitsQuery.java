@@ -8,7 +8,7 @@ import org.stepik.api.urls.Urls;
 /**
  * @author meanmail
  */
-public class StepikUnitsQuery extends StepikAbstractGetQuery<Units>{
+public class StepikUnitsQuery extends StepikAbstractGetQuery<Units> {
     public StepikUnitsQuery(StepikAbstractAction stepikAction) {
         super(stepikAction, Units.class);
     }

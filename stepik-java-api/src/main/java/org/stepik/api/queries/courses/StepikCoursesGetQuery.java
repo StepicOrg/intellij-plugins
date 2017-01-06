@@ -25,49 +25,41 @@ public class StepikCoursesGetQuery extends StepikAbstractGetQuery<Courses> {
         return this;
     }
 
-    
     public StepikCoursesGetQuery page(int page) {
         addParam("page", page);
         return this;
     }
 
-    
     public StepikCoursesGetQuery isFeatured(boolean value) {
         addParam("is_featured", value);
         return this;
     }
 
-    
     public StepikCoursesGetQuery tag(int value) {
         addParam("tag", value);
         return this;
     }
 
-    
     public StepikCoursesGetQuery language(String value) {
         addParam("language", value);
         return this;
     }
 
-    
     public StepikCoursesGetQuery owner(int value) {
         addParam("owner", value);
         return this;
     }
 
-    
     public StepikCoursesGetQuery isIdeaCompatible(boolean value) {
         addParam("is_idea_compatible", value);
         return this;
     }
 
-    
     public StepikCoursesGetQuery enrolled(boolean value) {
         addParam("enrolled", value);
         return this;
     }
 
-    
     @Override
     protected String getUrl() {
         return Urls.COURSES;

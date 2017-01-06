@@ -1,7 +1,7 @@
 package org.stepik.api.auth;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.stepik.api.actions.StepikAbstractAction;
 import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.queries.auth.UserAuthorizationQuery;
@@ -9,8 +9,8 @@ import org.stepik.api.queries.auth.UserAuthorizationQuery;
 /**
  * @author meanmail
  */
-public class OAuth extends StepikAbstractAction{
-    private static final Logger logger = LogManager.getLogger(OAuth.class);
+public class OAuth extends StepikAbstractAction {
+    private static final Logger logger = LoggerFactory.getLogger(OAuth.class);
 
     private String password;
     private GrantTypes grantType;
