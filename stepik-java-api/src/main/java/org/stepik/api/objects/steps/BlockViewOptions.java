@@ -1,6 +1,4 @@
-package org.stepik.api.objects.steps.queezes.code;
-
-import org.stepik.api.objects.steps.queezes.BlockViewOptions;
+package org.stepik.api.objects.steps;
 
 import java.util.List;
 import java.util.Map;
@@ -8,7 +6,7 @@ import java.util.Map;
 /**
  * @author meanmail
  */
-public class CodeOptions extends BlockViewOptions {
+public class BlockViewOptions {
     private List<List<String>> samples;
     private Map<String, String> codeTemplates;
     private Map<String, Limit> limits;

@@ -18,11 +18,8 @@ public class Units extends ObjectsContainer {
         return units;
     }
 
-    public boolean isEmpty() {
-        return getCount() == 0;
-    }
-
-    private int getCount() {
-        return getUnits().size();
+    @Override
+    protected List getItems() {
+        return getUnits();
     }
 }

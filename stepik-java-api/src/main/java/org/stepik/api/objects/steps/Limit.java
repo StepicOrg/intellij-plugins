@@ -1,4 +1,4 @@
-package org.stepik.api.objects.steps.queezes.code;
+package org.stepik.api.objects.steps;
 
 /**
  * @author meanmail

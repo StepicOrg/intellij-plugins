@@ -11,10 +11,6 @@ import java.util.List;
 public class Sections extends ObjectsContainer {
     private List<Section> sections;
 
-    public int getCount() {
-        return sections.size();
-    }
-
     public List<Section> getSections() {
         if (sections == null) {
             sections = new ArrayList<>();
@@ -22,7 +18,8 @@ public class Sections extends ObjectsContainer {
         return sections;
     }
 
-    public boolean isEmpty() {
-        return getCount() == 0;
+    @Override
+    protected List getItems() {
+        return getSections();
     }
 }

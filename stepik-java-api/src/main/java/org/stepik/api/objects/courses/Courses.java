@@ -2,6 +2,7 @@ package org.stepik.api.objects.courses;
 
 import org.stepik.api.objects.ObjectsContainer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -11,18 +12,14 @@ public class Courses extends ObjectsContainer {
     private List<Course> courses;
 
     public List<Course> getCourses() {
+        if (courses == null) {
+            courses = new ArrayList<>();
+        }
         return courses;
     }
 
-    public int getCount() {
-        if (courses == null) {
-            return 0;
-        }
-
-        return courses.size();
-    }
-
-    public boolean isEmpty() {
-        return getCount() == 0;
+    @Override
+    protected List getItems() {
+        return getCourses();
     }
 }

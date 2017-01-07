@@ -2,6 +2,7 @@ package org.stepik.api.objects.users;
 
 import org.stepik.api.objects.ObjectsContainer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -10,15 +11,15 @@ import java.util.List;
 public class Users extends ObjectsContainer {
     private List<User> users;
 
-    public int getCount() {
+    public List<User> getUsers() {
         if (users == null) {
-            return 0;
+            users = new ArrayList<>();
         }
-
-        return users.size();
+        return users;
     }
 
-    public List<User> getUsers() {
-        return users;
+    @Override
+    protected List getItems() {
+        return getUsers();
     }
 }

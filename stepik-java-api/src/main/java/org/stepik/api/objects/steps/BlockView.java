@@ -1,8 +1,6 @@
 package org.stepik.api.objects.steps;
 
-import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
-import org.stepik.api.objects.steps.queezes.BlockViewOptions;
 
 /**
  * @author meanmail
@@ -12,7 +10,7 @@ public class BlockView {
     private String text;
     private String video;
     private String animation;
-    private String options;
+    private BlockViewOptions options;
     @SerializedName("subtitle_files")
     private String[] subtitleFiles;
 
@@ -20,8 +18,8 @@ public class BlockView {
         return name;
     }
 
-    public <T extends BlockViewOptions> T getOptions(Class<T> clazz) {
-        return new Gson().fromJson(options, clazz);
+    public BlockViewOptions getOptions() {
+        return options;
     }
 
     public String getText() {

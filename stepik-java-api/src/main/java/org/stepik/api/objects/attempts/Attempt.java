@@ -14,10 +14,14 @@ public class Attempt {
     private String status;
     @SerializedName("time_left")
     private int timeLeft;
-    private String step;
-    private String user;
+    private int step;
+    private int user;
 
     public int getId() {
         return id;
+    }
+
+    public void setStep(int step) {
+        this.step = step;
     }
 }

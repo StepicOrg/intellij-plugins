@@ -2,6 +2,7 @@ package org.stepik.api.objects.attempts;
 
 import org.stepik.api.objects.ObjectsContainer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -11,18 +12,14 @@ public class Attempts extends ObjectsContainer {
     private List<Attempt> attempts;
 
     public List<Attempt> getAttempts() {
+        if (attempts == null) {
+            attempts = new ArrayList<>();
+        }
         return attempts;
     }
 
-    public boolean isEmpty() {
-        return getCount() == 0;
-    }
-
-    private int getCount() {
-        if (attempts == null) {
-            return 0;
-        }
-
-        return attempts.size();
+    @Override
+    protected List getItems() {
+        return getAttempts();
     }
 }
