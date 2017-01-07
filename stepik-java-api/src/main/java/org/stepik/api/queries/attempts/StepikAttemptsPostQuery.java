@@ -1,6 +1,5 @@
 package org.stepik.api.queries.attempts;
 
-import com.google.gson.Gson;
 import org.stepik.api.actions.StepikAbstractAction;
 import org.stepik.api.objects.attempts.Attempts;
 import org.stepik.api.objects.attempts.AttemptsPost;
@@ -24,7 +23,7 @@ public class StepikAttemptsPostQuery extends StepikAbstractPostQuery<Attempts> {
 
     @Override
     protected String getBody() {
-        return new Gson().toJson(attempts);
+        return getJsonConverter().toJson(attempts);
     }
 
     @Override

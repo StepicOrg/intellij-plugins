@@ -132,20 +132,24 @@ public class HttpTransportClient implements TransportClient {
     }
 
     @Override
-    public ClientResponse post(String url, String body) throws IOException {
+    public ClientResponse post(StepikApiClient stepikApiClient, String url, String body) throws IOException {
         Map<String, String> headers = new HashMap<>();
         headers.put(CONTENT_TYPE_HEADER, CONTENT_TYPE);
 
-        return post(url, body, headers);
+        return post(stepikApiClient, url, body, headers);
     }
 
     @Override
-    public ClientResponse get(String url) throws IOException {
-        return get(url, null);
+    public ClientResponse get(StepikApiClient stepikApiClient, String url) throws IOException {
+        return get(stepikApiClient, url, null);
     }
 
     @Override
-    public ClientResponse post(String url, String body, Map<String, String> headers) throws IOException {
+    public ClientResponse post(
+            StepikApiClient stepikApiClient,
+            String url, String body,
+            Map<String, String> headers)
+            throws IOException {
         HttpPost request = new HttpPost(url);
         if (headers != null) {
             headers.entrySet().forEach(entry -> request.setHeader(entry.getKey(), entry.getValue()));
@@ -153,19 +157,23 @@ public class HttpTransportClient implements TransportClient {
         if (body != null) {
             request.setEntity(new StringEntity(body));
         }
-        return call(request);
+        return call(stepikApiClient, request);
     }
 
-    @Override
-    public ClientResponse get(String url, Map<String, String> headers) throws IOException {
+    public ClientResponse get(
+            StepikApiClient stepikApiClient,
+            String url,
+            Map<String, String> headers) throws IOException {
         HttpGet request = new HttpGet(url);
         if (headers != null) {
             headers.entrySet().forEach(entry -> request.setHeader(entry.getKey(), entry.getValue()));
         }
-        return call(request);
+        return call(stepikApiClient, request);
     }
 
-    private ClientResponse call(HttpUriRequest request) throws IOException {
+    private ClientResponse call(
+            StepikApiClient stepikApiClient,
+            HttpUriRequest request) throws IOException {
         HttpResponse response = httpClient.execute(request);
         int statusCode = response.getStatusLine().getStatusCode();
 
@@ -185,7 +193,7 @@ public class HttpTransportClient implements TransportClient {
             }
         }
 
-        return new ClientResponse(statusCode, result.toString(), getHeaders(response.getAllHeaders()));
+        return new ClientResponse(stepikApiClient, statusCode, result.toString(), getHeaders(response.getAllHeaders()));
     }
 
     private Map<String, String> getHeaders(Header[] headers) {

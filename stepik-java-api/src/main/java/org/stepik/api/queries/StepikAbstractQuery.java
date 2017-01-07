@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.stepik.api.Utils;
 import org.stepik.api.actions.StepikAbstractAction;
 import org.stepik.api.client.ClientResponse;
+import org.stepik.api.client.JsonConverter;
 import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.client.TransportClient;
 import org.stepik.api.exceptions.StepikClientException;
@@ -98,10 +99,10 @@ abstract class StepikAbstractQuery<T> {
             switch (method) {
                 case GET:
                     url += "?" + mapToGetString();
-                    response = transportClient.get(url, headers);
+                    response = transportClient.get(stepikApi, url, headers);
                     break;
                 case POST:
-                    response = transportClient.post(url, getBody(), headers);
+                    response = transportClient.post(stepikApi, url, getBody(), headers);
                     break;
             }
         } catch (IOException e) {
@@ -131,5 +132,9 @@ abstract class StepikAbstractQuery<T> {
         return params.entrySet().stream()
                 .map(entry -> Utils.mapToGetString(entry.getKey(), entry.getValue()))
                 .collect(Collectors.joining("&"));
+    }
+
+    public JsonConverter getJsonConverter() {
+        return getStepikAction().getStepikApiClient().getJsonConverter();
     }
 }

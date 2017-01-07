@@ -1,7 +1,5 @@
 package org.stepik.api.client;
 
-import com.google.gson.Gson;
-
 import java.util.Map;
 
 /**
@@ -9,10 +7,12 @@ import java.util.Map;
  */
 public class ClientResponse {
     private final Map<String, String> headers;
-    private int statusCode;
-    private String body;
+    private final StepikApiClient stepikApiClient;
+    private final int statusCode;
+    private final String body;
 
-    ClientResponse(int statusCode, String body, Map<String, String> headers) {
+    ClientResponse(StepikApiClient stepikApiClient, int statusCode, String body, Map<String, String> headers) {
+        this.stepikApiClient = stepikApiClient;
         this.statusCode = statusCode;
         this.body = body;
         this.headers = headers;
@@ -23,7 +23,7 @@ public class ClientResponse {
     }
 
     public <T> T getBody(Class<T> clazz) {
-        return new Gson().fromJson(body, clazz);
+        return stepikApiClient.getJsonConverter().fromJson(body, clazz);
     }
 
     public Map<String, String> getHeaders() {

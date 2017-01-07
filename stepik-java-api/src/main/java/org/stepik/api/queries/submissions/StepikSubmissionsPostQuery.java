@@ -1,6 +1,5 @@
 package org.stepik.api.queries.submissions;
 
-import com.google.gson.Gson;
 import org.stepik.api.actions.StepikAbstractAction;
 import org.stepik.api.objects.submissions.Submissions;
 import org.stepik.api.objects.submissions.SubmissionsPost;
@@ -39,6 +38,6 @@ public class StepikSubmissionsPostQuery extends StepikAbstractPostQuery<Submissi
 
     @Override
     protected String getBody() {
-        return new Gson().toJson(submissions);
+        return getJsonConverter().toJson(submissions);
     }
 }

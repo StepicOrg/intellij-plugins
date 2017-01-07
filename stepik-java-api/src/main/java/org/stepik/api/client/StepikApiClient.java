@@ -92,10 +92,20 @@ import org.stepik.api.objects.auth.TokenInfo;
 public class StepikApiClient {
     private static final String VERSION = "0.1";
     private final TransportClient transportClient;
+    private final JsonConverter jsonConverter;
     private TokenInfo tokenInfo;
 
-    public StepikApiClient(TransportClient transportClient) {
+    public StepikApiClient() {
+        this(HttpTransportClient.getInstance(), DefaultJsonConverter.getInstance());
+    }
+
+    public StepikApiClient(TransportClient transportClient, JsonConverter jsonConverter) {
         this.transportClient = transportClient;
+        this.jsonConverter = jsonConverter;
+    }
+
+    public StepikApiClient(HttpTransportClient transportClient) {
+        this(transportClient, DefaultJsonConverter.getInstance());
     }
 
     public static String getVersion() {
@@ -112,17 +122,14 @@ public class StepikApiClient {
 
     public StepikAssignmentsAction assignments() {
         return new StepikAssignmentsAction(this);
-
     }
 
     public StepikAttachmentsAction attachments() {
         return new StepikAttachmentsAction(this);
-
     }
 
     public StepikAttemptsAction attempts() {
         return new StepikAttemptsAction(this);
-
     }
 
     public StepikCertificatesAction certificates() {
@@ -458,5 +465,9 @@ public class StepikApiClient {
 
     public void reset() {
         tokenInfo = null;
+    }
+
+    public JsonConverter getJsonConverter() {
+        return jsonConverter;
     }
 }

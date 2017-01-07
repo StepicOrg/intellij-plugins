@@ -1,6 +1,5 @@
 package org.stepik.api.queries.enrollments;
 
-import com.google.gson.Gson;
 import org.stepik.api.actions.StepikAbstractAction;
 import org.stepik.api.objects.enrollments.EnrollmentsPost;
 import org.stepik.api.queries.StepikAbstractPostQuery;
@@ -23,7 +22,7 @@ public class StepikEnrollmentsPostQuery extends StepikAbstractPostQuery<String> 
 
     @Override
     protected String getBody() {
-        return new Gson().toJson(enrollment);
+        return getJsonConverter().toJson(enrollment);
     }
 
     @Override

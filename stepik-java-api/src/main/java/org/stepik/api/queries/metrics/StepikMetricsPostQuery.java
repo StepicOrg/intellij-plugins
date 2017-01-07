@@ -1,6 +1,5 @@
 package org.stepik.api.queries.metrics;
 
-import com.google.gson.Gson;
 import org.stepik.api.actions.StepikAbstractAction;
 import org.stepik.api.objects.metrics.MetricWrapper;
 import org.stepik.api.queries.StepikAbstractPostQuery;
@@ -50,7 +49,7 @@ public class StepikMetricsPostQuery extends StepikAbstractPostQuery<String> {
 
     @Override
     protected String getBody() {
-        return new Gson().toJson(metrics);
+        return getJsonConverter().toJson(metrics);
     }
 
     @Override
