@@ -1,7 +1,5 @@
 package com.jetbrains.tmp.learning.courseFormat;
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
 import com.intellij.util.xmlb.annotations.Transient;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.core.EduUtils;

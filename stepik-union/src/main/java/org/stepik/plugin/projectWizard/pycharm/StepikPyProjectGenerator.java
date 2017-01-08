@@ -1,7 +1,5 @@
 package org.stepik.plugin.projectWizard.pycharm;
 
-import com.intellij.facet.ui.FacetEditorValidator;
-import com.intellij.facet.ui.FacetValidatorsManager;
 import com.intellij.facet.ui.ValidationResult;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;

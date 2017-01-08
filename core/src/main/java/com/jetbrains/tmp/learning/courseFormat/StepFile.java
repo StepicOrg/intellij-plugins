@@ -1,6 +1,5 @@
 package com.jetbrains.tmp.learning.courseFormat;
 
-import com.google.gson.annotations.Expose;
 import com.intellij.util.xmlb.annotations.Transient;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -26,6 +25,10 @@ public class StepFile {
         return step;
     }
 
+    public void setStep(@Nullable Step step) {
+        this.step = step;
+    }
+
     @NotNull
     public String getName() {
         if (name == null) {
@@ -48,9 +51,5 @@ public class StepFile {
 
     public void setText(@Nullable String text) {
         this.text = text;
-    }
-
-    public void setStep(@Nullable Step step) {
-        this.step = step;
     }
 }

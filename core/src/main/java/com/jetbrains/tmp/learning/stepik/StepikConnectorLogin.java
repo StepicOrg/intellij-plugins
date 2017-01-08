@@ -5,7 +5,6 @@ import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
-import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.util.net.HttpConfigurable;
 import com.jetbrains.tmp.learning.StepikProjectManager;
 import org.jetbrains.annotations.NotNull;
@@ -19,7 +18,7 @@ public class StepikConnectorLogin {
     private static final Logger logger = Logger.getInstance(StepikConnectorLogin.class.getName());
     private static final String CLIENT_ID = "hUCWcq3hZHCmz0DKrDtwOWITLcYutzot7p4n59vU";
     private static StepikUser currentUser;
-    private static StepikApiClient stepikApiClient = initStepikApiClient();
+    private static final StepikApiClient stepikApiClient = initStepikApiClient();
 
     @NotNull
     private static StepikApiClient initStepikApiClient() {
@@ -53,31 +52,27 @@ public class StepikConnectorLogin {
         }
     }
 
-    public static boolean loginFromDialog(@NotNull final Project project) {
+    public static void loginFromDialog(@NotNull final Project project) {
         StepikUser user = StepikProjectManager.getInstance(project).getUser();
         Project defaultProject = ProjectManager.getInstance().getDefaultProject();
         StepikUser defaultUser = StepikProjectManager.getInstance(defaultProject).getUser();
 
         if (minorLogin(user) == null) {
             if (minorLogin(defaultUser) == null) {
-                return showLoginDialog();
+                showLoginDialog();
             }
         }
 
         StepikProjectManager.getInstance(project).setUser(currentUser);
         StepikProjectManager.getInstance(defaultProject).setUser(currentUser);
 
-        return true;
     }
 
-    private static boolean showLoginDialog() {
-        final boolean[] logged = {false};
+    private static void showLoginDialog() {
         ApplicationManager.getApplication().invokeAndWait(() -> {
             final LoginDialog dialog = new LoginDialog();
             dialog.show();
-            logged[0] = dialog.getExitCode() == DialogWrapper.OK_EXIT_CODE;
         }, ModalityState.defaultModalityState());
-        return logged[0];
     }
 
     private static void resetClient() {

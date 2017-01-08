@@ -9,4 +9,8 @@ public class AttemptPost {
     public void setStep(int step) {
         this.step = step;
     }
+
+    public int getStep() {
+        return step;
+    }
 }
