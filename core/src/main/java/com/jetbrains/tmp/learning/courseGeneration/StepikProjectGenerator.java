@@ -1,7 +1,5 @@
 package com.jetbrains.tmp.learning.courseGeneration;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressManager;
@@ -11,6 +9,7 @@ import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.api.client.JsonConverter;
 import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.objects.courses.Course;
 import org.stepik.api.objects.courses.Courses;
@@ -127,8 +126,8 @@ public class StepikProjectGenerator {
             return courses;
         }
 
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        Gson gson = gsonBuilder.create();
+        JsonConverter jsonConverter = StepikConnectorLogin.getStepikApiClient()
+                .getJsonConverter();
 
         try {
             Files.walkFileTree(cacheCourses, new SimpleFileVisitor<Path>() {
@@ -139,7 +138,7 @@ public class StepikProjectGenerator {
                             .reduce((line, text) -> text + line);
 
                     if (content.isPresent()) {
-                        Course course = gson.fromJson(content.get(), Course.class);
+                        Course course = jsonConverter.fromJson(content.get(), Course.class);
                         courses.add(course);
                     }
 
@@ -181,8 +180,10 @@ public class StepikProjectGenerator {
         Path courseCache = CACHE_PATH.resolve("courses").resolve(course.getId() + ".json");
 
         try {
-            Files.createDirectories(courseCache);
-            Files.write(courseCache, new Gson().toJson(course).getBytes(),
+            Files.createDirectories(courseCache.getParent());
+            JsonConverter jsonConverter = StepikConnectorLogin.getStepikApiClient()
+                    .getJsonConverter();
+            Files.write(courseCache, jsonConverter.toJson(course).getBytes(),
                     StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
         } catch (IOException ignored) {
         }
@@ -206,7 +207,7 @@ public class StepikProjectGenerator {
             return;
         }
         StepikProjectManager stepikProjectManager = StepikProjectManager.getInstance(project);
-        stepikProjectManager.setCourse(com.jetbrains.tmp.learning.courseFormat.Course.fromCourse(course));
+        stepikProjectManager.setCourse(new com.jetbrains.tmp.learning.courseFormat.Course(course));
     }
 
     @Nullable
@@ -217,8 +218,8 @@ public class StepikProjectGenerator {
             return null;
         }
 
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        Gson gson = gsonBuilder.create();
+        JsonConverter jsonConverter = StepikConnectorLogin.getStepikApiClient()
+                .getJsonConverter();
 
         Optional<String> content;
         try {
@@ -229,7 +230,7 @@ public class StepikProjectGenerator {
             return null;
         }
 
-        return content.map(s -> gson.fromJson(s, Course.class)).orElse(null);
+        return content.map(s -> jsonConverter.fromJson(s, Course.class)).orElse(null);
     }
 
     @NotNull

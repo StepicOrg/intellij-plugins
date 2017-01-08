@@ -24,15 +24,14 @@ public class StepikConnectorLogin {
     @NotNull
     private static StepikApiClient initStepikApiClient() {
         HttpConfigurable instance = HttpConfigurable.getInstance();
-        HttpTransportClient transportClient;
         if (instance.USE_HTTP_PROXY) {
             logger.info("Uses proxy: Host = " + instance.PROXY_HOST + " Port = " + instance.PROXY_PORT);
+            HttpTransportClient transportClient;
             transportClient = HttpTransportClient.getInstance(instance.PROXY_HOST, instance.PROXY_PORT);
-        } else {
-            transportClient = HttpTransportClient.getInstance();
+            return new StepikApiClient(transportClient);
         }
 
-        return new StepikApiClient(transportClient);
+        return new StepikApiClient();
     }
 
     public static boolean loginFromSettings(

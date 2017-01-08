@@ -58,7 +58,7 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
     @Nullable
     @Override
     public Element getState() {
-        if (course == null || user.getEmail().isEmpty()) {
+        if (course == null) {
             return null;
         }
         Element el = new Element("stepikProjectManager");

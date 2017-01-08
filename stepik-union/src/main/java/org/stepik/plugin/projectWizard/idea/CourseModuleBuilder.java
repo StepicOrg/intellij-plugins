@@ -84,7 +84,7 @@ class CourseModuleBuilder extends AbstractModuleBuilder {
             FileUtil.createDirectory(new File(project.getBasePath(), section.getPath()));
             for (Lesson lesson : section.getLessons()) {
                 FileUtil.createDirectory(new File(project.getBasePath(), lesson.getPath()));
-                for (Step step : lesson.getStepList()) {
+                for (Step step : lesson.getSteps()) {
                     StepModuleBuilder stepModuleBuilder = new StepModuleBuilder(project.getBasePath() + lesson.getPath(),
                             step,
                             project);

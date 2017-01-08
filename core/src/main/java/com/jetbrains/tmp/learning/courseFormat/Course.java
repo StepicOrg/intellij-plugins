@@ -1,8 +1,6 @@
 package com.jetbrains.tmp.learning.courseFormat;
 
 import com.google.gson.annotations.Expose;
-import com.intellij.openapi.application.PathManager;
-import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.util.xmlb.annotations.Transient;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.core.EduUtils;
@@ -18,26 +16,50 @@ import org.stepik.api.objects.users.Users;
 import java.util.ArrayList;
 import java.util.List;
 
-@Deprecated
 public class Course implements StudyItem {
+    private org.stepik.api.objects.courses.Course data;
     @Nullable
-    @Expose
     private List<StepikUser> authors;
     @Nullable
-    @Expose
-    private String description;
-    @Nullable
-    @Expose
-    private String name;
-    @Expose
-    private int id;
-    @Expose
-    private boolean isAdaptive = false;
-    @Nullable
-    @Expose
     private List<Section> sections;
 
     public Course() {
+    }
+
+    public Course(org.stepik.api.objects.courses.Course data) {
+        this.data = data;
+
+        StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
+
+        List<Integer> authorsIds = data.getAuthors();
+        Users users = stepikApiClient.users()
+                .get()
+                .id(authorsIds)
+                .execute();
+
+        ArrayList<StepikUser> authorsList = new ArrayList<>();
+        for (User user : users.getUsers()) {
+            authorsList.add(StepikUser.fromUser(user));
+        }
+        setAuthors(authorsList);
+
+        List<Integer> sectionsIds = data.getSections();
+        Sections sections = stepikApiClient.sections()
+                .get()
+                .id(sectionsIds)
+                .execute();
+
+        ArrayList<Section> sectionsList = new ArrayList<>();
+        for (org.stepik.api.objects.sections.Section section : sections.getSections()) {
+            Section item = new Section(section);
+            if (item.getLessons().size() > 0) {
+                sectionsList.add(item);
+            }
+        }
+
+        setSections(sectionsList);
+
+        initCourse(true);
     }
 
     /**
@@ -65,63 +87,17 @@ public class Course implements StudyItem {
     @NotNull
     @Override
     public String getName() {
-        if (name == null) {
-            name = "";
-        }
-        return name;
+        return getData().getTitle();
     }
 
-    public void setName(@Nullable String name) {
-        this.name = name;
-    }
-
-    @Transient
     @Override
     public int getPosition() {
-        throw new UnsupportedOperationException("Course not support getPosition()");
-    }
-
-    @Transient
-    @Override
-    public void setPosition(int position) {
-        throw new UnsupportedOperationException("Course not support setPosition()");
-    }
-
-    @NotNull
-    public String getDescription() {
-        if (description == null) {
-            description = "";
-        }
-        return description;
-    }
-
-    public void setDescription(@Nullable String description) {
-        this.description = description;
-    }
-
-    public boolean isAdaptive() {
-        return isAdaptive;
-    }
-
-    public void setAdaptive(boolean adaptive) {
-        isAdaptive = adaptive;
+        return 0;
     }
 
     @Override
     public int getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    @Transient
-    @Nullable
-    @Override
-    public Course getCourse() {
-        return this;
+        return getData().getId();
     }
 
     public void addSection(@NotNull Section section) {
@@ -155,7 +131,7 @@ public class Course implements StudyItem {
     public Step getStepById(int id) {
         for (Section section : getSections()) {
             for (Lesson lesson : section.getLessons()) {
-                for (Step step : lesson.getStepList()) {
+                for (Step step : lesson.getSteps()) {
                     if (step.getId() == id) {
                         return step;
                     }
@@ -215,11 +191,6 @@ public class Course implements StudyItem {
         return "";
     }
 
-    @Override
-    public void updatePath() {
-        getSections().forEach(StudyItem::updatePath);
-    }
-
     @Transient
     @Nullable
     public Section getPrevSection(@NotNull Section section) {
@@ -246,50 +217,14 @@ public class Course implements StudyItem {
         return null;
     }
 
-    @Transient
-    @NotNull
-    public String getCacheDirectory() {
-        return FileUtil.join(PathManager.getConfigPath(), "courses", Integer.toString(id));
+    public org.stepik.api.objects.courses.Course getData() {
+        if (data == null) {
+            data = new org.stepik.api.objects.courses.Course();
+        }
+        return data;
     }
 
-    public static Course fromCourse(org.stepik.api.objects.courses.Course source) {
-        Course course = new Course();
-
-        StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
-
-        course.setAdaptive(source.isAdaptive());
-
-        int[] authorsIds = source.getAuthors();
-        Users users = stepikApiClient.users()
-                .get()
-                .id(authorsIds)
-                .execute();
-
-        ArrayList<StepikUser> authorsList = new ArrayList<>();
-        for (User user : users.getUsers()) {
-            authorsList.add(StepikUser.fromUser(user));
-        }
-        course.setAuthors(authorsList);
-
-        course.setDescription(source.getDescription());
-        course.setId(source.getId());
-        course.setName(source.getTitle());
-
-        int[] sectionsIds = source.getSections();
-        Sections sections = stepikApiClient.sections()
-                .get()
-                .id(sectionsIds)
-                .execute();
-
-        ArrayList<Section> sectionsList = new ArrayList<>();
-        for (org.stepik.api.objects.sections.Section section : sections.getSections()) {
-            sectionsList.add(Section.fromSection(section));
-        }
-
-        course.setSections(sectionsList);
-
-        course.initCourse(true);
-
-        return course;
+    public void setData(org.stepik.api.objects.courses.Course data) {
+        this.data = data;
     }
 }

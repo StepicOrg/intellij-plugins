@@ -8,53 +8,66 @@ import com.jetbrains.tmp.learning.core.EduNames;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.objects.steps.BlockView;
-import org.stepik.api.objects.steps.queezes.code.CodeOptions;
-import org.stepik.api.objects.steps.queezes.code.Limit;
+import org.stepik.api.objects.steps.BlockViewOptions;
+import org.stepik.api.objects.steps.Limit;
+import org.stepik.api.objects.steps.Sample;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Deprecated
 public class Step implements StudyItem {
-    @Expose
-    private int position;
-    @Expose
-    @Nullable
-    private String text;
-    @Expose
     @Nullable
     private StudyStatus status;
-    @Transient
     @Nullable
     private Lesson lesson;
-    @Expose
-    @Nullable
-    private String name;
-    @Expose
-    private int id;
-    @Expose
-    @SerializedName("task_files")
     @Nullable
     private Map<String, StepFile> stepFiles;
-    @Expose
     @Nullable
-    private Map<SupportedLanguages, String> timeLimits;
+    private Map<SupportedLanguages, Limit> timeLimits;
     @Nullable
-    @Expose
     private List<SupportedLanguages> supportedLanguages;
     @Nullable
-    @Expose
     private SupportedLanguages currentLang;
-    @Transient
-    @Nullable
-    private String directory;
-    @Transient
-    @Nullable
-    private String path;
+    private StepType type;
+    private org.stepik.api.objects.steps.Step data;
 
     public Step() {}
+
+    public Step(org.stepik.api.objects.steps.Step data) {
+        this.data = data;
+
+        setStatus(StudyStatus.UNCHECKED);
+
+        BlockView block = data.getBlock();
+
+        setType(StepType.of(block.getName()));
+        if (getType() == StepType.CODE) {
+            BlockViewOptions options = block.getOptions();
+            List<SupportedLanguages> languages = new ArrayList<>();
+            Map<String, StepFile> stepFiles = new HashMap<>();
+            Map<String, String> templates = options.getCodeTemplates();
+            templates.entrySet().forEach(entry -> {
+                SupportedLanguages language = SupportedLanguages.langOf(entry.getKey());
+                languages.add(language);
+
+                StepFile stepFile = new StepFile();
+                stepFile.setName(language.getMainFileName());
+                stepFile.setText(entry.getValue());
+                stepFile.setStep(this);
+
+                stepFiles.put(language.getMainFileName(), stepFile);
+            });
+
+            setSupportedLanguages(languages);
+            setStepFiles(stepFiles);
+            Map<SupportedLanguages, Limit> limits = new HashMap<>();
+            options.getLimits().entrySet()
+                    .forEach(entry -> limits.put(SupportedLanguages.langOf(entry.getKey()), entry.getValue()));
+            setTimeLimits(limits);
+        }
+    }
 
     void initStep(@Nullable final Lesson lesson, boolean isRestarted) {
         setLesson(lesson);
@@ -68,32 +81,12 @@ public class Step implements StudyItem {
 
     @NotNull
     public String getName() {
-        if (name == null) {
-            name = "";
-        }
-        return name;
-    }
-
-    @Override
-    public void setName(@Nullable String name) {
-        this.name = name;
+        return EduNames.STEP + getData().getPosition();
     }
 
     @NotNull
     public String getText() {
-        if (text == null) {
-            text = "";
-        }
-        return text;
-    }
-
-    public void setText(@Nullable final String text) {
-        this.text = text;
-    }
-
-    @Override
-    public void updatePath() {
-        path = null;
+        return getData().getBlock().getText();
     }
 
     @NotNull
@@ -125,8 +118,8 @@ public class Step implements StudyItem {
         this.lesson = lesson;
     }
 
+    @Transient
     @Nullable
-    @Override
     public Course getCourse() {
         if (lesson == null) {
             return null;
@@ -134,16 +127,15 @@ public class Step implements StudyItem {
         return lesson.getCourse();
     }
 
+    @Transient
     @Override
     public int getId() {
-        return id;
+        return getData().getId();
     }
 
-    @Override
+    @Transient
     public void setId(int id) {
-        this.id = id;
-        directory = null;
-        updatePath();
+        getData().setId(id);
     }
 
     @Override
@@ -162,54 +154,45 @@ public class Step implements StudyItem {
     @NotNull
     @Override
     public String getDirectory() {
-        if (directory == null) {
-            directory = EduNames.STEP + id;
-            updatePath();
-        }
-        return directory;
+        return EduNames.STEP + getId();
     }
 
     @NotNull
     @Override
     public String getPath() {
-        if (path == null) {
-            if (lesson != null) {
-                path = lesson.getPath() + "/" + getDirectory();
-            } else {
-                path = getDirectory();
-            }
+        if (lesson != null) {
+            return lesson.getPath() + "/" + getDirectory();
+        } else {
+            return getDirectory();
         }
-        return path;
     }
 
+    @Transient
     public int getPosition() {
-        return position;
+        return getData().getPosition();
     }
 
+    @Transient
     public void setPosition(int position) {
-        this.position = position;
-    }
-
-    public String getDescription() {
-        return text + getTimeLimit(currentLang);
+        getData().setPosition(position);
     }
 
     @SuppressWarnings("WeakerAccess")
     @NotNull
-    public Map<SupportedLanguages, String> getTimeLimits() {
+    public Map<SupportedLanguages, Limit> getTimeLimits() {
         if (timeLimits == null) {
             timeLimits = new HashMap<>();
         }
         return timeLimits;
     }
 
-    public void setTimeLimits(@Nullable Map<SupportedLanguages, String> timeLimits) {
+    public void setTimeLimits(@Nullable Map<SupportedLanguages, Limit> timeLimits) {
         this.timeLimits = timeLimits;
     }
 
-    @NotNull
-    private String getTimeLimit(SupportedLanguages lang) {
-        return getTimeLimits().getOrDefault(lang, "");
+    @Transient
+    public Limit getLimits() {
+        return getTimeLimits().getOrDefault(getCurrentLang(), new Limit());
     }
 
     @NotNull
@@ -227,7 +210,10 @@ public class Step implements StudyItem {
 
     @NotNull
     public SupportedLanguages getCurrentLang() {
-        if (currentLang == null || currentLang == SupportedLanguages.INVALID) {
+        if (supportedLanguages == null) {
+            currentLang = SupportedLanguages.INVALID;
+        } else if (currentLang == null || currentLang == SupportedLanguages.INVALID || !supportedLanguages.contains(
+                currentLang)) {
             currentLang = getFirstSupportLang();
         }
         return currentLang;
@@ -247,96 +233,33 @@ public class Step implements StudyItem {
         }
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Step step = (Step) o;
-
-        if (position != step.position) return false;
-        if (id != step.id) return false;
-        if (text != null ? !text.equals(step.text) : step.text != null) return false;
-        if (status != step.status) return false;
-        if (lesson != null ? !lesson.equals(step.lesson) : step.lesson != null) return false;
-        if (name != null ? !name.equals(step.name) : step.name != null) return false;
-        if (stepFiles != null ? !stepFiles.equals(step.stepFiles) : step.stepFiles != null) return false;
-        if (timeLimits != null ? !timeLimits.equals(step.timeLimits) : step.timeLimits != null) return false;
-        //noinspection SimplifiableIfStatement
-        if (supportedLanguages != null ?
-                !supportedLanguages.equals(step.supportedLanguages) :
-                step.supportedLanguages != null) return false;
-        return currentLang == step.currentLang;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = position;
-        result = 31 * result + (text != null ? text.hashCode() : 0);
-        result = 31 * result + (status != null ? status.hashCode() : 0);
-        result = 31 * result + (lesson != null ? lesson.hashCode() : 0);
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + id;
-        result = 31 * result + (stepFiles != null ? stepFiles.hashCode() : 0);
-        result = 31 * result + (timeLimits != null ? timeLimits.hashCode() : 0);
-        result = 31 * result + (supportedLanguages != null ? supportedLanguages.hashCode() : 0);
-        result = 31 * result + (currentLang != null ? currentLang.hashCode() : 0);
-        return result;
-    }
-
     public void addLanguages(@NotNull List<SupportedLanguages> languages) {
         getSupportedLanguages().addAll(languages);
     }
 
-    static Step fromStep(org.stepik.api.objects.steps.Step step) {
-        Step result = new Step();
+    public StepType getType() {
+        return type;
+    }
 
-        result.setId(step.getId());
-        result.setName("step" + step.getId());
-        result.setPosition(step.getPosition());
-        result.setStatus(StudyStatus.of(step.getStatus()));
+    public void setType(StepType type) {
+        this.type = type;
+    }
 
-        BlockView block = step.getBlock();
-
-        if (block.getName().equals("code")) {
-            CodeOptions options = block.getOptions(CodeOptions.class);
-            List<SupportedLanguages> languages = new ArrayList<>();
-            Map<String, StepFile> stepFiles = new HashMap<>();
-            Map<String, String> templates = options.getCodeTemplates();
-            templates.entrySet().forEach(entry -> {
-                SupportedLanguages language = SupportedLanguages.langOf(entry.getKey());
-                languages.add(language);
-
-                StepFile stepFile = new StepFile();
-                stepFile.setName(language.getMainFileName());
-                stepFile.setText(entry.getValue());
-                stepFile.setStep(result);
-
-                stepFiles.put(language.getMainFileName(), stepFile);
-            });
-
-            result.setSupportedLanguages(languages);
-            result.setStepFiles(stepFiles);
-
-            Map<String, Limit> limits = options.getLimits();
-
-            Map<SupportedLanguages, String> strLimits = new HashMap<>();
-
-            limits.entrySet().forEach(entry -> {
-                SupportedLanguages language = SupportedLanguages.langOf(entry.getKey());
-
-                int time = entry.getValue().getTime();
-                int memory = entry.getValue().getMemory();
-
-                String limit = time + "s; " + memory + "Mib";
-                strLimits.put(language, limit);
-            });
-
-            result.setTimeLimits(strLimits);
+    public org.stepik.api.objects.steps.Step getData() {
+        if (data == null) {
+            data = new org.stepik.api.objects.steps.Step();
         }
+        return data;
+    }
 
-        result.setText(block.getText());
+    public void setData(org.stepik.api.objects.steps.Step data) {
+        this.data = data;
+    }
 
-        return result;
+    public List<Sample> getSamples() {
+        if (type == StepType.CODE) {
+            return getData().getBlock().getOptions().getSamples();
+        }
+        return new ArrayList<>();
     }
 }

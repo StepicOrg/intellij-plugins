@@ -52,16 +52,6 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
         super(true);
         generator = StepikProjectGenerator.getInstance();
         pySPanel = new PyCCSettingPanel();
-
-        pySPanel.registerValidators(new FacetValidatorsManager() {
-            public void registerValidator(FacetEditorValidator validator, JComponent... componentsToWatch) {
-                throw new UnsupportedOperationException();
-            }
-
-            public void validate() {
-                ApplicationManager.getApplication().invokeLater(() -> fireStateChanged());
-            }
-        });
     }
 
     @Nullable
@@ -159,7 +149,7 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
             FileUtil.createDirectory(new File(project.getBasePath(), section.getPath()));
             for (Lesson lesson : section.getLessons()) {
                 FileUtil.createDirectory(new File(project.getBasePath(), lesson.getPath()));
-                for (Step step : lesson.getStepList()) {
+                for (Step step : lesson.getSteps()) {
                     step.setCurrentLang(SupportedLanguages.PYTHON);
                     File stepDir = new File(project.getBasePath(), step.getPath());
                     File srcDir = new File(stepDir, "src");

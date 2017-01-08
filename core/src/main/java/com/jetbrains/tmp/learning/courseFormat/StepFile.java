@@ -5,16 +5,12 @@ import com.intellij.util.xmlb.annotations.Transient;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-@Deprecated
 public class StepFile {
     @Nullable
-    @Expose
     private String name;
     @Nullable
-    @Expose
     private String text;
     @Nullable
-    @Transient
     private Step step;
 
     public StepFile() {

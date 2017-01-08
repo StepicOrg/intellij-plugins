@@ -39,8 +39,8 @@ public class StepikNextStepAction extends StepikStepNavigationAction {
 
         for (Section section : course.getSections()) {
             for (Lesson lesson : section.getLessons()) {
-                if (lesson.getStepList().size() > 0) {
-                    return lesson.getStepList().get(0);
+                if (lesson.getSteps().size() > 0) {
+                    return lesson.getSteps().get(0);
                 }
             }
         }

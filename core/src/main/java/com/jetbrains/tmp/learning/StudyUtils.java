@@ -31,10 +31,13 @@ import com.jetbrains.tmp.learning.ui.StudyToolWindowFactory;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.api.objects.steps.Limit;
+import org.stepik.api.objects.steps.Sample;
 import org.stepik.core.utils.ProjectFilesUtils;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -196,7 +199,31 @@ public class StudyUtils {
             stringBuilder.append("<br><br>");
         }
 
-        stringBuilder.append(step.getDescription());
+        stringBuilder.append(step.getText());
+
+        List<Sample> samples = step.getSamples();
+
+        for (int i = 1; i <= samples.size(); i++) {
+            Sample sample = samples.get(i - 1);
+            stringBuilder.append("<p><b>Sample Input ")
+                    .append(i)
+                    .append(":</b><br>")
+                    .append(sample.getInput().replaceAll("\\n", "<br>"))
+                    .append("<br>")
+                    .append("<b>Sample Output ")
+                    .append(i)
+                    .append(":</b><br>")
+                    .append(sample.getOutput().replaceAll("\\n", "<br>"))
+                    .append("<br>");
+        }
+
+        Limit limit = step.getLimits();
+        stringBuilder.append("<p><b>Limits: </b>")
+                .append(limit.getTime())
+                .append("s; ")
+                .append(limit.getMemory())
+                .append("Mib</p>");
+
         return stringBuilder.toString();
     }
 

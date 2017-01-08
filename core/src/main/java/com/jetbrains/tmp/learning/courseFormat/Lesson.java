@@ -10,43 +10,48 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.objects.steps.Steps;
+import org.stepik.api.objects.units.Unit;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Deprecated
 public class Lesson implements StudyItem {
-    @Transient
-    @Nullable
-    private List<Integer> steps;
-    @Transient
     @Nullable
     private Section section;
-    @Expose
-    private int position = -1;
-    @Expose
-    private int id;
-    @Expose
     @Nullable
-    @SerializedName("title")
-    private String name;
-    @Expose
-    @Nullable
-    @SerializedName("step_list")
-    private List<Step> stepList;
-    @Transient
-    @Nullable
-    private String directory;
-    @Transient
-    @Nullable
-    private String path;
+    private List<Step> steps;
+    private org.stepik.api.objects.lessons.Lesson data;
+    private Unit unit;
 
     public Lesson() {
     }
 
+    public Lesson(@NotNull org.stepik.api.objects.lessons.Lesson data, Unit unit) {
+        this.data = data;
+        this.unit = unit;
+
+        StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
+
+        List<Integer> stepsIds = data.getSteps();
+        Steps steps = stepikApiClient.steps()
+                .get()
+                .id(stepsIds)
+                .execute();
+
+        ArrayList<Step> stepList = new ArrayList<>();
+        for (org.stepik.api.objects.steps.Step step : steps.getSteps()) {
+            Step item = new Step(step);
+            if (item.getType() == StepType.CODE) {
+                stepList.add(item);
+            }
+        }
+
+        setSteps(stepList);
+    }
+
     void initLesson(@Nullable final Section section, boolean isRestarted) {
         setSection(section);
-        for (Step step : getStepList()) {
+        for (Step step : getSteps()) {
             step.initStep(this, isRestarted);
         }
     }
@@ -54,45 +59,30 @@ public class Lesson implements StudyItem {
     @NotNull
     @Override
     public String getName() {
-        if (name == null) {
-            name = "";
-        }
-        return name;
-    }
-
-    @Override
-    public void setName(@Nullable String name) {
-        this.name = name;
-    }
-
-    @Override
-    public void updatePath() {
-        path = null;
-
-        getStepList().forEach(StudyItem::updatePath);
+        return getData().getTitle();
     }
 
     @NotNull
-    public List<Step> getStepList() {
-        if (stepList == null) {
-            stepList = new ArrayList<>();
+    public List<Step> getSteps() {
+        if (steps == null) {
+            steps = new ArrayList<>();
         }
-        return stepList;
+        return steps;
     }
 
     @SuppressWarnings("unused")
-    public void setStepList(@Nullable List<Step> stepList) {
-        this.stepList = stepList;
+    public void setSteps(@Nullable List<Step> steps) {
+        this.steps = steps;
     }
 
     public void addStep(@NotNull final Step step) {
-        getStepList().add(step);
+        getSteps().add(step);
     }
 
     @Nullable
     public Step getStep(@NotNull final String name) {
         int id = EduUtils.parseDirName(name, EduNames.STEP);
-        for (Step step : getStepList()) {
+        for (Step step : getSteps()) {
             if (step.getId() == id) {
                 return step;
             }
@@ -103,7 +93,7 @@ public class Lesson implements StudyItem {
     @NotNull
     @Override
     public StudyStatus getStatus() {
-        for (Step step : getStepList()) {
+        for (Step step : getSteps()) {
             if (step.getStatus() != StudyStatus.SOLVED) {
                 return StudyStatus.UNCHECKED;
             }
@@ -114,38 +104,31 @@ public class Lesson implements StudyItem {
     @NotNull
     @Override
     public String getDirectory() {
-        if (directory == null) {
-            directory = EduNames.LESSON + id;
-            updatePath();
-        }
-        return directory;
+        return EduNames.LESSON + getId();
     }
 
     @NotNull
     @Override
     public String getPath() {
-        if (path == null) {
-            if (section != null) {
-                path = section.getPath() + "/" + getDirectory();
-            } else {
-                path = getDirectory();
-            }
+        if (section != null) {
+            return section.getPath() + "/" + getDirectory();
+        } else {
+            return getDirectory();
         }
-        return path;
     }
 
+    @Transient
     public int getId() {
-        return id;
+        return getData().getId();
     }
 
+    @Transient
     public void setId(int id) {
-        this.id = id;
-        directory = null;
-        updatePath();
+        getData().setId(id);
     }
 
     @Nullable
-    @Override
+    @Transient
     public Course getCourse() {
         if (section == null) {
             return null;
@@ -164,46 +147,35 @@ public class Lesson implements StudyItem {
         this.section = section;
     }
 
+    @Transient
     public int getPosition() {
-        return position;
+        return getUnit().getPosition();
     }
 
+    @Transient
     public void setPosition(int position) {
-        this.position = position;
+        getUnit().setPosition(position);
     }
 
     @Override
     public String toString() {
-        return "Lesson {id=" + id + ", name='" + name + "\'}";
-    }
-
-    @NotNull
-    public List<Integer> getSteps() {
-        if (steps == null) {
-            steps = new ArrayList<>();
-        }
-        return steps;
-    }
-
-    @SuppressWarnings("unused")
-    public void setSteps(@Nullable ArrayList<Integer> steps) {
-        this.steps = steps;
+        return "Lesson {id=" + getId() + ", name='" + getName() + "\'}";
     }
 
     @Transient
     @Nullable
     public Step getLastStep() {
-        int stepsCount = getStepList().size();
+        int stepsCount = getSteps().size();
         if (stepsCount == 0) {
             return null;
         }
-        return getStepList().get(stepsCount - 1);
+        return getSteps().get(stepsCount - 1);
     }
 
     @Transient
     @Nullable
     public Step getFirstStep() {
-        List<Step> children = getStepList();
+        List<Step> children = getSteps();
         if (children.size() == 0) {
             return null;
         }
@@ -215,7 +187,7 @@ public class Lesson implements StudyItem {
     @Nullable
     public Step getPrevStep(@NotNull Step step) {
         int position = step.getPosition();
-        List<Step> children = getStepList();
+        List<Step> children = getSteps();
         for (int i = children.size() - 1; i >= 0; i--) {
             Step item = children.get(i);
             if (item.getPosition() < position) {
@@ -229,7 +201,7 @@ public class Lesson implements StudyItem {
     @Nullable
     public Step getNextStep(@NotNull Step lesson) {
         int position = lesson.getPosition();
-        for (Step item : getStepList()) {
+        for (Step item : getSteps()) {
             if (item.getPosition() > position) {
                 return item;
             }
@@ -237,28 +209,25 @@ public class Lesson implements StudyItem {
         return null;
     }
 
-    static Lesson fromLesson(org.stepik.api.objects.lessons.Lesson lesson, int position) {
-        Lesson result = new Lesson();
-
-        StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
-
-        result.setId(lesson.getId());
-        result.setName(lesson.getTitle());
-        result.setPosition(position);
-
-        int[] stepsIds = lesson.getSteps();
-        Steps steps = stepikApiClient.steps()
-                .get()
-                .id(stepsIds)
-                .execute();
-
-        ArrayList<Step> stepList = new ArrayList<>();
-        for (org.stepik.api.objects.steps.Step step : steps.getSteps()) {
-            stepList.add(Step.fromStep(step));
+    public org.stepik.api.objects.lessons.Lesson getData() {
+        if (data == null) {
+            data = new org.stepik.api.objects.lessons.Lesson();
         }
+        return data;
+    }
 
-        result.setStepList(stepList);
+    public void setData(org.stepik.api.objects.lessons.Lesson data) {
+        this.data = data;
+    }
 
-        return result;
+    public Unit getUnit() {
+        if (unit == null) {
+            unit = new Unit();
+        }
+        return unit;
+    }
+
+    public void setUnit(Unit unit) {
+        this.unit = unit;
     }
 }

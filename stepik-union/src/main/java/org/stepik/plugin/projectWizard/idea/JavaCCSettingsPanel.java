@@ -14,6 +14,7 @@ import com.jetbrains.tmp.learning.courseGeneration.StepikProjectGenerator;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.api.client.StepikApiClient;
+import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.courses.Course;
 import org.stepik.api.objects.courses.Courses;
 import org.stepik.plugin.utils.Utils;
@@ -130,10 +131,17 @@ class JavaCCSettingsPanel extends ModuleWizardStep {
         super.onWizardFinished();
         int id = selectedCourse.getId();
         StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
-        stepikApiClient.enrollments()
-                .post()
-                .course(id)
-                .execute();
+        try {
+            stepikApiClient.enrollments()
+                    .post()
+                    .course(id)
+                    .execute();
+        } catch (StepikClientException e) {
+            String message = String.format("Can't enrollment on a course: id = %s, name = %s",
+                    id, selectedCourse.getTitle());
+            logger.error(message, e);
+            throw new CommitStepException(message);
+        }
         logger.info(String.format("Finished the project wizard with the selected course: id = %s, name = %s",
                 id, selectedCourse.getTitle()));
         StepikProjectGenerator.downloadAndFlushCourse(project, selectedCourse.getId());
