@@ -5,6 +5,8 @@ import org.stepik.api.objects.sections.Sections;
 import org.stepik.api.queries.StepikAbstractGetQuery;
 import org.stepik.api.urls.Urls;
 
+import java.util.List;
+
 /**
  * @author meanmail
  */
@@ -24,6 +26,11 @@ public class StepikSectionsQuery extends StepikAbstractGetQuery<Sections> {
     }
 
     public StepikSectionsQuery id(int values) {
+        addParam("ids[]", values);
+        return this;
+    }
+
+    public StepikSectionsQuery id(List<Integer> values) {
         addParam("ids[]", values);
         return this;
     }

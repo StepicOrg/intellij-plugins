@@ -5,6 +5,8 @@ import org.stepik.api.objects.steps.Steps;
 import org.stepik.api.queries.StepikAbstractGetQuery;
 import org.stepik.api.urls.Urls;
 
+import java.util.List;
+
 /**
  * @author meanmail
  */
@@ -19,6 +21,11 @@ public class StepikStepsQuery extends StepikAbstractGetQuery<Steps> {
     }
 
     public StepikStepsQuery id(int... values) {
+        addParam("ids[]", values);
+        return this;
+    }
+
+    public StepikStepsQuery id(List<Integer> values) {
         addParam("ids[]", values);
         return this;
     }

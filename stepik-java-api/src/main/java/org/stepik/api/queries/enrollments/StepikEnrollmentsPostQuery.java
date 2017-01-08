@@ -1,6 +1,7 @@
 package org.stepik.api.queries.enrollments;
 
 import org.stepik.api.actions.StepikAbstractAction;
+import org.stepik.api.objects.enrollments.Enrollments;
 import org.stepik.api.objects.enrollments.EnrollmentsPost;
 import org.stepik.api.queries.StepikAbstractPostQuery;
 import org.stepik.api.urls.Urls;
@@ -8,11 +9,11 @@ import org.stepik.api.urls.Urls;
 /**
  * @author meanmail
  */
-public class StepikEnrollmentsPostQuery extends StepikAbstractPostQuery<String> {
+public class StepikEnrollmentsPostQuery extends StepikAbstractPostQuery<Enrollments> {
     private final EnrollmentsPost enrollment = new EnrollmentsPost();
 
     public StepikEnrollmentsPostQuery(StepikAbstractAction stepikAction) {
-        super(stepikAction, String.class);
+        super(stepikAction, Enrollments.class);
     }
 
     public StepikEnrollmentsPostQuery course(int id) {

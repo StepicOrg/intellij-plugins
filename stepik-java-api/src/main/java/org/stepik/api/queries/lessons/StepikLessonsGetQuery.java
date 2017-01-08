@@ -18,7 +18,7 @@ public class StepikLessonsGetQuery extends StepikAbstractGetQuery<Lessons> {
         return this;
     }
 
-    public StepikLessonsGetQuery id(int... values) {
+    public StepikLessonsGetQuery id(int[] values) {
         addParam("ids[]", values);
         return this;
     }

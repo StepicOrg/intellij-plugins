@@ -6,6 +6,8 @@ import org.stepik.api.queries.Order;
 import org.stepik.api.queries.StepikAbstractGetQuery;
 import org.stepik.api.urls.Urls;
 
+import java.util.List;
+
 /**
  * @author meanmail
  */
@@ -24,6 +26,10 @@ public class StepikUsersGetQuery extends StepikAbstractGetQuery<Users> {
         return this;
     }
 
+    public StepikUsersGetQuery id(List<Integer> values) {
+        addParam("ids[]", values);
+        return this;
+    }
 
     public StepikUsersGetQuery page(int page) {
         addParam("page", page);
