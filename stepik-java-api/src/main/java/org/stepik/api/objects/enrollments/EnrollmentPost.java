@@ -6,6 +6,10 @@ package org.stepik.api.objects.enrollments;
 public class EnrollmentPost {
     private int course;
 
+    public int getCourse() {
+        return course;
+    }
+
     public void setCourse(int course) {
         this.course = course;
     }

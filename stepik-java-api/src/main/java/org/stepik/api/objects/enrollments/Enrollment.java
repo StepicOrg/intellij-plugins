@@ -5,4 +5,12 @@ package org.stepik.api.objects.enrollments;
  */
 public class Enrollment {
     private int id;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 }

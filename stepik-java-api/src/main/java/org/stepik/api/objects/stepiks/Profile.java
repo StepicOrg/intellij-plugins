@@ -2,6 +2,8 @@ package org.stepik.api.objects.stepiks;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
 /**
  * @author meanmail
  */
@@ -45,13 +47,13 @@ public class Profile {
     @SerializedName("level_title")
     private String levelTitle;
     @SerializedName("level_abilities")
-    private String[] levelAbilities;
+    private List<String> levelAbilities;
     @SerializedName("has_password")
     private boolean hasPassword;
     @SerializedName("social_accounts")
-    private int[] socialAccounts;
+    private List<Integer> socialAccounts;
     @SerializedName("email_addresses")
-    private int[] emailAddresses;
+    private List<Integer> emailAddresses;
     @SerializedName("is_email_verified")
     private boolean isEmailVerified;
     @SerializedName("invite_url")

@@ -11,7 +11,15 @@ public class Limit {
         return time;
     }
 
+    public void setTime(int time) {
+        this.time = time;
+    }
+
     public int getMemory() {
         return memory;
+    }
+
+    public void setMemory(int memory) {
+        this.memory = memory;
     }
 }
