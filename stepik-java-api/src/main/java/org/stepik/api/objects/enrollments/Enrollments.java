@@ -1,5 +1,7 @@
 package org.stepik.api.objects.enrollments;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.stepik.api.objects.ObjectsContainer;
 import org.stepik.api.objects.courses.Course;
 import org.stepik.api.objects.lessons.Lesson;
@@ -22,6 +24,7 @@ public class Enrollments extends ObjectsContainer {
     private List<Lesson> lessons;
     private List<Progress> progresses;
 
+    @NotNull
     public List<Enrollment> getEnrollments() {
         if (enrollments == null) {
             enrollments = new ArrayList<>();
@@ -29,15 +32,17 @@ public class Enrollments extends ObjectsContainer {
         return enrollments;
     }
 
-    public void setEnrollments(List<Enrollment> enrollments) {
+    public void setEnrollments(@Nullable List<Enrollment> enrollments) {
         this.enrollments = enrollments;
     }
 
+    @NotNull
     @Override
     protected List getItems() {
         return enrollments;
     }
 
+    @NotNull
     public List<Assignment> getAssignments() {
         if (assignments == null) {
             assignments = new ArrayList<>();
@@ -45,10 +50,11 @@ public class Enrollments extends ObjectsContainer {
         return assignments;
     }
 
-    public void setAssignments(List<Assignment> assignments) {
+    public void setAssignments(@Nullable List<Assignment> assignments) {
         this.assignments = assignments;
     }
 
+    @NotNull
     public List<Course> getCourses() {
         if (courses == null) {
             courses = new ArrayList<>();
@@ -56,10 +62,11 @@ public class Enrollments extends ObjectsContainer {
         return courses;
     }
 
-    public void setCourses(List<Course> courses) {
+    public void setCourses(@Nullable List<Course> courses) {
         this.courses = courses;
     }
 
+    @NotNull
     public List<Section> getSections() {
         if (sections == null) {
             sections = new ArrayList<>();
@@ -67,10 +74,11 @@ public class Enrollments extends ObjectsContainer {
         return sections;
     }
 
-    public void setSections(List<Section> sections) {
+    public void setSections(@Nullable List<Section> sections) {
         this.sections = sections;
     }
 
+    @NotNull
     public List<Unit> getUnits() {
         if (units == null) {
             units = new ArrayList<>();
@@ -78,10 +86,11 @@ public class Enrollments extends ObjectsContainer {
         return units;
     }
 
-    public void setUnits(List<Unit> units) {
+    public void setUnits(@Nullable List<Unit> units) {
         this.units = units;
     }
 
+    @NotNull
     public List<Lesson> getLessons() {
         if (lessons == null) {
             lessons = new ArrayList<>();
@@ -89,10 +98,11 @@ public class Enrollments extends ObjectsContainer {
         return lessons;
     }
 
-    public void setLessons(List<Lesson> lessons) {
+    public void setLessons(@Nullable List<Lesson> lessons) {
         this.lessons = lessons;
     }
 
+    @NotNull
     public List<Progress> getProgresses() {
         if (progresses == null) {
             progresses = new ArrayList<>();
@@ -100,7 +110,7 @@ public class Enrollments extends ObjectsContainer {
         return progresses;
     }
 
-    public void setProgresses(List<Progress> progresses) {
+    public void setProgresses(@Nullable List<Progress> progresses) {
         this.progresses = progresses;
     }
 }

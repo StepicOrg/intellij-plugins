@@ -1,4 +1,6 @@
-package org.stepik.api.queries.submissions;
+package org.stepik.api.objects.submissions;
+
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @author meanmail
@@ -6,6 +8,7 @@ package org.stepik.api.queries.submissions;
 public enum ReviewStatus {
     DONE, AWAITING;
 
+    @NotNull
     @Override
     public String toString() {
         return name().toLowerCase();

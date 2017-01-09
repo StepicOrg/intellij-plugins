@@ -1,53 +1,39 @@
 package org.stepik.api.queries.users;
 
+import org.jetbrains.annotations.NotNull;
 import org.stepik.api.actions.StepikAbstractAction;
 import org.stepik.api.objects.users.Users;
 import org.stepik.api.queries.Order;
 import org.stepik.api.queries.StepikAbstractGetQuery;
 import org.stepik.api.urls.Urls;
 
-import java.util.List;
-
 /**
  * @author meanmail
  */
-public class StepikUsersGetQuery extends StepikAbstractGetQuery<Users> {
-    public StepikUsersGetQuery(StepikAbstractAction stepikAction) {
+public class StepikUsersGetQuery extends StepikAbstractGetQuery<StepikUsersGetQuery, Users> {
+    public StepikUsersGetQuery(@NotNull StepikAbstractAction stepikAction) {
         super(stepikAction, Users.class);
     }
 
-    public StepikUsersGetQuery id(Integer... values) {
-        addParam("ids[]", values);
-        return this;
-    }
-
-    public StepikUsersGetQuery id(int... values) {
-        addParam("ids[]", values);
-        return this;
-    }
-
-    public StepikUsersGetQuery id(List<Integer> values) {
-        addParam("ids[]", values);
-        return this;
-    }
-
+    @NotNull
     public StepikUsersGetQuery page(int page) {
         addParam("page", page);
         return this;
     }
 
-
-    public StepikUsersGetQuery alias(String value) {
+    @NotNull
+    public StepikUsersGetQuery alias(@NotNull String value) {
         addParam("alias", value);
         return this;
     }
 
-
-    public StepikUsersGetQuery order(Order value) {
+    @NotNull
+    public StepikUsersGetQuery order(@NotNull Order value) {
         addParam("order", value.toString());
         return this;
     }
 
+    @NotNull
     @Override
     protected String getUrl() {
         return Urls.USERS;

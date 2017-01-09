@@ -63,7 +63,7 @@ public class LoginDialog extends DialogWrapper {
 
     private boolean validateLoginAndPasswordFields() {
         if (StringUtil.isEmptyOrSpaces(loginPanel.getLogin())) {
-            setErrorText("Please, enter your login");
+            setErrorText("Please, enter your username");
             return false;
         }
         if (StringUtil.isEmptyOrSpaces(loginPanel.getPassword())) {

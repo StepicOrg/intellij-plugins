@@ -1,6 +1,8 @@
 package org.stepik.api.objects.steps;
 
 import com.google.gson.annotations.SerializedName;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,6 +18,7 @@ public class BlockViewOptions {
     private Map<String, String> codeTemplates;
     private Map<String, Limit> limits;
 
+    @NotNull
     public Map<String, String> getCodeTemplates() {
         if (codeTemplates == null) {
             codeTemplates = new HashMap<>();
@@ -23,10 +26,11 @@ public class BlockViewOptions {
         return codeTemplates;
     }
 
-    public void setCodeTemplates(Map<String, String> codeTemplates) {
+    public void setCodeTemplates(@Nullable Map<String, String> codeTemplates) {
         this.codeTemplates = codeTemplates;
     }
 
+    @NotNull
     public Map<String, Limit> getLimits() {
         if (limits == null) {
             limits = new HashMap<>();
@@ -34,10 +38,11 @@ public class BlockViewOptions {
         return limits;
     }
 
-    public void setLimits(Map<String, Limit> limits) {
+    public void setLimits(@Nullable Map<String, Limit> limits) {
         this.limits = limits;
     }
 
+    @NotNull
     public List<Sample> getSamples() {
         if (samples == null) {
             samples = new ArrayList<>();
@@ -45,7 +50,7 @@ public class BlockViewOptions {
         return samples;
     }
 
-    public void setSamples(List<Sample> samples) {
+    public void setSamples(@Nullable List<Sample> samples) {
         this.samples = samples;
     }
 }

@@ -1,5 +1,6 @@
 package org.stepik.api.actions;
 
+import org.jetbrains.annotations.NotNull;
 import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.queries.attempts.StepikAttemptsPostQuery;
 
@@ -8,10 +9,11 @@ import org.stepik.api.queries.attempts.StepikAttemptsPostQuery;
  */
 public class StepikAttemptsAction extends StepikAbstractAction {
 
-    public StepikAttemptsAction(StepikApiClient stepikApiClient) {
+    public StepikAttemptsAction(@NotNull StepikApiClient stepikApiClient) {
         super(stepikApiClient);
     }
 
+    @NotNull
     public StepikAttemptsPostQuery post() {
         return new StepikAttemptsPostQuery(this);
     }

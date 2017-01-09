@@ -53,7 +53,7 @@ public class Section implements StudyItem {
 
         Lessons lessons = stepikApiClient.lessons()
                 .get()
-                .id(lessonsIds.toArray(new Integer[lessonsIds.size()]))
+                .id(lessonsIds)
                 .execute();
 
         ArrayList<Lesson> lessonsList = new ArrayList<>();

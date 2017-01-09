@@ -17,6 +17,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +58,7 @@ public class HttpTransportClient implements TransportClient {
         this(null, 0);
     }
 
-    private HttpTransportClient(String proxyHost, int proxyPort) {
+    private HttpTransportClient(@Nullable String proxyHost, int proxyPort) {
         CookieStore cookieStore = new BasicCookieStore();
         RequestConfig requestConfig = RequestConfig.custom()
                 .setSocketTimeout(SOCKET_TIMEOUT_MS)
@@ -96,6 +98,7 @@ public class HttpTransportClient implements TransportClient {
         httpClient = builder.build();
     }
 
+    @NotNull
     private static TrustManager[] getTrustAllCerts() {
         return new TrustManager[]{new X509TrustManager() {
             public X509Certificate[] getAcceptedIssuers() {
@@ -110,7 +113,7 @@ public class HttpTransportClient implements TransportClient {
         }};
     }
 
-
+    @NotNull
     public static HttpTransportClient getInstance() {
         if (instance == null) {
             instance = new HttpTransportClient();
@@ -119,7 +122,8 @@ public class HttpTransportClient implements TransportClient {
         return instance;
     }
 
-    public static HttpTransportClient getInstance(String proxyHost, int proxyPort) {
+    @NotNull
+    public static HttpTransportClient getInstance(@Nullable String proxyHost, int proxyPort) {
         Pair<String, Integer> proxy = new Pair<>(proxyHost, proxyPort);
 
         if (!instances.containsKey(proxy)) {
@@ -131,24 +135,29 @@ public class HttpTransportClient implements TransportClient {
         return instances.get(proxy);
     }
 
+    @NotNull
     @Override
-    public ClientResponse post(StepikApiClient stepikApiClient, String url, String body) throws IOException {
+    public ClientResponse post(@NotNull StepikApiClient stepikApiClient, @NotNull String url, @Nullable String body)
+            throws IOException {
         Map<String, String> headers = new HashMap<>();
         headers.put(CONTENT_TYPE_HEADER, CONTENT_TYPE);
 
         return post(stepikApiClient, url, body, headers);
     }
 
+    @NotNull
     @Override
-    public ClientResponse get(StepikApiClient stepikApiClient, String url) throws IOException {
+    public ClientResponse get(@NotNull StepikApiClient stepikApiClient, @NotNull String url) throws IOException {
         return get(stepikApiClient, url, null);
     }
 
+    @NotNull
     @Override
     public ClientResponse post(
-            StepikApiClient stepikApiClient,
-            String url, String body,
-            Map<String, String> headers)
+            @NotNull StepikApiClient stepikApiClient,
+            @NotNull String url,
+            @Nullable String body,
+            @Nullable Map<String, String> headers)
             throws IOException {
         HttpPost request = new HttpPost(url);
         if (headers != null) {
@@ -160,10 +169,11 @@ public class HttpTransportClient implements TransportClient {
         return call(stepikApiClient, request);
     }
 
+    @NotNull
     public ClientResponse get(
-            StepikApiClient stepikApiClient,
-            String url,
-            Map<String, String> headers) throws IOException {
+            @NotNull StepikApiClient stepikApiClient,
+            @NotNull String url,
+            @Nullable Map<String, String> headers) throws IOException {
         HttpGet request = new HttpGet(url);
         if (headers != null) {
             headers.entrySet().forEach(entry -> request.setHeader(entry.getKey(), entry.getValue()));
@@ -171,9 +181,10 @@ public class HttpTransportClient implements TransportClient {
         return call(stepikApiClient, request);
     }
 
+    @NotNull
     private ClientResponse call(
-            StepikApiClient stepikApiClient,
-            HttpUriRequest request) throws IOException {
+            @NotNull StepikApiClient stepikApiClient,
+            @NotNull HttpUriRequest request) throws IOException {
         HttpResponse response = httpClient.execute(request);
         int statusCode = response.getStatusLine().getStatusCode();
 
@@ -196,7 +207,8 @@ public class HttpTransportClient implements TransportClient {
         return new ClientResponse(stepikApiClient, statusCode, result.toString(), getHeaders(response.getAllHeaders()));
     }
 
-    private Map<String, String> getHeaders(Header[] headers) {
+    @NotNull
+    private Map<String, String> getHeaders(@NotNull Header[] headers) {
         Map<String, String> result = new HashMap<>();
         for (Header header : headers) {
             result.put(header.getName(), header.getValue());

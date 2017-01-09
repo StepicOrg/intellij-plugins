@@ -1,5 +1,6 @@
 package org.stepik.api.objects.courses;
 
+import org.jetbrains.annotations.NotNull;
 import org.stepik.api.objects.ObjectsContainer;
 
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import java.util.List;
 public class Courses extends ObjectsContainer {
     private List<Course> courses;
 
+    @NotNull
     public List<Course> getCourses() {
         if (courses == null) {
             courses = new ArrayList<>();
@@ -18,6 +20,7 @@ public class Courses extends ObjectsContainer {
         return courses;
     }
 
+    @NotNull
     @Override
     protected List getItems() {
         return getCourses();

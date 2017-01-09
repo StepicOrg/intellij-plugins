@@ -1,6 +1,8 @@
 package org.stepik.api.objects.steps;
 
 import com.google.gson.annotations.SerializedName;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,7 +30,7 @@ public class Step {
     @SerializedName("passed_by")
     private int passedBy;
     @SerializedName("correct_ratio")
-    private Double correctRatio;
+    private double correctRatio;
     private int worth;
     @SerializedName("is_solutions_unlocked")
     private boolean isSolutionsUnlocked;
@@ -49,6 +51,7 @@ public class Step {
     @SerializedName("discussion_threads")
     private List<String> discussionThreads;
 
+    @NotNull
     public BlockView getBlock() {
         if (block == null) {
             block = new BlockView();
@@ -56,7 +59,7 @@ public class Step {
         return block;
     }
 
-    public void setBlock(BlockView block) {
+    public void setBlock(@Nullable BlockView block) {
         this.block = block;
     }
 
@@ -76,6 +79,7 @@ public class Step {
         this.position = position;
     }
 
+    @NotNull
     public String getStatus() {
         if (status == null) {
             status = "";
@@ -83,7 +87,7 @@ public class Step {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(@Nullable String status) {
         this.status = status;
     }
 
@@ -95,6 +99,7 @@ public class Step {
         this.lesson = lesson;
     }
 
+    @NotNull
     public Map<String, String> getActions() {
         if (actions == null) {
             actions = new HashMap<>();
@@ -102,18 +107,20 @@ public class Step {
         return actions;
     }
 
-    public void setActions(Map<String, String> actions) {
+    public void setActions(@Nullable Map<String, String> actions) {
         this.actions = actions;
     }
 
+    @Nullable
     public String getProgress() {
         return progress;
     }
 
-    public void setProgress(String progress) {
+    public void setProgress(@Nullable String progress) {
         this.progress = progress;
     }
 
+    @NotNull
     public List<String> getSubscriptions() {
         if (subscriptions == null) {
             subscriptions = new ArrayList<>();
@@ -121,31 +128,34 @@ public class Step {
         return subscriptions;
     }
 
-    public void setSubscriptions(List<String> subscriptions) {
+    public void setSubscriptions(@Nullable List<String> subscriptions) {
         this.subscriptions = subscriptions;
     }
 
+    @Nullable
     public String getInstruction() {
         return instruction;
     }
 
-    public void setInstruction(String instruction) {
+    public void setInstruction(@Nullable String instruction) {
         this.instruction = instruction;
     }
 
+    @Nullable
     public String getSession() {
         return session;
     }
 
-    public void setSession(String session) {
+    public void setSession(@Nullable String session) {
         this.session = session;
     }
 
+    @Nullable
     public String getInstructionType() {
         return instructionType;
     }
 
-    public void setInstructionType(String instructionType) {
+    public void setInstructionType(@Nullable String instructionType) {
         this.instructionType = instructionType;
     }
 
@@ -165,11 +175,11 @@ public class Step {
         this.passedBy = passedBy;
     }
 
-    public Double getCorrectRatio() {
+    public double getCorrectRatio() {
         return correctRatio;
     }
 
-    public void setCorrectRatio(Double correctRatio) {
+    public void setCorrectRatio(double correctRatio) {
         this.correctRatio = correctRatio;
     }
 
@@ -213,19 +223,21 @@ public class Step {
         this.maxSubmissionsCount = maxSubmissionsCount;
     }
 
+    @Nullable
     public String getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(String createDate) {
+    public void setCreateDate(@Nullable String createDate) {
         this.createDate = createDate;
     }
 
+    @Nullable
     public String getUpdateDate() {
         return updateDate;
     }
 
-    public void setUpdateDate(String updateDate) {
+    public void setUpdateDate(@Nullable String updateDate) {
         this.updateDate = updateDate;
     }
 
@@ -237,14 +249,16 @@ public class Step {
         this.discussionsCount = discussionsCount;
     }
 
+    @Nullable
     public String getDiscussionProxy() {
         return discussionProxy;
     }
 
-    public void setDiscussionProxy(String discussionProxy) {
+    public void setDiscussionProxy(@Nullable String discussionProxy) {
         this.discussionProxy = discussionProxy;
     }
 
+    @NotNull
     public List<String> getDiscussionThreads() {
         if (discussionThreads == null) {
             discussionThreads = new ArrayList<>();
@@ -252,7 +266,7 @@ public class Step {
         return discussionThreads;
     }
 
-    public void setDiscussionThreads(List<String> discussionThreads) {
+    public void setDiscussionThreads(@Nullable List<String> discussionThreads) {
         this.discussionThreads = discussionThreads;
     }
 }

@@ -1,6 +1,7 @@
 package org.stepik.api.objects.auth;
 
 import com.google.gson.annotations.SerializedName;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @author meanmail
@@ -16,27 +17,30 @@ public class TokenInfo {
     private String refreshToken;
     private String scope;
 
+    @Nullable
     public String getAccessToken() {
         return accessToken;
     }
 
-    public void setAccessToken(String accessToken) {
+    public void setAccessToken(@Nullable String accessToken) {
         this.accessToken = accessToken;
     }
 
+    @Nullable
     public String getTokenType() {
         return tokenType;
     }
 
-    public void setTokenType(String tokenType) {
+    public void setTokenType(@Nullable String tokenType) {
         this.tokenType = tokenType;
     }
 
+    @Nullable
     public String getRefreshToken() {
         return refreshToken;
     }
 
-    public void setRefreshToken(String refreshToken) {
+    public void setRefreshToken(@Nullable String refreshToken) {
         this.refreshToken = refreshToken;
     }
 
@@ -48,11 +52,12 @@ public class TokenInfo {
         this.expiresIn = expiresIn;
     }
 
+    @Nullable
     public String getScope() {
         return scope;
     }
 
-    public void setScope(String scope) {
+    public void setScope(@Nullable String scope) {
         this.scope = scope;
     }
 }

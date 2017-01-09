@@ -1,6 +1,8 @@
 package org.stepik.api.objects.units;
 
 import com.google.gson.annotations.SerializedName;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,6 +76,7 @@ public class Unit {
         this.id = id;
     }
 
+    @NotNull
     public List<Integer> getAssignments() {
         if (assignments == null) {
             assignments = new ArrayList<>();
@@ -81,95 +84,106 @@ public class Unit {
         return assignments;
     }
 
-    public void setAssignments(List<Integer> assignments) {
+    public void setAssignments(@Nullable List<Integer> assignments) {
         this.assignments = assignments;
     }
 
+    @Nullable
     public String getProgress() {
         return progress;
     }
 
-    public void setProgress(String progress) {
+    public void setProgress(@Nullable String progress) {
         this.progress = progress;
     }
 
+    @Nullable
     public String getBeginDate() {
         return beginDate;
     }
 
-    public void setBeginDate(String beginDate) {
+    public void setBeginDate(@Nullable String beginDate) {
         this.beginDate = beginDate;
     }
 
+    @Nullable
     public String getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(String endDate) {
+    public void setEndDate(@Nullable String endDate) {
         this.endDate = endDate;
     }
 
+    @Nullable
     public String getSoftDeadline() {
         return softDeadline;
     }
 
-    public void setSoftDeadline(String softDeadline) {
+    public void setSoftDeadline(@Nullable String softDeadline) {
         this.softDeadline = softDeadline;
     }
 
+    @Nullable
     public String getHardDeadline() {
         return hardDeadline;
     }
 
-    public void setHardDeadline(String hardDeadline) {
+    public void setHardDeadline(@Nullable String hardDeadline) {
         this.hardDeadline = hardDeadline;
     }
 
+    @Nullable
     public String getGradingPolicy() {
         return gradingPolicy;
     }
 
-    public void setGradingPolicy(String gradingPolicy) {
+    public void setGradingPolicy(@Nullable String gradingPolicy) {
         this.gradingPolicy = gradingPolicy;
     }
 
+    @Nullable
     public String getBeginDateSource() {
         return beginDateSource;
     }
 
-    public void setBeginDateSource(String beginDateSource) {
+    public void setBeginDateSource(@Nullable String beginDateSource) {
         this.beginDateSource = beginDateSource;
     }
 
+    @Nullable
     public String getEndDateSource() {
         return endDateSource;
     }
 
-    public void setEndDateSource(String endDateSource) {
+    public void setEndDateSource(@Nullable String endDateSource) {
         this.endDateSource = endDateSource;
     }
 
+    @Nullable
     public String getSoftDeadlineSource() {
         return softDeadlineSource;
     }
 
-    public void setSoftDeadlineSource(String softDeadlineSource) {
+    public void setSoftDeadlineSource(@Nullable String softDeadlineSource) {
         this.softDeadlineSource = softDeadlineSource;
     }
 
+    @Nullable
     public String getHardDeadlineSource() {
         return hardDeadlineSource;
     }
 
-    public void setHardDeadlineSource(String hardDeadlineSource) {
+    public void setHardDeadlineSource(@Nullable String hardDeadlineSource) {
         this.hardDeadlineSource = hardDeadlineSource;
     }
 
+    @Nullable
     public String getGradingPolicySource() {
         return gradingPolicySource;
     }
 
-    public void setGradingPolicySource(String gradingPolicySource) {
+    public void setGradingPolicySource(@Nullable String gradingPolicySource) {
         this.gradingPolicySource = gradingPolicySource;
     }
 
@@ -181,19 +195,21 @@ public class Unit {
         isActive = active;
     }
 
+    @Nullable
     public String getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(String createDate) {
+    public void setCreateDate(@Nullable String createDate) {
         this.createDate = createDate;
     }
 
+    @Nullable
     public String getUpdateDate() {
         return updateDate;
     }
 
-    public void setUpdateDate(String updateDate) {
+    public void setUpdateDate(@Nullable String updateDate) {
         this.updateDate = updateDate;
     }
 }

@@ -1,6 +1,7 @@
 package org.stepik.api.queries;
 
 import org.apache.http.HttpHeaders;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.stepik.api.Utils;
@@ -31,25 +32,29 @@ abstract class StepikAbstractQuery<T> {
     private final QueryMethod method;
     private final Map<String, String[]> params = new HashMap<>();
 
-    StepikAbstractQuery(StepikAbstractAction stepikAction, Class<T> responseClass, QueryMethod method) {
+    StepikAbstractQuery(
+            @NotNull StepikAbstractAction stepikAction,
+            @NotNull Class<T> responseClass,
+            @NotNull QueryMethod method) {
         this.stepikAction = stepikAction;
         this.responseClass = responseClass;
         this.method = method;
     }
 
+    @NotNull
     protected StepikAbstractAction getStepikAction() {
         return stepikAction;
     }
 
-    protected void addParam(String key, String value) {
+    protected void addParam(@NotNull String key, @NotNull String value) {
         params.put(key, new String[]{value});
     }
 
-    protected void addParam(String key, boolean value) {
+    protected void addParam(@NotNull String key, boolean value) {
         params.put(key, new String[]{String.valueOf(value)});
     }
 
-    protected void addParam(String key, Integer... values) {
+    protected void addParam(@NotNull String key, @NotNull Integer... values) {
         String[] paramValues = Arrays.stream(values)
                 .map(String::valueOf)
                 .collect(Collectors.toList())
@@ -57,7 +62,7 @@ abstract class StepikAbstractQuery<T> {
         params.put(key, paramValues);
     }
 
-    protected void addParam(String key, List<Integer> values) {
+    protected void addParam(@NotNull String key, @NotNull List<Integer> values) {
         String[] paramValues = values.stream()
                 .map(String::valueOf)
                 .collect(Collectors.toList())
@@ -65,7 +70,7 @@ abstract class StepikAbstractQuery<T> {
         params.put(key, paramValues);
     }
 
-    protected void addParam(String key, int[] values) {
+    protected void addParam(@NotNull String key, @NotNull int[] values) {
         String[] paramValues = new String[values.length];
 
         for (int i = 0; i < values.length; i++) {
@@ -75,9 +80,10 @@ abstract class StepikAbstractQuery<T> {
         params.put(key, paramValues);
     }
 
-
+    @NotNull
     protected abstract String getUrl();
 
+    @NotNull
     public T execute() {
         StepikApiClient stepikApi = stepikAction.getStepikApiClient();
         TransportClient transportClient = stepikApi.getTransportClient();
@@ -117,23 +123,32 @@ abstract class StepikAbstractQuery<T> {
             throw new StepikClientException(message);
         }
 
-        return response.getBody(responseClass);
+        T result = response.getBody(responseClass);
+
+        if (result == null) {
+            throw new StepikClientException("Request successfully but the response body is null: " + url);
+        }
+        return result;
     }
 
+    @NotNull
     protected String getContentType() {
         return "application/json";
     }
 
+    @NotNull
     protected String getBody() {
         return mapToGetString();
     }
 
+    @NotNull
     private String mapToGetString() {
         return params.entrySet().stream()
                 .map(entry -> Utils.mapToGetString(entry.getKey(), entry.getValue()))
                 .collect(Collectors.joining("&"));
     }
 
+    @NotNull
     public JsonConverter getJsonConverter() {
         return getStepikAction().getStepikApiClient().getJsonConverter();
     }

@@ -1,6 +1,7 @@
 package org.stepik.api.objects.enrollments;
 
 import com.google.gson.annotations.SerializedName;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @author meanmail
@@ -39,27 +40,30 @@ public class Assignment {
         this.step = step;
     }
 
+    @Nullable
     public String getProgress() {
         return progress;
     }
 
-    public void setProgress(String progress) {
+    public void setProgress(@Nullable String progress) {
         this.progress = progress;
     }
 
+    @Nullable
     public String getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(String createDate) {
+    public void setCreateDate(@Nullable String createDate) {
         this.createDate = createDate;
     }
 
+    @Nullable
     public String getUpdateDate() {
         return updateDate;
     }
 
-    public void setUpdateDate(String updateDate) {
+    public void setUpdateDate(@Nullable String updateDate) {
         this.updateDate = updateDate;
     }
 }

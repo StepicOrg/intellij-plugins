@@ -1,17 +1,19 @@
 package org.stepik.api.actions;
 
+import org.jetbrains.annotations.NotNull;
 import org.stepik.api.client.StepikApiClient;
-import org.stepik.api.queries.sections.StepikSectionsQuery;
+import org.stepik.api.queries.sections.StepikSectionsGetQuery;
 
 /**
  * @author meanmail
  */
 public class StepikSectionsAction extends StepikAbstractAction {
-    public StepikSectionsAction(StepikApiClient stepikApiClient) {
+    public StepikSectionsAction(@NotNull StepikApiClient stepikApiClient) {
         super(stepikApiClient);
     }
 
-    public StepikSectionsQuery get() {
-        return new StepikSectionsQuery(this);
+    @NotNull
+    public StepikSectionsGetQuery get() {
+        return new StepikSectionsGetQuery(this);
     }
 }

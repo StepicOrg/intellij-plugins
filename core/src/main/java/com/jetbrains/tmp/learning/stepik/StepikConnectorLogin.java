@@ -89,7 +89,7 @@ public class StepikConnectorLogin {
         if (refreshToken != null) {
             try {
                 logger.info("Try refresh a token");
-                stepikApiClient.oauth()
+                stepikApiClient.oauth2()
                         .userAuthorizationRefresh(CLIENT_ID, refreshToken)
                         .execute();
                 logger.info("Refresh a token is successfully");
@@ -104,7 +104,7 @@ public class StepikConnectorLogin {
                 logger.info("Try execute the Authorization with a password");
                 String password = basicUser.getPassword();
                 if (password.isEmpty()) return null;
-                stepikApiClient.oauth()
+                stepikApiClient.oauth2()
                         .userAuthorizationPassword(CLIENT_ID, basicUser.getEmail(), password)
                         .execute();
                 logger.info("The Authorization with a password is successfully");

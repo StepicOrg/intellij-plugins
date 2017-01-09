@@ -1,5 +1,6 @@
 package org.stepik.api.objects.attempts;
 
+import org.jetbrains.annotations.NotNull;
 import org.stepik.api.objects.ObjectsContainer;
 
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import java.util.List;
 public class Attempts extends ObjectsContainer {
     private List<Attempt> attempts;
 
+    @NotNull
     public List<Attempt> getAttempts() {
         if (attempts == null) {
             attempts = new ArrayList<>();
@@ -18,6 +20,7 @@ public class Attempts extends ObjectsContainer {
         return attempts;
     }
 
+    @NotNull
     @Override
     protected List getItems() {
         return getAttempts();

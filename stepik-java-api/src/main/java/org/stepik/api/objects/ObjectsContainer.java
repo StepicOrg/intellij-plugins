@@ -1,5 +1,7 @@
 package org.stepik.api.objects;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.List;
 
 /**
@@ -16,8 +18,10 @@ public abstract class ObjectsContainer {
         return getCount() == 0;
     }
 
+    @NotNull
     protected abstract List getItems();
 
+    @NotNull
     public Meta getMeta() {
         if (meta == null) {
             meta = new Meta();

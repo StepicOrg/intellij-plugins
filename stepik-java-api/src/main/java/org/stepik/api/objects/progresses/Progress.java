@@ -1,6 +1,7 @@
 package org.stepik.api.objects.progresses;
 
 import com.google.gson.annotations.SerializedName;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @author meanmail
@@ -9,7 +10,7 @@ public class Progress {
     private String id;
     @SerializedName("last_viewed")
     private int lastViewed;
-    private Double score;
+    private double score;
     private int cost;
     @SerializedName("n_steps")
     private int nSteps;
@@ -18,11 +19,12 @@ public class Progress {
     @SerializedName("is_passed")
     private boolean isPassed;
 
+    @Nullable
     public String getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(@Nullable String id) {
         this.id = id;
     }
 
@@ -34,11 +36,11 @@ public class Progress {
         this.lastViewed = lastViewed;
     }
 
-    public Double getScore() {
+    public double getScore() {
         return score;
     }
 
-    public void setScore(Double score) {
+    public void setScore(double score) {
         this.score = score;
     }
 

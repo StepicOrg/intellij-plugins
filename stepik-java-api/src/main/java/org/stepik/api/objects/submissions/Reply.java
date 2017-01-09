@@ -1,5 +1,8 @@
 package org.stepik.api.objects.submissions;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,30 +20,40 @@ public class Reply {
     private List<Double> ordering;
     private String number;
 
+    @NotNull
     public String getLanguage() {
+        if (language == null) {
+            language = "";
+        }
         return language;
     }
 
-    public void setLanguage(String language) {
+    public void setLanguage(@Nullable String language) {
         this.language = language;
     }
 
+    @NotNull
     public String getCode() {
+        if (code == null) {
+            code = "";
+        }
         return code;
     }
 
-    public void setCode(String code) {
+    public void setCode(@Nullable String code) {
         this.code = code;
     }
 
+    @Nullable
     public String getFormula() {
         return formula;
     }
 
-    public void setFormula(String formula) {
+    public void setFormula(@Nullable String formula) {
         this.formula = formula;
     }
 
+    @NotNull
     public List<String> getAttachments() {
         if (attachments == null) {
             attachments = new ArrayList<>();
@@ -48,18 +61,20 @@ public class Reply {
         return attachments;
     }
 
-    public void setAttachments(List<String> attachments) {
+    public void setAttachments(@Nullable List<String> attachments) {
         this.attachments = attachments;
     }
 
+    @Nullable
     public String getText() {
         return text;
     }
 
-    public void setText(String text) {
+    public void setText(@Nullable String text) {
         this.text = text;
     }
 
+    @NotNull
     public List<String> getFiles() {
         if (files == null) {
             files = new ArrayList<>();
@@ -67,10 +82,11 @@ public class Reply {
         return files;
     }
 
-    public void setFiles(List<String> files) {
+    public void setFiles(@Nullable List<String> files) {
         this.files = files;
     }
 
+    @NotNull
     public List<Boolean> getChoices() {
         if (choices == null) {
             choices = new ArrayList<>();
@@ -78,10 +94,11 @@ public class Reply {
         return choices;
     }
 
-    public void setChoices(List<Boolean> choices) {
+    public void setChoices(@Nullable List<Boolean> choices) {
         this.choices = choices;
     }
 
+    @NotNull
     public List<Double> getOrdering() {
         if (ordering == null) {
             ordering = new ArrayList<>();
@@ -89,15 +106,16 @@ public class Reply {
         return ordering;
     }
 
-    public void setOrdering(List<Double> ordering) {
+    public void setOrdering(@Nullable List<Double> ordering) {
         this.ordering = ordering;
     }
 
+    @Nullable
     public String getNumber() {
         return number;
     }
 
-    public void setNumber(String number) {
+    public void setNumber(@Nullable String number) {
         this.number = number;
     }
 }

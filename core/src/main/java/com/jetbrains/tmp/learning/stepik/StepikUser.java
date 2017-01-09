@@ -134,10 +134,10 @@ public class StepikUser {
 
     @Override
     public String toString() {
-        return "StepikUser{" +
+        return "StepikUser {" +
                 "id=" + id +
                 ", firstName='" + firstName + '\'' +
-                ", email='" + email + '\'' +
+                ", lastName='" + lastName + '\'' +
                 '}';
     }
 

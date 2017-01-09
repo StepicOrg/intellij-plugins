@@ -1,6 +1,8 @@
 package org.stepik.api.objects.submissions;
 
 import com.google.gson.annotations.SerializedName;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @author meanmail
@@ -8,7 +10,7 @@ import com.google.gson.annotations.SerializedName;
 public class Submission {
     private int id;
     private String status;
-    private Double score;
+    private double score;
     private String hint;
     private String feedback;
     private String time;
@@ -27,22 +29,28 @@ public class Submission {
         this.id = id;
     }
 
+    @Nullable
     public String getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(@Nullable String status) {
         this.status = status;
     }
 
+    @NotNull
     public String getHint() {
+        if (hint == null) {
+            hint = "";
+        }
         return hint;
     }
 
-    public void setHint(String hint) {
+    public void setHint(@Nullable String hint) {
         this.hint = hint;
     }
 
+    @NotNull
     public Reply getReply() {
         if (reply == null) {
             reply = new Reply();
@@ -50,39 +58,42 @@ public class Submission {
         return reply;
     }
 
-    public void setReply(Reply reply) {
+    public void setReply(@Nullable Reply reply) {
         this.reply = reply;
     }
 
+    @Nullable
     public String getTime() {
         return time;
     }
 
-    public void setTime(String time) {
+    public void setTime(@Nullable String time) {
         this.time = time;
     }
 
-    public Double getScore() {
+    public double getScore() {
         return score;
     }
 
-    public void setScore(Double score) {
+    public void setScore(double score) {
         this.score = score;
     }
 
+    @Nullable
     public String getFeedback() {
         return feedback;
     }
 
-    public void setFeedback(String feedback) {
+    public void setFeedback(@Nullable String feedback) {
         this.feedback = feedback;
     }
 
+    @Nullable
     public String getReplyUrl() {
         return replyUrl;
     }
 
-    public void setReplyUrl(String replyUrl) {
+    public void setReplyUrl(@Nullable String replyUrl) {
         this.replyUrl = replyUrl;
     }
 
@@ -94,19 +105,20 @@ public class Submission {
         this.attempt = attempt;
     }
 
+    @Nullable
     public String getSession() {
         return session;
     }
 
-    public void setSession(String session) {
+    public void setSession(@Nullable String session) {
         this.session = session;
     }
 
-    public Double getEta() {
+    public double getEta() {
         return eta;
     }
 
-    public void setEta(Double eta) {
+    public void setEta(double eta) {
         this.eta = eta;
     }
 }

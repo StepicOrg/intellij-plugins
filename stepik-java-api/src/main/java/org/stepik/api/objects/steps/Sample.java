@@ -1,11 +1,15 @@
 package org.stepik.api.objects.steps;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 
 /**
  * @author meanmail
  */
 public class Sample extends ArrayList<String> {
+    @NotNull
     public String getInput() {
         if (size() == 0) {
             setInput("");
@@ -13,7 +17,10 @@ public class Sample extends ArrayList<String> {
         return get(0);
     }
 
-    public void setInput(String input) {
+    public void setInput(@Nullable String input) {
+        if (input == null) {
+            input = "";
+        }
         if (size() == 0) {
             add(input);
         } else {
@@ -21,6 +28,7 @@ public class Sample extends ArrayList<String> {
         }
     }
 
+    @NotNull
     public String getOutput() {
         if (size() < 2) {
             setOutput("");
@@ -28,7 +36,10 @@ public class Sample extends ArrayList<String> {
         return get(1);
     }
 
-    public void setOutput(String output) {
+    public void setOutput(@Nullable String output) {
+        if (output == null) {
+            output = "";
+        }
         if (size() == 0) {
             setInput("");
             add(output);

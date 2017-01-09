@@ -1,6 +1,8 @@
 package org.stepik.api.objects.users;
 
 import com.google.gson.annotations.SerializedName;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,19 +54,27 @@ public class User {
         this.id = id;
     }
 
+    @NotNull
     public String getFirstName() {
+        if (firstName == null) {
+            firstName = "";
+        }
         return firstName;
     }
 
-    public void setFirstName(String firstName) {
+    public void setFirstName(@Nullable String firstName) {
         this.firstName = firstName;
     }
 
+    @NotNull
     public String getLastName() {
+        if (lastName == null) {
+            lastName = "";
+        }
         return lastName;
     }
 
-    public void setLastName(String lastName) {
+    public void setLastName(@Nullable String lastName) {
         this.lastName = lastName;
     }
 
@@ -108,43 +118,48 @@ public class User {
         isOrganization = organization;
     }
 
+    @Nullable
     public String getShortBio() {
         return shortBio;
     }
 
-    public void setShortBio(String shortBio) {
+    public void setShortBio(@Nullable String shortBio) {
         this.shortBio = shortBio;
     }
 
+    @Nullable
     public String getDetails() {
         return details;
     }
 
-    public void setDetails(String details) {
+    public void setDetails(@Nullable String details) {
         this.details = details;
     }
 
+    @Nullable
     public String getAlias() {
         return alias;
     }
 
-    public void setAlias(String alias) {
+    public void setAlias(@Nullable String alias) {
         this.alias = alias;
     }
 
+    @Nullable
     public String getAvatar() {
         return avatar;
     }
 
-    public void setAvatar(String avatar) {
+    public void setAvatar(@Nullable String avatar) {
         this.avatar = avatar;
     }
 
+    @Nullable
     public String getCover() {
         return cover;
     }
 
-    public void setCover(String cover) {
+    public void setCover(@Nullable String cover) {
         this.cover = cover;
     }
 
@@ -156,19 +171,21 @@ public class User {
         this.level = level;
     }
 
+    @Nullable
     public String getLevelTitle() {
         return levelTitle;
     }
 
-    public void setLevelTitle(String levelTitle) {
+    public void setLevelTitle(@Nullable String levelTitle) {
         this.levelTitle = levelTitle;
     }
 
+    @Nullable
     public List<Integer> getTagProgresses() {
         return tagProgresses;
     }
 
-    public void setTagProgresses(List<Integer> tagProgresses) {
+    public void setTagProgresses(@Nullable List<Integer> tagProgresses) {
         this.tagProgresses = tagProgresses;
     }
 
@@ -204,14 +221,16 @@ public class User {
         this.reputationRank = reputationRank;
     }
 
+    @Nullable
     public String getJoinDate() {
         return joinDate;
     }
 
-    public void setJoinDate(String joinDate) {
+    public void setJoinDate(@Nullable String joinDate) {
         this.joinDate = joinDate;
     }
 
+    @NotNull
     public List<Integer> getSocialProfiles() {
         if (socialProfiles == null) {
             socialProfiles = new ArrayList<>();
@@ -219,7 +238,7 @@ public class User {
         return socialProfiles;
     }
 
-    public void setSocialProfiles(List<Integer> socialProfiles) {
+    public void setSocialProfiles(@Nullable List<Integer> socialProfiles) {
         this.socialProfiles = socialProfiles;
     }
 }

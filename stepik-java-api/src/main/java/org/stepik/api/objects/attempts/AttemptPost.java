@@ -6,11 +6,11 @@ package org.stepik.api.objects.attempts;
 public class AttemptPost {
     private int step;
 
-    public void setStep(int step) {
-        this.step = step;
-    }
-
     public int getStep() {
         return step;
+    }
+
+    public void setStep(int step) {
+        this.step = step;
     }
 }

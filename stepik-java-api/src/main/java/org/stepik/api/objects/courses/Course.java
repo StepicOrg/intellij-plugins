@@ -1,6 +1,8 @@
 package org.stepik.api.objects.courses;
 
 import com.google.gson.annotations.SerializedName;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.stepik.api.objects.steps.Video;
 
 import java.util.ArrayList;
@@ -153,6 +155,7 @@ public class Course {
         isAdaptive = adaptive;
     }
 
+    @NotNull
     public List<Integer> getAuthors() {
         if (authors == null) {
             authors = new ArrayList<>();
@@ -160,26 +163,32 @@ public class Course {
         return authors;
     }
 
-    public void setAuthors(List<Integer> authors) {
+    public void setAuthors(@Nullable List<Integer> authors) {
         this.authors = authors;
     }
 
+    @Nullable
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
+    public void setDescription(@Nullable String description) {
         this.description = description;
     }
 
+    @NotNull
     public String getTitle() {
+        if (title == null) {
+            title = "";
+        }
         return title;
     }
 
-    public void setTitle(String title) {
+    public void setTitle(@Nullable String title) {
         this.title = title;
     }
 
+    @NotNull
     public List<Integer> getSections() {
         if (sections == null) {
             sections = new ArrayList<>();
@@ -187,76 +196,85 @@ public class Course {
         return sections;
     }
 
-    public void setSections(List<Integer> sections) {
+    public void setSections(@Nullable List<Integer> sections) {
         this.sections = sections;
     }
 
+    @Nullable
     @Override
     public String toString() {
         return title;
     }
 
+    @Nullable
     public String getSummary() {
         return summary;
     }
 
-    public void setSummary(String summary) {
+    public void setSummary(@Nullable String summary) {
         this.summary = summary;
     }
 
+    @Nullable
     public String getWorkload() {
         return workload;
     }
 
-    public void setWorkload(String workload) {
+    public void setWorkload(@Nullable String workload) {
         this.workload = workload;
     }
 
+    @Nullable
     public String getCover() {
         return cover;
     }
 
-    public void setCover(String cover) {
+    public void setCover(@Nullable String cover) {
         this.cover = cover;
     }
 
+    @Nullable
     public String getIntro() {
         return intro;
     }
 
-    public void setIntro(String intro) {
+    public void setIntro(@Nullable String intro) {
         this.intro = intro;
     }
 
+    @Nullable
     public String getCourseFormat() {
         return courseFormat;
     }
 
-    public void setCourseFormat(String courseFormat) {
+    public void setCourseFormat(@Nullable String courseFormat) {
         this.courseFormat = courseFormat;
     }
 
+    @Nullable
     public String getTargetAudience() {
         return targetAudience;
     }
 
-    public void setTargetAudience(String targetAudience) {
+    public void setTargetAudience(@Nullable String targetAudience) {
         this.targetAudience = targetAudience;
     }
 
+    @Nullable
     public String getCertificateFooter() {
         return certificateFooter;
     }
 
-    public void setCertificateFooter(String certificateFooter) {
+    public void setCertificateFooter(@Nullable String certificateFooter) {
         this.certificateFooter = certificateFooter;
     }
 
+    @Nullable
     public String getCertificateCoverOrg() {
         return certificateCoverOrg;
     }
 
-    public void setCertificateCoverOrg(String certificateCoverOrg) {
+    public void setCertificateCoverOrg(@Nullable String certificateCoverOrg) {
         this.certificateCoverOrg = certificateCoverOrg;
     }
 
@@ -284,6 +302,7 @@ public class Course {
         this.certificateDistinctionThreshold = certificateDistinctionThreshold;
     }
 
+    @NotNull
     public List<Integer> getInstructors() {
         if (instructors == null) {
             instructors = new ArrayList<>();
@@ -291,23 +310,25 @@ public class Course {
         return instructors;
     }
 
-    public void setInstructors(List<Integer> instructors) {
+    public void setInstructors(@Nullable List<Integer> instructors) {
         this.instructors = instructors;
     }
 
+    @Nullable
     public String getCertificate() {
         return certificate;
     }
 
-    public void setCertificate(String certificate) {
+    public void setCertificate(@Nullable String certificate) {
         this.certificate = certificate;
     }
 
+    @Nullable
     public String getRequirements() {
         return requirements;
     }
 
-    public void setRequirements(String requirements) {
+    public void setRequirements(@Nullable String requirements) {
         this.requirements = requirements;
     }
 
@@ -335,78 +356,88 @@ public class Course {
         this.isFavorite = isFavorite;
     }
 
+    @Nullable
     public Map<String, String> getActions() {
         return actions;
     }
 
-    public void setActions(Map<String, String> actions) {
+    public void setActions(@Nullable Map<String, String> actions) {
         this.actions = actions;
     }
 
+    @Nullable
     public String getProgress() {
         return progress;
     }
 
-    public void setProgress(String progress) {
+    public void setProgress(@Nullable String progress) {
         this.progress = progress;
     }
 
+    @Nullable
     public String getCertificateLink() {
         return certificateLink;
     }
 
-    public void setCertificateLink(String certificateLink) {
+    public void setCertificateLink(@Nullable String certificateLink) {
         this.certificateLink = certificateLink;
     }
 
+    @Nullable
     public String getCertificateRegularLink() {
         return certificateRegularLink;
     }
 
-    public void setCertificateRegularLink(String certificateRegularLink) {
+    public void setCertificateRegularLink(@Nullable String certificateRegularLink) {
         this.certificateRegularLink = certificateRegularLink;
     }
 
+    @Nullable
     public String getCertificateDistinctionLink() {
         return certificateDistinctionLink;
     }
 
-    public void setCertificateDistinctionLink(String certificateDistinctionLink) {
+    public void setCertificateDistinctionLink(@Nullable String certificateDistinctionLink) {
         this.certificateDistinctionLink = certificateDistinctionLink;
     }
 
+    @Nullable
     public String getScheduleLink() {
         return scheduleLink;
     }
 
-    public void setScheduleLink(String scheduleLink) {
+    public void setScheduleLink(@Nullable String scheduleLink) {
         this.scheduleLink = scheduleLink;
     }
 
+    @Nullable
     public String getScheduleLongLink() {
         return scheduleLongLink;
     }
 
-    public void setScheduleLongLink(String scheduleLongLink) {
+    public void setScheduleLongLink(@Nullable String scheduleLongLink) {
         this.scheduleLongLink = scheduleLongLink;
     }
 
+    @Nullable
     public String getFirstDeadline() {
         return firstDeadline;
     }
 
-    public void setFirstDeadline(String firstDeadline) {
+    public void setFirstDeadline(@Nullable String firstDeadline) {
         this.firstDeadline = firstDeadline;
     }
 
+    @Nullable
     public String getLastDeadline() {
         return lastDeadline;
     }
 
-    public void setLastDeadline(String lastDeadline) {
+    public void setLastDeadline(@Nullable String lastDeadline) {
         this.lastDeadline = lastDeadline;
     }
 
+    @NotNull
     public List<String> getSubscriptions() {
         if (subscriptions == null) {
             subscriptions = new ArrayList<>();
@@ -414,10 +445,11 @@ public class Course {
         return subscriptions;
     }
 
-    public void setSubscriptions(List<String> subscriptions) {
+    public void setSubscriptions(@Nullable List<String> subscriptions) {
         this.subscriptions = subscriptions;
     }
 
+    @NotNull
     public List<Integer> getAnnouncements() {
         if (announcements == null) {
             announcements = new ArrayList<>();
@@ -425,7 +457,7 @@ public class Course {
         return announcements;
     }
 
-    public void setAnnouncements(List<Integer> announcements) {
+    public void setAnnouncements(@Nullable List<Integer> announcements) {
         this.announcements = announcements;
     }
 
@@ -453,22 +485,25 @@ public class Course {
         isIdeaCompatible = ideaCompatible;
     }
 
+    @Nullable
     public String getLastStep() {
         return lastStep;
     }
 
-    public void setLastStep(String lastStep) {
+    public void setLastStep(@Nullable String lastStep) {
         this.lastStep = lastStep;
     }
 
+    @Nullable
     public Video getIntroVideo() {
         return introVideo;
     }
 
-    public void setIntroVideo(Video introVideo) {
+    public void setIntroVideo(@Nullable Video introVideo) {
         this.introVideo = introVideo;
     }
 
+    @NotNull
     public List<String> getSocialProviders() {
         if (socialProviders == null) {
             socialProviders = new ArrayList<>();
@@ -476,10 +511,11 @@ public class Course {
         return socialProviders;
     }
 
-    public void setSocialProviders(List<String> socialProviders) {
+    public void setSocialProviders(@Nullable List<String> socialProviders) {
         this.socialProviders = socialProviders;
     }
 
+    @NotNull
     public List<Integer> getTags() {
         if (tags == null) {
             tags = new ArrayList<>();
@@ -487,7 +523,7 @@ public class Course {
         return tags;
     }
 
-    public void setTags(List<Integer> tags) {
+    public void setTags(@Nullable List<Integer> tags) {
         this.tags = tags;
     }
 
@@ -547,11 +583,12 @@ public class Course {
         this.owner = owner;
     }
 
+    @Nullable
     public String getLanguage() {
         return language;
     }
 
-    public void setLanguage(String language) {
+    public void setLanguage(@Nullable String language) {
         this.language = language;
     }
 
@@ -571,91 +608,102 @@ public class Course {
         isPublic = aPublic;
     }
 
+    @Nullable
     public String getSlug() {
         return slug;
     }
 
-    public void setSlug(String slug) {
+    public void setSlug(@Nullable String slug) {
         this.slug = slug;
     }
 
+    @Nullable
     public String getBeginDate() {
         return beginDate;
     }
 
-    public void setBeginDate(String beginDate) {
+    public void setBeginDate(@Nullable String beginDate) {
         this.beginDate = beginDate;
     }
 
+    @Nullable
     public String getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(String endDate) {
+    public void setEndDate(@Nullable String endDate) {
         this.endDate = endDate;
     }
 
+    @Nullable
     public String getSoftDeadline() {
         return softDeadline;
     }
 
-    public void setSoftDeadline(String softDeadline) {
+    public void setSoftDeadline(@Nullable String softDeadline) {
         this.softDeadline = softDeadline;
     }
 
+    @Nullable
     public String getHardDeadline() {
         return hardDeadline;
     }
 
-    public void setHardDeadline(String hardDeadline) {
+    public void setHardDeadline(@Nullable String hardDeadline) {
         this.hardDeadline = hardDeadline;
     }
 
+    @Nullable
     public String getGradingPolicy() {
         return gradingPolicy;
     }
 
-    public void setGradingPolicy(String gradingPolicy) {
+    public void setGradingPolicy(@Nullable String gradingPolicy) {
         this.gradingPolicy = gradingPolicy;
     }
 
+    @Nullable
     public String getBeginDateSource() {
         return beginDateSource;
     }
 
-    public void setBeginDateSource(String beginDateSource) {
+    public void setBeginDateSource(@Nullable String beginDateSource) {
         this.beginDateSource = beginDateSource;
     }
 
+    @Nullable
     public String getEndDateSource() {
         return endDateSource;
     }
 
-    public void setEndDateSource(String endDateSource) {
+    public void setEndDateSource(@Nullable String endDateSource) {
         this.endDateSource = endDateSource;
     }
 
+    @Nullable
     public String getSoftDeadlineSource() {
         return softDeadlineSource;
     }
 
-    public void setSoftDeadlineSource(String softDeadlineSource) {
+    public void setSoftDeadlineSource(@Nullable String softDeadlineSource) {
         this.softDeadlineSource = softDeadlineSource;
     }
 
+    @Nullable
     public String getHardDeadlineSource() {
         return hardDeadlineSource;
     }
 
-    public void setHardDeadlineSource(String hardDeadlineSource) {
+    public void setHardDeadlineSource(@Nullable String hardDeadlineSource) {
         this.hardDeadlineSource = hardDeadlineSource;
     }
 
+    @Nullable
     public String getGradingPolicySource() {
         return gradingPolicySource;
     }
 
-    public void setGradingPolicySource(String gradingPolicySource) {
+    public void setGradingPolicySource(@Nullable String gradingPolicySource) {
         this.gradingPolicySource = gradingPolicySource;
     }
 
@@ -667,59 +715,66 @@ public class Course {
         isActive = active;
     }
 
+    @Nullable
     public String getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(String createDate) {
+    public void setCreateDate(@Nullable String createDate) {
         this.createDate = createDate;
     }
 
+    @Nullable
     public String getUpdateDate() {
         return updateDate;
     }
 
-    public void setUpdateDate(String updateDate) {
+    public void setUpdateDate(@Nullable String updateDate) {
         this.updateDate = updateDate;
     }
 
+    @Nullable
     public String getLearnersGroup() {
         return learnersGroup;
     }
 
-    public void setLearnersGroup(String learnersGroup) {
+    public void setLearnersGroup(@Nullable String learnersGroup) {
         this.learnersGroup = learnersGroup;
     }
 
+    @Nullable
     public String getTestersGroup() {
         return testersGroup;
     }
 
-    public void setTestersGroup(String testersGroup) {
+    public void setTestersGroup(@Nullable String testersGroup) {
         this.testersGroup = testersGroup;
     }
 
+    @Nullable
     public String getModeratorsGroup() {
         return moderatorsGroup;
     }
 
-    public void setModeratorsGroup(String moderatorsGroup) {
+    public void setModeratorsGroup(@Nullable String moderatorsGroup) {
         this.moderatorsGroup = moderatorsGroup;
     }
 
+    @Nullable
     public String getTeachersGroup() {
         return teachersGroup;
     }
 
-    public void setTeachersGroup(String teachersGroup) {
+    public void setTeachersGroup(@Nullable String teachersGroup) {
         this.teachersGroup = teachersGroup;
     }
 
+    @Nullable
     public String getAdminsGroup() {
         return adminsGroup;
     }
 
-    public void setAdminsGroup(String adminsGroup) {
+    public void setAdminsGroup(@Nullable String adminsGroup) {
         this.adminsGroup = adminsGroup;
     }
 
@@ -731,14 +786,16 @@ public class Course {
         this.discussionsCount = discussionsCount;
     }
 
+    @Nullable
     public String getDiscussionProxy() {
         return discussionProxy;
     }
 
-    public void setDiscussionProxy(String discussionProxy) {
+    public void setDiscussionProxy(@Nullable String discussionProxy) {
         this.discussionProxy = discussionProxy;
     }
 
+    @NotNull
     public List<String> getDiscussionThreads() {
         if (discussionThreads == null) {
             discussionThreads = new ArrayList<>();
@@ -746,7 +803,7 @@ public class Course {
         return discussionThreads;
     }
 
-    public void setDiscussionThreads(List<String> discussionThreads) {
+    public void setDiscussionThreads(@Nullable List<String> discussionThreads) {
         this.discussionThreads = discussionThreads;
     }
 }

@@ -1,6 +1,7 @@
 package org.stepik.api.objects.attempts;
 
 import com.google.gson.annotations.SerializedName;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @author meanmail
@@ -25,35 +26,39 @@ public class Attempt {
         this.id = id;
     }
 
+    @Nullable
     public String getDataset() {
         return dataset;
     }
 
-    public void setDataset(String dataset) {
+    public void setDataset(@Nullable String dataset) {
         this.dataset = dataset;
     }
 
+    @Nullable
     public String getDatasetUrl() {
         return datasetUrl;
     }
 
-    public void setDatasetUrl(String datasetUrl) {
+    public void setDatasetUrl(@Nullable String datasetUrl) {
         this.datasetUrl = datasetUrl;
     }
 
+    @Nullable
     public String getTime() {
         return time;
     }
 
-    public void setTime(String time) {
+    public void setTime(@Nullable String time) {
         this.time = time;
     }
 
+    @Nullable
     public String getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(@Nullable String status) {
         this.status = status;
     }
 

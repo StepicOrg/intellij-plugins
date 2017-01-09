@@ -1,5 +1,6 @@
 package org.stepik.api.actions;
 
+import org.jetbrains.annotations.NotNull;
 import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.queries.courses.StepikCoursesGetQuery;
 
@@ -8,10 +9,11 @@ import org.stepik.api.queries.courses.StepikCoursesGetQuery;
  */
 public class StepikCoursesAction extends StepikAbstractAction {
 
-    public StepikCoursesAction(StepikApiClient stepikApiClient) {
+    public StepikCoursesAction(@NotNull StepikApiClient stepikApiClient) {
         super(stepikApiClient);
     }
 
+    @NotNull
     public StepikCoursesGetQuery get() {
         return new StepikCoursesGetQuery(this);
     }

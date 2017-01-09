@@ -1,12 +1,13 @@
 package org.stepik.api.actions;
 
+import org.jetbrains.annotations.NotNull;
 import org.stepik.api.client.StepikApiClient;
 
 /**
  * @author meanmail
  */
 public class StepikDiscussionProxiesAction extends StepikAbstractAction {
-    public StepikDiscussionProxiesAction(StepikApiClient stepikApiClient) {
+    public StepikDiscussionProxiesAction(@NotNull StepikApiClient stepikApiClient) {
         super(stepikApiClient);
     }
 }

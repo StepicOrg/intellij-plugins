@@ -1,6 +1,8 @@
 package org.stepik.api.objects.lessons;
 
 import com.google.gson.annotations.SerializedName;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -83,6 +85,7 @@ public class Lesson {
         this.title = title;
     }
 
+    @NotNull
     public List<Integer> getSteps() {
         if (steps == null) {
             steps = new ArrayList<>();
@@ -90,18 +93,20 @@ public class Lesson {
         return steps;
     }
 
-    public void setSteps(List<Integer> steps) {
+    public void setSteps(@Nullable List<Integer> steps) {
         this.steps = steps;
     }
 
+    @Nullable
     public Map<String, String> getActions() {
         return actions;
     }
 
-    public void setActions(Map<String, String> actions) {
+    public void setActions(@Nullable Map<String, String> actions) {
         this.actions = actions;
     }
 
+    @NotNull
     public List<Integer> getTags() {
         if (tags == null) {
             tags = new ArrayList<>();
@@ -109,10 +114,11 @@ public class Lesson {
         return tags;
     }
 
-    public void setTags(List<Integer> tags) {
+    public void setTags(@Nullable List<Integer> tags) {
         this.tags = tags;
     }
 
+    @NotNull
     public List<Integer> getRequiredTags() {
         if (requiredTags == null) {
             requiredTags = new ArrayList<>();
@@ -120,10 +126,11 @@ public class Lesson {
         return requiredTags;
     }
 
-    public void setRequiredTags(List<Integer> requiredTags) {
+    public void setRequiredTags(@Nullable List<Integer> requiredTags) {
         this.requiredTags = requiredTags;
     }
 
+    @NotNull
     public List<Object> getPlaylists() {
         if (playlists == null) {
             playlists = new ArrayList<>();
@@ -131,7 +138,7 @@ public class Lesson {
         return playlists;
     }
 
-    public void setPlaylists(List<Object> playlists) {
+    public void setPlaylists(@Nullable List<Object> playlists) {
         this.playlists = playlists;
     }
 
@@ -143,14 +150,16 @@ public class Lesson {
         isPrime = prime;
     }
 
+    @Nullable
     public String getProgress() {
         return progress;
     }
 
-    public void setProgress(String progress) {
+    public void setProgress(@Nullable String progress) {
         this.progress = progress;
     }
 
+    @NotNull
     public List<String> getSubscriptions() {
         if (subscriptions == null) {
             subscriptions = new ArrayList<>();
@@ -158,7 +167,7 @@ public class Lesson {
         return subscriptions;
     }
 
-    public void setSubscriptions(List<String> subscriptions) {
+    public void setSubscriptions(@Nullable List<String> subscriptions) {
         this.subscriptions = subscriptions;
     }
 
@@ -178,6 +187,7 @@ public class Lesson {
         this.passedBy = passedBy;
     }
 
+    @NotNull
     public List<String> getDependencies() {
         if (dependencies == null) {
             dependencies = new ArrayList<>();
@@ -185,10 +195,11 @@ public class Lesson {
         return dependencies;
     }
 
-    public void setDependencies(List<String> dependencies) {
+    public void setDependencies(@Nullable List<String> dependencies) {
         this.dependencies = dependencies;
     }
 
+    @NotNull
     public List<String> getFollowers() {
         if (followers == null) {
             followers = new ArrayList<>();
@@ -196,7 +207,7 @@ public class Lesson {
         return followers;
     }
 
-    public void setFollowers(List<String> followers) {
+    public void setFollowers(@Nullable List<String> followers) {
         this.followers = followers;
     }
 
@@ -208,11 +219,12 @@ public class Lesson {
         this.timeToComplete = timeToComplete;
     }
 
+    @Nullable
     public String getCoverUrl() {
         return coverUrl;
     }
 
-    public void setCoverUrl(String coverUrl) {
+    public void setCoverUrl(@Nullable String coverUrl) {
         this.coverUrl = coverUrl;
     }
 
@@ -232,11 +244,12 @@ public class Lesson {
         this.owner = owner;
     }
 
+    @Nullable
     public String getLanguage() {
         return language;
     }
 
-    public void setLanguage(String language) {
+    public void setLanguage(@Nullable String language) {
         this.language = language;
     }
 
@@ -256,67 +269,75 @@ public class Lesson {
         isPublic = aPublic;
     }
 
+    @Nullable
     public String getSlug() {
         return slug;
     }
 
-    public void setSlug(String slug) {
+    public void setSlug(@Nullable String slug) {
         this.slug = slug;
     }
 
+    @Nullable
     public String getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(String createDate) {
+    public void setCreateDate(@Nullable String createDate) {
         this.createDate = createDate;
     }
 
+    @Nullable
     public String getUpdateDate() {
         return updateDate;
     }
 
-    public void setUpdateDate(String updateDate) {
+    public void setUpdateDate(@Nullable String updateDate) {
         this.updateDate = updateDate;
     }
 
+    @Nullable
     public String getLearnersGroup() {
         return learnersGroup;
     }
 
-    public void setLearnersGroup(String learnersGroup) {
+    public void setLearnersGroup(@Nullable String learnersGroup) {
         this.learnersGroup = learnersGroup;
     }
 
+    @Nullable
     public String getTestersGroup() {
         return testersGroup;
     }
 
-    public void setTestersGroup(String testersGroup) {
+    public void setTestersGroup(@Nullable String testersGroup) {
         this.testersGroup = testersGroup;
     }
 
+    @Nullable
     public String getModeratorsGroup() {
         return moderatorsGroup;
     }
 
-    public void setModeratorsGroup(String moderatorsGroup) {
+    public void setModeratorsGroup(@Nullable String moderatorsGroup) {
         this.moderatorsGroup = moderatorsGroup;
     }
 
+    @Nullable
     public String getTeachersGroup() {
         return teachersGroup;
     }
 
-    public void setTeachersGroup(String teachersGroup) {
+    public void setTeachersGroup(@Nullable String teachersGroup) {
         this.teachersGroup = teachersGroup;
     }
 
+    @Nullable
     public String getAdminsGroup() {
         return adminsGroup;
     }
 
-    public void setAdminsGroup(String adminsGroup) {
+    public void setAdminsGroup(@Nullable String adminsGroup) {
         this.adminsGroup = adminsGroup;
     }
 
@@ -328,14 +349,16 @@ public class Lesson {
         this.discussionsCount = discussionsCount;
     }
 
+    @Nullable
     public String getDiscussionProxy() {
         return discussionProxy;
     }
 
-    public void setDiscussionProxy(String discussionProxy) {
+    public void setDiscussionProxy(@Nullable String discussionProxy) {
         this.discussionProxy = discussionProxy;
     }
 
+    @NotNull
     public List<String> getDiscussionThreads() {
         if (discussionThreads == null) {
             discussionThreads = new ArrayList<>();
@@ -343,7 +366,7 @@ public class Lesson {
         return discussionThreads;
     }
 
-    public void setDiscussionThreads(List<String> discussionThreads) {
+    public void setDiscussionThreads(@Nullable List<String> discussionThreads) {
         this.discussionThreads = discussionThreads;
     }
 
@@ -363,11 +386,12 @@ public class Lesson {
         this.abuseCount = abuseCount;
     }
 
+    @Nullable
     public String getVote() {
         return vote;
     }
 
-    public void setVote(String vote) {
+    public void setVote(@Nullable String vote) {
         this.vote = vote;
     }
 }
