@@ -125,6 +125,10 @@ abstract class StepikAbstractQuery<T> {
 
         T result = response.getBody(responseClass);
 
+        if (responseClass == VoidResult.class) {
+            //noinspection unchecked
+            return (T) new VoidResult();
+        }
         if (result == null) {
             throw new StepikClientException("Request successfully but the response body is null: " + url);
         }
