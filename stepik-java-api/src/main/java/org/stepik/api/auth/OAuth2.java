@@ -3,8 +3,8 @@ package org.stepik.api.auth;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.api.actions.StepikAbstractAction;
 import org.stepik.api.client.StepikApiClient;
-import org.stepik.api.queries.auth.UserAuthorizationRefreshPostQuery;
-import org.stepik.api.queries.auth.UserPasswordAuthorizationPostQuery;
+import org.stepik.api.queries.auth.UserAuthenticationRefreshPostQuery;
+import org.stepik.api.queries.auth.UserPasswordAuthenticationPostQuery;
 
 /**
  * @author meanmail
@@ -16,11 +16,11 @@ public class OAuth2 extends StepikAbstractAction {
     }
 
     @NotNull
-    public UserPasswordAuthorizationPostQuery userAuthorizationPassword(
+    public UserPasswordAuthenticationPostQuery userAuthenticationPassword(
             String clientId,
             String login,
             String password) {
-        UserPasswordAuthorizationPostQuery query = new UserPasswordAuthorizationPostQuery(this);
+        UserPasswordAuthenticationPostQuery query = new UserPasswordAuthenticationPostQuery(this);
 
         query.clientId(clientId);
         query.username(login);
@@ -30,8 +30,8 @@ public class OAuth2 extends StepikAbstractAction {
     }
 
     @NotNull
-    public UserAuthorizationRefreshPostQuery userAuthorizationRefresh(String clientId, String refreshToken) {
-        UserAuthorizationRefreshPostQuery query = new UserAuthorizationRefreshPostQuery(this);
+    public UserAuthenticationRefreshPostQuery userAuthenticationRefresh(String clientId, String refreshToken) {
+        UserAuthenticationRefreshPostQuery query = new UserAuthenticationRefreshPostQuery(this);
 
         query.clientId(clientId);
         query.refreshToken(refreshToken);
