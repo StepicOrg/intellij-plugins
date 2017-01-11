@@ -1,7 +1,6 @@
 package org.stepik.plugin.collective.ui;
 
 import com.intellij.ide.BrowserUtil;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.Messages;
@@ -33,7 +32,6 @@ class StepikSettingsPanel {
     private static final String DEFAULT_PASSWORD_TEXT = "************";
     private final static String AUTH_PASSWORD = "Password";
     private final static String AUTH_TOKEN = "Token";
-    private static final Logger logger = Logger.getInstance(StepikSettingsPanel.class);
     private static final String TEST_CONNECTION = "Test connection";
     private Project settingsProject;
     private JTextField emailTextField;

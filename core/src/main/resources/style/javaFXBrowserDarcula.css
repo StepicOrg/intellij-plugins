@@ -1,5 +1,5 @@
 ::-webkit-scrollbar-corner {
-background-color: #3c3f41;
+    background-color: #3c3f41;
 }
 
 body {
@@ -12,8 +12,8 @@ p img {
 }
 
 textarea {
-background-color: #3c3f41;
-color: #bababa
+    background-color: #3c3f41;
+    color: #bababa
 }
 
 a {

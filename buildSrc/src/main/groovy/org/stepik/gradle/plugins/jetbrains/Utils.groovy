@@ -374,9 +374,9 @@ class Utils {
 
     static String getDefaultArchiveType() {
         if (System.properties['os.name'].toLowerCase().contains('windows')) {
-            return  "zip"
+            return "zip"
         } else {
-            return  "tar.gz"
+            return "tar.gz"
         }
     }
 }

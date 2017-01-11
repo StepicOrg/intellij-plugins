@@ -12,7 +12,7 @@ import java.io.File;
 /**
  * @author meanmail
  */
-class ModuleBuilderWithSrc extends AbstractModuleBuilder  {
+class ModuleBuilderWithSrc extends AbstractModuleBuilder {
     @Override
     public void setupRootModel(ModifiableRootModel rootModel) throws ConfigurationException {
         super.setupRootModel(rootModel);

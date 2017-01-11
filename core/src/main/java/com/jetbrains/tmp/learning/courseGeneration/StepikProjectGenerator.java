@@ -31,25 +31,22 @@ import java.util.Optional;
 import static com.jetbrains.tmp.learning.StudyUtils.execCancelable;
 
 public class StepikProjectGenerator {
-    private static final Path CACHE_PATH = Paths.get(PathManager.getConfigPath(), "stepik-union", "cache");
-
-    private static final Logger logger = Logger.getInstance(StepikProjectGenerator.class);
     public static final Course EMPTY_COURSE = initEmptyCourse();
+    private static final Path CACHE_PATH = Paths.get(PathManager.getConfigPath(), "stepik-union", "cache");
+    private static final Logger logger = Logger.getInstance(StepikProjectGenerator.class);
+    private static StepikProjectGenerator instance;
+    @NotNull
+    private SupportedLanguages defaultLang = SupportedLanguages.INVALID;
+    @NotNull
+    private Course selectedCourseInfo = EMPTY_COURSE;
+    private StepikProjectGenerator() {
+    }
 
     private static Course initEmptyCourse() {
         Course course = new Course();
         course.setTitle("Empty");
         course.setDescription("Please, press refresh button");
         return course;
-    }
-
-    private static StepikProjectGenerator instance;
-    @NotNull
-    private SupportedLanguages defaultLang = SupportedLanguages.INVALID;
-    @NotNull
-    private Course selectedCourseInfo = EMPTY_COURSE;
-
-    private StepikProjectGenerator() {
     }
 
     public static StepikProjectGenerator getInstance() {

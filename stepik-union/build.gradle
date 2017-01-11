@@ -26,6 +26,6 @@ dependencies {
 }
 
 group 'org.stepik'
-version project.getProperties().get('pluginVersion')?:'SNAPSHOT'
+version project.getProperties().get('pluginVersion') ?: 'SNAPSHOT'
 
 defaultTasks "runIdea"

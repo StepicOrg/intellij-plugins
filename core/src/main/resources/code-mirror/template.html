@@ -1,50 +1,51 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <!--all elements like "${}" is replaced by real values while loading page in StudyBrowser-->
+    <!--all elements like "${}" is replaced by real values while loading page in StudyBrowser-->
 
-  <!--suppress HtmlUnknownTarget -->
-  <link rel="stylesheet" href="${css_oldcodemirror}">
-  <!--suppress HtmlUnknownTarget -->
-  <link rel="stylesheet" href="${css_codemirror}">
-  <!--suppress HtmlUnknownTarget -->
-  <script src="${codemirror}"></script>
-  <!--suppress HtmlUnknownTarget -->
-  <script src="${colorize}"></script>
-  <!--suppress HtmlUnknownTarget -->
-  <script src="${runmode}"></script>
-  <!--suppress HtmlUnknownTarget -->
-  <script src="${highlight_mode}"></script>
-  <!--suppress HtmlUnknownTarget -->
-  <script src="${javascript}"></script>
-  <!--suppress HtmlUnknownTarget -->
-  <script src="${language_script}"></script>
-  <!--suppress CssInvalidPropertyValue -->
-  <style media="screen" type="text/css">
-    body {
-      font-size: ${font_size}pt !important;
-    }
+    <!--suppress HtmlUnknownTarget -->
+    <link rel="stylesheet" href="${css_oldcodemirror}">
+    <!--suppress HtmlUnknownTarget -->
+    <link rel="stylesheet" href="${css_codemirror}">
+    <!--suppress HtmlUnknownTarget -->
+    <script src="${codemirror}"></script>
+    <!--suppress HtmlUnknownTarget -->
+    <script src="${colorize}"></script>
+    <!--suppress HtmlUnknownTarget -->
+    <script src="${runmode}"></script>
+    <!--suppress HtmlUnknownTarget -->
+    <script src="${highlight_mode}"></script>
+    <!--suppress HtmlUnknownTarget -->
+    <script src="${javascript}"></script>
+    <!--suppress HtmlUnknownTarget -->
+    <script src="${language_script}"></script>
+    <!--suppress CssInvalidPropertyValue -->
+    <style media="screen" type="text/css">
+        body {
+            font-size: ${font_size} pt !important;
+        }
 
-  </style>
+    </style>
 
-  <script type="text/x-mathjax-config">
+    <script type="text/x-mathjax-config">
     MathJax.Hub.Config({
       tex2jax: {inlineMath: [['$','$']], preview: "none"},
       TeX: {extensions: ["mhchem.js", "color.js"]},
       messageStyle: "none",
     });
-  </script>
-  <script type="text/javascript" async
-          src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML">
-  </script>
+
+    </script>
+    <script type="text/javascript" async
+            src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML">
+    </script>
 
 </head>
 <body>
 ${code}
 <script>
-  var nodeList = document.body.getElementsByTagName("code");
-  CodeMirror.colorize(nodeList, "${default_mode}")
-  CodeMirror.colorize();
+    var nodeList = document.body.getElementsByTagName("code");
+    CodeMirror.colorize(nodeList, "${default_mode}")
+    CodeMirror.colorize();
 </script>
 </body>
 </html>

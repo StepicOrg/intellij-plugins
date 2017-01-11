@@ -239,5 +239,5 @@ class JavaCCSettingsPanel extends ModuleWizardStep {
             }
             courseLinkDescription.setText(sb.toString());
         }
-       }
+    }
 }

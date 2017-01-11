@@ -14,7 +14,7 @@ subprojects {
     dependencies {
         testCompile 'org.hamcrest:java-hamcrest:2.0.0.0'
 
-        testCompile (group: 'junit', name: 'junit', version: '4+') {
+        testCompile(group: 'junit', name: 'junit', version: '4+') {
             exclude group: 'org.hamcrest'
         }
     }
@@ -22,12 +22,12 @@ subprojects {
     apply plugin: 'idea'
 
     tasks.withType(JavaCompile) {
-        def javaVersion = project.getProperties().get('javaVersion')?: JavaVersion.current()
+        def javaVersion = project.getProperties().get('javaVersion') ?: JavaVersion.current()
         sourceCompatibility = javaVersion
         targetCompatibility = javaVersion
     }
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = project.getProperties().get('gradleVersion')?: gradle.gradleVersion
+    gradleVersion = project.getProperties().get('gradleVersion') ?: gradle.gradleVersion
 }

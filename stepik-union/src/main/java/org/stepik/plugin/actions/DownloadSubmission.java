@@ -121,42 +121,6 @@ public class DownloadSubmission extends StudyActionWithShortcut {
                 .collect(Collectors.toList());
     }
 
-    private static class SubmissionDecorator {
-        private final Submission submission;
-
-        SubmissionDecorator(Submission submission) {
-            this.submission = submission;
-        }
-
-        private final static SimpleDateFormat timeISOFormat = getTimeISOFormat();
-        private final static SimpleDateFormat timeOutFormat = new SimpleDateFormat("dd MMM yyyy HH:mm:ss");
-
-        private static SimpleDateFormat getTimeISOFormat() {
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-            TimeZone tz = TimeZone.getTimeZone("UTC");
-            format.setTimeZone(tz);
-            return format;
-        }
-
-        @Override
-        public String toString() {
-            String localTime;
-            String time = submission.getTime();
-            try {
-                Date utcTime = timeISOFormat.parse(time);
-                localTime = timeOutFormat.format(utcTime);
-            } catch (ParseException e) {
-                localTime = time;
-            }
-
-            return String.format("#%d %-7s %s", submission.getId(), submission.getStatus(), localTime);
-        }
-
-        Submission getSubmission() {
-            return submission;
-        }
-    }
-
     private void showPopup(
             @NotNull Project project,
             @NotNull Step step,
@@ -240,6 +204,40 @@ public class DownloadSubmission extends StudyActionWithShortcut {
 
         Step targetStep = StudyUtils.getSelectedStep(project);
         e.getPresentation().setEnabled(targetStep != null);
+    }
+
+    private static class SubmissionDecorator {
+        private final static SimpleDateFormat timeISOFormat = getTimeISOFormat();
+        private final static SimpleDateFormat timeOutFormat = new SimpleDateFormat("dd MMM yyyy HH:mm:ss");
+        private final Submission submission;
+        SubmissionDecorator(Submission submission) {
+            this.submission = submission;
+        }
+
+        private static SimpleDateFormat getTimeISOFormat() {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+            TimeZone tz = TimeZone.getTimeZone("UTC");
+            format.setTimeZone(tz);
+            return format;
+        }
+
+        @Override
+        public String toString() {
+            String localTime;
+            String time = submission.getTime();
+            try {
+                Date utcTime = timeISOFormat.parse(time);
+                localTime = timeOutFormat.format(utcTime);
+            } catch (ParseException e) {
+                localTime = time;
+            }
+
+            return String.format("#%d %-7s %s", submission.getId(), submission.getStatus(), localTime);
+        }
+
+        Submission getSubmission() {
+            return submission;
+        }
     }
 
     private class Listener implements JBPopupListener {
