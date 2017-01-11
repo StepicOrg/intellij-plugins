@@ -18,7 +18,7 @@ public class User {
     @SerializedName("is_active")
     private boolean isActive;
     @SerializedName("is_guest")
-    private boolean isGuest;
+    private boolean isGuest = true;
     @SerializedName("is_organization")
     private boolean isOrganization;
     @SerializedName("short_bio")
