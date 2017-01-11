@@ -4,7 +4,6 @@ import com.intellij.util.xmlb.annotations.Transient;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.core.EduUtils;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
-import com.jetbrains.tmp.learning.stepik.StepikUser;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
@@ -18,7 +17,7 @@ import java.util.List;
 public class Course implements StudyItem {
     private org.stepik.api.objects.courses.Course data;
     @Nullable
-    private List<StepikUser> authors;
+    private List<User> authors;
     @Nullable
     private List<Section> sections;
 
@@ -36,11 +35,7 @@ public class Course implements StudyItem {
                 .id(authorsIds)
                 .execute();
 
-        ArrayList<StepikUser> authorsList = new ArrayList<>();
-        for (User user : users.getUsers()) {
-            authorsList.add(StepikUser.fromUser(user));
-        }
-        setAuthors(authorsList);
+        setAuthors(users.getUsers());
 
         List<Integer> sectionsIds = data.getSections();
         Sections sections = stepikApiClient.sections()
@@ -72,14 +67,14 @@ public class Course implements StudyItem {
 
     @SuppressWarnings("unused")
     @NotNull
-    public List<StepikUser> getAuthors() {
+    public List<User> getAuthors() {
         if (authors == null) {
             authors = new ArrayList<>();
         }
         return authors;
     }
 
-    public void setAuthors(@Nullable List<StepikUser> authors) {
+    public void setAuthors(@Nullable List<User> authors) {
         this.authors = authors;
     }
 
