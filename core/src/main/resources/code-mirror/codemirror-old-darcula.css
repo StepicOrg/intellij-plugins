@@ -62,14 +62,14 @@
     color: #dddddd;
 }
 
-.cm-s-default span.cm-comment {
+.cm-s-default span.cm-comment { 
     color: #7f7f7f;
 }
 
 .cm-s-default span.cm-string-2 {
     color: #f50;
 }
-
+    
 .cm-s-default span.cm-meta {
     color: #ba9d2a;
 }
