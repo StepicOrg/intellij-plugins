@@ -24,7 +24,7 @@ public class StudyToolWindowFactory implements ToolWindowFactory, DumbAware {
         toolWindow.setIcon(AllStepikIcons.stepikLogoSmall);
         StepikProjectManager stepManager = StepikProjectManager.getInstance(project);
         final Course course = stepManager.getCourse();
-        if (course != null || !stepManager.getUser().getEmail().isEmpty()) {
+        if (course != null) {
             logger.info("Study Tool Window is created");
             final StudyToolWindow studyToolWindow;
             if (StudyUtils.hasJavaFx()) {

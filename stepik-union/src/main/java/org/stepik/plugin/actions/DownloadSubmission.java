@@ -16,7 +16,6 @@ import com.intellij.openapi.ui.popup.JBPopupListener;
 import com.intellij.openapi.ui.popup.LightweightWindowEvent;
 import com.intellij.openapi.ui.popup.PopupChooserBuilder;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.actions.StudyActionWithShortcut;
@@ -82,7 +81,7 @@ public class DownloadSubmission extends StudyActionWithShortcut {
             return;
         }
 
-        List<Submission> submissions = getSubmissions(project, step);
+        List<Submission> submissions = getSubmissions(step);
 
         if (submissions == null) {
             return;
@@ -96,11 +95,9 @@ public class DownloadSubmission extends StudyActionWithShortcut {
     }
 
     @Nullable
-    private List<Submission> getSubmissions(
-            @NotNull Project project,
-            @NotNull Step step) {
+    private List<Submission> getSubmissions(@NotNull Step step) {
         int stepId = step.getId();
-        int userId = StepikProjectManager.getInstance(project).getUser().getId();
+        int userId = StepikConnectorLogin.getCurrentUser().getId();
 
         StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
 

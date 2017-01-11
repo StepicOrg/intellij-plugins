@@ -49,7 +49,7 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
     private StepikPyProjectGenerator() {
         super(true);
         generator = StepikProjectGenerator.getInstance();
-        pySPanel = new PyCCSettingPanel();
+        pySPanel = new PyCCSettingPanel(this);
     }
 
     @Nullable

@@ -39,7 +39,7 @@ class CourseModuleBuilder extends AbstractModuleBuilder {
             throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
         Module baseModule = super.createModule(moduleModel);
         Project project = baseModule.getProject();
-        logger.info("create module - login");
+        logger.info("Create project module");
         StepikConnectorLogin.loginFromDialog(project);
         createCourseFromGenerator(moduleModel, project);
         return baseModule;

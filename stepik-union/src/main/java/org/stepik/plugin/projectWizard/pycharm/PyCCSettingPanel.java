@@ -6,7 +6,6 @@ import com.intellij.icons.AllIcons;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.HyperlinkAdapter;
-import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.courseGeneration.StepikProjectGenerator;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
@@ -24,12 +23,13 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.List;
 
-class PyCCSettingPanel extends JPanel {
+class PyCCSettingPanel {
     final static String COURSE_LINK = "Course link";
     private final static String COURSE_LIST = "Course list";
     private final ValidationResult invalidCourse = new ValidationResult("Please select a course");
     private final ValidationResult adaptiveCourse = new ValidationResult(
             "Sorry, but we don't support adaptive courses yet");
+    private final StepikPyProjectGenerator generator;
     private JPanel mainPanel;
     private JLabel nameLabel;
     private JLabel userName;
@@ -51,7 +51,8 @@ class PyCCSettingPanel extends JPanel {
     private Course courseFromLink = StepikProjectGenerator.EMPTY_COURSE;
     private FacetValidatorsManager validationManager;
 
-    PyCCSettingPanel() {
+    PyCCSettingPanel(StepikPyProjectGenerator generator) {
+        this.generator = generator;
     }
 
     void init(Project project) {
@@ -94,7 +95,7 @@ class PyCCSettingPanel extends JPanel {
 
     private void setupGeneralSettings() {
         refreshCourseList(false);
-        userName.setText(StepikProjectManager.getInstance(project).getUser().getName());
+        userName.setText(StepikConnectorLogin.getCurrentUserFullName());
     }
 
     Course getSelectedCourse() {
@@ -117,7 +118,9 @@ class PyCCSettingPanel extends JPanel {
         courseListComboBox.removeAllItems();
         addCoursesToComboBox(courses);
         selectedCourse = courseListComboBox.getItemAt(0);
-        if (selectedCourse == null) selectedCourse = StepikProjectGenerator.EMPTY_COURSE;
+        if (selectedCourse == null) {
+            selectedCourse = StepikProjectGenerator.EMPTY_COURSE;
+        }
         courseListDescription.setText(selectedCourse.getDescription());
     }
 
@@ -130,41 +133,22 @@ class PyCCSettingPanel extends JPanel {
 
     ValidationResult check() {
         if (selectedCourse.isAdaptive()) {
-            return setError(adaptiveCourse);
+            return adaptiveCourse;
         }
         if (selectedCourse == StepikProjectGenerator.EMPTY_COURSE) {
-            return setError(invalidCourse);
-        }
-        return setOK();
-    }
-
-    private ValidationResult setError(@NotNull ValidationResult result) {
-        if (validationManager != null) {
-            validationManager.validate();
-        }
-        return result;
-    }
-
-    private ValidationResult setOK() {
-        if (validationManager != null) {
-            validationManager.validate();
+            return invalidCourse;
         }
         return ValidationResult.OK;
-    }
-
-    void registerValidators(FacetValidatorsManager manager) {
-        validationManager = manager;
     }
 
     /**
      * Listeners
      */
-
     private class RefreshActionListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             refreshCourseList(true);
-            check();
+            generator.fireStateChanged();
         }
     }
 
@@ -180,7 +164,7 @@ class PyCCSettingPanel extends JPanel {
                     ((CardLayout) courseSelectPanel.getLayout()).show(courseSelectPanel, COURSE_LINK);
                     selectedCourse = courseFromLink;
                 }
-                check();
+                generator.fireStateChanged();
             }
         }
     }
@@ -191,8 +175,8 @@ class PyCCSettingPanel extends JPanel {
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 selectedCourse = (Course) e.getItem();
                 courseListDescription.setText(selectedCourse.getDescription());
+                generator.fireStateChanged();
             }
-            check();
         }
     }
 
@@ -217,7 +201,7 @@ class PyCCSettingPanel extends JPanel {
                 courseLinkDescription.setText("Wrong link");
                 courseFromLink = StepikProjectGenerator.EMPTY_COURSE;
                 selectedCourse = StepikProjectGenerator.EMPTY_COURSE;
-                check();
+                generator.fireStateChanged();
                 return;
             }
 
@@ -225,7 +209,7 @@ class PyCCSettingPanel extends JPanel {
             courseFromLink = selectedCourse;
             courseLinkDescription.setText(String.format("<b>Course:</b> %s<br><br>%s",
                     selectedCourse.toString(), selectedCourse.getDescription()));
-            check();
+            generator.fireStateChanged();
         }
     }
 }

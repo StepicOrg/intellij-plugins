@@ -1,11 +1,7 @@
 package com.jetbrains.tmp.learning.stepik;
 
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
-import com.intellij.openapi.project.ProjectUtil;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.util.text.StringUtil;
-import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.ui.LoginPanel;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,7 +13,7 @@ public class LoginDialog extends DialogWrapper {
     LoginDialog() {
         super(false);
         loginPanel = new LoginPanel(this);
-        setTitle("Login to Stepik");
+        setTitle("Authentication at Stepik");
         setOKButtonText("Login");
         init();
     }
@@ -45,17 +41,9 @@ public class LoginDialog extends DialogWrapper {
     @Override
     protected void doOKAction() {
         if (!validateLoginAndPasswordFields()) return;
-        StepikUser basicUser = new StepikUser(loginPanel.getLogin(), loginPanel.getPassword());
-        final StepikUser user = StepikConnectorLogin.minorLogin(basicUser);
-        if (user != null) {
+        boolean authenticated = StepikConnectorLogin.authenticate(loginPanel.getLogin(), loginPanel.getPassword());
+        if (authenticated) {
             doJustOkAction();
-            final Project project = ProjectUtil.guessCurrentProject(loginPanel.getContentPanel());
-            StepikProjectManager.getInstance(project).setUser(user);
-
-            Project defaultProject = ProjectManager.getInstance().getDefaultProject();
-            if (StepikProjectManager.getInstance(defaultProject).getUser().getEmail().isEmpty()) {
-                StepikProjectManager.getInstance(defaultProject).setUser(user);
-            }
         } else {
             setErrorText("Login failed");
         }

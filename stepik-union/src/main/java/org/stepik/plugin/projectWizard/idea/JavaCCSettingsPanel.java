@@ -8,7 +8,6 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.HyperlinkAdapter;
-import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.courseGeneration.StepikProjectGenerator;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
@@ -102,7 +101,8 @@ class JavaCCSettingsPanel extends ModuleWizardStep {
     @Override
     public void updateStep() {
         StepikConnectorLogin.loginFromDialog(project);
-        userName.setText(StepikProjectManager.getInstance(project).getUser().getName());
+        String username = StepikConnectorLogin.getCurrentUserFullName();
+        userName.setText(username);
         refreshCourseList(false);
 
         langComboBox.addItem(SupportedLanguages.PYTHON);
