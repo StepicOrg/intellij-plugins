@@ -7,13 +7,16 @@ import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
 import com.intellij.util.xmlb.XmlSerializer;
 import com.intellij.util.xmlb.annotations.Transient;
 import com.jetbrains.tmp.learning.courseFormat.Course;
-import com.jetbrains.tmp.learning.stepik.StepikUser;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Implementation of class which contains all the information
@@ -25,9 +28,10 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
     private static final Logger logger = Logger.getInstance(StepikProjectManager.class);
     private static final int CURRENT_VERSION = 1;
     private final Project project;
-    private StepikUser user = new StepikUser();
     private Course course;
     private boolean showHint = true;
+    private int createdBy;
+    private int updatedBy;
     @NotNull
     private SupportedLanguages defaultLang = SupportedLanguages.INVALID;
     private int version = CURRENT_VERSION;
@@ -44,6 +48,26 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
 
     public static StepikProjectManager getInstance(@NotNull final Project project) {
         return ServiceManager.getService(project, StepikProjectManager.class);
+    }
+
+    public static StepikProjectManager getDefaultInstance() {
+        Project defaultProject = ProjectManager.getInstance().getDefaultProject();
+        return StepikProjectManager.getInstance(defaultProject);
+    }
+
+    public static List<StepikProjectManager> getOpenedInstances() {
+        Project[] openedProjects = ProjectManager.getInstance().getOpenProjects();
+
+        ArrayList<StepikProjectManager> openedInstances = new ArrayList<>();
+
+        for (Project project : openedProjects) {
+            StepikProjectManager instance = getInstance(project);
+            if (instance.course != null) {
+                openedInstances.add(instance);
+            }
+        }
+
+        return openedInstances;
     }
 
     @Nullable
@@ -85,17 +109,8 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
                 course.initCourse(true);
             }
         } catch (StudySerializationUtils.StudyUnrecognizedFormatException e) {
-            logger.warn("Failed deserialization StepikProjectManager \n"+ e.getMessage());
+            logger.warn("Failed deserialization StepikProjectManager \n" + e.getMessage());
         }
-    }
-
-    @NotNull
-    public StepikUser getUser() {
-        return user;
-    }
-
-    public void setUser(@NotNull final StepikUser user) {
-        this.user = user;
     }
 
     @NotNull
@@ -129,5 +144,24 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
     @SuppressWarnings("unused")
     public void setVersion(int version) {
         this.version = version;
+    }
+
+    public int getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(int createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public int getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(int updatedBy) {
+        this.updatedBy = updatedBy;
+        if (createdBy == 0) {
+            createdBy = updatedBy;
+        }
     }
 }
