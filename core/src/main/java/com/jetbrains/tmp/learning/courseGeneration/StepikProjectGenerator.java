@@ -6,6 +6,7 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.SupportedLanguages;
+import com.jetbrains.tmp.learning.courseFormat.CourseNode;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -38,7 +39,8 @@ public class StepikProjectGenerator {
     @NotNull
     private SupportedLanguages defaultLang = SupportedLanguages.INVALID;
     @NotNull
-    private Course selectedCourseInfo = EMPTY_COURSE;
+    private Course selectedCourse = EMPTY_COURSE;
+
     private StepikProjectGenerator() {
     }
 
@@ -60,7 +62,7 @@ public class StepikProjectGenerator {
     private static List<Course> getCourses(boolean force) {
         List<Course> courses = new ArrayList<>();
 
-        List<Integer> coursesIds = getHardcodedCoursesId();
+        List<Long> coursesIds = getHardcodedCoursesId();
 
         if (!force) {
             courses = getCoursesFromCache();
@@ -86,8 +88,8 @@ public class StepikProjectGenerator {
     }
 
     @NotNull
-    private static List<Integer> getHardcodedCoursesId() {
-        return Arrays.asList(187, 67, 512, 401, 217, 150, 125, 126, 1127);
+    private static List<Long> getHardcodedCoursesId() {
+        return Arrays.asList(187L, 67L, 512L, 401L, 217L, 150L, 125L, 126L, 1127L);
     }
 
     @NotNull
@@ -104,7 +106,7 @@ public class StepikProjectGenerator {
                         }
                         flushCourses(courses);
                         return courses;
-                    }, "Refreshing Course List", true, project);
+                    }, "Refreshing CourseNode List", true, project);
         } catch (RuntimeException e) {
             return Collections.singletonList(EMPTY_COURSE);
         }
@@ -154,7 +156,7 @@ public class StepikProjectGenerator {
         return courses;
     }
 
-    public static void downloadAndFlushCourse(@Nullable Project project, int id) {
+    public static void downloadAndFlushCourse(@Nullable Project project, long id) {
         ProgressManager.getInstance().runProcessWithProgressSynchronously(() -> {
             ProgressManager.getInstance().getProgressIndicator().setIndeterminate(true);
             return execCancelable(() -> {
@@ -170,7 +172,7 @@ public class StepikProjectGenerator {
                 flushCourse(courses.getCourses().get(0));
                 return null;
             });
-        }, "Downloading Course", true, project);
+        }, "Downloading CourseNode", true, project);
     }
 
     private static void flushCourse(Course course) {
@@ -188,9 +190,9 @@ public class StepikProjectGenerator {
 
     public void setSelectedCourse(@Nullable Course course) {
         if (course == null) {
-            selectedCourseInfo = StepikProjectGenerator.EMPTY_COURSE;
+            selectedCourse = StepikProjectGenerator.EMPTY_COURSE;
         } else {
-            selectedCourseInfo = course;
+            selectedCourse = course;
         }
     }
 
@@ -204,12 +206,12 @@ public class StepikProjectGenerator {
             return;
         }
         StepikProjectManager stepikProjectManager = StepikProjectManager.getInstance(project);
-        stepikProjectManager.setCourse(new com.jetbrains.tmp.learning.courseFormat.Course(course));
+        stepikProjectManager.setCourseNode(new CourseNode(course));
     }
 
     @Nullable
     private Course getCourse() {
-        Path courseCache = CACHE_PATH.resolve("courses").resolve(selectedCourseInfo.getId() + ".json");
+        Path courseCache = CACHE_PATH.resolve("courses").resolve(selectedCourse.getId() + ".json");
 
         if (!Files.exists(courseCache)) {
             return null;

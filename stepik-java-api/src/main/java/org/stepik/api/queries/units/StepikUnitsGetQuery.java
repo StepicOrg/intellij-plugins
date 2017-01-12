@@ -6,8 +6,6 @@ import org.stepik.api.objects.units.Units;
 import org.stepik.api.queries.StepikAbstractGetQuery;
 import org.stepik.api.urls.Urls;
 
-import java.util.List;
-
 /**
  * @author meanmail
  */
@@ -23,13 +21,7 @@ public class StepikUnitsGetQuery extends StepikAbstractGetQuery<StepikUnitsGetQu
     }
 
     @NotNull
-    public StepikUnitsGetQuery page(@NotNull List<Integer> value) {
-        addParam("page", value);
-        return this;
-    }
-
-    @NotNull
-    public StepikUnitsGetQuery lesson(int value) {
+    public StepikUnitsGetQuery lesson(long value) {
         addParam("lesson", value);
         return this;
     }

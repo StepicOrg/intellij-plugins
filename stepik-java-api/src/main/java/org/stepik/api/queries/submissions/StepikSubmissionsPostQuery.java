@@ -24,7 +24,7 @@ public class StepikSubmissionsPostQuery extends StepikAbstractPostQuery<Submissi
     }
 
     @NotNull
-    public StepikSubmissionsPostQuery attempt(int id) {
+    public StepikSubmissionsPostQuery attempt(long id) {
         submissions.getSubmission().setAttempt(id);
         return this;
     }

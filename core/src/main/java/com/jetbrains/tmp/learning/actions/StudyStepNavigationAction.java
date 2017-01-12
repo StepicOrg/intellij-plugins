@@ -10,9 +10,9 @@ import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.StudyState;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.core.EduNames;
-import com.jetbrains.tmp.learning.courseFormat.Course;
-import com.jetbrains.tmp.learning.courseFormat.Step;
+import com.jetbrains.tmp.learning.courseFormat.CourseNode;
 import com.jetbrains.tmp.learning.courseFormat.StepFile;
+import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.editor.StudyEditor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -108,7 +108,7 @@ abstract public class StudyStepNavigationAction extends StudyActionWithShortcut 
         navigateStep(project);
     }
 
-    protected abstract Step getTargetStep(@NotNull final Step sourceStep);
+    protected abstract StepNode getTargetStep(@NotNull final StepNode sourceStepNode);
 
     @Override
     public void update(AnActionEvent e) {
@@ -120,14 +120,14 @@ abstract public class StudyStepNavigationAction extends StudyActionWithShortcut 
 
         StudyEditor studyEditor = StudyUtils.getSelectedStudyEditor(project);
         StudyState studyState = new StudyState(studyEditor);
-        Course course = StepikProjectManager.getInstance(project).getCourse();
+        CourseNode courseNode = StepikProjectManager.getInstance(project).getCourseNode();
 
-        if (!studyState.isValid() && course != null) {
+        if (!studyState.isValid() && courseNode != null) {
             e.getPresentation().setEnabled(true);
             return;
         }
 
-        if (getTargetStep(studyState.getStep()) == null) {
+        if (getTargetStep(studyState.getStepNode()) == null) {
             e.getPresentation().setEnabled(false);
         }
     }

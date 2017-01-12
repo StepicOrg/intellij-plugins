@@ -3,6 +3,7 @@ package org.stepik.api.objects.units;
 import com.google.gson.annotations.SerializedName;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.api.objects.AbstractObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,8 +11,7 @@ import java.util.List;
 /**
  * @author meanmail
  */
-public class Unit {
-    private int id;
+public class Unit extends AbstractObject {
     private int section;
     private int lesson;
     private List<Integer> assignments;
@@ -66,14 +66,6 @@ public class Unit {
 
     public void setSection(int section) {
         this.section = section;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     @NotNull

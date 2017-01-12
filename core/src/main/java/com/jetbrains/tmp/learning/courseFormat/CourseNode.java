@@ -7,6 +7,8 @@ import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
+import org.stepik.api.objects.courses.Course;
+import org.stepik.api.objects.sections.Section;
 import org.stepik.api.objects.sections.Sections;
 import org.stepik.api.objects.users.User;
 import org.stepik.api.objects.users.Users;
@@ -14,22 +16,22 @@ import org.stepik.api.objects.users.Users;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Course implements StudyItem {
-    private org.stepik.api.objects.courses.Course data;
+public class CourseNode implements StudyNode {
+    private Course data;
     @Nullable
     private List<User> authors;
     @Nullable
-    private List<Section> sections;
+    private List<SectionNode> sectionNodes;
 
-    public Course() {
+    public CourseNode() {
     }
 
-    public Course(org.stepik.api.objects.courses.Course data) {
+    public CourseNode(Course data) {
         this.data = data;
 
         StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
 
-        List<Integer> authorsIds = data.getAuthors();
+        List<Long> authorsIds = data.getAuthors();
         Users users = stepikApiClient.users()
                 .get()
                 .id(authorsIds)
@@ -37,21 +39,21 @@ public class Course implements StudyItem {
 
         setAuthors(users.getUsers());
 
-        List<Integer> sectionsIds = data.getSections();
+        List<Long> sectionsIds = data.getSections();
         Sections sections = stepikApiClient.sections()
                 .get()
                 .id(sectionsIds)
                 .execute();
 
-        ArrayList<Section> sectionsList = new ArrayList<>();
-        for (org.stepik.api.objects.sections.Section section : sections.getSections()) {
-            Section item = new Section(section);
-            if (item.getLessons().size() > 0) {
+        ArrayList<SectionNode> sectionsList = new ArrayList<>();
+        for (Section section : sections.getSections()) {
+            SectionNode item = new SectionNode(section);
+            if (item.getLessonNodes().size() > 0) {
                 sectionsList.add(item);
             }
         }
 
-        setSections(sectionsList);
+        setSectionNodes(sectionsList);
 
         initCourse(true);
     }
@@ -60,8 +62,8 @@ public class Course implements StudyItem {
      * Initializes state of course
      */
     public void initCourse(boolean isRestarted) {
-        for (Section section : getSections()) {
-            section.initSection(this, isRestarted);
+        for (SectionNode sectionNode : getSectionNodes()) {
+            sectionNode.initSection(this, isRestarted);
         }
     }
 
@@ -90,31 +92,31 @@ public class Course implements StudyItem {
     }
 
     @Override
-    public int getId() {
+    public long getId() {
         return getData().getId();
     }
 
-    public void addSection(@NotNull Section section) {
-        getSections().add(section);
-        getSections().sort(StudyItemComparator.getInstance());
+    void addSection(@NotNull SectionNode sectionNode) {
+        getSectionNodes().add(sectionNode);
+        getSectionNodes().sort(StudyNodeComparator.getInstance());
     }
 
     @Nullable
-    public Section getSectionById(int id) {
-        for (Section section : getSections()) {
-            if (section.getId() == id) {
-                return section;
+    public SectionNode getSectionById(long id) {
+        for (SectionNode sectionNode : getSectionNodes()) {
+            if (sectionNode.getId() == id) {
+                return sectionNode;
             }
         }
         return null;
     }
 
     @Nullable
-    public Lesson getLessonById(int id) {
-        for (Section section : getSections()) {
-            for (Lesson lesson : section.getLessons()) {
-                if (lesson.getId() == id) {
-                    return lesson;
+    public LessonNode getLessonById(long id) {
+        for (SectionNode sectionNode : getSectionNodes()) {
+            for (LessonNode lessonNode : sectionNode.getLessonNodes()) {
+                if (lessonNode.getId() == id) {
+                    return lessonNode;
                 }
             }
         }
@@ -122,12 +124,12 @@ public class Course implements StudyItem {
     }
 
     @Nullable
-    public Step getStepById(int id) {
-        for (Section section : getSections()) {
-            for (Lesson lesson : section.getLessons()) {
-                for (Step step : lesson.getSteps()) {
-                    if (step.getId() == id) {
-                        return step;
+    public StepNode getStepById(long id) {
+        for (SectionNode sectionNode : getSectionNodes()) {
+            for (LessonNode lessonNode : sectionNode.getLessonNodes()) {
+                for (StepNode stepNode : lessonNode.getStepNodes()) {
+                    if (stepNode.getId() == id) {
+                        return stepNode;
                     }
                 }
             }
@@ -136,25 +138,25 @@ public class Course implements StudyItem {
     }
 
     @NotNull
-    public List<Section> getSections() {
-        if (sections == null) {
-            sections = new ArrayList<>();
+    public List<SectionNode> getSectionNodes() {
+        if (sectionNodes == null) {
+            sectionNodes = new ArrayList<>();
         }
-        return sections;
+        return sectionNodes;
     }
 
     @SuppressWarnings("unused")
-    public void setSections(@Nullable List<Section> sections) {
-        this.sections = sections;
+    public void setSectionNodes(@Nullable List<SectionNode> sectionNodes) {
+        this.sectionNodes = sectionNodes;
     }
 
     @Nullable
-    public Section getSectionByDirName(@NotNull String dirName) {
+    public SectionNode getSectionByDirName(@NotNull String dirName) {
         int id = EduUtils.parseDirName(dirName, EduNames.SECTION);
         return getSectionById(id);
     }
 
-    public Lesson getLessonByDirName(@NotNull String name) {
+    public LessonNode getLessonByDirName(@NotNull String name) {
         int id = EduUtils.parseDirName(name, EduNames.LESSON);
         return getLessonById(id);
     }
@@ -163,8 +165,8 @@ public class Course implements StudyItem {
     @NotNull
     @Override
     public StudyStatus getStatus() {
-        for (Section section : getSections()) {
-            if (section.getStatus() != StudyStatus.SOLVED)
+        for (SectionNode sectionNode : getSectionNodes()) {
+            if (sectionNode.getStatus() != StudyStatus.SOLVED)
                 return StudyStatus.UNCHECKED;
         }
 
@@ -187,11 +189,11 @@ public class Course implements StudyItem {
 
     @Transient
     @Nullable
-    public Section getPrevSection(@NotNull Section section) {
-        int position = section.getPosition();
-        List<Section> children = getSections();
+    public SectionNode getPrevSection(@NotNull SectionNode sectionNode) {
+        int position = sectionNode.getPosition();
+        List<SectionNode> children = getSectionNodes();
         for (int i = children.size() - 1; i >= 0; i--) {
-            Section item = children.get(i);
+            SectionNode item = children.get(i);
             if (item.getPosition() < position) {
                 return item;
             }
@@ -201,9 +203,9 @@ public class Course implements StudyItem {
 
     @Transient
     @Nullable
-    public Section getNextSection(@NotNull Section section) {
-        int position = section.getPosition();
-        for (Section item : getSections()) {
+    public SectionNode getNextSection(@NotNull SectionNode sectionNode) {
+        int position = sectionNode.getPosition();
+        for (SectionNode item : getSectionNodes()) {
             if (item.getPosition() > position) {
                 return item;
             }
@@ -211,14 +213,14 @@ public class Course implements StudyItem {
         return null;
     }
 
-    public org.stepik.api.objects.courses.Course getData() {
+    public Course getData() {
         if (data == null) {
-            data = new org.stepik.api.objects.courses.Course();
+            data = new Course();
         }
         return data;
     }
 
-    public void setData(org.stepik.api.objects.courses.Course data) {
+    public void setData(Course data) {
         this.data = data;
     }
 }

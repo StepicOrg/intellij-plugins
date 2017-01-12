@@ -5,10 +5,10 @@ import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.project.Project;
 import com.jetbrains.tmp.learning.StepikProjectManager;
-import com.jetbrains.tmp.learning.courseFormat.Course;
-import com.jetbrains.tmp.learning.courseFormat.Lesson;
-import com.jetbrains.tmp.learning.courseFormat.Section;
-import com.jetbrains.tmp.learning.courseFormat.Step;
+import com.jetbrains.tmp.learning.courseFormat.CourseNode;
+import com.jetbrains.tmp.learning.courseFormat.LessonNode;
+import com.jetbrains.tmp.learning.courseFormat.SectionNode;
+import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.navigation.StudyNavigator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -25,22 +25,22 @@ public class StepikNextStepAction extends StepikStepNavigationAction {
     }
 
     @Override
-    protected Step getTargetStep(@NotNull final Step sourceStep) {
-        return StudyNavigator.nextStep(sourceStep);
+    protected StepNode getTargetStep(@NotNull final StepNode sourceStepNode) {
+        return StudyNavigator.nextStep(sourceStepNode);
     }
 
     @Nullable
     @Override
-    protected Step getDefaultStep(@NotNull final Project project) {
-        Course course = StepikProjectManager.getInstance(project).getCourse();
-        if (course == null) {
+    protected StepNode getDefaultStep(@NotNull final Project project) {
+        CourseNode courseNode = StepikProjectManager.getInstance(project).getCourseNode();
+        if (courseNode == null) {
             return null;
         }
 
-        for (Section section : course.getSections()) {
-            for (Lesson lesson : section.getLessons()) {
-                if (lesson.getSteps().size() > 0) {
-                    return lesson.getSteps().get(0);
+        for (SectionNode sectionNode : courseNode.getSectionNodes()) {
+            for (LessonNode lessonNode : sectionNode.getLessonNodes()) {
+                if (lessonNode.getStepNodes().size() > 0) {
+                    return lessonNode.getStepNodes().get(0);
                 }
             }
         }

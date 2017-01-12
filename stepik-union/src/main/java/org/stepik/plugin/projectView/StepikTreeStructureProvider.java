@@ -8,7 +8,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.jetbrains.tmp.learning.StepikProjectManager;
-import com.jetbrains.tmp.learning.courseFormat.Course;
+import com.jetbrains.tmp.learning.courseFormat.CourseNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -58,8 +58,8 @@ abstract class StepikTreeStructureProvider implements TreeStructureProvider, Dum
             return false;
         }
         final StepikProjectManager stepikProjectManager = StepikProjectManager.getInstance(project);
-        Course course = stepikProjectManager.getCourse();
-        return course != null;
+        CourseNode courseNode = stepikProjectManager.getCourseNode();
+        return courseNode != null;
     }
 
     @Nullable

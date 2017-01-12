@@ -29,19 +29,19 @@ public class StepikSubmissionsGetQuery extends StepikAbstractGetQuery<StepikSubm
     }
 
     @NotNull
-    public StepikSubmissionsGetQuery step(int value) {
+    public StepikSubmissionsGetQuery step(long value) {
         addParam("step", value);
         return this;
     }
 
     @NotNull
-    public StepikSubmissionsGetQuery user(int value) {
+    public StepikSubmissionsGetQuery user(long value) {
         addParam("user", value);
         return this;
     }
 
     @NotNull
-    public StepikSubmissionsGetQuery attempt(int value) {
+    public StepikSubmissionsGetQuery attempt(long value) {
         addParam("attempt", value);
         return this;
     }

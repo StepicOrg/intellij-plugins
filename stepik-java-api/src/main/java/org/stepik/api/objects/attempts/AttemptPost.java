@@ -4,13 +4,13 @@ package org.stepik.api.objects.attempts;
  * @author meanmail
  */
 public class AttemptPost {
-    private int step;
+    private long step;
 
-    public int getStep() {
+    public long getStep() {
         return step;
     }
 
-    public void setStep(int step) {
+    public void setStep(long step) {
         this.step = step;
     }
 }

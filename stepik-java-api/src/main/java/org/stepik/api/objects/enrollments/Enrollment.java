@@ -1,16 +1,9 @@
 package org.stepik.api.objects.enrollments;
 
+import org.stepik.api.objects.AbstractObject;
+
 /**
  * @author meanmail
  */
-public class Enrollment {
-    private int id;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
+public class Enrollment extends AbstractObject {
 }

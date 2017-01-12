@@ -10,23 +10,23 @@ public class StepFile {
     @Nullable
     private String text;
     @Nullable
-    private Step step;
+    private StepNode stepNode;
 
     public StepFile() {
     }
 
-    public void initStepFile(@Nullable final Step step) {
-        this.step = step;
+    public void initStepFile(@Nullable final StepNode stepNode) {
+        this.stepNode = stepNode;
     }
 
     @Nullable
     @Transient
-    public Step getStep() {
-        return step;
+    public StepNode getStepNode() {
+        return stepNode;
     }
 
-    public void setStep(@Nullable Step step) {
-        this.step = step;
+    public void setStepNode(@Nullable StepNode stepNode) {
+        this.stepNode = stepNode;
     }
 
     @NotNull

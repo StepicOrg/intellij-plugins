@@ -9,8 +9,8 @@ import com.intellij.openapi.wm.ToolWindowId;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.actions.StudyStepNavigationAction;
-import com.jetbrains.tmp.learning.courseFormat.Step;
 import com.jetbrains.tmp.learning.courseFormat.StepFile;
+import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,32 +23,32 @@ public abstract class StepikStepNavigationAction extends StudyStepNavigationActi
     }
 
     @Nullable
-    protected abstract Step getDefaultStep(@NotNull final Project project);
+    protected abstract StepNode getDefaultStep(@NotNull final Project project);
 
     @Override
     public void navigateStep(@NotNull final Project project) {
-        Step currentStep = StudyUtils.getSelectedStep(project);
-        Step targetStep;
+        StepNode currentStepNode = StudyUtils.getSelectedStep(project);
+        StepNode targetStepNode;
 
-        if (currentStep == null) {
-            targetStep = getDefaultStep(project);
+        if (currentStepNode == null) {
+            targetStepNode = getDefaultStep(project);
         } else {
-            targetStep = getTargetStep(currentStep);
+            targetStepNode = getTargetStep(currentStepNode);
         }
 
-        if (targetStep == null) {
+        if (targetStepNode == null) {
             return;
         }
         for (VirtualFile file : FileEditorManager.getInstance(project).getOpenFiles()) {
             FileEditorManager.getInstance(project).closeFile(file);
         }
-        Map<String, StepFile> nextStepFiles = targetStep.getStepFiles();
+        Map<String, StepFile> nextStepFiles = targetStepNode.getStepFiles();
         VirtualFile projectDir = project.getBaseDir();
         if (projectDir == null) {
             return;
         }
 
-        VirtualFile stepDir = projectDir.findFileByRelativePath(targetStep.getPath());
+        VirtualFile stepDir = projectDir.findFileByRelativePath(targetStepNode.getPath());
         if (stepDir == null) {
             return;
         }

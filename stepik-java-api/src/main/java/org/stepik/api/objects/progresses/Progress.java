@@ -1,13 +1,12 @@
 package org.stepik.api.objects.progresses;
 
 import com.google.gson.annotations.SerializedName;
-import org.jetbrains.annotations.Nullable;
+import org.stepik.api.objects.AbstractObjectWithStringId;
 
 /**
  * @author meanmail
  */
-public class Progress {
-    private String id;
+public class Progress extends AbstractObjectWithStringId {
     @SerializedName("last_viewed")
     private int lastViewed;
     private double score;
@@ -18,15 +17,6 @@ public class Progress {
     private int nStepsPassed;
     @SerializedName("is_passed")
     private boolean isPassed;
-
-    @Nullable
-    public String getId() {
-        return id;
-    }
-
-    public void setId(@Nullable String id) {
-        this.id = id;
-    }
 
     public int getLastViewed() {
         return lastViewed;

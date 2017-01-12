@@ -31,9 +31,9 @@ import com.intellij.util.containers.hash.HashMap;
 import com.jetbrains.tmp.learning.actions.StudyActionWithShortcut;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.core.EduUtils;
-import com.jetbrains.tmp.learning.courseFormat.Course;
-import com.jetbrains.tmp.learning.courseFormat.Step;
+import com.jetbrains.tmp.learning.courseFormat.CourseNode;
 import com.jetbrains.tmp.learning.courseFormat.StepFile;
+import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.editor.StudyEditorFactoryListener;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import com.jetbrains.tmp.learning.ui.StudyToolWindow;
@@ -64,17 +64,17 @@ public class StudyProjectComponent implements ProjectComponent {
 
     @Override
     public void projectOpened() {
-        final Course course = StepikProjectManager.getInstance(project).getCourse();
+        final CourseNode courseNode = StepikProjectManager.getInstance(project).getCourseNode();
         // Check if user has javafx lib in his JDK. Now bundled JDK doesn't have this lib inside.
         if (StudyUtils.hasJavaFx()) {
             Platform.setImplicitExit(false);
         }
 
-        registerStudyToolWindow(course);
+        registerStudyToolWindow(courseNode);
         ApplicationManager.getApplication().invokeLater(
                 (DumbAwareRunnable) () -> ApplicationManager.getApplication()
                         .runWriteAction((DumbAwareRunnable) () -> {
-                            if (course != null) {
+                            if (courseNode != null) {
                                 UISettings uiSettings = UISettings.getInstance();
                                 if (uiSettings != null) {
                                     uiSettings.HIDE_TOOL_STRIPES = false;
@@ -87,8 +87,8 @@ public class StudyProjectComponent implements ProjectComponent {
                         }));
     }
 
-    public void registerStudyToolWindow(@Nullable final Course course) {
-        if (course != null) {
+    public void registerStudyToolWindow(@Nullable final CourseNode courseNode) {
+        if (courseNode != null) {
             final ToolWindowManager toolWindowManager = ToolWindowManager.getInstance(project);
             registerToolWindows(toolWindowManager);
             final ToolWindow studyToolWindow =
@@ -150,8 +150,8 @@ public class StudyProjectComponent implements ProjectComponent {
 
     @Override
     public void projectClosed() {
-        final Course course = StepikProjectManager.getInstance(project).getCourse();
-        if (course != null) {
+        final CourseNode courseNode = StepikProjectManager.getInstance(project).getCourseNode();
+        if (courseNode != null) {
             final ToolWindow toolWindow = ToolWindowManager.getInstance(project)
                     .getToolWindow(StudyToolWindowFactory.STUDY_TOOL_WINDOW);
             if (toolWindow != null) {
@@ -226,20 +226,20 @@ public class StudyProjectComponent implements ProjectComponent {
             final VirtualFile stepDir = createdFile.getParent();
 
             if (stepDir != null && stepDir.getName().contains(EduNames.STEP)) {
-                final Course course = StepikProjectManager.getInstance(project).getCourse();
-                if (course == null) {
+                final CourseNode courseNode = StepikProjectManager.getInstance(project).getCourseNode();
+                if (courseNode == null) {
                     return;
                 }
                 int stepId = EduUtils.parseDirName(stepDir.getName(), EduNames.STEP);
-                final Step step = course.getStepById(stepId);
-                if (step == null) {
+                final StepNode stepNode = courseNode.getStepById(stepId);
+                if (stepNode == null) {
                     return;
                 }
                 final StepFile stepFile = new StepFile();
-                stepFile.initStepFile(step);
+                stepFile.initStepFile(stepNode);
                 final String name = createdFile.getName();
                 stepFile.setName(name);
-                step.getStepFiles().put(name, stepFile);
+                stepNode.getStepFiles().put(name, stepFile);
             }
         }
     }

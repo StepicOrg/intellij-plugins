@@ -10,7 +10,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.util.xmlb.XmlSerializer;
 import com.intellij.util.xmlb.annotations.Transient;
-import com.jetbrains.tmp.learning.courseFormat.Course;
+import com.jetbrains.tmp.learning.courseFormat.CourseNode;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -28,10 +28,10 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
     private static final Logger logger = Logger.getInstance(StepikProjectManager.class);
     private static final int CURRENT_VERSION = 1;
     private final Project project;
-    private Course course;
+    private CourseNode courseNode;
     private boolean showHint = true;
-    private int createdBy;
-    private int updatedBy;
+    private long createdBy;
+    private long updatedBy;
     @NotNull
     private SupportedLanguages defaultLang = SupportedLanguages.INVALID;
     private int version = CURRENT_VERSION;
@@ -62,7 +62,7 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
 
         for (Project project : openedProjects) {
             StepikProjectManager instance = getInstance(project);
-            if (instance.course != null) {
+            if (instance.courseNode != null) {
                 openedInstances.add(instance);
             }
         }
@@ -71,18 +71,18 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
     }
 
     @Nullable
-    public Course getCourse() {
-        return course;
+    public CourseNode getCourseNode() {
+        return courseNode;
     }
 
-    public void setCourse(Course course) {
-        this.course = course;
+    public void setCourseNode(CourseNode courseNode) {
+        this.courseNode = courseNode;
     }
 
     @Nullable
     @Override
     public Element getState() {
-        if (course == null) {
+        if (courseNode == null) {
             return null;
         }
         Element el = new Element("stepikProjectManager");
@@ -105,8 +105,8 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
             }
             XmlSerializer.deserializeInto(this, state.getChild(StudySerializationUtils.Xml.MAIN_ELEMENT));
             this.version = CURRENT_VERSION;
-            if (course != null) {
-                course.initCourse(true);
+            if (courseNode != null) {
+                courseNode.initCourse(true);
             }
         } catch (StudySerializationUtils.StudyUnrecognizedFormatException e) {
             logger.warn("Failed deserialization StepikProjectManager \n" + e.getMessage());
@@ -146,19 +146,19 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
         this.version = version;
     }
 
-    public int getCreatedBy() {
+    public long getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(int createdBy) {
+    public void setCreatedBy(long createdBy) {
         this.createdBy = createdBy;
     }
 
-    public int getUpdatedBy() {
+    public long getUpdatedBy() {
         return updatedBy;
     }
 
-    public void setUpdatedBy(int updatedBy) {
+    public void setUpdatedBy(long updatedBy) {
         this.updatedBy = updatedBy;
         if (createdBy == 0) {
             createdBy = updatedBy;

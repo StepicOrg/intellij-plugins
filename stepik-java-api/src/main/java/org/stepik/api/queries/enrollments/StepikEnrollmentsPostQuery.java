@@ -18,7 +18,7 @@ public class StepikEnrollmentsPostQuery extends StepikAbstractPostQuery<Enrollme
     }
 
     @NotNull
-    public StepikEnrollmentsPostQuery course(int id) {
+    public StepikEnrollmentsPostQuery course(long id) {
         enrollment.getEnrollment().setCourse(id);
         return this;
     }

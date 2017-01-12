@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class SubmissionPost {
     private Reply reply;
-    private int attempt;
+    private long attempt;
 
     @NotNull
     public Reply getReply() {
@@ -17,11 +17,11 @@ public class SubmissionPost {
         return reply;
     }
 
-    public int getAttempt() {
+    public long getAttempt() {
         return attempt;
     }
 
-    public void setAttempt(int attempt) {
+    public void setAttempt(long attempt) {
         this.attempt = attempt;
     }
 }

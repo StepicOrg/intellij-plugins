@@ -5,7 +5,7 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFileSystemItem;
 import com.jetbrains.tmp.learning.StepikProjectManager;
-import com.jetbrains.tmp.learning.courseFormat.Course;
+import com.jetbrains.tmp.learning.courseFormat.CourseNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.core.utils.ProjectFilesUtils;
@@ -32,8 +32,8 @@ public class ProjectPsiFilesUtils {
         }
 
         Project project = target.getProject();
-        final Course course = StepikProjectManager.getInstance(project).getCourse();
-        if (course == null) {
+        final CourseNode courseNode = StepikProjectManager.getInstance(project).getCourseNode();
+        if (courseNode == null) {
             return false;
         }
 
@@ -67,8 +67,8 @@ public class ProjectPsiFilesUtils {
             return false;
         }
         Project project = element.getProject();
-        Course course = StepikProjectManager.getInstance(project).getCourse();
-        if (course == null) {
+        CourseNode courseNode = StepikProjectManager.getInstance(project).getCourseNode();
+        if (courseNode == null) {
             return false;
         }
         PsiFileSystemItem file = getFile(element);
@@ -76,7 +76,7 @@ public class ProjectPsiFilesUtils {
             return false;
         }
         String path = getRelativePath(file);
-        return ProjectFilesUtils.isNotMovableOrRenameElement(course, path);
+        return ProjectFilesUtils.isNotMovableOrRenameElement(courseNode, path);
     }
 
 }

@@ -3,6 +3,7 @@ package org.stepik.api.objects.courses;
 import com.google.gson.annotations.SerializedName;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.api.objects.AbstractObject;
 import org.stepik.api.objects.steps.Video;
 
 import java.util.ArrayList;
@@ -12,8 +13,7 @@ import java.util.Map;
 /**
  * @author meanmail
  */
-public class Course {
-    private int id;
+public class Course extends AbstractObject {
     private String summary;
     private String workload;
     private String cover;
@@ -36,7 +36,7 @@ public class Course {
     private String certificate;
     private String requirements;
     private String description;
-    private List<Integer> sections;
+    private List<Long> sections;
     @SerializedName("total_units")
     private int totalUnits;
     private int enrollment;
@@ -74,7 +74,7 @@ public class Course {
     private Video introVideo;
     @SerializedName("social_providers")
     private List<String> socialProviders;
-    private List<Integer> authors;
+    private List<Long> authors;
     private List<Integer> tags;
     @SerializedName("has_tutors")
     private boolean hasTutors;
@@ -139,14 +139,6 @@ public class Course {
     @SerializedName("discussion_threads")
     private List<String> discussionThreads;
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public boolean isAdaptive() {
         return isAdaptive;
     }
@@ -156,14 +148,14 @@ public class Course {
     }
 
     @NotNull
-    public List<Integer> getAuthors() {
+    public List<Long> getAuthors() {
         if (authors == null) {
             authors = new ArrayList<>();
         }
         return authors;
     }
 
-    public void setAuthors(@Nullable List<Integer> authors) {
+    public void setAuthors(@Nullable List<Long> authors) {
         this.authors = authors;
     }
 
@@ -189,14 +181,14 @@ public class Course {
     }
 
     @NotNull
-    public List<Integer> getSections() {
+    public List<Long> getSections() {
         if (sections == null) {
             sections = new ArrayList<>();
         }
         return sections;
     }
 
-    public void setSections(@Nullable List<Integer> sections) {
+    public void setSections(@Nullable List<Long> sections) {
         this.sections = sections;
     }
 

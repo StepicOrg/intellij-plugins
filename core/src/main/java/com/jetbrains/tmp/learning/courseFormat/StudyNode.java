@@ -2,7 +2,7 @@ package com.jetbrains.tmp.learning.courseFormat;
 
 import org.jetbrains.annotations.NotNull;
 
-public interface StudyItem {
+public interface StudyNode {
     @NotNull
     String getName();
 
@@ -17,5 +17,5 @@ public interface StudyItem {
     @NotNull
     String getPath();
 
-    int getId();
+    long getId();
 }

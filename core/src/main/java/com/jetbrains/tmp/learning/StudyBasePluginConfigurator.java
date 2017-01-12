@@ -6,7 +6,7 @@ import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.jetbrains.tmp.learning.courseFormat.Step;
+import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.ui.StudyToolWindow;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -42,8 +42,8 @@ public abstract class StudyBasePluginConfigurator implements StudyPluginConfigur
         return new FileEditorManagerListener() {
             @Override
             public void fileOpened(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
-                Step step = StudyUtils.getStep(source.getProject(), file);
-                setStepText(step);
+                StepNode stepNode = StudyUtils.getStep(source.getProject(), file);
+                setStepText(stepNode);
             }
 
             @Override
@@ -60,13 +60,13 @@ public abstract class StudyBasePluginConfigurator implements StudyPluginConfigur
             public void selectionChanged(@NotNull FileEditorManagerEvent event) {
                 VirtualFile file = event.getNewFile();
                 if (file != null) {
-                    Step step = StudyUtils.getStep(event.getManager().getProject(), file);
-                    setStepText(step);
+                    StepNode stepNode = StudyUtils.getStep(event.getManager().getProject(), file);
+                    setStepText(stepNode);
                 }
             }
 
-            private void setStepText(@Nullable final Step step) {
-                String text = StudyUtils.getStepTextFromStep(step);
+            private void setStepText(@Nullable final StepNode stepNode) {
+                String text = StudyUtils.getStepTextFromStep(stepNode);
                 if (text == null) {
                     toolWindow.setEmptyText();
                     return;

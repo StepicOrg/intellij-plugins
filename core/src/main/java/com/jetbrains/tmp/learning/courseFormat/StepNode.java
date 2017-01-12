@@ -9,17 +9,18 @@ import org.stepik.api.objects.steps.BlockView;
 import org.stepik.api.objects.steps.BlockViewOptions;
 import org.stepik.api.objects.steps.Limit;
 import org.stepik.api.objects.steps.Sample;
+import org.stepik.api.objects.steps.Step;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Step implements StudyItem {
+public class StepNode implements StudyNode {
     @Nullable
     private StudyStatus status;
     @Nullable
-    private Lesson lesson;
+    private LessonNode lessonNode;
     @Nullable
     private Map<String, StepFile> stepFiles;
     @Nullable
@@ -29,11 +30,11 @@ public class Step implements StudyItem {
     @Nullable
     private SupportedLanguages currentLang;
     private StepType type;
-    private org.stepik.api.objects.steps.Step data;
+    private Step data;
 
-    public Step() {}
+    public StepNode() {}
 
-    public Step(org.stepik.api.objects.steps.Step data) {
+    public StepNode(Step data) {
         this.data = data;
 
         setStatus(StudyStatus.UNCHECKED);
@@ -53,7 +54,7 @@ public class Step implements StudyItem {
                 StepFile stepFile = new StepFile();
                 stepFile.setName(language.getMainFileName());
                 stepFile.setText(entry.getValue());
-                stepFile.setStep(this);
+                stepFile.setStepNode(this);
 
                 stepFiles.put(language.getMainFileName(), stepFile);
             });
@@ -67,8 +68,8 @@ public class Step implements StudyItem {
         }
     }
 
-    void initStep(@Nullable final Lesson lesson, boolean isRestarted) {
-        setLesson(lesson);
+    void initStep(@Nullable final LessonNode lessonNode, boolean isRestarted) {
+        setLessonNode(lessonNode);
         if (!isRestarted) {
             status = StudyStatus.UNCHECKED;
         }
@@ -107,32 +108,32 @@ public class Step implements StudyItem {
 
     @Nullable
     @Transient
-    public Lesson getLesson() {
-        return lesson;
+    public LessonNode getLessonNode() {
+        return lessonNode;
     }
 
     @Transient
-    public void setLesson(@Nullable Lesson lesson) {
-        this.lesson = lesson;
+    public void setLessonNode(@Nullable LessonNode lessonNode) {
+        this.lessonNode = lessonNode;
     }
 
     @Transient
     @Nullable
-    public Course getCourse() {
-        if (lesson == null) {
+    public CourseNode getCourse() {
+        if (lessonNode == null) {
             return null;
         }
-        return lesson.getCourse();
+        return lessonNode.getCourse();
     }
 
     @Transient
     @Override
-    public int getId() {
+    public long getId() {
         return getData().getId();
     }
 
     @Transient
-    public void setId(int id) {
+    public void setId(long id) {
         getData().setId(id);
     }
 
@@ -158,8 +159,8 @@ public class Step implements StudyItem {
     @NotNull
     @Override
     public String getPath() {
-        if (lesson != null) {
-            return lesson.getPath() + "/" + getDirectory();
+        if (lessonNode != null) {
+            return lessonNode.getPath() + "/" + getDirectory();
         } else {
             return getDirectory();
         }
@@ -243,14 +244,14 @@ public class Step implements StudyItem {
         this.type = type;
     }
 
-    public org.stepik.api.objects.steps.Step getData() {
+    public Step getData() {
         if (data == null) {
-            data = new org.stepik.api.objects.steps.Step();
+            data = new Step();
         }
         return data;
     }
 
-    public void setData(org.stepik.api.objects.steps.Step data) {
+    public void setData(Step data) {
         this.data = data;
     }
 

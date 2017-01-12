@@ -3,6 +3,7 @@ package org.stepik.api.objects.steps;
 import com.google.gson.annotations.SerializedName;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.api.objects.AbstractObjectWithStringId;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,22 +11,13 @@ import java.util.List;
 /**
  * @author meanmail
  */
-public class Video {
-    private String id;
+public class Video extends AbstractObjectWithStringId {
     private String thumbnail;
     private List<VideoUrl> urls;
     private String status;
     @SerializedName("upload_date")
     private String uploadDate;
     private String filename;
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
 
     @Nullable
     public String getThumbnail() {

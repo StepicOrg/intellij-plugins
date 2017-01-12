@@ -20,10 +20,11 @@ import com.jetbrains.python.remote.PyProjectSynchronizer;
 import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.StudyProjectComponent;
 import com.jetbrains.tmp.learning.SupportedLanguages;
-import com.jetbrains.tmp.learning.courseFormat.Lesson;
-import com.jetbrains.tmp.learning.courseFormat.Section;
-import com.jetbrains.tmp.learning.courseFormat.Step;
+import com.jetbrains.tmp.learning.courseFormat.CourseNode;
+import com.jetbrains.tmp.learning.courseFormat.LessonNode;
+import com.jetbrains.tmp.learning.courseFormat.SectionNode;
 import com.jetbrains.tmp.learning.courseFormat.StepFile;
+import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.courseGeneration.StepikProjectGenerator;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import icons.AllStepikIcons;
@@ -123,39 +124,39 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
 
         StepikProjectManager stepManager = StepikProjectManager.getInstance(project);
         stepManager.setDefaultLang(generator.getDefaultLang());
-        com.jetbrains.tmp.learning.courseFormat.Course course = stepManager.getCourse();
-        if (course == null) {
+        CourseNode courseNode = stepManager.getCourseNode();
+        if (courseNode == null) {
             logger.warn("failed to generate builders");
             return;
         }
 
         FileUtil.createDirectory(new File(project.getBasePath(), "Sandbox"));
 
-        createSubDirectories(course, project);
+        createSubDirectories(courseNode, project);
 
         ApplicationManager.getApplication().invokeLater(
                 () -> DumbService.allowStartingDumbModeInside(DumbModePermission.MAY_START_BACKGROUND,
                         () -> ApplicationManager.getApplication().runWriteAction(
                                 () -> StudyProjectComponent.getInstance(project)
-                                        .registerStudyToolWindow(course))));
+                                        .registerStudyToolWindow(courseNode))));
     }
 
     private void createSubDirectories(
-            @NotNull com.jetbrains.tmp.learning.courseFormat.Course course,
+            @NotNull CourseNode courseNode,
             @NotNull Project project) {
-        for (Section section : course.getSections()) {
-            FileUtil.createDirectory(new File(project.getBasePath(), section.getPath()));
-            for (Lesson lesson : section.getLessons()) {
-                FileUtil.createDirectory(new File(project.getBasePath(), lesson.getPath()));
-                for (Step step : lesson.getSteps()) {
-                    step.setCurrentLang(SupportedLanguages.PYTHON);
-                    File stepDir = new File(project.getBasePath(), step.getPath());
+        for (SectionNode sectionNode : courseNode.getSectionNodes()) {
+            FileUtil.createDirectory(new File(project.getBasePath(), sectionNode.getPath()));
+            for (LessonNode lessonNode : sectionNode.getLessonNodes()) {
+                FileUtil.createDirectory(new File(project.getBasePath(), lessonNode.getPath()));
+                for (StepNode stepNode : lessonNode.getStepNodes()) {
+                    stepNode.setCurrentLang(SupportedLanguages.PYTHON);
+                    File stepDir = new File(project.getBasePath(), stepNode.getPath());
                     File srcDir = new File(stepDir, "src");
                     FileUtil.createDirectory(stepDir);
                     FileUtil.createDirectory(srcDir);
 
                     try (BufferedWriter writer = new BufferedWriter(new FileWriter(new File(srcDir, "main.py")))) {
-                        StepFile stepFile = step.getFile("main.py");
+                        StepFile stepFile = stepNode.getFile("main.py");
                         if (stepFile != null) {
                             writer.write(stepFile.getText());
                         }

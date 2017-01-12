@@ -15,8 +15,8 @@ import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.actions.StudyCheckAction;
 import com.jetbrains.tmp.learning.checker.StudyCheckUtils;
 import com.jetbrains.tmp.learning.core.EduNames;
-import com.jetbrains.tmp.learning.courseFormat.Course;
-import com.jetbrains.tmp.learning.courseFormat.Step;
+import com.jetbrains.tmp.learning.courseFormat.CourseNode;
+import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
@@ -52,22 +52,22 @@ public class StepikJavaPostAction extends StudyCheckAction {
                         return;
                     }
 
-                    Step step = StudyUtils.getSelectedStep(project);
-                    if (step == null) {
+                    StepNode stepNode = StudyUtils.getSelectedStep(project);
+                    if (stepNode == null) {
                         return;
                     }
 
-                    if (!checkLangSettings(step, project)) {
+                    if (!checkLangSettings(stepNode, project)) {
                         return;
                     }
                     StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
-                    int intAttemptId;
+                    long intAttemptId;
                     StepikClientException exception = null;
                     Attempts attempts = null;
                     try {
                         attempts = stepikApiClient.attempts()
                                 .post()
-                                .step(step.getId())
+                                .step(stepNode.getId())
                                 .execute();
                     } catch (StepikClientException e) {
                         exception = e;
@@ -77,19 +77,18 @@ public class StepikJavaPostAction extends StudyCheckAction {
                         logger.warn("Failed post attempt ", exception);
                         Notification notification = new Notification(
                                 "Step.sending",
-                                step.getName() + " Failed send",
+                                stepNode.getName() + " Failed send",
                                 "Did't send",
                                 NotificationType.ERROR);
                         notification.notify(project);
                         return;
                     }
                     intAttemptId = attempts.getAttempts().get(0).getId();
-                    String attemptId = Integer.toString(intAttemptId);
 
-                    SupportedLanguages currentLang = step.getCurrentLang();
+                    SupportedLanguages currentLang = stepNode.getCurrentLang();
                     String activateFileName = currentLang.getMainFileName();
 
-                    String mainFilePath = String.join("/", step.getPath(), EduNames.SRC, activateFileName);
+                    String mainFilePath = String.join("/", stepNode.getPath(), EduNames.SRC, activateFileName);
                     VirtualFile mainFile = project.getBaseDir().findFileByRelativePath(mainFilePath);
                     if (mainFile == null) {
                         return;
@@ -114,28 +113,28 @@ public class StepikJavaPostAction extends StudyCheckAction {
                         logger.warn("Failed post submission ", exception);
                         Notification notification = new Notification(
                                 "Step.sending",
-                                step.getName() + " Failed send",
+                                stepNode.getName() + " Failed send",
                                 "Did't send",
                                 NotificationType.ERROR);
                         notification.notify(project);
                         return;
                     }
                     List<Submission> submissionsList = submissions.getSubmissions();
-                    Course course = step.getCourse();
+                    CourseNode courseNode = stepNode.getCourse();
                     stepikApiClient.metrics()
                             .post()
                             .name("ide_plugin")
                             .tags("name", "S_Union")
                             .tags("action", "send")
-                            .data("courseId", course != null ? course.getId() : 0)
-                            .data("stepId", step.getId())
+                            .data("courseId", courseNode != null ? courseNode.getId() : 0)
+                            .data("stepId", stepNode.getId())
                             .execute();
 
-                    int submissionId = submissionsList.get(0).getId();
+                    long submissionId = submissionsList.get(0).getId();
                     logger.info("submissionId = " + submissionId);
 
                     final Application application = ApplicationManager.getApplication();
-                    final int finalSubmissionId = submissionId;
+                    final long finalSubmissionId = submissionId;
                     application.executeOnPooledThread(
                             () -> {
                                 String stepStatus = "evaluation";
@@ -170,15 +169,15 @@ public class StepikJavaPostAction extends StudyCheckAction {
                                 if ("correct".equals(stepStatus)) {
                                     notificationType = NotificationType.INFORMATION;
                                     hint = "Success!";
-                                    step.setStatus(StudyStatus.SOLVED);
+                                    stepNode.setStatus(StudyStatus.SOLVED);
                                 } else {
                                     notificationType = NotificationType.WARNING;
-                                    if (step.getStatus() != StudyStatus.SOLVED)
-                                        step.setStatus(StudyStatus.FAILED);
+                                    if (stepNode.getStatus() != StudyStatus.SOLVED)
+                                        stepNode.setStatus(StudyStatus.FAILED);
                                 }
                                 Notification notification = new Notification(
                                         "Step.sending",
-                                        step.getName() + " is " + stepStatus,
+                                        stepNode.getName() + " is " + stepStatus,
                                         hint,
                                         notificationType);
                                 notification.notify(project);
@@ -197,7 +196,7 @@ public class StepikJavaPostAction extends StudyCheckAction {
             return;
         }
 
-        Step targetStep = StudyUtils.getSelectedStep(project);
-        e.getPresentation().setEnabled(targetStep != null);
+        StepNode targetStepNode = StudyUtils.getSelectedStep(project);
+        e.getPresentation().setEnabled(targetStepNode != null);
     }
 }

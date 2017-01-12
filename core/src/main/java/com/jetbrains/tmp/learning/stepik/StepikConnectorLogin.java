@@ -39,7 +39,7 @@ public class StepikConnectorLogin {
         Project defaultProject = ProjectManager.getInstance().getDefaultProject();
         StepikProjectManager stepikProjectManager = StepikProjectManager.getInstance(defaultProject);
 
-        int lastUserId = stepikProjectManager.getUpdatedBy();
+        long lastUserId = stepikProjectManager.getUpdatedBy();
 
         AuthInfo authInfo = getAuthInfo(lastUserId);
 
@@ -49,7 +49,7 @@ public class StepikConnectorLogin {
     }
 
     public static void loginFromDialog(@NotNull final Project project) {
-        int userId = StepikProjectManager.getInstance(project).getUpdatedBy();
+        long userId = StepikProjectManager.getInstance(project).getUpdatedBy();
         AuthInfo authInfo = getAuthInfo(userId);
         if (!minorLogin(authInfo.getUsername(), authInfo.getPassword())) {
             ApplicationManager.getApplication().invokeAndWait(() -> {
@@ -96,7 +96,7 @@ public class StepikConnectorLogin {
     }
 
     @NotNull
-    private static AuthInfo getAuthInfo(int userId) {
+    private static AuthInfo getAuthInfo(long userId) {
         String serviceName = StepikProjectManager.class.getName();
         CredentialAttributes attributes = new CredentialAttributes(serviceName,
                 String.valueOf(userId),
@@ -122,7 +122,7 @@ public class StepikConnectorLogin {
         return getAuthInfo(currentUser.getId()).getPassword();
     }
 
-    private static void setAuthInfo(int userId, @NotNull final AuthInfo authInfo) {
+    private static void setAuthInfo(long userId, @NotNull final AuthInfo authInfo) {
         String serviceName = StepikProjectManager.class.getName();
         CredentialAttributes attributes = new CredentialAttributes(serviceName,
                 String.valueOf(userId),
@@ -179,7 +179,7 @@ public class StepikConnectorLogin {
             authInfo.setUsername(username);
             authInfo.setPassword(password);
 
-            int userId = getCurrentUser().getId();
+            long userId = getCurrentUser().getId();
             setAuthInfo(userId, authInfo);
 
             StepikProjectManager.getDefaultInstance().setUpdatedBy(userId);

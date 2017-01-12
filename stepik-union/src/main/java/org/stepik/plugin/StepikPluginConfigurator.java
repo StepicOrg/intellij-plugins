@@ -4,7 +4,7 @@ import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.project.Project;
 import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.StudyBasePluginConfigurator;
-import com.jetbrains.tmp.learning.courseFormat.Course;
+import com.jetbrains.tmp.learning.courseFormat.CourseNode;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.plugin.actions.DownloadSubmission;
 import org.stepik.plugin.actions.InsertStepikDirectives;
@@ -42,9 +42,9 @@ public class StepikPluginConfigurator extends StudyBasePluginConfigurator {
         StepikProjectManager stepikProjectManager = StepikProjectManager.getInstance(project);
         if (stepikProjectManager == null)
             return false;
-        Course course = stepikProjectManager.getCourse();
+        CourseNode courseNode = stepikProjectManager.getCourseNode();
 
-        return course != null;
+        return courseNode != null;
     }
 
     @NotNull

@@ -3,6 +3,7 @@ package org.stepik.api.objects.sections;
 import com.google.gson.annotations.SerializedName;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.api.objects.AbstractObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,10 +12,9 @@ import java.util.Map;
 /**
  * @author meanmail
  */
-public class Section {
-    private int id;
+public class Section extends AbstractObject {
     private int course;
-    private List<Integer> units;
+    private List<Long> units;
     private int position;
     @SerializedName("discounting_policy")
     private String discountingPolicy;
@@ -64,23 +64,15 @@ public class Section {
     @SerializedName("update_date")
     private String updateDate;
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
     @NotNull
-    public List<Integer> getUnits() {
+    public List<Long> getUnits() {
         if (units == null) {
             units = new ArrayList<>();
         }
         return units;
     }
 
-    public void setUnits(@Nullable List<Integer> units) {
+    public void setUnits(@Nullable List<Long> units) {
         this.units = units;
     }
 

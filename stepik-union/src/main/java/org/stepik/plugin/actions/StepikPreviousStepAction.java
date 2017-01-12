@@ -5,10 +5,10 @@ import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.project.Project;
 import com.jetbrains.tmp.learning.StepikProjectManager;
-import com.jetbrains.tmp.learning.courseFormat.Course;
-import com.jetbrains.tmp.learning.courseFormat.Lesson;
-import com.jetbrains.tmp.learning.courseFormat.Section;
-import com.jetbrains.tmp.learning.courseFormat.Step;
+import com.jetbrains.tmp.learning.courseFormat.CourseNode;
+import com.jetbrains.tmp.learning.courseFormat.LessonNode;
+import com.jetbrains.tmp.learning.courseFormat.SectionNode;
+import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.navigation.StudyNavigator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -26,27 +26,27 @@ public class StepikPreviousStepAction extends StepikStepNavigationAction {
     }
 
     @Override
-    protected Step getTargetStep(@NotNull final Step sourceStep) {
-        return StudyNavigator.previousStep(sourceStep);
+    protected StepNode getTargetStep(@NotNull final StepNode sourceStepNode) {
+        return StudyNavigator.previousStep(sourceStepNode);
     }
 
     @Nullable
     @Override
-    protected Step getDefaultStep(@NotNull final Project project) {
-        Course course = StepikProjectManager.getInstance(project).getCourse();
-        if (course == null) {
+    protected StepNode getDefaultStep(@NotNull final Project project) {
+        CourseNode courseNode = StepikProjectManager.getInstance(project).getCourseNode();
+        if (courseNode == null) {
             return null;
         }
 
-        List<Section> sections = course.getSections();
+        List<SectionNode> sectionNodes = courseNode.getSectionNodes();
 
-        for (int i = sections.size() - 1; i >= 0; i--) {
-            List<Lesson> lessons = sections.get(i).getLessons();
-            for (int j = lessons.size() - 1; i >= 0; i--) {
-                Lesson lesson = lessons.get(j);
-                Step step = lesson.getLastStep();
-                if (step != null) {
-                    return step;
+        for (int i = sectionNodes.size() - 1; i >= 0; i--) {
+            List<LessonNode> lessonNodes = sectionNodes.get(i).getLessonNodes();
+            for (int j = lessonNodes.size() - 1; i >= 0; i--) {
+                LessonNode lessonNode = lessonNodes.get(j);
+                StepNode stepNode = lessonNode.getLastStep();
+                if (stepNode != null) {
+                    return stepNode;
                 }
             }
         }

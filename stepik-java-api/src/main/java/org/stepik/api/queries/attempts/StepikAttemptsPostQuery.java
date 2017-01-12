@@ -18,7 +18,7 @@ public class StepikAttemptsPostQuery extends StepikAbstractPostQuery<Attempts> {
     }
 
     @NotNull
-    public StepikAttemptsPostQuery step(int id) {
+    public StepikAttemptsPostQuery step(long id) {
         attempts.getAttempt().setStep(id);
         return this;
     }

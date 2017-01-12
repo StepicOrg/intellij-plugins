@@ -3,6 +3,7 @@ package org.stepik.api.objects.steps;
 import com.google.gson.annotations.SerializedName;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.api.objects.AbstractObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,8 +13,7 @@ import java.util.Map;
 /**
  * @author meanmail
  */
-public class Step {
-    private int id;
+public class Step extends AbstractObject {
     private int lesson;
     private int position;
     private String status;
@@ -61,14 +61,6 @@ public class Step {
 
     public void setBlock(@Nullable BlockView block) {
         this.block = block;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public int getPosition() {

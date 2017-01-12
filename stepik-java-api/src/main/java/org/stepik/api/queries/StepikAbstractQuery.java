@@ -54,6 +54,14 @@ abstract class StepikAbstractQuery<T> {
         params.put(key, new String[]{String.valueOf(value)});
     }
 
+    protected void addParam(@NotNull String key, @NotNull Long... values) {
+        String[] paramValues = Arrays.stream(values)
+                .map(String::valueOf)
+                .collect(Collectors.toList())
+                .toArray(new String[values.length]);
+        params.put(key, paramValues);
+    }
+
     protected void addParam(@NotNull String key, @NotNull Integer... values) {
         String[] paramValues = Arrays.stream(values)
                 .map(String::valueOf)
@@ -62,7 +70,7 @@ abstract class StepikAbstractQuery<T> {
         params.put(key, paramValues);
     }
 
-    protected void addParam(@NotNull String key, @NotNull List<Integer> values) {
+    protected void addParam(@NotNull String key, @NotNull List<Long> values) {
         String[] paramValues = values.stream()
                 .map(String::valueOf)
                 .collect(Collectors.toList())
@@ -70,7 +78,7 @@ abstract class StepikAbstractQuery<T> {
         params.put(key, paramValues);
     }
 
-    protected void addParam(@NotNull String key, @NotNull int[] values) {
+    protected void addParam(@NotNull String key, @NotNull long[] values) {
         String[] paramValues = new String[values.length];
 
         for (int i = 0; i < values.length; i++) {

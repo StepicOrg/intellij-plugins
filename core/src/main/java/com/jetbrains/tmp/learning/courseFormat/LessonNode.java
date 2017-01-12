@@ -7,50 +7,52 @@ import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
+import org.stepik.api.objects.lessons.Lesson;
+import org.stepik.api.objects.steps.Step;
 import org.stepik.api.objects.steps.Steps;
 import org.stepik.api.objects.units.Unit;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Lesson implements StudyItem {
+public class LessonNode implements StudyNode {
     @Nullable
-    private Section section;
+    private SectionNode sectionNode;
     @Nullable
-    private List<Step> steps;
-    private org.stepik.api.objects.lessons.Lesson data;
+    private List<StepNode> stepNodes;
+    private Lesson data;
     private Unit unit;
 
-    public Lesson() {
+    public LessonNode() {
     }
 
-    public Lesson(@NotNull org.stepik.api.objects.lessons.Lesson data, Unit unit) {
+    public LessonNode(@NotNull Lesson data, Unit unit) {
         this.data = data;
         this.unit = unit;
 
         StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
 
-        List<Integer> stepsIds = data.getSteps();
+        List<Long> stepsIds = data.getSteps();
         Steps steps = stepikApiClient.steps()
                 .get()
                 .id(stepsIds)
                 .execute();
 
-        ArrayList<Step> stepList = new ArrayList<>();
-        for (org.stepik.api.objects.steps.Step step : steps.getSteps()) {
-            Step item = new Step(step);
+        ArrayList<StepNode> stepNodeList = new ArrayList<>();
+        for (Step step : steps.getSteps()) {
+            StepNode item = new StepNode(step);
             if (item.getType() == StepType.CODE) {
-                stepList.add(item);
+                stepNodeList.add(item);
             }
         }
 
-        setSteps(stepList);
+        setStepNodes(stepNodeList);
     }
 
-    void initLesson(@Nullable final Section section, boolean isRestarted) {
-        setSection(section);
-        for (Step step : getSteps()) {
-            step.initStep(this, isRestarted);
+    void initLesson(@Nullable final SectionNode sectionNode, boolean isRestarted) {
+        setSectionNode(sectionNode);
+        for (StepNode stepNode : getStepNodes()) {
+            stepNode.initStep(this, isRestarted);
         }
     }
 
@@ -61,28 +63,28 @@ public class Lesson implements StudyItem {
     }
 
     @NotNull
-    public List<Step> getSteps() {
-        if (steps == null) {
-            steps = new ArrayList<>();
+    public List<StepNode> getStepNodes() {
+        if (stepNodes == null) {
+            stepNodes = new ArrayList<>();
         }
-        return steps;
+        return stepNodes;
     }
 
     @SuppressWarnings("unused")
-    public void setSteps(@Nullable List<Step> steps) {
-        this.steps = steps;
+    public void setStepNodes(@Nullable List<StepNode> stepNodes) {
+        this.stepNodes = stepNodes;
     }
 
-    public void addStep(@NotNull final Step step) {
-        getSteps().add(step);
+    public void addStep(@NotNull final StepNode stepNode) {
+        getStepNodes().add(stepNode);
     }
 
     @Nullable
-    public Step getStep(@NotNull final String name) {
+    public StepNode getStep(@NotNull final String name) {
         int id = EduUtils.parseDirName(name, EduNames.STEP);
-        for (Step step : getSteps()) {
-            if (step.getId() == id) {
-                return step;
+        for (StepNode stepNode : getStepNodes()) {
+            if (stepNode.getId() == id) {
+                return stepNode;
             }
         }
         return null;
@@ -91,8 +93,8 @@ public class Lesson implements StudyItem {
     @NotNull
     @Override
     public StudyStatus getStatus() {
-        for (Step step : getSteps()) {
-            if (step.getStatus() != StudyStatus.SOLVED) {
+        for (StepNode stepNode : getStepNodes()) {
+            if (stepNode.getStatus() != StudyStatus.SOLVED) {
                 return StudyStatus.UNCHECKED;
             }
         }
@@ -108,41 +110,41 @@ public class Lesson implements StudyItem {
     @NotNull
     @Override
     public String getPath() {
-        if (section != null) {
-            return section.getPath() + "/" + getDirectory();
+        if (sectionNode != null) {
+            return sectionNode.getPath() + "/" + getDirectory();
         } else {
             return getDirectory();
         }
     }
 
     @Transient
-    public int getId() {
+    public long getId() {
         return getData().getId();
     }
 
     @Transient
-    public void setId(int id) {
+    public void setId(long id) {
         getData().setId(id);
     }
 
     @Nullable
     @Transient
-    public Course getCourse() {
-        if (section == null) {
+    public CourseNode getCourse() {
+        if (sectionNode == null) {
             return null;
         }
-        return section.getCourse();
+        return sectionNode.getCourseNode();
     }
 
     @Nullable
     @Transient
-    public Section getSection() {
-        return section;
+    public SectionNode getSectionNode() {
+        return sectionNode;
     }
 
     @Transient
-    public void setSection(@Nullable Section section) {
-        this.section = section;
+    public void setSectionNode(@Nullable SectionNode sectionNode) {
+        this.sectionNode = sectionNode;
     }
 
     @Transient
@@ -157,23 +159,23 @@ public class Lesson implements StudyItem {
 
     @Override
     public String toString() {
-        return "Lesson {id=" + getId() + ", name='" + getName() + "\'}";
+        return "LessonNode {id=" + getId() + ", name='" + getName() + "\'}";
     }
 
     @Transient
     @Nullable
-    public Step getLastStep() {
-        int stepsCount = getSteps().size();
+    public StepNode getLastStep() {
+        int stepsCount = getStepNodes().size();
         if (stepsCount == 0) {
             return null;
         }
-        return getSteps().get(stepsCount - 1);
+        return getStepNodes().get(stepsCount - 1);
     }
 
     @Transient
     @Nullable
-    public Step getFirstStep() {
-        List<Step> children = getSteps();
+    public StepNode getFirstStep() {
+        List<StepNode> children = getStepNodes();
         if (children.size() == 0) {
             return null;
         }
@@ -183,11 +185,11 @@ public class Lesson implements StudyItem {
 
     @Transient
     @Nullable
-    public Step getPrevStep(@NotNull Step step) {
-        int position = step.getPosition();
-        List<Step> children = getSteps();
+    public StepNode getPrevStep(@NotNull StepNode stepNode) {
+        int position = stepNode.getPosition();
+        List<StepNode> children = getStepNodes();
         for (int i = children.size() - 1; i >= 0; i--) {
-            Step item = children.get(i);
+            StepNode item = children.get(i);
             if (item.getPosition() < position) {
                 return item;
             }
@@ -197,9 +199,9 @@ public class Lesson implements StudyItem {
 
     @Transient
     @Nullable
-    public Step getNextStep(@NotNull Step lesson) {
+    public StepNode getNextStep(@NotNull StepNode lesson) {
         int position = lesson.getPosition();
-        for (Step item : getSteps()) {
+        for (StepNode item : getStepNodes()) {
             if (item.getPosition() > position) {
                 return item;
             }
@@ -207,14 +209,14 @@ public class Lesson implements StudyItem {
         return null;
     }
 
-    public org.stepik.api.objects.lessons.Lesson getData() {
+    public Lesson getData() {
         if (data == null) {
-            data = new org.stepik.api.objects.lessons.Lesson();
+            data = new Lesson();
         }
         return data;
     }
 
-    public void setData(org.stepik.api.objects.lessons.Lesson data) {
+    public void setData(Lesson data) {
         this.data = data;
     }
 

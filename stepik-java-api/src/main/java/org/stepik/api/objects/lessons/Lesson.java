@@ -3,6 +3,7 @@ package org.stepik.api.objects.lessons;
 import com.google.gson.annotations.SerializedName;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.api.objects.AbstractObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,9 +12,8 @@ import java.util.Map;
 /**
  * @author meanmail
  */
-public class Lesson {
-    private int id;
-    private List<Integer> steps;
+public class Lesson extends AbstractObject {
+    private List<Long> steps;
     private Map<String, String> actions;
     private List<Integer> tags;
     @SerializedName("required_tags")
@@ -69,14 +69,6 @@ public class Lesson {
     private int abuseCount;
     private String vote;
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public String getTitle() {
         return title;
     }
@@ -86,14 +78,14 @@ public class Lesson {
     }
 
     @NotNull
-    public List<Integer> getSteps() {
+    public List<Long> getSteps() {
         if (steps == null) {
             steps = new ArrayList<>();
         }
         return steps;
     }
 
-    public void setSteps(@Nullable List<Integer> steps) {
+    public void setSteps(@Nullable List<Long> steps) {
         this.steps = steps;
     }
 

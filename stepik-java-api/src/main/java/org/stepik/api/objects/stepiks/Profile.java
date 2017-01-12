@@ -2,14 +2,14 @@ package org.stepik.api.objects.stepiks;
 
 import com.google.gson.annotations.SerializedName;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.api.objects.AbstractObject;
 
 import java.util.List;
 
 /**
  * @author meanmail
  */
-public class Profile {
-    private int id;
+public class Profile extends AbstractObject {
     @SerializedName("first_name")
     private String firstName;
     @SerializedName("last_name")
@@ -64,14 +64,6 @@ public class Profile {
     private String balance;
     @SerializedName("subscription_plan")
     private String subscriptionPlan;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
     @Nullable
     public String getFirstName() {

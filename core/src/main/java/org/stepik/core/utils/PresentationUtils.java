@@ -1,10 +1,10 @@
 package org.stepik.core.utils;
 
 import com.intellij.ui.JBColor;
-import com.jetbrains.tmp.learning.courseFormat.Course;
-import com.jetbrains.tmp.learning.courseFormat.Lesson;
-import com.jetbrains.tmp.learning.courseFormat.Section;
-import com.jetbrains.tmp.learning.courseFormat.Step;
+import com.jetbrains.tmp.learning.courseFormat.CourseNode;
+import com.jetbrains.tmp.learning.courseFormat.LessonNode;
+import com.jetbrains.tmp.learning.courseFormat.SectionNode;
+import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
 import icons.AllStepikIcons;
 import org.jetbrains.annotations.NotNull;
@@ -38,13 +38,13 @@ public class PresentationUtils {
 
         Icon[] set;
 
-        if (subjectClass == Step.class) {
+        if (subjectClass == StepNode.class) {
             set = icons[3];
-        } else if (subjectClass == Lesson.class) {
+        } else if (subjectClass == LessonNode.class) {
             set = icons[2];
-        } else if (subjectClass == Section.class) {
+        } else if (subjectClass == SectionNode.class) {
             set = icons[1];
-        } else if (subjectClass == Course.class) {
+        } else if (subjectClass == CourseNode.class) {
             set = icons[0];
         } else
             return null;

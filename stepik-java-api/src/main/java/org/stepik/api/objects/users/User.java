@@ -3,6 +3,7 @@ package org.stepik.api.objects.users;
 import com.google.gson.annotations.SerializedName;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.api.objects.AbstractObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,8 +11,7 @@ import java.util.List;
 /**
  * @author meanmail
  */
-public class User {
-    private int id;
+public class User extends AbstractObject {
     private int profile;
     @SerializedName("is_private")
     private boolean isPrivate;
@@ -45,14 +45,6 @@ public class User {
     private String joinDate;
     @SerializedName("social_profiles")
     private List<Integer> socialProfiles;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
     @NotNull
     public String getFirstName() {
@@ -180,8 +172,11 @@ public class User {
         this.levelTitle = levelTitle;
     }
 
-    @Nullable
+    @NotNull
     public List<Integer> getTagProgresses() {
+        if (tagProgresses == null) {
+            tagProgresses = new ArrayList<>();
+        }
         return tagProgresses;
     }
 

@@ -21,8 +21,8 @@ import com.intellij.problems.WolfTheProblemSolver;
 import com.jetbrains.tmp.learning.StudyState;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.actions.StudyActionWithShortcut;
-import com.jetbrains.tmp.learning.courseFormat.Step;
 import com.jetbrains.tmp.learning.courseFormat.StepFile;
+import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
 import com.jetbrains.tmp.learning.editor.StudyEditor;
 import icons.AllStepikIcons;
@@ -74,9 +74,9 @@ public class StepikResetStepAction extends StudyActionWithShortcut {
             @NotNull final Project project,
             StepFile stepFile) {
         resetDocument(document, stepFile, project);
-        Step step = stepFile.getStep();
-        if (step != null) {
-            step.setStatus(StudyStatus.UNCHECKED);
+        StepNode stepNode = stepFile.getStepNode();
+        if (stepNode != null) {
+            stepNode.setStatus(StudyStatus.UNCHECKED);
         }
         ProjectView.getInstance(project).refresh();
         StudyUtils.updateToolWindows(project);

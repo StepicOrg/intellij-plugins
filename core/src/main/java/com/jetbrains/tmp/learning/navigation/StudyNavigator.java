@@ -1,9 +1,9 @@
 package com.jetbrains.tmp.learning.navigation;
 
-import com.jetbrains.tmp.learning.courseFormat.Course;
-import com.jetbrains.tmp.learning.courseFormat.Lesson;
-import com.jetbrains.tmp.learning.courseFormat.Section;
-import com.jetbrains.tmp.learning.courseFormat.Step;
+import com.jetbrains.tmp.learning.courseFormat.CourseNode;
+import com.jetbrains.tmp.learning.courseFormat.LessonNode;
+import com.jetbrains.tmp.learning.courseFormat.SectionNode;
+import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -12,31 +12,31 @@ public class StudyNavigator {
     }
 
     @Nullable
-    private static Step navigate(@NotNull final Step step, @NotNull Direction direction) {
-        Lesson lesson = step.getLesson();
-        if (lesson == null) {
+    private static StepNode navigate(@NotNull final StepNode stepNode, @NotNull Direction direction) {
+        LessonNode lessonNode = stepNode.getLessonNode();
+        if (lessonNode == null) {
             return null;
         }
-        Step item = null;
+        StepNode item = null;
         switch (direction) {
             case BACK:
-                item = lesson.getPrevStep(step);
+                item = lessonNode.getPrevStep(stepNode);
                 break;
             case FORWARD:
-                item = lesson.getNextStep(step);
+                item = lessonNode.getNextStep(stepNode);
                 break;
         }
         if (item != null) {
             return item;
         }
 
-        while ((lesson = navigate(lesson, direction)) != null) {
+        while ((lessonNode = navigate(lessonNode, direction)) != null) {
             switch (direction) {
                 case BACK:
-                    item = lesson.getLastStep();
+                    item = lessonNode.getLastStep();
                     break;
                 case FORWARD:
-                    item = lesson.getFirstStep();
+                    item = lessonNode.getFirstStep();
                     break;
             }
             if (item != null) {
@@ -47,31 +47,31 @@ public class StudyNavigator {
     }
 
     @Nullable
-    private static Lesson navigate(@NotNull final Lesson lesson, @NotNull Direction direction) {
-        Section section = lesson.getSection();
-        if (section == null) {
+    private static LessonNode navigate(@NotNull final LessonNode lessonNode, @NotNull Direction direction) {
+        SectionNode sectionNode = lessonNode.getSectionNode();
+        if (sectionNode == null) {
             return null;
         }
-        Lesson item = null;
+        LessonNode item = null;
         switch (direction) {
             case BACK:
-                item = section.getPrevLesson(lesson);
+                item = sectionNode.getPrevLesson(lessonNode);
                 break;
             case FORWARD:
-                item = section.getNextLesson(lesson);
+                item = sectionNode.getNextLesson(lessonNode);
                 break;
         }
         if (item != null) {
             return item;
         }
 
-        while ((section = navigate(section, direction)) != null) {
+        while ((sectionNode = navigate(sectionNode, direction)) != null) {
             switch (direction) {
                 case BACK:
-                    item = section.getLastLesson();
+                    item = sectionNode.getLastLesson();
                     break;
                 case FORWARD:
-                    item = section.getFirstLesson();
+                    item = sectionNode.getFirstLesson();
                     break;
             }
             if (item != null) {
@@ -82,28 +82,28 @@ public class StudyNavigator {
     }
 
     @Nullable
-    private static Section navigate(@NotNull final Section section, @NotNull Direction direction) {
-        Course course = section.getCourse();
-        if (course == null) {
+    private static SectionNode navigate(@NotNull final SectionNode sectionNode, @NotNull Direction direction) {
+        CourseNode courseNode = sectionNode.getCourseNode();
+        if (courseNode == null) {
             return null;
         }
         switch (direction) {
             case BACK:
-                return course.getPrevSection(section);
+                return courseNode.getPrevSection(sectionNode);
             case FORWARD:
-                return course.getNextSection(section);
+                return courseNode.getNextSection(sectionNode);
         }
         return null;
     }
 
     @Nullable
-    public static Step nextStep(@NotNull final Step step) {
-        return navigate(step, Direction.FORWARD);
+    public static StepNode nextStep(@NotNull final StepNode stepNode) {
+        return navigate(stepNode, Direction.FORWARD);
     }
 
     @Nullable
-    public static Step previousStep(@NotNull final Step step) {
-        return navigate(step, Direction.BACK);
+    public static StepNode previousStep(@NotNull final StepNode stepNode) {
+        return navigate(stepNode, Direction.BACK);
     }
 
     private enum Direction {

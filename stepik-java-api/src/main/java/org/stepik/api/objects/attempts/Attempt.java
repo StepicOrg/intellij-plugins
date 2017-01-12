@@ -2,12 +2,12 @@ package org.stepik.api.objects.attempts;
 
 import com.google.gson.annotations.SerializedName;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.api.objects.AbstractObject;
 
 /**
  * @author meanmail
  */
-public class Attempt {
-    private int id;
+public class Attempt extends AbstractObject {
     private String dataset;
     @SerializedName("dataset_url")
     private String datasetUrl;
@@ -17,14 +17,6 @@ public class Attempt {
     private int timeLeft;
     private int step;
     private int user;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
     @Nullable
     public String getDataset() {

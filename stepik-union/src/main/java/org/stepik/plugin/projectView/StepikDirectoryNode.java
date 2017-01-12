@@ -8,10 +8,10 @@ import com.intellij.psi.PsiDirectory;
 import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.core.EduUtils;
-import com.jetbrains.tmp.learning.courseFormat.Course;
-import com.jetbrains.tmp.learning.courseFormat.Lesson;
-import com.jetbrains.tmp.learning.courseFormat.Section;
-import com.jetbrains.tmp.learning.courseFormat.Step;
+import com.jetbrains.tmp.learning.courseFormat.CourseNode;
+import com.jetbrains.tmp.learning.courseFormat.LessonNode;
+import com.jetbrains.tmp.learning.courseFormat.SectionNode;
+import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.plugin.utils.PresentationDataUtils;
 
@@ -36,34 +36,34 @@ class StepikDirectoryNode extends PsiDirectoryNode {
     public int getTypeSortWeight(boolean sortByType) {
         String name = getValue().getName();
         StepikProjectManager stepManager = StepikProjectManager.getInstance(getValue().getProject());
-        Course course = stepManager.getCourse();
-        if (course == null) {
+        CourseNode courseNode = stepManager.getCourseNode();
+        if (courseNode == null) {
             return 0;
         }
 
         if (name.startsWith(EduNames.SECTION)) {
             int id = EduUtils.parseDirName(name, EduNames.SECTION);
-            Section section = course.getSectionById(id);
-            if (section == null) {
+            SectionNode sectionNode = courseNode.getSectionById(id);
+            if (sectionNode == null) {
                 return id;
             }
-            return section.getPosition();
+            return sectionNode.getPosition();
         }
         if (name.startsWith(EduNames.LESSON)) {
             int id = EduUtils.parseDirName(name, EduNames.LESSON);
-            Lesson lesson = course.getLessonById(id);
-            if (lesson == null) {
+            LessonNode lessonNode = courseNode.getLessonById(id);
+            if (lessonNode == null) {
                 return id;
             }
-            return lesson.getPosition();
+            return lessonNode.getPosition();
         }
         if (name.startsWith(EduNames.STEP)) {
             int id = EduUtils.parseDirName(name, EduNames.STEP);
-            Step step = course.getStepById(id);
-            if (step == null) {
+            StepNode stepNode = courseNode.getStepById(id);
+            if (stepNode == null) {
                 return id;
             }
-            return step.getPosition();
+            return stepNode.getPosition();
         }
 
         return Integer.MAX_VALUE;

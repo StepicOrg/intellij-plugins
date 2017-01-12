@@ -16,7 +16,7 @@ import com.jetbrains.tmp.learning.StudyState;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.actions.StudyActionWithShortcut;
-import com.jetbrains.tmp.learning.courseFormat.Step;
+import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.editor.StudyEditor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -63,8 +63,8 @@ public class InsertStepikDirectives extends StudyActionWithShortcut {
         if (!studyState.isValid()) {
             return;
         }
-        Step targetStep = studyState.getStep();
-        if (targetStep == null) {
+        StepNode targetStepNode = studyState.getStepNode();
+        if (targetStepNode == null) {
             return;
         }
 
@@ -75,7 +75,7 @@ public class InsertStepikDirectives extends StudyActionWithShortcut {
                 documentManager.saveDocument(document);
         }
 
-        SupportedLanguages currentLang = targetStep.getCurrentLang();
+        SupportedLanguages currentLang = targetStepNode.getCurrentLang();
         VirtualFile src = studyState.getStepDir();
         VirtualFile file = src.findChild(currentLang.getMainFileName());
         if (file == null) {

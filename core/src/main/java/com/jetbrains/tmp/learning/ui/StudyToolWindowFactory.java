@@ -10,7 +10,7 @@ import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentManager;
 import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.StudyUtils;
-import com.jetbrains.tmp.learning.courseFormat.Course;
+import com.jetbrains.tmp.learning.courseFormat.CourseNode;
 import icons.AllStepikIcons;
 import org.jetbrains.annotations.NotNull;
 
@@ -23,8 +23,8 @@ public class StudyToolWindowFactory implements ToolWindowFactory, DumbAware {
     public void createToolWindowContent(@NotNull final Project project, @NotNull final ToolWindow toolWindow) {
         toolWindow.setIcon(AllStepikIcons.stepikLogoSmall);
         StepikProjectManager stepManager = StepikProjectManager.getInstance(project);
-        final Course course = stepManager.getCourse();
-        if (course != null) {
+        final CourseNode courseNode = stepManager.getCourseNode();
+        if (courseNode != null) {
             logger.info("Study Tool Window is created");
             final StudyToolWindow studyToolWindow;
             if (StudyUtils.hasJavaFx()) {

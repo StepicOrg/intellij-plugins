@@ -2,12 +2,12 @@ package org.stepik.api.objects.enrollments;
 
 import com.google.gson.annotations.SerializedName;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.api.objects.AbstractObject;
 
 /**
  * @author meanmail
  */
-public class Assignment {
-    private int id;
+public class Assignment extends AbstractObject {
     private int unit;
     private int step;
     private String progress;
@@ -15,14 +15,6 @@ public class Assignment {
     private String createDate;
     @SerializedName("update_date")
     private String updateDate;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
     public int getUnit() {
         return unit;

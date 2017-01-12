@@ -3,12 +3,12 @@ package org.stepik.api.objects.submissions;
 import com.google.gson.annotations.SerializedName;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.api.objects.AbstractObject;
 
 /**
  * @author meanmail
  */
-public class Submission {
-    private int id;
+public class Submission extends AbstractObject {
     private String status;
     private double score;
     private String hint;
@@ -20,14 +20,6 @@ public class Submission {
     private int attempt;
     private String session;
     private double eta;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
     @Nullable
     public String getStatus() {
