@@ -99,16 +99,12 @@ public class StepikApiClient {
     private TokenInfo tokenInfo;
 
     public StepikApiClient() {
-        this(HttpTransportClient.getInstance(), DefaultJsonConverter.getInstance());
-    }
-
-    public StepikApiClient(@NotNull TransportClient transportClient, @NotNull JsonConverter jsonConverter) {
-        this.transportClient = transportClient;
-        this.jsonConverter = jsonConverter;
+        this(HttpTransportClient.getInstance());
     }
 
     public StepikApiClient(@NotNull HttpTransportClient transportClient) {
-        this(transportClient, DefaultJsonConverter.getInstance());
+        this.transportClient = transportClient;
+        this.jsonConverter = DefaultJsonConverter.getInstance();
     }
 
     @NotNull
