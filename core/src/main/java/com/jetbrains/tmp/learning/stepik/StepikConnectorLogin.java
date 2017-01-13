@@ -6,7 +6,6 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
 import com.intellij.util.net.HttpConfigurable;
 import com.jetbrains.tmp.learning.StepikProjectManager;
 import org.jetbrains.annotations.NotNull;
@@ -36,8 +35,8 @@ public class StepikConnectorLogin {
         } else {
             client = new StepikApiClient();
         }
-        Project defaultProject = ProjectManager.getInstance().getDefaultProject();
-        StepikProjectManager stepikProjectManager = StepikProjectManager.getInstance(defaultProject);
+
+        StepikProjectManager stepikProjectManager = StepikProjectManager.getDefaultInstance();
 
         long lastUserId = stepikProjectManager.getUpdatedBy();
 
@@ -51,13 +50,21 @@ public class StepikConnectorLogin {
     public static void loginFromDialog(@NotNull final Project project) {
         long userId = StepikProjectManager.getInstance(project).getUpdatedBy();
         AuthInfo authInfo = getAuthInfo(userId);
-        if (!minorLogin(authInfo.getUsername(), authInfo.getPassword())) {
-            ApplicationManager.getApplication().invokeAndWait(() -> {
-                logger.info("Show the authentication dialog");
-                final LoginDialog dialog = new LoginDialog();
-                dialog.show();
-            }, ModalityState.defaultModalityState());
+        if (!authInfo.valid()) {
+            showAuthDialog();
+        } else if (!minorLogin(authInfo.getUsername(), authInfo.getPassword())) {
+            showAuthDialog();
         }
+        StepikProjectManager stepikProjectManager = StepikProjectManager.getInstance(project);
+        stepikProjectManager.setUpdatedBy(userId);
+    }
+
+    private static void showAuthDialog() {
+        ApplicationManager.getApplication().invokeAndWait(() -> {
+            logger.info("Show the authentication dialog");
+            final LoginDialog dialog = new LoginDialog();
+            dialog.show();
+        }, ModalityState.defaultModalityState());
     }
 
     private static boolean minorLogin(@NotNull String username, @NotNull String password) {
