@@ -6,6 +6,7 @@ package org.stepik.api.urls;
 public class Urls {
     private static final String STEPIK_URL = "https://stepik.org";
     public static final String OAUTH_URL = STEPIK_URL + "/oauth2/token/";
+    public static final String COURSE = STEPIK_URL + "/course";
     private static final String STEPIK_API_URL = STEPIK_URL + "/api";
     public static final String COURSES = STEPIK_API_URL + "/courses";
     public static final String LESSONS = STEPIK_API_URL + "/lessons";

@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.objects.AbstractObject;
 import org.stepik.api.objects.steps.Video;
+import org.stepik.api.urls.Urls;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -797,5 +798,10 @@ public class Course extends AbstractObject {
 
     public void setDiscussionThreads(@Nullable List<String> discussionThreads) {
         this.discussionThreads = discussionThreads;
+    }
+
+    @NotNull
+    public String getLink() {
+        return Urls.COURSE + "/" + getId();
     }
 }
