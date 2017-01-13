@@ -45,12 +45,13 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
     private static final Logger logger = Logger.getInstance(StepikPyProjectGenerator.class.getName());
     private static final String MODULE_NAME = "Stepik";
     private final StepikProjectGenerator generator;
-    private final PyCCSettingPanel pySPanel;
+    private final PyCharmWizardStep wizardStep;
 
     private StepikPyProjectGenerator() {
         super(true);
         generator = StepikProjectGenerator.getInstance();
-        pySPanel = new PyCCSettingPanel(this);
+        Project defaultProject = DefaultProjectFactory.getInstance().getDefaultProject();
+        wizardStep = new PyCharmWizardStep(this, defaultProject);
     }
 
     @Nullable
@@ -69,16 +70,14 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
     @Nullable
     @Override
     public JPanel extendBasePanel() throws ProcessCanceledException {
-        Project defaultProject = DefaultProjectFactory.getInstance().getDefaultProject();
-        StepikConnectorLogin.loginFromDialog(defaultProject);
-        pySPanel.init(defaultProject);
-        return pySPanel.getMainPanel();
+        wizardStep.updateStep();
+        return wizardStep.getComponent();
     }
 
     @NotNull
     @Override
     public ValidationResult validate(@NotNull String s) {
-        return pySPanel.check();
+        return wizardStep.check();
     }
 
     @Nullable
@@ -87,16 +86,14 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
         return generator -> {
             Project defaultProject = DefaultProjectFactory.getInstance().getDefaultProject();
             StepikConnectorLogin.loginFromDialog(defaultProject);
-            final Course course = pySPanel.getSelectedCourse();
-            if (course == null || course == StepikProjectGenerator.EMPTY_COURSE) return false;
+            final Course course = wizardStep.getSelectedCourse();
+            if (course == StepikProjectGenerator.EMPTY_COURSE) return false;
             this.generator.setSelectedCourse(course);
-            if (PyCCSettingPanel.COURSE_LINK.equals(pySPanel.getBuildType())) {
-                StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
-                stepikApiClient.enrollments()
-                        .post()
-                        .course(course.getId())
-                        .execute();
-            }
+            StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
+            stepikApiClient.enrollments()
+                    .post()
+                    .course(course.getId())
+                    .execute();
             StepikProjectGenerator.downloadAndFlushCourse(defaultProject, course.getId());
             return true;
         };
@@ -109,8 +106,11 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
 
     @Override
     public void configureProject(
-            @NotNull final Project project, @NotNull VirtualFile baseDir, @NotNull final PyNewProjectSettings settings,
-            @NotNull final Module module, @Nullable final PyProjectSynchronizer synchronizer) {
+            @NotNull final Project project,
+            @NotNull VirtualFile baseDir,
+            @NotNull final PyNewProjectSettings settings,
+            @NotNull final Module module,
+            @Nullable final PyProjectSynchronizer synchronizer) {
         super.configureProject(project, baseDir, settings, module, synchronizer);
         StepikConnectorLogin.loginFromDialog(project);
         ApplicationManager.getApplication()

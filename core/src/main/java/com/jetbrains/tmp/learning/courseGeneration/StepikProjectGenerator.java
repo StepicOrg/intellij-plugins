@@ -106,7 +106,7 @@ public class StepikProjectGenerator {
                         }
                         flushCourses(courses);
                         return courses;
-                    }, "Refreshing CourseNode List", true, project);
+                    }, "Refreshing Course List", true, project);
         } catch (RuntimeException e) {
             return Collections.singletonList(EMPTY_COURSE);
         }
@@ -172,7 +172,7 @@ public class StepikProjectGenerator {
                 flushCourse(courses.getCourses().get(0));
                 return null;
             });
-        }, "Downloading CourseNode", true, project);
+        }, "Downloading Course", true, project);
     }
 
     private static void flushCourse(Course course) {

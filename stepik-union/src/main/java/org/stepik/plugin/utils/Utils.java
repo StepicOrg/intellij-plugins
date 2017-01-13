@@ -1,8 +1,10 @@
 package org.stepik.plugin.utils;
 
+import com.jetbrains.tmp.learning.courseGeneration.StepikProjectGenerator;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.api.client.StepikApiClient;
+import org.stepik.api.objects.courses.Course;
 import org.stepik.api.objects.sections.Sections;
 import org.stepik.api.objects.units.Units;
 
@@ -87,5 +89,27 @@ public class Utils {
 
     private static boolean isFillOfInt(@NotNull String link) {
         return link.matches("[0-9]+");
+    }
+
+    @NotNull
+    public static String getCourseDescription(@NotNull Course course) {
+        String description;
+        if (course == StepikProjectGenerator.EMPTY_COURSE) {
+            description = "Wrong link";
+        } else {
+
+            StringBuilder sb = new StringBuilder();
+            sb.append("<b>Course:</b> ")
+                    .append(course.toString())
+                    .append("<br><br>")
+                    .append(course.getDescription());
+            if (course.isAdaptive()) {
+                sb.append("<p style='font-weight: bold;'>This course is adaptive.<br>")
+                        .append("Sorry, but we don't support adaptive courses yet</p>");
+            }
+            description = sb.toString();
+        }
+
+        return description;
     }
 }

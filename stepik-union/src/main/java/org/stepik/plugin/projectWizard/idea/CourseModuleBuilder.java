@@ -109,7 +109,7 @@ class CourseModuleBuilder extends AbstractModuleBuilder {
         Project project = wizardContext.getProject() == null ?
                 DefaultProjectFactory.getInstance().getDefaultProject() :
                 wizardContext.getProject();
-        wizardSteps[0] = new JavaCCSettingsPanel(generator, project);
+        wizardSteps[0] = new JavaWizardStep(generator, project);
 
         return wizardSteps;
     }
