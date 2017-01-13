@@ -18,12 +18,10 @@ import javax.swing.*;
 class JavaWizardStep extends ModuleWizardStep {
     private static final Logger logger = Logger.getInstance(JavaWizardStep.class);
     private final StepikProjectGenerator generator;
-    private final Project project;
     private final ProjectSettingsPanel panel;
 
     JavaWizardStep(@NotNull final StepikProjectGenerator generator, @NotNull Project project) {
         this.generator = generator;
-        this.project = project;
         panel = new ProjectSettingsPanel(project, true);
     }
 
@@ -73,6 +71,5 @@ class JavaWizardStep extends ModuleWizardStep {
         }
         logger.info(String.format("Leaving step the project wizard with the selected course: id = %s, name = %s",
                 id, selectedCourse.getTitle()));
-        StepikProjectGenerator.downloadAndFlushCourse(project, selectedCourse.getId());
     }
 }

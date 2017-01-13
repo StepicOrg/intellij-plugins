@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * @author meanmail
  */
-public class Enrollments extends ObjectsContainer {
+public class Enrollments extends ObjectsContainer<Enrollment> {
     private List<Enrollment> enrollments;
     private List<Assignment> assignments;
     private List<Course> courses;
@@ -38,8 +38,14 @@ public class Enrollments extends ObjectsContainer {
 
     @NotNull
     @Override
-    protected List getItems() {
-        return enrollments;
+    public List<Enrollment> getItems() {
+        return getEnrollments();
+    }
+
+    @NotNull
+    @Override
+    public Class<Enrollment> getItemClass() {
+        return Enrollment.class;
     }
 
     @NotNull

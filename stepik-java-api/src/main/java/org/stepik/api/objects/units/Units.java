@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * @author meanmail
  */
-public class Units extends ObjectsContainer {
+public class Units extends ObjectsContainer<Unit> {
     private List<Unit> units;
 
     @NotNull
@@ -22,7 +22,13 @@ public class Units extends ObjectsContainer {
 
     @NotNull
     @Override
-    protected List getItems() {
+    public List<Unit> getItems() {
         return getUnits();
+    }
+
+    @NotNull
+    @Override
+    public Class<Unit> getItemClass() {
+        return Unit.class;
     }
 }

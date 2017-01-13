@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public interface JsonConverter {
     @Nullable
-    <T> T fromJson(@NotNull String json, @NotNull Class<T> clazz);
+    <T> T fromJson(@Nullable String json, @NotNull Class<T> clazz);
 
     @NotNull
     String toJson(@Nullable Object object);

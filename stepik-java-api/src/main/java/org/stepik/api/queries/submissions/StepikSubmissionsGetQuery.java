@@ -75,4 +75,9 @@ public class StepikSubmissionsGetQuery extends StepikAbstractGetQuery<StepikSubm
         addParam("page", value);
         return this;
     }
+
+    @Override
+    protected boolean isCacheEnabled() {
+        return false;
+    }
 }

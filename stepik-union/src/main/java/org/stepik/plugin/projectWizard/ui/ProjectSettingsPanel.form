@@ -83,7 +83,7 @@
           <text value=""/>
         </properties>
       </component>
-      <scrollpane id="28b00">
+      <scrollpane id="28b00" binding="scrollPane">
         <constraints>
           <grid row="4" column="0" row-span="1" col-span="3" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false">
             <minimum-size width="1" height="1"/>

@@ -22,6 +22,11 @@ public class StepikStepiksGetQuery extends StepikAbstractGetQuery<StepikStepiksG
         return this;
     }
 
+    @Override
+    protected boolean isCacheEnabled() {
+        return false;
+    }
+
     @NotNull
     @Override
     protected String getUrl() {

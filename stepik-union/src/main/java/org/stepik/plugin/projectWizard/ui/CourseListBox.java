@@ -21,8 +21,8 @@ public class CourseListBox extends JComboBox<Course> {
         setModel(courseListModel);
     }
 
-    void refresh(boolean force, @NotNull Project project) {
-        courseListModel.update(force, project);
+    void refresh(@NotNull Project project) {
+        courseListModel.update(project);
     }
 
     void setTarget(@Nullable ProjectSetting target) {

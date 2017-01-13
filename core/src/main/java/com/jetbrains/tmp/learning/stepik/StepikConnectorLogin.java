@@ -40,7 +40,7 @@ public class StepikConnectorLogin {
 
         long lastUserId = stepikProjectManager.getUpdatedBy();
 
-        AuthInfo authInfo = getAuthInfo(lastUserId);
+        AuthInfo authInfo = getAuthInfo(lastUserId, client);
 
         client.setTokenInfo(authInfo.getTokenInfo());
 
@@ -50,9 +50,7 @@ public class StepikConnectorLogin {
     public static void loginFromDialog(@NotNull final Project project) {
         long userId = StepikProjectManager.getInstance(project).getUpdatedBy();
         AuthInfo authInfo = getAuthInfo(userId);
-        if (!authInfo.valid()) {
-            showAuthDialog();
-        } else if (!minorLogin(authInfo.getUsername(), authInfo.getPassword())) {
+        if (!minorLogin(authInfo.getUsername(), authInfo.getPassword())) {
             showAuthDialog();
         }
         StepikProjectManager stepikProjectManager = StepikProjectManager.getInstance(project);
@@ -104,6 +102,14 @@ public class StepikConnectorLogin {
 
     @NotNull
     private static AuthInfo getAuthInfo(long userId) {
+        return getAuthInfo(userId, stepikApiClient);
+    }
+
+    @NotNull
+    private static AuthInfo getAuthInfo(long userId, StepikApiClient client) {
+        if (userId == 0) {
+            return new AuthInfo();
+        }
         String serviceName = StepikProjectManager.class.getName();
         CredentialAttributes attributes = new CredentialAttributes(serviceName,
                 String.valueOf(userId),
@@ -111,11 +117,7 @@ public class StepikConnectorLogin {
                 false);
         String serializedAuthInfo = PasswordSafe.getInstance().getPassword(attributes);
 
-        if (serializedAuthInfo == null) {
-            return new AuthInfo();
-        }
-
-        AuthInfo authInfo = stepikApiClient.getJsonConverter().fromJson(serializedAuthInfo, AuthInfo.class);
+        AuthInfo authInfo = client.getJsonConverter().fromJson(serializedAuthInfo, AuthInfo.class);
 
         if (authInfo == null) {
             return new AuthInfo();

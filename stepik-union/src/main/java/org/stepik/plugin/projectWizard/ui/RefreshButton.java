@@ -28,7 +28,7 @@ public class RefreshButton extends JButton {
         super.fireActionPerformed(event);
 
         if (target != null) {
-            target.refresh(true, project);
+            target.refresh(project);
         }
     }
 }

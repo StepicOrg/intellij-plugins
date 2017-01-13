@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * @author meanmail
  */
-public class Steps extends ObjectsContainer {
+public class Steps extends ObjectsContainer<Step> {
     private List<Step> steps;
 
     @NotNull
@@ -20,10 +20,15 @@ public class Steps extends ObjectsContainer {
         return steps;
     }
 
+    @NotNull
+    @Override
+    public List<Step> getItems() {
+        return getSteps();
+    }
 
     @NotNull
     @Override
-    protected List getItems() {
-        return getSteps();
+    public Class<Step> getItemClass() {
+        return Step.class;
     }
 }

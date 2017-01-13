@@ -89,6 +89,9 @@ import org.stepik.api.actions.StepikWsAction;
 import org.stepik.api.auth.OAuth2;
 import org.stepik.api.objects.auth.TokenInfo;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 /**
  * @author meanmail
  */
@@ -97,6 +100,8 @@ public class StepikApiClient {
     private final TransportClient transportClient;
     private final JsonConverter jsonConverter;
     private TokenInfo tokenInfo;
+    private Path cachePath = Paths.get(System.getProperty("user.home"), ".stepik", "stepik-api", "cache");
+    private boolean cacheEnabled = true;
 
     public StepikApiClient() {
         this(HttpTransportClient.getInstance());
@@ -561,5 +566,22 @@ public class StepikApiClient {
     @NotNull
     public JsonConverter getJsonConverter() {
         return jsonConverter;
+    }
+
+    @NotNull
+    public Path getCachePath() {
+        return cachePath;
+    }
+
+    public void setCachePath(@NotNull Path cachePath) {
+        this.cachePath = cachePath;
+    }
+
+    public boolean isCacheEnabled() {
+        return cacheEnabled;
+    }
+
+    public void setCacheEnabled(boolean cacheEnabled) {
+        this.cacheEnabled = cacheEnabled;
     }
 }

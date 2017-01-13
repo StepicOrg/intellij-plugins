@@ -2,6 +2,7 @@ package org.stepik.api.objects.stepiks;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.api.objects.ObjectsContainer;
 import org.stepik.api.objects.users.User;
 
 import java.util.ArrayList;
@@ -10,7 +11,7 @@ import java.util.List;
 /**
  * @author meanmail
  */
-public class Stepiks {
+public class Stepiks extends ObjectsContainer<Stepik> {
     private List<Stepik> stepics;
     private List<User> users;
     private List<Profile> profiles;
@@ -58,5 +59,17 @@ public class Stepiks {
 
     public void setProfiles(@Nullable List<Profile> profiles) {
         this.profiles = profiles;
+    }
+
+    @NotNull
+    @Override
+    public List<Stepik> getItems() {
+        return getStepics();
+    }
+
+    @NotNull
+    @Override
+    public Class<Stepik> getItemClass() {
+        return Stepik.class;
     }
 }

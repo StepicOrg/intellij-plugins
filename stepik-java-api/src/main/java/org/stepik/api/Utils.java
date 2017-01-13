@@ -1,10 +1,15 @@
 package org.stepik.api;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -26,5 +31,19 @@ public class Utils {
         } catch (UnsupportedEncodingException e) {
             return value;
         }
+    }
+
+    @Nullable
+    public static String readFile(@NotNull Path file) {
+        Optional<String> content;
+        try {
+            content = Files.readAllLines(file)
+                    .stream()
+                    .reduce((line, text) -> text + line);
+        } catch (IOException e) {
+            return null;
+        }
+
+        return content.orElse(null);
     }
 }

@@ -1,6 +1,7 @@
 package org.stepik.api.client;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,7 +23,15 @@ public class DefaultJsonConverter implements JsonConverter {
     @Nullable
     @Override
     public <T> T fromJson(@Nullable String json, @NotNull Class<T> clazz) {
-        return gson.fromJson(json, clazz);
+        if (json == null) {
+            return null;
+        }
+
+        try {
+            return gson.fromJson(json, clazz);
+        } catch (JsonSyntaxException e) {
+            return null;
+        }
     }
 
     @NotNull

@@ -9,13 +9,19 @@ import java.util.List;
 /**
  * @author meanmail
  */
-public class Progresses extends ObjectsContainer {
+public class Progresses extends ObjectsContainer<Progress> {
     private List<Progress> progresses;
 
     @NotNull
     @Override
-    protected List getItems() {
+    public List<Progress> getItems() {
         return getProgresses();
+    }
+
+    @NotNull
+    @Override
+    public Class<Progress> getItemClass() {
+        return Progress.class;
     }
 
     @NotNull

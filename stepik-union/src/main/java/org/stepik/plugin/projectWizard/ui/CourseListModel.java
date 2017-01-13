@@ -37,8 +37,8 @@ class CourseListModel extends AbstractListModel<Course> implements ComboBoxModel
         }
     }
 
-    void update(boolean force, @NotNull Project project) {
-        List<Course> newCourseList = StepikProjectGenerator.getCoursesUnderProgress(force, project);
+    void update(@NotNull Project project) {
+        List<Course> newCourseList = StepikProjectGenerator.getCoursesUnderProgress(project);
         Object currentSelectedCourse = getSelectedItem();
         courses.clear();
 

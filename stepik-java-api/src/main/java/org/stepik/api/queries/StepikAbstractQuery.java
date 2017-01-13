@@ -28,10 +28,8 @@ abstract class StepikAbstractQuery<T> {
 
     private final StepikAbstractAction stepikAction;
     private final Class<T> responseClass;
-
     private final QueryMethod method;
     private final Map<String, String[]> params = new HashMap<>();
-
     StepikAbstractQuery(
             @NotNull StepikAbstractAction stepikAction,
             @NotNull Class<T> responseClass,
@@ -39,6 +37,10 @@ abstract class StepikAbstractQuery<T> {
         this.stepikAction = stepikAction;
         this.responseClass = responseClass;
         this.method = method;
+    }
+
+    Class<T> getResponseClass() {
+        return responseClass;
     }
 
     @NotNull
@@ -70,7 +72,7 @@ abstract class StepikAbstractQuery<T> {
         params.put(key, paramValues);
     }
 
-    protected void addParam(@NotNull String key, @NotNull List<Long> values) {
+    protected <V> void addParam(@NotNull String key, @NotNull List<V> values) {
         String[] paramValues = values.stream()
                 .map(String::valueOf)
                 .collect(Collectors.toList())
@@ -86,6 +88,11 @@ abstract class StepikAbstractQuery<T> {
         }
 
         params.put(key, paramValues);
+    }
+
+    @NotNull
+    protected List<String> getParam(@NotNull String key) {
+        return Arrays.asList(params.getOrDefault(key, new String[0]));
     }
 
     @NotNull

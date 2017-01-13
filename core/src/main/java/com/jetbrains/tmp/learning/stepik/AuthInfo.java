@@ -44,8 +44,4 @@ class AuthInfo {
     void setUsername(@Nullable String username) {
         this.username = username;
     }
-
-    boolean valid() {
-        return tokenInfo != null || (password != null && username != null);
-    }
 }

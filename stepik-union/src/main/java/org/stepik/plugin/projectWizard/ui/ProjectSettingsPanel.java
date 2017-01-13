@@ -24,11 +24,11 @@ public class ProjectSettingsPanel implements ProjectSetting {
     private LanguageComboBox langComboBox;
     private JLabel buildLabel;
     private BuildTypeComboBox buildType;
-    private JPanel courseSelectPanel;
     private JLabel courseLabel;
     private CourseListBox courseListComboBox;
     private RefreshButton refreshListButton;
     private CourseDescriptionPane courseListDescription;
+    private JScrollPane scrollPane;
     private Course selectedCourse = StepikProjectGenerator.EMPTY_COURSE;
 
     public ProjectSettingsPanel(@NotNull Project project, boolean visibleLangBox) {
@@ -51,7 +51,7 @@ public class ProjectSettingsPanel implements ProjectSetting {
         StepikConnectorLogin.loginFromDialog(project);
         String username = StepikConnectorLogin.getCurrentUserFullName();
         userName.setText(username);
-        courseListComboBox.refresh(false, project);
+        courseListComboBox.refresh(project);
         logger.info("Updating settings is done");
     }
 
@@ -77,6 +77,9 @@ public class ProjectSettingsPanel implements ProjectSetting {
         selectedCourse = course;
         String description = Utils.getCourseDescription(course);
         courseListDescription.setText(description);
+        // Scroll to top
+        courseListDescription.setSelectionStart(0);
+        courseListDescription.setSelectionEnd(0);
         logger.info("Has selected the course: " + course);
         notifyListeners();
     }

@@ -94,7 +94,6 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
                     .post()
                     .course(course.getId())
                     .execute();
-            StepikProjectGenerator.downloadAndFlushCourse(defaultProject, course.getId());
             return true;
         };
     }

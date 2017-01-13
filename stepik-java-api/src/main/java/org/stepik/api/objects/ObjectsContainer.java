@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * @author meanmail
  */
-public abstract class ObjectsContainer {
+public abstract class ObjectsContainer<T> {
     private Meta meta;
 
     public int getCount() {
@@ -19,7 +19,7 @@ public abstract class ObjectsContainer {
     }
 
     @NotNull
-    protected abstract List getItems();
+    public abstract List<T> getItems();
 
     @NotNull
     public Meta getMeta() {
@@ -29,4 +29,7 @@ public abstract class ObjectsContainer {
         }
         return meta;
     }
+
+    @NotNull
+    public abstract Class<T> getItemClass();
 }
