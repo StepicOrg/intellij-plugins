@@ -1,9 +1,8 @@
-package org.stepik.plugin.actions;
+package org.stepik.plugin.actions.step;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
-import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
@@ -15,7 +14,6 @@ import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.StudyState;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.SupportedLanguages;
-import com.jetbrains.tmp.learning.actions.StudyActionWithShortcut;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.editor.StudyEditor;
 import org.jetbrains.annotations.NotNull;
@@ -30,7 +28,7 @@ import static org.stepik.plugin.utils.DirectivesUtils.removeAmbientCode;
 import static org.stepik.plugin.utils.DirectivesUtils.writeInToFile;
 
 
-public class InsertStepikDirectives extends StudyActionWithShortcut {
+public class InsertStepikDirectives extends AbstractStepAction {
     private static final String SHORTCUT = "ctrl alt pressed R";
     private static final String ACTION_ID = "STEPIK.InsertStepikDirectives";
 
@@ -95,21 +93,5 @@ public class InsertStepikDirectives extends StudyActionWithShortcut {
         if (needInsert) {
             ReformatUtils.reformatSelectedEditor(project);
         }
-    }
-
-    @Override
-    public void update(AnActionEvent event) {
-        StudyUtils.updateAction(event);
-
-        final Project project = event.getProject();
-        if (project == null) {
-            return;
-        }
-
-        StudyEditor studyEditor = StudyUtils.getSelectedStudyEditor(project);
-        StudyState studyState = new StudyState(studyEditor);
-        Presentation presentation = event.getPresentation();
-
-        presentation.setEnabled(studyState.isValid());
     }
 }

@@ -1,6 +1,7 @@
-package org.stepik.plugin.projectView;
+package org.stepik.plugin.projectView.pycharm;
 
 import org.jetbrains.annotations.NotNull;
+import org.stepik.plugin.projectView.StepikTreeStructureProvider;
 
 /**
  * @author meanmail

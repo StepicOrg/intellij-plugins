@@ -1,4 +1,4 @@
-package org.stepik.plugin.actions;
+package org.stepik.plugin.actions.step;
 
 import com.intellij.ide.projectView.ProjectView;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -18,7 +18,6 @@ import com.intellij.openapi.ui.popup.PopupChooserBuilder;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.SupportedLanguages;
-import com.jetbrains.tmp.learning.actions.StudyActionWithShortcut;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.CourseNode;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
@@ -44,7 +43,7 @@ import java.util.stream.Collectors;
  * @author meanmail
  * @since 0.8
  */
-public class DownloadSubmission extends StudyActionWithShortcut {
+public class DownloadSubmission extends AbstractStepAction {
     private static final String ACTION_ID = "STEPIK.DownloadSubmission";
     private static final String SHORTCUT = "ctrl alt pressed PAGE_DOWN";
 
@@ -191,19 +190,6 @@ public class DownloadSubmission extends StudyActionWithShortcut {
                         }),
                 "Download submission",
                 "Download submission");
-    }
-
-    @Override
-    public void update(AnActionEvent e) {
-        StudyUtils.updateAction(e);
-
-        Project project = e.getProject();
-        if (project == null) {
-            return;
-        }
-
-        StepNode targetStepNode = StudyUtils.getSelectedStep(project);
-        e.getPresentation().setEnabled(targetStepNode != null);
     }
 
     private static class SubmissionDecorator {

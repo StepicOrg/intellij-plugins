@@ -1,8 +1,9 @@
-package org.stepik.plugin.projectView;
+package org.stepik.plugin.projectView.idea;
 
 import com.intellij.ide.navigationToolbar.JavaNavBarExtension;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.plugin.projectView.NavBarModelExtensionUtils;
 
 /**
  * @author meanmail

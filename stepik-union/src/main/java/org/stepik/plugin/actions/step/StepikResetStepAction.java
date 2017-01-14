@@ -1,9 +1,8 @@
-package org.stepik.plugin.actions;
+package org.stepik.plugin.actions.step;
 
 import com.intellij.ide.projectView.ProjectView;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
-import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.diagnostic.Logger;
@@ -20,7 +19,6 @@ import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.problems.WolfTheProblemSolver;
 import com.jetbrains.tmp.learning.StudyState;
 import com.jetbrains.tmp.learning.StudyUtils;
-import com.jetbrains.tmp.learning.actions.StudyActionWithShortcut;
 import com.jetbrains.tmp.learning.courseFormat.StepFile;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
@@ -31,7 +29,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
-public class StepikResetStepAction extends StudyActionWithShortcut {
+public class StepikResetStepAction extends AbstractStepAction {
     private static final String ACTION_ID = "STEPIK.ResetStepAction";
     private static final String SHORTCUT = "ctrl shift pressed X";
     private static final Logger logger = Logger
@@ -113,22 +111,6 @@ public class StepikResetStepAction extends StudyActionWithShortcut {
         }
 
         refresh(project);
-    }
-
-    @Override
-    public void update(AnActionEvent event) {
-        StudyUtils.updateAction(event);
-
-        final Project project = event.getProject();
-        if (project == null) {
-            return;
-        }
-
-        StudyEditor studyEditor = StudyUtils.getSelectedStudyEditor(project);
-        StudyState studyState = new StudyState(studyEditor);
-        Presentation presentation = event.getPresentation();
-
-        presentation.setEnabled(studyState.isValid());
     }
 
     @NotNull

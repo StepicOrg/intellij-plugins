@@ -21,10 +21,10 @@ import com.jetbrains.tmp.learning.courseFormat.CourseNode;
 import com.jetbrains.tmp.learning.courseFormat.LessonNode;
 import com.jetbrains.tmp.learning.courseFormat.SectionNode;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
-import com.jetbrains.tmp.learning.courseGeneration.StepikProjectGenerator;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
+import org.stepik.plugin.projectWizard.StepikProjectGenerator;
 
 import java.io.File;
 import java.io.IOException;

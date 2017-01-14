@@ -1,9 +1,10 @@
-package org.stepik.plugin.projectView;
+package org.stepik.plugin.projectView.pycharm;
 
 import com.intellij.ide.navigationToolbar.DefaultNavBarExtension;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.Processor;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.plugin.projectView.NavBarModelExtensionUtils;
 
 /**
  * @author meanmail

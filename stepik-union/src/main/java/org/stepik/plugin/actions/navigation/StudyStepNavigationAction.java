@@ -1,19 +1,19 @@
-package com.jetbrains.tmp.learning.actions;
+package org.stepik.plugin.actions.navigation;
 
 import com.intellij.ide.projectView.ProjectView;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.ui.tree.TreeUtil;
 import com.jetbrains.tmp.learning.StepikProjectManager;
-import com.jetbrains.tmp.learning.StudyState;
 import com.jetbrains.tmp.learning.StudyUtils;
+import com.jetbrains.tmp.learning.actions.StudyActionWithShortcut;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.CourseNode;
 import com.jetbrains.tmp.learning.courseFormat.StepFile;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
-import com.jetbrains.tmp.learning.editor.StudyEditor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -24,12 +24,12 @@ import java.util.List;
 import java.util.Map;
 
 
-abstract public class StudyStepNavigationAction extends StudyActionWithShortcut {
-    public StudyStepNavigationAction(@Nullable String text, @Nullable String description, @Nullable Icon icon) {
+abstract class StudyStepNavigationAction extends StudyActionWithShortcut {
+    StudyStepNavigationAction(@Nullable String text, @Nullable String description, @Nullable Icon icon) {
         super(text, description, icon);
     }
 
-    protected static void updateProjectView(@NotNull Project project, VirtualFile shouldBeActive) {
+    static void updateProjectView(@NotNull Project project, VirtualFile shouldBeActive) {
         JTree tree = ProjectView.getInstance(project).getCurrentProjectViewPane().getTree();
         if (shouldBeActive != null) {
             ProjectView.getInstance(project).selectCB(shouldBeActive, shouldBeActive, false).doWhenDone(() -> {
@@ -74,10 +74,10 @@ abstract public class StudyStepNavigationAction extends StudyActionWithShortcut 
         return null;
     }
 
-    public abstract void navigateStep(@NotNull final Project project);
+    protected abstract void navigateStep(@NotNull final Project project);
 
     @Nullable
-    protected VirtualFile getFileToActivate(
+    VirtualFile getFileToActivate(
             @NotNull Project project,
             @NotNull Map<String, StepFile> nextStepFiles,
             @NotNull VirtualFile stepDir) {
@@ -112,23 +112,15 @@ abstract public class StudyStepNavigationAction extends StudyActionWithShortcut 
 
     @Override
     public void update(AnActionEvent e) {
-        StudyUtils.updateAction(e);
+        final Presentation presentation = e.getPresentation();
+        presentation.setEnabled(false);
+
         Project project = e.getProject();
         if (project == null) {
             return;
         }
 
-        StudyEditor studyEditor = StudyUtils.getSelectedStudyEditor(project);
-        StudyState studyState = new StudyState(studyEditor);
         CourseNode courseNode = StepikProjectManager.getInstance(project).getCourseNode();
-
-        if (!studyState.isValid() && courseNode != null) {
-            e.getPresentation().setEnabled(true);
-            return;
-        }
-
-        if (getTargetStep(studyState.getStepNode()) == null) {
-            e.getPresentation().setEnabled(false);
-        }
+        presentation.setEnabled(courseNode != null);
     }
 }

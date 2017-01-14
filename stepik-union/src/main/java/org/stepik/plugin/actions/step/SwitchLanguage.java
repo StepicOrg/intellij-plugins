@@ -1,4 +1,4 @@
-package org.stepik.plugin.actions;
+package org.stepik.plugin.actions.step;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -16,7 +16,6 @@ import com.intellij.psi.PsiManager;
 import com.intellij.refactoring.move.moveFilesOrDirectories.MoveFilesOrDirectoriesUtil;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.SupportedLanguages;
-import com.jetbrains.tmp.learning.actions.StudyActionWithShortcut;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import org.jetbrains.annotations.NotNull;
@@ -24,9 +23,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
-import static org.stepik.plugin.actions.ActionUtils.checkLangSettings;
-
-public class SwitchLanguage extends StudyActionWithShortcut {
+public class SwitchLanguage extends AbstractStepAction {
     private static final String ACTION_ID = "STEPIK.SwitchLanguage";
     private static final String SHORTCUT = "ctrl alt pressed PAGE_UP";
 
@@ -54,7 +51,7 @@ public class SwitchLanguage extends StudyActionWithShortcut {
             return;
         }
 
-        if (!checkLangSettings(targetStepNode, project)) {
+        if (!ActionUtils.checkLangSettings(targetStepNode, project)) {
             return;
         }
 
@@ -125,19 +122,6 @@ public class SwitchLanguage extends StudyActionWithShortcut {
         VirtualFile vf = src.findChild(activateFileName);
         if (vf != null)
             FileEditorManager.getInstance(project).openFile(vf, true);
-    }
-
-    @Override
-    public void update(AnActionEvent e) {
-        StudyUtils.updateAction(e);
-
-        Project project = e.getProject();
-        if (project == null) {
-            return;
-        }
-
-        StepNode targetStepNode = StudyUtils.getSelectedStep(project);
-        e.getPresentation().setEnabled(targetStepNode != null);
     }
 
     @NotNull

@@ -1,4 +1,4 @@
-package com.jetbrains.tmp.learning.courseGeneration;
+package org.stepik.plugin.projectWizard;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressManager;
@@ -108,7 +108,7 @@ public class StepikProjectGenerator {
                     return null;
                 }
 
-                return null;
+                return courses.getCourses().get(0);
             });
         }, "Downloading Course", true, project);
     }

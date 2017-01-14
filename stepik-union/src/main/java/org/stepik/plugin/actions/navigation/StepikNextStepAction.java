@@ -1,4 +1,4 @@
-package org.stepik.plugin.actions;
+package org.stepik.plugin.actions.navigation;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
@@ -9,25 +9,23 @@ import com.jetbrains.tmp.learning.courseFormat.CourseNode;
 import com.jetbrains.tmp.learning.courseFormat.LessonNode;
 import com.jetbrains.tmp.learning.courseFormat.SectionNode;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
-import com.jetbrains.tmp.learning.navigation.StudyNavigator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.util.List;
 
-public class StepikPreviousStepAction extends StepikStepNavigationAction {
-    private static final String ACTION_ID = "STEPIK.PreviousStepAction";
-    private static final String SHORTCUT = "ctrl pressed COMMA";
+public class StepikNextStepAction extends StepikStepNavigationAction {
+    private static final String ACTION_ID = "STEPIK.NextStepAction";
+    private static final String SHORTCUT = "ctrl pressed PERIOD";
 
-    public StepikPreviousStepAction() {
-        super("Previous Step (" + KeymapUtil.getShortcutText(new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT),
-                null)) + ")", "Navigate to the previous step", AllIcons.Actions.Back);
+    public StepikNextStepAction() {
+        super("Next Step (" + KeymapUtil.getShortcutText(new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT),
+                null)) + ")", "Navigate to the next step", AllIcons.Actions.Forward);
     }
 
     @Override
     protected StepNode getTargetStep(@NotNull final StepNode sourceStepNode) {
-        return StudyNavigator.previousStep(sourceStepNode);
+        return StudyNavigator.nextStep(sourceStepNode);
     }
 
     @Nullable
@@ -38,15 +36,10 @@ public class StepikPreviousStepAction extends StepikStepNavigationAction {
             return null;
         }
 
-        List<SectionNode> sectionNodes = courseNode.getSectionNodes();
-
-        for (int i = sectionNodes.size() - 1; i >= 0; i--) {
-            List<LessonNode> lessonNodes = sectionNodes.get(i).getLessonNodes();
-            for (int j = lessonNodes.size() - 1; i >= 0; i--) {
-                LessonNode lessonNode = lessonNodes.get(j);
-                StepNode stepNode = lessonNode.getLastStep();
-                if (stepNode != null) {
-                    return stepNode;
+        for (SectionNode sectionNode : courseNode.getSectionNodes()) {
+            for (LessonNode lessonNode : sectionNode.getLessonNodes()) {
+                if (lessonNode.getStepNodes().size() > 0) {
+                    return lessonNode.getStepNodes().get(0);
                 }
             }
         }

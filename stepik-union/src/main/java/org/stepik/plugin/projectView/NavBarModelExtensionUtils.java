@@ -16,9 +16,9 @@ import static org.stepik.plugin.utils.PresentationDataUtils.updatePresentationDa
 /**
  * @author meanmail
  */
-class NavBarModelExtensionUtils {
+public class NavBarModelExtensionUtils {
     @Nullable
-    static String getPresentableText(@Nullable final Object object) {
+    public static String getPresentableText(@Nullable final Object object) {
         if (object instanceof Project) {
             Project project = (Project) object;
             StepikProjectManager stepikProjectManager = StepikProjectManager.getInstance(project);
@@ -41,7 +41,7 @@ class NavBarModelExtensionUtils {
     }
 
     @Nullable
-    static PsiElement adjustElement(final PsiElement psiElement) {
+    public static PsiElement adjustElement(final PsiElement psiElement) {
         Project project = psiElement.getProject();
         StepikProjectManager stepikProjectManager = StepikProjectManager.getInstance(project);
         CourseNode courseNode = stepikProjectManager.getCourseNode();

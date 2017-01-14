@@ -1,7 +1,5 @@
 package com.jetbrains.tmp.learning;
 
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
@@ -11,8 +9,6 @@ import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
-import com.intellij.openapi.ui.popup.Balloon;
-import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
@@ -52,18 +48,6 @@ public class StudyUtils {
     private StudyUtils() {
     }
 
-    public static void updateAction(@NotNull final AnActionEvent e) {
-        final Presentation presentation = e.getPresentation();
-        presentation.setEnabled(false);
-        final Project project = e.getProject();
-        if (project != null) {
-            final StudyEditor studyEditor = getSelectedStudyEditor(project);
-            if (studyEditor != null) {
-                presentation.setEnabledAndVisible(true);
-            }
-        }
-    }
-
     public static void updateToolWindows(@NotNull final Project project) {
         final StudyToolWindow studyToolWindow = getStudyToolWindow(project);
         if (studyToolWindow != null) {
@@ -83,7 +67,6 @@ public class StudyUtils {
                 .removeAllContents(false);
         StudyToolWindowFactory factory = new StudyToolWindowFactory();
         factory.createToolWindowContent(project, windowManager.getToolWindow(StudyToolWindowFactory.STUDY_TOOL_WINDOW));
-
     }
 
     @Nullable
@@ -102,19 +85,7 @@ public class StudyUtils {
         return null;
     }
 
-    /**
-     * shows pop up in the center of "check step" button in study editor
-     */
-    public static void showCheckPopUp(@NotNull final Project project, @NotNull final Balloon balloon) {
-        final StudyEditor studyEditor = getSelectedStudyEditor(project);
-        assert studyEditor != null;
-
-        balloon.show(computeLocation(studyEditor.getEditor()), Balloon.Position.above);
-        Disposer.register(project, balloon);
-    }
-
     public static RelativePoint computeLocation(Editor editor) {
-
         final Rectangle visibleRect = editor.getComponent().getVisibleRect();
         Point point = new Point(visibleRect.x + visibleRect.width + 10,
                 visibleRect.y + 10);

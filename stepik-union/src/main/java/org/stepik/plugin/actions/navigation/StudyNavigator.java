@@ -1,4 +1,4 @@
-package com.jetbrains.tmp.learning.navigation;
+package org.stepik.plugin.actions.navigation;
 
 import com.jetbrains.tmp.learning.courseFormat.CourseNode;
 import com.jetbrains.tmp.learning.courseFormat.LessonNode;

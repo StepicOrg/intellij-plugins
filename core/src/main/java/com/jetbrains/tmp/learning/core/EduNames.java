@@ -9,7 +9,6 @@ public class EduNames {
     public static final String STEP = "step";
 
     public static final String SANDBOX_DIR = "Sandbox";
-    public static final String COURSE_META_FILE = "course.json";
 
     public static final String SRC = "src";
 

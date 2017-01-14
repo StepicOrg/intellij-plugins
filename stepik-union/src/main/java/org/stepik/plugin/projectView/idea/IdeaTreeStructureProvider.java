@@ -1,7 +1,8 @@
-package org.stepik.plugin.projectView;
+package org.stepik.plugin.projectView.idea;
 
 import com.intellij.psi.PsiClass;
 import org.jetbrains.annotations.NotNull;
+import org.stepik.plugin.projectView.StepikTreeStructureProvider;
 
 /**
  * @author meanmail

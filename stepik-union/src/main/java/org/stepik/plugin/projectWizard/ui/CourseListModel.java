@@ -1,13 +1,13 @@
 package org.stepik.plugin.projectWizard.ui;
 
 import com.intellij.openapi.project.Project;
-import com.jetbrains.tmp.learning.courseGeneration.StepikProjectGenerator;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.objects.courses.Course;
 import org.stepik.api.objects.courses.Courses;
+import org.stepik.plugin.projectWizard.StepikProjectGenerator;
 import org.stepik.plugin.utils.Utils;
 
 import javax.swing.*;

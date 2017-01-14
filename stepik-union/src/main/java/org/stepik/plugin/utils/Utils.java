@@ -1,6 +1,5 @@
 package org.stepik.plugin.utils;
 
-import com.jetbrains.tmp.learning.courseGeneration.StepikProjectGenerator;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.api.client.StepikApiClient;
@@ -94,7 +93,7 @@ public class Utils {
     @NotNull
     public static String getCourseDescription(@NotNull Course course) {
         String description;
-        if (course == StepikProjectGenerator.EMPTY_COURSE) {
+        if (course.getId() == 0) {
             description = "Wrong link";
         } else {
 

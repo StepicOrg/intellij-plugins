@@ -1,4 +1,4 @@
-package org.stepik.plugin.actions;
+package org.stepik.plugin.actions.navigation;
 
 import com.intellij.ide.projectView.ProjectView;
 import com.intellij.openapi.fileEditor.FileEditorManager;
@@ -8,7 +8,6 @@ import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowId;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.jetbrains.tmp.learning.StudyUtils;
-import com.jetbrains.tmp.learning.actions.StudyStepNavigationAction;
 import com.jetbrains.tmp.learning.courseFormat.StepFile;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import org.jetbrains.annotations.NotNull;

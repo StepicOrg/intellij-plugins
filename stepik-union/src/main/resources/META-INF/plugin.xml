@@ -33,13 +33,13 @@
     </extensions>
 
     <actions>
-        <action id="STEPIK.StepikJavaPostAction" class="org.stepik.plugin.actions.StepikJavaPostAction"/>
-        <action id="STEPIK.PreviousStepAction" class="org.stepik.plugin.actions.StepikPreviousStepAction"/>
-        <action id="STEPIK.NextStepAction" class="org.stepik.plugin.actions.StepikNextStepAction"/>
-        <action id="STEPIK.DownloadSubmission" class="org.stepik.plugin.actions.DownloadSubmission"/>
-        <action id="STEPIK.SwitchLanguage" class="org.stepik.plugin.actions.SwitchLanguage"/>
-        <action id="STEPIK.InsertStepikDirectives" class="org.stepik.plugin.actions.InsertStepikDirectives"/>
-        <action id="STEPIK.RefreshStepAction" class="org.stepik.plugin.actions.StepikResetStepAction" text="Reset Step File" description="Refresh current step"/>
+        <action id="STEPIK.StepikJavaPostAction" class="org.stepik.plugin.actions.step.StepikJavaPostAction"/>
+        <action id="STEPIK.PreviousStepAction" class="org.stepik.plugin.actions.navigation.StepikPreviousStepAction"/>
+        <action id="STEPIK.NextStepAction" class="org.stepik.plugin.actions.navigation.StepikNextStepAction"/>
+        <action id="STEPIK.DownloadSubmission" class="org.stepik.plugin.actions.step.DownloadSubmission"/>
+        <action id="STEPIK.SwitchLanguage" class="org.stepik.plugin.actions.step.SwitchLanguage"/>
+        <action id="STEPIK.InsertStepikDirectives" class="org.stepik.plugin.actions.step.InsertStepikDirectives"/>
+        <action id="STEPIK.RefreshStepAction" class="org.stepik.plugin.actions.step.StepikResetStepAction" text="Reset Step File" description="Refresh current step"/>
     </actions>
 
     <!--______________________ CORE ________________________________________-->

@@ -1,29 +1,24 @@
-package com.jetbrains.tmp.learning.actions;
+package org.stepik.plugin.actions.step;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
-import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Ref;
-import com.jetbrains.tmp.learning.StudyUtils;
 import icons.AllStepikIcons;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 
-public abstract class StudyCheckAction extends StudyActionWithShortcut {
+public abstract class StudyCheckAction extends AbstractStepAction {
     private static final String SHORTCUT = "ctrl alt pressed ENTER";
 
-    private final Ref<Boolean> checkInProgress = new Ref<>(false);
-
-    public StudyCheckAction() {
+    StudyCheckAction() {
         super("Check Step (" + KeymapUtil.getShortcutText(new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT),
                 null)) + ")", "Check current step", AllStepikIcons.ToolWindow.checkTask);
     }
 
-    public abstract void check(@NotNull final Project project);
+    protected abstract void check(@NotNull final Project project);
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
@@ -33,15 +28,6 @@ public abstract class StudyCheckAction extends StudyActionWithShortcut {
         }
         FileDocumentManager.getInstance().saveAllDocuments();
         check(project);
-    }
-
-    @Override
-    public void update(AnActionEvent e) {
-        final Presentation presentation = e.getPresentation();
-        StudyUtils.updateAction(e);
-        if (presentation.isEnabled()) {
-            presentation.setEnabled(!checkInProgress.get());
-        }
     }
 
     @Override

@@ -18,7 +18,7 @@ import java.util.Collection;
 import static org.stepik.plugin.utils.PresentationDataUtils.isVisibleDirectory;
 import static org.stepik.plugin.utils.PresentationDataUtils.isVisibleFile;
 
-abstract class StepikTreeStructureProvider implements TreeStructureProvider, DumbAware {
+public abstract class StepikTreeStructureProvider implements TreeStructureProvider, DumbAware {
     @NotNull
     @Override
     public Collection<AbstractTreeNode> modify(

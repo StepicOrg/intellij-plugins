@@ -25,7 +25,6 @@ import com.jetbrains.tmp.learning.courseFormat.LessonNode;
 import com.jetbrains.tmp.learning.courseFormat.SectionNode;
 import com.jetbrains.tmp.learning.courseFormat.StepFile;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
-import com.jetbrains.tmp.learning.courseGeneration.StepikProjectGenerator;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import icons.AllStepikIcons;
 import org.jetbrains.annotations.Nls;
@@ -33,6 +32,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.objects.courses.Course;
+import org.stepik.plugin.projectWizard.StepikProjectGenerator;
 
 import javax.swing.*;
 import java.io.BufferedWriter;
@@ -87,7 +87,10 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
             Project defaultProject = DefaultProjectFactory.getInstance().getDefaultProject();
             StepikConnectorLogin.loginFromDialog(defaultProject);
             final Course course = wizardStep.getSelectedCourse();
-            if (course == StepikProjectGenerator.EMPTY_COURSE) return false;
+            if (course.getId() == 0) {
+                return false;
+            }
+
             this.generator.setSelectedCourse(course);
             StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
             stepikApiClient.enrollments()
