@@ -31,7 +31,8 @@ public class UtilsTest {
 
     @Test
     public void mapToGetStringNeedEncodeValues() throws Exception {
-        String getString = Utils.mapToGetString("параметр", new String[]{"значение"});
+        String enc = System.getProperty("file.encoding");
+        String getString = Utils.mapToGetString("параметр", new String[]{"значение"}, enc);
 
         String expected;
         expected = "%D0%BF%D0%B0%D1%80%D0%B0%D0%BC%D0%B5%D1%82%D1%80=%D0%B7%D0%BD%D0%B0%D1%87%D0%B5%D0%BD%D0%B8%D0%B5";
