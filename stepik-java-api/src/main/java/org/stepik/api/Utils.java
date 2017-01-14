@@ -6,6 +6,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -16,23 +17,18 @@ import java.util.stream.Collectors;
  * @author meanmail
  */
 public class Utils {
-
-    public static String mapToGetString(@NotNull String name, @NotNull String[] values) {
-        return mapToGetString(name, values, "UTF-8");
-    }
-
     @NotNull
-    public static String mapToGetString(@NotNull String name, @NotNull String[] values, @NotNull String enc) {
-        String encodedName = encode(name, enc);
+    public static String mapToGetString(@NotNull String name, @NotNull String[] values) {
+        String encodedName = encode(name);
         return Arrays.stream(values)
-                .map(value -> encodedName + "=" + encode(value, enc))
+                .map(value -> encodedName + "=" + encode(value))
                 .collect(Collectors.joining("&"));
     }
 
     @NotNull
-    private static String encode(@NotNull String value, @NotNull String enc) {
+    private static String encode(@NotNull String value) {
         try {
-            return URLEncoder.encode(value, enc);
+            return URLEncoder.encode(value, StandardCharsets.UTF_8.name());
         } catch (UnsupportedEncodingException e) {
             return value;
         }

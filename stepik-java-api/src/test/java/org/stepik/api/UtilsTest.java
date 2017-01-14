@@ -31,8 +31,9 @@ public class UtilsTest {
 
     @Test
     public void mapToGetStringNeedEncodeValues() throws Exception {
-        String enc = System.getProperty("file.encoding");
-        String getString = Utils.mapToGetString("параметр", new String[]{"значение"}, enc);
+        String name = "\u043f\u0430\u0440\u0430\u043c\u0435\u0442\u0440";
+        String[] value = new String[]{"\u0437\u043d\u0430\u0447\u0435\u043d\u0438\u0435"};
+        String getString = Utils.mapToGetString(name, value);
 
         String expected;
         expected = "%D0%BF%D0%B0%D1%80%D0%B0%D0%BC%D0%B5%D1%82%D1%80=%D0%B7%D0%BD%D0%B0%D1%87%D0%B5%D0%BD%D0%B8%D0%B5";
