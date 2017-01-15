@@ -84,8 +84,6 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
     @Override
     public BooleanFunction<PythonProjectGenerator> beforeProjectGenerated(@Nullable Sdk sdk) {
         return generator -> {
-            Project defaultProject = DefaultProjectFactory.getInstance().getDefaultProject();
-            StepikConnectorLogin.loginFromDialog(defaultProject);
             final Course course = wizardStep.getSelectedCourse();
             if (course.getId() == 0) {
                 return false;
@@ -114,7 +112,6 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
             @NotNull final Module module,
             @Nullable final PyProjectSynchronizer synchronizer) {
         super.configureProject(project, baseDir, settings, module, synchronizer);
-        StepikConnectorLogin.loginFromDialog(project);
         ApplicationManager.getApplication()
                 .runWriteAction(() -> ModuleRootModificationUtil.setModuleSdk(module, settings.getSdk()));
         createCourseFromGenerator(project);

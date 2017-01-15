@@ -17,31 +17,55 @@ import java.util.List;
 import java.util.Map;
 
 public class StepNode implements StudyNode {
-    @Nullable
     private StudyStatus status;
-    @Nullable
     private LessonNode lessonNode;
-    @Nullable
     private Map<String, StepFile> stepFiles;
-    @Nullable
-    private Map<SupportedLanguages, Limit> timeLimits;
-    @Nullable
+    private Map<SupportedLanguages, Limit> limits;
     private List<SupportedLanguages> supportedLanguages;
-    @Nullable
     private SupportedLanguages currentLang;
-    private StepType type;
     private Step data;
 
     public StepNode() {}
 
-    public StepNode(Step data) {
+    public StepNode(@NotNull final LessonNode lessonNode, @NotNull Step data) {
         this.data = data;
+        init(lessonNode, true);
+    }
 
-        setStatus(StudyStatus.UNCHECKED);
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
+        StepNode stepNode = (StepNode) o;
+
+        if (status != stepNode.status) return false;
+        if (lessonNode != null ? !lessonNode.equals(stepNode.lessonNode) : stepNode.lessonNode != null) return false;
+        if (stepFiles != null ? !stepFiles.equals(stepNode.stepFiles) : stepNode.stepFiles != null) return false;
+        if (limits != null ? !limits.equals(stepNode.limits) : stepNode.limits != null) return false;
+        if (supportedLanguages != null ?
+                !supportedLanguages.equals(stepNode.supportedLanguages) :
+                stepNode.supportedLanguages != null) return false;
+        //noinspection SimplifiableIfStatement
+        if (currentLang != stepNode.currentLang) return false;
+        return data != null ? data.equals(stepNode.data) : stepNode.data == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = status != null ? status.hashCode() : 0;
+        result = 31 * result + (lessonNode != null ? lessonNode.hashCode() : 0);
+        result = 31 * result + (stepFiles != null ? stepFiles.hashCode() : 0);
+        result = 31 * result + (limits != null ? limits.hashCode() : 0);
+        result = 31 * result + (supportedLanguages != null ? supportedLanguages.hashCode() : 0);
+        result = 31 * result + (currentLang != null ? currentLang.hashCode() : 0);
+        result = 31 * result + (data != null ? data.hashCode() : 0);
+        return result;
+    }
+
+    void init(@NotNull final LessonNode lessonNode, boolean isRestarted) {
         BlockView block = data.getBlock();
 
-        setType(StepType.of(block.getName()));
         if (getType() == StepType.CODE) {
             BlockViewOptions options = block.getOptions();
             List<SupportedLanguages> languages = new ArrayList<>();
@@ -64,25 +88,27 @@ public class StepNode implements StudyNode {
             Map<SupportedLanguages, Limit> limits = new HashMap<>();
             options.getLimits().entrySet()
                     .forEach(entry -> limits.put(SupportedLanguages.langOf(entry.getKey()), entry.getValue()));
-            setTimeLimits(limits);
+            setLimits(limits);
         }
-    }
 
-    void initStep(@Nullable final LessonNode lessonNode, boolean isRestarted) {
         setLessonNode(lessonNode);
-        if (!isRestarted) {
+
+        if (isRestarted) {
             status = StudyStatus.UNCHECKED;
         }
+
         for (StepFile stepFile : getStepFiles().values()) {
-            stepFile.initStepFile(this);
+            stepFile.init(this);
         }
     }
 
+    @Transient
     @NotNull
     public String getName() {
         return EduNames.STEP + getData().getPosition();
     }
 
+    @Transient
     @NotNull
     public String getText() {
         return getData().getBlock().getText();
@@ -112,7 +138,6 @@ public class StepNode implements StudyNode {
         return lessonNode;
     }
 
-    @Transient
     public void setLessonNode(@Nullable LessonNode lessonNode) {
         this.lessonNode = lessonNode;
     }
@@ -132,7 +157,6 @@ public class StepNode implements StudyNode {
         return getData().getId();
     }
 
-    @Transient
     public void setId(long id) {
         getData().setId(id);
     }
@@ -150,12 +174,14 @@ public class StepNode implements StudyNode {
         this.status = status;
     }
 
+    @Transient
     @NotNull
     @Override
     public String getDirectory() {
         return EduNames.STEP + getId();
     }
 
+    @Transient
     @NotNull
     @Override
     public String getPath() {
@@ -171,27 +197,28 @@ public class StepNode implements StudyNode {
         return getData().getPosition();
     }
 
-    @Transient
     public void setPosition(int position) {
         getData().setPosition(position);
     }
 
     @SuppressWarnings("WeakerAccess")
     @NotNull
-    public Map<SupportedLanguages, Limit> getTimeLimits() {
-        if (timeLimits == null) {
-            timeLimits = new HashMap<>();
+    public Map<SupportedLanguages, Limit> getLimits() {
+        if (limits == null) {
+            limits = new HashMap<>();
         }
-        return timeLimits;
+        return limits;
     }
 
-    public void setTimeLimits(@Nullable Map<SupportedLanguages, Limit> timeLimits) {
-        this.timeLimits = timeLimits;
+    @SuppressWarnings({"WeakerAccess", "unused"})
+    public void setLimits(@Nullable Map<SupportedLanguages, Limit> limits) {
+        this.limits = limits;
     }
 
+    @NotNull
     @Transient
-    public Limit getLimits() {
-        return getTimeLimits().getOrDefault(getCurrentLang(), new Limit());
+    public Limit getLimit() {
+        return getLimits().getOrDefault(getCurrentLang(), new Limit());
     }
 
     @NotNull
@@ -203,7 +230,7 @@ public class StepNode implements StudyNode {
     }
 
     @SuppressWarnings("unused")
-    public void setSupportedLanguages(@NotNull List<SupportedLanguages> supportedLanguages) {
+    public void setSupportedLanguages(@Nullable List<SupportedLanguages> supportedLanguages) {
         this.supportedLanguages = supportedLanguages;
     }
 
@@ -222,6 +249,7 @@ public class StepNode implements StudyNode {
         this.currentLang = currentLang;
     }
 
+    @Transient
     @NotNull
     private SupportedLanguages getFirstSupportLang() {
         List<SupportedLanguages> languages = getSupportedLanguages();
@@ -232,18 +260,8 @@ public class StepNode implements StudyNode {
         }
     }
 
-    public void addLanguages(@NotNull List<SupportedLanguages> languages) {
-        getSupportedLanguages().addAll(languages);
-    }
-
-    public StepType getType() {
-        return type;
-    }
-
-    public void setType(StepType type) {
-        this.type = type;
-    }
-
+    @SuppressWarnings("WeakerAccess")
+    @NotNull
     public Step getData() {
         if (data == null) {
             data = new Step();
@@ -251,14 +269,22 @@ public class StepNode implements StudyNode {
         return data;
     }
 
-    public void setData(Step data) {
+    @SuppressWarnings("unused")
+    public void setData(@Nullable Step data) {
         this.data = data;
     }
 
+    @Transient
+    @NotNull
     public List<Sample> getSamples() {
-        if (type == StepType.CODE) {
+        if (StepType.of(data.getBlock().getName()) == StepType.CODE) {
             return getData().getBlock().getOptions().getSamples();
         }
         return new ArrayList<>();
+    }
+
+    @Transient
+    public StepType getType() {
+        return StepType.of(data.getBlock().getName());
     }
 }

@@ -1,5 +1,6 @@
 package com.jetbrains.tmp.learning.courseFormat;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.util.xmlb.annotations.Transient;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.core.EduUtils;
@@ -7,6 +8,7 @@ import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
+import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.courses.Course;
 import org.stepik.api.objects.sections.Section;
 import org.stepik.api.objects.sections.Sections;
@@ -17,53 +19,78 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CourseNode implements StudyNode {
+    private static final Logger logger = Logger.getInstance(CourseNode.class);
     private Course data;
-    @Nullable
     private List<User> authors;
-    @Nullable
     private List<SectionNode> sectionNodes;
 
     public CourseNode() {
     }
 
-    public CourseNode(Course data) {
+    public CourseNode(@NotNull Course data) {
         this.data = data;
-
-        StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
-
-        List<Long> authorsIds = data.getAuthors();
-        Users users = stepikApiClient.users()
-                .get()
-                .id(authorsIds)
-                .execute();
-
-        setAuthors(users.getUsers());
-
-        List<Long> sectionsIds = data.getSections();
-        Sections sections = stepikApiClient.sections()
-                .get()
-                .id(sectionsIds)
-                .execute();
-
-        ArrayList<SectionNode> sectionsList = new ArrayList<>();
-        for (Section section : sections.getSections()) {
-            SectionNode item = new SectionNode(section);
-            if (item.getLessonNodes().size() > 0) {
-                sectionsList.add(item);
-            }
-        }
-
-        setSectionNodes(sectionsList);
-
-        initCourse(true);
+        init(true);
     }
 
-    /**
-     * Initializes state of course
-     */
-    public void initCourse(boolean isRestarted) {
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        CourseNode that = (CourseNode) o;
+
+        if (data != null ? !data.equals(that.data) : that.data != null) return false;
+        //noinspection SimplifiableIfStatement
+        if (authors != null ? !authors.equals(that.authors) : that.authors != null) return false;
+        return sectionNodes != null ? sectionNodes.equals(that.sectionNodes) : that.sectionNodes == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = data != null ? data.hashCode() : 0;
+        result = 31 * result + (authors != null ? authors.hashCode() : 0);
+        result = 31 * result + (sectionNodes != null ? sectionNodes.hashCode() : 0);
+        return result;
+    }
+
+    public void init(boolean isRestarted) {
+        try {
+            StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
+            List<Long> authorsIds = data.getAuthors();
+            if (authorsIds.size() > 0) {
+                Users users = stepikApiClient.users()
+                        .get()
+                        .id(authorsIds)
+                        .execute();
+                setAuthors(users.getUsers());
+            }
+
+            List<Long> sectionsIds = data.getSections();
+            if (sectionsIds.size() > 0) {
+                Sections sections = stepikApiClient.sections()
+                        .get()
+                        .id(sectionsIds)
+                        .execute();
+
+
+                for (Section section : sections.getSections()) {
+                    SectionNode sectionNode = getSectionById(section.getId());
+                    if (sectionNode != null) {
+                        sectionNode.setData(section);
+                    } else {
+                        SectionNode item = new SectionNode(this, section);
+                        if (item.getLessonNodes().size() > 0) {
+                            getSectionNodes().add(item);
+                        }
+                    }
+                }
+            }
+        } catch (StepikClientException logged) {
+            logger.warn("A course initialization don't is fully", logged);
+        }
+
         for (SectionNode sectionNode : getSectionNodes()) {
-            sectionNode.initSection(this, isRestarted);
+            sectionNode.init(this, isRestarted);
         }
     }
 
@@ -76,21 +103,25 @@ public class CourseNode implements StudyNode {
         return authors;
     }
 
+    @SuppressWarnings({"WeakerAccess", "unused"})
     public void setAuthors(@Nullable List<User> authors) {
         this.authors = authors;
     }
 
+    @Transient
     @NotNull
     @Override
     public String getName() {
         return getData().getTitle();
     }
 
+    @Transient
     @Override
     public int getPosition() {
         return 0;
     }
 
+    @Transient
     @Override
     public long getId() {
         return getData().getId();
@@ -156,6 +187,7 @@ public class CourseNode implements StudyNode {
         return getSectionById(id);
     }
 
+    @Nullable
     public LessonNode getLessonByDirName(@NotNull String name) {
         int id = EduUtils.parseDirName(name, EduNames.LESSON);
         return getLessonById(id);
@@ -187,7 +219,6 @@ public class CourseNode implements StudyNode {
         return "";
     }
 
-    @Transient
     @Nullable
     public SectionNode getPrevSection(@NotNull SectionNode sectionNode) {
         int position = sectionNode.getPosition();
@@ -201,7 +232,6 @@ public class CourseNode implements StudyNode {
         return null;
     }
 
-    @Transient
     @Nullable
     public SectionNode getNextSection(@NotNull SectionNode sectionNode) {
         int position = sectionNode.getPosition();
@@ -213,6 +243,8 @@ public class CourseNode implements StudyNode {
         return null;
     }
 
+    @SuppressWarnings("WeakerAccess")
+    @NotNull
     public Course getData() {
         if (data == null) {
             data = new Course();
@@ -220,7 +252,8 @@ public class CourseNode implements StudyNode {
         return data;
     }
 
-    public void setData(Course data) {
+    @SuppressWarnings("unused")
+    public void setData(@Nullable Course data) {
         this.data = data;
     }
 }

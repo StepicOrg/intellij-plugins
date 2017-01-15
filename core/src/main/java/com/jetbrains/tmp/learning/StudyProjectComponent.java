@@ -35,7 +35,6 @@ import com.jetbrains.tmp.learning.courseFormat.CourseNode;
 import com.jetbrains.tmp.learning.courseFormat.StepFile;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.editor.StudyEditorFactoryListener;
-import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import com.jetbrains.tmp.learning.ui.StudyToolWindow;
 import com.jetbrains.tmp.learning.ui.StudyToolWindowFactory;
 import javafx.application.Platform;
@@ -82,7 +81,6 @@ public class StudyProjectComponent implements ProjectComponent {
                                 }
                                 logger.info("register Shortcuts");
                                 registerShortcuts();
-                                StepikConnectorLogin.loginFromDialog(project);
                             }
                         }));
     }
@@ -236,7 +234,7 @@ public class StudyProjectComponent implements ProjectComponent {
                     return;
                 }
                 final StepFile stepFile = new StepFile();
-                stepFile.initStepFile(stepNode);
+                stepFile.init(stepNode);
                 final String name = createdFile.getName();
                 stepFile.setName(name);
                 stepNode.getStepFiles().put(name, stepFile);

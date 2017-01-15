@@ -21,7 +21,6 @@ import com.jetbrains.tmp.learning.courseFormat.CourseNode;
 import com.jetbrains.tmp.learning.courseFormat.LessonNode;
 import com.jetbrains.tmp.learning.courseFormat.SectionNode;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
-import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.plugin.projectWizard.StepikProjectGenerator;
@@ -40,7 +39,6 @@ class CourseModuleBuilder extends AbstractModuleBuilder {
         Module baseModule = super.createModule(moduleModel);
         Project project = baseModule.getProject();
         logger.info("Create project module");
-        StepikConnectorLogin.loginFromDialog(project);
         createCourseFromGenerator(moduleModel, project);
         return baseModule;
     }

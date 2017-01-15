@@ -1,5 +1,6 @@
 package com.jetbrains.tmp.learning.courseFormat;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.util.xmlb.annotations.Transient;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.core.EduUtils;
@@ -7,6 +8,7 @@ import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
+import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.lessons.Lesson;
 import org.stepik.api.objects.steps.Step;
 import org.stepik.api.objects.steps.Steps;
@@ -16,9 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LessonNode implements StudyNode {
-    @Nullable
+    private static final Logger logger = Logger.getInstance(LessonNode.class);
     private SectionNode sectionNode;
-    @Nullable
     private List<StepNode> stepNodes;
     private Lesson data;
     private Unit unit;
@@ -26,36 +27,84 @@ public class LessonNode implements StudyNode {
     public LessonNode() {
     }
 
-    public LessonNode(@NotNull Lesson data, Unit unit) {
+    public LessonNode(
+            @NotNull final SectionNode sectionNode,
+            @NotNull Lesson data,
+            @NotNull Unit unit) {
         this.data = data;
         this.unit = unit;
+        init(sectionNode, true);
+    }
 
-        StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
-        List<Long> stepsIds = data.getSteps();
-        Steps steps = stepikApiClient.steps()
-                .get()
-                .id(stepsIds)
-                .execute();
+        LessonNode that = (LessonNode) o;
 
-        ArrayList<StepNode> stepNodeList = new ArrayList<>();
-        for (Step step : steps.getSteps()) {
-            StepNode item = new StepNode(step);
-            if (item.getType() == StepType.CODE) {
-                stepNodeList.add(item);
+        if (sectionNode != null ? !sectionNode.equals(that.sectionNode) : that.sectionNode != null) return false;
+        if (stepNodes != null ? !stepNodes.equals(that.stepNodes) : that.stepNodes != null) return false;
+        //noinspection SimplifiableIfStatement
+        if (data != null ? !data.equals(that.data) : that.data != null) return false;
+        return unit != null ? unit.equals(that.unit) : that.unit == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = sectionNode != null ? sectionNode.hashCode() : 0;
+        result = 31 * result + (stepNodes != null ? stepNodes.hashCode() : 0);
+        result = 31 * result + (data != null ? data.hashCode() : 0);
+        result = 31 * result + (unit != null ? unit.hashCode() : 0);
+        return result;
+    }
+
+    void init(@NotNull final SectionNode sectionNode, boolean isRestarted) {
+        try {
+            StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
+
+            List<Long> stepsIds = data.getSteps();
+
+            if (stepsIds.size() > 0) {
+                Steps steps = stepikApiClient.steps()
+                        .get()
+                        .id(stepsIds)
+                        .execute();
+
+                for (Step step : steps.getSteps()) {
+                    StepNode stepNode = getStepById(step.getId());
+                    if (stepNode != null) {
+                        stepNode.setData(step);
+                    } else {
+                        StepNode item = new StepNode(this, step);
+                        if (item.getType() == StepType.CODE) {
+                            getStepNodes().add(item);
+                        }
+                    }
+                }
+            }
+        } catch (StepikClientException logged) {
+            logger.warn("A lesson initialization don't is fully", logged);
+        }
+
+        setSectionNode(sectionNode);
+
+        for (StepNode stepNode : getStepNodes()) {
+            stepNode.init(this, isRestarted);
+        }
+    }
+
+    @Nullable
+    private StepNode getStepById(long id) {
+        for (StepNode stepNode : getStepNodes()) {
+            if (stepNode.getId() == id) {
+                return stepNode;
             }
         }
-
-        setStepNodes(stepNodeList);
+        return null;
     }
 
-    void initLesson(@Nullable final SectionNode sectionNode, boolean isRestarted) {
-        setSectionNode(sectionNode);
-        for (StepNode stepNode : getStepNodes()) {
-            stepNode.initStep(this, isRestarted);
-        }
-    }
-
+    @Transient
     @NotNull
     @Override
     public String getName() {
@@ -90,6 +139,7 @@ public class LessonNode implements StudyNode {
         return null;
     }
 
+    @Transient
     @NotNull
     @Override
     public StudyStatus getStatus() {
@@ -101,12 +151,14 @@ public class LessonNode implements StudyNode {
         return StudyStatus.SOLVED;
     }
 
+    @Transient
     @NotNull
     @Override
     public String getDirectory() {
         return EduNames.LESSON + getId();
     }
 
+    @Transient
     @NotNull
     @Override
     public String getPath() {
@@ -122,7 +174,6 @@ public class LessonNode implements StudyNode {
         return getData().getId();
     }
 
-    @Transient
     public void setId(long id) {
         getData().setId(id);
     }
@@ -142,7 +193,6 @@ public class LessonNode implements StudyNode {
         return sectionNode;
     }
 
-    @Transient
     public void setSectionNode(@Nullable SectionNode sectionNode) {
         this.sectionNode = sectionNode;
     }
@@ -152,11 +202,11 @@ public class LessonNode implements StudyNode {
         return getUnit().getPosition();
     }
 
-    @Transient
     public void setPosition(int position) {
         getUnit().setPosition(position);
     }
 
+    @NotNull
     @Override
     public String toString() {
         return "LessonNode {id=" + getId() + ", name='" + getName() + "\'}";
@@ -209,6 +259,8 @@ public class LessonNode implements StudyNode {
         return null;
     }
 
+    @SuppressWarnings("WeakerAccess")
+    @NotNull
     public Lesson getData() {
         if (data == null) {
             data = new Lesson();
@@ -216,10 +268,13 @@ public class LessonNode implements StudyNode {
         return data;
     }
 
-    public void setData(Lesson data) {
+    @SuppressWarnings("unused")
+    public void setData(@Nullable Lesson data) {
         this.data = data;
     }
 
+    @SuppressWarnings("WeakerAccess")
+    @NotNull
     public Unit getUnit() {
         if (unit == null) {
             unit = new Unit();
@@ -227,7 +282,8 @@ public class LessonNode implements StudyNode {
         return unit;
     }
 
-    public void setUnit(Unit unit) {
+    @SuppressWarnings("unused")
+    public void setUnit(@Nullable Unit unit) {
         this.unit = unit;
     }
 }

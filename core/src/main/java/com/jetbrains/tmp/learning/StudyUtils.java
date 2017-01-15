@@ -188,7 +188,7 @@ public class StudyUtils {
                     .append("<br>");
         }
 
-        Limit limit = stepNode.getLimits();
+        Limit limit = stepNode.getLimit();
         stringBuilder.append("<p><b>Limits: </b>")
                 .append(limit.getTime())
                 .append("s; ")

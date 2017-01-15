@@ -1,11 +1,13 @@
 package com.jetbrains.tmp.learning.courseFormat;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.util.xmlb.annotations.Transient;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
+import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.lessons.Lesson;
 import org.stepik.api.objects.lessons.Lessons;
 import org.stepik.api.objects.sections.Section;
@@ -22,60 +24,102 @@ import java.util.Map;
  */
 
 public class SectionNode implements StudyNode {
+    private static final Logger logger = Logger.getInstance(SectionNode.class);
     private Section data;
-    @Nullable
     private List<LessonNode> lessonNodes;
-    @Nullable
     private CourseNode courseNode;
 
     public SectionNode() {
     }
 
-    public SectionNode(Section data) {
+    public SectionNode(@NotNull final CourseNode courseNode, @NotNull Section data) {
         this.data = data;
+        init(courseNode, true);
+    }
 
-        StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
-        List<Long> unitsIds = data.getUnits();
+        SectionNode that = (SectionNode) o;
 
-        Units units = stepikApiClient.units()
-                .get()
-                .id(unitsIds)
-                .execute();
+        if (data != null ? !data.equals(that.data) : that.data != null) return false;
+        //noinspection SimplifiableIfStatement
+        if (lessonNodes != null ? !lessonNodes.equals(that.lessonNodes) : that.lessonNodes != null) return false;
+        return courseNode != null ? courseNode.equals(that.courseNode) : that.courseNode == null;
+    }
 
-        Map<Long, Unit> unitsMap = new HashMap<>();
+    @Override
+    public int hashCode() {
+        int result = data != null ? data.hashCode() : 0;
+        result = 31 * result + (lessonNodes != null ? lessonNodes.hashCode() : 0);
+        result = 31 * result + (courseNode != null ? courseNode.hashCode() : 0);
+        return result;
+    }
 
-        List<Long> lessonsIds = new ArrayList<>();
+    void init(@NotNull final CourseNode courseNode, boolean isRestarted) {
+        try {
+            StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
 
-        units.getUnits().forEach(unit -> {
-            long lessonId = unit.getLesson();
-            lessonsIds.add(lessonId);
-            unitsMap.put(lessonId, unit);
-        });
+            List<Long> unitsIds = data.getUnits();
 
-        Lessons lessons = stepikApiClient.lessons()
-                .get()
-                .id(lessonsIds)
-                .execute();
+            if (unitsIds.size() > 0) {
+                Units units = stepikApiClient.units()
+                        .get()
+                        .id(unitsIds)
+                        .execute();
 
-        ArrayList<LessonNode> lessonsList = new ArrayList<>();
-        for (Lesson lesson : lessons.getLessons()) {
-            LessonNode item = new LessonNode(lesson, unitsMap.get(lesson.getId()));
-            if (item.getStepNodes().size() > 0) {
-                lessonsList.add(item);
+                Map<Long, Unit> unitsMap = new HashMap<>();
+
+                List<Long> lessonsIds = new ArrayList<>();
+
+                units.getUnits().forEach(unit -> {
+                    long lessonId = unit.getLesson();
+                    lessonsIds.add(lessonId);
+                    unitsMap.put(lessonId, unit);
+                });
+
+                Lessons lessons = stepikApiClient.lessons()
+                        .get()
+                        .id(lessonsIds)
+                        .execute();
+
+                for (Lesson lesson : lessons.getLessons()) {
+                    LessonNode lessonNode = getLessonById(lesson.getId());
+                    if (lessonNode != null) {
+                        lessonNode.setData(lesson);
+                        lessonNode.setUnit(unitsMap.get(lesson.getId()));
+                    } else {
+                        LessonNode item = new LessonNode(this, lesson, unitsMap.get(lesson.getId()));
+                        if (item.getStepNodes().size() > 0) {
+                            getLessonNodes().add(item);
+                        }
+                    }
+                }
+            }
+        } catch (StepikClientException logged) {
+            logger.warn("A section initialization don't is fully", logged);
+        }
+
+        setCourseNode(courseNode);
+
+        for (LessonNode lessonNode : getLessonNodes()) {
+            lessonNode.init(this, isRestarted);
+        }
+    }
+
+    @Nullable
+    private LessonNode getLessonById(long id) {
+        for (LessonNode lessonNode : getLessonNodes()) {
+            if (lessonNode.getId() == id) {
+                return lessonNode;
             }
         }
-
-        setLessonNodes(lessonsList);
+        return null;
     }
 
-    void initSection(@Nullable final CourseNode courseNode, boolean isRestarted) {
-        setCourseNode(courseNode);
-        for (LessonNode lessonNode : getLessonNodes()) {
-            lessonNode.initLesson(this, isRestarted);
-        }
-    }
-
+    @Transient
     @NotNull
     @Override
     public String getName() {
@@ -88,7 +132,6 @@ public class SectionNode implements StudyNode {
         return getData().getPosition();
     }
 
-    @Transient
     public void setPosition(int position) {
         getData().setPosition(position);
     }
@@ -106,6 +149,7 @@ public class SectionNode implements StudyNode {
         this.lessonNodes = lessonNodes;
     }
 
+    @Transient
     @NotNull
     @Override
     public StudyStatus getStatus() {
@@ -117,12 +161,14 @@ public class SectionNode implements StudyNode {
         return StudyStatus.SOLVED;
     }
 
+    @Transient
     @NotNull
     @Override
     public String getDirectory() {
         return EduNames.SECTION + getId();
     }
 
+    @Transient
     @NotNull
     @Override
     public String getPath() {
@@ -139,7 +185,6 @@ public class SectionNode implements StudyNode {
         return courseNode;
     }
 
-    @Transient
     public void setCourseNode(@Nullable CourseNode courseNode) {
         this.courseNode = courseNode;
     }
@@ -150,7 +195,6 @@ public class SectionNode implements StudyNode {
         return getData().getId();
     }
 
-    @Transient
     public void setId(long id) {
         getData().setId(id);
     }
@@ -205,6 +249,8 @@ public class SectionNode implements StudyNode {
         return null;
     }
 
+    @SuppressWarnings("WeakerAccess")
+    @NotNull
     public Section getData() {
         if (data == null) {
             data = new Section();
@@ -212,11 +258,12 @@ public class SectionNode implements StudyNode {
         return data;
     }
 
-    public void setData(Section data) {
+    @SuppressWarnings("unused")
+    public void setData(@Nullable Section data) {
         this.data = data;
     }
 
-    public void addLesson(LessonNode lessonNode) {
+    public void addLesson(@Nullable LessonNode lessonNode) {
         getLessonNodes().add(lessonNode);
     }
 }

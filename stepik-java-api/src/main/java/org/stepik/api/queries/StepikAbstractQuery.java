@@ -128,13 +128,13 @@ abstract class StepikAbstractQuery<T> {
             }
         } catch (IOException e) {
             String message = "Failed query to " + getUrl();
-            logger.error(message, e);
+            logger.warn(message, e);
             throw new StepikClientException(message, e);
         }
 
         if (response.getStatusCode() / 100 != 2) {
             String message = "Failed query to " + getUrl() + " returned the status code " + response.getStatusCode();
-            logger.error(message);
+            logger.warn(message);
             throw new StepikClientException(message);
         }
 

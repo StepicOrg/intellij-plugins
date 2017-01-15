@@ -17,17 +17,29 @@ public class ProjectSettingsPanel implements ProjectSetting {
     private static final Logger logger = Logger.getInstance(ProjectSettingsPanel.class);
     private final Project project;
     private final List<ProjectSettingListener> listeners = new ArrayList<>();
+    @SuppressWarnings("unused")
     private JPanel mainPanel;
+    @SuppressWarnings("unused")
     private JLabel nameLabel;
+    @SuppressWarnings("unused")
     private JLabel userName;
+    @SuppressWarnings("unused")
     private JLabel langLabel;
+    @SuppressWarnings("unused")
     private LanguageComboBox langComboBox;
+    @SuppressWarnings("unused")
     private JLabel buildLabel;
+    @SuppressWarnings("unused")
     private BuildTypeComboBox buildType;
+    @SuppressWarnings("unused")
     private JLabel courseLabel;
+    @SuppressWarnings("unused")
     private CourseListBox courseListComboBox;
+    @SuppressWarnings("unused")
     private RefreshButton refreshListButton;
+    @SuppressWarnings("unused")
     private CourseDescriptionPane courseListDescription;
+    @SuppressWarnings("unused")
     private JScrollPane scrollPane;
     private Course selectedCourse = StepikProjectGenerator.EMPTY_COURSE;
 
@@ -48,7 +60,7 @@ public class ProjectSettingsPanel implements ProjectSetting {
 
     public void updateStep() {
         logger.info("Start updating settings");
-        StepikConnectorLogin.loginFromDialog(project);
+        StepikConnectorLogin.loginFromDialog();
         String username = StepikConnectorLogin.getCurrentUserFullName();
         userName.setText(username);
         courseListComboBox.refresh(project);
