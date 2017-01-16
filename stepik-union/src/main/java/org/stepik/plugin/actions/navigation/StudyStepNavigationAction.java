@@ -121,6 +121,12 @@ abstract class StudyStepNavigationAction extends StudyActionWithShortcut {
         }
 
         CourseNode courseNode = StepikProjectManager.getInstance(project).getCourseNode();
-        presentation.setEnabled(courseNode != null);
+
+        if (courseNode == null) {
+            return;
+        }
+
+        StepNode stepNode = StudyUtils.getSelectedStep(project);
+        presentation.setEnabled(stepNode == null || getTargetStep(stepNode) != null);
     }
 }
