@@ -11,9 +11,11 @@ import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.internal.FileUtils
+import org.gradle.internal.jvm.Jvm
 import org.gradle.jvm.tasks.Jar
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.Nullable
+import org.stepik.gradle.plugins.jetbrains.dependency.DependencyManager
 
 import java.nio.file.Files
 import java.nio.file.Path
@@ -107,6 +109,12 @@ class PrepareSandboxTask extends DefaultTask {
     private static HashSet<Path> getDependenciesJars(@NotNull Project project) {
         def runtimeConfiguration = project.configurations.getByName(JavaPlugin.RUNTIME_CONFIGURATION_NAME)
 
+        def libsToIgnored = [Jvm.current().toolsJar]
+
+        DependencyManager.dependencies.forEach {
+            libsToIgnored.addAll(it.jarFiles)
+        }
+
         def result = new HashSet<>()
         runtimeConfiguration.getAllDependencies().each {
             if (it instanceof ProjectDependency) {
@@ -118,7 +126,16 @@ class PrepareSandboxTask extends DefaultTask {
                     result.addAll(dependenciesJars)
                 }
             }
+            // FIXME: Remove a condition with 'slf4j' when the stepik-java-api will extracted into a other project
+            runtimeConfiguration.fileCollection(it)
+                    .filter {
+                !it.name.startsWith('slf4j-') && !libsToIgnored.contains(it)
+            }
+            .forEach {
+                result.add(it.absoluteFile.toPath())
+            }
         }
+
         result
     }
 
