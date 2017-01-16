@@ -10,6 +10,8 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.DefaultConnectionReuseStrategy;
 import org.apache.http.impl.client.BasicCookieStore;
@@ -17,21 +19,19 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.ssl.SSLContexts;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.security.KeyManagementException;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -79,15 +79,17 @@ public class HttpTransportClient implements TransportClient {
                 .setUserAgent(USER_AGENT)
                 .setConnectionReuseStrategy(DefaultConnectionReuseStrategy.INSTANCE);
 
-        SSLContext sslContext = null;
         try {
-            sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(null, getTrustAllCerts(), new SecureRandom());
-        } catch (NoSuchAlgorithmException | KeyManagementException e) {
-            logger.warn("Failed get instance SSL context", e);
-        }
-        if (sslContext != null) {
-            builder.setSSLContext(sslContext);
+            SSLContext sslContext = SSLContexts.custom()
+                    .loadTrustMaterial(null, (chain, authType) -> true)
+                    .build();
+
+            SSLConnectionSocketFactory sslSocketFactory = new SSLConnectionSocketFactory(sslContext,
+                    NoopHostnameVerifier.INSTANCE);
+
+            builder.setSSLSocketFactory(sslSocketFactory);
+        } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException e) {
+            logger.warn("Failed set SSL connection socket factory", e);
         }
 
         if (proxyHost != null) {
@@ -96,21 +98,6 @@ public class HttpTransportClient implements TransportClient {
         }
 
         httpClient = builder.build();
-    }
-
-    @NotNull
-    private static TrustManager[] getTrustAllCerts() {
-        return new TrustManager[]{new X509TrustManager() {
-            public X509Certificate[] getAcceptedIssuers() {
-                return null;
-            }
-
-            public void checkClientTrusted(X509Certificate[] certs, String authType) {
-            }
-
-            public void checkServerTrusted(X509Certificate[] certs, String authType) {
-            }
-        }};
     }
 
     @NotNull
