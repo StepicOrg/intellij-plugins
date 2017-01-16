@@ -26,6 +26,6 @@ class RunIdeaTask extends BaseRunTask {
         if (extension.type == "IC") {
             return "Idea"
         }
-        return null;
+        return null
     }
 }

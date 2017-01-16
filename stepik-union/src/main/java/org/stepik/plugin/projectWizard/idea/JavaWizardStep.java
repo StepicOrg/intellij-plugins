@@ -1,6 +1,7 @@
 package org.stepik.plugin.projectWizard.idea;
 
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
+import com.intellij.ide.wizard.CommitStepException;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
@@ -19,6 +20,8 @@ class JavaWizardStep extends ModuleWizardStep {
     private static final Logger logger = Logger.getInstance(JavaWizardStep.class);
     private final StepikProjectGenerator generator;
     private final ProjectSettingsPanel panel;
+    private boolean valid;
+    private boolean leaving;
 
     JavaWizardStep(@NotNull final StepikProjectGenerator generator, @NotNull Project project) {
         this.generator = generator;
@@ -38,15 +41,27 @@ class JavaWizardStep extends ModuleWizardStep {
     @Override
     public void updateStep() {
         panel.updateStep();
+        valid = false;
+        leaving = false;
     }
 
     @Override
     public boolean validate() throws ConfigurationException {
-        return panel.validate();
+        valid = panel.validate();
+        return valid;
     }
 
     @Override
     public void onStepLeaving() {
+        leaving = true;
+    }
+
+    @Override
+    public void onWizardFinished() throws CommitStepException {
+        if (!(valid && leaving)) {
+            return;
+        }
+
         Course selectedCourse = panel.getSelectedCourse();
         SupportedLanguages selectedLang = panel.getLanguage();
         generator.setDefaultLang(selectedLang);
