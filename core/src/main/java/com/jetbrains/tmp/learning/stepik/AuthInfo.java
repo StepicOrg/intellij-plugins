@@ -44,4 +44,8 @@ class AuthInfo {
     void setUsername(@Nullable String username) {
         this.username = username;
     }
+
+    boolean canBeValid() {
+        return username != null && !username.isEmpty() && password != null && !password.isEmpty();
+    }
 }

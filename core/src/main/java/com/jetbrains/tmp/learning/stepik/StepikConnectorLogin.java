@@ -52,10 +52,18 @@ public class StepikConnectorLogin {
         return client;
     }
 
-    public static void loginFromDialog() {
-        long userId = getLastUser();
-        AuthInfo authInfo = getAuthInfo(userId);
-        if (!minorLogin(authInfo.getUsername(), authInfo.getPassword())) {
+    /**
+     * Authentication is in the following order:
+     * <ul>
+     * <li>Check a current authentication.</li>
+     * <li>Try refresh a token.</li>
+     * <li>Try authentication with a stored password.</li>
+     * <li>Show a dialog box for getting an username and a password</li>
+     * </ul>
+     */
+    public static void authentication() {
+        AuthInfo authInfo = getAuthInfo(getLastUser());
+        if (!minorLogin(authInfo)) {
             showAuthDialog();
         }
     }
@@ -68,16 +76,22 @@ public class StepikConnectorLogin {
         }, ModalityState.defaultModalityState());
     }
 
-    private static boolean minorLogin(@NotNull String username, @NotNull String password) {
+    private static boolean minorLogin(@NotNull AuthInfo authInfo) {
         logger.info("Check the authentication");
-        User user = getCurrentUser();
 
-        if (!user.isGuest()) {
-            logger.info("Authenticated");
-            return true;
+        if (stepikApiClient.getTokenInfo().getAccessToken() != null) {
+            User user = getCurrentUser();
+
+            if (!user.isGuest()) {
+                logger.info("Authenticated");
+                return true;
+            }
         }
 
         String refreshToken = stepikApiClient.getTokenInfo().getRefreshToken();
+        if (refreshToken == null && authInfo.getTokenInfo() != null) {
+            refreshToken = authInfo.getTokenInfo().getRefreshToken();
+        }
 
         if (refreshToken != null) {
             try {
@@ -92,10 +106,10 @@ public class StepikConnectorLogin {
             }
         }
 
-        if (!username.isEmpty() && !password.isEmpty()) {
+        if (authInfo.canBeValid()) {
             try {
                 logger.info("Try execute the Authentication with a password");
-                authenticate(username, password);
+                authenticate(authInfo.getUsername(), authInfo.getPassword());
                 logger.info("The Authentication with a password is successfully");
                 return true;
             } catch (StepikClientException e) {
@@ -149,7 +163,7 @@ public class StepikConnectorLogin {
 
     @NotNull
     public static StepikApiClient getStepikApiClient() {
-        loginFromDialog();
+        authentication();
         return stepikApiClient;
     }
 

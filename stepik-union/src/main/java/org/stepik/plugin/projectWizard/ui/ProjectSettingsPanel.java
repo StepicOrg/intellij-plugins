@@ -60,7 +60,7 @@ public class ProjectSettingsPanel implements ProjectSetting {
 
     public void updateStep() {
         logger.info("Start updating settings");
-        StepikConnectorLogin.loginFromDialog();
+        StepikConnectorLogin.authentication();
         String username = StepikConnectorLogin.getCurrentUserFullName();
         userName.setText(username);
         courseListComboBox.refresh(project);
