@@ -53,7 +53,7 @@ public class StepikProjectGenerator {
         List<Long> coursesIds = getHardcodedCoursesId();
 
         if (!coursesIds.isEmpty()) {
-            StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
+            StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
             try {
                 courses = stepikApiClient.courses()
                         .get()
@@ -94,7 +94,7 @@ public class StepikProjectGenerator {
         return ProgressManager.getInstance().runProcessWithProgressSynchronously(() -> {
             ProgressManager.getInstance().getProgressIndicator().setIndeterminate(true);
             return execCancelable(() -> {
-                StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
+                StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
                 Courses courses;
                 try {
                     courses = stepikApiClient.courses()

@@ -33,8 +33,6 @@ public class Utils {
             return parts.length != 0 ? Integer.parseInt(parts[parts.length - 1]) : 0;
         }
 
-        StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
-
         String[] paramStr = link.split("\\?");
         if (paramStr.length > 1) {
             String[] params = paramStr[1].split("&");
@@ -44,6 +42,7 @@ public class Utils {
                     .forEach(s -> unitId[0] = s.substring(5, s.length()));
 
             if (!unitId[0].equals("-1")) {
+                StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
                 Units units = stepikApiClient.units()
                         .get()
                         .id(Integer.parseInt(unitId[0]))
@@ -60,7 +59,7 @@ public class Utils {
                 return 0;
             String[] parts = list.get(i + 1).split("-");
             int lessonId = Integer.parseInt(parts[parts.length - 1]);
-
+            StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
             Units units = stepikApiClient.units()
                     .get()
                     .lesson(lessonId)

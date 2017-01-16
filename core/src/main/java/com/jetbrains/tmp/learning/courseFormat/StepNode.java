@@ -1,5 +1,6 @@
 package com.jetbrains.tmp.learning.courseFormat;
 
+import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.util.xmlb.annotations.Transient;
 import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.core.EduNames;
@@ -29,7 +30,7 @@ public class StepNode implements StudyNode {
 
     public StepNode(@NotNull final LessonNode lessonNode, @NotNull Step data) {
         this.data = data;
-        init(lessonNode, true);
+        init(lessonNode, true, null);
     }
 
     @Override
@@ -63,7 +64,11 @@ public class StepNode implements StudyNode {
         return result;
     }
 
-    void init(@NotNull final LessonNode lessonNode, boolean isRestarted) {
+    void init(@NotNull final LessonNode lessonNode, boolean isRestarted, @Nullable ProgressIndicator indicator) {
+        if (indicator != null) {
+            indicator.setText("Refresh a step: " + getName());
+            indicator.setText2("");
+        }
         BlockView block = data.getBlock();
 
         if (getType() == StepType.CODE) {

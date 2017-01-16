@@ -67,13 +67,13 @@ class JavaWizardStep extends ModuleWizardStep {
         generator.setDefaultLang(selectedLang);
         generator.setSelectedCourse(selectedCourse);
 
-        if (selectedCourse.getId() == 0) {
+        long id = selectedCourse.getId();
+
+        if (id == 0) {
             return;
         }
 
-        long id = selectedCourse.getId();
-
-        StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
+        StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
         try {
             stepikApiClient.enrollments()
                     .post()

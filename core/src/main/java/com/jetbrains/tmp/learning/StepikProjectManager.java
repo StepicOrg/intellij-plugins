@@ -5,6 +5,8 @@ import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.xmlb.XmlSerializer;
@@ -116,23 +118,34 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
             logger.warn("Failed deserialization StepikProjectManager \n" + e.getMessage() + "\n" + project);
         }
 
+        refreshCourse();
+        logger.info("The StepikProjectManager state loaded");
+    }
+
+    private void refreshCourse() {
         if (courseNode == null) {
             return;
         }
-        try {
-            StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
-            Courses courses = stepikApiClient.courses()
-                    .get()
-                    .id(courseNode.getId())
-                    .execute();
-            if (!courses.isEmpty()) {
-                courseNode.setData(courses.getCourses().get(0));
-            }
-        } catch (StepikClientException logged) {
-            logger.warn("A course initialization don't is fully", logged);
-        }
-        courseNode.init(false);
-        logger.info("The StepikProjectManager state loaded");
+
+        ProgressManager.getInstance()
+                .runProcessWithProgressSynchronously(() -> {
+                    ProgressIndicator indicator = ProgressManager.getInstance()
+                            .getProgressIndicator();
+                    indicator.setIndeterminate(true);
+                    try {
+                        StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
+                        Courses courses = stepikApiClient.courses()
+                                .get()
+                                .id(courseNode.getId())
+                                .execute();
+                        if (!courses.isEmpty()) {
+                            courseNode.setData(courses.getCourses().get(0));
+                        }
+                    } catch (StepikClientException logged) {
+                        logger.warn("A course initialization don't is fully", logged);
+                    }
+                    courseNode.init(false, indicator);
+                }, "Refreshing Course", true, project);
     }
 
     @NotNull

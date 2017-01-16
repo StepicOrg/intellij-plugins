@@ -163,7 +163,6 @@ public class StepikConnectorLogin {
 
     @NotNull
     public static StepikApiClient getStepikApiClient() {
-        authentication();
         return stepikApiClient;
     }
 
@@ -229,5 +228,10 @@ public class StepikConnectorLogin {
     public static String getCurrentUserFullName() {
         User user = getCurrentUser();
         return user.getFirstName() + " " + user.getLastName();
+    }
+
+    public static StepikApiClient authAndGetStepikApiClient() {
+        StepikConnectorLogin.authentication();
+        return stepikApiClient;
     }
 }

@@ -95,10 +95,10 @@ public class DownloadSubmission extends AbstractStepAction {
 
     @Nullable
     private List<Submission> getSubmissions(@NotNull StepNode stepNode) {
+        StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
+
         long stepId = stepNode.getId();
         long userId = StepikConnectorLogin.getCurrentUser().getId();
-
-        StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
 
         Submissions submissions = stepikApiClient.submissions()
                 .get()
@@ -164,7 +164,7 @@ public class DownloadSubmission extends AbstractStepAction {
 
         final String finalCode = submission.getReply().getCode();
 
-        StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
+        StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
         CourseNode courseNode = stepNode.getCourse();
         stepikApiClient.metrics()
                 .post()

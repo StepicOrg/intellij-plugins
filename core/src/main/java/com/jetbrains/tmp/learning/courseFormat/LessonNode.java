@@ -1,6 +1,7 @@
 package com.jetbrains.tmp.learning.courseFormat;
 
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.util.xmlb.annotations.Transient;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.core.EduUtils;
@@ -33,7 +34,7 @@ public class LessonNode implements StudyNode {
             @NotNull Unit unit) {
         this.data = data;
         this.unit = unit;
-        init(sectionNode, true);
+        init(sectionNode, true, null);
     }
 
     @Override
@@ -59,9 +60,14 @@ public class LessonNode implements StudyNode {
         return result;
     }
 
-    void init(@NotNull final SectionNode sectionNode, boolean isRestarted) {
+    void init(@NotNull final SectionNode sectionNode, boolean isRestarted, @Nullable ProgressIndicator indicator) {
         try {
             StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
+
+            if (indicator != null) {
+                indicator.setText("Refresh a lesson: " + getName());
+                indicator.setText2("Update steps");
+            }
 
             List<Long> stepsIds = data.getSteps();
 
@@ -90,7 +96,7 @@ public class LessonNode implements StudyNode {
         setSectionNode(sectionNode);
 
         for (StepNode stepNode : getStepNodes()) {
-            stepNode.init(this, isRestarted);
+            stepNode.init(this, isRestarted, indicator);
         }
     }
 

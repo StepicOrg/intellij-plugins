@@ -54,7 +54,7 @@ public class StepikJavaPostAction extends StudyCheckAction {
                     if (!ActionUtils.checkLangSettings(stepNode, project)) {
                         return;
                     }
-                    StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
+                    StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
                     long intAttemptId;
                     StepikClientException exception = null;
                     Attempts attempts = null;

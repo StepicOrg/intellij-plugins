@@ -78,7 +78,8 @@ class CourseListModel extends AbstractListModel<Course> implements ComboBoxModel
     private Object getCourse(@NotNull String link) {
         int courseId = Utils.getCourseIdFromLink(link);
 
-        StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
+        StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
+
         Courses courses = null;
 
         if (courseId != 0) {

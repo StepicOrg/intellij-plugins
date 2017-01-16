@@ -90,7 +90,7 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
             }
 
             this.generator.setSelectedCourse(course);
-            StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
+            StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
             stepikApiClient.enrollments()
                     .post()
                     .course(course.getId())

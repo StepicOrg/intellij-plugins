@@ -1,6 +1,7 @@
 package com.jetbrains.tmp.learning.courseFormat;
 
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.util.xmlb.annotations.Transient;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.core.EduUtils;
@@ -29,7 +30,7 @@ public class CourseNode implements StudyNode {
 
     public CourseNode(@NotNull Course data) {
         this.data = data;
-        init(true);
+        init(true, null);
     }
 
     @Override
@@ -53,9 +54,13 @@ public class CourseNode implements StudyNode {
         return result;
     }
 
-    public void init(boolean isRestarted) {
+    public void init(boolean isRestarted, @Nullable ProgressIndicator indicator) {
         try {
-            StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
+            StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
+            if (indicator != null) {
+                indicator.setText("Refresh " + getName());
+                indicator.setText2("Update course authors");
+            }
             List<Long> authorsIds = data.getAuthors();
             if (authorsIds.size() > 0) {
                 Users users = stepikApiClient.users()
@@ -65,6 +70,9 @@ public class CourseNode implements StudyNode {
                 setAuthors(users.getUsers());
             }
 
+            if (indicator != null) {
+                indicator.setText2("Update sections");
+            }
             List<Long> sectionsIds = data.getSections();
             if (sectionsIds.size() > 0) {
                 Sections sections = stepikApiClient.sections()
@@ -90,7 +98,7 @@ public class CourseNode implements StudyNode {
         }
 
         for (SectionNode sectionNode : getSectionNodes()) {
-            sectionNode.init(this, isRestarted);
+            sectionNode.init(this, isRestarted, indicator);
         }
     }
 
