@@ -1,6 +1,7 @@
 package org.stepik.plugin.utils;
 
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
+import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.objects.courses.Course;
@@ -89,25 +90,31 @@ public class Utils {
         return link.matches("[0-9]+");
     }
 
+    @Language("HTML")
+    private static final String DEFAULT_DESCRIPTION =
+            "<b>A course does not selected.</b><br>" +
+                    "<ul>" +
+                    "<li>Select a course from a list.</li>" +
+                    "<li>Push on a refresh button if a course list is a empty.</li>" +
+                    "<li>Write a link to a course (example, https://stepik.org/187/) or a id of course.</li>" +
+                    "</ul>";
+
+    @Language("HTML")
+    private static final String DEFAULT_MESSAGE_FOR_ADAPTIVE =
+            "<p style='font-weight: bold;'>This course is adaptive.<br>" +
+                    "Sorry, but we don't support adaptive courses yet</p>";
+
     @NotNull
     public static String getCourseDescription(@NotNull Course course) {
-        String description;
         if (course.getId() == 0) {
-            description = "Wrong link";
+            return DEFAULT_DESCRIPTION;
         } else {
-
             StringBuilder sb = new StringBuilder();
-            sb.append("<b>Course:</b> ")
-                    .append(course.toString())
-                    .append("<br><br>")
-                    .append(course.getDescription());
+            sb.append(course.getDescription());
             if (course.isAdaptive()) {
-                sb.append("<p style='font-weight: bold;'>This course is adaptive.<br>")
-                        .append("Sorry, but we don't support adaptive courses yet</p>");
+                sb.append(DEFAULT_MESSAGE_FOR_ADAPTIVE);
             }
-            description = sb.toString();
+            return sb.toString();
         }
-
-        return description;
     }
 }
