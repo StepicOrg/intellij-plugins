@@ -18,7 +18,6 @@ import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.ssl.SSLContexts;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -46,7 +45,7 @@ public class HttpTransportClient implements TransportClient {
     private static final String CONTENT_TYPE_HEADER = "Content-Type";
     private static final String USER_AGENT = "Stepik Java API Client/" + StepikApiClient.getVersion();
 
-    private static final int MAX_SIMULTANEOUS_CONNECTIONS = 300;
+    private static final int MAX_SIMULTANEOUS_CONNECTIONS = 100000;
     private static final int FULL_CONNECTION_TIMEOUT_S = 60;
     private static final int CONNECTION_TIMEOUT_MS = 5_000;
     private static final int SOCKET_TIMEOUT_MS = FULL_CONNECTION_TIMEOUT_S * 1000;
@@ -67,15 +66,10 @@ public class HttpTransportClient implements TransportClient {
                 .setCookieSpec(CookieSpecs.STANDARD)
                 .build();
 
-        PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
-
-        connectionManager.setMaxTotal(MAX_SIMULTANEOUS_CONNECTIONS);
-        connectionManager.setDefaultMaxPerRoute(MAX_SIMULTANEOUS_CONNECTIONS);
-
         HttpClientBuilder builder = HttpClients.custom()
-                .setConnectionManager(connectionManager)
                 .setDefaultRequestConfig(requestConfig)
                 .setDefaultCookieStore(cookieStore)
+                .setMaxConnPerRoute(MAX_SIMULTANEOUS_CONNECTIONS)
                 .setUserAgent(USER_AGENT)
                 .setConnectionReuseStrategy(DefaultConnectionReuseStrategy.INSTANCE);
 
