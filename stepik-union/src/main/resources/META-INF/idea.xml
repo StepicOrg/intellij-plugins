@@ -1,6 +1,6 @@
 <idea-plugin version="2">
     <extensions defaultExtensionNs="com.intellij">
-        <treeStructureProvider implementation="org.stepik.plugin.projectView.IdeaTreeStructureProvider"/>
-        <navbar implementation="org.stepik.plugin.projectView.IdeaNavBarModelExtension"/>
+        <treeStructureProvider implementation="org.stepik.plugin.projectView.idea.IdeaTreeStructureProvider"/>
+        <navbar implementation="org.stepik.plugin.projectView.idea.IdeaNavBarModelExtension"/>
     </extensions>
 </idea-plugin>

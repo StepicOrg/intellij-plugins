@@ -1,7 +1,5 @@
 package com.jetbrains.tmp.learning;
 
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
@@ -11,8 +9,6 @@ import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
-import com.intellij.openapi.ui.popup.Balloon;
-import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
@@ -21,20 +17,23 @@ import com.intellij.ui.content.Content;
 import com.intellij.util.TimeoutUtil;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.core.EduUtils;
-import com.jetbrains.tmp.learning.courseFormat.Course;
-import com.jetbrains.tmp.learning.courseFormat.Lesson;
-import com.jetbrains.tmp.learning.courseFormat.Step;
+import com.jetbrains.tmp.learning.courseFormat.CourseNode;
+import com.jetbrains.tmp.learning.courseFormat.LessonNode;
 import com.jetbrains.tmp.learning.courseFormat.StepFile;
+import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.editor.StudyEditor;
 import com.jetbrains.tmp.learning.ui.StudyToolWindow;
 import com.jetbrains.tmp.learning.ui.StudyToolWindowFactory;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.api.objects.steps.Limit;
+import org.stepik.api.objects.steps.Sample;
 import org.stepik.core.utils.ProjectFilesUtils;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -49,18 +48,6 @@ public class StudyUtils {
     private StudyUtils() {
     }
 
-    public static void updateAction(@NotNull final AnActionEvent e) {
-        final Presentation presentation = e.getPresentation();
-        presentation.setEnabled(false);
-        final Project project = e.getProject();
-        if (project != null) {
-            final StudyEditor studyEditor = getSelectedStudyEditor(project);
-            if (studyEditor != null) {
-                presentation.setEnabledAndVisible(true);
-            }
-        }
-    }
-
     public static void updateToolWindows(@NotNull final Project project) {
         final StudyToolWindow studyToolWindow = getStudyToolWindow(project);
         if (studyToolWindow != null) {
@@ -68,7 +55,7 @@ public class StudyUtils {
             if (stepText != null) {
                 studyToolWindow.setStepText(stepText);
             } else {
-                logger.warn("Step text is null");
+                logger.warn("StepNode text is null");
             }
         }
     }
@@ -80,7 +67,6 @@ public class StudyUtils {
                 .removeAllContents(false);
         StudyToolWindowFactory factory = new StudyToolWindowFactory();
         factory.createToolWindowContent(project, windowManager.getToolWindow(StudyToolWindowFactory.STUDY_TOOL_WINDOW));
-
     }
 
     @Nullable
@@ -99,19 +85,7 @@ public class StudyUtils {
         return null;
     }
 
-    /**
-     * shows pop up in the center of "check step" button in study editor
-     */
-    public static void showCheckPopUp(@NotNull final Project project, @NotNull final Balloon balloon) {
-        final StudyEditor studyEditor = getSelectedStudyEditor(project);
-        assert studyEditor != null;
-
-        balloon.show(computeLocation(studyEditor.getEditor()), Balloon.Position.above);
-        Disposer.register(project, balloon);
-    }
-
     public static RelativePoint computeLocation(Editor editor) {
-
         final Rectangle visibleRect = editor.getComponent().getVisibleRect();
         Point point = new Point(visibleRect.x + visibleRect.width + 10,
                 visibleRect.y + 10);
@@ -120,8 +94,8 @@ public class StudyUtils {
 
     @Nullable
     public static StepFile getStepFile(@NotNull final Project project, @NotNull final VirtualFile file) {
-        final Course course = StepikProjectManager.getInstance(project).getCourse();
-        if (course == null) {
+        final CourseNode courseNode = StepikProjectManager.getInstance(project).getCourseNode();
+        if (courseNode == null) {
             return null;
         }
         VirtualFile stepDir = file.getParent();
@@ -138,11 +112,11 @@ public class StudyUtils {
         final String stepDirName = stepDir.getName();
         if (stepDirName.contains(EduNames.STEP)) {
             int stepId = EduUtils.parseDirName(stepDirName, EduNames.STEP);
-            final Step step = course.getStepById(stepId);
-            if (step == null) {
+            final StepNode stepNode = courseNode.getStepById(stepId);
+            if (stepNode == null) {
                 return null;
             }
-            return step.getFile(file.getName());
+            return stepNode.getFile(file.getName());
         }
         return null;
     }
@@ -172,31 +146,55 @@ public class StudyUtils {
 
     @Nullable
     @Contract("null -> null")
-    static String getStepTextFromStep(@Nullable final Step step) {
-        if (step == null) {
+    static String getStepTextFromStep(@Nullable final StepNode stepNode) {
+        if (stepNode == null) {
             return null;
         }
-        return getTextWithStepLink(step);
+        return getTextWithStepLink(stepNode);
     }
 
     @NotNull
-    private static String getTextWithStepLink(Step step) {
+    private static String getTextWithStepLink(StepNode stepNode) {
         StringBuilder stringBuilder = new StringBuilder();
 
-        Lesson lesson = step.getLesson();
-        if (lesson != null) {
+        LessonNode lessonNode = stepNode.getLessonNode();
+        if (lessonNode != null) {
             stringBuilder.append("<a href=\"https://stepik.org/lesson/")
-                    .append(lesson.getId())
+                    .append(lessonNode.getId())
                     .append("/step/")
-                    .append(step.getPosition())
+                    .append(stepNode.getPosition())
                     .append("\">View step on Stepik.org</a>");
         }
 
-        if (!step.getText().startsWith("<p>") && !step.getText().startsWith("<h")) {
+        if (!stepNode.getText().startsWith("<p>") && !stepNode.getText().startsWith("<h")) {
             stringBuilder.append("<br><br>");
         }
 
-        stringBuilder.append(step.getDescription());
+        stringBuilder.append(stepNode.getText());
+
+        List<Sample> samples = stepNode.getSamples();
+
+        for (int i = 1; i <= samples.size(); i++) {
+            Sample sample = samples.get(i - 1);
+            stringBuilder.append("<p><b>Sample Input ")
+                    .append(i)
+                    .append(":</b><br>")
+                    .append(sample.getInput().replaceAll("\\n", "<br>"))
+                    .append("<br>")
+                    .append("<b>Sample Output ")
+                    .append(i)
+                    .append(":</b><br>")
+                    .append(sample.getOutput().replaceAll("\\n", "<br>"))
+                    .append("<br>");
+        }
+
+        Limit limit = stepNode.getLimit();
+        stringBuilder.append("<p><b>Limits: </b>")
+                .append(limit.getTime())
+                .append("s; ")
+                .append(limit.getMemory())
+                .append("Mib</p>");
+
         return stringBuilder.toString();
     }
 
@@ -213,9 +211,9 @@ public class StudyUtils {
 
     @Nullable
     public static String getStepText(@NotNull final Project project) {
-        final Step step = getSelectedStep(project);
-        if (step != null) {
-            return getStepTextFromStep(step);
+        final StepNode stepNode = getSelectedStep(project);
+        if (stepNode != null) {
+            return getStepTextFromStep(stepNode);
         }
         return EMPTY_STEP_TEXT;
     }
@@ -232,7 +230,7 @@ public class StudyUtils {
     }
 
     @Nullable
-    public static Step getSelectedStep(@NotNull Project project) {
+    public static StepNode getSelectedStep(@NotNull Project project) {
         VirtualFile[] files = FileEditorManager.getInstance(project).getSelectedFiles();
         if (files.length == 0) {
             return null;
@@ -246,7 +244,7 @@ public class StudyUtils {
         Project studyProject = null;
         Project[] openProjects = ProjectManager.getInstance().getOpenProjects();
         for (Project project : openProjects) {
-            if (StepikProjectManager.getInstance(project).getCourse() != null) {
+            if (StepikProjectManager.getInstance(project).getCourseNode() != null) {
                 studyProject = project;
                 break;
             }
@@ -269,22 +267,22 @@ public class StudyUtils {
     }
 
     @Nullable
-    static Step getStep(@NotNull Project project, @NotNull VirtualFile stepVF) {
+    static StepNode getStep(@NotNull Project project, @NotNull VirtualFile stepVF) {
         String path = getRelativePath(project, stepVF);
         if (stepPathPattern == null) {
             stepPathPattern = Pattern.compile("^(section[0-9]+)/(lesson[0-9]+)/(step[0-9]+)/src/.*");
         }
         Matcher matcher = stepPathPattern.matcher(path);
         if (matcher.matches()) {
-            Course course = StepikProjectManager.getInstance(project).getCourse();
-            if (course == null) {
+            CourseNode courseNode = StepikProjectManager.getInstance(project).getCourseNode();
+            if (courseNode == null) {
                 return null;
             }
-            Lesson lesson = course.getLessonByDirName(matcher.group(2));
-            if (lesson == null) {
+            LessonNode lessonNode = courseNode.getLessonByDirName(matcher.group(2));
+            if (lessonNode == null) {
                 return null;
             }
-            return lesson.getStep(matcher.group(3));
+            return lessonNode.getStep(matcher.group(3));
         }
         return null;
     }

@@ -1,7 +1,5 @@
 package org.stepik.plugin.projectWizard.pycharm;
 
-import com.intellij.facet.ui.FacetEditorValidator;
-import com.intellij.facet.ui.FacetValidatorsManager;
 import com.intellij.facet.ui.ValidationResult;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
@@ -22,19 +20,19 @@ import com.jetbrains.python.remote.PyProjectSynchronizer;
 import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.StudyProjectComponent;
 import com.jetbrains.tmp.learning.SupportedLanguages;
-import com.jetbrains.tmp.learning.courseFormat.Course;
-import com.jetbrains.tmp.learning.courseFormat.Lesson;
-import com.jetbrains.tmp.learning.courseFormat.Section;
-import com.jetbrains.tmp.learning.courseFormat.Step;
+import com.jetbrains.tmp.learning.courseFormat.CourseNode;
+import com.jetbrains.tmp.learning.courseFormat.LessonNode;
+import com.jetbrains.tmp.learning.courseFormat.SectionNode;
 import com.jetbrains.tmp.learning.courseFormat.StepFile;
-import com.jetbrains.tmp.learning.courseGeneration.StepikProjectGenerator;
-import com.jetbrains.tmp.learning.stepik.CourseInfo;
+import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
-import com.jetbrains.tmp.learning.stepik.StepikConnectorPost;
 import icons.AllStepikIcons;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.api.client.StepikApiClient;
+import org.stepik.api.objects.courses.Course;
+import org.stepik.plugin.projectWizard.StepikProjectGenerator;
 
 import javax.swing.*;
 import java.io.BufferedWriter;
@@ -47,22 +45,13 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
     private static final Logger logger = Logger.getInstance(StepikPyProjectGenerator.class.getName());
     private static final String MODULE_NAME = "Stepik";
     private final StepikProjectGenerator generator;
-    private final PyCCSettingPanel pySPanel;
+    private final PyCharmWizardStep wizardStep;
 
     private StepikPyProjectGenerator() {
         super(true);
         generator = StepikProjectGenerator.getInstance();
-        pySPanel = new PyCCSettingPanel();
-
-        pySPanel.registerValidators(new FacetValidatorsManager() {
-            public void registerValidator(FacetEditorValidator validator, JComponent... componentsToWatch) {
-                throw new UnsupportedOperationException();
-            }
-
-            public void validate() {
-                ApplicationManager.getApplication().invokeLater(() -> fireStateChanged());
-            }
-        });
+        Project defaultProject = DefaultProjectFactory.getInstance().getDefaultProject();
+        wizardStep = new PyCharmWizardStep(this, defaultProject);
     }
 
     @Nullable
@@ -81,31 +70,31 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
     @Nullable
     @Override
     public JPanel extendBasePanel() throws ProcessCanceledException {
-        Project defaultProject = DefaultProjectFactory.getInstance().getDefaultProject();
-        StepikConnectorLogin.loginFromDialog(defaultProject);
-        pySPanel.init(defaultProject);
-        return pySPanel.getMainPanel();
+        wizardStep.updateStep();
+        return wizardStep.getComponent();
     }
 
     @NotNull
     @Override
     public ValidationResult validate(@NotNull String s) {
-        return pySPanel.check();
+        return wizardStep.check();
     }
 
     @Nullable
     @Override
     public BooleanFunction<PythonProjectGenerator> beforeProjectGenerated(@Nullable Sdk sdk) {
         return generator -> {
-            Project defaultProject = DefaultProjectFactory.getInstance().getDefaultProject();
-            StepikConnectorLogin.loginFromDialog(defaultProject);
-            final CourseInfo courseInfo = pySPanel.getSelectedCourse();
-            if (courseInfo == null || courseInfo == CourseInfo.INVALID_COURSE) return false;
-            this.generator.setSelectedCourse(courseInfo);
-            if (PyCCSettingPanel.COURSE_LINK.equals(pySPanel.getBuildType())) {
-                StepikConnectorPost.enrollToCourse(courseInfo.getId());
+            final Course course = wizardStep.getSelectedCourse();
+            if (course.getId() == 0) {
+                return false;
             }
-            StepikProjectGenerator.downloadAndFlushCourse(defaultProject, courseInfo);
+
+            this.generator.setSelectedCourse(course);
+            StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
+            stepikApiClient.enrollments()
+                    .post()
+                    .course(course.getId())
+                    .execute();
             return true;
         };
     }
@@ -117,10 +106,12 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
 
     @Override
     public void configureProject(
-            @NotNull final Project project, @NotNull VirtualFile baseDir, @NotNull final PyNewProjectSettings settings,
-            @NotNull final Module module, @Nullable final PyProjectSynchronizer synchronizer) {
+            @NotNull final Project project,
+            @NotNull VirtualFile baseDir,
+            @NotNull final PyNewProjectSettings settings,
+            @NotNull final Module module,
+            @Nullable final PyProjectSynchronizer synchronizer) {
         super.configureProject(project, baseDir, settings, module, synchronizer);
-        StepikConnectorLogin.loginFromDialog(project);
         ApplicationManager.getApplication()
                 .runWriteAction(() -> ModuleRootModificationUtil.setModuleSdk(module, settings.getSdk()));
         createCourseFromGenerator(project);
@@ -132,39 +123,39 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
 
         StepikProjectManager stepManager = StepikProjectManager.getInstance(project);
         stepManager.setDefaultLang(generator.getDefaultLang());
-        Course course = stepManager.getCourse();
-        if (course == null) {
+        CourseNode courseNode = stepManager.getCourseNode();
+        if (courseNode == null) {
             logger.warn("failed to generate builders");
             return;
         }
 
         FileUtil.createDirectory(new File(project.getBasePath(), "Sandbox"));
 
-        createSubDirectories(course, project);
+        createSubDirectories(courseNode, project);
 
         ApplicationManager.getApplication().invokeLater(
                 () -> DumbService.allowStartingDumbModeInside(DumbModePermission.MAY_START_BACKGROUND,
                         () -> ApplicationManager.getApplication().runWriteAction(
                                 () -> StudyProjectComponent.getInstance(project)
-                                        .registerStudyToolWindow(course))));
+                                        .registerStudyToolWindow(courseNode))));
     }
 
     private void createSubDirectories(
-            @NotNull Course course,
+            @NotNull CourseNode courseNode,
             @NotNull Project project) {
-        for (Section section : course.getSections()) {
-            FileUtil.createDirectory(new File(project.getBasePath(), section.getPath()));
-            for (Lesson lesson : section.getLessons()) {
-                FileUtil.createDirectory(new File(project.getBasePath(), lesson.getPath()));
-                for (Step step : lesson.getStepList()) {
-                    step.setCurrentLang(SupportedLanguages.PYTHON);
-                    File stepDir = new File(project.getBasePath(), step.getPath());
+        for (SectionNode sectionNode : courseNode.getSectionNodes()) {
+            FileUtil.createDirectory(new File(project.getBasePath(), sectionNode.getPath()));
+            for (LessonNode lessonNode : sectionNode.getLessonNodes()) {
+                FileUtil.createDirectory(new File(project.getBasePath(), lessonNode.getPath()));
+                for (StepNode stepNode : lessonNode.getStepNodes()) {
+                    stepNode.setCurrentLang(SupportedLanguages.PYTHON);
+                    File stepDir = new File(project.getBasePath(), stepNode.getPath());
                     File srcDir = new File(stepDir, "src");
                     FileUtil.createDirectory(stepDir);
                     FileUtil.createDirectory(srcDir);
 
                     try (BufferedWriter writer = new BufferedWriter(new FileWriter(new File(srcDir, "main.py")))) {
-                        StepFile stepFile = step.getFile("main.py");
+                        StepFile stepFile = stepNode.getFile("main.py");
                         if (stepFile != null) {
                             writer.write(stepFile.getText());
                         }

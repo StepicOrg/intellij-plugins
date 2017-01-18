@@ -13,8 +13,8 @@ import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.core.EduUtils;
-import com.jetbrains.tmp.learning.courseFormat.Step;
 import com.jetbrains.tmp.learning.courseFormat.StepFile;
+import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import org.apache.commons.codec.binary.Base64;
 import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
@@ -29,13 +29,13 @@ import java.util.Map;
 
 class StepModuleBuilder extends ModuleBuilderWithSrc {
     private static final Logger logger = Logger.getInstance(StepModuleBuilder.class);
-    private final Step step;
+    private final StepNode stepNode;
     private final Project project;
 
-    StepModuleBuilder(String moduleDir, @NotNull Step step, @NotNull Project project) {
-        this.step = step;
+    StepModuleBuilder(String moduleDir, @NotNull StepNode stepNode, @NotNull Project project) {
+        this.stepNode = stepNode;
         this.project = project;
-        String stepName = step.getDirectory();
+        String stepName = stepNode.getDirectory();
         setName(stepName);
         setModuleFilePath(FileUtil.join(moduleDir, stepName,
                 stepName + ModuleFileType.DOT_DEFAULT_EXTENSION));
@@ -53,20 +53,20 @@ class StepModuleBuilder extends ModuleBuilderWithSrc {
 
     private void createStepContent() throws IOException {
         StepikProjectManager stepManager = StepikProjectManager.getInstance(project);
-        step.setCurrentLang(stepManager.getDefaultLang());
+        stepNode.setCurrentLang(stepManager.getDefaultLang());
 
-        String src = stepManager.getProject().getBasePath() + String.join("/", step.getPath(), EduNames.SRC);
+        String src = stepManager.getProject().getBasePath() + String.join("/", stepNode.getPath(), EduNames.SRC);
 
-        createStepFiles(step, src);
+        createStepFiles(stepNode, src);
 
-        SupportedLanguages currentLang = step.getCurrentLang();
+        SupportedLanguages currentLang = stepNode.getCurrentLang();
 
         moveFromHide(currentLang.getMainFileName(), src);
     }
 
-    private void createStepFiles(@NotNull Step step, @NotNull String src) {
+    private void createStepFiles(@NotNull StepNode stepNode, @NotNull String src) {
         String hide = src + "/" + EduNames.HIDE;
-        for (Map.Entry<String, StepFile> stepFileEntry : step.getStepFiles().entrySet()) {
+        for (Map.Entry<String, StepFile> stepFileEntry : stepNode.getStepFiles().entrySet()) {
             final String name = stepFileEntry.getKey();
             final StepFile stepFile = stepFileEntry.getValue();
             final File file = new File(hide, name);

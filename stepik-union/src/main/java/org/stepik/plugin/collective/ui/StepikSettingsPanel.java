@@ -1,7 +1,6 @@
 package org.stepik.plugin.collective.ui;
 
 import com.intellij.ide.BrowserUtil;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.Messages;
@@ -14,9 +13,9 @@ import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.stepik.EduStepikNames;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
-import com.jetbrains.tmp.learning.stepik.StepikUser;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.api.objects.users.User;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -33,7 +32,7 @@ class StepikSettingsPanel {
     private static final String DEFAULT_PASSWORD_TEXT = "************";
     private final static String AUTH_PASSWORD = "Password";
     private final static String AUTH_TOKEN = "Token";
-    private static final Logger logger = Logger.getInstance(StepikSettingsPanel.class);
+    private static final String TEST_CONNECTION = "Test connection";
     private Project settingsProject;
     private JTextField emailTextField;
     private JPasswordField passwordField;
@@ -68,17 +67,15 @@ class StepikSettingsPanel {
         hintCheckBox.setSelected(StepikProjectManager.getInstance(settingsProject).getShowHint());
         hintCheckBox.addActionListener(e -> hintCheckBoxModified = true);
         testButton.addActionListener(e -> {
-            StepikProjectManager manager = StepikProjectManager.getInstance(settingsProject);
-            StepikUser oldUser = manager.getUser();
-            StepikUser testUser = new StepikUser(getEmail(), getPassword());
-            manager.setUser(testUser);
-            if (StepikConnectorLogin.loginFromSettings(settingsProject, testUser)) {
-                String message = "Hello, " + manager.getUser().getName() + "!\n I am glad to see you.";
-                Messages.showMessageDialog(message, "Check credentials", Messages.getInformationIcon());
+            User user = StepikConnectorLogin.testAuthentication(getEmail(), getPassword());
+
+            if (!user.isGuest()) {
+                String fullName = user.getFirstName() + " " + user.getLastName();
+                String message = "Hello, " + fullName + "!\n I am glad to see you.";
+                Messages.showMessageDialog(message, TEST_CONNECTION, Messages.getInformationIcon());
             } else {
-                Messages.showWarningDialog("Can't sign in.", "Check credentials");
+                Messages.showWarningDialog("Can't sign in.", TEST_CONNECTION);
             }
-            manager.setUser(oldUser);
         });
 
         passwordField.getDocument().addDocumentListener(new DocumentAdapter() {
@@ -125,7 +122,7 @@ class StepikSettingsPanel {
     }
 
     private void erasePassword() {
-        setPassword("");
+        setPasswordFieldText("");
         credentialsModified = true;
     }
 
@@ -146,15 +143,14 @@ class StepikSettingsPanel {
     private String getPassword() {
         if (!credentialsModified) {
             initProjectOfSettings();
-            logger.info("user's password");
-            return StepikProjectManager.getInstance(settingsProject).getUser().getPassword();
+            return StepikConnectorLogin.getCurrentUserPassword();
         }
         return String.valueOf(passwordField.getPassword());
     }
 
-    private void setPassword(@NotNull final String password) {
+    private void setPasswordFieldText(@NotNull final String password) {
         // Show password as blank if password is empty
-        passwordField.setText(StringUtil.isEmpty(password) ? null : password);
+        passwordField.setText(StringUtil.isEmpty(password) ? "" : password);
     }
 
     private void initProjectOfSettings() {
@@ -165,23 +161,22 @@ class StepikSettingsPanel {
 
     void reset() {
         initProjectOfSettings();
-        final StepikUser user = StepikProjectManager.getInstance(settingsProject).getUser();
-        setLogin(user.getEmail());
-        setPassword(DEFAULT_PASSWORD_TEXT);
+        setLogin(StepikConnectorLogin.getCurrentUsername());
+        setPasswordFieldText(DEFAULT_PASSWORD_TEXT);
         resetCredentialsModification();
     }
 
     void apply() {
         if (credentialsModified) {
             initProjectOfSettings();
-            StepikProjectManager manager = StepikProjectManager.getInstance(settingsProject);
-            StepikUser basicUser = new StepikUser(getEmail(), getPassword());
-            manager.setUser(basicUser);
 
-            if (!StepikConnectorLogin.loginFromSettings(settingsProject, basicUser)) {
+            User user = StepikConnectorLogin.testAuthentication(getEmail(), getPassword());
+
+            if (!user.isGuest()) {
+                StepikConnectorLogin.authenticate(getEmail(), getPassword());
+            } else {
                 Messages.showWarningDialog("Can't sign in.", "Check credentials");
             }
-            logger.info(manager.getUser().toString());
         }
         if (hintCheckBoxModified) {
             StepikProjectManager manager = StepikProjectManager.getInstance(settingsProject);

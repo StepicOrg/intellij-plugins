@@ -6,7 +6,7 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.jetbrains.tmp.learning.StepikProjectManager;
-import com.jetbrains.tmp.learning.courseFormat.Course;
+import com.jetbrains.tmp.learning.courseFormat.CourseNode;
 import org.jetbrains.annotations.Nullable;
 
 import static org.stepik.plugin.utils.PresentationDataUtils.isVisibleDirectory;
@@ -16,16 +16,16 @@ import static org.stepik.plugin.utils.PresentationDataUtils.updatePresentationDa
 /**
  * @author meanmail
  */
-class NavBarModelExtensionUtils {
+public class NavBarModelExtensionUtils {
     @Nullable
-    static String getPresentableText(@Nullable final Object object) {
+    public static String getPresentableText(@Nullable final Object object) {
         if (object instanceof Project) {
             Project project = (Project) object;
             StepikProjectManager stepikProjectManager = StepikProjectManager.getInstance(project);
-            Course course = stepikProjectManager.getCourse();
-            if (course == null)
+            CourseNode courseNode = stepikProjectManager.getCourseNode();
+            if (courseNode == null)
                 return null;
-            return course.getName();
+            return courseNode.getName();
         }
 
         if (object instanceof PsiDirectory) {
@@ -41,11 +41,11 @@ class NavBarModelExtensionUtils {
     }
 
     @Nullable
-    static PsiElement adjustElement(final PsiElement psiElement) {
+    public static PsiElement adjustElement(final PsiElement psiElement) {
         Project project = psiElement.getProject();
         StepikProjectManager stepikProjectManager = StepikProjectManager.getInstance(project);
-        Course course = stepikProjectManager.getCourse();
-        if (course == null)
+        CourseNode courseNode = stepikProjectManager.getCourseNode();
+        if (courseNode == null)
             return psiElement;
 
         if (psiElement instanceof PsiDirectory) {

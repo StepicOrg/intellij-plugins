@@ -4,15 +4,15 @@ import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.project.Project;
 import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.StudyBasePluginConfigurator;
-import com.jetbrains.tmp.learning.courseFormat.Course;
+import com.jetbrains.tmp.learning.courseFormat.CourseNode;
 import org.jetbrains.annotations.NotNull;
-import org.stepik.plugin.actions.DownloadSubmission;
-import org.stepik.plugin.actions.InsertStepikDirectives;
-import org.stepik.plugin.actions.StepikJavaPostAction;
-import org.stepik.plugin.actions.StepikNextStepAction;
-import org.stepik.plugin.actions.StepikPreviousStepAction;
-import org.stepik.plugin.actions.StepikResetStepAction;
-import org.stepik.plugin.actions.SwitchLanguage;
+import org.stepik.plugin.actions.navigation.StepikNextStepAction;
+import org.stepik.plugin.actions.navigation.StepikPreviousStepAction;
+import org.stepik.plugin.actions.step.DownloadSubmission;
+import org.stepik.plugin.actions.step.InsertStepikDirectives;
+import org.stepik.plugin.actions.step.StepikJavaPostAction;
+import org.stepik.plugin.actions.step.StepikResetStepAction;
+import org.stepik.plugin.actions.step.SwitchLanguage;
 
 public class StepikPluginConfigurator extends StudyBasePluginConfigurator {
     @NotNull
@@ -42,9 +42,9 @@ public class StepikPluginConfigurator extends StudyBasePluginConfigurator {
         StepikProjectManager stepikProjectManager = StepikProjectManager.getInstance(project);
         if (stepikProjectManager == null)
             return false;
-        Course course = stepikProjectManager.getCourse();
+        CourseNode courseNode = stepikProjectManager.getCourseNode();
 
-        return course != null;
+        return courseNode != null;
     }
 
     @NotNull

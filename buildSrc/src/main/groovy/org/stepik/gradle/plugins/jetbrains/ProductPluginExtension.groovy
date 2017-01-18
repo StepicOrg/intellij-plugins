@@ -16,7 +16,7 @@ class ProductPluginExtension {
 
     static final String DEFAULT_VERSION = "LATEST-EAP-SNAPSHOT"
     static final String DEFAULT_ARCHIVE_TYPE = Utils.getDefaultArchiveType()
-    private final def systemProperties = new HashMap<String, Object>()
+    private final systemProperties = new HashMap<String, Object>()
     private File idePath
     private String version = DEFAULT_VERSION
     private String archiveType = DEFAULT_ARCHIVE_TYPE

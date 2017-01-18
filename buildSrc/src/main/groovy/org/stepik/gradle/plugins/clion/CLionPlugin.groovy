@@ -7,9 +7,9 @@ import org.stepik.gradle.plugins.jetbrains.RepositoryType
  * @author meanmail
  */
 class CLionPlugin extends BasePlugin {
-    private static final def PRODUCT_NAME = "CLion"
-    private static final def EXTENSION_NAME = "clion"
-    private static final def DEFAULT_REPO =
+    private static final PRODUCT_NAME = "CLion"
+    private static final EXTENSION_NAME = "clion"
+    private static final DEFAULT_REPO =
             'http://download.jetbrains.com/cpp/CLion-[version].[archiveType]'
 
     CLionPlugin() {

@@ -2,9 +2,9 @@ package org.stepik.core.utils;
 
 import com.intellij.openapi.util.io.FileUtil;
 import com.jetbrains.tmp.learning.core.EduNames;
-import com.jetbrains.tmp.learning.courseFormat.Course;
-import com.jetbrains.tmp.learning.courseFormat.Lesson;
-import com.jetbrains.tmp.learning.courseFormat.Step;
+import com.jetbrains.tmp.learning.courseFormat.CourseNode;
+import com.jetbrains.tmp.learning.courseFormat.LessonNode;
+import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,19 +32,19 @@ public class ProjectFilesUtils {
         return !(isWithinSrc(targetPath) || isWithinSandbox(targetPath) || isSandbox(targetPath) || isSrc(targetPath));
     }
 
-    private static boolean isStepFile(@NotNull Course course, @NotNull String path) {
+    private static boolean isStepFile(@NotNull CourseNode courseNode, @NotNull String path) {
         String[] dirs = splitPath(path);
         if (dirs.length > 3) {
-            Lesson lesson = course.getLessonByDirName(dirs[1]);
-            if (lesson == null) {
+            LessonNode lessonNode = courseNode.getLessonByDirName(dirs[1]);
+            if (lessonNode == null) {
                 return false;
             }
-            Step step = lesson.getStep(dirs[2]);
-            if (step == null) {
+            StepNode stepNode = lessonNode.getStep(dirs[2]);
+            if (stepNode == null) {
                 return false;
             }
             String fileName = dirs[dirs.length - 1];
-            Set<String> filenames = step.getStepFiles().keySet();
+            Set<String> filenames = stepNode.getStepFiles().keySet();
             if (filenames.stream().anyMatch(fileName::equals)) {
                 return true;
             }
@@ -52,9 +52,9 @@ public class ProjectFilesUtils {
         return false;
     }
 
-    public static boolean isNotMovableOrRenameElement(@NotNull Course course, @NotNull String path) {
+    public static boolean isNotMovableOrRenameElement(@NotNull CourseNode courseNode, @NotNull String path) {
         if (isWithinSrc(path)) {
-            return isHideDir(path) || isWithinHideDir(path) || isStepFile(course, path);
+            return isHideDir(path) || isWithinHideDir(path) || isStepFile(courseNode, path);
         }
 
         return !isWithinSandbox(path);

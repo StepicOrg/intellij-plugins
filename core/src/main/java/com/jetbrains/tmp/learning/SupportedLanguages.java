@@ -34,6 +34,12 @@ public enum SupportedLanguages {
     }
 
     @NotNull
+    public static SupportedLanguages langOf(@NotNull String lang) {
+        lang = lang.replaceAll("[0-9]+", "").toUpperCase();
+        return SupportedLanguages.valueOf(lang);
+    }
+
+    @NotNull
     public String getName() {
         return name;
     }
@@ -46,12 +52,6 @@ public enum SupportedLanguages {
     @NotNull
     public String getMainFileName() {
         return mainFileName;
-    }
-
-    @NotNull
-    public static SupportedLanguages langOf(@NotNull String lang) {
-        lang = lang.replaceAll("[0-9]+", "").toUpperCase();
-        return SupportedLanguages.valueOf(lang);
     }
 
     @NotNull

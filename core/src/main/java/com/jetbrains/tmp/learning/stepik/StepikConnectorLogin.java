@@ -1,201 +1,237 @@
-/*
- * Copyright 2000-2016 JetBrains s.r.o.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.jetbrains.tmp.learning.stepik;
 
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.intellij.credentialStore.CredentialAttributes;
+import com.intellij.ide.passwordSafe.PasswordSafe;
+import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
-import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.util.net.HttpConfigurable;
 import com.jetbrains.tmp.learning.StepikProjectManager;
-import org.apache.http.Consts;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpStatus;
-import org.apache.http.NameValuePair;
-import org.apache.http.StatusLine;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import org.stepik.api.client.HttpTransportClient;
+import org.stepik.api.client.StepikApiClient;
+import org.stepik.api.exceptions.StepikClientException;
+import org.stepik.api.objects.auth.TokenInfo;
+import org.stepik.api.objects.users.User;
 
 public class StepikConnectorLogin {
-    private static final Logger logger = Logger.getInstance(StepikConnectorLogin.class.getName());
+    private static final Logger logger = Logger.getInstance(StepikConnectorLogin.class);
     private static final String CLIENT_ID = "hUCWcq3hZHCmz0DKrDtwOWITLcYutzot7p4n59vU";
-    private static CloseableHttpClient ourClient;
-    private static StepikUser currentUser;
+    private static final String LAST_USER_PROPERTY_NAME = "org.stepik.plugin.union.LAST_USER";
+    private static final StepikApiClient stepikApiClient = initStepikApiClient();
 
-    // TODO sing_in
-    @Nullable
-    static CloseableHttpClient getHttpClient() {
-        if (ourClient == null) {
-            List<BasicHeader> headers = new ArrayList<>();
-            if (currentUser != null && currentUser.getAccessToken() != null && !currentUser.getAccessToken()
-                    .isEmpty()) {
-                headers.add(new BasicHeader("Authorization", "Bearer " + currentUser.getAccessToken()));
-                headers.add(new BasicHeader("Content-type", EduStepikNames.CONTENT_TYPE_APPL_JSON));
-            } else {
-                logger.warn("access_token is empty.. login..");
-                showLoginDialog();
-                headers.add(new BasicHeader("Authorization", "Bearer " + currentUser.getAccessToken()));
-                headers.add(new BasicHeader("Content-type", EduStepikNames.CONTENT_TYPE_APPL_JSON));
-            }
-            HttpClientBuilder builder = StepikConnectorInit.getBuilder();
-            if (builder != null) {
-                ourClient = builder.setDefaultHeaders(headers).build();
-            }
-        }
-        return ourClient;
+    private static long getLastUser() {
+        return PropertiesComponent.getInstance().getOrInitLong(LAST_USER_PROPERTY_NAME, 0);
     }
 
-    public static boolean loginFromSettings(
-            @NotNull final Project project,
-            @NotNull StepikUser basicUser) {
-        resetClient();
-        StepikUser user = minorLogin(basicUser);
+    private static void setLastUser(long lastUser) {
+        PropertiesComponent.getInstance().setValue(LAST_USER_PROPERTY_NAME, String.valueOf(lastUser));
+    }
 
-        if (user == null) {
-            return false;
+    @NotNull
+    private static StepikApiClient initStepikApiClient() {
+        HttpConfigurable instance = HttpConfigurable.getInstance();
+        StepikApiClient client;
+        if (instance.USE_HTTP_PROXY) {
+            logger.info("Uses proxy: Host = " + instance.PROXY_HOST + " Port = " + instance.PROXY_PORT);
+            HttpTransportClient transportClient;
+            transportClient = HttpTransportClient.getInstance(instance.PROXY_HOST, instance.PROXY_PORT);
+            client = new StepikApiClient(transportClient);
         } else {
-            StepikProjectManager.getInstance(project).setUser(user);
+            client = new StepikApiClient();
+        }
 
-            Project defaultProject = ProjectManager.getInstance().getDefaultProject();
-            if (defaultProject != project) {
-                StepikProjectManager.getInstance(defaultProject).setUser(user);
-            }
-            return true;
+        long lastUserId = getLastUser();
+
+        AuthInfo authInfo = getAuthInfo(lastUserId, client);
+
+        client.setTokenInfo(authInfo.getTokenInfo());
+
+        return client;
+    }
+
+    /**
+     * Authentication is in the following order:
+     * <ul>
+     * <li>Check a current authentication.</li>
+     * <li>Try refresh a token.</li>
+     * <li>Try authentication with a stored password.</li>
+     * <li>Show a dialog box for getting an username and a password</li>
+     * </ul>
+     */
+    public static void authentication() {
+        AuthInfo authInfo = getAuthInfo(getLastUser());
+        if (!minorLogin(authInfo)) {
+            showAuthDialog();
         }
     }
 
-    public static boolean loginFromDialog(@NotNull final Project project) {
-        StepikUser user = StepikProjectManager.getInstance(project).getUser();
-        Project defaultProject = ProjectManager.getInstance().getDefaultProject();
-        StepikUser defaultUser = StepikProjectManager.getInstance(defaultProject).getUser();
-
-        if (minorLogin(user) == null) {
-            if (minorLogin(defaultUser) == null) {
-                return showLoginDialog();
-            }
-        }
-
-        StepikProjectManager.getInstance(project).setUser(currentUser);
-        StepikProjectManager.getInstance(defaultProject).setUser(currentUser);
-
-        return true;
-    }
-
-    private static boolean showLoginDialog() {
-        final boolean[] logged = {false};
+    private static void showAuthDialog() {
         ApplicationManager.getApplication().invokeAndWait(() -> {
+            logger.info("Show the authentication dialog");
             final LoginDialog dialog = new LoginDialog();
             dialog.show();
-            logged[0] = dialog.getExitCode() == DialogWrapper.OK_EXIT_CODE;
         }, ModalityState.defaultModalityState());
-        return logged[0];
     }
 
-    private static void resetClient() {
-        ourClient = null;
-        currentUser = null;
+    private static boolean minorLogin(@NotNull AuthInfo authInfo) {
+        logger.info("Check the authentication");
+
+        if (stepikApiClient.getTokenInfo().getAccessToken() != null) {
+            User user = getCurrentUser();
+
+            if (!user.isGuest()) {
+                logger.info("Authenticated");
+                return true;
+            }
+        }
+
+        String refreshToken = stepikApiClient.getTokenInfo().getRefreshToken();
+        if (refreshToken == null && authInfo.getTokenInfo() != null) {
+            refreshToken = authInfo.getTokenInfo().getRefreshToken();
+        }
+
+        if (refreshToken != null) {
+            try {
+                logger.info("Try refresh a token");
+                stepikApiClient.oauth2()
+                        .userAuthenticationRefresh(CLIENT_ID, refreshToken)
+                        .execute();
+                logger.info("Refresh a token is successfully");
+                return true;
+            } catch (StepikClientException re) {
+                logger.info("Refresh a token is failed: " + re.getMessage());
+            }
+        }
+
+        if (authInfo.canBeValid()) {
+            try {
+                logger.info("Try execute the Authentication with a password");
+                authenticate(authInfo.getUsername(), authInfo.getPassword());
+                logger.info("The Authentication with a password is successfully");
+                return true;
+            } catch (StepikClientException e) {
+                logger.info("The Authentication with a password is failed: " + e.getMessage());
+            }
+        }
+
+        return false;
     }
 
-    @Nullable
-    static StepikUser minorLogin(@NotNull StepikUser basicUser) {
-        String refreshToken;
-        StepikWrappers.TokenInfo tokenInfo = null;
-        List<NameValuePair> nvps = new ArrayList<>();
+    @NotNull
+    private static AuthInfo getAuthInfo(long userId) {
+        return getAuthInfo(userId, stepikApiClient);
+    }
 
-        if (!(refreshToken = basicUser.getRefreshToken()).isEmpty()) {
-            logger.info("refresh_token auth");
-            nvps.add(new BasicNameValuePair("client_id", CLIENT_ID));
-            nvps.add(new BasicNameValuePair("content-type", "application/json"));
-            nvps.add(new BasicNameValuePair("grant_type", "refresh_token"));
-            nvps.add(new BasicNameValuePair("refresh_token", refreshToken));
-
-            tokenInfo = postCredentials(nvps);
+    @NotNull
+    private static AuthInfo getAuthInfo(long userId, StepikApiClient client) {
+        if (userId == 0) {
+            return new AuthInfo();
         }
+        String serviceName = StepikProjectManager.class.getName();
+        CredentialAttributes attributes = new CredentialAttributes(serviceName,
+                String.valueOf(userId),
+                StepikProjectManager.class,
+                false);
+        String serializedAuthInfo = PasswordSafe.getInstance().getPassword(attributes);
+        AuthInfo authInfo = client.getJsonConverter().fromJson(serializedAuthInfo, AuthInfo.class);
 
-        nvps.clear();
-
-        if (tokenInfo == null) {
-            logger.info("credentials auth");
-            String password = basicUser.getPassword();
-            if (password.isEmpty()) return null;
-            nvps.add(new BasicNameValuePair("client_id", CLIENT_ID));
-            nvps.add(new BasicNameValuePair("grant_type", "password"));
-            nvps.add(new BasicNameValuePair("username", basicUser.getEmail()));
-            nvps.add(new BasicNameValuePair("password", password));
-
-            tokenInfo = postCredentials(nvps);
+        if (authInfo == null) {
+            return new AuthInfo();
         }
+        return authInfo;
+    }
 
-        if (tokenInfo == null) {
-            return null;
-        }
-        currentUser = new StepikUser(basicUser);
-        currentUser.setupTokenInfo(tokenInfo);
-        StepikWrappers.AuthorWrapper userWrapper = StepikConnectorGet.getCurrentUser();
-        if (userWrapper != null) {
-            currentUser.update(userWrapper.users.get(0));
+    @NotNull
+    public static String getCurrentUserPassword() {
+        User currentUser = getCurrentUser();
+        return getAuthInfo(currentUser.getId()).getPassword();
+    }
+
+    private static void setAuthInfo(long userId, @NotNull final AuthInfo authInfo) {
+        String serviceName = StepikProjectManager.class.getName();
+        CredentialAttributes attributes = new CredentialAttributes(serviceName,
+                String.valueOf(userId),
+                StepikProjectManager.class,
+                false);
+        String serializedAuthInfo = stepikApiClient.getJsonConverter().toJson(authInfo);
+        PasswordSafe.getInstance().setPassword(attributes, serializedAuthInfo);
+        setLastUser(userId);
+    }
+
+    @NotNull
+    public static StepikApiClient getStepikApiClient() {
+        return stepikApiClient;
+    }
+
+    @NotNull
+    public static User testAuthentication(@Nullable String username, @Nullable String password) {
+        TokenInfo currentTokenInfo = stepikApiClient.getTokenInfo();
+
+        User testUser;
+        if (authenticate(username, password)) {
+            logger.info("The test authentication is successfully");
+            testUser = getCurrentUser();
         } else {
-            return null;
+            logger.info("The test authentication is failed");
+            testUser = new User();
         }
-        return currentUser;
+
+        stepikApiClient.setTokenInfo(currentTokenInfo);
+
+        return testUser;
     }
 
-    private static StepikWrappers.TokenInfo postCredentials(@NotNull List<NameValuePair> nvps) {
-        final Gson gson = new GsonBuilder()
-                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-                .create();
-
-        final HttpPost request = new HttpPost(EduStepikNames.TOKEN_URL);
-        request.setEntity(new UrlEncodedFormEntity(nvps, Consts.UTF_8));
-
+    @NotNull
+    public static User getCurrentUser() {
         try {
-            CloseableHttpClient client = StepikConnectorInit.getHttpClient();
-            if (client == null) {
-                logger.warn("Failed to Login: httpClient is null");
-                return null;
-            }
-            final CloseableHttpResponse response = client.execute(request);
-            final StatusLine statusLine = response.getStatusLine();
-            final HttpEntity responseEntity = response.getEntity();
-            final String responseString = responseEntity != null ? EntityUtils.toString(responseEntity) : "";
-            if (statusLine.getStatusCode() == HttpStatus.SC_OK) {
-                return gson.fromJson(responseString, StepikWrappers.TokenInfo.class);
-            } else {
-                logger.warn("Failed to Login: " + statusLine.getStatusCode() + statusLine.getReasonPhrase());
-                throw new IOException("Stepik returned non 200 status code " + responseString);
-            }
-        } catch (IOException e) {
-            logger.warn(e.getMessage());
-            return null;
+            return stepikApiClient.stepiks()
+                    .get()
+                    .id(1)
+                    .execute().getUser();
+        } catch (StepikClientException e) {
+            logger.warn("Get current user is failed", e);
+            return new User();
         }
+    }
+
+    public static boolean authenticate(@Nullable String username, @Nullable String password) {
+        try {
+            stepikApiClient.oauth2()
+                    .userAuthenticationPassword(CLIENT_ID, username, password)
+                    .execute();
+
+            AuthInfo authInfo = new AuthInfo();
+            authInfo.setTokenInfo(stepikApiClient.getTokenInfo());
+            authInfo.setUsername(username);
+            authInfo.setPassword(password);
+
+            long userId = getCurrentUser().getId();
+            setAuthInfo(userId, authInfo);
+            logger.info("Authentication is successfully");
+            return true;
+        } catch (StepikClientException e) {
+            logger.warn("Authentication is failed", e);
+            return false;
+        }
+    }
+
+    @NotNull
+    public static String getCurrentUsername() {
+        User currentUser = getCurrentUser();
+        return getAuthInfo(currentUser.getId()).getUsername();
+    }
+
+    @NotNull
+    public static String getCurrentUserFullName() {
+        User user = getCurrentUser();
+        return user.getFirstName() + " " + user.getLastName();
+    }
+
+    public static StepikApiClient authAndGetStepikApiClient() {
+        StepikConnectorLogin.authentication();
+        return stepikApiClient;
     }
 }

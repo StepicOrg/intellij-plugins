@@ -33,7 +33,8 @@ public class StepikModuleType extends ModuleType<CourseModuleBuilder> {
     @NotNull
     private static StepikModuleType instantiate() {
         try {
-            return (StepikModuleType) Class.forName("org.stepik.plugin.projectWizard.idea.StepikModuleType").newInstance();
+            return (StepikModuleType) Class.forName("org.stepik.plugin.projectWizard.idea.StepikModuleType")
+                    .newInstance();
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }

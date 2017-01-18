@@ -17,7 +17,7 @@ import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.StudyBasePluginConfigurator;
 import com.jetbrains.tmp.learning.StudyPluginConfigurator;
 import com.jetbrains.tmp.learning.StudyUtils;
-import com.jetbrains.tmp.learning.courseFormat.Course;
+import com.jetbrains.tmp.learning.courseFormat.CourseNode;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -47,9 +47,9 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
 
     private static DefaultActionGroup getActionGroup(@NotNull final Project project) {
         DefaultActionGroup group = new DefaultActionGroup();
-        Course course = StepikProjectManager.getInstance(project).getCourse();
-        if (course == null) {
-            logger.warn("Course is null");
+        CourseNode courseNode = StepikProjectManager.getInstance(project).getCourseNode();
+        if (courseNode == null) {
+            logger.warn("CourseNode is null");
             return group;
         }
         StudyPluginConfigurator configurator = StudyUtils.getConfigurator(project);

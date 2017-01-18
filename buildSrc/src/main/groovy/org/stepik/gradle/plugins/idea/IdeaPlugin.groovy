@@ -7,9 +7,9 @@ import org.stepik.gradle.plugins.jetbrains.RepositoryType
  * @author meanmail
  */
 class IdeaPlugin extends BasePlugin {
-    private static final def PRODUCT_NAME = "Idea"
-    private static final def EXTENSION_NAME = "intellij"
-    private static final def DEFAULT_REPO = 'https://www.jetbrains.com/intellij-repository/releases'
+    private static final PRODUCT_NAME = "Idea"
+    private static final EXTENSION_NAME = "intellij"
+    private static final DEFAULT_REPO = 'https://www.jetbrains.com/intellij-repository/releases'
 
     IdeaPlugin() {
         extensionName = EXTENSION_NAME

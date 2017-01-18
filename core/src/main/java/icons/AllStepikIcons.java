@@ -6,13 +6,13 @@ import com.intellij.openapi.util.IconLoader;
 import javax.swing.*;
 
 public class AllStepikIcons {
-    private static Icon load(String path) {
-        return IconLoader.getIcon(path, AllStepikIcons.class);
-    }
-
     public static final Icon stepikLogo = load("/icons/stepikLogo.png"); // 16x16
     public static final Icon stepikLogoBig = load("/icons/stepikLogoBig.png"); // 24x24
     public static final Icon stepikLogoSmall = load("/icons/stepikLogoSmall.png"); // 13x13
+
+    private static Icon load(String path) {
+        return IconLoader.getIcon(path, AllStepikIcons.class);
+    }
 
     public static class ProjectTree {
         public static final Icon course = load("/icons/projectTree/course.png"); // 16x16

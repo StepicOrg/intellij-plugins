@@ -21,6 +21,7 @@ import org.stepik.gradle.plugins.jetbrains.Utils
  */
 class DependencyManager {
     private static final Logger logger = LoggerFactory.getLogger(DependencyManager)
+    private static Set<ProductDependency> dependencies = new HashSet<>()
 
     @NotNull
     static ProductDependency resolveRemoteMaven(
@@ -40,7 +41,7 @@ class DependencyManager {
 
         def classesDirectory = getClassesDirectory(project, configuration)
         extension.idePath = classesDirectory
-        return createCompileDependency(extension.version, classesDirectory, project)
+        return createCompileDependency(project, name, version, classesDirectory)
     }
 
     @NotNull
@@ -76,15 +77,18 @@ class DependencyManager {
             throw new BuildException("Specified idePath '$idePath' is not path to $productName", null)
         }
 
-        return createCompileDependency(extension.version, idePath, project)
+        return createCompileDependency(project, productName.toLowerCase(), extension.version, idePath)
     }
 
     @NotNull
     private static ProductDependency createCompileDependency(
+            @NotNull Project project,
+            @NotNull String productName,
             @NotNull String version,
-            @NotNull File classesDirectory,
-            @NotNull Project project) {
-        return new ProductDependency(version,
+            @NotNull File classesDirectory) {
+        return new ProductDependency(
+                productName,
+                version,
                 version,
                 classesDirectory,
                 !hasKotlinDependency(project))
@@ -124,6 +128,7 @@ class DependencyManager {
         ]
 
         project.dependencies.add(JavaPlugin.COMPILE_CONFIGURATION_NAME, map)
+        dependencies.add(dependency)
     }
 
     private static File getOrCreateIvyXml(
@@ -131,9 +136,9 @@ class DependencyManager {
             @NotNull final String productName) {
         def ivyFile = new File(dependency.classes, "${dependency.getFqn(productName)}.xml")
         if (!ivyFile.exists()) {
-            final def version = dependency.version
-            final def identity = new DefaultIvyPublicationIdentity("com.jetbrains", productName, version)
-            final def generator = new IvyDescriptorFileGenerator(identity)
+            final version = dependency.version
+            final identity = new DefaultIvyPublicationIdentity("com.jetbrains", productName, version)
+            final generator = new IvyDescriptorFileGenerator(identity)
             generator.addConfiguration(new DefaultIvyConfiguration("default"))
             generator.addConfiguration(new DefaultIvyConfiguration("compile"))
             generator.addConfiguration(new DefaultIvyConfiguration("sources"))
@@ -196,6 +201,10 @@ class DependencyManager {
             println("Unarchivated $productName to $idePath")
         }
 
-        return DependencyManager.resolveLocal(project, extension, productName)
+        return resolveLocal(project, extension, productName)
+    }
+
+    static Set<ProductDependency> getDependencies() {
+        return dependencies
     }
 }
