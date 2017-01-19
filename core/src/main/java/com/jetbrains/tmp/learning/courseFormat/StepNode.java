@@ -78,14 +78,15 @@ public class StepNode implements StudyNode {
             Map<String, String> templates = options.getCodeTemplates();
             templates.entrySet().forEach(entry -> {
                 SupportedLanguages language = SupportedLanguages.langOf(entry.getKey());
-                languages.add(language);
 
-                StepFile stepFile = new StepFile();
-                stepFile.setName(language.getMainFileName());
-                stepFile.setText(entry.getValue());
-                stepFile.setStepNode(this);
-
-                stepFiles.put(language.getMainFileName(), stepFile);
+                if (language != SupportedLanguages.INVALID) {
+                    languages.add(language);
+                    StepFile stepFile = new StepFile();
+                    stepFile.setName(language.getMainFileName());
+                    stepFile.setText(entry.getValue());
+                    stepFile.setStepNode(this);
+                    stepFiles.put(language.getMainFileName(), stepFile);
+                }
             });
 
             setSupportedLanguages(languages);

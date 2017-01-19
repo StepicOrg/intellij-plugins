@@ -36,7 +36,11 @@ public enum SupportedLanguages {
     @NotNull
     public static SupportedLanguages langOf(@NotNull String lang) {
         lang = lang.replaceAll("[0-9]+", "").toUpperCase();
-        return SupportedLanguages.valueOf(lang);
+        try {
+            return SupportedLanguages.valueOf(lang);
+        } catch (IllegalArgumentException e) {
+            return INVALID;
+        }
     }
 
     @NotNull
