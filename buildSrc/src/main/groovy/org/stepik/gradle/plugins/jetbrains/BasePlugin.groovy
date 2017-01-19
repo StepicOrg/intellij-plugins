@@ -6,6 +6,7 @@ import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.tasks.bundling.Zip
 import org.gradle.api.tasks.compile.AbstractCompile
 import org.gradle.api.tasks.testing.Test
 import org.gradle.internal.jvm.Jvm
@@ -31,6 +32,7 @@ abstract class BasePlugin implements Plugin<Project> {
     private String prepareTestSandboxTaskName
     private String patchPluginXmlTaskName
     private String pluginXmlDirName
+    private String buildPluginTaskName
     protected boolean extensionInstrumentCode
     RepositoryType repositoryType
 
@@ -59,6 +61,7 @@ abstract class BasePlugin implements Plugin<Project> {
         configurePatchPluginXmlTask(project, extension)
         configurePrepareSandboxTask(project, extension)
         configureRunTask(project, extension)
+        configureBuildPluginTask(project)
         configureProcessResources(project)
         project.afterEvaluate(new Action<Project>() {
             @Override
@@ -198,6 +201,20 @@ abstract class BasePlugin implements Plugin<Project> {
         }
     }
 
+    private void configureBuildPluginTask(@NotNull Project project) {
+        logger.info("Configuring building plugin task")
+        def prepareSandboxTask = project.tasks.findByName(prepareSandboxTaskName) as PrepareSandboxTask
+        project.tasks.create(buildPluginTaskName, Zip).with {
+            description = "Bundles the project as a distribution."
+            group = tasksGroupName
+            from { "${prepareSandboxTask.getDestinationDir()}/${prepareSandboxTask.getPluginName()}" }
+            into { prepareSandboxTask.getPluginName() }
+            dependsOn(prepareSandboxTask)
+            conventionMapping.map('baseName', { prepareSandboxTask.getPluginName() })
+            it
+        }
+    }
+
     String getProductName() {
         return productName
     }
@@ -208,6 +225,7 @@ abstract class BasePlugin implements Plugin<Project> {
         this.prepareTestSandboxTaskName = "prepare${productName}TestSandbox"
         this.patchPluginXmlTaskName = "patch${productName}PluginXml"
         this.pluginXmlDirName = "patched${productName}PluginXmlFiles"
+        this.buildPluginTaskName = "build${productName}Plugin"
     }
 
     String getProductGroup() {

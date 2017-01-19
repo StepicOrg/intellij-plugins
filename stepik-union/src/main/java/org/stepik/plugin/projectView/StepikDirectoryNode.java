@@ -1,24 +1,19 @@
 package org.stepik.plugin.projectView;
 
 import com.intellij.ide.projectView.PresentationData;
-import com.intellij.ide.projectView.ProjectView;
 import com.intellij.ide.projectView.ViewSettings;
 import com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode;
-import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
-import com.jetbrains.tmp.learning.StudyUtils;
+import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.core.EduUtils;
-import com.jetbrains.tmp.learning.courseFormat.Task;
-import com.jetbrains.tmp.learning.courseFormat.TaskFile;
+import com.jetbrains.tmp.learning.courseFormat.CourseNode;
+import com.jetbrains.tmp.learning.courseFormat.LessonNode;
+import com.jetbrains.tmp.learning.courseFormat.SectionNode;
+import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.plugin.utils.PresentationDataUtils;
-
-import java.util.Map;
 
 /**
  * @author meanmail
@@ -40,14 +35,35 @@ class StepikDirectoryNode extends PsiDirectoryNode {
     @Override
     public int getTypeSortWeight(boolean sortByType) {
         String name = getValue().getName();
+        StepikProjectManager stepManager = StepikProjectManager.getInstance(getValue().getProject());
+        CourseNode courseNode = stepManager.getCourseNode();
+        if (courseNode == null) {
+            return 0;
+        }
+
         if (name.startsWith(EduNames.SECTION)) {
-            return EduUtils.getIndex(name, EduNames.SECTION);
+            int id = EduUtils.parseDirName(name, EduNames.SECTION);
+            SectionNode sectionNode = courseNode.getSectionById(id);
+            if (sectionNode == null) {
+                return id;
+            }
+            return sectionNode.getPosition();
         }
         if (name.startsWith(EduNames.LESSON)) {
-            return EduUtils.getIndex(name, EduNames.LESSON);
+            int id = EduUtils.parseDirName(name, EduNames.LESSON);
+            LessonNode lessonNode = courseNode.getLessonById(id);
+            if (lessonNode == null) {
+                return id;
+            }
+            return lessonNode.getPosition();
         }
-        if (name.startsWith(EduNames.TASK)) {
-            return EduUtils.getIndex(name, EduNames.TASK);
+        if (name.startsWith(EduNames.STEP)) {
+            int id = EduUtils.parseDirName(name, EduNames.STEP);
+            StepNode stepNode = courseNode.getStepById(id);
+            if (stepNode == null) {
+                return id;
+            }
+            return stepNode.getPosition();
         }
 
         return Integer.MAX_VALUE;
@@ -61,53 +77,6 @@ class StepikDirectoryNode extends PsiDirectoryNode {
     @Override
     public boolean canNavigateToSource() {
         return true;
-    }
-
-    @Override
-    public void navigate(boolean requestFocus) {
-        final PsiDirectory value = getValue();
-        final String myValueName = value.getName();
-        if (myValueName.contains(EduNames.TASK)) {
-            TaskFile taskFile = null;
-            VirtualFile virtualFile = null;
-            for (PsiElement child : value.getChildren()) {
-                PsiFile containingFile = child.getContainingFile();
-                //TODO fix. Step don't open by double click
-                if (containingFile == null)
-                    break;
-                VirtualFile childFile = containingFile.getVirtualFile();
-                taskFile = StudyUtils.getTaskFile(myProject, childFile);
-                if (taskFile != null) {
-                    virtualFile = childFile;
-                    break;
-                }
-            }
-            if (taskFile != null) {
-                VirtualFile taskDir = virtualFile.getParent();
-                Task task = taskFile.getTask();
-                for (VirtualFile openFile : FileEditorManager.getInstance(myProject).getOpenFiles()) {
-                    FileEditorManager.getInstance(myProject).closeFile(openFile);
-                }
-                VirtualFile child = null;
-                Map<String, TaskFile> taskFiles = task.getTaskFiles();
-                for (Map.Entry<String, TaskFile> entry : taskFiles.entrySet()) {
-                    VirtualFile file = taskDir.findChild(entry.getKey());
-                    if (file != null) {
-                        FileEditorManager.getInstance(myProject).openFile(file, true);
-                    }
-                    child = file;
-                }
-                if (child != null) {
-                    ProjectView.getInstance(myProject).select(child, child, false);
-                    FileEditorManager.getInstance(myProject).openFile(child, true);
-                } else {
-                    VirtualFile[] children = taskDir.getChildren();
-                    if (children.length > 0) {
-                        ProjectView.getInstance(myProject).select(children[0], children[0], false);
-                    }
-                }
-            }
-        }
     }
 
     @Override

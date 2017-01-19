@@ -23,6 +23,9 @@ class RunIdeaTask extends BaseRunTask {
 
     @Override
     protected String getPlatformPrefix() {
-        return "Idea"
+        if (extension.type == "IC") {
+            return "Idea"
+        }
+        return null
     }
 }

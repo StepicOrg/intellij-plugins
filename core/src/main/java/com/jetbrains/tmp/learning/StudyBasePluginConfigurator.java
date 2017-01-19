@@ -6,7 +6,7 @@ import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.jetbrains.tmp.learning.courseFormat.Task;
+import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.ui.StudyToolWindow;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -17,14 +17,14 @@ import java.util.Map;
 
 public abstract class StudyBasePluginConfigurator implements StudyPluginConfigurator {
     @NotNull
-    @Override
-    public DefaultActionGroup getActionGroup(Project project) {
-        return getDefaultActionGroup();
+    public static DefaultActionGroup getDefaultActionGroup() {
+        return new DefaultActionGroup();
     }
 
     @NotNull
-    public static DefaultActionGroup getDefaultActionGroup() {
-        return new DefaultActionGroup();
+    @Override
+    public DefaultActionGroup getActionGroup(Project project) {
+        return getDefaultActionGroup();
     }
 
     @NotNull
@@ -42,37 +42,36 @@ public abstract class StudyBasePluginConfigurator implements StudyPluginConfigur
         return new FileEditorManagerListener() {
             @Override
             public void fileOpened(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
-                Task task = StudyUtils.getTask(source.getProject(), file);
-                setTaskText(task, file.getParent());
+                StepNode stepNode = StudyUtils.getStep(source.getProject(), file);
+                setStepText(stepNode);
             }
 
             @Override
             public void fileClosed(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
                 for (VirtualFile openedFile : source.getOpenFiles()) {
-                    if (StudyUtils.getTask(project, openedFile) != null) {
+                    if (StudyUtils.getStep(project, openedFile) != null) {
                         return;
                     }
                 }
-                toolWindow.setEmptyText(project);
+                toolWindow.setEmptyText();
             }
 
             @Override
             public void selectionChanged(@NotNull FileEditorManagerEvent event) {
                 VirtualFile file = event.getNewFile();
                 if (file != null) {
-                    Task task = StudyUtils.getTask(event.getManager().getProject(), file);
-                    setTaskText(task, file.getParent());
+                    StepNode stepNode = StudyUtils.getStep(event.getManager().getProject(), file);
+                    setStepText(stepNode);
                 }
-                toolWindow.setBottomComponent(null);
             }
 
-            private void setTaskText(@Nullable final Task task, @Nullable final VirtualFile taskDirectory) {
-                String text = StudyUtils.getTaskTextFromTask(task);
+            private void setStepText(@Nullable final StepNode stepNode) {
+                String text = StudyUtils.getStepTextFromStep(stepNode);
                 if (text == null) {
-                    toolWindow.setEmptyText(project);
+                    toolWindow.setEmptyText();
                     return;
                 }
-                toolWindow.setTaskText(text, taskDirectory, project);
+                toolWindow.setStepText(text);
             }
         };
     }

@@ -3,15 +3,12 @@ package org.stepik.plugin.projectView;
 import com.intellij.ide.projectView.TreeStructureProvider;
 import com.intellij.ide.projectView.ViewSettings;
 import com.intellij.ide.util.treeView.AbstractTreeNode;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
-import com.jetbrains.tmp.learning.StudyTaskManager;
-import com.jetbrains.tmp.learning.core.EduNames;
-import com.jetbrains.tmp.learning.courseFormat.Course;
+import com.jetbrains.tmp.learning.StepikProjectManager;
+import com.jetbrains.tmp.learning.courseFormat.CourseNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,9 +18,7 @@ import java.util.Collection;
 import static org.stepik.plugin.utils.PresentationDataUtils.isVisibleDirectory;
 import static org.stepik.plugin.utils.PresentationDataUtils.isVisibleFile;
 
-public class StepikTreeStructureProvider implements TreeStructureProvider, DumbAware {
-    private static final Logger logger = Logger.getInstance(StepikTreeStructureProvider.class);
-
+public abstract class StepikTreeStructureProvider implements TreeStructureProvider, DumbAware {
     @NotNull
     @Override
     public Collection<AbstractTreeNode> modify(
@@ -47,7 +42,7 @@ public class StepikTreeStructureProvider implements TreeStructureProvider, DumbA
                     if (isVisibleFile((PsiFile) value)) {
                         nodes.add(node);
                     }
-                } else if (value instanceof PsiClass) {
+                } else if (shouldAdd(value)) {
                     nodes.add(node);
                 }
             }
@@ -55,14 +50,16 @@ public class StepikTreeStructureProvider implements TreeStructureProvider, DumbA
         return nodes;
     }
 
+    protected abstract boolean shouldAdd(@NotNull Object object);
+
     private boolean needModify(@NotNull final AbstractTreeNode parent) {
         final Project project = parent.getProject();
         if (project == null) {
             return false;
         }
-        final StudyTaskManager studyTaskManager = StudyTaskManager.getInstance(project);
-        Course course = studyTaskManager.getCourse();
-        return course != null && EduNames.STEPIK_CODE.equals(course.getCourseMode());
+        final StepikProjectManager stepikProjectManager = StepikProjectManager.getInstance(project);
+        CourseNode courseNode = stepikProjectManager.getCourseNode();
+        return courseNode != null;
     }
 
     @Nullable

@@ -8,7 +8,7 @@ import javax.swing.*;
 
 public abstract class StudyActionWithShortcut extends DumbAwareAction {
 
-    public StudyActionWithShortcut(@Nullable String text, @Nullable String description, @Nullable Icon icon) {
+    protected StudyActionWithShortcut(@Nullable String text, @Nullable String description, @Nullable Icon icon) {
         super(text, description, icon);
     }
 

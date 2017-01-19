@@ -7,7 +7,7 @@ import org.jetbrains.annotations.Nullable;
 public enum SupportedLanguages {
     JAVA(EduNames.JAVA8, "Main.java", "//", new String[]{"class Main {"}, new String[]{"}"}),
     PYTHON(EduNames.PYTHON3, "main.py", "#", null, null),
-    INVALID("", "", "", null, null);
+    INVALID(EduNames.INVALID, "", "", null, null);
 
     private final String name;
     private final String comment;
@@ -34,6 +34,16 @@ public enum SupportedLanguages {
     }
 
     @NotNull
+    public static SupportedLanguages langOf(@NotNull String lang) {
+        lang = lang.replaceAll("[0-9]+", "").toUpperCase();
+        try {
+            return SupportedLanguages.valueOf(lang);
+        } catch (IllegalArgumentException e) {
+            return INVALID;
+        }
+    }
+
+    @NotNull
     public String getName() {
         return name;
     }
@@ -46,12 +56,6 @@ public enum SupportedLanguages {
     @NotNull
     public String getMainFileName() {
         return mainFileName;
-    }
-
-    @Nullable
-    public static SupportedLanguages langOf(@NotNull String lang) {
-        lang = lang.replaceAll("[0-9]+", "").toUpperCase();
-        return SupportedLanguages.valueOf(lang);
     }
 
     @NotNull
@@ -74,16 +78,9 @@ public enum SupportedLanguages {
         return line.trim().startsWith(comment);
     }
 
+    @NotNull
     @Override
     public String toString() {
         return name;
-    }
-
-    public static SupportedLanguages type(String token) {
-        return SupportedLanguages.langOf(token);
-    }
-
-    public static String token(SupportedLanguages t) {
-        return t.name();
     }
 }

@@ -7,9 +7,9 @@ import org.stepik.gradle.plugins.jetbrains.RepositoryType
  * @author meanmail
  */
 class PyCharmPlugin extends BasePlugin {
-    private static final def PRODUCT_NAME = "PyCharm"
-    private static final def EXTENSION_NAME = "pycharm"
-    private static final def DEFAULT_REPO =
+    private static final PRODUCT_NAME = "PyCharm"
+    private static final EXTENSION_NAME = "pycharm"
+    private static final DEFAULT_REPO =
             'https://download-cf.jetbrains.com/python/pycharm-community-[version].[archiveType]'
 
     PyCharmPlugin() {

@@ -1,6 +1,7 @@
 package org.stepik.gradle.plugins.jetbrains.dependency
 
 import groovy.transform.ToString
+import org.gradle.api.artifacts.Dependency
 import org.jetbrains.annotations.NotNull
 
 /**
@@ -17,12 +18,15 @@ class ProductDependency implements Serializable {
     @NotNull
     private final Collection<File> jarFiles
     private final boolean withKotlin
+    private final String productName
 
     ProductDependency(
+            @NotNull String productName,
             @NotNull String version,
             @NotNull String buildNumber,
             @NotNull File classes,
             boolean withKotlin) {
+        this.productName = productName
         this.version = version
         this.buildNumber = buildNumber
         this.classes = classes
@@ -81,10 +85,14 @@ class ProductDependency implements Serializable {
 
     @Override
     boolean equals(Object o) {
-        if (this == o) return true
-        if (o == null || getClass() != o.getClass()) return false
+        if (o.class == Dependency.class) {
+            return contentEquals(o as Dependency)
+        }
 
-        ProductDependency that = (ProductDependency) o
+        if (this.is(o)) return true
+        if (o == null || this.class != o.class) return false
+
+        ProductDependency that = o as ProductDependency
 
         if (withKotlin != that.withKotlin) return false
         if (version != that.version) return false
@@ -102,5 +110,9 @@ class ProductDependency implements Serializable {
         result = 31 * result + jarFiles.hashCode()
         result = 31 * result + (withKotlin ? 1 : 0)
         return result
+    }
+
+    boolean contentEquals(Dependency dependency) {
+        return dependency.getGroup() == "com.jetbrains" && dependency.getName() == productName && dependency.getVersion() == version
     }
 }

@@ -9,18 +9,18 @@ import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.tmp.learning.StudyUtils;
-import com.jetbrains.tmp.learning.courseFormat.TaskFile;
+import com.jetbrains.tmp.learning.courseFormat.StepFile;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 
 public class StudyFileEditorProvider implements FileEditorProvider, DumbAware {
-    public static final String EDITOR_TYPE_ID = "SCore.StudyEditor";
+    private static final String EDITOR_TYPE_ID = "SCore.StudyEditor";
     private final FileEditorProvider defaultTextEditorProvider = TextEditorProvider.getInstance();
 
     @Override
     public boolean accept(@NotNull Project project, @NotNull VirtualFile file) {
-        TaskFile taskFile = StudyUtils.getTaskFile(project, file);
-        return taskFile != null && TextEditorProvider.isTextFile(file);
+        StepFile stepFile = StudyUtils.getStepFile(project, file);
+        return stepFile != null && TextEditorProvider.isTextFile(file);
     }
 
     @NotNull

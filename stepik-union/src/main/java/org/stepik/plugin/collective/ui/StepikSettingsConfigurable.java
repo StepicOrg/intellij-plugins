@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 
 public class StepikSettingsConfigurable implements SearchableConfigurable, VcsConfigurableProvider {
-    private StepikSettingsPanel mySettingsPane;
+    private StepikSettingsPanel settingsPane;
 
     public StepikSettingsConfigurable() {
     }
@@ -28,30 +28,30 @@ public class StepikSettingsConfigurable implements SearchableConfigurable, VcsCo
 
     @NotNull
     public JComponent createComponent() {
-        if (mySettingsPane == null) {
-            mySettingsPane = new StepikSettingsPanel();
+        if (settingsPane == null) {
+            settingsPane = new StepikSettingsPanel();
         }
-        return mySettingsPane.getPanel();
+        return settingsPane.getPanel();
     }
 
     public boolean isModified() {
-        return mySettingsPane != null && mySettingsPane.isModified();
+        return settingsPane != null && settingsPane.isModified();
     }
 
     public void apply() throws ConfigurationException {
-        if (mySettingsPane != null) {
-            mySettingsPane.apply();
+        if (settingsPane != null) {
+            settingsPane.apply();
         }
     }
 
     public void reset() {
-        if (mySettingsPane != null) {
-            mySettingsPane.reset();
+        if (settingsPane != null) {
+            settingsPane.reset();
         }
     }
 
     public void disposeUIResources() {
-        mySettingsPane = null;
+        settingsPane = null;
     }
 
     @NotNull

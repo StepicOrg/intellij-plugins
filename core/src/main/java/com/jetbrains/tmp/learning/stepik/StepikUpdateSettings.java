@@ -15,6 +15,11 @@ public class StepikUpdateSettings implements PersistentStateComponent<StepikUpda
     public StepikUpdateSettings() {
     }
 
+    @Nullable
+    public static StepikUpdateSettings getInstance() {
+        return ServiceManager.getService(StepikUpdateSettings.class);
+    }
+
     public long getNextTimeCheck() {
         return nextTimeCheck;
     }
@@ -32,10 +37,5 @@ public class StepikUpdateSettings implements PersistentStateComponent<StepikUpda
     @Override
     public void loadState(@NotNull StepikUpdateSettings state) {
         XmlSerializerUtil.copyBean(state, this);
-    }
-
-    @Nullable
-    public static StepikUpdateSettings getInstance() {
-        return ServiceManager.getService(StepikUpdateSettings.class);
     }
 }

@@ -2,7 +2,7 @@
     <id>org.stepik.plugin.union</id>
     <name>Stepik Union</name>
     <version>SNAPSHOT</version>
-    <idea-version since-build="162.0"/>
+    <idea-version since-build="163.7743.44"/>
     <vendor email="petr.bogdanov@stepik.org" url="http://www.stepik.org">Stepik</vendor>
 
     <description><![CDATA[
@@ -16,15 +16,13 @@
     ]]></description>
 
     <depends>com.intellij.modules.lang</depends>
-    <depends optional="true">PythonCore</depends>
     <depends optional="true" config-file="idea.xml">com.intellij.modules.java</depends>
     <depends optional="true" config-file="pycharm.xml">com.intellij.modules.python</depends>
+    <depends optional="true" config-file="clion.xml">com.intellij.modules.clion</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <treeStructureProvider implementation="org.stepik.plugin.projectView.StepikTreeStructureProvider"/>
         <applicationConfigurable instance="org.stepik.plugin.collective.ui.StepikSettingsConfigurable"/>
-        <moduleType id="STEPIK_MODULE_TYPE" implementationClass="org.stepik.plugin.java.project.wizard.StepikModuleType"/>
-        <navbar implementation="org.stepik.plugin.projectView.StepikNavBarModelExtension"/>
+        <moduleType id="STEPIK_MODULE_TYPE" implementationClass="org.stepik.plugin.projectWizard.idea.StepikModuleType"/>
         <refactoring.moveHandler implementation="org.stepik.plugin.refactoring.move.StepikMoveHandlerDelegate" order="first"/>
         <renamePsiElementProcessor implementation="org.stepik.plugin.refactoring.rename.StepikRenamePsiElementProcessor" order="first"/>
         <refactoring.safeDeleteProcessor implementation="org.stepik.plugin.refactoring.safeDelete.StepikSafeDeleteProcessorDelegate" order="first"/>
@@ -35,13 +33,13 @@
     </extensions>
 
     <actions>
-        <action id="STEPIK.StepikJavaPostAction" class="org.stepik.plugin.actions.StepikJavaPostAction"/>
-        <action id="STEPIK.PreviousTaskAction" class="org.stepik.plugin.actions.StepikPreviousTaskAction"/>
-        <action id="STEPIK.NextTaskAction" class="org.stepik.plugin.actions.StepikNextTaskAction"/>
-        <action id="STEPIK.DownloadSubmission" class="org.stepik.plugin.actions.DownloadSubmission"/>
-        <action id="STEPIK.SwitchLanguage" class="org.stepik.plugin.actions.SwitchLanguage"/>
-        <action id="STEPIK.InsertStepikDirectives" class="org.stepik.plugin.actions.InsertStepikDirectives"/>
-        <action id="STEPIK.RefreshTaskAction" class="org.stepik.plugin.actions.StepikRefreshTaskFileAction" text="Reset Task File" description="Refresh current task"/>
+        <action id="STEPIK.StepikJavaPostAction" class="org.stepik.plugin.actions.step.StepikJavaPostAction"/>
+        <action id="STEPIK.PreviousStepAction" class="org.stepik.plugin.actions.navigation.StepikPreviousStepAction"/>
+        <action id="STEPIK.NextStepAction" class="org.stepik.plugin.actions.navigation.StepikNextStepAction"/>
+        <action id="STEPIK.DownloadSubmission" class="org.stepik.plugin.actions.step.DownloadSubmission"/>
+        <action id="STEPIK.SwitchLanguage" class="org.stepik.plugin.actions.step.SwitchLanguage"/>
+        <action id="STEPIK.InsertStepikDirectives" class="org.stepik.plugin.actions.step.InsertStepikDirectives"/>
+        <action id="STEPIK.RefreshStepAction" class="org.stepik.plugin.actions.step.StepikResetStepAction" text="Reset Step File" description="Refresh current step"/>
     </actions>
 
     <!--______________________ CORE ________________________________________-->
@@ -52,21 +50,15 @@
         </component>
     </project-components>
 
-    <application-components>
-        <component>
-            <implementation-class>com.jetbrains.tmp.learning.stepik.EduStepikUpdater</implementation-class>
-        </component>
-    </application-components>
-
     <extensionPoints>
         <extensionPoint qualifiedName="SCore.studyPluginConfigurator" interface="com.jetbrains.tmp.learning.StudyPluginConfigurator"/>
     </extensionPoints>
 
     <extensions defaultExtensionNs="com.intellij">
         <projectService serviceInterface="com.intellij.codeInsight.documentation.DocumentationManager" serviceImplementation="com.jetbrains.tmp.learning.StudyDocumentationManager" overrides="true"/>
-        <toolWindow id="Task Description" anchor="right" factoryClass="com.jetbrains.tmp.learning.ui.StudyToolWindowFactory" conditionClass="com.jetbrains.tmp.learning.ui.StudyCondition"/>
+        <toolWindow id="Step Description" anchor="right" factoryClass="com.jetbrains.tmp.learning.ui.StudyToolWindowFactory" conditionClass="com.jetbrains.tmp.learning.ui.StudyCondition"/>
         <fileEditorProvider implementation="com.jetbrains.tmp.learning.editor.StudyFileEditorProvider"/>
-        <projectService serviceImplementation="com.jetbrains.tmp.learning.StudyTaskManager"/>
+        <projectService serviceInterface="com.jetbrains.tmp.learning.StepikProjectManager" serviceImplementation="com.jetbrains.tmp.learning.StepikProjectManager"/>
         <applicationService serviceImplementation="com.jetbrains.tmp.learning.stepik.StepikUpdateSettings"/>
     </extensions>
 </idea-plugin>

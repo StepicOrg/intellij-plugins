@@ -3,51 +3,51 @@ package com.jetbrains.tmp.learning;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.jetbrains.tmp.learning.courseFormat.Task;
-import com.jetbrains.tmp.learning.courseFormat.TaskFile;
+import com.jetbrains.tmp.learning.courseFormat.StepFile;
+import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.editor.StudyEditor;
 import org.jetbrains.annotations.Nullable;
 
 public class StudyState {
-    private final StudyEditor myStudyEditor;
-    private final Editor myEditor;
-    private final TaskFile myTaskFile;
-    private final VirtualFile myVirtualFile;
-    private final Task myTask;
-    private final VirtualFile myTaskDir;
+    private final StudyEditor studyEditor;
+    private final Editor editor;
+    private final StepFile stepFile;
+    private final VirtualFile virtualFile;
+    private final StepNode stepNode;
+    private final VirtualFile stepDir;
 
     public StudyState(@Nullable final StudyEditor studyEditor) {
-        myStudyEditor = studyEditor;
-        myEditor = studyEditor != null ? studyEditor.getEditor() : null;
-        myTaskFile = studyEditor != null ? studyEditor.getTaskFile() : null;
-        myVirtualFile = myEditor != null ? FileDocumentManager.getInstance().getFile(myEditor.getDocument()) : null;
-        myTaskDir = myVirtualFile != null ? myVirtualFile.getParent() : null;
-        myTask = myTaskFile != null ? myTaskFile.getTask() : null;
+        this.studyEditor = studyEditor;
+        editor = studyEditor != null ? studyEditor.getEditor() : null;
+        stepFile = studyEditor != null ? studyEditor.getStepFile() : null;
+        virtualFile = editor != null ? FileDocumentManager.getInstance().getFile(editor.getDocument()) : null;
+        stepDir = virtualFile != null ? virtualFile.getParent() : null;
+        stepNode = stepFile != null ? stepFile.getStepNode() : null;
     }
 
     public Editor getEditor() {
-        return myEditor;
+        return editor;
     }
 
-    public TaskFile getTaskFile() {
-        return myTaskFile;
+    public StepFile getStepFile() {
+        return stepFile;
     }
 
     public VirtualFile getVirtualFile() {
-        return myVirtualFile;
+        return virtualFile;
     }
 
-    public Task getTask() {
-        return myTask;
+    public StepNode getStepNode() {
+        return stepNode;
     }
 
-    public VirtualFile getTaskDir() {
-        return myTaskDir;
+    public VirtualFile getStepDir() {
+        return stepDir;
     }
 
     public boolean isValid() {
-        return myStudyEditor != null && myEditor != null &&
-                myTaskFile != null && myVirtualFile != null &&
-                myTask != null && myTaskDir != null;
+        return studyEditor != null && editor != null &&
+                stepFile != null && virtualFile != null &&
+                stepNode != null && stepDir != null;
     }
 }

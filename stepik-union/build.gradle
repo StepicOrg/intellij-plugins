@@ -21,19 +21,11 @@ clion {
 }
 
 dependencies {
+    compile project(":stepik-java-api")
     compile project(":core")
 }
 
-jar {
-    into('/') {
-        from "${project(":core").getBuildDir()}/classes/main"
-    }
-    into('/') {
-        from "${project(":core").getBuildDir()}/resources/main"
-    }
-}
-
 group 'org.stepik'
-version project.getProperties().get('pluginVersion')?:'SNAPSHOT'
+version project.getProperties().get('pluginVersion') ?: 'SNAPSHOT'
 
 defaultTasks "runIdea"

@@ -20,9 +20,9 @@ public interface StudyPluginConfigurator {
     DefaultActionGroup getActionGroup(Project project);
 
     /**
-     * Provide panels, that could be added to Task tool window.
+     * Provide panels, that could be added to Step tool window.
      *
-     * @return Map from panel id, i.e. "Task description", to panel itself.
+     * @return Map from panel id, i.e. "Step description", to panel itself.
      */
     @NotNull
     Map<String, JPanel> getAdditionalPanels(Project project);

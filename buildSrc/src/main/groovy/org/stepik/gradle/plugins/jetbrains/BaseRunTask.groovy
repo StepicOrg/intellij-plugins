@@ -97,8 +97,10 @@ abstract class BaseRunTask extends JavaExec {
         systemProperty("idea.classpath.index.enabled", false)
         systemProperty("idea.is.internal", true)
 
-        if (!systemProperties.containsKey("idea.platform.prefix")) {
-            systemProperty("idea.platform.prefix", platformPrefix)
+        if (platformPrefix != null) {
+            if (!systemProperties.containsKey("idea.platform.prefix")) {
+                systemProperty("idea.platform.prefix", platformPrefix)
+            }
         }
     }
 
@@ -112,5 +114,9 @@ abstract class BaseRunTask extends JavaExec {
 
     void setPlugin(BasePlugin plugin) {
         this.plugin = plugin
+    }
+
+    ProductPluginExtension getExtension() {
+        return extension
     }
 }

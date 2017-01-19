@@ -8,23 +8,23 @@ import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentManager;
-import com.jetbrains.tmp.learning.StudyTaskManager;
+import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.StudyUtils;
-import com.jetbrains.tmp.learning.courseFormat.Course;
-import icons.InteractiveLearningIcons;
+import com.jetbrains.tmp.learning.courseFormat.CourseNode;
+import icons.AllStepikIcons;
 import org.jetbrains.annotations.NotNull;
 
 public class StudyToolWindowFactory implements ToolWindowFactory, DumbAware {
-    public static final String STUDY_TOOL_WINDOW = "Task Description";
+    public static final String STUDY_TOOL_WINDOW = "Step Description";
     private static final Logger logger = Logger.getInstance(StudyToolWindowFactory.class.getName());
 
 
     @Override
     public void createToolWindowContent(@NotNull final Project project, @NotNull final ToolWindow toolWindow) {
-        toolWindow.setIcon(InteractiveLearningIcons.TaskDescription);
-        StudyTaskManager taskManager = StudyTaskManager.getInstance(project);
-        final Course course = taskManager.getCourse();
-        if (course != null || !taskManager.getUser().getEmail().isEmpty()) {
+        toolWindow.setIcon(AllStepikIcons.stepikLogoSmall);
+        StepikProjectManager stepManager = StepikProjectManager.getInstance(project);
+        final CourseNode courseNode = stepManager.getCourseNode();
+        if (courseNode != null) {
             logger.info("Study Tool Window is created");
             final StudyToolWindow studyToolWindow;
             if (StudyUtils.hasJavaFx()) {
@@ -32,7 +32,7 @@ public class StudyToolWindowFactory implements ToolWindowFactory, DumbAware {
             } else {
                 studyToolWindow = new StudySwingToolWindow();
             }
-            studyToolWindow.init(project, true);
+            studyToolWindow.init(project);
             final ContentManager contentManager = toolWindow.getContentManager();
             final Content content = contentManager.getFactory().createContent(studyToolWindow, null, false);
             contentManager.addContent(content);

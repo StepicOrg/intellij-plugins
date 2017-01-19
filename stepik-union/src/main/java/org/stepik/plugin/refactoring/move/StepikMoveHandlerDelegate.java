@@ -11,6 +11,7 @@ import org.stepik.plugin.utils.ProjectPsiFilesUtils;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.stepik.plugin.utils.ProjectPsiFilesUtils.isCanNotBeTarget;
@@ -50,7 +51,7 @@ public class StepikMoveHandlerDelegate extends MoveHandlerDelegate {
         List<PsiFileSystemItem> sources = Arrays.stream(elements)
                 .filter(ProjectPsiFilesUtils::isNotMovableOrRenameElement)
                 .map(ProjectPsiFilesUtils::getFile)
-                .filter(file -> file != null)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
         StringBuilder message = new StringBuilder();
