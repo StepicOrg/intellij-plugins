@@ -17,7 +17,6 @@ public class AcceptableClasses {
         Set<Class<? extends PsiElement>> acceptableClasses = new HashSet<>();
 
         acceptableClasses.add(PsiFileSystemItem.class);
-        acceptableClasses.add(PyClass.class);
 
         return acceptableClasses;
     }

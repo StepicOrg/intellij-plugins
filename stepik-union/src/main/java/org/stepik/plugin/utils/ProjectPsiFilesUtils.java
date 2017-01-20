@@ -57,7 +57,12 @@ public class ProjectPsiFilesUtils {
     private static boolean notAccept(
             @NotNull PsiElement target,
             @NotNull Set<Class<? extends PsiElement>> acceptableClasses) {
-        return acceptableClasses.stream().filter(clazz -> target.getClass().isInstance(clazz)).count() != 0;
+        for (Class<? extends PsiElement> clazz : acceptableClasses) {
+            if (clazz.isInstance(target)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @NotNull
