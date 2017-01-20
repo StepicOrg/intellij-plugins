@@ -2,7 +2,6 @@ package org.stepik.plugin.refactoring.impl.pycharm;
 
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFileSystemItem;
-import com.jetbrains.python.psi.PyClass;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
