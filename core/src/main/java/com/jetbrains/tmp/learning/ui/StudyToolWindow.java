@@ -17,7 +17,6 @@ import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.StudyBasePluginConfigurator;
 import com.jetbrains.tmp.learning.StudyPluginConfigurator;
 import com.jetbrains.tmp.learning.StudyUtils;
-import com.jetbrains.tmp.learning.courseFormat.CourseNode;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -45,11 +44,11 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
         return JBUI.Panels.simplePanel(actionToolBar.getComponent());
     }
 
+    @NotNull
     private static DefaultActionGroup getActionGroup(@NotNull final Project project) {
         DefaultActionGroup group = new DefaultActionGroup();
-        CourseNode courseNode = StepikProjectManager.getInstance(project).getCourseNode();
-        if (courseNode == null) {
-            logger.warn("CourseNode is null");
+        if (!StepikProjectManager.isStepikProject(project)) {
+            logger.warn(project.getName() + " is not Stepik-project");
             return group;
         }
         StudyPluginConfigurator configurator = StudyUtils.getConfigurator(project);

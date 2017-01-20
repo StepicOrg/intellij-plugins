@@ -2,5 +2,8 @@
     <extensions defaultExtensionNs="com.intellij">
         <treeStructureProvider implementation="org.stepik.plugin.projectView.idea.IdeaTreeStructureProvider"/>
         <navbar implementation="org.stepik.plugin.projectView.idea.IdeaNavBarModelExtension"/>
+        <refactoring.moveHandler implementation="org.stepik.plugin.refactoring.impl.idea.move.MoveHandlerDelegate" order="first"/>
+        <renamePsiElementProcessor implementation="org.stepik.plugin.refactoring.impl.idea.rename.RenamePsiElementProcessor" order="first"/>
+        <refactoring.safeDeleteProcessor implementation="org.stepik.plugin.refactoring.impl.idea.safeDelete.SafeDeleteProcessorDelegate" order="first"/>
     </extensions>
 </idea-plugin>

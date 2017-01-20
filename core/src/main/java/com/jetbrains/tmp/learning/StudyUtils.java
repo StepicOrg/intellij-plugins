@@ -244,7 +244,7 @@ public class StudyUtils {
         Project studyProject = null;
         Project[] openProjects = ProjectManager.getInstance().getOpenProjects();
         for (Project project : openProjects) {
-            if (StepikProjectManager.getInstance(project).getCourseNode() != null) {
+            if (StepikProjectManager.isStepikProject(project)) {
                 studyProject = project;
                 break;
             }

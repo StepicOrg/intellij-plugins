@@ -190,4 +190,8 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
     public void setCreatedBy(long createdBy) {
         this.createdBy = createdBy;
     }
+
+    public static boolean isStepikProject(@Nullable Project project) {
+        return project != null && getInstance(project).getCourseNode() != null;
+    }
 }

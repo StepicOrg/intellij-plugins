@@ -11,7 +11,6 @@ import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.actions.StudyActionWithShortcut;
 import com.jetbrains.tmp.learning.core.EduNames;
-import com.jetbrains.tmp.learning.courseFormat.CourseNode;
 import com.jetbrains.tmp.learning.courseFormat.StepFile;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import org.jetbrains.annotations.NotNull;
@@ -116,13 +115,7 @@ abstract class StudyStepNavigationAction extends StudyActionWithShortcut {
         presentation.setEnabled(false);
 
         Project project = e.getProject();
-        if (project == null) {
-            return;
-        }
-
-        CourseNode courseNode = StepikProjectManager.getInstance(project).getCourseNode();
-
-        if (courseNode == null) {
+        if (!StepikProjectManager.isStepikProject(project)) {
             return;
         }
 
