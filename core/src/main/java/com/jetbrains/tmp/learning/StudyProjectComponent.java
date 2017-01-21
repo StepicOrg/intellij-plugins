@@ -148,8 +148,7 @@ public class StudyProjectComponent implements ProjectComponent {
 
     @Override
     public void projectClosed() {
-        final CourseNode courseNode = StepikProjectManager.getInstance(project).getCourseNode();
-        if (courseNode != null) {
+        if (StepikProjectManager.isStepikProject(project)) {
             final ToolWindow toolWindow = ToolWindowManager.getInstance(project)
                     .getToolWindow(StudyToolWindowFactory.STUDY_TOOL_WINDOW);
             if (toolWindow != null) {
