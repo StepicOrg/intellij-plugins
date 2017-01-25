@@ -10,10 +10,12 @@ import org.stepik.plugin.projectWizard.StepikProjectGenerator;
 import org.stepik.plugin.utils.Utils;
 
 import javax.swing.*;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProjectSettingsPanel implements ProjectSetting {
+public class ProjectSettingsPanel implements ProjectSetting, HierarchyListener {
     private static final Logger logger = Logger.getInstance(ProjectSettingsPanel.class);
     private final Project project;
     private final List<ProjectSettingListener> listeners = new ArrayList<>();
@@ -51,6 +53,7 @@ public class ProjectSettingsPanel implements ProjectSetting {
 
         langComboBox.setVisible(visibleLangBox);
         langLabel.setVisible(visibleLangBox);
+        mainPanel.addHierarchyListener(this);
     }
 
     @NotNull
@@ -122,5 +125,10 @@ public class ProjectSettingsPanel implements ProjectSetting {
     @NotNull
     public Course getSelectedCourse() {
         return selectedCourse;
+    }
+
+    @Override
+    public void hierarchyChanged(HierarchyEvent e) {
+        notifyListeners();
     }
 }

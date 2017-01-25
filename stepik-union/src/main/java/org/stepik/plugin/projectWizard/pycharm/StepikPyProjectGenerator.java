@@ -11,6 +11,8 @@ import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.roots.ModuleRootModificationUtil;
+import com.intellij.openapi.ui.LabeledComponent;
+import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.BooleanFunction;
@@ -32,6 +34,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.objects.courses.Course;
+import org.stepik.plugin.projectWizard.ProjectWizardUtils;
 import org.stepik.plugin.projectWizard.StepikProjectGenerator;
 
 import javax.swing.*;
@@ -46,6 +49,7 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
     private static final String MODULE_NAME = "Stepik";
     private final StepikProjectGenerator generator;
     private final PyCharmWizardStep wizardStep;
+    private TextFieldWithBrowseButton locationField;
 
     private StepikPyProjectGenerator() {
         super(true);
@@ -70,8 +74,60 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
     @Nullable
     @Override
     public JPanel extendBasePanel() throws ProcessCanceledException {
+        locationField = null;
         wizardStep.updateStep();
         return wizardStep.getComponent();
+    }
+
+    @NotNull
+    private String getLocation() {
+        TextFieldWithBrowseButton locationField = getLocationField();
+
+        if (locationField == null) {
+            return "";
+        }
+
+        return locationField.getText();
+    }
+
+    private void setLocation(@NotNull String location) {
+        TextFieldWithBrowseButton locationField = getLocationField();
+
+        if (locationField == null) {
+            return;
+        }
+
+        locationField.setText(location);
+    }
+
+    @Nullable
+    private TextFieldWithBrowseButton getLocationField() {
+        if (locationField == null) {
+            JPanel basePanel = (JPanel) wizardStep.getComponent().getParent();
+            if (basePanel == null) {
+                return null;
+            }
+            JPanel topPanel = (JPanel) basePanel.getComponent(0);
+            LabeledComponent locationComponent = (LabeledComponent) topPanel.getComponent(0);
+
+            locationField = (TextFieldWithBrowseButton) locationComponent.getComponent();
+        }
+
+        return locationField;
+    }
+
+
+    @Override
+    public void fireStateChanged() {
+        if (getLocationField() != null) {
+            long id = wizardStep.getSelectedCourse().getId();
+            String projectName = "course" + id;
+            String projectDir = new File(getLocation()).getParent();
+            projectName = ProjectWizardUtils.findNonExistingFileName(projectDir, projectName);
+            setLocation(projectDir + "/" + projectName);
+        }
+
+        super.fireStateChanged();
     }
 
     @NotNull
@@ -97,11 +153,6 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
                     .execute();
             return true;
         };
-    }
-
-    @Override
-    public Object getProjectSettings() {
-        return new PyNewProjectSettings();
     }
 
     @Override
