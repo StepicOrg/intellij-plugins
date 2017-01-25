@@ -38,6 +38,7 @@ import org.stepik.plugin.projectWizard.ProjectWizardUtils;
 import org.stepik.plugin.projectWizard.StepikProjectGenerator;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -112,14 +113,18 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
     @Nullable
     private TextFieldWithBrowseButton getLocationField() {
         if (locationField == null) {
-            JPanel basePanel = (JPanel) wizardStep.getComponent().getParent();
+            Container basePanel = wizardStep.getComponent().getParent();
             if (basePanel == null) {
                 return null;
             }
-            JPanel topPanel = (JPanel) basePanel.getComponent(0);
-            LabeledComponent locationComponent = (LabeledComponent) topPanel.getComponent(0);
-
-            locationField = (TextFieldWithBrowseButton) locationComponent.getComponent();
+            try {
+                Container topPanel = (Container) basePanel.getComponent(0);
+                LabeledComponent locationComponent = (LabeledComponent) topPanel.getComponent(0);
+                locationField = (TextFieldWithBrowseButton) locationComponent.getComponent();
+            } catch (ClassCastException | ArrayIndexOutOfBoundsException e) {
+                logger.warn("Auto naming for a project don't work: ", e);
+                return null;
+            }
         }
 
         return locationField;
