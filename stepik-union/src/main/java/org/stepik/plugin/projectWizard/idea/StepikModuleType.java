@@ -14,6 +14,7 @@ import icons.AllStepikIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jps.model.java.JavaModuleSourceRootTypes;
+import org.stepik.plugin.projectWizard.ProjectWizardUtils;
 
 import javax.swing.*;
 
@@ -88,5 +89,21 @@ public class StepikModuleType extends ModuleType<CourseModuleBuilder> {
     @Override
     public boolean isValidSdk(@NotNull final Module module, final Sdk projectSdk) {
         return isValidJavaSdk(module);
+    }
+
+    @Nullable
+    @Override
+    public ModuleWizardStep modifySettingsStep(
+            @NotNull SettingsStep settingsStep, @NotNull ModuleBuilder moduleBuilder) {
+        JTextField nameField = settingsStep.getModuleNameField();
+        if (nameField != null) {
+            CourseModuleBuilder courseModuleBuilder = (CourseModuleBuilder) moduleBuilder;
+            long id = courseModuleBuilder.getWizardStep().getSelectedCourse().getId();
+            String projectName = "course" + id;
+            String projectDir = settingsStep.getContext().getProjectFileDirectory();
+            projectName = ProjectWizardUtils.findNonExistingFileName(projectDir, projectName);
+            nameField.setText(projectName);
+        }
+        return null;
     }
 }

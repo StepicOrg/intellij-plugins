@@ -42,7 +42,7 @@ import java.io.IOException;
 
 
 class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettings> {
-    private static final Logger logger = Logger.getInstance(StepikPyProjectGenerator.class.getName());
+    private static final Logger logger = Logger.getInstance(StepikPyProjectGenerator.class);
     private static final String MODULE_NAME = "Stepik";
     private final StepikProjectGenerator generator;
     private final PyCharmWizardStep wizardStep;
