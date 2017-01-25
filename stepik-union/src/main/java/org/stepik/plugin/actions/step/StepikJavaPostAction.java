@@ -31,7 +31,7 @@ import java.util.List;
 public class StepikJavaPostAction extends StudyCheckAction {
     private static final Logger logger = Logger.getInstance(StepikJavaPostAction.class);
     private static final String ACTION_ID = "STEPIC.StepikJavaPostAction";
-    private static final int PERIOD = 2 * 1000; // ms
+    private static final int PERIOD = 2 * 1000; //ms
     private static final int FIVE_MINUTES = 5 * 60 * 1000; //ms
 
     public StepikJavaPostAction() {
@@ -52,21 +52,28 @@ public class StepikJavaPostAction extends StudyCheckAction {
             return;
         }
 
-        Long submissionId = sendStep(project, stepNode);
+        ProgressManager.getInstance().run(new Task.Backgroundable(project, "Checking Step: " + stepNode.getName()) {
+            @Override
+            public void run(@NotNull ProgressIndicator indicator) {
+                indicator.setIndeterminate(true);
 
-        String stepIdString = "id=" + stepNode.getId();
+                Long submissionId = sendStep(project, stepNode);
 
-        if (submissionId == null) {
-            logger.info("Sending is failed: " + stepIdString);
-            return;
-        }
+                String stepIdString = "id=" + stepNode.getId();
 
-        logger.info("Sending is success: " + stepIdString);
+                if (submissionId == null) {
+                    logger.info("Sending is failed: " + stepIdString);
+                    return;
+                }
 
-        sendMetric(stepNode);
+                logger.info("Sending is success: " + stepIdString);
 
-        checkStep(project, stepNode, submissionId);
-        logger.info("Finish checking step: " + stepIdString);
+                sendMetric(stepNode);
+
+                checkStep(project, indicator, stepNode, submissionId);
+                logger.info("Finish checking step: " + stepIdString);
+            }
+        });
     }
 
     @Nullable
@@ -168,53 +175,62 @@ public class StepikJavaPostAction extends StudyCheckAction {
         logger.info("Sending metric was successfully");
     }
 
-    private void checkStep(@NotNull Project project, @NotNull StepNode stepNode, final long submissionId) {
-        ProgressManager.getInstance().run(new Task.Backgroundable(project, "Checking Step: " + stepNode.getName()) {
-            @Override
-            public void run(@NotNull ProgressIndicator progressIndicator) {
-                ProgressManager.getInstance().getProgressIndicator().setIndeterminate(true);
-                String stepIdString = "id=" + stepNode.getId();
-                logger.info("Started check a status for step: " + stepIdString);
-                StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
-                String stepStatus = "evaluation";
-                int timer = 0;
-                String hint;
+    private void checkStep(
+            @NotNull Project project,
+            @NotNull ProgressIndicator indicator,
+            @NotNull StepNode stepNode,
+            final long submissionId) {
+        String stepIdString = "id=" + stepNode.getId();
+        logger.info("Started check a status for step: " + stepIdString);
+        StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
+        String stepStatus = "evaluation";
+        int timer = 0;
+        String hint;
 
-                Submission currentSubmission = null;
-                while ("evaluation".equals(stepStatus) && timer < FIVE_MINUTES) {
-                    try {
-                        Thread.sleep(PERIOD);
-                        try {
-                            ProgressManager.checkCanceled();
-                        } catch (ProcessCanceledException e) {
-                            return;
-                        }
-                        timer += PERIOD;
-                        Submissions submission = stepikApiClient.submissions()
-                                .get()
-                                .id(submissionId)
-                                .execute();
-
-                        if (!submission.isEmpty()) {
-                            currentSubmission = submission.getSubmissions().get(0);
-                            stepStatus = currentSubmission.getStatus();
-                        }
-                    } catch (StepikClientException | InterruptedException e) {
-                        StepikJavaPostAction.this.notifyError(project, "Error", "Get Status error");
-                        logger.info("Stop check a status for step: " + stepIdString, e);
-                        return;
-                    }
-                }
-                if (currentSubmission == null) {
-                    logger.info("Stop check a status for step: " + stepIdString + " without result");
+        Submission currentSubmission = null;
+        while ("evaluation".equals(stepStatus) && timer < FIVE_MINUTES) {
+            try {
+                Thread.sleep(PERIOD);
+                try {
+                    ProgressManager.checkCanceled();
+                } catch (ProcessCanceledException e) {
                     return;
                 }
-                hint = currentSubmission.getHint();
-                StepikJavaPostAction.this.notify(project, stepNode, stepStatus, hint);
-                ProjectView.getInstance(project).refresh();
-                logger.info("Finish check a status for step: " + stepIdString + " with status: " + stepStatus);
+                timer += PERIOD;
+                Submissions submission = stepikApiClient.submissions()
+                        .get()
+                        .id(submissionId)
+                        .execute();
+
+                if (!submission.isEmpty()) {
+                    currentSubmission = submission.getSubmissions().get(0);
+                    setupCheckProgress(indicator, currentSubmission, timer);
+                    stepStatus = currentSubmission.getStatus();
+                }
+            } catch (StepikClientException | InterruptedException e) {
+                notifyError(project, "Error", "Get Status error");
+                logger.info("Stop check a status for step: " + stepIdString, e);
+                return;
             }
-        });
+        }
+        if (currentSubmission == null) {
+            logger.info("Stop check a status for step: " + stepIdString + " without result");
+            return;
+        }
+        hint = currentSubmission.getHint();
+        notify(project, stepNode, stepStatus, hint);
+        ProjectView.getInstance(project).refresh();
+        logger.info("Finish check a status for step: " + stepIdString + " with status: " + stepStatus);
+    }
+
+    private void setupCheckProgress(@NotNull ProgressIndicator indicator, Submission currentSubmission, int timer) {
+        double eta = currentSubmission.getEta() * 1000; //to ms
+        indicator.setIndeterminate(false);
+        if (eta < 1) {
+            indicator.setFraction(1);
+        } else {
+            indicator.setFraction(timer / eta);
+        }
     }
 
     private void notify(
