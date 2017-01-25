@@ -50,6 +50,8 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
     private final StepikProjectGenerator generator;
     private final PyCharmWizardStep wizardStep;
     private TextFieldWithBrowseButton locationField;
+    private boolean locationSetting;
+    private boolean keepLocation;
 
     private StepikPyProjectGenerator() {
         super(true);
@@ -75,6 +77,7 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
     @Override
     public JPanel extendBasePanel() throws ProcessCanceledException {
         locationField = null;
+        keepLocation = false;
         wizardStep.updateStep();
         return wizardStep.getComponent();
     }
@@ -91,13 +94,19 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
     }
 
     private void setLocation(@NotNull String location) {
+        if (keepLocation) {
+            return;
+        }
+
         TextFieldWithBrowseButton locationField = getLocationField();
 
         if (locationField == null) {
             return;
         }
 
+        locationSetting = true;
         locationField.setText(location);
+        locationSetting = false;
     }
 
     @Nullable
@@ -116,10 +125,14 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
         return locationField;
     }
 
+    @Override
+    public void locationChanged(@NotNull String newLocation) {
+        keepLocation = keepLocation || !locationSetting;
+    }
 
     @Override
     public void fireStateChanged() {
-        if (getLocationField() != null) {
+        if (!keepLocation && getLocationField() != null) {
             long id = wizardStep.getSelectedCourse().getId();
             String projectName = "course" + id;
             String projectDir = new File(getLocation()).getParent();
