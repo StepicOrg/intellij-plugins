@@ -87,9 +87,11 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
     }
 
     @Nullable
-
     @Override
     public Element getState() {
+        if (courseNode == null) {
+            return null;
+        }
         Element el = new Element("stepikProjectManager");
         Element courseElement = new Element(StudySerializationUtils.MAIN_ELEMENT);
         XmlSerializer.serializeInto(this, courseElement);
