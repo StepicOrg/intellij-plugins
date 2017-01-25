@@ -171,15 +171,16 @@ public class StepikConnectorLogin {
         TokenInfo currentTokenInfo = stepikApiClient.getTokenInfo();
 
         User testUser;
-        if (authenticate(username, password)) {
+        try {
+            authenticate(username, password);
             logger.info("The test authentication is successfully");
             testUser = getCurrentUser();
-        } else {
+        } catch (StepikClientException e) {
             logger.info("The test authentication is failed");
-            testUser = new User();
+            throw e;
+        } finally {
+            stepikApiClient.setTokenInfo(currentTokenInfo);
         }
-
-        stepikApiClient.setTokenInfo(currentTokenInfo);
 
         return testUser;
     }
@@ -197,7 +198,7 @@ public class StepikConnectorLogin {
         }
     }
 
-    public static boolean authenticate(@Nullable String username, @Nullable String password) {
+    public static void authenticate(@Nullable String username, @Nullable String password) {
         try {
             stepikApiClient.oauth2()
                     .userAuthenticationPassword(CLIENT_ID, username, password)
@@ -211,10 +212,9 @@ public class StepikConnectorLogin {
             long userId = getCurrentUser().getId();
             setAuthInfo(userId, authInfo);
             logger.info("Authentication is successfully");
-            return true;
         } catch (StepikClientException e) {
             logger.warn("Authentication is failed", e);
-            return false;
+            throw e;
         }
     }
 

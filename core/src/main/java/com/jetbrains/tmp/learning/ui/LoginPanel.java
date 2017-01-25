@@ -15,9 +15,13 @@ import java.awt.event.MouseEvent;
 
 public class LoginPanel {
 
+    @SuppressWarnings("unused")
     private JPanel contentPanel;
+    @SuppressWarnings("unused")
     private JPasswordField passwordField;
+    @SuppressWarnings("unused")
     private JTextField loginField;
+    @SuppressWarnings("unused")
     private JBLabel signUpLabel;
 
     public LoginPanel(final LoginDialog dialog) {
@@ -51,10 +55,6 @@ public class LoginPanel {
 
     public JPanel getContentPanel() {
         return contentPanel;
-    }
-
-    public JTextField getLoginField() {
-        return loginField;
     }
 
     public String getPassword() {

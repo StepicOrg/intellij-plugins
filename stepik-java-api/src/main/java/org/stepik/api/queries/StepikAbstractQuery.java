@@ -8,12 +8,13 @@ import org.stepik.api.Utils;
 import org.stepik.api.actions.StepikAbstractAction;
 import org.stepik.api.client.ClientResponse;
 import org.stepik.api.client.JsonConverter;
+import org.stepik.api.client.StatusCodes;
 import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.client.TransportClient;
 import org.stepik.api.exceptions.StepikClientException;
+import org.stepik.api.exceptions.StepikUnauthorizedException;
 import org.stepik.api.objects.auth.TokenInfo;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +31,7 @@ abstract class StepikAbstractQuery<T> {
     private final Class<T> responseClass;
     private final QueryMethod method;
     private final Map<String, String[]> params = new HashMap<>();
+
     StepikAbstractQuery(
             @NotNull StepikAbstractAction stepikAction,
             @NotNull Class<T> responseClass,
@@ -108,34 +110,33 @@ abstract class StepikAbstractQuery<T> {
         Map<String, String> headers = new HashMap<>();
         TokenInfo tokenInfo = stepikApi.getTokenInfo();
         String accessToken = tokenInfo.getAccessToken();
-        String tokenType = tokenInfo.getTokenType();
         if (accessToken != null) {
+            String tokenType = tokenInfo.getTokenType();
             headers.put(HttpHeaders.AUTHORIZATION, tokenType + " " + accessToken);
         }
         headers.put(HttpHeaders.CONTENT_TYPE, getContentType());
 
 
         ClientResponse response = null;
-        try {
-            switch (method) {
-                case GET:
-                    url += "?" + mapToGetString();
-                    response = transportClient.get(stepikApi, url, headers);
-                    break;
-                case POST:
-                    response = transportClient.post(stepikApi, url, getBody(), headers);
-                    break;
-            }
-        } catch (IOException e) {
-            String message = "Failed query to " + getUrl();
-            logger.warn(message, e);
-            throw new StepikClientException(message, e);
+        switch (method) {
+            case GET:
+                url += "?" + mapToGetString();
+                response = transportClient.get(stepikApi, url, headers);
+                break;
+            case POST:
+                response = transportClient.post(stepikApi, url, getBody(), headers);
+                break;
         }
 
         if (response.getStatusCode() / 100 != 2) {
             String message = "Failed query to " + getUrl() + " returned the status code " + response.getStatusCode();
             logger.warn(message);
-            throw new StepikClientException(message);
+
+            if (response.getStatusCode() == StatusCodes.SC_UNAUTHORIZED) {
+                throw new StepikUnauthorizedException(message);
+            } else {
+                throw new StepikClientException(message);
+            }
         }
 
         T result = response.getBody(responseClass);
