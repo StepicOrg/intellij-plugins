@@ -14,9 +14,10 @@ import icons.AllStepikIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jps.model.java.JavaModuleSourceRootTypes;
-import org.stepik.plugin.projectWizard.ProjectWizardUtils;
 
 import javax.swing.*;
+
+import static org.stepik.plugin.projectWizard.ProjectWizardUtils.findNonExistingFileName;
 
 public class StepikModuleType extends ModuleType<CourseModuleBuilder> {
     static final String MODULE_NAME = "Stepik";
@@ -101,7 +102,7 @@ public class StepikModuleType extends ModuleType<CourseModuleBuilder> {
             long id = courseModuleBuilder.getWizardStep().getSelectedCourse().getId();
             String projectName = "course" + id;
             String projectDir = settingsStep.getContext().getProjectFileDirectory();
-            projectName = ProjectWizardUtils.findNonExistingFileName(projectDir, projectName);
+            projectName = findNonExistingFileName(projectDir, projectName);
             nameField.setText(projectName);
         }
         return null;

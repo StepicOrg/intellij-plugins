@@ -7,15 +7,14 @@ import java.io.File;
  */
 public class ProjectWizardUtils {
     public static String findNonExistingFileName(String searchDirectory, String preferredName) {
-        int idx = 0;
+        String fileName = preferredName;
+        int idx = 1;
 
-        while (true) {
-            String fileName = (idx > 0 ? preferredName + "_" + idx : preferredName);
-            if (!(new File(searchDirectory, fileName)).exists()) {
-                return fileName;
-            }
-
+        while (new File(searchDirectory, fileName).exists()) {
+            fileName = preferredName + "_" + idx;
             ++idx;
         }
+
+        return fileName;
     }
 }
