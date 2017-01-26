@@ -15,6 +15,7 @@ import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.stepik.EduStepikNames;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
+import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.exceptions.StepikClientException;
@@ -33,35 +34,28 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 
+import static com.intellij.openapi.ui.Messages.showMessageDialog;
+import static com.intellij.openapi.ui.Messages.showWarningDialog;
+
 class StepikSettingsPanel {
     private static final String DEFAULT_PASSWORD_TEXT = "************";
     private final static String AUTH_PASSWORD = "Password";
     private final static String AUTH_TOKEN = "Token";
-    private static final String TEST_CONNECTION = "Test a Connection";
+    private static final String TEST_CONNECTION = "Test connection";
     private static final String CHECK_CREDENTIALS = "Check credentials";
     private static final String WRONG_LOGIN_PASSWORD = "Wrong a login or a password";
     private static final String FAILED_CONNECTION = "Failed connection";
     private Project settingsProject;
-    @SuppressWarnings("unused")
     private JTextField emailTextField;
     private JPasswordField passwordField;
-    @SuppressWarnings("unused")
     private JPasswordField tokenField; // look at createUIComponents() to understand
-    @SuppressWarnings("unused")
     private JTextPane signupTextField;
-    @SuppressWarnings("unused")
     private JPanel pane;
-    @SuppressWarnings("unused")
     private JButton testButton;
-    @SuppressWarnings("unused")
     private ComboBox<String> authTypeComboBox;
-    @SuppressWarnings("unused")
     private JPanel cardPanel;
-    @SuppressWarnings("unused")
     private JBLabel authTypeLabel;
-    @SuppressWarnings("unused")
     private JButton magicButton;
-    @SuppressWarnings("unused")
     private JCheckBox hintCheckBox;
 
     private boolean credentialsModified;
@@ -76,8 +70,9 @@ class StepikSettingsPanel {
             }
         });
         magicButton.setText("Magic auth");
-        signupTextField.setText("<html>Do not have an account at stepik.org? <a href=\"" +
-                EduStepikNames.STEPIK_SIGN_IN_LINK + ">" + "Sign up" + "</a></html>");
+        @Language("HTML")
+        String signupText = "<html>Do not have an account at stepik.org? <a href='%s'>Sign up</a></html>";
+        signupTextField.setText(String.format(signupText, EduStepikNames.STEPIK_SIGN_IN_LINK));
         signupTextField.setBackground(pane.getBackground());
         signupTextField.setCursor(new Cursor(Cursor.HAND_CURSOR));
         authTypeLabel.setBorder(JBUI.Borders.emptyLeft(10));
@@ -97,11 +92,11 @@ class StepikSettingsPanel {
 
                 String fullName = user.getFirstName() + " " + user.getLastName();
                 String message = "Hello, " + fullName + "!\n I am glad to see you.";
-                Messages.showMessageDialog(message, TEST_CONNECTION, Messages.getInformationIcon());
+                showMessageDialog(message, TEST_CONNECTION, Messages.getInformationIcon());
             } catch (StepikUnauthorizedException e) {
-                showWarning(TEST_CONNECTION, WRONG_LOGIN_PASSWORD);
+                showWarningDialog(WRONG_LOGIN_PASSWORD, TEST_CONNECTION);
             } catch (StepikClientException e) {
-                showWarning(TEST_CONNECTION, FAILED_CONNECTION);
+                showWarningDialog(FAILED_CONNECTION, TEST_CONNECTION);
             }
         });
 
@@ -209,9 +204,9 @@ class StepikSettingsPanel {
                         }, "Connection at Stepik", true, Utils.getCurrentProject());
 
             } catch (StepikUnauthorizedException e) {
-                showWarning(CHECK_CREDENTIALS, WRONG_LOGIN_PASSWORD);
+                showWarningDialog(WRONG_LOGIN_PASSWORD, CHECK_CREDENTIALS);
             } catch (StepikClientException e) {
-                showWarning(CHECK_CREDENTIALS, FAILED_CONNECTION);
+                showWarningDialog(FAILED_CONNECTION, CHECK_CREDENTIALS);
             }
         }
 
@@ -220,10 +215,6 @@ class StepikSettingsPanel {
             manager.setShowHint(hintCheckBox.isSelected());
         }
         resetCredentialsModification();
-    }
-
-    private void showWarning(@NotNull String title, String message) {
-        Messages.showWarningDialog(message, title);
     }
 
     boolean isModified() {

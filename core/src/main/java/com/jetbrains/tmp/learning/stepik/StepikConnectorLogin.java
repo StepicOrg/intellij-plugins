@@ -102,7 +102,7 @@ public class StepikConnectorLogin {
                 logger.info("Refresh a token is successfully");
                 return true;
             } catch (StepikClientException re) {
-                logger.info("Refresh a token is failed: " + re.getMessage());
+                logger.info("Refresh a token failed: " + re.getMessage());
             }
         }
 
@@ -113,7 +113,7 @@ public class StepikConnectorLogin {
                 logger.info("The Authentication with a password is successfully");
                 return true;
             } catch (StepikClientException e) {
-                logger.info("The Authentication with a password is failed: " + e.getMessage());
+                logger.info("The Authentication with a password failed: " + e.getMessage());
             }
         }
 
@@ -176,7 +176,7 @@ public class StepikConnectorLogin {
             logger.info("The test authentication is successfully");
             testUser = getCurrentUser();
         } catch (StepikClientException e) {
-            logger.info("The test authentication is failed");
+            logger.info("The test authentication failed");
             throw e;
         } finally {
             stepikApiClient.setTokenInfo(currentTokenInfo);
@@ -193,7 +193,7 @@ public class StepikConnectorLogin {
                     .id(1)
                     .execute().getUser();
         } catch (StepikClientException e) {
-            logger.warn("Get current user is failed", e);
+            logger.warn("Get current user failed", e);
             return new User();
         }
     }
@@ -213,7 +213,7 @@ public class StepikConnectorLogin {
             setAuthInfo(userId, authInfo);
             logger.info("Authentication is successfully");
         } catch (StepikClientException e) {
-            logger.warn("Authentication is failed", e);
+            logger.warn("Authentication failed", e);
             throw e;
         }
     }

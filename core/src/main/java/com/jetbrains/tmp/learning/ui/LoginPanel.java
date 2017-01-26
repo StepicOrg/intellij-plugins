@@ -14,14 +14,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class LoginPanel {
-
-    @SuppressWarnings("unused")
     private JPanel contentPanel;
-    @SuppressWarnings("unused")
     private JPasswordField passwordField;
-    @SuppressWarnings("unused")
     private JTextField loginField;
-    @SuppressWarnings("unused")
     private JBLabel signUpLabel;
 
     public LoginPanel(final LoginDialog dialog) {

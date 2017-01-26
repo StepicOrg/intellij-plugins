@@ -49,7 +49,7 @@ public class HttpTransportClient implements TransportClient {
     private static final String USER_AGENT = "Stepik Java API Client/" + StepikApiClient.getVersion();
 
     private static final int MAX_SIMULTANEOUS_CONNECTIONS = 100000;
-    private static final int FULL_CONNECTION_TIMEOUT_S = 10;
+    private static final int FULL_CONNECTION_TIMEOUT_S = 30;
     private static final int CONNECTION_TIMEOUT_MS = 5_000;
     private static final int SOCKET_TIMEOUT_MS = FULL_CONNECTION_TIMEOUT_S * 1000;
     private static final Map<Pair<String, Integer>, HttpTransportClient> instances = new HashMap<>();
