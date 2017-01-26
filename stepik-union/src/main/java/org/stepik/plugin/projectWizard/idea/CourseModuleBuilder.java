@@ -31,6 +31,7 @@ import java.io.IOException;
 class CourseModuleBuilder extends AbstractModuleBuilder {
     private static final Logger logger = Logger.getInstance(CourseModuleBuilder.class);
     private final StepikProjectGenerator generator = StepikProjectGenerator.getInstance();
+    private JavaWizardStep wizardStep;
 
     @NotNull
     @Override
@@ -107,8 +108,14 @@ class CourseModuleBuilder extends AbstractModuleBuilder {
         Project project = wizardContext.getProject() == null ?
                 DefaultProjectFactory.getInstance().getDefaultProject() :
                 wizardContext.getProject();
-        wizardSteps[0] = new JavaWizardStep(generator, project);
+
+        wizardStep = new JavaWizardStep(generator, project);
+        wizardSteps[0] = wizardStep;
 
         return wizardSteps;
+    }
+
+    JavaWizardStep getWizardStep() {
+        return wizardStep;
     }
 }

@@ -11,6 +11,8 @@ import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.roots.ModuleRootModificationUtil;
+import com.intellij.openapi.ui.LabeledComponent;
+import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.BooleanFunction;
@@ -32,9 +34,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.objects.courses.Course;
+import org.stepik.plugin.projectWizard.ProjectWizardUtils;
 import org.stepik.plugin.projectWizard.StepikProjectGenerator;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -42,10 +46,13 @@ import java.io.IOException;
 
 
 class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettings> {
-    private static final Logger logger = Logger.getInstance(StepikPyProjectGenerator.class.getName());
+    private static final Logger logger = Logger.getInstance(StepikPyProjectGenerator.class);
     private static final String MODULE_NAME = "Stepik";
     private final StepikProjectGenerator generator;
     private final PyCharmWizardStep wizardStep;
+    private TextFieldWithBrowseButton locationField;
+    private boolean locationSetting;
+    private boolean keepLocation;
 
     private StepikPyProjectGenerator() {
         super(true);
@@ -70,8 +77,75 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
     @Nullable
     @Override
     public JPanel extendBasePanel() throws ProcessCanceledException {
+        locationField = null;
+        keepLocation = false;
         wizardStep.updateStep();
         return wizardStep.getComponent();
+    }
+
+    @NotNull
+    private String getLocation() {
+        TextFieldWithBrowseButton locationField = getLocationField();
+
+        if (locationField == null) {
+            return "";
+        }
+
+        return locationField.getText();
+    }
+
+    private void setLocation(@NotNull String location) {
+        if (keepLocation) {
+            return;
+        }
+
+        TextFieldWithBrowseButton locationField = getLocationField();
+
+        if (locationField == null) {
+            return;
+        }
+
+        locationSetting = true;
+        locationField.setText(location);
+        locationSetting = false;
+    }
+
+    @Nullable
+    private TextFieldWithBrowseButton getLocationField() {
+        if (locationField == null) {
+            Container basePanel = wizardStep.getComponent().getParent();
+            if (basePanel == null) {
+                return null;
+            }
+            try {
+                Container topPanel = (Container) basePanel.getComponent(0);
+                LabeledComponent locationComponent = (LabeledComponent) topPanel.getComponent(0);
+                locationField = (TextFieldWithBrowseButton) locationComponent.getComponent();
+            } catch (ClassCastException | ArrayIndexOutOfBoundsException e) {
+                logger.warn("Auto naming for a project don't work: ", e);
+                return null;
+            }
+        }
+
+        return locationField;
+    }
+
+    @Override
+    public void locationChanged(@NotNull String newLocation) {
+        keepLocation = keepLocation || !locationSetting;
+    }
+
+    @Override
+    public void fireStateChanged() {
+        if (!keepLocation && getLocationField() != null) {
+            long id = wizardStep.getSelectedCourse().getId();
+            String projectName = "course" + id;
+            String projectDir = new File(getLocation()).getParent();
+            projectName = ProjectWizardUtils.findNonExistingFileName(projectDir, projectName);
+            setLocation(projectDir + "/" + projectName);
+        }
+
+        super.fireStateChanged();
     }
 
     @NotNull
@@ -97,11 +171,6 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
                     .execute();
             return true;
         };
-    }
-
-    @Override
-    public Object getProjectSettings() {
-        return new PyNewProjectSettings();
     }
 
     @Override
