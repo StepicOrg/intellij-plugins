@@ -28,6 +28,7 @@ import org.stepik.plugin.utils.DirectivesUtils;
 import java.util.List;
 
 public class StepikJavaPostAction extends StudyCheckAction {
+    private static final String EVALUATION = "evaluation";
     private static final Logger logger = Logger.getInstance(StepikJavaPostAction.class);
     private static final String ACTION_ID = "STEPIC.StepikJavaPostAction";
     private static final int PERIOD = 2 * 1000; //ms
@@ -38,44 +39,74 @@ public class StepikJavaPostAction extends StudyCheckAction {
     }
 
     @Nullable
-    private static Long sendStep(@NotNull Project project, StepNode stepNode) {
+    private static Long sendStep(@NotNull Project project, @NotNull StepNode stepNode) {
         long stepId = stepNode.getId();
-        String stepIdString = "id=" + stepId;
-        logger.info("Sending step: " + stepIdString);
 
+        logger.info(String.format("Start sending step: id=%s", stepId));
+
+        StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
+
+        Long intAttemptId = getAttemptId(project, stepikApiClient, stepNode);
+        if (intAttemptId == null) {
+            return null;
+        }
+
+        Long submissionId = getSubmissionId(project, stepikApiClient, stepNode, intAttemptId);
+        if (submissionId == null) {
+            return null;
+        }
+
+        logger.info(String.format("Finish sending step: id=%s", stepId));
+
+        if (isCanceled()) {
+            return null;
+        }
+
+        return submissionId;
+    }
+
+    @Nullable
+    private static Long getAttemptId(
+            @NotNull Project project,
+            @NotNull StepikApiClient stepikApiClient,
+            @NotNull StepNode stepNode) {
+        Attempts attempts;
+        try {
+            attempts = stepikApiClient.attempts()
+                    .post()
+                    .step(stepNode.getId())
+                    .execute();
+            if (attempts.isEmpty()) {
+                notifyFailed(project, stepNode, "Attempts is Empty", null);
+                return null;
+            }
+        } catch (StepikClientException e) {
+            notifyFailed(project, stepNode, "Failed post attempt", e);
+            return null;
+        }
+
+        return attempts.getAttempts().get(0).getId();
+    }
+
+    @Nullable
+    private static Long getSubmissionId(
+            @NotNull Project project,
+            @NotNull StepikApiClient stepikApiClient,
+            @NotNull StepNode stepNode,
+            long intAttemptId) {
         if (!ActionUtils.checkLangSettings(stepNode, project)) {
             return null;
         }
 
         SupportedLanguages currentLang = stepNode.getCurrentLang();
+
         String code = getCode(project, stepNode, currentLang);
         if (code == null) {
-            logger.info("Sending step failed: " + stepIdString + ". Step content is null");
+            logger.info(String.format("Sending step failed: id=%s. Step content is null", stepNode.getId()));
             return null;
         }
 
-        StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
-        StepikClientException exception = null;
-        Attempts attempts = null;
-        try {
-            attempts = stepikApiClient.attempts()
-                    .post()
-                    .step(stepId)
-                    .execute();
-        } catch (StepikClientException e) {
-            exception = e;
-        }
-
-        if (exception != null || attempts.isEmpty()) {
-            logger.warn("Failed post attempt ", exception);
-            ActionUtils.notifyError(project, stepNode.getName() + " Failed send", "Did't send");
-            logger.info("Sending step failed: " + stepIdString, exception);
-            return null;
-        }
-
-        long intAttemptId = attempts.getAttempts().get(0).getId();
-
-        Submissions submissions = null;
+        Submissions submissions;
         try {
             submissions = stepikApiClient.submissions()
                     .post()
@@ -83,26 +114,45 @@ public class StepikJavaPostAction extends StudyCheckAction {
                     .language(currentLang.getName())
                     .code(code)
                     .execute();
+            if (submissions.isEmpty()) {
+                notifyFailed(project, stepNode, "Submissions is empty", null);
+                return null;
+            }
         } catch (StepikClientException e) {
-            exception = e;
-        }
-
-        if (exception != null || submissions.isEmpty()) {
-            logger.warn("Failed post submission ", exception);
-            ActionUtils.notifyError(project, stepNode.getName() + " Failed send", "Did't send");
-            logger.info("Sending step failed: " + stepIdString, exception);
+            notifyFailed(project, stepNode, "Failed post submission", e);
             return null;
         }
+
         List<Submission> submissionsList = submissions.getSubmissions();
 
-        Long submissionId = submissionsList.get(0).getId();
-        logger.info("End sending step: " + stepIdString);
+        return submissionsList.get(0).getId();
+    }
 
-        if (isCanceled()) {
+    @Nullable
+    private static String getCode(
+            @NotNull Project project,
+            @NotNull StepNode stepNode,
+            @NotNull SupportedLanguages currentLang) {
+        String activateFileName = currentLang.getMainFileName();
+        String mainFilePath = String.join("/", stepNode.getPath(), EduNames.SRC, activateFileName);
+        VirtualFile mainFile = project.getBaseDir().findFileByRelativePath(mainFilePath);
+        if (mainFile == null) {
             return null;
         }
 
-        return submissionId;
+        String[] text = DirectivesUtils.getFileText(mainFile);
+        return DirectivesUtils.getTextUnderDirectives(text, currentLang);
+    }
+
+    private static void notifyFailed(
+            @NotNull Project project,
+            @NotNull StepNode stepNode,
+            @NotNull String message,
+            @Nullable StepikClientException exception) {
+        logger.warn(message, exception);
+        String title = String.format("Failed send %s", stepNode.getName());
+        String content = "Did't send";
+        ActionUtils.notifyError(project, title, content);
     }
 
     private static boolean isCanceled() {
@@ -114,24 +164,7 @@ public class StepikJavaPostAction extends StudyCheckAction {
         return false;
     }
 
-    @Nullable
-    private static String getCode(
-            @NotNull Project project,
-            @NotNull StepNode stepNode,
-            @NotNull SupportedLanguages currentLang) {
-        String activateFileName = currentLang.getMainFileName();
-
-        String mainFilePath = String.join("/", stepNode.getPath(), EduNames.SRC, activateFileName);
-        VirtualFile mainFile = project.getBaseDir().findFileByRelativePath(mainFilePath);
-        if (mainFile == null) {
-            return null;
-        }
-
-        String[] text = DirectivesUtils.getFileText(mainFile);
-        return DirectivesUtils.getTextUnderDirectives(text, currentLang);
-    }
-
-    private static void sendMetric(StepNode stepNode) {
+    private static void sendMetric(@NotNull StepNode stepNode) {
         StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
         CourseNode courseNode = stepNode.getCourse();
 
@@ -151,21 +184,21 @@ public class StepikJavaPostAction extends StudyCheckAction {
         logger.info("Sending metric was successfully");
     }
 
-    private static void checkStep(
+    private static void checkStepStatus(
             @NotNull Project project,
-            @NotNull ProgressIndicator indicator,
             @NotNull StepNode stepNode,
-            final long submissionId) {
+            final long submissionId,
+            @NotNull ProgressIndicator indicator) {
         String stepIdString = "id=" + stepNode.getId();
         logger.info("Started check a status for step: " + stepIdString);
         StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
-        String stepStatus = "evaluation";
+        String stepStatus = EVALUATION;
         int timer = 0;
         String hint;
         indicator.setIndeterminate(false);
 
         Submission currentSubmission = null;
-        while ("evaluation".equals(stepStatus) && timer < FIVE_MINUTES) {
+        while (EVALUATION.equals(stepStatus) && timer < FIVE_MINUTES) {
             try {
                 Thread.sleep(PERIOD);
                 if (isCanceled()) {
@@ -189,7 +222,7 @@ public class StepikJavaPostAction extends StudyCheckAction {
             }
         }
         if (currentSubmission == null) {
-            logger.info("Stop check a status for step: " + stepIdString + " without result");
+            logger.info(String.format("Stop check a status for step: %s without result", stepIdString));
             return;
         }
 
@@ -198,7 +231,7 @@ public class StepikJavaPostAction extends StudyCheckAction {
         hint = currentSubmission.getHint();
         notify(project, stepNode, stepStatus, hint);
         ProjectView.getInstance(project).refresh();
-        logger.info("Finish check a status for step: " + stepIdString + " with status: " + stepStatus);
+        logger.info(String.format("Finish check a status for step: %s with status: %s", stepIdString, stepStatus));
     }
 
     private static void notify(
@@ -218,13 +251,8 @@ public class StepikJavaPostAction extends StudyCheckAction {
 
         stepNode.setStatus(status);
 
-        ActionUtils.notify(project, stepNode.getName() + " is " + stepStatus, hint, notificationType);
-    }
-
-    @NotNull
-    @Override
-    public String getActionId() {
-        return ACTION_ID;
+        String title = String.format("%s is %s", stepNode.getName(), stepStatus);
+        ActionUtils.notify(project, title, hint, notificationType);
     }
 
     @Override
@@ -236,27 +264,30 @@ public class StepikJavaPostAction extends StudyCheckAction {
             return;
         }
 
-        ProgressManager.getInstance().run(new Task.Backgroundable(project, "Checking Step: " + stepNode.getName()) {
+        String title = "Checking Step: " + stepNode.getName();
+
+        ProgressManager.getInstance().run(new Task.Backgroundable(project, title) {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
 
                 Long submissionId = sendStep(project, stepNode);
 
-                String stepIdString = "id=" + stepNode.getId();
-
                 if (submissionId == null) {
-                    logger.info("Sending is failed: " + stepIdString);
                     return;
                 }
 
-                logger.info("Sending is success: " + stepIdString);
-
                 sendMetric(stepNode);
 
-                checkStep(project, indicator, stepNode, submissionId);
-                logger.info("Finish checking step: " + stepIdString);
+                checkStepStatus(project, stepNode, submissionId, indicator);
+                logger.info(String.format("Finish checking step: id=%s", stepNode.getId()));
             }
         });
+    }
+
+    @NotNull
+    @Override
+    public String getActionId() {
+        return ACTION_ID;
     }
 }

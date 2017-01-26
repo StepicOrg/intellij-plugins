@@ -13,12 +13,14 @@ import org.jetbrains.annotations.NotNull;
 import org.stepik.api.objects.submissions.Submission;
 
 import java.util.Optional;
-import java.util.function.Function;
 
 class ActionUtils {
     static final int MILLISECONDS_IN_MINUTES = 60 * 1000;
     private static final Logger logger = Logger.getInstance(ActionUtils.class);
     private static final int MILLISECONDS_IN_HOUR = 60 * MILLISECONDS_IN_MINUTES;
+    private static final String HOUR = "hour";
+    private static final String MINUTE = "minute";
+    private static final String SECOND = "second";
 
     static boolean checkLangSettings(StepNode stepNode, Project project) {
         String srcPath = String.join("/", stepNode.getPath(), EduNames.SRC);
@@ -45,32 +47,41 @@ class ActionUtils {
     }
 
     static String etaAsString(long eta) {
-        Function<Long, String> ending = (value) -> value == 1 ? "" : "s";
         StringBuilder result = new StringBuilder();
+
         long hours = eta / MILLISECONDS_IN_HOUR;
         if (hours > 0) {
-            result.append(hours).append(" hour").append(ending.apply(hours)).append(" ");
+            appendTimePart(result, hours, HOUR);
             eta = eta - hours * MILLISECONDS_IN_HOUR;
         }
 
         long minutes = eta / MILLISECONDS_IN_MINUTES;
         if (minutes > 0) {
-            result.append(minutes).append(" minute").append(ending.apply(minutes)).append(" ");
+            appendTimePart(result, minutes, MINUTE);
             eta = eta - minutes * MILLISECONDS_IN_MINUTES;
         }
+
         long seconds = eta / 1000;
         if (seconds > 0) {
-            result.append(seconds).append(" second").append(ending.apply(seconds)).append(" ");
+            appendTimePart(result, seconds, SECOND);
         }
 
         return result.toString().trim();
     }
 
+    private static void appendTimePart(StringBuilder result, long value, String label) {
+        result.append(value)
+                .append(" ")
+                .append(label)
+                .append(value == 1 ? "" : "s")
+                .append(" ");
+    }
+
     static void notify(
             @NotNull Project project,
-            String title,
-            String content,
-            NotificationType type) {
+            @NotNull String title,
+            @NotNull String content,
+            @NotNull NotificationType type) {
         Notification notification = new Notification(
                 "Step.sending",
                 title,
@@ -78,7 +89,6 @@ class ActionUtils {
                 type);
         notification.notify(project);
     }
-
 
     static void notifyError(
             @NotNull Project project,
@@ -95,6 +105,6 @@ class ActionUtils {
         double total = eta + timer;
 
         indicator.setFraction(1 - eta / total);
-        indicator.setText("Ends in " + ActionUtils.etaAsString((long) eta));
+        indicator.setText("Ends in " + etaAsString((long) eta));
     }
 }
