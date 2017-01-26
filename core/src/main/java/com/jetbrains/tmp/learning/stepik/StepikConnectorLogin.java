@@ -102,7 +102,7 @@ public class StepikConnectorLogin {
                 logger.info("Refresh a token is successfully");
                 return true;
             } catch (StepikClientException re) {
-                logger.info("Refresh a token is failed: " + re.getMessage());
+                logger.info("Refresh a token failed: " + re.getMessage());
             }
         }
 
@@ -113,7 +113,7 @@ public class StepikConnectorLogin {
                 logger.info("The Authentication with a password is successfully");
                 return true;
             } catch (StepikClientException e) {
-                logger.info("The Authentication with a password is failed: " + e.getMessage());
+                logger.info("The Authentication with a password failed: " + e.getMessage());
             }
         }
 
@@ -171,15 +171,16 @@ public class StepikConnectorLogin {
         TokenInfo currentTokenInfo = stepikApiClient.getTokenInfo();
 
         User testUser;
-        if (authenticate(username, password)) {
+        try {
+            authenticate(username, password);
             logger.info("The test authentication is successfully");
             testUser = getCurrentUser();
-        } else {
-            logger.info("The test authentication is failed");
-            testUser = new User();
+        } catch (StepikClientException e) {
+            logger.info("The test authentication failed");
+            throw e;
+        } finally {
+            stepikApiClient.setTokenInfo(currentTokenInfo);
         }
-
-        stepikApiClient.setTokenInfo(currentTokenInfo);
 
         return testUser;
     }
@@ -192,12 +193,12 @@ public class StepikConnectorLogin {
                     .id(1)
                     .execute().getUser();
         } catch (StepikClientException e) {
-            logger.warn("Get current user is failed", e);
+            logger.warn("Get current user failed", e);
             return new User();
         }
     }
 
-    public static boolean authenticate(@Nullable String username, @Nullable String password) {
+    public static void authenticate(@Nullable String username, @Nullable String password) {
         try {
             stepikApiClient.oauth2()
                     .userAuthenticationPassword(CLIENT_ID, username, password)
@@ -211,10 +212,9 @@ public class StepikConnectorLogin {
             long userId = getCurrentUser().getId();
             setAuthInfo(userId, authInfo);
             logger.info("Authentication is successfully");
-            return true;
         } catch (StepikClientException e) {
-            logger.warn("Authentication is failed", e);
-            return false;
+            logger.warn("Authentication failed", e);
+            throw e;
         }
     }
 

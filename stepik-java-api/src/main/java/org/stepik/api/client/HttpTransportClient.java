@@ -2,11 +2,12 @@ package org.stepik.api.client;
 
 import javafx.util.Pair;
 import org.apache.http.Header;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
-import org.apache.http.HttpResponse;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -23,11 +24,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.stepik.api.exceptions.StepikClientException;
 
 import javax.net.ssl.SSLContext;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -46,7 +49,7 @@ public class HttpTransportClient implements TransportClient {
     private static final String USER_AGENT = "Stepik Java API Client/" + StepikApiClient.getVersion();
 
     private static final int MAX_SIMULTANEOUS_CONNECTIONS = 100000;
-    private static final int FULL_CONNECTION_TIMEOUT_S = 60;
+    private static final int FULL_CONNECTION_TIMEOUT_S = 30;
     private static final int CONNECTION_TIMEOUT_MS = 5_000;
     private static final int SOCKET_TIMEOUT_MS = FULL_CONNECTION_TIMEOUT_S * 1000;
     private static final Map<Pair<String, Integer>, HttpTransportClient> instances = new HashMap<>();
@@ -118,8 +121,7 @@ public class HttpTransportClient implements TransportClient {
 
     @NotNull
     @Override
-    public ClientResponse post(@NotNull StepikApiClient stepikApiClient, @NotNull String url, @Nullable String body)
-            throws IOException {
+    public ClientResponse post(@NotNull StepikApiClient stepikApiClient, @NotNull String url, @Nullable String body) {
         Map<String, String> headers = new HashMap<>();
         headers.put(CONTENT_TYPE_HEADER, CONTENT_TYPE);
 
@@ -128,7 +130,7 @@ public class HttpTransportClient implements TransportClient {
 
     @NotNull
     @Override
-    public ClientResponse get(@NotNull StepikApiClient stepikApiClient, @NotNull String url) throws IOException {
+    public ClientResponse get(@NotNull StepikApiClient stepikApiClient, @NotNull String url) {
         return get(stepikApiClient, url, null);
     }
 
@@ -138,14 +140,17 @@ public class HttpTransportClient implements TransportClient {
             @NotNull StepikApiClient stepikApiClient,
             @NotNull String url,
             @Nullable String body,
-            @Nullable Map<String, String> headers)
-            throws IOException {
+            @Nullable Map<String, String> headers) {
         HttpPost request = new HttpPost(url);
         if (headers != null) {
             headers.entrySet().forEach(entry -> request.setHeader(entry.getKey(), entry.getValue()));
         }
         if (body != null) {
-            request.setEntity(new StringEntity(body));
+            try {
+                request.setEntity(new StringEntity(body));
+            } catch (UnsupportedEncodingException e) {
+                throw new StepikClientException("Failed setting entity", e);
+            }
         }
         return call(stepikApiClient, request);
     }
@@ -154,7 +159,7 @@ public class HttpTransportClient implements TransportClient {
     public ClientResponse get(
             @NotNull StepikApiClient stepikApiClient,
             @NotNull String url,
-            @Nullable Map<String, String> headers) throws IOException {
+            @Nullable Map<String, String> headers) {
         HttpGet request = new HttpGet(url);
         if (headers != null) {
             headers.entrySet().forEach(entry -> request.setHeader(entry.getKey(), entry.getValue()));
@@ -165,14 +170,20 @@ public class HttpTransportClient implements TransportClient {
     @NotNull
     private ClientResponse call(
             @NotNull StepikApiClient stepikApiClient,
-            @NotNull HttpUriRequest request) throws IOException {
-        HttpResponse response = httpClient.execute(request);
+            @NotNull HttpUriRequest request) {
+        CloseableHttpResponse response;
+        try {
+            response = httpClient.execute(request);
+        } catch (IOException e) {
+            throw new StepikClientException("Failed a request", e);
+        }
         int statusCode = response.getStatusLine().getStatusCode();
 
         StringBuilder result = new StringBuilder();
-        if (statusCode != StatusCodes.SC_NO_CONTENT) {
+        HttpEntity entity = response.getEntity();
+        if (entity != null) {
             try (BufferedReader content = new BufferedReader(
-                    new InputStreamReader(response.getEntity().getContent(), ENCODING))) {
+                    new InputStreamReader(entity.getContent(), ENCODING))) {
 
                 String line;
                 while ((line = content.readLine()) != null) {
@@ -182,6 +193,8 @@ public class HttpTransportClient implements TransportClient {
                 if (result.length() > 0) {
                     result.deleteCharAt(0); // Delete first break line
                 }
+            } catch (IOException | UnsupportedOperationException e) {
+                throw new StepikClientException("Failed getting a content", e);
             }
         }
 

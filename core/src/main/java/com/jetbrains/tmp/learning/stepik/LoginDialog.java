@@ -1,9 +1,14 @@
 package com.jetbrains.tmp.learning.stepik;
 
+import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.openapi.util.ThrowableComputable;
 import com.intellij.openapi.util.text.StringUtil;
 import com.jetbrains.tmp.learning.ui.LoginPanel;
 import org.jetbrains.annotations.NotNull;
+import org.stepik.api.exceptions.StepikClientException;
+import org.stepik.api.exceptions.StepikUnauthorizedException;
+import org.stepik.core.utils.Utils;
 
 import javax.swing.*;
 
@@ -40,12 +45,26 @@ public class LoginDialog extends DialogWrapper {
 
     @Override
     protected void doOKAction() {
-        if (!validateLoginAndPasswordFields()) return;
-        boolean authenticated = StepikConnectorLogin.authenticate(loginPanel.getLogin(), loginPanel.getPassword());
-        if (authenticated) {
+        if (!validateLoginAndPasswordFields()) {
+            return;
+        }
+
+        try {
+            String login = loginPanel.getLogin();
+            String password = loginPanel.getPassword();
+
+            ProgressManager.getInstance()
+                    .runProcessWithProgressSynchronously((ThrowableComputable<Object, StepikClientException>) () -> {
+                        ProgressManager.getInstance().getProgressIndicator().setIndeterminate(true);
+                        StepikConnectorLogin.authenticate(login, password);
+                        return null;
+                    }, "Connection at Stepik", true, Utils.getCurrentProject());
+
             doJustOkAction();
-        } else {
-            setErrorText("Login failed");
+        } catch (StepikUnauthorizedException e) {
+            setErrorText("Wrong a login or a password");
+        } catch (StepikClientException e) {
+            setErrorText("Connection failed");
         }
     }
 

@@ -14,7 +14,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class LoginPanel {
-
     private JPanel contentPanel;
     private JPasswordField passwordField;
     private JTextField loginField;
@@ -51,10 +50,6 @@ public class LoginPanel {
 
     public JPanel getContentPanel() {
         return contentPanel;
-    }
-
-    public JTextField getLoginField() {
-        return loginField;
     }
 
     public String getPassword() {

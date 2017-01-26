@@ -1,9 +1,11 @@
 package org.stepik.plugin.collective.ui;
 
 import com.intellij.ide.BrowserUtil;
+import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.util.ThrowableComputable;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.HyperlinkAdapter;
@@ -13,9 +15,13 @@ import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.stepik.EduStepikNames;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
+import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.api.exceptions.StepikClientException;
+import org.stepik.api.exceptions.StepikUnauthorizedException;
 import org.stepik.api.objects.users.User;
+import org.stepik.core.utils.Utils;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -28,11 +34,17 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 
+import static com.intellij.openapi.ui.Messages.showMessageDialog;
+import static com.intellij.openapi.ui.Messages.showWarningDialog;
+
 class StepikSettingsPanel {
     private static final String DEFAULT_PASSWORD_TEXT = "************";
     private final static String AUTH_PASSWORD = "Password";
     private final static String AUTH_TOKEN = "Token";
     private static final String TEST_CONNECTION = "Test connection";
+    private static final String CHECK_CREDENTIALS = "Check credentials";
+    private static final String WRONG_LOGIN_PASSWORD = "Wrong a login or a password";
+    private static final String FAILED_CONNECTION = "Failed connection";
     private Project settingsProject;
     private JTextField emailTextField;
     private JPasswordField passwordField;
@@ -58,23 +70,33 @@ class StepikSettingsPanel {
             }
         });
         magicButton.setText("Magic auth");
-        signupTextField.setText("<html>Do not have an account at stepik.org? <a href=\"" +
-                EduStepikNames.STEPIK_SIGN_IN_LINK + ">" + "Sign up" + "</a></html>");
+        @Language("HTML")
+        String signupText = "<html>Do not have an account at stepik.org? <a href='%s'>Sign up</a></html>";
+        signupTextField.setText(String.format(signupText, EduStepikNames.STEPIK_SIGN_IN_LINK));
         signupTextField.setBackground(pane.getBackground());
         signupTextField.setCursor(new Cursor(Cursor.HAND_CURSOR));
         authTypeLabel.setBorder(JBUI.Borders.emptyLeft(10));
         authTypeComboBox.addItem(AUTH_PASSWORD);
         hintCheckBox.setSelected(StepikProjectManager.getInstance(settingsProject).getShowHint());
         hintCheckBox.addActionListener(e -> hintCheckBoxModified = true);
-        testButton.addActionListener(e -> {
-            User user = StepikConnectorLogin.testAuthentication(getEmail(), getPassword());
+        testButton.addActionListener(event -> {
+            try {
+                String login = getEmail();
+                String password = getPassword();
 
-            if (!user.isGuest()) {
+                User user = ProgressManager.getInstance()
+                        .runProcessWithProgressSynchronously((ThrowableComputable<User, StepikClientException>) () -> {
+                            ProgressManager.getInstance().getProgressIndicator().setIndeterminate(true);
+                            return StepikConnectorLogin.testAuthentication(login, password);
+                        }, "Connection at Stepik", true, Utils.getCurrentProject());
+
                 String fullName = user.getFirstName() + " " + user.getLastName();
                 String message = "Hello, " + fullName + "!\n I am glad to see you.";
-                Messages.showMessageDialog(message, TEST_CONNECTION, Messages.getInformationIcon());
-            } else {
-                Messages.showWarningDialog("Can't sign in.", TEST_CONNECTION);
+                showMessageDialog(message, TEST_CONNECTION, Messages.getInformationIcon());
+            } catch (StepikUnauthorizedException e) {
+                showWarningDialog(WRONG_LOGIN_PASSWORD, TEST_CONNECTION);
+            } catch (StepikClientException e) {
+                showWarningDialog(FAILED_CONNECTION, TEST_CONNECTION);
             }
         });
 
@@ -170,14 +192,24 @@ class StepikSettingsPanel {
         if (credentialsModified) {
             initProjectOfSettings();
 
-            User user = StepikConnectorLogin.testAuthentication(getEmail(), getPassword());
+            try {
+                String login = getEmail();
+                String password = getPassword();
 
-            if (!user.isGuest()) {
-                StepikConnectorLogin.authenticate(getEmail(), getPassword());
-            } else {
-                Messages.showWarningDialog("Can't sign in.", "Check credentials");
+                ProgressManager.getInstance()
+                        .runProcessWithProgressSynchronously((ThrowableComputable<User, StepikClientException>) () -> {
+                            ProgressManager.getInstance().getProgressIndicator().setIndeterminate(true);
+                            StepikConnectorLogin.authenticate(login, password);
+                            return null;
+                        }, "Connection at Stepik", true, Utils.getCurrentProject());
+
+            } catch (StepikUnauthorizedException e) {
+                showWarningDialog(WRONG_LOGIN_PASSWORD, CHECK_CREDENTIALS);
+            } catch (StepikClientException e) {
+                showWarningDialog(FAILED_CONNECTION, CHECK_CREDENTIALS);
             }
         }
+
         if (hintCheckBoxModified) {
             StepikProjectManager manager = StepikProjectManager.getInstance(settingsProject);
             manager.setShowHint(hintCheckBox.isSelected());
