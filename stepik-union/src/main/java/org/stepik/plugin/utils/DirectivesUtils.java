@@ -1,11 +1,14 @@
 package org.stepik.plugin.utils;
 
+import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.impl.ApplicationImpl;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.tmp.learning.SupportedLanguages;
@@ -24,8 +27,10 @@ public class DirectivesUtils {
 
     @NotNull
     public static String[] getFileText(@NotNull VirtualFile vf) {
-        Document document = FileDocumentManager.getInstance().getDocument(vf);
-        return document != null ? document.getText().split("\n") : new String[0];
+        return ApplicationManager.getApplication().runReadAction((Computable<String[]>) () -> {
+            Document document = FileDocumentManager.getInstance().getDocument(vf);
+            return document != null ? document.getText().split("\n") : new String[0];
+        });
     }
 
     @NotNull
