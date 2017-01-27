@@ -1,6 +1,7 @@
 package org.stepik.plugin.projectWizard.ui;
 
 import com.intellij.openapi.project.Project;
+import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -37,8 +38,8 @@ class CourseListModel extends AbstractListModel<Course> implements ComboBoxModel
         }
     }
 
-    void update(@NotNull Project project) {
-        List<Course> newCourseList = StepikProjectGenerator.getCoursesUnderProgress(project);
+    void update(@NotNull Project project, @NotNull SupportedLanguages programmingLanguage) {
+        List<Course> newCourseList = StepikProjectGenerator.getCoursesUnderProgress(project, programmingLanguage);
         Object currentSelectedCourse = getSelectedItem();
         courses.clear();
 
