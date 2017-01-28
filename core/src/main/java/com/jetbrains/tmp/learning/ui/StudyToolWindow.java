@@ -29,6 +29,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Comparator;
 import java.util.Map;
 
 public abstract class StudyToolWindow extends SimpleToolWindowPanel implements DataProvider, Disposable, ActionListener {
@@ -143,7 +144,9 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
             text = EMPTY_STEP_TEXT;
         }
 
-        stepNode.getSupportedLanguages().forEach(languageBox::addItem);
+        stepNode.getSupportedLanguages().stream()
+                .sorted(Comparator.comparingInt(Enum::ordinal))
+                .forEach(languageBox::addItem);
         languageBox.setSelectedItem(stepNode.getCurrentLang());
         languageBox.setVisible(languageBox.getModel().getSize() != 0);
 
