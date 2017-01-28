@@ -1,21 +1,16 @@
-package org.stepik.plugin.actions.step;
+package org.stepik.core.utils;
 
-import com.intellij.icons.AllIcons;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.refactoring.move.moveFilesOrDirectories.MoveFilesOrDirectoriesUtil;
-import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.StepFile;
@@ -23,40 +18,20 @@ import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
 import java.io.IOException;
 
-import static com.jetbrains.tmp.learning.SupportedLanguages.JAVA;
-import static com.jetbrains.tmp.learning.SupportedLanguages.PYTHON;
+public class ProgrammingLanguageUtils {
+    private static final Logger logger = Logger.getInstance(ProgrammingLanguageUtils.class);
 
-public class SwitchProgrammingLanguage extends AbstractStepAction {
-    private static final Logger logger = Logger.getInstance(SwitchProgrammingLanguage.class);
-    private static final String ACTION_ID = "STEPIK.SwitchProgrammingLanguage";
-    private static final String SHORTCUT = "ctrl alt pressed PAGE_UP";
-
-    public SwitchProgrammingLanguage() {
-        super("Switch programming language(" + KeymapUtil.getShortcutText(
-                new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT), null)) + ")",
-                "Switch programming language", AllIcons.Actions.Diff);
-    }
-
-    @Override
-    public void actionPerformed(AnActionEvent e) {
-        Project project = e.getProject();
-        if (project == null) {
+    public static void switchProgrammingLanguage(
+            @NotNull Project project,
+            @NotNull StepNode targetStepNode,
+            @NotNull SupportedLanguages language) {
+        if (!targetStepNode.getSupportedLanguages().contains(language)) {
             return;
         }
 
-        StepNode targetStepNode = StudyUtils.getSelectedStep(project);
-        if (targetStepNode == null) {
-            return;
-        }
-
-        switchLang(project, targetStepNode);
-    }
-
-    private void switchLang(@NotNull Project project, @NotNull StepNode targetStepNode) {
-        if (targetStepNode.getSupportedLanguages().size() == 1) {
+        if (targetStepNode.getCurrentLang() == language) {
             return;
         }
 
@@ -86,11 +61,10 @@ public class SwitchProgrammingLanguage extends AbstractStepAction {
         }
 
         SupportedLanguages currentLang = targetStepNode.getCurrentLang();
-        SupportedLanguages secondLang = currentLang == JAVA ? PYTHON : JAVA;
 
-        PsiFile second = getOrCreateMainFile(project, hide.getVirtualFile(), secondLang, targetStepNode);
+        PsiFile second = getOrCreateMainFile(project, hide.getVirtualFile(), language, targetStepNode);
         if (second == null) {
-            logger.error("Can't create Main file: " + secondLang.getMainFileName());
+            logger.error("Can't create Main file: " + language.getMainFileName());
             return;
         }
 
@@ -102,11 +76,11 @@ public class SwitchProgrammingLanguage extends AbstractStepAction {
             MoveFilesOrDirectoriesUtil.doMoveFile(second, src);
         });
 
-        targetStepNode.setCurrentLang(secondLang);
+        targetStepNode.setCurrentLang(language);
         FileEditorManager.getInstance(project).openFile(second.getVirtualFile(), true);
     }
 
-    private PsiDirectory getOrCreateDir(
+    private static PsiDirectory getOrCreateDir(
             @NotNull Project project,
             @NotNull VirtualFile parent,
             @NotNull String name) {
@@ -117,7 +91,7 @@ public class SwitchProgrammingLanguage extends AbstractStepAction {
                     .getApplication()
                     .runWriteAction(() -> {
                         try {
-                            hideVF[0] = parent.createChildDirectory(this, name);
+                            hideVF[0] = parent.createChildDirectory(null, name);
                         } catch (IOException e) {
                             hideVF[0] = null;
                         }
@@ -131,7 +105,7 @@ public class SwitchProgrammingLanguage extends AbstractStepAction {
     }
 
     @Nullable
-    private PsiFile getOrCreateMainFile(
+    private static PsiFile getOrCreateMainFile(
             @NotNull Project project,
             @NotNull VirtualFile parent,
             @NotNull SupportedLanguages language,
@@ -144,7 +118,7 @@ public class SwitchProgrammingLanguage extends AbstractStepAction {
                     .getApplication()
                     .runWriteAction(() -> {
                         try {
-                            file[0] = parent.createChildData(this, fileName);
+                            file[0] = parent.createChildData(null, fileName);
 
                             StepFile stepFile = stepNode.getStepFiles().get(fileName);
                             if (stepFile != null) {
@@ -156,17 +130,5 @@ public class SwitchProgrammingLanguage extends AbstractStepAction {
                     });
         }
         return PsiManager.getInstance(project).findFile(file[0]);
-    }
-
-    @NotNull
-    @Override
-    public String getActionId() {
-        return ACTION_ID;
-    }
-
-    @Nullable
-    @Override
-    public String[] getShortcuts() {
-        return new String[]{SHORTCUT};
     }
 }
