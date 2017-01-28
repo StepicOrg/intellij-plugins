@@ -11,6 +11,7 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.refactoring.move.moveFilesOrDirectories.MoveFilesOrDirectoriesUtil;
+import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.StepFile;
@@ -31,19 +32,13 @@ public class ProgrammingLanguageUtils {
             return;
         }
 
-        if (targetStepNode.getCurrentLang() == language) {
+        SupportedLanguages currentLang = targetStepNode.getCurrentLang();
+
+        if (currentLang == language) {
             return;
         }
 
-        FileDocumentManager documentManager = FileDocumentManager.getInstance();
-        FileEditorManager editorManager = FileEditorManager.getInstance(project);
-        for (VirtualFile file : FileEditorManager.getInstance(project).getOpenFiles()) {
-            Document document = documentManager.getDocument(file);
-            if (document == null)
-                continue;
-            documentManager.saveDocument(document);
-            editorManager.closeFile(file);
-        }
+        closeStepNodeFile(project, targetStepNode);
 
         VirtualFile srcParent = project.getBaseDir().findFileByRelativePath(targetStepNode.getPath());
         if (srcParent == null) {
@@ -60,24 +55,65 @@ public class ProgrammingLanguageUtils {
             return;
         }
 
-        SupportedLanguages currentLang = targetStepNode.getCurrentLang();
-
-        PsiFile second = getOrCreateMainFile(project, hide.getVirtualFile(), language, targetStepNode);
-        if (second == null) {
-            logger.error("Can't create Main file: " + language.getMainFileName());
-            return;
+        PsiFile second = src.findFile(language.getMainFileName());
+        boolean moveSecond = second == null;
+        if (moveSecond) {
+            second = getOrCreateMainFile(project, hide.getVirtualFile(), language, targetStepNode);
+            if (second == null) {
+                logger.error("Can't create Main file: " + language.getMainFileName());
+                return;
+            }
         }
 
-        final PsiFile first = src.findFile(currentLang.getMainFileName());
-        ApplicationManager.getApplication().runWriteAction(() -> {
-            if (first != null) {
-                MoveFilesOrDirectoriesUtil.doMoveFile(first, hide);
-            }
-            MoveFilesOrDirectoriesUtil.doMoveFile(second, src);
-        });
+        PsiFile first = hide.findFile(currentLang.getMainFileName());
+        boolean moveFirst = first == null;
+
+        if (moveFirst) {
+            first = src.findFile(currentLang.getMainFileName());
+        }
+
+        exchangeFiles(src, hide, first, second, moveFirst, moveSecond);
 
         targetStepNode.setCurrentLang(language);
         FileEditorManager.getInstance(project).openFile(second.getVirtualFile(), true);
+    }
+
+    private static void exchangeFiles(
+            @NotNull PsiDirectory src,
+            @NotNull PsiDirectory hide,
+            @Nullable PsiFile first,
+            @NotNull PsiFile second,
+            boolean moveFirst,
+            boolean moveSecond) {
+
+        if (moveFirst || moveSecond) {
+            ApplicationManager.getApplication().runWriteAction(() -> {
+                if (moveFirst && first != null) {
+                    MoveFilesOrDirectoriesUtil.doMoveFile(first, hide);
+                }
+
+                if (moveSecond) {
+                    MoveFilesOrDirectoriesUtil.doMoveFile(second, src);
+                }
+            });
+        }
+    }
+
+    private static void closeStepNodeFile(@NotNull Project project, @NotNull StepNode targetStepNode) {
+        FileDocumentManager documentManager = FileDocumentManager.getInstance();
+        FileEditorManager editorManager = FileEditorManager.getInstance(project);
+        for (VirtualFile file : FileEditorManager.getInstance(project).getOpenFiles()) {
+            StudyUtils.getStep(project, file);
+            if (StudyUtils.getStep(project, file) != targetStepNode) {
+                continue;
+            }
+            Document document = documentManager.getDocument(file);
+            if (document == null) {
+                continue;
+            }
+            documentManager.saveDocument(document);
+            editorManager.closeFile(file);
+        }
     }
 
     private static PsiDirectory getOrCreateDir(

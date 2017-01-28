@@ -253,7 +253,7 @@ public class StudyUtils {
     }
 
     @Nullable
-    static StepNode getStep(@NotNull Project project, @NotNull VirtualFile stepVF) {
+    public static StepNode getStep(@NotNull Project project, @NotNull VirtualFile stepVF) {
         String path = getRelativePath(project, stepVF);
         if (stepPathPattern == null) {
             stepPathPattern = Pattern.compile("^(section[0-9]+)/(lesson[0-9]+)/(step[0-9]+)/src/.*");
