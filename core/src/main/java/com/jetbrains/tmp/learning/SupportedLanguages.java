@@ -59,7 +59,6 @@ public enum SupportedLanguages {
             case "mono c#":
                 return MONO_CS;
             case "c++11":
-                return CPP;
             case "c++":
                 return CPP;
         }
