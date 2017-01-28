@@ -12,7 +12,7 @@ import org.stepik.plugin.actions.step.DownloadSubmission;
 import org.stepik.plugin.actions.step.InsertStepikDirectives;
 import org.stepik.plugin.actions.step.StepikJavaPostAction;
 import org.stepik.plugin.actions.step.StepikResetStepAction;
-import org.stepik.plugin.actions.step.SwitchLanguage;
+import org.stepik.plugin.actions.step.SwitchProgrammingLanguage;
 
 public class StepikPluginConfigurator extends StudyBasePluginConfigurator {
     @NotNull
@@ -25,7 +25,7 @@ public class StepikPluginConfigurator extends StudyBasePluginConfigurator {
         group.add(new StepikNextStepAction());
         group.add(new StepikResetStepAction());
         group.add(new DownloadSubmission());
-        group.add(new SwitchLanguage());
+        group.add(new SwitchProgrammingLanguage());
         group.add(new InsertStepikDirectives());
 
         return group;
