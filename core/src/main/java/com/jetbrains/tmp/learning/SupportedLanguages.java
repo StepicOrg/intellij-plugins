@@ -1,13 +1,26 @@
 package com.jetbrains.tmp.learning;
 
-import com.jetbrains.tmp.learning.core.EduNames;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public enum SupportedLanguages {
-    JAVA(EduNames.JAVA8, "Main.java", "//", new String[]{"class Main {"}, new String[]{"}"}),
-    PYTHON(EduNames.PYTHON3, "main.py", "#", null, null),
-    INVALID(EduNames.INVALID, "", "", null, null);
+    ASM32("asm32", "main32.asm", "#", null, null),
+    ASM64("asm64", "main64.asm", "#", null, null),
+    C("C", "main.c", "//", null, null),
+    CLOJURE("Clojure", "main.clj", ";;", null, null),
+    CPP("C++11", "main.cpp", "//", null, null),
+    HASKELL("Haskell 8.0", "Main.hs", "--", null, null),
+    JAVA("Java 8", "Main.java", "//", new String[]{"class Main {"}, new String[]{"}"}),
+    JAVASCRIPT("JavaScript", "main.js", "//", null, null),
+    MONO_CS("Mono c#", "main.cs", "//", null, null),
+    OCTAVE("Octave", "main.m", "%", null, null),
+    PYTHON("Python 3", "main.py", "#", null, null),
+    R("R", "main.r", "#", null, null),
+    RUBY("Ruby", "main.rb", "#", null, null),
+    RUST("Rust", "main.rs", "//", null, null),
+    SHELL("Shell", "main.sh", "#", null, null),
+    SCALA("Scala", "Main.scala", "//", null, null),
+    INVALID("invalid", "", "", null, null);
 
     private final String name;
     private final String comment;
@@ -35,7 +48,22 @@ public enum SupportedLanguages {
 
     @NotNull
     public static SupportedLanguages langOf(@NotNull String lang) {
-        lang = lang.replaceAll("[0-9]+", "").toUpperCase();
+        switch (lang) {
+            case "java8":
+                return JAVA;
+            case "python3":
+                return PYTHON;
+            case "haskell 7.10":
+            case "haskell 8.0":
+                return HASKELL;
+            case "mono c#":
+                return MONO_CS;
+            case "c++11":
+                return CPP;
+            case "c++":
+                return CPP;
+        }
+        lang = lang.toUpperCase();
         try {
             return SupportedLanguages.valueOf(lang);
         } catch (IllegalArgumentException e) {

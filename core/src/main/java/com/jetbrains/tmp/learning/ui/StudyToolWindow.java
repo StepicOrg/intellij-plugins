@@ -49,6 +49,7 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
         contentPanel = new JPanel(cardLayout);
         splitPane = new OnePixelSplitter(myVertical = true);
         languageBox = new JComboBox<>();
+        languageBox.setVisible(false);
         languageBox.addActionListener(this);
     }
 
@@ -144,6 +145,7 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
 
         stepNode.getSupportedLanguages().forEach(languageBox::addItem);
         languageBox.setSelectedItem(stepNode.getCurrentLang());
+        languageBox.setVisible(languageBox.getModel().getSize() != 0);
 
         setText(text);
     }

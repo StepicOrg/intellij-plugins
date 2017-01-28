@@ -11,8 +11,6 @@ import java.util.Arrays;
  */
 public class LanguageComboBox extends JComboBox<SupportedLanguages> {
     public LanguageComboBox() {
-        addItem(SupportedLanguages.PYTHON);
-        addItem(SupportedLanguages.JAVA);
         Arrays.stream(SupportedLanguages.values())
                 .filter(language -> language != SupportedLanguages.INVALID)
                 .forEach(this::addItem);

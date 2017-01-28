@@ -60,6 +60,9 @@ class StudySerializationUtils {
     private static final String TIME = "time";
     private static final String MEMORY = "memory";
     private static final Pattern limitPattern = Pattern.compile(".*:\\s(\\d+)\\sMb.*:\\s(\\d+)s.*");
+    private static final String DEFAULT_LANG = "defaultLang";
+    private static final String CURRENT_LANG = "currentLang";
+    private static final String SUPPORTED_LANGUAGES = "supportedLanguages";
 
     static int getVersion(Element element) throws StudyUnrecognizedFormatException {
         final Element stepManager = element.getChild(MAIN_ELEMENT);
@@ -269,6 +272,58 @@ class StudySerializationUtils {
         data.addContent(dataCourseTag);
 
         return dataCourseTag;
+    }
+
+    static Element convertToThirdVersion(Element state) throws StudyUnrecognizedFormatException {
+        final Element stepManager = state.getChild(MAIN_ELEMENT);
+
+        Element defaultLang = getFieldWithName(stepManager, DEFAULT_LANG);
+        Attribute defaultLangValue = defaultLang.getAttribute(VALUE);
+        replaceLanguage(defaultLangValue);
+
+        Element courseNode = getFieldWithName(stepManager, COURSE_NODE).getChild(COURSE_NODE_CLASS);
+        List<Element> sectionNodes = getListFieldWithName(courseNode, SECTIONS_NODES, SECTION_NODE);
+
+        for (Element sectionNode : sectionNodes) {
+            List<Element> lessonNodes = getListFieldWithName(sectionNode, LESSON_NODES, LESSON_NODE);
+            for (Element lessonNode : lessonNodes) {
+                List<Element> stepNodes = getListFieldWithName(lessonNode, STEP_NODES, STEP_NODE);
+                for (Element stepNode : stepNodes) {
+                    Element currentLang = getFieldWithName(stepNode, CURRENT_LANG);
+                    Attribute currentLangValue = currentLang.getAttribute(VALUE);
+                    replaceLanguage(currentLangValue);
+
+                    Element limits = getFieldWithName(stepNode, LIMITS);
+                    Element map = limits.getChild(MAP);
+                    List<Element> entrySet = map.getChildren(ENTRY);
+                    entrySet.forEach(entry -> {
+                        Attribute key = entry.getAttribute(KEY);
+                        replaceLanguage(key);
+                    });
+
+                    Element supportedLanguages = getFieldWithName(stepNode, SUPPORTED_LANGUAGES);
+                    Element list = supportedLanguages.getChild(LIST);
+                    List<Element> items = list.getChildren(OPTION);
+                    items.forEach(item -> {
+                        Attribute value = item.getAttribute(VALUE);
+                        replaceLanguage(value);
+                    });
+                }
+            }
+        }
+
+        return state;
+    }
+
+    private static void replaceLanguage(Attribute attribute) {
+        switch (attribute.getValue()) {
+            case "java8":
+                attribute.setValue("Java 8");
+                break;
+            case "python3":
+                attribute.setValue("Python 3");
+                break;
+        }
     }
 
     static class StudyUnrecognizedFormatException extends Exception {
