@@ -14,6 +14,7 @@ import javax.swing.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author meanmail
@@ -76,6 +77,14 @@ class CourseListModel extends AbstractListModel<Course> implements ComboBoxModel
 
     @NotNull
     private Object getCourse(@NotNull String link) {
+        List<Course> filteredCourses = courses.stream()
+                .filter(course -> course.getTitle().equals(link))
+                .collect(Collectors.toList());
+
+        if (filteredCourses.size() > 0) {
+            return filteredCourses.get(0);
+        }
+
         int courseId = Utils.getCourseIdFromLink(link);
 
         StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
