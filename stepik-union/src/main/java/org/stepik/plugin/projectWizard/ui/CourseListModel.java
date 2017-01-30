@@ -77,8 +77,10 @@ class CourseListModel extends AbstractListModel<Course> implements ComboBoxModel
 
     @NotNull
     private Object getCourse(@NotNull String link) {
+        final String finalLink = link.toLowerCase();
+
         List<Course> filteredCourses = courses.stream()
-                .filter(course -> course.getTitle().equals(link))
+                .filter(course -> course.getTitle().toLowerCase().equals(finalLink))
                 .collect(Collectors.toList());
 
         if (filteredCourses.size() > 0) {
@@ -109,5 +111,9 @@ class CourseListModel extends AbstractListModel<Course> implements ComboBoxModel
         }
 
         return course;
+    }
+
+    public List<Course> getCourses() {
+        return courses;
     }
 }
