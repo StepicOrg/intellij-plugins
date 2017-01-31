@@ -30,6 +30,7 @@ public enum SupportedLanguages {
     SCALA("Scala", "scala", "Main.scala", "//", null, null),
     INVALID("invalid", "", "", "", null, null);
 
+    private static Map<String, SupportedLanguages> map;
     private final String name;
     private final String comment;
     private final String mainFileName;
@@ -52,7 +53,6 @@ public enum SupportedLanguages {
             @NotNull String comment,
             @Nullable String[] beforeCode,
             @Nullable String[] afterCode) {
-
         this.title = title;
         this.name = name;
         this.mainFileName = mainFileName;
@@ -61,22 +61,18 @@ public enum SupportedLanguages {
         this.afterCode = afterCode;
     }
 
-    private static Map<String, SupportedLanguages> map;
-
     @NotNull
     public static SupportedLanguages langOf(@NotNull String lang) {
         if (map == null) {
             map = new HashMap<>();
-
             Arrays.stream(values()).forEach(value -> map.put(value.getName(), value));
         }
 
         SupportedLanguages language = map.get(lang);
-
         if (language == null) {
             return INVALID;
         }
-        
+
         return language;
     }
 

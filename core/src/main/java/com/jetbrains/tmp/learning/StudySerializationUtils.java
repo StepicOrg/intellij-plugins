@@ -335,9 +335,8 @@ class StudySerializationUtils {
                                     Element limits = getFieldWithNameOrNull(stepNode, LIMITS);
                                     replaceLanguages(limits, MAP, ENTRY, KEY);
 
-                                    Element supportedLanguages = getFieldWithNameOrNull(stepNode,
-                                            SUPPORTED_LANGUAGES);
-
+                                    Element supportedLanguages;
+                                    supportedLanguages = getFieldWithNameOrNull(stepNode, SUPPORTED_LANGUAGES);
                                     replaceLanguages(supportedLanguages, LIST, OPTION, VALUE);
                                 })
                         ));
