@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -117,6 +118,9 @@ class StudySerializationUtils {
 
         List<Element> children = new ArrayList<>();
         Element list = child.getChild(LIST);
+        if (list == null) {
+            return null;
+        }
         children.addAll(list.getChildren(className));
 
         return children;
@@ -315,35 +319,29 @@ class StudySerializationUtils {
         if (sectionNodes == null) {
             return state;
         }
-        sectionNodes.forEach(sectionNode -> {
-            List<Element> lessonNodes = getListFieldWithNameOrNull(sectionNode, LESSON_NODES, LESSON_NODE);
-            if (lessonNodes == null) {
-                return;
-            }
+        sectionNodes.stream()
+                .map(sectionNode -> getListFieldWithNameOrNull(sectionNode, LESSON_NODES, LESSON_NODE))
+                .filter(Objects::nonNull)
+                .forEach(lessonNodes -> lessonNodes.stream()
+                        .map(lessonNode -> getListFieldWithNameOrNull(lessonNode, STEP_NODES, STEP_NODE))
+                        .filter(Objects::nonNull)
+                        .forEach(stepNodes -> stepNodes.forEach(stepNode -> {
+                                    Element currentLang = getFieldWithNameOrNull(stepNode, CURRENT_LANG);
+                                    if (currentLang != null) {
+                                        Attribute currentLangValue = currentLang.getAttribute(VALUE);
+                                        replaceLanguage(currentLangValue);
+                                    }
 
-            lessonNodes.forEach(lessonNode -> {
-                List<Element> stepNodes = getListFieldWithNameOrNull(lessonNode, STEP_NODES, STEP_NODE);
-                if (stepNodes == null) {
-                    return;
-                }
+                                    Element limits = getFieldWithNameOrNull(stepNode, LIMITS);
+                                    replaceLanguages(limits, MAP, ENTRY, KEY);
 
-                stepNodes.forEach(stepNode -> {
-                    Element currentLang = getFieldWithNameOrNull(stepNode, CURRENT_LANG);
-                    if (currentLang != null) {
-                        Attribute currentLangValue = currentLang.getAttribute(VALUE);
-                        replaceLanguage(currentLangValue);
-                    }
-
-                    Element limits = getFieldWithNameOrNull(stepNode, LIMITS);
-                    replaceLanguages(limits, MAP, ENTRY, KEY);
-
-                    Element supportedLanguages = getFieldWithNameOrNull(stepNode, SUPPORTED_LANGUAGES);
-                    if (supportedLanguages != null) {
-                        replaceLanguages(supportedLanguages, LIST, OPTION, VALUE);
-                    }
-                });
-            });
-        });
+                                    Element supportedLanguages = getFieldWithNameOrNull(stepNode,
+                                            SUPPORTED_LANGUAGES);
+                                    if (supportedLanguages != null) {
+                                        replaceLanguages(supportedLanguages, LIST, OPTION, VALUE);
+                                    }
+                                })
+                        ));
 
         return state;
     }

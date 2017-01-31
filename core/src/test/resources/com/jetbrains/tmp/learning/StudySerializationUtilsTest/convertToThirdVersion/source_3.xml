@@ -13,6 +13,7 @@
                                         <option name="stepNodes">
                                             <list>
                                                 <StepNode>
+                                                    <option name="currentLang" value="java8"/>
                                                     <option name="limits">
                                                         <map>
                                                             <entry key="java8"/>
