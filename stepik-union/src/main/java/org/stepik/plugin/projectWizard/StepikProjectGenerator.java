@@ -80,9 +80,9 @@ public class StepikProjectGenerator {
     @NotNull
     private static List<Long> getHardcodedCoursesId(@NotNull SupportedLanguages programmingLanguage) {
         switch (programmingLanguage) {
-            case JAVA:
+            case JAVA8:
                 return Arrays.asList(187L, 150L, 217L, 1127L, 125L, 126L);
-            case PYTHON:
+            case PYTHON3:
                 return Arrays.asList(67L, 512L, 401L, 217L, 1127L, 125L, 126L, 150L);
         }
 

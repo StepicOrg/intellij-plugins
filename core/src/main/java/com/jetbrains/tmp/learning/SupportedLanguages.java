@@ -13,7 +13,7 @@ public enum SupportedLanguages {
     HASKELL("Haskell", "haskell", "Main.hs", "--", null, null),
     HASKELL_7_10("Haskell 7.10", "haskell 7.10", "Main_7.10.hs", "--", null, null),
     HASKELL_8_0("Haskell 8.0", "haskell 8.0", "Main_8.0.hs", "--", null, null),
-    JAVA8("Java 8", "java8", "Main_8.java", "//", new String[]{"class Main {"}, new String[]{"}"}),
+    JAVA8("Java 8", "java8", "Main.java", "//", new String[]{"class Main {"}, new String[]{"}"}),
     JAVASCRIPT("JavaScript", "javascript", "main.js", "//", null, null),
     MONO_CS("Mono c#", "mono c#", "main.cs", "//", null, null),
     OCTAVE("Octave", "octave", "main.m", "%", null, null),
