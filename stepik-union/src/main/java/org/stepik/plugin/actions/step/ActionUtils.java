@@ -105,6 +105,6 @@ class ActionUtils {
         double total = eta + timer;
 
         indicator.setFraction(1 - eta / total);
-        indicator.setText("Ends in " + etaAsString((long) eta));
+        indicator.setText2("Ends in " + etaAsString((long) eta));
     }
 }
