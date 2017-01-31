@@ -295,7 +295,7 @@ class StudySerializationUtils {
         return dataCourseTag;
     }
 
-    static Element convertToThirdVersion(Element state) throws StudyUnrecognizedFormatException {
+    static Element convertToThirdVersion(@NotNull Element state) throws StudyUnrecognizedFormatException {
         final Element stepManager = state.getChild(MAIN_ELEMENT);
         if (stepManager == null) {
             throw new StudyUnrecognizedFormatException("Not found element \" + MAIN_ELEMENT + \"");
@@ -337,9 +337,8 @@ class StudySerializationUtils {
 
                                     Element supportedLanguages = getFieldWithNameOrNull(stepNode,
                                             SUPPORTED_LANGUAGES);
-                                    if (supportedLanguages != null) {
-                                        replaceLanguages(supportedLanguages, LIST, OPTION, VALUE);
-                                    }
+
+                                    replaceLanguages(supportedLanguages, LIST, OPTION, VALUE);
                                 })
                         ));
 
@@ -347,10 +346,10 @@ class StudySerializationUtils {
     }
 
     private static void replaceLanguages(
-            Element collection,
-            String collectionType,
-            String itemType,
-            String valueAttrName) {
+            @Nullable Element collection,
+            @NotNull String collectionType,
+            @NotNull String itemType,
+            @NotNull String valueAttrName) {
         if (collection != null) {
             Element items = collection.getChild(collectionType);
             if (items != null) {
