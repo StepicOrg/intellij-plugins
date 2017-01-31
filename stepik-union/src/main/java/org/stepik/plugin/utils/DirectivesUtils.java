@@ -17,8 +17,8 @@ import java.util.Arrays;
 public class DirectivesUtils {
     private static final String START_DIRECTIVE = "Stepik code: start";
     private static final String END_DIRECTIVE = "Stepik code: end";
-    private static final String START_HINT = "Please note, only the code BELOW will be sent to Stepik";
-    private static final String END_HINT = "Please note, only the code ABOVE will be sent to Stepik";
+    private static final String START_HINT = "Please note, only the code BELOW will be sent to Stepik.org";
+    private static final String END_HINT = "Please note, only the code ABOVE will be sent to Stepik.org";
 
     private static final String MESSAGE = "Do you want to remove Stepik directives and external code?\n" +
             "You can undo this action using \"ctrl + Z\".";
