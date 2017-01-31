@@ -3,6 +3,10 @@ package com.jetbrains.tmp.learning;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
 public enum SupportedLanguages {
     ASM32("asm32", "asm32", "main32.asm", "#", null, null),
     ASM64("asm64", "asm64", "main64.asm", "#", null, null),
@@ -13,6 +17,7 @@ public enum SupportedLanguages {
     HASKELL("Haskell", "haskell", "Main.hs", "--", null, null),
     HASKELL_7_10("Haskell 7.10", "haskell 7.10", "Main_7.10.hs", "--", null, null),
     HASKELL_8_0("Haskell 8.0", "haskell 8.0", "Main_8.0.hs", "--", null, null),
+    JAVA("Java", "java", "Main.java", "//", new String[]{"class Main {"}, new String[]{"}"}),
     JAVA8("Java 8", "java8", "Main.java", "//", new String[]{"class Main {"}, new String[]{"}"}),
     JAVASCRIPT("JavaScript", "javascript", "main.js", "//", null, null),
     MONO_CS("Mono c#", "mono c#", "main.cs", "//", null, null),
@@ -56,28 +61,23 @@ public enum SupportedLanguages {
         this.afterCode = afterCode;
     }
 
+    private static Map<String, SupportedLanguages> map;
+
     @NotNull
     public static SupportedLanguages langOf(@NotNull String lang) {
-        switch (lang) {
-            case "java":
-                return JAVA8;
-            case "haskell 7.10":
-                return HASKELL_7_10;
-            case "haskell 8.0":
-                return HASKELL_8_0;
-            case "mono c#":
-                return MONO_CS;
-            case "c++11":
-                return CPP_11;
-            case "c++":
-                return CPP;
+        if (map == null) {
+            map = new HashMap<>();
+
+            Arrays.stream(values()).forEach(value -> map.put(value.getName(), value));
         }
-        lang = lang.toUpperCase();
-        try {
-            return SupportedLanguages.valueOf(lang);
-        } catch (IllegalArgumentException e) {
+
+        SupportedLanguages language = map.get(lang);
+
+        if (language == null) {
             return INVALID;
         }
+        
+        return language;
     }
 
     @NotNull
