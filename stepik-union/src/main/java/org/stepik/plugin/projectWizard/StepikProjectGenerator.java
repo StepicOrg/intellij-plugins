@@ -84,6 +84,25 @@ public class StepikProjectGenerator {
                 return Arrays.asList(187L, 150L, 217L, 1127L, 125L, 126L);
             case PYTHON3:
                 return Arrays.asList(67L, 512L, 401L, 217L, 1127L, 125L, 126L, 150L);
+            case ASM32:
+            case ASM64:
+            case CLOJURE:
+            case CPP:
+            case CPP_11:
+            case HASKELL:
+            case HASKELL_7_10:
+            case JAVASCRIPT:
+            case MONO_CS:
+            case OCTAVE:
+            case R:
+            case RUST:
+            case SHELL:
+                return Arrays.asList(217L, 1127L, 125L, 126L, 150L);
+            case C:
+            case HASKELL_8_0:
+            case RUBY:
+            case SCALA:
+                return Arrays.asList(1127L, 125L, 126L, 150L);
         }
 
         return Collections.emptyList();
