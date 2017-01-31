@@ -68,12 +68,7 @@ public enum SupportedLanguages {
             Arrays.stream(values()).forEach(value -> map.put(value.getName(), value));
         }
 
-        SupportedLanguages language = map.get(lang);
-        if (language == null) {
-            return INVALID;
-        }
-
-        return language;
+        return map.getOrDefault(lang, INVALID);
     }
 
     @NotNull
