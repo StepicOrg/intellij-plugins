@@ -1,0 +1,9 @@
+<!-- state version 2 | Repair defaultLang-->
+<component name="StepikStudySettings">
+    <StepikProjectManager>
+        <option name="defaultLang" value="invalid"/>
+        <option name="courseNode">
+            <CourseNode/>
+        </option>
+    </StepikProjectManager>
+</component>

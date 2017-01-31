@@ -1,0 +1,28 @@
+<!-- state version 2 | Repair currentLang for step -->
+<component name="StepikStudySettings">
+    <StepikProjectManager>
+        <option name="defaultLang" value="invalid"/>
+        <option name="courseNode">
+            <CourseNode>
+                <option name="sectionNodes">
+                    <list>
+                        <SectionNode>
+                            <option name="lessonNodes">
+                                <list>
+                                    <LessonNode>
+                                        <option name="stepNodes">
+                                            <list>
+                                                <StepNode>
+                                                </StepNode>
+                                            </list>
+                                        </option>
+                                    </LessonNode>
+                                </list>
+                            </option>
+                        </SectionNode>
+                    </list>
+                </option>
+            </CourseNode>
+        </option>
+    </StepikProjectManager>
+</component>
