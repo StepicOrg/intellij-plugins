@@ -48,9 +48,9 @@ public class StepikProjectGenerator {
     }
 
     @NotNull
-    private static List<Course> getCourses() {
+    private static List<Course> getCourses(@NotNull SupportedLanguages programmingLanguage) {
         List<Course> courses = new ArrayList<>();
-        List<Long> coursesIds = getHardcodedCoursesId();
+        List<Long> coursesIds = getHardcodedCoursesId(programmingLanguage);
 
         if (!coursesIds.isEmpty()) {
             StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
@@ -65,21 +65,39 @@ public class StepikProjectGenerator {
             }
         }
 
+        courses.sort((course1, course2) -> {
+            long id1 = course1.getId();
+            long id2 = course2.getId();
+
+            int index1 = coursesIds.indexOf(id1);
+            int index2 = coursesIds.indexOf(id2);
+            return Integer.compare(index1, index2);
+        });
+
         return courses;
     }
 
     @NotNull
-    private static List<Long> getHardcodedCoursesId() {
-        return Arrays.asList(187L, 67L, 512L, 401L, 217L, 150L, 125L, 126L, 1127L);
+    private static List<Long> getHardcodedCoursesId(@NotNull SupportedLanguages programmingLanguage) {
+        switch (programmingLanguage) {
+            case JAVA:
+                return Arrays.asList(187L, 150L, 217L, 1127L, 125L, 126L);
+            case PYTHON:
+                return Arrays.asList(67L, 512L, 401L, 217L, 1127L, 125L, 126L, 150L);
+        }
+
+        return Collections.emptyList();
     }
 
     @NotNull
-    public static List<Course> getCoursesUnderProgress(@NotNull final Project project) {
+    public static List<Course> getCoursesUnderProgress(
+            @NotNull final Project project,
+            @NotNull SupportedLanguages programmingLanguage) {
         try {
             return ProgressManager.getInstance()
                     .runProcessWithProgressSynchronously(() -> {
                         ProgressManager.getInstance().getProgressIndicator().setIndeterminate(true);
-                        List<Course> courses = getCourses();
+                        List<Course> courses = getCourses(programmingLanguage);
                         if (courses.isEmpty()) {
                             courses.add(EMPTY_COURSE);
                         }

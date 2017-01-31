@@ -19,29 +19,17 @@ public class ProjectSettingsPanel implements ProjectSetting, HierarchyListener {
     private static final Logger logger = Logger.getInstance(ProjectSettingsPanel.class);
     private final Project project;
     private final List<ProjectSettingListener> listeners = new ArrayList<>();
-    @SuppressWarnings("unused")
     private JPanel mainPanel;
-    @SuppressWarnings("unused")
     private JLabel nameLabel;
-    @SuppressWarnings("unused")
     private JLabel userName;
-    @SuppressWarnings("unused")
     private JLabel langLabel;
-    @SuppressWarnings("unused")
     private LanguageComboBox langComboBox;
-    @SuppressWarnings("unused")
     private JLabel buildLabel;
-    @SuppressWarnings("unused")
     private BuildTypeComboBox buildType;
-    @SuppressWarnings("unused")
     private JLabel courseLabel;
-    @SuppressWarnings("unused")
     private CourseListBox courseListComboBox;
-    @SuppressWarnings("unused")
     private RefreshButton refreshListButton;
-    @SuppressWarnings("unused")
     private CourseDescriptionPane courseListDescription;
-    @SuppressWarnings("unused")
     private JScrollPane scrollPane;
     private Course selectedCourse = StepikProjectGenerator.EMPTY_COURSE;
 
@@ -51,8 +39,10 @@ public class ProjectSettingsPanel implements ProjectSetting, HierarchyListener {
         refreshListButton.setTarget(courseListComboBox, project);
         courseListComboBox.setTarget(this);
 
+        langComboBox.setTarget(this);
         langComboBox.setVisible(visibleLangBox);
         langLabel.setVisible(visibleLangBox);
+
         mainPanel.addHierarchyListener(this);
     }
 
@@ -66,7 +56,7 @@ public class ProjectSettingsPanel implements ProjectSetting, HierarchyListener {
         StepikConnectorLogin.authentication();
         String username = StepikConnectorLogin.getCurrentUserFullName();
         userName.setText(username);
-        courseListComboBox.refresh(project);
+        courseListComboBox.refresh(project, langComboBox.getSelectedItem());
         logger.info("Updating settings is done");
     }
 
@@ -111,6 +101,11 @@ public class ProjectSettingsPanel implements ProjectSetting, HierarchyListener {
     @Override
     public void removeListener(@NotNull ProjectSettingListener listener) {
         listeners.remove(listener);
+    }
+
+    @Override
+    public void selectedProgrammingLanguage(@NotNull SupportedLanguages language) {
+        courseListComboBox.refresh(project, language);
     }
 
     @NotNull
