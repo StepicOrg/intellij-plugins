@@ -9,7 +9,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.ui.StudyToolWindow;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.util.Collections;
@@ -43,7 +42,7 @@ public abstract class StudyBasePluginConfigurator implements StudyPluginConfigur
             @Override
             public void fileOpened(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
                 StepNode stepNode = StudyUtils.getStep(source.getProject(), file);
-                setStepText(stepNode);
+                toolWindow.setStepNode(stepNode);
             }
 
             @Override
@@ -53,7 +52,7 @@ public abstract class StudyBasePluginConfigurator implements StudyPluginConfigur
                         return;
                     }
                 }
-                toolWindow.setEmptyText();
+                toolWindow.setStepNode(null);
             }
 
             @Override
@@ -61,17 +60,8 @@ public abstract class StudyBasePluginConfigurator implements StudyPluginConfigur
                 VirtualFile file = event.getNewFile();
                 if (file != null) {
                     StepNode stepNode = StudyUtils.getStep(event.getManager().getProject(), file);
-                    setStepText(stepNode);
+                    toolWindow.setStepNode(stepNode);
                 }
-            }
-
-            private void setStepText(@Nullable final StepNode stepNode) {
-                String text = StudyUtils.getStepTextFromStep(stepNode);
-                if (text == null) {
-                    toolWindow.setEmptyText();
-                    return;
-                }
-                toolWindow.setStepText(text);
             }
         };
     }

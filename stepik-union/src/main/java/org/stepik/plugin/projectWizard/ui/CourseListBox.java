@@ -21,6 +21,10 @@ public class CourseListBox extends JComboBox<Course> {
         super();
         courseListModel = new CourseListModel();
         setModel(courseListModel);
+        CourseListBoxEditor courseEditor = new CourseListBoxEditor();
+        courseEditor.setModel(courseListModel);
+        courseEditor.setOwner(this);
+        setEditor(courseEditor);
     }
 
     void refresh(@NotNull Project project, @NotNull SupportedLanguages programmingLanguage) {

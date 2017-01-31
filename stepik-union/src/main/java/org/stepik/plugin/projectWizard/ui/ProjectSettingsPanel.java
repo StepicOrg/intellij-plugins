@@ -24,8 +24,6 @@ public class ProjectSettingsPanel implements ProjectSetting, HierarchyListener {
     private JLabel userName;
     private JLabel langLabel;
     private LanguageComboBox langComboBox;
-    private JLabel buildLabel;
-    private BuildTypeComboBox buildType;
     private JLabel courseLabel;
     private CourseListBox courseListComboBox;
     private RefreshButton refreshListButton;
@@ -35,7 +33,6 @@ public class ProjectSettingsPanel implements ProjectSetting, HierarchyListener {
 
     public ProjectSettingsPanel(@NotNull Project project, boolean visibleLangBox) {
         this.project = project;
-        buildType.setTarget(this);
         refreshListButton.setTarget(courseListComboBox, project);
         courseListComboBox.setTarget(this);
 
@@ -64,17 +61,6 @@ public class ProjectSettingsPanel implements ProjectSetting, HierarchyListener {
         boolean valid = !selectedCourse.isAdaptive() && selectedCourse.getId() != 0;
         logger.info("Validation is " + valid);
         return valid;
-    }
-
-    @Override
-    public void selectedBuildType(@NotNull BuildType type) {
-        if (type == BuildType.COURSE_LINK) {
-            courseListComboBox.getModel().setSelectedItem("");
-            courseListComboBox.requestFocus(true);
-        }
-        courseListComboBox.setEditable(BuildType.COURSE_LINK == type);
-        courseLabel.setText(type + ":");
-        logger.info("Has selected the build type: " + type);
     }
 
     @Override

@@ -18,7 +18,7 @@ public class LanguageComboBox extends JComboBox<SupportedLanguages> {
         Arrays.stream(SupportedLanguages.values())
                 .filter(language -> language != SupportedLanguages.INVALID)
                 .forEach(this::addItem);
-        setSelectedItem(SupportedLanguages.JAVA);
+        setSelectedItem(SupportedLanguages.JAVA8);
     }
 
     void setTarget(@Nullable ProjectSetting target) {

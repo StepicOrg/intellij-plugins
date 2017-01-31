@@ -12,20 +12,13 @@ import com.intellij.openapi.util.io.FileUtil;
 import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.core.EduNames;
-import com.jetbrains.tmp.learning.core.EduUtils;
 import com.jetbrains.tmp.learning.courseFormat.StepFile;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
-import org.apache.commons.codec.binary.Base64;
 import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.Map;
 
 class StepModuleBuilder extends ModuleBuilderWithSrc {
     private static final Logger logger = Logger.getInstance(StepModuleBuilder.class);
@@ -51,41 +44,25 @@ class StepModuleBuilder extends ModuleBuilderWithSrc {
         return module;
     }
 
-    private void createStepContent() throws IOException {
+    private void createStepContent() {
         StepikProjectManager stepManager = StepikProjectManager.getInstance(project);
         stepNode.setCurrentLang(stepManager.getDefaultLang());
 
         String src = stepManager.getProject().getBasePath() + String.join("/", stepNode.getPath(), EduNames.SRC);
+        createMainFile(stepNode, src);
+    }
 
-        createStepFiles(stepNode, src);
-
+    private void createMainFile(@NotNull StepNode stepNode, @NotNull String src) {
         SupportedLanguages currentLang = stepNode.getCurrentLang();
+        String name = currentLang.getMainFileName();
+        final StepFile stepFile = stepNode.getStepFiles().get(name);
+        final String text = stepFile.getText();
+        final File file = new File(src, name);
 
-        moveFromHide(currentLang.getMainFileName(), src);
-    }
-
-    private void createStepFiles(@NotNull StepNode stepNode, @NotNull String src) {
-        String hide = src + "/" + EduNames.HIDE;
-        for (Map.Entry<String, StepFile> stepFileEntry : stepNode.getStepFiles().entrySet()) {
-            final String name = stepFileEntry.getKey();
-            final StepFile stepFile = stepFileEntry.getValue();
-            final File file = new File(hide, name);
-
-            try {
-                if (EduUtils.isImage(stepFile.getName())) {
-                    FileUtil.writeToFile(file, Base64.decodeBase64(stepFile.getText()));
-                } else {
-                    FileUtil.writeToFile(file, stepFile.getText());
-                }
-            } catch (IOException e) {
-                logger.error("Failed copying file " + file);
-            }
+        try {
+            FileUtil.writeToFile(file, text);
+        } catch (IOException e) {
+            logger.error("Failed create main file: " + file);
         }
-    }
-
-    private void moveFromHide(@NotNull String filename, @NotNull String src) throws IOException {
-        Path source = Paths.get(src, EduNames.HIDE, filename);
-        Path target = Paths.get(src, filename);
-        Files.move(source, target, StandardCopyOption.REPLACE_EXISTING);
     }
 }

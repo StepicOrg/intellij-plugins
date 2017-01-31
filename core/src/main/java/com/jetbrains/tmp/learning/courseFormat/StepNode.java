@@ -17,6 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.jetbrains.tmp.learning.SupportedLanguages.INVALID;
+
 public class StepNode implements StudyNode {
     private StudyStatus status;
     private LessonNode lessonNode;
@@ -79,7 +81,7 @@ public class StepNode implements StudyNode {
             templates.entrySet().forEach(entry -> {
                 SupportedLanguages language = SupportedLanguages.langOf(entry.getKey());
 
-                if (language != SupportedLanguages.INVALID) {
+                if (language != INVALID && !languages.contains(language)) {
                     languages.add(language);
                     StepFile stepFile = new StepFile();
                     stepFile.setName(language.getMainFileName());
@@ -243,8 +245,8 @@ public class StepNode implements StudyNode {
     @NotNull
     public SupportedLanguages getCurrentLang() {
         if (supportedLanguages == null) {
-            currentLang = SupportedLanguages.INVALID;
-        } else if (currentLang == null || currentLang == SupportedLanguages.INVALID || !supportedLanguages.contains(
+            currentLang = INVALID;
+        } else if (currentLang == null || currentLang == INVALID || !supportedLanguages.contains(
                 currentLang)) {
             currentLang = getFirstSupportLang();
         }
@@ -260,7 +262,7 @@ public class StepNode implements StudyNode {
     private SupportedLanguages getFirstSupportLang() {
         List<SupportedLanguages> languages = getSupportedLanguages();
         if (languages.isEmpty()) {
-            return SupportedLanguages.INVALID;
+            return INVALID;
         } else {
             return languages.get(0);
         }

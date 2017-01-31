@@ -28,7 +28,7 @@ import org.stepik.api.objects.courses.Courses;
 @State(name = "StepikStudySettings", storages = @Storage("stepik_study_project.xml"))
 public class StepikProjectManager implements PersistentStateComponent<Element>, DumbAware {
     private static final Logger logger = Logger.getInstance(StepikProjectManager.class);
-    private static final int CURRENT_VERSION = 2;
+    private static final int CURRENT_VERSION = 3;
     private final Project project;
     private CourseNode courseNode;
     private boolean showHint = true;
@@ -48,6 +48,10 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
 
     public static StepikProjectManager getInstance(@NotNull final Project project) {
         return ServiceManager.getService(project, StepikProjectManager.class);
+    }
+
+    public static boolean isStepikProject(@Nullable Project project) {
+        return project != null && getInstance(project).getCourseNode() != null;
     }
 
     @Nullable
@@ -109,9 +113,11 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
             switch (version) {
                 case 1:
                     state = StudySerializationUtils.convertToSecondVersion(state);
+                case 2:
+                    state = StudySerializationUtils.convertToThirdVersion(state);
                     //uncomment for future versions
-                    //case 2:
-                    //state = StudySerializationUtils.Xml.convertToThirdVersion(state);
+                    //case 3:
+                    //state = StudySerializationUtils.convertToFourthVersion(state);
             }
 
             XmlSerializer.deserializeInto(this, state.getChild(StudySerializationUtils.MAIN_ELEMENT));
@@ -191,9 +197,5 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
     @SuppressWarnings("unused")
     public void setCreatedBy(long createdBy) {
         this.createdBy = createdBy;
-    }
-
-    public static boolean isStepikProject(@Nullable Project project) {
-        return project != null && getInstance(project).getCourseNode() != null;
     }
 }

@@ -1,9 +1,6 @@
 package com.jetbrains.tmp.learning.core;
 
-import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
-
-import javax.imageio.ImageIO;
 
 public class EduUtils {
     private EduUtils() {
@@ -25,16 +22,5 @@ public class EduUtils {
         } catch (NumberFormatException e) {
             return -1;
         }
-    }
-
-    public static boolean isImage(@NotNull String fileName) {
-        final String[] readerFormatNames = ImageIO.getReaderFormatNames();
-        for (@NonNls String format : readerFormatNames) {
-            final String ext = format.toLowerCase();
-            if (fileName.endsWith(ext)) {
-                return true;
-            }
-        }
-        return false;
     }
 }
