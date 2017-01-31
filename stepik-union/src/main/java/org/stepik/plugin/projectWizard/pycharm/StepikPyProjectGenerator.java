@@ -217,7 +217,7 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
             for (LessonNode lessonNode : sectionNode.getLessonNodes()) {
                 FileUtil.createDirectory(new File(project.getBasePath(), lessonNode.getPath()));
                 for (StepNode stepNode : lessonNode.getStepNodes()) {
-                    stepNode.setCurrentLang(SupportedLanguages.PYTHON);
+                    stepNode.setCurrentLang(SupportedLanguages.PYTHON3);
                     File stepDir = new File(project.getBasePath(), stepNode.getPath());
                     File srcDir = new File(stepDir, "src");
                     FileUtil.createDirectory(stepDir);
