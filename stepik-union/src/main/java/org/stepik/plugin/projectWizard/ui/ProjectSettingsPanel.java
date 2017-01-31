@@ -36,8 +36,10 @@ public class ProjectSettingsPanel implements ProjectSetting, HierarchyListener {
         refreshListButton.setTarget(courseListComboBox, project);
         courseListComboBox.setTarget(this);
 
+        langComboBox.setTarget(this);
         langComboBox.setVisible(visibleLangBox);
         langLabel.setVisible(visibleLangBox);
+
         mainPanel.addHierarchyListener(this);
     }
 
@@ -51,7 +53,7 @@ public class ProjectSettingsPanel implements ProjectSetting, HierarchyListener {
         StepikConnectorLogin.authentication();
         String username = StepikConnectorLogin.getCurrentUserFullName();
         userName.setText(username);
-        courseListComboBox.refresh(project);
+        courseListComboBox.refresh(project, langComboBox.getSelectedItem());
         logger.info("Updating settings is done");
     }
 
@@ -85,6 +87,11 @@ public class ProjectSettingsPanel implements ProjectSetting, HierarchyListener {
     @Override
     public void removeListener(@NotNull ProjectSettingListener listener) {
         listeners.remove(listener);
+    }
+
+    @Override
+    public void selectedProgrammingLanguage(@NotNull SupportedLanguages language) {
+        courseListComboBox.refresh(project, language);
     }
 
     @NotNull
