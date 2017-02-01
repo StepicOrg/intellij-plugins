@@ -50,7 +50,7 @@ public class StudySerializationUtilsTest {
         }
     }
 
-    @Test(expected = StudySerializationUtils.StudyUnrecognizedFormatException.class)
+    @Test(expected = StudyUnrecognizedFormatException.class)
     public void convertToThirdVersionWithException() throws Exception {
         Element stateVersion2 = readXmlFile("source.xml");
         StudySerializationUtils.convertToThirdVersion(stateVersion2);

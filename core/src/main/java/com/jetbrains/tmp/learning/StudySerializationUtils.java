@@ -380,10 +380,4 @@ class StudySerializationUtils {
                 break;
         }
     }
-
-    static class StudyUnrecognizedFormatException extends Exception {
-        StudyUnrecognizedFormatException(String message) {
-            super(message);
-        }
-    }
 }
