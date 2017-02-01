@@ -13,7 +13,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
-import java.io.InputStream;
 
 import static org.junit.Assert.assertEquals;
 
@@ -26,13 +25,12 @@ public class StudySerializationUtilsTest {
 
     private static Element readXmlFile(@NotNull String filename)
             throws ParserConfigurationException, SAXException, IOException {
-        InputStream file1 = StudySerializationUtilsTest.class.getResourceAsStream(
-                "/com/jetbrains/tmp/learning/StudySerializationUtilsTest/convertToThirdVersion/" + filename);
 
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setValidating(false);
         DocumentBuilder builder = factory.newDocumentBuilder();
-        Document doc = builder.parse(file1);
+        Document doc = builder.parse(StudySerializationUtilsTest.class
+                .getResourceAsStream("convertToThirdVersion/" + filename));
         DOMBuilder domBuilder = new DOMBuilder();
 
         return domBuilder.build(doc).getRootElement();
