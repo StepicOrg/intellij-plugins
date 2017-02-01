@@ -310,10 +310,13 @@ class StudySerializationUtils {
 
         Element courseNodeOption = getFieldWithNameOrNull(stepManager, COURSE_NODE);
         if (courseNodeOption == null) {
-            courseNodeOption = createFieldWithClass(stepManager, COURSE_NODE, COURSE_NODE_CLASS).getParentElement();
+            throw new StudyUnrecognizedFormatException("Field " + COURSE_NODE + " don't found");
         }
 
         Element courseNode = courseNodeOption.getChild(COURSE_NODE_CLASS);
+        if (courseNode == null) {
+            throw new StudyUnrecognizedFormatException("Field " + COURSE_NODE + "is not " + COURSE_NODE_CLASS);
+        }
 
         List<Element> sectionNodes = getListFieldWithNameOrNull(courseNode, SECTIONS_NODES, SECTION_NODE);
         if (sectionNodes == null) {
