@@ -16,6 +16,7 @@ import static com.jetbrains.tmp.learning.SupportedLanguages.CPP_11;
 import static com.jetbrains.tmp.learning.SupportedLanguages.HASKELL;
 import static com.jetbrains.tmp.learning.SupportedLanguages.HASKELL_7_10;
 import static com.jetbrains.tmp.learning.SupportedLanguages.HASKELL_8_0;
+import static com.jetbrains.tmp.learning.SupportedLanguages.JAVA;
 import static com.jetbrains.tmp.learning.SupportedLanguages.JAVA8;
 import static com.jetbrains.tmp.learning.SupportedLanguages.JAVASCRIPT;
 import static com.jetbrains.tmp.learning.SupportedLanguages.MONO_CS;
@@ -42,7 +43,7 @@ public class SupportedLanguagesTest {
             new Pair<>(HASKELL, "haskell"),
             new Pair<>(HASKELL_7_10, "haskell 7.10"),
             new Pair<>(HASKELL_8_0, "haskell 8.0"),
-            new Pair<>(JAVA8, "java"),
+            new Pair<>(JAVA, "java"),
             new Pair<>(JAVA8, "java8"),
             new Pair<>(OCTAVE, "octave"),
             new Pair<>(ASM32, "asm32"),

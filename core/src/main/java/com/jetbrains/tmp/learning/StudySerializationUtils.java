@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -106,18 +107,38 @@ class StudySerializationUtils {
         return null;
     }
 
+    private static List<Element> getListFieldWithNameOrNull(
+            @NotNull Element parent,
+            @NotNull String fieldName,
+            @NotNull String className) {
+        Element child = getFieldWithNameOrNull(parent, fieldName);
+        if (child == null) {
+            return null;
+        }
+
+        List<Element> children = new ArrayList<>();
+        Element list = child.getChild(LIST);
+        if (list == null) {
+            return null;
+        }
+        children.addAll(list.getChildren(className));
+
+        return children;
+    }
+
     @NotNull
     private static List<Element> getListFieldWithName(
             @NotNull Element parent,
             @NotNull String fieldName,
             @NotNull String className)
             throws StudyUnrecognizedFormatException {
-        List<Element> children = new ArrayList<>();
+        List<Element> children = getListFieldWithNameOrNull(parent, fieldName, className);
 
-        Element child = getFieldWithName(parent, fieldName);
-        Element list = child.getChild(LIST);
-        children.addAll(list.getChildren(className));
-
+        if (children == null) {
+            throw new StudyUnrecognizedFormatException(String.format("Can't get a list: not found %s (%s)",
+                    fieldName,
+                    className));
+        }
         return children;
     }
 
@@ -274,48 +295,82 @@ class StudySerializationUtils {
         return dataCourseTag;
     }
 
-    static Element convertToThirdVersion(Element state) throws StudyUnrecognizedFormatException {
+    static Element convertToThirdVersion(@NotNull Element state) throws StudyUnrecognizedFormatException {
         final Element stepManager = state.getChild(MAIN_ELEMENT);
+        if (stepManager == null) {
+            throw new StudyUnrecognizedFormatException("Not found element \" + MAIN_ELEMENT + \"");
+        }
 
-        Element defaultLang = getFieldWithName(stepManager, DEFAULT_LANG);
+        Element defaultLang = getFieldWithNameOrNull(stepManager, DEFAULT_LANG);
+        if (defaultLang == null) {
+            defaultLang = createField(stepManager, DEFAULT_LANG, "invalid");
+        }
         Attribute defaultLangValue = defaultLang.getAttribute(VALUE);
         replaceLanguage(defaultLangValue);
 
-        Element courseNode = getFieldWithName(stepManager, COURSE_NODE).getChild(COURSE_NODE_CLASS);
-        List<Element> sectionNodes = getListFieldWithName(courseNode, SECTIONS_NODES, SECTION_NODE);
-
-        for (Element sectionNode : sectionNodes) {
-            List<Element> lessonNodes = getListFieldWithName(sectionNode, LESSON_NODES, LESSON_NODE);
-            for (Element lessonNode : lessonNodes) {
-                List<Element> stepNodes = getListFieldWithName(lessonNode, STEP_NODES, STEP_NODE);
-                for (Element stepNode : stepNodes) {
-                    Element currentLang = getFieldWithName(stepNode, CURRENT_LANG);
-                    Attribute currentLangValue = currentLang.getAttribute(VALUE);
-                    replaceLanguage(currentLangValue);
-
-                    Element limits = getFieldWithName(stepNode, LIMITS);
-                    Element map = limits.getChild(MAP);
-                    List<Element> entrySet = map.getChildren(ENTRY);
-                    entrySet.forEach(entry -> {
-                        Attribute key = entry.getAttribute(KEY);
-                        replaceLanguage(key);
-                    });
-
-                    Element supportedLanguages = getFieldWithName(stepNode, SUPPORTED_LANGUAGES);
-                    Element list = supportedLanguages.getChild(LIST);
-                    List<Element> items = list.getChildren(OPTION);
-                    items.forEach(item -> {
-                        Attribute value = item.getAttribute(VALUE);
-                        replaceLanguage(value);
-                    });
-                }
-            }
+        Element courseNodeOption = getFieldWithNameOrNull(stepManager, COURSE_NODE);
+        if (courseNodeOption == null) {
+            String message = String.format("Field %s don't found", COURSE_NODE);
+            throw new StudyUnrecognizedFormatException(message);
         }
+
+        Element courseNode = courseNodeOption.getChild(COURSE_NODE_CLASS);
+        if (courseNode == null) {
+            String message = String.format("Field %s is not %s", COURSE_NODE, COURSE_NODE_CLASS);
+            throw new StudyUnrecognizedFormatException(message);
+        }
+
+        List<Element> sectionNodes = getListFieldWithNameOrNull(courseNode, SECTIONS_NODES, SECTION_NODE);
+        if (sectionNodes == null) {
+            return state;
+        }
+        sectionNodes.stream()
+                .map(sectionNode -> getListFieldWithNameOrNull(sectionNode, LESSON_NODES, LESSON_NODE))
+                .filter(Objects::nonNull)
+                .forEach(lessonNodes -> lessonNodes.stream()
+                        .map(lessonNode -> getListFieldWithNameOrNull(lessonNode, STEP_NODES, STEP_NODE))
+                        .filter(Objects::nonNull)
+                        .forEach(stepNodes -> stepNodes.forEach(stepNode -> {
+                                    Element currentLang = getFieldWithNameOrNull(stepNode, CURRENT_LANG);
+                                    if (currentLang != null) {
+                                        Attribute currentLangValue = currentLang.getAttribute(VALUE);
+                                        replaceLanguage(currentLangValue);
+                                    }
+
+                                    Element limits = getFieldWithNameOrNull(stepNode, LIMITS);
+                                    replaceLanguages(limits, MAP, ENTRY, KEY);
+
+                                    Element supportedLanguages;
+                                    supportedLanguages = getFieldWithNameOrNull(stepNode, SUPPORTED_LANGUAGES);
+                                    replaceLanguages(supportedLanguages, LIST, OPTION, VALUE);
+                                })
+                        ));
 
         return state;
     }
 
-    private static void replaceLanguage(Attribute attribute) {
+    private static void replaceLanguages(
+            @Nullable Element collection,
+            @NotNull String collectionType,
+            @NotNull String itemType,
+            @NotNull String valueAttrName) {
+        if (collection != null) {
+            Element items = collection.getChild(collectionType);
+            if (items != null) {
+                List<Element> itemList = items.getChildren(itemType);
+                itemList.forEach(entry -> {
+                    Attribute value = entry.getAttribute(valueAttrName);
+                    replaceLanguage(value);
+                });
+            }
+        }
+    }
+
+    private static void replaceLanguage(@Nullable Attribute attribute) {
+        if (attribute == null) {
+            return;
+        }
+
         switch (attribute.getValue()) {
             case "java8":
                 attribute.setValue("Java 8");
@@ -323,12 +378,6 @@ class StudySerializationUtils {
             case "python3":
                 attribute.setValue("Python 3");
                 break;
-        }
-    }
-
-    static class StudyUnrecognizedFormatException extends Exception {
-        StudyUnrecognizedFormatException(String message) {
-            super(message);
         }
     }
 }

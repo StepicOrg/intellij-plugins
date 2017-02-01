@@ -122,8 +122,9 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
 
             XmlSerializer.deserializeInto(this, state.getChild(StudySerializationUtils.MAIN_ELEMENT));
             this.version = CURRENT_VERSION;
-        } catch (StudySerializationUtils.StudyUnrecognizedFormatException e) {
+        } catch (StudyUnrecognizedFormatException e) {
             logger.warn("Failed deserialization StepikProjectManager \n" + e.getMessage() + "\n" + project);
+            return;
         }
 
         refreshCourse();
