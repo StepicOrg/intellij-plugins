@@ -31,7 +31,7 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
     private static final int CURRENT_VERSION = 3;
     private final Project project;
     private CourseNode courseNode;
-    private boolean showHint = true;
+    private boolean showHint = false;
     private long createdBy;
     private SupportedLanguages defaultLang = SupportedLanguages.INVALID;
     private int version = CURRENT_VERSION;

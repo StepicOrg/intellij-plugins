@@ -1,8 +1,6 @@
 package org.stepik.plugin.utils;
 
-import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.application.impl.ApplicationImpl;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
@@ -19,8 +17,8 @@ import java.util.Arrays;
 public class DirectivesUtils {
     private static final String START_DIRECTIVE = "Stepik code: start";
     private static final String END_DIRECTIVE = "Stepik code: end";
-    private static final String START_HINT = "Please note, only the code below will be sent to Stepik.org";
-    private static final String END_HINT = "Please note, only the code above will be sent to Stepik.org";
+    private static final String START_HINT = "Please note, only the code BELOW will be sent to Stepik.org";
+    private static final String END_HINT = "Please note, only the code ABOVE will be sent to Stepik.org";
 
     private static final String MESSAGE = "Do you want to remove Stepik directives and external code?\n" +
             "You can undo this action using \"ctrl + Z\".";
