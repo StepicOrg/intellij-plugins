@@ -3,15 +3,22 @@
     <name>Stepik Union</name>
     <version>SNAPSHOT</version>
     <idea-version since-build="163.7743.44"/>
-    <vendor email="petr.bogdanov@stepik.org" url="http://www.stepik.org">Stepik</vendor>
+    <vendor email="plugin@stepik.org" url="https://stepik.org">Stepik</vendor>
 
     <description><![CDATA[
-      Stepik plugin for code challenges on Python and Java.<br>
+      Stepik plugin for code challenges on Python, Java, asm, C, C++, Clojure, Haskell, JavaScript, Mono C#, Octave, R, Ruby, Rust, Shell, Scala.<br>
 
       To uses this plugin you have to have Stepik account and follow the course.<br>
       <br>
-      Optional dependency:<br>
-      Python plugin<br>
+      Optional plugins:<br>
+      Python<br>
+      Clojure-Kit<br>
+      Haskell<br>
+      Scala<br>
+      BashSupport<br>
+      Ruby<br>
+      Rust<br>
+      R Language Support<br>
 
     ]]></description>
 
