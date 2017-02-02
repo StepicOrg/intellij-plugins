@@ -34,7 +34,12 @@ public class ProgrammingLanguageUtils {
 
         SupportedLanguages currentLang = targetStepNode.getCurrentLang();
 
-        if (currentLang == language || currentLang.getMainFileName().equals(language.getMainFileName())) {
+        if (currentLang == language) {
+            return;
+        }
+
+        if (currentLang.getMainFileName().equals(language.getMainFileName())) {
+            targetStepNode.setCurrentLang(language);
             return;
         }
 
