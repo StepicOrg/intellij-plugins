@@ -1,6 +1,7 @@
 package org.stepik.plugin.projectWizard.ui;
 
 import com.intellij.openapi.project.Project;
+import com.jetbrains.tmp.learning.SupportedLanguages;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.objects.courses.Course;
@@ -14,15 +15,25 @@ import java.awt.event.ItemEvent;
 public class CourseListBox extends JComboBox<Course> {
     private final CourseListModel courseListModel;
     private ProjectSetting target;
+    private SupportedLanguages programmingLanguage = SupportedLanguages.INVALID;
 
     public CourseListBox() {
         super();
         courseListModel = new CourseListModel();
         setModel(courseListModel);
+        CourseListBoxEditor courseEditor = new CourseListBoxEditor();
+        courseEditor.setModel(courseListModel);
+        courseEditor.setOwner(this);
+        setEditor(courseEditor);
+    }
+
+    void refresh(@NotNull Project project, @NotNull SupportedLanguages programmingLanguage) {
+        this.programmingLanguage = programmingLanguage;
+        courseListModel.update(project, programmingLanguage);
     }
 
     void refresh(@NotNull Project project) {
-        courseListModel.update(project);
+        courseListModel.update(project, programmingLanguage);
     }
 
     void setTarget(@Nullable ProjectSetting target) {

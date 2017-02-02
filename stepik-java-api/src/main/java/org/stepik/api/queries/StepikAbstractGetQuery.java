@@ -11,6 +11,7 @@ import org.stepik.api.objects.AbstractObjectWithStringId;
 import org.stepik.api.objects.ObjectsContainer;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -87,22 +88,23 @@ public abstract class StepikAbstractGetQuery<T extends StepikAbstractGetQuery, R
             for (String id : ids) {
                 Path file = courseCache.resolve(id + JSON_EXTENSION);
                 if (Files.exists(file)) {
-                    Object item = null;
-                    try {
-                        String text = Utils.readFile(file);
-                        //noinspection unchecked
-                        item = getJsonConverter().fromJson(text, items.getItemClass());
-                    } catch (JsonSyntaxException ignored) {
-                    }
-
                     long updateFileTime = file.toFile().lastModified();
                     long currentTime = new Date().getTime();
 
                     long diff = currentTime - updateFileTime;
                     if (diff > 0 && diff <= getCacheLifeTime()) {
-                        //noinspection unchecked
-                        items.getItems().add(item);
-                        continue;
+                        Object item = null;
+                        try {
+                            String text = Utils.readFile(file);
+                            //noinspection unchecked
+                            item = getJsonConverter().fromJson(text, items.getItemClass());
+                        } catch (JsonSyntaxException ignored) {
+                        }
+                        if (item != null) {
+                            //noinspection unchecked
+                            items.getItems().add(item);
+                            continue;
+                        }
                     }
                 }
 
@@ -137,8 +139,8 @@ public abstract class StepikAbstractGetQuery<T extends StepikAbstractGetQuery, R
 
         try {
             Files.createDirectories(courseCache.getParent());
-            Files.write(courseCache, getJsonConverter().toJson(item).getBytes(),
-                    StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+            byte[] content = getJsonConverter().toJson(item).getBytes(StandardCharsets.UTF_8);
+            Files.write(courseCache, content, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
         } catch (IOException ignored) {
         }
     }

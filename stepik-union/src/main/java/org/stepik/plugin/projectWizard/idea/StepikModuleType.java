@@ -17,6 +17,8 @@ import org.jetbrains.jps.model.java.JavaModuleSourceRootTypes;
 
 import javax.swing.*;
 
+import static org.stepik.plugin.projectWizard.ProjectWizardUtils.findNonExistingFileName;
+
 public class StepikModuleType extends ModuleType<CourseModuleBuilder> {
     static final String MODULE_NAME = "Stepik";
     static final StepikModuleType STEPIK_MODULE_TYPE;
@@ -88,5 +90,21 @@ public class StepikModuleType extends ModuleType<CourseModuleBuilder> {
     @Override
     public boolean isValidSdk(@NotNull final Module module, final Sdk projectSdk) {
         return isValidJavaSdk(module);
+    }
+
+    @Nullable
+    @Override
+    public ModuleWizardStep modifySettingsStep(
+            @NotNull SettingsStep settingsStep, @NotNull ModuleBuilder moduleBuilder) {
+        JTextField nameField = settingsStep.getModuleNameField();
+        if (nameField != null) {
+            CourseModuleBuilder courseModuleBuilder = (CourseModuleBuilder) moduleBuilder;
+            long id = courseModuleBuilder.getWizardStep().getSelectedCourse().getId();
+            String projectName = "course" + id;
+            String projectDir = settingsStep.getContext().getProjectFileDirectory();
+            projectName = findNonExistingFileName(projectDir, projectName);
+            nameField.setText(projectName);
+        }
+        return null;
     }
 }

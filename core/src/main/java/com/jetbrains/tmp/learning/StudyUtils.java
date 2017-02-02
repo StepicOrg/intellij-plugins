@@ -42,7 +42,6 @@ import java.util.regex.Pattern;
 
 public class StudyUtils {
     private static final Logger logger = Logger.getInstance(StudyUtils.class.getName());
-    private static final String EMPTY_STEP_TEXT = "Please, open any step to see step description";
     private static Pattern stepPathPattern;
 
     private StudyUtils() {
@@ -51,12 +50,8 @@ public class StudyUtils {
     public static void updateToolWindows(@NotNull final Project project) {
         final StudyToolWindow studyToolWindow = getStudyToolWindow(project);
         if (studyToolWindow != null) {
-            String stepText = getStepText(project);
-            if (stepText != null) {
-                studyToolWindow.setStepText(stepText);
-            } else {
-                logger.warn("StepNode text is null");
-            }
+            StepNode stepNode = getSelectedStep(project);
+            studyToolWindow.setStepNode(stepNode);
         }
     }
 
@@ -146,7 +141,7 @@ public class StudyUtils {
 
     @Nullable
     @Contract("null -> null")
-    static String getStepTextFromStep(@Nullable final StepNode stepNode) {
+    public static String getStepTextFromStep(@Nullable final StepNode stepNode) {
         if (stepNode == null) {
             return null;
         }
@@ -209,15 +204,6 @@ public class StudyUtils {
         return null;
     }
 
-    @Nullable
-    public static String getStepText(@NotNull final Project project) {
-        final StepNode stepNode = getSelectedStep(project);
-        if (stepNode != null) {
-            return getStepTextFromStep(stepNode);
-        }
-        return EMPTY_STEP_TEXT;
-    }
-
     private static String getRelativePath(@NotNull Project project, @NotNull VirtualFile item) {
         String path = item.getPath();
         String basePath = project.getBasePath();
@@ -244,7 +230,7 @@ public class StudyUtils {
         Project studyProject = null;
         Project[] openProjects = ProjectManager.getInstance().getOpenProjects();
         for (Project project : openProjects) {
-            if (StepikProjectManager.getInstance(project).getCourseNode() != null) {
+            if (StepikProjectManager.isStepikProject(project)) {
                 studyProject = project;
                 break;
             }
@@ -267,7 +253,7 @@ public class StudyUtils {
     }
 
     @Nullable
-    static StepNode getStep(@NotNull Project project, @NotNull VirtualFile stepVF) {
+    public static StepNode getStep(@NotNull Project project, @NotNull VirtualFile stepVF) {
         String path = getRelativePath(project, stepVF);
         if (stepPathPattern == null) {
             stepPathPattern = Pattern.compile("^(section[0-9]+)/(lesson[0-9]+)/(step[0-9]+)/src/.*");

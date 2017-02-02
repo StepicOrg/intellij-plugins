@@ -52,7 +52,7 @@ public class DirectivesUtilsTest {
             String testName = JAVA + i;
             String test = testsMap.get(testName);
             Assert.assertNotNull(NOT_FOUND + testName, test);
-            res.put(i, DirectivesUtils.getTextUnderDirectives(test.split("\n"), SupportedLanguages.JAVA));
+            res.put(i, DirectivesUtils.getTextUnderDirectives(test.split("\n"), SupportedLanguages.JAVA8));
             Assert.assertEquals(testsMap.get(JAVA + 1), res.get(i));
         }
 
@@ -65,7 +65,7 @@ public class DirectivesUtilsTest {
             String testName = PYTHON + i;
             String test = testsMap.get(testName);
             Assert.assertNotNull(NOT_FOUND + testName, test);
-            res.put(i, DirectivesUtils.getTextUnderDirectives(test.split("\n"), SupportedLanguages.PYTHON));
+            res.put(i, DirectivesUtils.getTextUnderDirectives(test.split("\n"), SupportedLanguages.PYTHON3));
             Assert.assertEquals(testsMap.get(PYTHON + 1), res.get(i));
         }
 

@@ -10,47 +10,37 @@ import org.stepik.plugin.projectWizard.StepikProjectGenerator;
 import org.stepik.plugin.utils.Utils;
 
 import javax.swing.*;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProjectSettingsPanel implements ProjectSetting {
+public class ProjectSettingsPanel implements ProjectSetting, HierarchyListener {
     private static final Logger logger = Logger.getInstance(ProjectSettingsPanel.class);
     private final Project project;
     private final List<ProjectSettingListener> listeners = new ArrayList<>();
-    @SuppressWarnings("unused")
     private JPanel mainPanel;
-    @SuppressWarnings("unused")
     private JLabel nameLabel;
-    @SuppressWarnings("unused")
     private JLabel userName;
-    @SuppressWarnings("unused")
     private JLabel langLabel;
-    @SuppressWarnings("unused")
     private LanguageComboBox langComboBox;
-    @SuppressWarnings("unused")
-    private JLabel buildLabel;
-    @SuppressWarnings("unused")
-    private BuildTypeComboBox buildType;
-    @SuppressWarnings("unused")
     private JLabel courseLabel;
-    @SuppressWarnings("unused")
     private CourseListBox courseListComboBox;
-    @SuppressWarnings("unused")
     private RefreshButton refreshListButton;
-    @SuppressWarnings("unused")
     private CourseDescriptionPane courseListDescription;
-    @SuppressWarnings("unused")
     private JScrollPane scrollPane;
     private Course selectedCourse = StepikProjectGenerator.EMPTY_COURSE;
 
     public ProjectSettingsPanel(@NotNull Project project, boolean visibleLangBox) {
         this.project = project;
-        buildType.setTarget(this);
         refreshListButton.setTarget(courseListComboBox, project);
         courseListComboBox.setTarget(this);
 
+        langComboBox.setTarget(this);
         langComboBox.setVisible(visibleLangBox);
         langLabel.setVisible(visibleLangBox);
+
+        mainPanel.addHierarchyListener(this);
     }
 
     @NotNull
@@ -63,7 +53,7 @@ public class ProjectSettingsPanel implements ProjectSetting {
         StepikConnectorLogin.authentication();
         String username = StepikConnectorLogin.getCurrentUserFullName();
         userName.setText(username);
-        courseListComboBox.refresh(project);
+        courseListComboBox.refresh(project, langComboBox.getSelectedItem());
         logger.info("Updating settings is done");
     }
 
@@ -71,17 +61,6 @@ public class ProjectSettingsPanel implements ProjectSetting {
         boolean valid = !selectedCourse.isAdaptive() && selectedCourse.getId() != 0;
         logger.info("Validation is " + valid);
         return valid;
-    }
-
-    @Override
-    public void selectedBuildType(@NotNull BuildType type) {
-        if (type == BuildType.COURSE_LINK) {
-            courseListComboBox.getModel().setSelectedItem("");
-            courseListComboBox.requestFocus(true);
-        }
-        courseListComboBox.setEditable(BuildType.COURSE_LINK == type);
-        courseLabel.setText(type + ":");
-        logger.info("Has selected the build type: " + type);
     }
 
     @Override
@@ -110,6 +89,11 @@ public class ProjectSettingsPanel implements ProjectSetting {
         listeners.remove(listener);
     }
 
+    @Override
+    public void selectedProgrammingLanguage(@NotNull SupportedLanguages language) {
+        courseListComboBox.refresh(project, language);
+    }
+
     @NotNull
     public SupportedLanguages getLanguage() {
         return langComboBox.getSelectedItem();
@@ -122,5 +106,10 @@ public class ProjectSettingsPanel implements ProjectSetting {
     @NotNull
     public Course getSelectedCourse() {
         return selectedCourse;
+    }
+
+    @Override
+    public void hierarchyChanged(HierarchyEvent e) {
+        notifyListeners();
     }
 }

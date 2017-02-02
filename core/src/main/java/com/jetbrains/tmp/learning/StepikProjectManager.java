@@ -28,10 +28,10 @@ import org.stepik.api.objects.courses.Courses;
 @State(name = "StepikStudySettings", storages = @Storage("stepik_study_project.xml"))
 public class StepikProjectManager implements PersistentStateComponent<Element>, DumbAware {
     private static final Logger logger = Logger.getInstance(StepikProjectManager.class);
-    private static final int CURRENT_VERSION = 2;
+    private static final int CURRENT_VERSION = 3;
     private final Project project;
     private CourseNode courseNode;
-    private boolean showHint = true;
+    private boolean showHint = false;
     private long createdBy;
     private SupportedLanguages defaultLang = SupportedLanguages.INVALID;
     private int version = CURRENT_VERSION;
@@ -48,6 +48,10 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
 
     public static StepikProjectManager getInstance(@NotNull final Project project) {
         return ServiceManager.getService(project, StepikProjectManager.class);
+    }
+
+    public static boolean isStepikProject(@Nullable Project project) {
+        return project != null && getInstance(project).getCourseNode() != null;
     }
 
     @Nullable
@@ -87,9 +91,11 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
     }
 
     @Nullable
-
     @Override
     public Element getState() {
+        if (courseNode == null) {
+            return null;
+        }
         Element el = new Element("stepikProjectManager");
         Element courseElement = new Element(StudySerializationUtils.MAIN_ELEMENT);
         XmlSerializer.serializeInto(this, courseElement);
@@ -107,15 +113,18 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
             switch (version) {
                 case 1:
                     state = StudySerializationUtils.convertToSecondVersion(state);
+                case 2:
+                    state = StudySerializationUtils.convertToThirdVersion(state);
                     //uncomment for future versions
-                    //case 2:
-                    //state = StudySerializationUtils.Xml.convertToThirdVersion(state);
+                    //case 3:
+                    //state = StudySerializationUtils.convertToFourthVersion(state);
             }
 
             XmlSerializer.deserializeInto(this, state.getChild(StudySerializationUtils.MAIN_ELEMENT));
             this.version = CURRENT_VERSION;
-        } catch (StudySerializationUtils.StudyUnrecognizedFormatException e) {
+        } catch (StudyUnrecognizedFormatException e) {
             logger.warn("Failed deserialization StepikProjectManager \n" + e.getMessage() + "\n" + project);
+            return;
         }
 
         refreshCourse();

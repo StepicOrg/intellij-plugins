@@ -1,0 +1,41 @@
+<!-- state version 2 | Repair replaceLanguage into supportedLanguages -->
+<component name="StepikStudySettings">
+    <StepikProjectManager>
+        <option name="defaultLang" value="invalid"/>
+        <option name="courseNode">
+            <CourseNode>
+                <option name="sectionNodes">
+                    <list>
+                        <SectionNode>
+                            <option name="lessonNodes">
+                                <list>
+                                    <LessonNode>
+                                        <option name="stepNodes">
+                                            <list>
+                                                <StepNode>
+                                                    <option name="currentLang" value="Java 8"/>
+                                                    <option name="limits">
+                                                        <map>
+                                                            <entry key="Java 8"/>
+                                                            <entry key="Python 3"/>
+                                                        </map>
+                                                    </option>
+                                                    <option name="supportedLanguages">
+                                                        <list>
+                                                            <option value="Java 8"/>
+                                                            <option value="Python 3"/>
+                                                        </list>
+                                                    </option>
+                                                </StepNode>
+                                            </list>
+                                        </option>
+                                    </LessonNode>
+                                </list>
+                            </option>
+                        </SectionNode>
+                    </list>
+                </option>
+            </CourseNode>
+        </option>
+    </StepikProjectManager>
+</component>

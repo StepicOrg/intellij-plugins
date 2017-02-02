@@ -11,14 +11,21 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.stepik.plugin.utils.ProjectPsiFilesUtils.isNotMovableOrRenameElement;
 
 /**
  * @author meanmail
  */
-public class StepikSafeDeleteProcessorDelegate extends SafeDeleteProcessorDelegateBase {
+public abstract class AbstractSafeDeleteProcessorDelegate extends SafeDeleteProcessorDelegateBase {
+    private final Set<Class<? extends PsiElement>> acceptableClasses = new HashSet<>();
+
+    protected void addAcceptableClasses(@NotNull Set<Class<? extends PsiElement>> classes) {
+        acceptableClasses.addAll(classes);
+    }
 
     @Nullable
     @Override
@@ -31,7 +38,7 @@ public class StepikSafeDeleteProcessorDelegate extends SafeDeleteProcessorDelega
 
     @Override
     public boolean handlesElement(PsiElement element) {
-        return isNotMovableOrRenameElement(element);
+        return isNotMovableOrRenameElement(element, acceptableClasses);
     }
 
     @Nullable

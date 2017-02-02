@@ -6,6 +6,7 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.tmp.learning.SupportedLanguages;
@@ -16,16 +17,18 @@ import java.util.Arrays;
 public class DirectivesUtils {
     private static final String START_DIRECTIVE = "Stepik code: start";
     private static final String END_DIRECTIVE = "Stepik code: end";
-    private static final String START_HINT = "Please note, only the code below will be sent to Stepik.org";
-    private static final String END_HINT = "Please note, only the code above will be sent to Stepik.org";
+    private static final String START_HINT = "Please note, only the code BELOW will be sent to Stepik.org";
+    private static final String END_HINT = "Please note, only the code ABOVE will be sent to Stepik.org";
 
     private static final String MESSAGE = "Do you want to remove Stepik directives and external code?\n" +
             "You can undo this action using \"ctrl + Z\".";
 
     @NotNull
     public static String[] getFileText(@NotNull VirtualFile vf) {
-        Document document = FileDocumentManager.getInstance().getDocument(vf);
-        return document != null ? document.getText().split("\n") : new String[0];
+        return ApplicationManager.getApplication().runReadAction((Computable<String[]>) () -> {
+            Document document = FileDocumentManager.getInstance().getDocument(vf);
+            return document != null ? document.getText().split("\n") : new String[0];
+        });
     }
 
     @NotNull

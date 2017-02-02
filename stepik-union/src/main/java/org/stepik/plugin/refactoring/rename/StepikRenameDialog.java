@@ -10,14 +10,15 @@ import org.jetbrains.annotations.Nullable;
 /**
  * @author meanmail
  */
-public class StepikRenameDialog extends RenameDialog {
+class StepikRenameDialog extends RenameDialog {
 
     private static final String MESSAGE = "Don't make any changes to the structure of the project tree, it might become defective.";
 
-    public StepikRenameDialog(
+    StepikRenameDialog(
             @NotNull Project project,
             @NotNull PsiElement psiElement,
-            @Nullable PsiElement nameSuggestionContext, Editor editor) {
+            @Nullable PsiElement nameSuggestionContext,
+            Editor editor) {
         super(project, psiElement, nameSuggestionContext, editor);
     }
 

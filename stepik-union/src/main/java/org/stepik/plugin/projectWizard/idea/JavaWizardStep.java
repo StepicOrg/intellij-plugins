@@ -87,4 +87,8 @@ class JavaWizardStep extends ModuleWizardStep {
         logger.info(String.format("Leaving step the project wizard with the selected course: id = %s, name = %s",
                 id, selectedCourse.getTitle()));
     }
+
+    Course getSelectedCourse() {
+        return panel.getSelectedCourse();
+    }
 }

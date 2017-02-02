@@ -21,7 +21,7 @@ class PyCharmWizardStep implements ProjectSettingListener {
         this.generator = generator;
         panel = new ProjectSettingsPanel(project, false);
         panel.addListener(this);
-        panel.setLanguage(SupportedLanguages.PYTHON);
+        panel.setLanguage(SupportedLanguages.PYTHON3);
     }
 
     @NotNull

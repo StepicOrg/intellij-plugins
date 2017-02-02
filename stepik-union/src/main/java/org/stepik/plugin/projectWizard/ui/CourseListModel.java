@@ -1,6 +1,7 @@
 package org.stepik.plugin.projectWizard.ui;
 
 import com.intellij.openapi.project.Project;
+import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -14,6 +15,7 @@ import javax.swing.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author meanmail
@@ -37,21 +39,21 @@ class CourseListModel extends AbstractListModel<Course> implements ComboBoxModel
         }
     }
 
-    void update(@NotNull Project project) {
-        List<Course> newCourseList = StepikProjectGenerator.getCoursesUnderProgress(project);
-        Object currentSelectedCourse = getSelectedItem();
+    void update(@NotNull Project project, @NotNull SupportedLanguages programmingLanguage) {
+        List<Course> newCourseList = StepikProjectGenerator.getCoursesUnderProgress(project, programmingLanguage);
+        Course selectedCourse = getSelectedItem();
         courses.clear();
 
         if (newCourseList.size() > 0) {
             courses.addAll(newCourseList);
-            if (currentSelectedCourse == StepikProjectGenerator.EMPTY_COURSE) {
-                currentSelectedCourse = courses.get(0);
+            if (selectedCourse == StepikProjectGenerator.EMPTY_COURSE || !courses.contains(selectedCourse)) {
+                selectedCourse = courses.get(0);
             }
         } else {
             courses.add(StepikProjectGenerator.EMPTY_COURSE);
         }
 
-        setSelectedItem(currentSelectedCourse);
+        setSelectedItem(selectedCourse);
         fireIntervalAdded(this, 0, getSize() - 1);
     }
 
@@ -76,6 +78,16 @@ class CourseListModel extends AbstractListModel<Course> implements ComboBoxModel
 
     @NotNull
     private Object getCourse(@NotNull String link) {
+        final String finalLink = link.toLowerCase();
+
+        List<Course> filteredCourses = courses.stream()
+                .filter(course -> course.getTitle().toLowerCase().equals(finalLink))
+                .collect(Collectors.toList());
+
+        if (filteredCourses.size() > 0) {
+            return filteredCourses.get(0);
+        }
+
         int courseId = Utils.getCourseIdFromLink(link);
 
         StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
@@ -100,5 +112,9 @@ class CourseListModel extends AbstractListModel<Course> implements ComboBoxModel
         }
 
         return course;
+    }
+
+    public List<Course> getCourses() {
+        return courses;
     }
 }

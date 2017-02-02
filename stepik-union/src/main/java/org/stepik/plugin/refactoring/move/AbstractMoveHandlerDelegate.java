@@ -6,12 +6,15 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFileSystemItem;
 import com.intellij.refactoring.move.MoveCallback;
 import com.intellij.refactoring.move.MoveHandlerDelegate;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.plugin.utils.ProjectPsiFilesUtils;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.stepik.plugin.utils.ProjectPsiFilesUtils.isCanNotBeTarget;
@@ -20,10 +23,16 @@ import static org.stepik.plugin.utils.ProjectPsiFilesUtils.isNotMovableOrRenameE
 /**
  * @author meanmail
  */
-public class StepikMoveHandlerDelegate extends MoveHandlerDelegate {
+public abstract class AbstractMoveHandlerDelegate extends MoveHandlerDelegate {
+    private final Set<Class<? extends PsiElement>> acceptableClasses = new HashSet<>();
+
+    protected void addAcceptableClasses(@NotNull Set<Class<? extends PsiElement>> classes) {
+        acceptableClasses.addAll(classes);
+    }
+
     @Override
     public boolean isMoveRedundant(PsiElement source, PsiElement target) {
-        return isNotMovableOrRenameElement(source) || isCanNotBeTarget(target);
+        return isNotMovableOrRenameElement(source, acceptableClasses) || isCanNotBeTarget(target, acceptableClasses);
     }
 
     @Override
@@ -34,12 +43,12 @@ public class StepikMoveHandlerDelegate extends MoveHandlerDelegate {
     @Override
     public boolean isValidTarget(@Nullable PsiElement target, PsiElement[] sources) {
         for (PsiElement source : sources) {
-            if (isNotMovableOrRenameElement(source)) {
+            if (isNotMovableOrRenameElement(source, acceptableClasses)) {
                 return true;
             }
         }
 
-        return isCanNotBeTarget(target);
+        return isCanNotBeTarget(target, acceptableClasses);
     }
 
     @Override
@@ -49,7 +58,7 @@ public class StepikMoveHandlerDelegate extends MoveHandlerDelegate {
             @Nullable PsiElement targetContainer,
             @Nullable MoveCallback callback) {
         List<PsiFileSystemItem> sources = Arrays.stream(elements)
-                .filter(ProjectPsiFilesUtils::isNotMovableOrRenameElement)
+                .filter(psiElement -> isNotMovableOrRenameElement(psiElement, acceptableClasses))
                 .map(ProjectPsiFilesUtils::getFile)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());

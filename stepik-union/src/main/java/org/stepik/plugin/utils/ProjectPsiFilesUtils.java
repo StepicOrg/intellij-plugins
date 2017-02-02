@@ -1,7 +1,6 @@
 package org.stepik.plugin.utils;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFileSystemItem;
 import com.jetbrains.tmp.learning.StepikProjectManager;
@@ -9,6 +8,8 @@ import com.jetbrains.tmp.learning.courseFormat.CourseNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.core.utils.ProjectFilesUtils;
+
+import java.util.Set;
 
 /**
  * @author meanmail
@@ -26,18 +27,19 @@ public class ProjectPsiFilesUtils {
         return item;
     }
 
-    public static boolean isCanNotBeTarget(@Nullable PsiElement target) {
+    public static boolean isCanNotBeTarget(
+            @Nullable PsiElement target,
+            @NotNull Set<Class<? extends PsiElement>> acceptableClasses) {
         if (target == null) {
             return false;
         }
 
         Project project = target.getProject();
-        final CourseNode courseNode = StepikProjectManager.getInstance(project).getCourseNode();
-        if (courseNode == null) {
+        if (!StepikProjectManager.isStepikProject(project)) {
             return false;
         }
 
-        if (!(target instanceof PsiFileSystemItem || target instanceof PsiClass)) {
+        if (notAccept(target, acceptableClasses)) {
             return false;
         }
 
@@ -52,6 +54,17 @@ public class ProjectPsiFilesUtils {
         return ProjectFilesUtils.isCanNotBeTarget(targetPath);
     }
 
+    private static boolean notAccept(
+            @NotNull PsiElement target,
+            @NotNull Set<Class<? extends PsiElement>> acceptableClasses) {
+        for (Class<? extends PsiElement> clazz : acceptableClasses) {
+            if (clazz.isInstance(target)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     @NotNull
     static String getRelativePath(@NotNull PsiFileSystemItem item) {
         String path = item.getVirtualFile().getPath();
@@ -62,15 +75,19 @@ public class ProjectPsiFilesUtils {
         return ProjectFilesUtils.getRelativePath(projectPath, path);
     }
 
-    public static boolean isNotMovableOrRenameElement(@NotNull PsiElement element) {
-        if (!(element instanceof PsiFileSystemItem || element instanceof PsiClass)) {
-            return false;
-        }
+    public static boolean isNotMovableOrRenameElement(
+            @NotNull PsiElement element,
+            @NotNull Set<Class<? extends PsiElement>> acceptableClasses) {
         Project project = element.getProject();
         CourseNode courseNode = StepikProjectManager.getInstance(project).getCourseNode();
         if (courseNode == null) {
             return false;
         }
+
+        if (notAccept(element, acceptableClasses)) {
+            return false;
+        }
+
         PsiFileSystemItem file = getFile(element);
         if (file == null) {
             return false;

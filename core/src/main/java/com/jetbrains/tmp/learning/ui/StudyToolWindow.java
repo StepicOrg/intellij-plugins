@@ -6,6 +6,7 @@ import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.DataProvider;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.project.Project;
@@ -13,43 +14,51 @@ import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.ui.JBCardLayout;
 import com.intellij.ui.OnePixelSplitter;
 import com.intellij.util.ui.JBUI;
+import com.intellij.util.ui.components.BorderLayoutPanel;
 import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.StudyBasePluginConfigurator;
 import com.jetbrains.tmp.learning.StudyPluginConfigurator;
 import com.jetbrains.tmp.learning.StudyUtils;
-import com.jetbrains.tmp.learning.courseFormat.CourseNode;
+import com.jetbrains.tmp.learning.SupportedLanguages;
+import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.stepik.core.utils.ProgrammingLanguageUtils;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Comparator;
 import java.util.Map;
 
-public abstract class StudyToolWindow extends SimpleToolWindowPanel implements DataProvider, Disposable {
+public abstract class StudyToolWindow extends SimpleToolWindowPanel implements DataProvider, Disposable, ActionListener {
     private static final Logger logger = Logger.getInstance(StudyToolWindow.class);
     private static final String STEP_INFO_ID = "stepInfo";
     private static final String EMPTY_STEP_TEXT = "Please, open any step to see step description";
+    private final JComboBox<SupportedLanguages> languageBox;
 
     private final JBCardLayout cardLayout;
     private final JPanel contentPanel;
     private final OnePixelSplitter splitPane;
+    private Project project;
+    private StepNode stepNode;
 
     StudyToolWindow() {
         super(true, true);
         cardLayout = new JBCardLayout();
         contentPanel = new JPanel(cardLayout);
         splitPane = new OnePixelSplitter(myVertical = true);
+        languageBox = new JComboBox<>();
+        languageBox.setVisible(false);
+        languageBox.addActionListener(this);
     }
 
-    private static JPanel createToolbarPanel(ActionGroup group) {
-        final ActionToolbar actionToolBar = ActionManager.getInstance().createActionToolbar("Study", group, true);
-        return JBUI.Panels.simplePanel(actionToolBar.getComponent());
-    }
-
+    @NotNull
     private static DefaultActionGroup getActionGroup(@NotNull final Project project) {
         DefaultActionGroup group = new DefaultActionGroup();
-        CourseNode courseNode = StepikProjectManager.getInstance(project).getCourseNode();
-        if (courseNode == null) {
-            logger.warn("CourseNode is null");
+        if (!StepikProjectManager.isStepikProject(project)) {
+            logger.warn(project.getName() + " is not Stepik-project");
             return group;
         }
         StudyPluginConfigurator configurator = StudyUtils.getConfigurator(project);
@@ -62,13 +71,15 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
         }
     }
 
-    void init(@NotNull final Project project) {
-        String stepText = StudyUtils.getStepText(project);
-        if (stepText == null) {
-            logger.warn("step text is empty");
-            return;
-        }
+    private JPanel createToolbarPanel(ActionGroup group) {
+        final ActionToolbar actionToolBar = ActionManager.getInstance().createActionToolbar("Study", group, true);
+        BorderLayoutPanel toolBar = JBUI.Panels.simplePanel(actionToolBar.getComponent());
+        toolBar.addToRight(languageBox);
+        return toolBar;
+    }
 
+    void init(@NotNull final Project project) {
+        this.project = project;
         final DefaultActionGroup group = getActionGroup(project);
         setActionToolbar(group);
 
@@ -89,7 +100,9 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
             final FileEditorManagerListener listener = configurator.getFileEditorManagerListener(project, this);
             project.getMessageBus().connect().subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, listener);
         }
-        setStepText(stepText);
+
+        StepNode stepNode = StudyUtils.getSelectedStep(project);
+        setStepNode(stepNode);
     }
 
     private void setActionToolbar(DefaultActionGroup group) {
@@ -112,13 +125,51 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
 
     public abstract JComponent createStepInfoPanel(Project project);
 
-    public void setStepText(String text) {
+    public void setStepNode(@Nullable StepNode stepNode) {
+        if (this.stepNode == stepNode) {
+            return;
+        }
+
+        this.stepNode = stepNode;
+        languageBox.removeAllItems();
+        languageBox.setVisible(stepNode != null);
+
+        if (stepNode == null) {
+            setText(EMPTY_STEP_TEXT);
+            return;
+        }
+
+        String text = StudyUtils.getStepTextFromStep(stepNode);
+        if (text == null) {
+            text = EMPTY_STEP_TEXT;
+        }
+
+        stepNode.getSupportedLanguages().stream()
+                .sorted(Comparator.comparingInt(Enum::ordinal))
+                .forEach(languageBox::addItem);
+        languageBox.setSelectedItem(stepNode.getCurrentLang());
+        languageBox.setVisible(languageBox.getModel().getSize() != 0);
+
         setText(text);
     }
 
     protected abstract void setText(@NotNull String text);
 
-    public void setEmptyText() {
-        setStepText(EMPTY_STEP_TEXT);
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (stepNode == null) {
+            return;
+        }
+
+        SupportedLanguages language = (SupportedLanguages) languageBox.getSelectedItem();
+
+        if (language == null) {
+            return;
+        }
+
+        ApplicationManager.getApplication().invokeLater(() ->
+                ProgrammingLanguageUtils.switchProgrammingLanguage(project, stepNode,
+                        (SupportedLanguages) languageBox.getSelectedItem())
+        );
     }
 }

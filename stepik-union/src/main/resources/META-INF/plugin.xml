@@ -3,15 +3,22 @@
     <name>Stepik Union</name>
     <version>SNAPSHOT</version>
     <idea-version since-build="163.7743.44"/>
-    <vendor email="petr.bogdanov@stepik.org" url="http://www.stepik.org">Stepik</vendor>
+    <vendor email="plugin@stepik.org" url="https://stepik.org">Stepik</vendor>
 
     <description><![CDATA[
-      Stepik plugin for code challenges on Python and Java.<br>
+      Stepik plugin for code challenges on Python, Java, asm, C, C++, Clojure, Haskell, JavaScript, Mono C#, Octave, R, Ruby, Rust, Shell, Scala.<br>
 
       To uses this plugin you have to have Stepik account and follow the course.<br>
       <br>
-      Optional dependency:<br>
-      Python plugin<br>
+      Optional plugins:<br>
+      Python<br>
+      Clojure-Kit<br>
+      Haskell<br>
+      Scala<br>
+      BashSupport<br>
+      Ruby<br>
+      Rust<br>
+      R Language Support<br>
 
     ]]></description>
 
@@ -23,9 +30,6 @@
     <extensions defaultExtensionNs="com.intellij">
         <applicationConfigurable instance="org.stepik.plugin.collective.ui.StepikSettingsConfigurable"/>
         <moduleType id="STEPIK_MODULE_TYPE" implementationClass="org.stepik.plugin.projectWizard.idea.StepikModuleType"/>
-        <refactoring.moveHandler implementation="org.stepik.plugin.refactoring.move.StepikMoveHandlerDelegate" order="first"/>
-        <renamePsiElementProcessor implementation="org.stepik.plugin.refactoring.rename.StepikRenamePsiElementProcessor" order="first"/>
-        <refactoring.safeDeleteProcessor implementation="org.stepik.plugin.refactoring.safeDelete.StepikSafeDeleteProcessorDelegate" order="first"/>
     </extensions>
 
     <extensions defaultExtensionNs="SCore">
@@ -37,7 +41,6 @@
         <action id="STEPIK.PreviousStepAction" class="org.stepik.plugin.actions.navigation.StepikPreviousStepAction"/>
         <action id="STEPIK.NextStepAction" class="org.stepik.plugin.actions.navigation.StepikNextStepAction"/>
         <action id="STEPIK.DownloadSubmission" class="org.stepik.plugin.actions.step.DownloadSubmission"/>
-        <action id="STEPIK.SwitchLanguage" class="org.stepik.plugin.actions.step.SwitchLanguage"/>
         <action id="STEPIK.InsertStepikDirectives" class="org.stepik.plugin.actions.step.InsertStepikDirectives"/>
         <action id="STEPIK.RefreshStepAction" class="org.stepik.plugin.actions.step.StepikResetStepAction" text="Reset Step File" description="Refresh current step"/>
     </actions>
