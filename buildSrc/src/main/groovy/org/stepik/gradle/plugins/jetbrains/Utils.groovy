@@ -22,7 +22,11 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 import java.nio.charset.Charset
-import java.nio.file.*
+import java.nio.file.DirectoryNotEmptyException
+import java.nio.file.FileVisitResult
+import java.nio.file.FileVisitor
+import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.attribute.BasicFileAttributes
 
 /**
@@ -30,10 +34,13 @@ import java.nio.file.attribute.BasicFileAttributes
  */
 class Utils {
     private static final Logger logger = LoggerFactory.getLogger(Utils)
-    private static final String APPLICATION = "application"
-    private static final String COMPONENT = "component"
-    private static final String NAME = "name"
-    private static final String VALUE = "value"
+    static final String APPLICATION = "application"
+    static final String COMPONENT = "component"
+    static final String COMPONENT_NAME = "componentName"
+    static final String NAME = "name"
+    static final String OPTIONS = "options"
+    static final String OPTION_TAG = "optionTag"
+    static final String VALUE = "value"
     static final UPDATE_XML = [
             filename     : "updates.xml",
             componentName: "UpdatesConfigurable",
@@ -140,10 +147,10 @@ class Utils {
         def component = new Element(COMPONENT)
         applicationNode.addContent(component)
 
-        setAttributeValue(component, NAME, map["componentName"] as String)
+        setAttributeValue(component, NAME, map[COMPONENT_NAME] as String)
 
-        map["options"].each { Pair option ->
-            def optionTag = new Element(map["optionTag"] as String)
+        map[OPTIONS].each { Pair option ->
+            def optionTag = new Element(map[OPTION_TAG] as String)
             component.addContent(optionTag)
             setAttributeValue(optionTag, NAME, option.getLeft() as String)
             setAttributeValue(optionTag, VALUE, option.getRight() as String)
@@ -166,7 +173,7 @@ class Utils {
             applicationNode.setName(APPLICATION)
         }
 
-        String componentName = map["componentName"]
+        String componentName = map[COMPONENT_NAME]
         def component = applicationNode.getChildren(COMPONENT).find {
             Attribute attr = it.getAttribute(NAME)
             return attr != null && componentName == attr.getValue()
@@ -183,14 +190,14 @@ class Utils {
             setAttributeValue(component, NAME, componentName)
         }
 
-        map["options"].each { Pair option ->
-            def optionTag = component.getChildren(map["optionTag"] as String).find {
+        map[OPTIONS].each { Pair option ->
+            def optionTag = component.getChildren(map[OPTION_TAG] as String).find {
                 Attribute attr = it.getAttribute(NAME)
                 return attr != null && option.getLeft() == attr.getValue()
             }
 
             if (optionTag == null) {
-                optionTag = new Element(map["optionTag"] as String)
+                optionTag = new Element(map[OPTION_TAG] as String)
                 component.addContent(optionTag)
                 setAttributeValue(optionTag, NAME, option.getLeft() as String)
             }

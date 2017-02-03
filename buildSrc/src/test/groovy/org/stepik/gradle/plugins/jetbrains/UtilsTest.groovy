@@ -8,6 +8,13 @@ import org.junit.Test
 
 import static org.junit.Assert.assertEquals
 import static org.junit.Assert.assertNotNull
+import static org.stepik.gradle.plugins.jetbrains.Utils.APPLICATION
+import static org.stepik.gradle.plugins.jetbrains.Utils.COMPONENT
+import static org.stepik.gradle.plugins.jetbrains.Utils.COMPONENT_NAME
+import static org.stepik.gradle.plugins.jetbrains.Utils.NAME
+import static org.stepik.gradle.plugins.jetbrains.Utils.OPTIONS
+import static org.stepik.gradle.plugins.jetbrains.Utils.OPTION_TAG
+import static org.stepik.gradle.plugins.jetbrains.Utils.VALUE
 
 /**
  * @author meanmail
@@ -17,10 +24,6 @@ class UtilsTest {
     private static final String IDEA_VERSION = "idea-version"
     private static final String SINCE_BUILD = "since-build"
     private static final String VALID_IDE_VERSION = "163.8344"
-    private static final String APPLICATION = "application"
-    private static final String COMPONENT = "component"
-    private static final String NAME = "name"
-    private static final String VALUE = "value"
     private Document document
     private Element ideaVersionTag
 
@@ -93,15 +96,15 @@ class UtilsTest {
         assertEquals(root.getName(), APPLICATION)
         def component = root.getChild(COMPONENT)
         assertNotNull(component)
-        assertEquals(component.getAttributeValue(NAME), map["componentName"])
+        assertEquals(component.getAttributeValue(NAME), map[COMPONENT_NAME])
 
-        def optionTags = component.getChildren(map["optionTag"] as String)
+        def optionTags = component.getChildren(map[OPTION_TAG] as String)
         Map<String, Element> optionsMap = new HashMap<>()
         optionTags.each {
             optionsMap.put(it.getAttributeValue(NAME), it)
         }
 
-        map["options"].each { Pair option ->
+        map[OPTIONS].each { Pair option ->
             def optionTag = optionsMap.get(option.getLeft())
             assertNotNull(optionTag)
             assertEquals(optionTag.getAttributeValue(VALUE), option.getRight())
