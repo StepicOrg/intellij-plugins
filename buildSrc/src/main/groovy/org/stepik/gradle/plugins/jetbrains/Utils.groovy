@@ -5,6 +5,7 @@ import org.gradle.api.Task
 import org.gradle.api.file.FileCollection
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.SourceSet
+import org.gradle.internal.Pair
 import org.gradle.process.JavaForkOptions
 import org.jdom2.Attribute
 import org.jdom2.Document
@@ -32,27 +33,38 @@ class Utils {
     private static final String APPLICATION = "application"
     private static final String COMPONENT = "component"
     private static final String NAME = "name"
-    private static final String UPDATES_CONFIGURABLE = "UpdatesConfigurable"
-    private static final String OPTION = "option"
-    private static final String CHECK_NEEDED = "CHECK_NEEDED"
     private static final String VALUE = "value"
-    private static final String FALSE = "false"
+    static final UPDATE_XML = [
+            filename     : "updates.xml",
+            componentName: "UpdatesConfigurable",
+            optionTag    : "option",
+            options      : [
+                    Pair.of("CHECK_NEEDED", "false")
+            ]
+    ]
+    static final IDE_GENERAL_XML = [
+            filename     : "ide.general.xml",
+            componentName: "GeneralSettings",
+            optionTag    : "option",
+            options      : [
+                    Pair.of("confirmExit", "false"),
+                    Pair.of("showTipsOnStartup", "false")
+            ]
+    ]
+    static final OPTIONS_XML = [
+            filename     : "options.xml",
+            componentName: "PropertiesComponent",
+            optionTag    : "property",
+            options      : [
+                    Pair.of("toolwindow.stripes.buttons.info.shown", "true")
+            ]
+    ]
 
     @Nullable
     static Document getXmlDocument(@NotNull File file) {
         try {
             def builder = new SAXBuilder()
             return builder.build(file)
-        } catch (JDOMException | IOException ignored) {
-            return null
-        }
-    }
-
-    @Nullable
-    static Document getXmlDocument(@NotNull InputStream input) {
-        try {
-            def builder = new SAXBuilder()
-            return builder.build(input)
         } catch (JDOMException | IOException ignored) {
             return null
         }
@@ -119,7 +131,7 @@ class Utils {
         node.setAttribute(name, value)
     }
 
-    static Document createUpdatesXml() {
+    static Document createXml(Map map) {
         def doc = new Document()
 
         def applicationNode = new Element(APPLICATION)
@@ -128,17 +140,19 @@ class Utils {
         def component = new Element(COMPONENT)
         applicationNode.addContent(component)
 
-        setAttributeValue(component, NAME, UPDATES_CONFIGURABLE)
+        setAttributeValue(component, NAME, map["componentName"] as String)
 
-        def option = new Element(OPTION)
-        component.addContent(option)
-        setAttributeValue(option, NAME, CHECK_NEEDED)
-        setAttributeValue(option, VALUE, FALSE)
+        map["options"].each { Pair option ->
+            def optionTag = new Element(map["optionTag"] as String)
+            component.addContent(optionTag)
+            setAttributeValue(optionTag, NAME, option.getLeft() as String)
+            setAttributeValue(optionTag, VALUE, option.getRight() as String)
+        }
 
         return doc
     }
 
-    static void repairUpdateXml(Document doc) {
+    static void repairXml(Document doc, Map map) {
         def applicationNode
 
         if (!doc.hasRootElement()) {
@@ -152,9 +166,10 @@ class Utils {
             applicationNode.setName(APPLICATION)
         }
 
+        String componentName = map["componentName"]
         def component = applicationNode.getChildren(COMPONENT).find {
             Attribute attr = it.getAttribute(NAME)
-            return attr != null && UPDATES_CONFIGURABLE == attr.getValue()
+            return attr != null && componentName == attr.getValue()
         }
 
         if (component == null) {
@@ -164,22 +179,24 @@ class Utils {
 
         def name = component.getAttribute(NAME)
 
-        if (name == null || UPDATES_CONFIGURABLE == name.getValue()) {
-            setAttributeValue(component, NAME, UPDATES_CONFIGURABLE)
+        if (name == null || componentName == name.getValue()) {
+            setAttributeValue(component, NAME, componentName)
         }
 
-        def option = component.getChildren(OPTION).find {
-            Attribute attr = it.getAttribute(NAME)
-            return attr != null && CHECK_NEEDED == attr.getValue()
-        }
+        map["options"].each { Pair option ->
+            def optionTag = component.getChildren(map["optionTag"] as String).find {
+                Attribute attr = it.getAttribute(NAME)
+                return attr != null && option.getLeft() == attr.getValue()
+            }
 
-        if (option == null) {
-            option = new Element(OPTION)
-            component.addContent(option)
-            setAttributeValue(option, NAME, CHECK_NEEDED)
-        }
+            if (optionTag == null) {
+                optionTag = new Element(map["optionTag"] as String)
+                component.addContent(optionTag)
+                setAttributeValue(optionTag, NAME, option.getLeft() as String)
+            }
 
-        setAttributeValue(option, VALUE, FALSE)
+            setAttributeValue(optionTag, VALUE, option.getRight() as String)
+        }
     }
 
     @Nullable
@@ -378,5 +395,42 @@ class Utils {
         } else {
             return "tar.gz"
         }
+    }
+
+    static void createOrRepairXml(@NotNull File optionsDir, Map map) {
+        def updatesConfig = new File(optionsDir, map["filename"] as String)
+        try {
+            if (!updatesConfig.exists() && !updatesConfig.createNewFile()) {
+                return
+            }
+        } catch (IOException ignore) {
+            return
+        }
+
+        def doc = getXmlDocument(updatesConfig)
+
+        if (!doc || !doc.hasRootElement()) {
+            doc = createXml(map)
+        } else {
+            repairXml(doc, map)
+        }
+
+        try {
+            outputXml(doc, updatesConfig)
+        } catch (IOException ignored) {
+            logger.warn("Failed write to " + updatesConfig)
+        }
+    }
+
+    static void createOrRepairUpdateXml(@NotNull File file) {
+        createOrRepairXml(file, UPDATE_XML)
+    }
+
+    static void createOrRepairIdeGeneralXml(@NotNull File file) {
+        createOrRepairXml(file, IDE_GENERAL_XML)
+    }
+
+    static void createOrRepairOptionsXml(File file) {
+        createOrRepairXml(file, OPTIONS_XML)
     }
 }
