@@ -104,4 +104,18 @@ public class Metrics {
             @NotNull MetricsStatus status) {
         stepAction("switch_language", project, stepNode, status);
     }
+
+    public static void insertAmbientCodeAction(
+            @NotNull Project project,
+            @NotNull StepNode stepNode,
+            @NotNull MetricsStatus status) {
+        stepAction("insert_ambient_code", project, stepNode, status);
+    }
+
+    public static void removeAmbientCodeAction(
+            @NotNull Project project,
+            @NotNull StepNode stepNode,
+            @NotNull MetricsStatus status) {
+        stepAction("remove_ambient_code", project, stepNode, status);
+    }
 }
