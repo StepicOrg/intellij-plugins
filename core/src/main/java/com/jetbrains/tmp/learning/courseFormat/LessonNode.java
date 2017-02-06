@@ -186,6 +186,7 @@ public class LessonNode implements StudyNode {
 
     @Nullable
     @Transient
+    @Override
     public CourseNode getCourse() {
         if (sectionNode == null) {
             return null;

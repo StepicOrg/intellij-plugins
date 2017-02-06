@@ -1,6 +1,7 @@
 package com.jetbrains.tmp.learning.courseFormat;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public interface StudyNode {
     @NotNull
@@ -18,4 +19,7 @@ public interface StudyNode {
     String getPath();
 
     long getId();
+
+    @Nullable
+    CourseNode getCourse();
 }

@@ -205,6 +205,12 @@ public class SectionNode implements StudyNode {
         getData().setId(id);
     }
 
+    @Nullable
+    @Override
+    public CourseNode getCourse() {
+        return courseNode;
+    }
+
     @Transient
     @Nullable
     public LessonNode getLastLesson() {

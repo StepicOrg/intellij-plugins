@@ -6,6 +6,7 @@ import com.intellij.openapi.project.Project;
 import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.courseFormat.CourseNode;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
+import com.jetbrains.tmp.learning.courseFormat.StudyNode;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.api.client.StepikApiClient;
@@ -30,7 +31,10 @@ public class Metrics {
         stepAction("download", project, stepNode, status);
     }
 
-    private static void postMetrics(@NotNull Project project, @NotNull Consumer<StepikMetricsPostQuery> installer) {
+    private static void postMetrics(
+            @NotNull Project project,
+            @NotNull Consumer<StepikMetricsPostQuery> installer,
+            @NotNull MetricsStatus status) {
         StepikMetricsPostQuery query = null;
         try {
             StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
@@ -42,12 +46,29 @@ public class Metrics {
                     .tags("ide_name", ApplicationInfo.getInstance().getVersionName())
                     .data("ide_version", ApplicationInfo.getInstance().getBuild().toString())
                     .data("plugin_version", PluginUtils.getVersion())
-                    .data("session", session);
+                    .data("session", session)
+                    .tags("status", status);
 
             StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
 
             if (projectManager != null) {
-                query.data("project_id", projectManager.getUuid());
+                query.data("project_id", projectManager.getUuid())
+                        .tags("project_programming_language", projectManager.getDefaultLang().getName())
+                        .data("project_manager_version", projectManager.getVersion());
+
+                StudyNode projectRoot = projectManager.getProjectRoot();
+
+                if (projectRoot != null) {
+                    Class<? extends StudyNode> projectRootClass = projectRoot.getClass();
+                    query.tags("project_root_class", projectRootClass.getSimpleName())
+                            .data("project_root_id", projectRoot.getId());
+
+                    CourseNode courseNode = projectRoot.getCourse();
+
+                    if (courseNode != null) {
+                        query.data("course_id", projectRoot.getId());
+                    }
+                }
             }
 
             installer.accept(query);
@@ -78,17 +99,12 @@ public class Metrics {
             @NotNull Project project,
             @NotNull StepNode stepNode,
             @NotNull MetricsStatus status) {
-        CourseNode courseNode = stepNode.getCourse();
-        long courseId = courseNode != null ? courseNode.getId() : 0;
-
         Consumer<StepikMetricsPostQuery> installer = query -> query.tags("action", actionName)
-                .data("course_id", courseId)
                 .data("step_id", stepNode.getId())
-                .tags("status", status)
-                .tags("programming_language", stepNode.getCurrentLang().getName())
+                .tags("step_programming_language", stepNode.getCurrentLang().getName())
                 .tags("step_type", stepNode.getData().getBlock().getName());
 
-        postMetrics(project, installer);
+        postMetrics(project, installer, status);
     }
 
     public static void resetStepAction(
@@ -117,5 +133,10 @@ public class Metrics {
             @NotNull StepNode stepNode,
             @NotNull MetricsStatus status) {
         stepAction("remove_ambient_code", project, stepNode, status);
+    }
+
+    public static void createProject(@NotNull Project project, @NotNull MetricsStatus status) {
+        Consumer<StepikMetricsPostQuery> installer = query -> query.tags("action", "create_project");
+        postMetrics(project, installer, status);
     }
 }

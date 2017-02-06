@@ -135,6 +135,12 @@ public class CourseNode implements StudyNode {
         return getData().getId();
     }
 
+    @Nullable
+    @Override
+    public CourseNode getCourse() {
+        return this;
+    }
+
     void addSection(@NotNull SectionNode sectionNode) {
         getSectionNodes().add(sectionNode);
         getSectionNodes().sort(StudyNodeComparator.getInstance());

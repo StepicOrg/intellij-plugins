@@ -152,6 +152,7 @@ public class StepNode implements StudyNode {
 
     @Transient
     @Nullable
+    @Override
     public CourseNode getCourse() {
         if (lessonNode == null) {
             return null;
