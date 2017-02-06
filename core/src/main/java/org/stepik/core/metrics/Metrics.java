@@ -90,4 +90,11 @@ public class Metrics {
 
         postMetrics(project, installer);
     }
+
+    public static void resetStepAction(
+            @NotNull Project project,
+            @NotNull StepNode stepNode,
+            @NotNull MetricsStatus status) {
+        stepAction("reset_step", project, stepNode, status);
+    }
 }

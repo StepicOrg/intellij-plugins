@@ -292,7 +292,18 @@ public class StepNode implements StudyNode {
     }
 
     @Transient
-    public StepType getType() {
+    StepType getType() {
         return StepType.of(data.getBlock().getName());
+    }
+
+    @Transient
+    @NotNull
+    public String getCurrentFileText() {
+        StepFile file = getFile(getCurrentLang().getMainFileName());
+        if (file == null) {
+            return "";
+        }
+
+        return file.getText();
     }
 }
