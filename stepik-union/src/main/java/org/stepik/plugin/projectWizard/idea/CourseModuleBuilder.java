@@ -76,7 +76,7 @@ class CourseModuleBuilder extends AbstractModuleBuilder {
                 () -> DumbService.allowStartingDumbModeInside(DumbModePermission.MAY_START_BACKGROUND,
                         () -> ApplicationManager.getApplication().runWriteAction(
                                 () -> StudyProjectComponent.getInstance(project)
-                                        .registerStudyToolWindow(courseNode))));
+                                        .registerStudyToolWindow())));
     }
 
     private void createSubDirectories(

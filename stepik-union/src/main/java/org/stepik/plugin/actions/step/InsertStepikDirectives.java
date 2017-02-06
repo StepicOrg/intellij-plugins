@@ -11,11 +11,10 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.tmp.learning.StepikProjectManager;
-import com.jetbrains.tmp.learning.StudyState;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.SupportedLanguages;
+import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
-import com.jetbrains.tmp.learning.editor.StudyEditor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.core.metrics.Metrics;
@@ -56,14 +55,11 @@ public class InsertStepikDirectives extends AbstractStepAction {
     @Override
     public void actionPerformed(AnActionEvent e) {
         Project project = e.getProject();
-        if (project == null)
-            return;
-        StudyEditor studyEditor = StudyUtils.getSelectedStudyEditor(project);
-        StudyState studyState = new StudyState(studyEditor);
-        if (!studyState.isValid()) {
+        if (project == null) {
             return;
         }
-        StepNode targetStepNode = studyState.getStepNode();
+
+        StepNode targetStepNode = StudyUtils.getSelectedStep(project);
         if (targetStepNode == null) {
             return;
         }
@@ -76,7 +72,14 @@ public class InsertStepikDirectives extends AbstractStepAction {
         }
 
         SupportedLanguages currentLang = targetStepNode.getCurrentLang();
-        VirtualFile src = studyState.getStepDir();
+        VirtualFile stepDir = project.getBaseDir().findFileByRelativePath(targetStepNode.getPath());
+        if (stepDir == null) {
+            return;
+        }
+        VirtualFile src = stepDir.findChild(EduNames.SRC);
+        if (src == null) {
+            return;
+        }
         VirtualFile file = src.findChild(currentLang.getMainFileName());
         if (file == null) {
             return;
@@ -84,7 +87,9 @@ public class InsertStepikDirectives extends AbstractStepAction {
         String[] text = DirectivesUtils.getFileText(file);
 
         Pair<Integer, Integer> locations = DirectivesUtils.findDirectives(text, currentLang);
-        boolean showHint = StepikProjectManager.getInstance(project).getShowHint();
+
+        StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
+        boolean showHint = projectManager != null && projectManager.getShowHint();
         boolean needInsert = locations.first == -1 && locations.second == text.length;
         if (needInsert) {
             text = insertAmbientCode(text, currentLang, showHint);
@@ -95,7 +100,10 @@ public class InsertStepikDirectives extends AbstractStepAction {
         }
         writeInToFile(text, file, project);
         if (needInsert) {
-            ReformatUtils.reformatSelectedEditor(project);
+            final Document document = FileDocumentManager.getInstance().getDocument(file);
+            if (document != null) {
+                ReformatUtils.reformatSelectedEditor(project, document);
+            }
         }
     }
 }

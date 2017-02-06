@@ -139,4 +139,9 @@ public class Metrics {
         Consumer<StepikMetricsPostQuery> installer = query -> query.tags("action", "create_project");
         postMetrics(project, installer, status);
     }
+
+    public static void openProject(@NotNull Project project, @NotNull MetricsStatus status) {
+        Consumer<StepikMetricsPostQuery> installer = query -> query.tags("action", "open_project");
+        postMetrics(project, installer, status);
+    }
 }
