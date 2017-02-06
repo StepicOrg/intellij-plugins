@@ -18,8 +18,11 @@ import com.jetbrains.tmp.learning.courseFormat.StepFile;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.core.metrics.Metrics;
 
 import java.io.IOException;
+
+import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
 
 public class ProgrammingLanguageUtils {
     private static final Logger logger = Logger.getInstance(ProgrammingLanguageUtils.class);
@@ -40,6 +43,7 @@ public class ProgrammingLanguageUtils {
 
         if (currentLang.getMainFileName().equals(language.getMainFileName())) {
             targetStepNode.setCurrentLang(language);
+            Metrics.switchLanguage(project, targetStepNode, SUCCESSFUL);
             return;
         }
 
@@ -81,6 +85,7 @@ public class ProgrammingLanguageUtils {
 
         targetStepNode.setCurrentLang(language);
         FileEditorManager.getInstance(project).openFile(second.getVirtualFile(), true);
+        Metrics.switchLanguage(project, targetStepNode, SUCCESSFUL);
     }
 
     private static void exchangeFiles(

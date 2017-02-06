@@ -97,4 +97,11 @@ public class Metrics {
             @NotNull MetricsStatus status) {
         stepAction("reset_step", project, stepNode, status);
     }
+
+    public static void switchLanguage(
+            @NotNull Project project,
+            @NotNull StepNode stepNode,
+            @NotNull MetricsStatus status) {
+        stepAction("switch_language", project, stepNode, status);
+    }
 }
