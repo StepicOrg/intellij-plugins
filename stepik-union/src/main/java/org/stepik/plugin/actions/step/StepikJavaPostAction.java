@@ -174,8 +174,8 @@ public class StepikJavaPostAction extends StudyCheckAction {
                     .name("ide_plugin")
                     .tags("name", "S_Union")
                     .tags("action", "send")
-                    .data("courseId", courseNode != null ? courseNode.getId() : 0)
-                    .data("stepId", stepNode.getId())
+                    .data("course_id", courseNode != null ? courseNode.getId() : 0)
+                    .data("step_id", stepNode.getId())
                     .execute();
         } catch (StepikClientException e) {
             logger.warn("Failed send metric", e);

@@ -44,6 +44,12 @@ public class StepikMetricsPostQuery extends StepikAbstractPostQuery<VoidResult> 
     }
 
     @NotNull
+    public StepikMetricsPostQuery tags(@NotNull String key, @NotNull Object value) {
+        metrics.getMetric().addTags(key, value.toString());
+        return this;
+    }
+
+    @NotNull
     public StepikMetricsPostQuery data(@NotNull Map<String, Object> value) {
         metrics.getMetric().setData(value);
         return this;
@@ -65,5 +71,10 @@ public class StepikMetricsPostQuery extends StepikAbstractPostQuery<VoidResult> 
     @Override
     protected String getUrl() {
         return Urls.METRICS;
+    }
+
+    @Override
+    public String toString() {
+        return getJsonConverter().toJson(metrics);
     }
 }

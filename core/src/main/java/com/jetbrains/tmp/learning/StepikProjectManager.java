@@ -20,6 +20,8 @@ import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.courses.Courses;
 
+import java.util.UUID;
+
 /**
  * Implementation of class which contains all the information
  * about study in context of current project
@@ -35,6 +37,7 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
     private long createdBy;
     private SupportedLanguages defaultLang = SupportedLanguages.INVALID;
     private int version = CURRENT_VERSION;
+    private String uuid;
 
     @SuppressWarnings({"SameParameterValue", "WeakerAccess"})
     public StepikProjectManager(@Nullable Project project) {
@@ -74,9 +77,10 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
         if (createdBy != that.createdBy) return false;
         if (version != that.version) return false;
         if (project != null ? !project.equals(that.project) : that.project != null) return false;
-        //noinspection SimplifiableIfStatement
         if (courseNode != null ? !courseNode.equals(that.courseNode) : that.courseNode != null) return false;
-        return defaultLang == that.defaultLang;
+        //noinspection SimplifiableIfStatement
+        if (defaultLang != that.defaultLang) return false;
+        return uuid != null ? uuid.equals(that.uuid) : that.uuid == null;
     }
 
     @Override
@@ -87,6 +91,7 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
         result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
         result = 31 * result + (defaultLang != null ? defaultLang.hashCode() : 0);
         result = 31 * result + version;
+        result = 31 * result + (uuid != null ? uuid.hashCode() : 0);
         return result;
     }
 
@@ -198,5 +203,17 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
     @SuppressWarnings("unused")
     public void setCreatedBy(long createdBy) {
         this.createdBy = createdBy;
+    }
+
+    public String getUuid() {
+        if (uuid == null) {
+            uuid = UUID.randomUUID().toString();
+        }
+        return uuid;
+    }
+
+    @SuppressWarnings("unused")
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 }
