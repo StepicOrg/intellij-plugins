@@ -2,7 +2,6 @@ package org.stepik.plugin.collective.ui;
 
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.progress.ProgressManager;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.ThrowableComputable;
@@ -12,7 +11,6 @@ import com.intellij.ui.HyperlinkAdapter;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.util.ui.JBUI;
 import com.jetbrains.tmp.learning.StepikProjectManager;
-import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.stepik.EduStepikNames;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.intellij.lang.annotations.Language;
@@ -45,7 +43,6 @@ class StepikSettingsPanel {
     private static final String CHECK_CREDENTIALS = "Check credentials";
     private static final String WRONG_LOGIN_PASSWORD = "Wrong a login or a password";
     private static final String FAILED_CONNECTION = "Failed connection";
-    private Project settingsProject;
     private JTextField emailTextField;
     private JPasswordField passwordField;
     private JPasswordField tokenField; // look at createUIComponents() to understand
@@ -60,6 +57,7 @@ class StepikSettingsPanel {
 
     private boolean credentialsModified;
     private boolean hintCheckBoxModified;
+    private StepikProjectManager projectManager;
 
     StepikSettingsPanel() {
         initProjectOfSettings();
@@ -77,7 +75,7 @@ class StepikSettingsPanel {
         signupTextField.setCursor(new Cursor(Cursor.HAND_CURSOR));
         authTypeLabel.setBorder(JBUI.Borders.emptyLeft(10));
         authTypeComboBox.addItem(AUTH_PASSWORD);
-        hintCheckBox.setSelected(StepikProjectManager.getInstance(settingsProject).getShowHint());
+        hintCheckBox.setSelected(projectManager != null && projectManager.getShowHint());
         hintCheckBox.addActionListener(e -> hintCheckBoxModified = true);
         testButton.addActionListener(event -> {
             try {
@@ -176,9 +174,7 @@ class StepikSettingsPanel {
     }
 
     private void initProjectOfSettings() {
-        if (settingsProject == null) {
-            settingsProject = StudyUtils.getStudyProject();
-        }
+        projectManager = StepikProjectManager.getInstance(Utils.getCurrentProject());
     }
 
     void reset() {
@@ -210,9 +206,8 @@ class StepikSettingsPanel {
             }
         }
 
-        if (hintCheckBoxModified) {
-            StepikProjectManager manager = StepikProjectManager.getInstance(settingsProject);
-            manager.setShowHint(hintCheckBox.isSelected());
+        if (hintCheckBoxModified && projectManager != null) {
+            projectManager.setShowHint(hintCheckBox.isSelected());
         }
         resetCredentialsModification();
     }

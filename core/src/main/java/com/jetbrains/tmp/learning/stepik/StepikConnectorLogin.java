@@ -15,6 +15,9 @@ import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.auth.TokenInfo;
 import org.stepik.api.objects.users.User;
+import org.stepik.core.metrics.Metrics;
+
+import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
 
 public class StepikConnectorLogin {
     private static final Logger logger = Logger.getInstance(StepikConnectorLogin.class);
@@ -212,6 +215,7 @@ public class StepikConnectorLogin {
             long userId = getCurrentUser().getId();
             setAuthInfo(userId, authInfo);
             logger.info("Authentication is successfully");
+            Metrics.authenticate(SUCCESSFUL);
         } catch (StepikClientException e) {
             logger.warn("Authentication failed", e);
             throw e;

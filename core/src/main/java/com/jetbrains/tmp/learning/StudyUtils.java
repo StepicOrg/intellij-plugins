@@ -5,7 +5,6 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
@@ -191,24 +190,6 @@ public class StudyUtils {
         }
 
         return getStep(project, files[0]);
-    }
-
-    @Nullable
-    public static Project getStudyProject() {
-        Project studyProject = null;
-        Project[] openProjects = ProjectManager.getInstance().getOpenProjects();
-        for (Project project : openProjects) {
-            if (StepikProjectManager.isStepikProject(project)) {
-                studyProject = project;
-                break;
-            }
-        }
-        if (studyProject == null) {
-            logger.info("return default project");
-            return ProjectManager.getInstance().getDefaultProject();
-        }
-        logger.info("return regular project");
-        return studyProject;
     }
 
     public static boolean hasJavaFx() {

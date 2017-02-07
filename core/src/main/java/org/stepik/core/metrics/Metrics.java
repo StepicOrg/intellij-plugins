@@ -13,6 +13,7 @@ import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.queries.metrics.StepikMetricsPostQuery;
 import org.stepik.core.utils.PluginUtils;
+import org.stepik.core.utils.Utils;
 
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -142,6 +143,12 @@ public class Metrics {
 
     public static void openProject(@NotNull Project project, @NotNull MetricsStatus status) {
         Consumer<StepikMetricsPostQuery> installer = query -> query.tags("action", "open_project");
+        postMetrics(project, installer, status);
+    }
+
+    public static void authenticate(@NotNull MetricsStatus status) {
+        Consumer<StepikMetricsPostQuery> installer = query -> query.tags("action", "authenticate");
+        Project project = Utils.getCurrentProject();
         postMetrics(project, installer, status);
     }
 }
