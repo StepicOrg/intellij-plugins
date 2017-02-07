@@ -29,10 +29,6 @@ public class StepikConnectorLogin {
         return PropertiesComponent.getInstance().getOrInitLong(LAST_USER_PROPERTY_NAME, 0);
     }
 
-    private static void setLastUser(long lastUser) {
-        PropertiesComponent.getInstance().setValue(LAST_USER_PROPERTY_NAME, String.valueOf(lastUser));
-    }
-
     @NotNull
     private static StepikApiClient initStepikApiClient() {
         HttpConfigurable instance = HttpConfigurable.getInstance();
@@ -138,7 +134,10 @@ public class StepikConnectorLogin {
                 String.valueOf(userId),
                 StepikProjectManager.class,
                 false);
-        String serializedAuthInfo = PasswordSafe.getInstance().getPassword(attributes);
+        String serializedAuthInfo;
+        synchronized (StepikConnectorLogin.class) {
+            serializedAuthInfo = PasswordSafe.getInstance().getPassword(attributes);
+        }
         AuthInfo authInfo = client.getJsonConverter().fromJson(serializedAuthInfo, AuthInfo.class);
 
         if (authInfo == null) {
@@ -160,8 +159,10 @@ public class StepikConnectorLogin {
                 StepikProjectManager.class,
                 false);
         String serializedAuthInfo = stepikApiClient.getJsonConverter().toJson(authInfo);
-        PasswordSafe.getInstance().setPassword(attributes, serializedAuthInfo);
-        setLastUser(userId);
+        synchronized (StepikConnectorLogin.class) {
+            PasswordSafe.getInstance().setPassword(attributes, serializedAuthInfo);
+            PropertiesComponent.getInstance().setValue(LAST_USER_PROPERTY_NAME, String.valueOf(userId));
+        }
     }
 
     @NotNull
