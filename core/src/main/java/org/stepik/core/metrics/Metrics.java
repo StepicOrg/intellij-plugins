@@ -36,49 +36,51 @@ public class Metrics {
             @NotNull Project project,
             @NotNull Consumer<StepikMetricsPostQuery> installer,
             @NotNull MetricsStatus status) {
-        StepikMetricsPostQuery query = null;
-        try {
-            StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
+        new Thread(() -> {
+            StepikMetricsPostQuery query = null;
+            try {
+                StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
 
-            query = stepikApiClient.metrics()
-                    .post()
-                    .name("ide_plugin")
-                    .tags("name", "S_Union")
-                    .tags("ide_name", ApplicationInfo.getInstance().getVersionName())
-                    .data("ide_version", ApplicationInfo.getInstance().getBuild().toString())
-                    .data("plugin_version", PluginUtils.getVersion())
-                    .data("session", session)
-                    .tags("status", status);
+                query = stepikApiClient.metrics()
+                        .post()
+                        .name("ide_plugin")
+                        .tags("name", "S_Union")
+                        .tags("ide_name", ApplicationInfo.getInstance().getVersionName())
+                        .data("ide_version", ApplicationInfo.getInstance().getBuild().toString())
+                        .data("plugin_version", PluginUtils.getVersion())
+                        .data("session", session)
+                        .tags("status", status);
 
-            StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
+                StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
 
-            if (projectManager != null) {
-                query.data("project_id", projectManager.getUuid())
-                        .tags("project_programming_language", projectManager.getDefaultLang().getName())
-                        .data("project_manager_version", projectManager.getVersion());
+                if (projectManager != null) {
+                    query.data("project_id", projectManager.getUuid())
+                            .tags("project_programming_language", projectManager.getDefaultLang().getName())
+                            .data("project_manager_version", projectManager.getVersion());
 
-                StudyNode projectRoot = projectManager.getProjectRoot();
+                    StudyNode projectRoot = projectManager.getProjectRoot();
 
-                if (projectRoot != null) {
-                    Class<? extends StudyNode> projectRootClass = projectRoot.getClass();
-                    query.tags("project_root_class", projectRootClass.getSimpleName())
-                            .data("project_root_id", projectRoot.getId());
+                    if (projectRoot != null) {
+                        Class<? extends StudyNode> projectRootClass = projectRoot.getClass();
+                        query.tags("project_root_class", projectRootClass.getSimpleName())
+                                .data("project_root_id", projectRoot.getId());
 
-                    CourseNode courseNode = projectRoot.getCourse();
+                        CourseNode courseNode = projectRoot.getCourse();
 
-                    if (courseNode != null) {
-                        query.data("course_id", projectRoot.getId());
+                        if (courseNode != null) {
+                            query.data("course_id", projectRoot.getId());
+                        }
                     }
                 }
+
+                installer.accept(query);
+
+                query.execute();
+            } catch (StepikClientException e) {
+                String message = String.format("Failed post metric: %s", query != null ? query.toString() : "null");
+                logger.warn(message, e);
             }
-
-            installer.accept(query);
-
-            query.execute();
-        } catch (StepikClientException e) {
-            String message = String.format("Failed post metric: %s", query != null ? query.toString() : "null");
-            logger.warn(message, e);
-        }
+        }).start();
     }
 
     public static void sendAction(
