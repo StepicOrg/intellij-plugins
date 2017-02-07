@@ -7,7 +7,7 @@ import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class StudyNavigator {
+class StudyNavigator {
     private StudyNavigator() {
     }
 
@@ -97,12 +97,12 @@ public class StudyNavigator {
     }
 
     @Nullable
-    public static StepNode nextStep(@NotNull final StepNode stepNode) {
+    static StepNode nextStep(@NotNull final StepNode stepNode) {
         return navigate(stepNode, Direction.FORWARD);
     }
 
     @Nullable
-    public static StepNode previousStep(@NotNull final StepNode stepNode) {
+    static StepNode previousStep(@NotNull final StepNode stepNode) {
         return navigate(stepNode, Direction.BACK);
     }
 

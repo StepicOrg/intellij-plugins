@@ -151,4 +151,11 @@ public class Metrics {
         Project project = Utils.getCurrentProject();
         postMetrics(project, installer, status);
     }
+
+    public static void navigateAction(
+            @NotNull Project project,
+            @NotNull StepNode stepNode,
+            @NotNull MetricsStatus status) {
+        stepAction("navigate", project, stepNode, status);
+    }
 }

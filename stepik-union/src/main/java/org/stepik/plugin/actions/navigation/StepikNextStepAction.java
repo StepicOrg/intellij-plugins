@@ -31,7 +31,11 @@ public class StepikNextStepAction extends StepikStepNavigationAction {
     @Nullable
     @Override
     protected StepNode getDefaultStep(@NotNull final Project project) {
-        CourseNode courseNode = StepikProjectManager.getInstance(project).getCourseNode();
+        StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
+        if (projectManager == null) {
+            return null;
+        }
+        CourseNode courseNode = projectManager.getCourseNode();
         if (courseNode == null) {
             return null;
         }
