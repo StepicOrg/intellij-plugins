@@ -211,6 +211,7 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
         this.createdBy = createdBy;
     }
 
+    @NotNull
     public String getUuid() {
         if (uuid == null) {
             uuid = UUID.randomUUID().toString();
@@ -219,7 +220,7 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
     }
 
     @SuppressWarnings("unused")
-    public void setUuid(String uuid) {
+    public void setUuid(@Nullable String uuid) {
         this.uuid = uuid;
     }
 

@@ -11,12 +11,12 @@ import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.exceptions.StepikClientException;
+import org.stepik.api.objects.metrics.Metric;
 import org.stepik.api.queries.metrics.StepikMetricsPostQuery;
 import org.stepik.core.utils.PluginUtils;
 import org.stepik.core.utils.Utils;
 
 import java.util.UUID;
-import java.util.function.Consumer;
 
 /**
  * @author meanmail
@@ -34,7 +34,7 @@ public class Metrics {
 
     private static void postMetrics(
             @NotNull Project project,
-            @NotNull Consumer<StepikMetricsPostQuery> installer,
+            @NotNull Metric metric,
             @NotNull MetricsStatus status) {
         new Thread(() -> {
             StepikMetricsPostQuery query = null;
@@ -43,6 +43,8 @@ public class Metrics {
 
                 query = stepikApiClient.metrics()
                         .post()
+                        .tags(metric.getTags())
+                        .data(metric.getData())
                         .name("ide_plugin")
                         .tags("name", "S_Union")
                         .tags("ide_name", ApplicationInfo.getInstance().getVersionName())
@@ -73,8 +75,6 @@ public class Metrics {
                     }
                 }
 
-                installer.accept(query);
-
                 query.execute();
             } catch (StepikClientException e) {
                 String message = String.format("Failed post metric: %s", query != null ? query.toString() : "null");
@@ -102,12 +102,13 @@ public class Metrics {
             @NotNull Project project,
             @NotNull StepNode stepNode,
             @NotNull MetricsStatus status) {
-        Consumer<StepikMetricsPostQuery> installer = query -> query.tags("action", actionName)
-                .data("step_id", stepNode.getId())
-                .tags("step_programming_language", stepNode.getCurrentLang().getName())
-                .tags("step_type", stepNode.getData().getBlock().getName());
+        Metric metric = new Metric();
+        metric.addTags("action", actionName);
+        metric.addData("step_id", stepNode.getId());
+        metric.addTags("step_programming_language", stepNode.getCurrentLang().getName());
+        metric.addTags("step_type", stepNode.getData().getBlock().getName());
 
-        postMetrics(project, installer, status);
+        postMetrics(project, metric, status);
     }
 
     public static void resetStepAction(
@@ -139,19 +140,23 @@ public class Metrics {
     }
 
     public static void createProject(@NotNull Project project, @NotNull MetricsStatus status) {
-        Consumer<StepikMetricsPostQuery> installer = query -> query.tags("action", "create_project");
-        postMetrics(project, installer, status);
+        Metric metric = new Metric();
+        metric.addTags("action", "create_project");
+        postMetrics(project, metric, status);
     }
 
     public static void openProject(@NotNull Project project, @NotNull MetricsStatus status) {
-        Consumer<StepikMetricsPostQuery> installer = query -> query.tags("action", "open_project");
-        postMetrics(project, installer, status);
+        Metric metric = new Metric();
+        metric.addTags("action", "open_project");
+        postMetrics(project, metric, status);
     }
 
     public static void authenticate(@NotNull MetricsStatus status) {
-        Consumer<StepikMetricsPostQuery> installer = query -> query.tags("action", "authenticate");
+        Metric metric = new Metric();
+        metric.addTags("action", "authenticate");
+
         Project project = Utils.getCurrentProject();
-        postMetrics(project, installer, status);
+        postMetrics(project, metric, status);
     }
 
     public static void navigateAction(
