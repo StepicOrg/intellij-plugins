@@ -18,11 +18,12 @@ import org.stepik.api.objects.users.User;
 import org.stepik.core.metrics.Metrics;
 
 import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
+import static org.stepik.core.utils.PluginUtils.PLUGIN_ID;
 
 public class StepikConnectorLogin {
     private static final Logger logger = Logger.getInstance(StepikConnectorLogin.class);
     private static final String CLIENT_ID = "hUCWcq3hZHCmz0DKrDtwOWITLcYutzot7p4n59vU";
-    private static final String LAST_USER_PROPERTY_NAME = "org.stepik.plugin.union.LAST_USER";
+    private static final String LAST_USER_PROPERTY_NAME = PLUGIN_ID + ".LAST_USER";
     private static final StepikApiClient stepikApiClient = initStepikApiClient();
 
     private static long getLastUser() {

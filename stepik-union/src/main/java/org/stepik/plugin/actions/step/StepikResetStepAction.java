@@ -65,7 +65,8 @@ public class StepikResetStepAction extends AbstractStepAction {
     }
 
     private static void resetDocument(
-            @NotNull Project project, @NotNull final Document document,
+            @NotNull Project project,
+            @NotNull final Document document,
             @NotNull final StepNode stepNode) {
         CommandProcessor.getInstance().executeCommand(project,
                 () -> ApplicationManager

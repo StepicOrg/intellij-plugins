@@ -25,13 +25,6 @@ public class Metrics {
     private static final Logger logger = Logger.getInstance(Metrics.class);
     private static final String session = UUID.randomUUID().toString();
 
-    public static void downloadAction(
-            @NotNull Project project,
-            @NotNull StepNode stepNode,
-            @NotNull MetricsStatus status) {
-        stepAction("download", project, stepNode, status);
-    }
-
     private static void postMetrics(
             @NotNull Project project,
             @NotNull Metric metric,
@@ -83,18 +76,27 @@ public class Metrics {
         }).start();
     }
 
-    public static void sendAction(
+    private static void postSimpleMetric(
             @NotNull Project project,
-            @NotNull StepNode stepNode,
+            @NotNull String action,
             @NotNull MetricsStatus status) {
-        stepAction("send", project, stepNode, status);
+        Metric metric = new Metric();
+        metric.addTags("action", action);
+
+        postMetrics(project, metric, status);
     }
 
-    public static void getStepStatusAction(
-            @NotNull Project project,
-            @NotNull StepNode stepNode,
-            @NotNull MetricsStatus status) {
-        stepAction("get_step_status", project, stepNode, status);
+    public static void authenticate(@NotNull MetricsStatus status) {
+        Project project = Utils.getCurrentProject();
+        postSimpleMetric(project, "authenticate", status);
+    }
+
+    public static void createProject(@NotNull Project project, @NotNull MetricsStatus status) {
+        postSimpleMetric(project, "create_project", status);
+    }
+
+    public static void openProject(@NotNull Project project, @NotNull MetricsStatus status) {
+        postSimpleMetric(project, "open_project", status);
     }
 
     private static void stepAction(
@@ -111,18 +113,25 @@ public class Metrics {
         postMetrics(project, metric, status);
     }
 
-    public static void resetStepAction(
+    public static void sendAction(
             @NotNull Project project,
             @NotNull StepNode stepNode,
             @NotNull MetricsStatus status) {
-        stepAction("reset_step", project, stepNode, status);
+        stepAction("send", project, stepNode, status);
     }
 
-    public static void switchLanguage(
+    public static void downloadAction(
             @NotNull Project project,
             @NotNull StepNode stepNode,
             @NotNull MetricsStatus status) {
-        stepAction("switch_language", project, stepNode, status);
+        stepAction("download", project, stepNode, status);
+    }
+
+    public static void getStepStatusAction(
+            @NotNull Project project,
+            @NotNull StepNode stepNode,
+            @NotNull MetricsStatus status) {
+        stepAction("get_step_status", project, stepNode, status);
     }
 
     public static void insertAmbientCodeAction(
@@ -132,6 +141,20 @@ public class Metrics {
         stepAction("insert_ambient_code", project, stepNode, status);
     }
 
+    public static void navigateAction(
+            @NotNull Project project,
+            @NotNull StepNode stepNode,
+            @NotNull MetricsStatus status) {
+        stepAction("navigate", project, stepNode, status);
+    }
+
+    public static void resetStepAction(
+            @NotNull Project project,
+            @NotNull StepNode stepNode,
+            @NotNull MetricsStatus status) {
+        stepAction("reset_step", project, stepNode, status);
+    }
+
     public static void removeAmbientCodeAction(
             @NotNull Project project,
             @NotNull StepNode stepNode,
@@ -139,30 +162,10 @@ public class Metrics {
         stepAction("remove_ambient_code", project, stepNode, status);
     }
 
-    public static void createProject(@NotNull Project project, @NotNull MetricsStatus status) {
-        Metric metric = new Metric();
-        metric.addTags("action", "create_project");
-        postMetrics(project, metric, status);
-    }
-
-    public static void openProject(@NotNull Project project, @NotNull MetricsStatus status) {
-        Metric metric = new Metric();
-        metric.addTags("action", "open_project");
-        postMetrics(project, metric, status);
-    }
-
-    public static void authenticate(@NotNull MetricsStatus status) {
-        Metric metric = new Metric();
-        metric.addTags("action", "authenticate");
-
-        Project project = Utils.getCurrentProject();
-        postMetrics(project, metric, status);
-    }
-
-    public static void navigateAction(
+    public static void switchLanguage(
             @NotNull Project project,
             @NotNull StepNode stepNode,
             @NotNull MetricsStatus status) {
-        stepAction("navigate", project, stepNode, status);
+        stepAction("switch_language", project, stepNode, status);
     }
 }
