@@ -10,6 +10,9 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.keymap.KeymapUtil;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
@@ -20,6 +23,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.core.EduNames;
+import com.jetbrains.tmp.learning.courseFormat.LessonNode;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
@@ -32,10 +36,12 @@ import org.stepik.api.objects.submissions.Submission;
 import org.stepik.api.objects.submissions.Submissions;
 import org.stepik.api.queries.Order;
 import org.stepik.core.metrics.Metrics;
+import org.stepik.core.utils.Utils;
 
 import javax.swing.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
@@ -89,16 +95,39 @@ public class DownloadSubmission extends AbstractStepAction {
             return;
         }
 
-        List<Submission> submissions = getSubmissions(stepNode);
+        String title = "Download submission";
+
+        List<Submission> submissions = ProgressManager.getInstance()
+                .run(new Task.WithResult<List<Submission>, RuntimeException>(project, title, true) {
+                    @Override
+                    protected List<Submission> compute(@NotNull ProgressIndicator progressIndicator)
+                            throws RuntimeException {
+                        progressIndicator.setIndeterminate(true);
+                        LessonNode lessonNode = stepNode.getLessonNode();
+                        String lessonName = lessonNode != null ? lessonNode.getName() : "";
+                        progressIndicator.setText(lessonName);
+                        progressIndicator.setText2(stepNode.getName());
+                        List<Submission> submissions = getSubmissions(stepNode);
+
+                        if (Utils.isCanceled()) {
+                            Metrics.downloadAction(project, stepNode, USER_CANCELED);
+                            return null;
+                        }
+
+                        if (submissions == null) {
+                            Metrics.downloadAction(project, stepNode, DATA_NOT_LOADED);
+                            return Collections.emptyList();
+                        }
+
+                        SupportedLanguages currentLang = stepNode.getCurrentLang();
+
+                        return filterSubmissions(submissions, currentLang);
+                    }
+                });
 
         if (submissions == null) {
-            Metrics.downloadAction(project, stepNode, DATA_NOT_LOADED);
             return;
         }
-
-        SupportedLanguages currentLang = stepNode.getCurrentLang();
-
-        submissions = filterSubmissions(submissions, currentLang);
 
         showPopup(project, stepNode, submissions);
     }

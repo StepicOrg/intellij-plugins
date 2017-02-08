@@ -3,7 +3,6 @@ package org.stepik.plugin.actions.step;
 import com.intellij.ide.projectView.ProjectView;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
@@ -24,6 +23,7 @@ import org.stepik.api.objects.submissions.Submission;
 import org.stepik.api.objects.submissions.Submissions;
 import org.stepik.core.metrics.Metrics;
 import org.stepik.core.metrics.MetricsStatus;
+import org.stepik.core.utils.Utils;
 import org.stepik.plugin.utils.DirectivesUtils;
 
 import java.util.List;
@@ -67,7 +67,7 @@ public class StepikJavaPostAction extends StudyCheckAction {
 
         logger.info(String.format("Finish sending step: id=%s", stepId));
 
-        if (isCanceled()) {
+        if (Utils.isCanceled()) {
             Metrics.sendAction(project, stepNode, USER_CANCELED);
             return null;
         }
@@ -165,15 +165,6 @@ public class StepikJavaPostAction extends StudyCheckAction {
         ActionUtils.notifyError(project, title, content);
     }
 
-    private static boolean isCanceled() {
-        try {
-            ProgressManager.checkCanceled();
-        } catch (ProcessCanceledException e) {
-            return true;
-        }
-        return false;
-    }
-
     private static void checkStepStatus(
             @NotNull Project project,
             @NotNull StepNode stepNode,
@@ -191,7 +182,7 @@ public class StepikJavaPostAction extends StudyCheckAction {
         while (EVALUATION.equals(stepStatus) && timer < FIVE_MINUTES) {
             try {
                 Thread.sleep(PERIOD);
-                if (isCanceled()) {
+                if (Utils.isCanceled()) {
                     Metrics.getStepStatusAction(project, stepNode, USER_CANCELED);
                     return;
                 }
