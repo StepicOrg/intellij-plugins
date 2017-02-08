@@ -20,11 +20,13 @@ class JavaWizardStep extends ModuleWizardStep {
     private static final Logger logger = Logger.getInstance(JavaWizardStep.class);
     private final StepikProjectGenerator generator;
     private final ProjectSettingsPanel panel;
+    private final Project project;
     private boolean valid;
     private boolean leaving;
 
     JavaWizardStep(@NotNull final StepikProjectGenerator generator, @NotNull Project project) {
         this.generator = generator;
+        this.project = project;
         panel = new ProjectSettingsPanel(project, true);
     }
 
@@ -62,10 +64,10 @@ class JavaWizardStep extends ModuleWizardStep {
             return;
         }
 
-        Course selectedCourse = panel.getSelectedCourse();
         SupportedLanguages selectedLang = panel.getLanguage();
         generator.setDefaultLang(selectedLang);
-        generator.setSelectedCourse(selectedCourse);
+        Course selectedCourse = panel.getSelectedCourse();
+        generator.createCourseNodeUnderProgress(project, selectedCourse);
 
         long id = selectedCourse.getId();
 

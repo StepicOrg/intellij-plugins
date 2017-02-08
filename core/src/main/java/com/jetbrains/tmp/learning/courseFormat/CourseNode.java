@@ -28,9 +28,9 @@ public class CourseNode implements StudyNode {
     public CourseNode() {
     }
 
-    public CourseNode(@NotNull Course data) {
+    public CourseNode(Course data, ProgressIndicator indicator) {
         this.data = data;
-        init(true, null);
+        init(true, indicator);
     }
 
     @Override
