@@ -44,8 +44,6 @@ public class LessonNode implements StudyNode {
 
         LessonNode that = (LessonNode) o;
 
-        if (sectionNode != null ? !sectionNode.equals(that.sectionNode) : that.sectionNode != null) return false;
-        if (stepNodes != null ? !stepNodes.equals(that.stepNodes) : that.stepNodes != null) return false;
         //noinspection SimplifiableIfStatement
         if (data != null ? !data.equals(that.data) : that.data != null) return false;
         return unit != null ? unit.equals(that.unit) : that.unit == null;
@@ -53,9 +51,7 @@ public class LessonNode implements StudyNode {
 
     @Override
     public int hashCode() {
-        int result = sectionNode != null ? sectionNode.hashCode() : 0;
-        result = 31 * result + (stepNodes != null ? stepNodes.hashCode() : 0);
-        result = 31 * result + (data != null ? data.hashCode() : 0);
+        int result = data != null ? data.hashCode() : 0;
         result = 31 * result + (unit != null ? unit.hashCode() : 0);
         return result;
     }
@@ -128,10 +124,6 @@ public class LessonNode implements StudyNode {
     @SuppressWarnings("unused")
     public void setStepNodes(@Nullable List<StepNode> stepNodes) {
         this.stepNodes = stepNodes;
-    }
-
-    public void addStep(@NotNull final StepNode stepNode) {
-        getStepNodes().add(stepNode);
     }
 
     @Nullable
@@ -207,10 +199,6 @@ public class LessonNode implements StudyNode {
     @Transient
     public int getPosition() {
         return getUnit().getPosition();
-    }
-
-    public void setPosition(int position) {
-        getUnit().setPosition(position);
     }
 
     @NotNull

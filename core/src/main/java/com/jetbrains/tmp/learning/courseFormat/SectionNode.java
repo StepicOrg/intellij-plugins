@@ -45,18 +45,12 @@ public class SectionNode implements StudyNode {
 
         SectionNode that = (SectionNode) o;
 
-        if (data != null ? !data.equals(that.data) : that.data != null) return false;
-        //noinspection SimplifiableIfStatement
-        if (lessonNodes != null ? !lessonNodes.equals(that.lessonNodes) : that.lessonNodes != null) return false;
-        return courseNode != null ? courseNode.equals(that.courseNode) : that.courseNode == null;
+        return data != null ? data.equals(that.data) : that.data == null;
     }
 
     @Override
     public int hashCode() {
-        int result = data != null ? data.hashCode() : 0;
-        result = 31 * result + (lessonNodes != null ? lessonNodes.hashCode() : 0);
-        result = 31 * result + (courseNode != null ? courseNode.hashCode() : 0);
-        return result;
+        return data != null ? data.hashCode() : 0;
     }
 
     void init(@NotNull final CourseNode courseNode, boolean isRestarted, @Nullable ProgressIndicator indicator) {
@@ -136,10 +130,6 @@ public class SectionNode implements StudyNode {
     @Override
     public int getPosition() {
         return getData().getPosition();
-    }
-
-    public void setPosition(int position) {
-        getData().setPosition(position);
     }
 
     @NotNull
@@ -273,9 +263,5 @@ public class SectionNode implements StudyNode {
     @SuppressWarnings("unused")
     public void setData(@Nullable Section data) {
         this.data = data;
-    }
-
-    public void addLesson(@Nullable LessonNode lessonNode) {
-        getLessonNodes().add(lessonNode);
     }
 }
