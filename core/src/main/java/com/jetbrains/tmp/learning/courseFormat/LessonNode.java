@@ -17,9 +17,7 @@ import org.stepik.api.objects.steps.Steps;
 import org.stepik.api.objects.units.Unit;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static com.jetbrains.tmp.learning.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
 
@@ -28,7 +26,6 @@ public class LessonNode extends Node<StepNode> {
     private List<StepNode> stepNodes;
     private Lesson data;
     private Unit unit;
-    private Map<Long, StepNode> mapStepNodes;
     private long courseId;
 
     public LessonNode() {
@@ -62,10 +59,8 @@ public class LessonNode extends Node<StepNode> {
                         .id(stepsIds)
                         .execute();
 
-                Map<Long, StepNode> nodeMap = getMapStepNodes();
-
                 for (Step step : steps.getSteps()) {
-                    StepNode stepNode = nodeMap.get(step.getId());
+                    StepNode stepNode = getChildById(step.getId());
                     if (stepNode != null) {
                         stepNode.setData(step);
                     } else {
@@ -76,7 +71,7 @@ public class LessonNode extends Node<StepNode> {
                     }
                 }
 
-                clearNodeMap();
+                clearMapNodes();
             }
         } catch (StepikClientException logged) {
             logger.warn("A lesson initialization don't is fully", logged);
@@ -87,10 +82,6 @@ public class LessonNode extends Node<StepNode> {
         for (StepNode stepNode : getStepNodes()) {
             stepNode.init(this, isRestarted, indicator);
         }
-    }
-
-    private void clearNodeMap() {
-        mapStepNodes = null;
     }
 
     @Transient
@@ -111,7 +102,7 @@ public class LessonNode extends Node<StepNode> {
     @SuppressWarnings("unused")
     public void setStepNodes(@Nullable List<StepNode> stepNodes) {
         this.stepNodes = stepNodes;
-        clearNodeMap();
+        clearMapNodes();
     }
 
     @Nullable
@@ -149,6 +140,10 @@ public class LessonNode extends Node<StepNode> {
         return getData().getId();
     }
 
+    public void setId(long id) {
+        getData().setId(id);
+    }
+
     @Override
     public long getCourseId() {
         StudyNode parent = getParent();
@@ -180,10 +175,6 @@ public class LessonNode extends Node<StepNode> {
         } catch (StepikClientException ignored) {
         }
         return 0;
-    }
-
-    public void setId(long id) {
-        getData().setId(id);
     }
 
     @Transient
@@ -228,20 +219,6 @@ public class LessonNode extends Node<StepNode> {
     @SuppressWarnings("unused,WeakerAccess")
     public void setUnit(@Nullable Unit unit) {
         this.unit = unit;
-    }
-
-    @Transient
-    private Map<Long, StepNode> getMapStepNodes() {
-        if (mapStepNodes == null) {
-            mapStepNodes = new HashMap<>();
-            getStepNodes().forEach(stepNode -> mapStepNodes.put(stepNode.getId(), stepNode));
-        }
-        return mapStepNodes;
-    }
-
-    @Nullable
-    StepNode getStepById(long id) {
-        return getMapStepNodes().get(id);
     }
 
     @Override

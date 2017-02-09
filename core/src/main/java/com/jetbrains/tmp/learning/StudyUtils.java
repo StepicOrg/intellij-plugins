@@ -1,13 +1,14 @@
 package com.jetbrains.tmp.learning;
 
+import com.intellij.ide.projectView.ProjectView;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFileSystemItem;
 import com.intellij.ui.content.Content;
-import com.jetbrains.tmp.learning.courseFormat.CourseNode;
-import com.jetbrains.tmp.learning.courseFormat.LessonNode;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.courseFormat.StudyNode;
 import com.jetbrains.tmp.learning.ui.StudyToolWindow;
@@ -25,7 +26,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StudyUtils {
-    private static Pattern stepPathPattern;
+    private static final String PATH_PATTERN = "^(?:(?:section([0-9]+)/lesson([0-9]+)/step([0-9]+))|(?:lesson([0-9]+)/step([0-9]+))|(?:step([0-9]+))).*$";
+    private static Pattern pathPattern;
 
     private StudyUtils() {
     }
@@ -141,12 +143,42 @@ public class StudyUtils {
 
     @Nullable
     public static StepNode getSelectedStep(@NotNull Project project) {
-        VirtualFile[] files = FileEditorManager.getInstance(project).getSelectedFiles();
+        VirtualFile[] files = FileEditorManager.getInstance(project).getOpenFiles();
         if (files.length == 0) {
             return null;
         }
 
-        return getStep(project, files[0]);
+        StudyNode studyNode = getStep(project, files[0]);
+
+        return studyNode instanceof StepNode ? (StepNode) studyNode : null;
+    }
+
+    @Nullable
+    public static StudyNode getSelectedNode(@NotNull Project project) {
+        StepNode stepNode = getSelectedStep(project);
+        if (stepNode != null) {
+            return stepNode;
+        }
+
+        PsiElement node = ProjectView.getInstance(project)
+                .getParentOfCurrentSelection();
+        if (node == null) {
+            return null;
+        }
+
+        PsiFileSystemItem file;
+
+        if (node instanceof PsiFileSystemItem) {
+            file = (PsiFileSystemItem) node;
+        } else {
+            file = node.getContainingFile();
+        }
+
+        if (file == null) {
+            return null;
+        }
+
+        return getStep(project, file.getVirtualFile());
     }
 
     public static boolean hasJavaFx() {
@@ -159,27 +191,46 @@ public class StudyUtils {
     }
 
     @Nullable
-    public static StepNode getStep(@NotNull Project project, @NotNull VirtualFile stepVF) {
+    public static StudyNode getStep(@NotNull Project project, @NotNull VirtualFile stepVF) {
         String path = getRelativePath(project, stepVF);
-        if (stepPathPattern == null) {
-            stepPathPattern = Pattern.compile("^(section[0-9]+)/(lesson[0-9]+)/(step[0-9]+)/src/.*");
+
+        if (pathPattern == null) {
+            pathPattern = Pattern.compile(PATH_PATTERN);
         }
-        Matcher matcher = stepPathPattern.matcher(path);
+        Matcher matcher = pathPattern.matcher(path);
         if (matcher.matches()) {
-            StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
-            if (projectManager == null) {
-                return null;
-            }
-            CourseNode courseNode = projectManager.getCourseNode();
-            if (courseNode == null) {
-                return null;
-            }
-            LessonNode lessonNode = courseNode.getLessonByDirName(matcher.group(2));
-            if (lessonNode == null) {
-                return null;
-            }
-            return lessonNode.getStep(matcher.group(3));
+            return getStudyNode(project, matcher);
         }
+
         return null;
+    }
+
+    @Nullable
+    private static StudyNode getStudyNode(@NotNull Project project, Matcher matcher) {
+        StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
+        if (projectManager == null) {
+            return null;
+        }
+        StudyNode projectRoot = projectManager.getProjectRoot();
+        if (projectRoot == null) {
+            return null;
+        }
+
+        for (int i = 1; i <= matcher.groupCount(); i++) {
+            String idString = matcher.group(i);
+
+            if (idString == null) {
+                continue;
+            }
+
+            int id = Integer.parseInt(idString);
+
+            projectRoot = projectRoot.getChildById(id);
+            if (projectRoot == null) {
+                return null;
+            }
+        }
+
+        return projectRoot;
     }
 }

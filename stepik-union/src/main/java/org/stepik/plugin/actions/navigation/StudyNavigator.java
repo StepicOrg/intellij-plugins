@@ -13,6 +13,7 @@ class StudyNavigator {
             @Nullable final StudyNode prevNode,
             @Nullable final StudyNode currentNode,
             @NotNull Direction direction) {
+
         if (currentNode == null) {
             return null;
         }
@@ -21,12 +22,18 @@ class StudyNavigator {
 
         if (currentNode.isLeaf()) {
             if (parent != null) {
+                StudyNode item = null;
                 switch (direction) {
                     case BACK:
-                        return parent.getPrevChild(currentNode);
+                        item = parent.getPrevChild(currentNode);
+                        break;
                     case FORWARD:
-                        return parent.getNextChild(currentNode);
+                        item = parent.getNextChild(currentNode);
                 }
+                if (item == null) {
+                    return navigate(parent, parent.getParent(), direction);
+                }
+                return item;
             } else {
                 return null;
             }
@@ -42,6 +49,9 @@ class StudyNavigator {
             }
 
             if (targetNode != null) {
+                if (targetNode.isLeaf()) {
+                    return targetNode;
+                }
                 return navigate(null, targetNode, direction);
             } else if (parent != null) {
                 return navigate(currentNode, parent, direction);

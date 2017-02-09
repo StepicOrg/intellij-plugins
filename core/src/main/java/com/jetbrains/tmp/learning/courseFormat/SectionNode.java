@@ -28,7 +28,6 @@ public class SectionNode extends Node<LessonNode> {
     private static final Logger logger = Logger.getInstance(SectionNode.class);
     private Section data;
     private List<LessonNode> lessonNodes;
-    private Map<Long, LessonNode> mapLessonNodes;
 
     public SectionNode() {
     }
@@ -70,10 +69,8 @@ public class SectionNode extends Node<LessonNode> {
                         .id(lessonsIds)
                         .execute();
 
-                Map<Long, LessonNode> nodeMap = getMapLessonNodes();
-
                 for (Lesson lesson : lessons.getLessons()) {
-                    LessonNode lessonNode = nodeMap.get(lesson.getId());
+                    LessonNode lessonNode = getChildById(lesson.getId());
                     if (lessonNode != null) {
                         lessonNode.setData(lesson);
                         lessonNode.setUnit(unitsMap.get(lesson.getId()));
@@ -85,7 +82,7 @@ public class SectionNode extends Node<LessonNode> {
                     }
                 }
 
-                clearNodeMap();
+                clearMapNodes();
             }
         } catch (StepikClientException logged) {
             logger.warn("A section initialization don't is fully", logged);
@@ -96,19 +93,6 @@ public class SectionNode extends Node<LessonNode> {
         for (LessonNode lessonNode : getLessonNodes()) {
             lessonNode.init(this, isRestarted, indicator);
         }
-    }
-
-    private void clearNodeMap() {
-        mapLessonNodes = null;
-    }
-
-    @Transient
-    private Map<Long, LessonNode> getMapLessonNodes() {
-        if (mapLessonNodes == null) {
-            mapLessonNodes = new HashMap<>();
-            getLessonNodes().forEach(lessonNode -> mapLessonNodes.put(lessonNode.getId(), lessonNode));
-        }
-        return mapLessonNodes;
     }
 
     @Transient
@@ -135,7 +119,7 @@ public class SectionNode extends Node<LessonNode> {
     @SuppressWarnings("unused")
     public void setLessonNodes(@Nullable List<LessonNode> lessonNodes) {
         this.lessonNodes = lessonNodes;
-        clearNodeMap();
+        clearMapNodes();
     }
 
     @Transient
@@ -189,11 +173,6 @@ public class SectionNode extends Node<LessonNode> {
     @SuppressWarnings("unused")
     public void setData(@Nullable Section data) {
         this.data = data;
-    }
-
-    @Nullable
-    LessonNode getLessonById(long id) {
-        return getMapLessonNodes().get(id);
     }
 
     @Override
