@@ -26,7 +26,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StudyUtils {
-    private static final String PATH_PATTERN = "^(?:(?:section([0-9]+)/lesson([0-9]+)/step([0-9]+))|(?:lesson([0-9]+)/step([0-9]+))|(?:step([0-9]+))).*$";
+    private static final String PATH_PATTERN = "^(?:(?:section([0-9]+)/lesson([0-9]+)/step([0-9]+))|" +
+            "(?:lesson([0-9]+)/step([0-9]+))|" +
+            "(?:step([0-9]+))|" +
+            "(?:section([0-9]+)/lesson([0-9]+))|" +
+            "(?:section([0-9]+))" +
+            ").*$";
     private static Pattern pathPattern;
 
     private StudyUtils() {
@@ -148,7 +153,7 @@ public class StudyUtils {
             return null;
         }
 
-        StudyNode studyNode = getStep(project, files[0]);
+        StudyNode studyNode = getStudyNode(project, files[0]);
 
         return studyNode instanceof StepNode ? (StepNode) studyNode : null;
     }
@@ -178,7 +183,7 @@ public class StudyUtils {
             return null;
         }
 
-        return getStep(project, file.getVirtualFile());
+        return getStudyNode(project, file.getVirtualFile());
     }
 
     public static boolean hasJavaFx() {
@@ -191,8 +196,16 @@ public class StudyUtils {
     }
 
     @Nullable
-    public static StudyNode getStep(@NotNull Project project, @NotNull VirtualFile stepVF) {
-        String path = getRelativePath(project, stepVF);
+    public static StudyNode getStudyNode(@NotNull Project project, @NotNull VirtualFile nodeVF) {
+        String path = getRelativePath(project, nodeVF);
+
+        if (path.equals(".")) {
+            StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
+            if (projectManager != null) {
+                return projectManager.getProjectRoot();
+            }
+            return null;
+        }
 
         if (pathPattern == null) {
             pathPattern = Pattern.compile(PATH_PATTERN);

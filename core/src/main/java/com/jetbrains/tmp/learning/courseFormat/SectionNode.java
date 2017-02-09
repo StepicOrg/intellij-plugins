@@ -134,15 +134,8 @@ public class SectionNode extends Node<LessonNode> {
         return StudyStatus.SOLVED;
     }
 
-    @Transient
-    @NotNull
     @Override
-    public String getDirectory() {
-        return EduNames.SECTION + getId();
-    }
-
-    @Override
-    protected List<LessonNode> getChildren() {
+    public List<LessonNode> getChildren() {
         return getLessonNodes();
     }
 
@@ -173,6 +166,12 @@ public class SectionNode extends Node<LessonNode> {
     @SuppressWarnings("unused")
     public void setData(@Nullable Section data) {
         this.data = data;
+    }
+
+    @NotNull
+    @Override
+    String getDirectoryPrefix() {
+        return EduNames.SECTION;
     }
 
     @Override

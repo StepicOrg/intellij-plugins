@@ -129,13 +129,6 @@ public class LessonNode extends Node<StepNode> {
     }
 
     @Transient
-    @NotNull
-    @Override
-    public String getDirectory() {
-        return EduNames.LESSON + getId();
-    }
-
-    @Transient
     public long getId() {
         return getData().getId();
     }
@@ -189,7 +182,7 @@ public class LessonNode extends Node<StepNode> {
     }
 
     @Override
-    protected List<StepNode> getChildren() {
+    public List<StepNode> getChildren() {
         return getStepNodes();
     }
 
@@ -219,6 +212,12 @@ public class LessonNode extends Node<StepNode> {
     @SuppressWarnings("unused,WeakerAccess")
     public void setUnit(@Nullable Unit unit) {
         this.unit = unit;
+    }
+
+    @NotNull
+    @Override
+    String getDirectoryPrefix() {
+        return EduNames.LESSON;
     }
 
     @Override

@@ -49,7 +49,7 @@ class StepModuleBuilder extends ModuleBuilderWithSrc {
         }
         stepNode.setCurrentLang(projectManager.getDefaultLang());
 
-        String src = projectManager.getProject().getBasePath() + String.join("/", stepNode.getPath(), EduNames.SRC);
+        String src = String.join("/", projectManager.getProject().getBasePath(), stepNode.getPath(), EduNames.SRC);
         createMainFile(stepNode, src);
     }
 

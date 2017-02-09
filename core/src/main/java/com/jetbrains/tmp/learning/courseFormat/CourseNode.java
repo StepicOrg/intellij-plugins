@@ -159,12 +159,6 @@ public class CourseNode extends Node<SectionNode> {
     }
 
     @Nullable
-    public StudyNode getSectionByDirName(@NotNull String dirName) {
-        int id = EduUtils.parseDirName(dirName, EduNames.SECTION);
-        return getChildById(id);
-    }
-
-    @Nullable
     public LessonNode getLessonByDirName(@NotNull String name) {
         int id = EduUtils.parseDirName(name, EduNames.LESSON);
         return getLessonById(id);
@@ -182,22 +176,8 @@ public class CourseNode extends Node<SectionNode> {
         return StudyStatus.SOLVED;
     }
 
-    @Transient
-    @NotNull
     @Override
-    public String getDirectory() {
-        return "";
-    }
-
-    @Transient
-    @NotNull
-    @Override
-    public String getPath() {
-        return "";
-    }
-
-    @Override
-    protected List<SectionNode> getChildren() {
+    public List<SectionNode> getChildren() {
         return getSectionNodes();
     }
 
