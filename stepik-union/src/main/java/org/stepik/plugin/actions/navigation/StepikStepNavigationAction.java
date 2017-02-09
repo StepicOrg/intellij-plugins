@@ -1,5 +1,6 @@
 package org.stepik.plugin.actions.navigation;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -11,6 +12,7 @@ import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.courseFormat.StudyNode;
+import com.jetbrains.tmp.learning.ui.StudyToolWindow;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.core.metrics.Metrics;
@@ -70,6 +72,11 @@ abstract class StepikStepNavigationAction extends StudyStepNavigationAction {
 
         updateProjectView(project, mainFile);
         Metrics.navigateAction(project, targetNode, SUCCESSFUL);
+
+        StudyToolWindow toolWindow = StudyUtils.getStudyToolWindow(project);
+        if (toolWindow != null) {
+            ApplicationManager.getApplication().invokeLater(() -> toolWindow.setStepNode(targetNode));
+        }
 
         ToolWindow runToolWindow = ToolWindowManager.getInstance(project).getToolWindow(ToolWindowId.RUN);
         if (runToolWindow != null) {

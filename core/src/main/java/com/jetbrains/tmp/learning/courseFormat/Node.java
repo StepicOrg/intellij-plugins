@@ -117,6 +117,6 @@ public abstract class Node<C extends StudyNode> implements StudyNode {
     }
 
     void clearMapNodes() {
-        mapNodes.clear();
+        mapNodes = null;
     }
 }
