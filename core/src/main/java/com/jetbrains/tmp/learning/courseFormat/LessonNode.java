@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.lessons.Lesson;
+import org.stepik.api.objects.sections.Sections;
 import org.stepik.api.objects.steps.Step;
 import org.stepik.api.objects.steps.Steps;
 import org.stepik.api.objects.units.Unit;
@@ -20,27 +21,29 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class LessonNode implements StudyNode {
+import static com.jetbrains.tmp.learning.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
+
+public class LessonNode extends Node<StepNode> {
     private static final Logger logger = Logger.getInstance(LessonNode.class);
-    private SectionNode sectionNode;
     private List<StepNode> stepNodes;
     private Lesson data;
     private Unit unit;
     private Map<Long, StepNode> mapStepNodes;
+    private long courseId;
 
     public LessonNode() {
     }
 
     public LessonNode(
-            @NotNull final SectionNode sectionNode,
+            @NotNull final SectionNode parent,
             @NotNull Lesson data,
             @NotNull Unit unit) {
         this.data = data;
         this.unit = unit;
-        init(sectionNode, true, null);
+        init(parent, true, null);
     }
 
-    void init(@NotNull final SectionNode sectionNode, boolean isRestarted, @Nullable ProgressIndicator indicator) {
+    void init(@NotNull final SectionNode parent, boolean isRestarted, @Nullable ProgressIndicator indicator) {
         try {
             StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
 
@@ -48,6 +51,8 @@ public class LessonNode implements StudyNode {
                 indicator.setText("Refresh a lesson: " + getName());
                 indicator.setText2("Update steps");
             }
+
+            courseId = 0;
 
             List<Long> stepsIds = getData().getSteps();
 
@@ -70,16 +75,22 @@ public class LessonNode implements StudyNode {
                         }
                     }
                 }
+
+                clearNodeMap();
             }
         } catch (StepikClientException logged) {
             logger.warn("A lesson initialization don't is fully", logged);
         }
 
-        setSectionNode(sectionNode);
+        setParent(parent);
 
         for (StepNode stepNode : getStepNodes()) {
             stepNode.init(this, isRestarted, indicator);
         }
+    }
+
+    private void clearNodeMap() {
+        mapStepNodes = null;
     }
 
     @Transient
@@ -100,7 +111,7 @@ public class LessonNode implements StudyNode {
     @SuppressWarnings("unused")
     public void setStepNodes(@Nullable List<StepNode> stepNodes) {
         this.stepNodes = stepNodes;
-        mapStepNodes = null;
+        clearNodeMap();
     }
 
     @Nullable
@@ -134,43 +145,45 @@ public class LessonNode implements StudyNode {
     }
 
     @Transient
-    @NotNull
-    @Override
-    public String getPath() {
-        if (sectionNode != null) {
-            return sectionNode.getPath() + "/" + getDirectory();
-        } else {
-            return getDirectory();
-        }
-    }
-
-    @Transient
     public long getId() {
         return getData().getId();
     }
 
+    @Override
+    public long getCourseId() {
+        StudyNode parent = getParent();
+        if (parent != null) {
+            return parent.getCourseId();
+        }
+
+        if (courseId != 0) {
+            return courseId;
+        }
+
+        int sectionId = getUnit().getSection();
+        if (sectionId == 0) {
+            return 0;
+        }
+
+        try {
+            StepikApiClient stepikApiClient = authAndGetStepikApiClient();
+
+            Sections sections = stepikApiClient.sections()
+                    .get()
+                    .id(sectionId)
+                    .execute();
+            if (sections.isEmpty()) {
+                return 0;
+            }
+            courseId = sections.getItems().get(0).getCourse();
+            return courseId;
+        } catch (StepikClientException ignored) {
+        }
+        return 0;
+    }
+
     public void setId(long id) {
         getData().setId(id);
-    }
-
-    @Nullable
-    @Transient
-    @Override
-    public CourseNode getCourse() {
-        if (sectionNode == null) {
-            return null;
-        }
-        return sectionNode.getCourseNode();
-    }
-
-    @Nullable
-    @Transient
-    public SectionNode getSectionNode() {
-        return sectionNode;
-    }
-
-    public void setSectionNode(@Nullable SectionNode sectionNode) {
-        this.sectionNode = sectionNode;
     }
 
     @Transient
@@ -184,51 +197,9 @@ public class LessonNode implements StudyNode {
         return "LessonNode {id=" + getId() + ", name='" + getName() + "\'}";
     }
 
-    @Transient
-    @Nullable
-    public StepNode getLastStep() {
-        int stepsCount = getStepNodes().size();
-        if (stepsCount == 0) {
-            return null;
-        }
-        return getStepNodes().get(stepsCount - 1);
-    }
-
-    @Transient
-    @Nullable
-    public StepNode getFirstStep() {
-        List<StepNode> children = getStepNodes();
-        if (children.size() == 0) {
-            return null;
-        }
-
-        return children.get(0);
-    }
-
-    @Transient
-    @Nullable
-    public StepNode getPrevStep(@NotNull StepNode stepNode) {
-        int position = stepNode.getPosition();
-        List<StepNode> children = getStepNodes();
-        for (int i = children.size() - 1; i >= 0; i--) {
-            StepNode item = children.get(i);
-            if (item.getPosition() < position) {
-                return item;
-            }
-        }
-        return null;
-    }
-
-    @Transient
-    @Nullable
-    public StepNode getNextStep(@NotNull StepNode lesson) {
-        int position = lesson.getPosition();
-        for (StepNode item : getStepNodes()) {
-            if (item.getPosition() > position) {
-                return item;
-            }
-        }
-        return null;
+    @Override
+    protected List<StepNode> getChildren() {
+        return getStepNodes();
     }
 
     @SuppressWarnings("WeakerAccess")

@@ -6,40 +6,46 @@ import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.core.EduNames;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.api.client.StepikApiClient;
+import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.steps.BlockView;
 import org.stepik.api.objects.steps.BlockViewOptions;
 import org.stepik.api.objects.steps.Limit;
 import org.stepik.api.objects.steps.Sample;
 import org.stepik.api.objects.steps.Step;
+import org.stepik.api.objects.units.Units;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import static com.jetbrains.tmp.learning.SupportedLanguages.INVALID;
+import static com.jetbrains.tmp.learning.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
 
-public class StepNode implements StudyNode {
+public class StepNode extends Node<StudyNode> {
     private StudyStatus status;
-    private LessonNode lessonNode;
     private List<SupportedLanguages> supportedLanguages;
     private SupportedLanguages currentLang;
     private Step data;
+    private long courseId;
 
     public StepNode() {}
 
-    public StepNode(@NotNull final LessonNode lessonNode, @NotNull Step data) {
+    public StepNode(@NotNull final LessonNode parent, @NotNull Step data) {
         this.data = data;
-        init(lessonNode, true, null);
+        init(parent, true, null);
     }
 
-    void init(@NotNull final LessonNode lessonNode, boolean isRestarted, @Nullable ProgressIndicator indicator) {
+    void init(@NotNull final LessonNode parent, boolean isRestarted, @Nullable ProgressIndicator indicator) {
         if (indicator != null) {
             indicator.setText("Refresh a step: " + getName());
             indicator.setText2("");
         }
 
         supportedLanguages = null;
-        setLessonNode(lessonNode);
+        courseId = 0;
+        setParent(parent);
 
         if (isRestarted) {
             status = StudyStatus.UNCHECKED;
@@ -71,24 +77,9 @@ public class StepNode implements StudyNode {
         return getTemplate(getCurrentLang());
     }
 
-    @Nullable
-    @Transient
-    public LessonNode getLessonNode() {
-        return lessonNode;
-    }
-
-    public void setLessonNode(@Nullable LessonNode lessonNode) {
-        this.lessonNode = lessonNode;
-    }
-
-    @Transient
-    @Nullable
     @Override
-    public CourseNode getCourse() {
-        if (lessonNode == null) {
-            return null;
-        }
-        return lessonNode.getCourse();
+    protected List<StudyNode> getChildren() {
+        return Collections.emptyList();
     }
 
     @Transient
@@ -99,6 +90,43 @@ public class StepNode implements StudyNode {
 
     public void setId(long id) {
         getData().setId(id);
+    }
+
+    @Override
+    public long getCourseId() {
+        StudyNode parent = getParent();
+        if (parent != null) {
+            return parent.getCourseId();
+        }
+
+        if (courseId != 0) {
+            return courseId;
+        }
+
+        int lessonId = getData().getLesson();
+        if (lessonId == 0) {
+            return 0;
+        }
+
+        try {
+            StepikApiClient stepikApiClient = authAndGetStepikApiClient();
+
+            Units units = stepikApiClient.units()
+                    .get()
+                    .lesson(lessonId)
+                    .execute();
+            if (units.isEmpty()) {
+                return 0;
+            }
+
+            LessonNode lessonNode = new LessonNode();
+            lessonNode.setUnit(units.getItems().get(0));
+
+            courseId = lessonNode.getCourseId();
+            return courseId;
+        } catch (StepikClientException ignored) {
+        }
+        return 0;
     }
 
     @Override
@@ -119,17 +147,6 @@ public class StepNode implements StudyNode {
     @Override
     public String getDirectory() {
         return EduNames.STEP + getId();
-    }
-
-    @Transient
-    @NotNull
-    @Override
-    public String getPath() {
-        if (lessonNode != null) {
-            return lessonNode.getPath() + "/" + getDirectory();
-        } else {
-            return getDirectory();
-        }
     }
 
     @Transient
