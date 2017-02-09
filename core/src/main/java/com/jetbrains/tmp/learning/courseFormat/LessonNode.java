@@ -16,7 +16,9 @@ import org.stepik.api.objects.steps.Steps;
 import org.stepik.api.objects.units.Unit;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class LessonNode implements StudyNode {
     private static final Logger logger = Logger.getInstance(LessonNode.class);
@@ -24,6 +26,7 @@ public class LessonNode implements StudyNode {
     private List<StepNode> stepNodes;
     private Lesson data;
     private Unit unit;
+    private Map<Long, StepNode> mapStepNodes;
 
     public LessonNode() {
     }
@@ -37,25 +40,6 @@ public class LessonNode implements StudyNode {
         init(sectionNode, true, null);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        LessonNode that = (LessonNode) o;
-
-        //noinspection SimplifiableIfStatement
-        if (data != null ? !data.equals(that.data) : that.data != null) return false;
-        return unit != null ? unit.equals(that.unit) : that.unit == null;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = data != null ? data.hashCode() : 0;
-        result = 31 * result + (unit != null ? unit.hashCode() : 0);
-        return result;
-    }
-
     void init(@NotNull final SectionNode sectionNode, boolean isRestarted, @Nullable ProgressIndicator indicator) {
         try {
             StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
@@ -65,7 +49,7 @@ public class LessonNode implements StudyNode {
                 indicator.setText2("Update steps");
             }
 
-            List<Long> stepsIds = data.getSteps();
+            List<Long> stepsIds = getData().getSteps();
 
             if (stepsIds.size() > 0) {
                 Steps steps = stepikApiClient.steps()
@@ -73,8 +57,10 @@ public class LessonNode implements StudyNode {
                         .id(stepsIds)
                         .execute();
 
+                Map<Long, StepNode> nodeMap = getMapStepNodes();
+
                 for (Step step : steps.getSteps()) {
-                    StepNode stepNode = getStepById(step.getId());
+                    StepNode stepNode = nodeMap.get(step.getId());
                     if (stepNode != null) {
                         stepNode.setData(step);
                     } else {
@@ -96,16 +82,6 @@ public class LessonNode implements StudyNode {
         }
     }
 
-    @Nullable
-    private StepNode getStepById(long id) {
-        for (StepNode stepNode : getStepNodes()) {
-            if (stepNode.getId() == id) {
-                return stepNode;
-            }
-        }
-        return null;
-    }
-
     @Transient
     @NotNull
     @Override
@@ -124,6 +100,7 @@ public class LessonNode implements StudyNode {
     @SuppressWarnings("unused")
     public void setStepNodes(@Nullable List<StepNode> stepNodes) {
         this.stepNodes = stepNodes;
+        mapStepNodes = null;
     }
 
     @Nullable
@@ -277,8 +254,41 @@ public class LessonNode implements StudyNode {
         return unit;
     }
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings("unused,WeakerAccess")
     public void setUnit(@Nullable Unit unit) {
         this.unit = unit;
+    }
+
+    @Transient
+    private Map<Long, StepNode> getMapStepNodes() {
+        if (mapStepNodes == null) {
+            mapStepNodes = new HashMap<>();
+            getStepNodes().forEach(stepNode -> mapStepNodes.put(stepNode.getId(), stepNode));
+        }
+        return mapStepNodes;
+    }
+
+    @Nullable
+    StepNode getStepById(long id) {
+        return getMapStepNodes().get(id);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        LessonNode that = (LessonNode) o;
+
+        //noinspection SimplifiableIfStatement
+        if (data != null ? !data.equals(that.data) : that.data != null) return false;
+        return unit != null ? unit.equals(that.unit) : that.unit == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = data != null ? data.hashCode() : 0;
+        result = 31 * result + (unit != null ? unit.hashCode() : 0);
+        return result;
     }
 }
