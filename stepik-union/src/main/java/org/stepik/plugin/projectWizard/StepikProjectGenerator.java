@@ -139,9 +139,8 @@ public class StepikProjectGenerator {
                         return;
                     }
 
-                    ProgressIndicator indicator = ProgressManager.getInstance()
-                            .getProgressIndicator();
-
+                    ProgressIndicator indicator = ProgressManager.getInstance().getProgressIndicator();
+                    indicator.setIndeterminate(true);
                     courseNode = new CourseNode(course, indicator);
                 }, "Creating project", true, project);
     }
