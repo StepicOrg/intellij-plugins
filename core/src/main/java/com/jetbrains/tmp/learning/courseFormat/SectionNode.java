@@ -83,6 +83,7 @@ public class SectionNode extends Node<LessonNode> {
                 }
 
                 clearMapNodes();
+                sortChildren();
             }
         } catch (StepikClientException logged) {
             logger.warn("A section initialization don't is fully", logged);
@@ -119,6 +120,7 @@ public class SectionNode extends Node<LessonNode> {
     @SuppressWarnings("unused")
     public void setLessonNodes(@Nullable List<LessonNode> lessonNodes) {
         this.lessonNodes = lessonNodes;
+        sortChildren();
         clearMapNodes();
     }
 
