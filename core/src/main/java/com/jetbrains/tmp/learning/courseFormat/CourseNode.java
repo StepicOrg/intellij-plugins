@@ -17,9 +17,7 @@ import org.stepik.api.objects.users.Users;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static com.jetbrains.tmp.learning.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
 
@@ -28,7 +26,6 @@ public class CourseNode extends Node<SectionNode> {
     private Course data;
     private List<User> authors;
     private List<SectionNode> sectionNodes;
-    private Map<Long, SectionNode> mapSectionNodes;
 
     public CourseNode() {
     }
@@ -55,10 +52,8 @@ public class CourseNode extends Node<SectionNode> {
                         .id(sectionsIds)
                         .execute();
 
-                Map<Long, SectionNode> nodeMap = getMapSectionNodes();
-
                 for (Section section : sections.getSections()) {
-                    SectionNode sectionNode = nodeMap.get(section.getId());
+                    SectionNode sectionNode = getChildById(section.getId());
                     if (sectionNode != null) {
                         sectionNode.setData(section);
                     } else {
@@ -69,7 +64,7 @@ public class CourseNode extends Node<SectionNode> {
                     }
                 }
 
-                clearNodeMap();
+                clearMapNodes();
             }
         } catch (StepikClientException logged) {
             logger.warn("A course initialization don't is fully", logged);
@@ -78,19 +73,6 @@ public class CourseNode extends Node<SectionNode> {
         for (SectionNode sectionNode : getSectionNodes()) {
             sectionNode.init(this, isRestarted, indicator);
         }
-    }
-
-    private void clearNodeMap() {
-        mapSectionNodes = null;
-    }
-
-    @Transient
-    private Map<Long, SectionNode> getMapSectionNodes() {
-        if (mapSectionNodes == null) {
-            mapSectionNodes = new HashMap<>();
-            getSectionNodes().forEach(sectionNode -> mapSectionNodes.put(sectionNode.getId(), sectionNode));
-        }
-        return mapSectionNodes;
     }
 
     @SuppressWarnings("unused")
@@ -139,14 +121,9 @@ public class CourseNode extends Node<SectionNode> {
     }
 
     @Nullable
-    public SectionNode getSectionById(long id) {
-        return getMapSectionNodes().get(id);
-    }
-
-    @Nullable
     public LessonNode getLessonById(long id) {
         for (SectionNode sectionNode : getSectionNodes()) {
-            LessonNode lessonNode = sectionNode.getLessonById(id);
+            LessonNode lessonNode = sectionNode.getChildById(id);
             if (lessonNode != null) {
                 return lessonNode;
             }
@@ -158,7 +135,7 @@ public class CourseNode extends Node<SectionNode> {
     public StepNode getStepById(long id) {
         for (SectionNode sectionNode : getSectionNodes()) {
             for (LessonNode lessonNode : sectionNode.getLessonNodes()) {
-                StepNode stepNode = lessonNode.getStepById(id);
+                StepNode stepNode = lessonNode.getChildById(id);
                 if (stepNode != null) {
                     return stepNode;
                 }
@@ -178,13 +155,13 @@ public class CourseNode extends Node<SectionNode> {
     @SuppressWarnings("unused")
     public void setSectionNodes(@Nullable List<SectionNode> sectionNodes) {
         this.sectionNodes = sectionNodes;
-        clearNodeMap();
+        clearMapNodes();
     }
 
     @Nullable
-    public SectionNode getSectionByDirName(@NotNull String dirName) {
+    public StudyNode getSectionByDirName(@NotNull String dirName) {
         int id = EduUtils.parseDirName(dirName, EduNames.SECTION);
-        return getSectionById(id);
+        return getChildById(id);
     }
 
     @Nullable

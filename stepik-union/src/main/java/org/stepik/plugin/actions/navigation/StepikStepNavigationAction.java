@@ -6,6 +6,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowId;
 import com.intellij.openapi.wm.ToolWindowManager;
+import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
@@ -25,7 +26,15 @@ abstract class StepikStepNavigationAction extends StudyStepNavigationAction {
 
     @Override
     public void navigateStep(@NotNull final Project project) {
-        StudyNode currentNode = StudyUtils.getSelectedStep(project);
+        StudyNode currentNode = StudyUtils.getSelectedNode(project);
+        if (currentNode == null) {
+            StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
+            if (projectManager == null) {
+                return;
+            }
+            currentNode = projectManager.getProjectRoot();
+        }
+
         StudyNode targetNode;
 
         targetNode = getTargetStep(currentNode);

@@ -4,13 +4,16 @@ import com.intellij.util.xmlb.annotations.Transient;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author meanmail
  */
 public abstract class Node<C extends StudyNode> implements StudyNode {
     private StudyNode parent;
+    private Map<Long, C> mapNodes;
 
     protected abstract List<C> getChildren();
 
@@ -96,5 +99,24 @@ public abstract class Node<C extends StudyNode> implements StudyNode {
         } else {
             return getDirectory();
         }
+    }
+
+    @Nullable
+    @Override
+    public C getChildById(long id) {
+        return getMapNodes().get(id);
+    }
+
+    @Transient
+    private Map<Long, C> getMapNodes() {
+        if (mapNodes == null) {
+            mapNodes = new HashMap<>();
+            getChildren().forEach(node -> mapNodes.put(node.getId(), node));
+        }
+        return mapNodes;
+    }
+
+    void clearMapNodes() {
+        mapNodes.clear();
     }
 }

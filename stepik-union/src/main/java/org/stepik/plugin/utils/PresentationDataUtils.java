@@ -11,7 +11,6 @@ import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.CourseNode;
 import com.jetbrains.tmp.learning.courseFormat.LessonNode;
-import com.jetbrains.tmp.learning.courseFormat.SectionNode;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.courseFormat.StudyNode;
 import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
@@ -34,8 +33,11 @@ public class PresentationDataUtils {
     public static void updatePresentationData(@NotNull PresentationData data, @NotNull PsiDirectory psiDirectory) {
         Project project = psiDirectory.getProject();
         String valueName = psiDirectory.getName();
-        StepikProjectManager stepikProjectManager = StepikProjectManager.getInstance(project);
-        CourseNode courseNode = stepikProjectManager.getCourseNode();
+        StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
+        if (projectManager == null) {
+            return;
+        }
+        CourseNode courseNode = projectManager.getCourseNode();
         if (courseNode == null) {
             return;
         }
@@ -65,7 +67,7 @@ public class PresentationDataUtils {
             }
             setAttributes(data, lessonNode);
         } else if (valueName.startsWith(EduNames.SECTION)) {
-            SectionNode sectionNode = courseNode.getSectionByDirName(valueName);
+            StudyNode sectionNode = courseNode.getSectionByDirName(valueName);
             if (sectionNode != null) {
                 setAttributes(data, sectionNode);
             }

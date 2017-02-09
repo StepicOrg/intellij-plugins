@@ -10,8 +10,8 @@ import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.core.EduUtils;
 import com.jetbrains.tmp.learning.courseFormat.CourseNode;
 import com.jetbrains.tmp.learning.courseFormat.LessonNode;
-import com.jetbrains.tmp.learning.courseFormat.SectionNode;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
+import com.jetbrains.tmp.learning.courseFormat.StudyNode;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.plugin.utils.PresentationDataUtils;
 
@@ -35,15 +35,18 @@ class StepikDirectoryNode extends PsiDirectoryNode {
     @Override
     public int getTypeSortWeight(boolean sortByType) {
         String name = getValue().getName();
-        StepikProjectManager stepManager = StepikProjectManager.getInstance(getValue().getProject());
-        CourseNode courseNode = stepManager.getCourseNode();
+        StepikProjectManager projectManager = StepikProjectManager.getInstance(getValue().getProject());
+        if (projectManager == null) {
+            return 0;
+        }
+        CourseNode courseNode = projectManager.getCourseNode();
         if (courseNode == null) {
             return 0;
         }
 
         if (name.startsWith(EduNames.SECTION)) {
             int id = EduUtils.parseDirName(name, EduNames.SECTION);
-            SectionNode sectionNode = courseNode.getSectionById(id);
+            StudyNode sectionNode = courseNode.getChildById(id);
             if (sectionNode == null) {
                 return id;
             }

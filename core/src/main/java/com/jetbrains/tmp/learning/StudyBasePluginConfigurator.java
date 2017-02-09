@@ -6,7 +6,7 @@ import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.jetbrains.tmp.learning.courseFormat.StepNode;
+import com.jetbrains.tmp.learning.courseFormat.StudyNode;
 import com.jetbrains.tmp.learning.ui.StudyToolWindow;
 import org.jetbrains.annotations.NotNull;
 
@@ -41,26 +41,20 @@ public abstract class StudyBasePluginConfigurator implements StudyPluginConfigur
         return new FileEditorManagerListener() {
             @Override
             public void fileOpened(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
-                StepNode stepNode = StudyUtils.getStep(source.getProject(), file);
-                toolWindow.setStepNode(stepNode);
             }
 
             @Override
             public void fileClosed(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
-                for (VirtualFile openedFile : source.getOpenFiles()) {
-                    if (StudyUtils.getStep(project, openedFile) != null) {
-                        return;
-                    }
-                }
-                toolWindow.setStepNode(null);
             }
 
             @Override
             public void selectionChanged(@NotNull FileEditorManagerEvent event) {
                 VirtualFile file = event.getNewFile();
                 if (file != null) {
-                    StepNode stepNode = StudyUtils.getStep(event.getManager().getProject(), file);
+                    StudyNode stepNode = StudyUtils.getStep(event.getManager().getProject(), file);
                     toolWindow.setStepNode(stepNode);
+                } else {
+                    toolWindow.setStepNode(null);
                 }
             }
         };

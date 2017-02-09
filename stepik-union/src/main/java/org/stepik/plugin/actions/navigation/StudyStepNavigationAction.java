@@ -10,7 +10,6 @@ import com.intellij.util.ui.tree.TreeUtil;
 import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.actions.StudyActionWithShortcut;
-import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.courseFormat.StudyNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -87,7 +86,7 @@ abstract class StudyStepNavigationAction extends StudyActionWithShortcut {
             return;
         }
 
-        StepNode stepNode = StudyUtils.getSelectedStep(project);
+        StudyNode stepNode = StudyUtils.getSelectedNode(project);
         presentation.setEnabled(stepNode == null || getTargetStep(stepNode) != null);
     }
 }

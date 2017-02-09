@@ -34,4 +34,7 @@ public interface StudyNode {
     boolean isLeaf();
 
     long getCourseId();
+
+    @Nullable
+    StudyNode getChildById(long id);
 }
