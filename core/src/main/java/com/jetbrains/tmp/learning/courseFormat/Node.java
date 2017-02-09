@@ -11,11 +11,9 @@ import java.util.Map;
 /**
  * @author meanmail
  */
-public abstract class Node<C extends StudyNode> implements StudyNode {
+public abstract class Node<C extends StudyNode> implements StudyNode<C> {
     private StudyNode parent;
     private Map<Long, C> mapNodes;
-
-    protected abstract List<C> getChildren();
 
     @Transient
     @Nullable
@@ -95,10 +93,28 @@ public abstract class Node<C extends StudyNode> implements StudyNode {
     @Override
     public String getPath() {
         if (parent != null) {
+            if (parent.getPath().isEmpty()) {
+                return getDirectory();
+            }
             return parent.getPath() + "/" + getDirectory();
         } else {
-            return getDirectory();
+            return "";
         }
+    }
+
+    @NotNull
+    @Override
+    public String getDirectory() {
+        if (parent != null) {
+            return getDirectoryPrefix() + getId();
+        } else {
+            return "";
+        }
+    }
+
+    @NotNull
+    String getDirectoryPrefix() {
+        return "";
     }
 
     @Nullable

@@ -112,7 +112,7 @@ public class ProgrammingLanguageUtils {
         FileDocumentManager documentManager = FileDocumentManager.getInstance();
         FileEditorManager editorManager = FileEditorManager.getInstance(project);
         for (VirtualFile file : FileEditorManager.getInstance(project).getOpenFiles()) {
-            if (StudyUtils.getStep(project, file) != targetStepNode) {
+            if (StudyUtils.getStudyNode(project, file) != targetStepNode) {
                 continue;
             }
             Document document = documentManager.getDocument(file);

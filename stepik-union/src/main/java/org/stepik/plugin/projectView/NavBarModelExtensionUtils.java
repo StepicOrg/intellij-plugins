@@ -6,7 +6,7 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.jetbrains.tmp.learning.StepikProjectManager;
-import com.jetbrains.tmp.learning.courseFormat.CourseNode;
+import com.jetbrains.tmp.learning.courseFormat.StudyNode;
 import org.jetbrains.annotations.Nullable;
 
 import static org.stepik.plugin.utils.PresentationDataUtils.isVisibleDirectory;
@@ -21,11 +21,15 @@ public class NavBarModelExtensionUtils {
     public static String getPresentableText(@Nullable final Object object) {
         if (object instanceof Project) {
             Project project = (Project) object;
-            StepikProjectManager stepikProjectManager = StepikProjectManager.getInstance(project);
-            CourseNode courseNode = stepikProjectManager.getCourseNode();
-            if (courseNode == null)
+            StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
+            if (projectManager == null) {
                 return null;
-            return courseNode.getName();
+            }
+            StudyNode root = projectManager.getProjectRoot();
+            if (root == null) {
+                return null;
+            }
+            return root.getName();
         }
 
         if (object instanceof PsiDirectory) {
@@ -43,9 +47,12 @@ public class NavBarModelExtensionUtils {
     @Nullable
     public static PsiElement adjustElement(final PsiElement psiElement) {
         Project project = psiElement.getProject();
-        StepikProjectManager stepikProjectManager = StepikProjectManager.getInstance(project);
-        CourseNode courseNode = stepikProjectManager.getCourseNode();
-        if (courseNode == null)
+        StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
+        if (projectManager == null) {
+            return null;
+        }
+        StudyNode root = projectManager.getProjectRoot();
+        if (root == null)
             return psiElement;
 
         if (psiElement instanceof PsiDirectory) {

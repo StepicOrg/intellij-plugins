@@ -78,7 +78,7 @@ public class StepNode extends Node<StudyNode> {
     }
 
     @Override
-    protected List<StudyNode> getChildren() {
+    public List<StudyNode> getChildren() {
         return Collections.emptyList();
     }
 
@@ -140,13 +140,6 @@ public class StepNode extends Node<StudyNode> {
 
     public void setStatus(@Nullable StudyStatus status) {
         this.status = status;
-    }
-
-    @Transient
-    @NotNull
-    @Override
-    public String getDirectory() {
-        return EduNames.STEP + getId();
     }
 
     @Transient
@@ -249,6 +242,12 @@ public class StepNode extends Node<StudyNode> {
 
     public boolean isStepFile(@NotNull String fileName) {
         return getCurrentLang().getMainFileName().equals(fileName);
+    }
+
+    @NotNull
+    @Override
+    String getDirectoryPrefix() {
+        return EduNames.STEP;
     }
 
     @Override

@@ -55,7 +55,7 @@ public class ProjectFilesUtils {
         return !isWithinSandbox(path);
     }
 
-    static boolean isSandbox(@NotNull String path) {
+    public static boolean isSandbox(@NotNull String path) {
         return path.matches(EduNames.SANDBOX_DIR);
     }
 

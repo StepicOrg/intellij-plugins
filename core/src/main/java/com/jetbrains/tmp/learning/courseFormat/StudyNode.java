@@ -4,7 +4,9 @@ import com.intellij.util.xmlb.annotations.Transient;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface StudyNode {
+import java.util.List;
+
+public interface StudyNode<C extends StudyNode> {
     @NotNull
     String getName();
 
@@ -36,5 +38,7 @@ public interface StudyNode {
     long getCourseId();
 
     @Nullable
-    StudyNode getChildById(long id);
+    C getChildById(long id);
+
+    List<C> getChildren();
 }
