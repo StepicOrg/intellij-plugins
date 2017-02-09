@@ -5,7 +5,6 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.util.xmlb.annotations.Transient;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.core.EduUtils;
-import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
@@ -17,7 +16,10 @@ import org.stepik.api.objects.users.User;
 import org.stepik.api.objects.users.Users;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+
+import static com.jetbrains.tmp.learning.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
 
 public class CourseNode implements StudyNode {
     private static final Logger logger = Logger.getInstance(CourseNode.class);
@@ -40,35 +42,23 @@ public class CourseNode implements StudyNode {
 
         CourseNode that = (CourseNode) o;
 
-        if (data != null ? !data.equals(that.data) : that.data != null) return false;
-        //noinspection SimplifiableIfStatement
-        if (authors != null ? !authors.equals(that.authors) : that.authors != null) return false;
-        return sectionNodes != null ? sectionNodes.equals(that.sectionNodes) : that.sectionNodes == null;
+        return data != null ? data.equals(that.data) : that.data == null;
     }
 
     @Override
     public int hashCode() {
-        int result = data != null ? data.hashCode() : 0;
-        result = 31 * result + (authors != null ? authors.hashCode() : 0);
-        result = 31 * result + (sectionNodes != null ? sectionNodes.hashCode() : 0);
-        return result;
+        return data != null ? data.hashCode() : 0;
     }
 
     public void init(boolean isRestarted, @Nullable ProgressIndicator indicator) {
         try {
-            StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
+            StepikApiClient stepikApiClient = authAndGetStepikApiClient();
             if (indicator != null) {
                 indicator.setText("Refresh " + getName());
                 indicator.setText2("Update course authors");
             }
-            List<Long> authorsIds = data.getAuthors();
-            if (authorsIds.size() > 0) {
-                Users users = stepikApiClient.users()
-                        .get()
-                        .id(authorsIds)
-                        .execute();
-                setAuthors(users.getUsers());
-            }
+
+            authors = null;
 
             if (indicator != null) {
                 indicator.setText2("Update sections");
@@ -79,7 +69,6 @@ public class CourseNode implements StudyNode {
                         .get()
                         .id(sectionsIds)
                         .execute();
-
 
                 for (Section section : sections.getSections()) {
                     SectionNode sectionNode = getSectionById(section.getId());
@@ -104,16 +93,23 @@ public class CourseNode implements StudyNode {
 
     @SuppressWarnings("unused")
     @NotNull
+    @Transient
     public List<User> getAuthors() {
         if (authors == null) {
-            authors = new ArrayList<>();
+            List<Long> authorsIds = data.getAuthors();
+            if (authorsIds.size() > 0) {
+                try {
+                    Users users = authAndGetStepikApiClient().users()
+                            .get()
+                            .id(authorsIds)
+                            .execute();
+                    authors = users.getUsers();
+                } catch (StepikClientException e) {
+                    return Collections.emptyList();
+                }
+            }
         }
-        return authors;
-    }
-
-    @SuppressWarnings({"WeakerAccess", "unused"})
-    public void setAuthors(@Nullable List<User> authors) {
-        this.authors = authors;
+        return authors != null ? authors : Collections.emptyList();
     }
 
     @Transient

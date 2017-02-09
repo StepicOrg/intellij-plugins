@@ -1,6 +1,5 @@
 package org.stepik.plugin.actions.navigation;
 
-import com.intellij.ide.projectView.ProjectView;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -8,14 +7,13 @@ import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowId;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.jetbrains.tmp.learning.StudyUtils;
-import com.jetbrains.tmp.learning.courseFormat.StepFile;
+import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.core.metrics.Metrics;
 
 import javax.swing.*;
-import java.util.Map;
 
 import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
 
@@ -44,23 +42,23 @@ abstract class StepikStepNavigationAction extends StudyStepNavigationAction {
         for (VirtualFile file : FileEditorManager.getInstance(project).getOpenFiles()) {
             FileEditorManager.getInstance(project).closeFile(file);
         }
-        Map<String, StepFile> nextStepFiles = targetStepNode.getStepFiles();
+
         VirtualFile projectDir = project.getBaseDir();
         if (projectDir == null) {
             return;
         }
 
-        VirtualFile stepDir = projectDir.findFileByRelativePath(targetStepNode.getPath());
-        if (stepDir == null) {
+        VirtualFile srcDir = projectDir.findFileByRelativePath(targetStepNode.getPath() + "/" + EduNames.SRC);
+        if (srcDir == null) {
             return;
         }
-        if (nextStepFiles.isEmpty()) {
-            ProjectView.getInstance(project).select(stepDir, stepDir, false);
-            return;
-        }
-        VirtualFile shouldBeActive = getFileToActivate(project, nextStepFiles, stepDir);
 
-        updateProjectView(project, shouldBeActive);
+        VirtualFile mainFile = srcDir.findChild(targetStepNode.getCurrentLang().getMainFileName());
+        if (mainFile == null) {
+            mainFile = srcDir;
+        }
+
+        updateProjectView(project, mainFile);
         Metrics.navigateAction(project, targetStepNode, SUCCESSFUL);
 
         ToolWindow runToolWindow = ToolWindowManager.getInstance(project).getToolWindow(ToolWindowId.RUN);

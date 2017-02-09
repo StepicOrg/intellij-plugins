@@ -64,6 +64,100 @@ public class Section extends AbstractObject {
     @SerializedName("update_date")
     private String updateDate;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        Section section = (Section) o;
+
+        if (course != section.course) return false;
+        if (position != section.position) return false;
+        if (requiredPercent != section.requiredPercent) return false;
+        if (isRequirementSatisfied != section.isRequirementSatisfied) return false;
+        if (isExam != section.isExam) return false;
+        if (examDurationMinutes != section.examDurationMinutes) return false;
+        if (isActive != section.isActive) return false;
+        if (units != null ? !units.equals(section.units) : section.units != null) return false;
+        if (discountingPolicy != null ?
+                !discountingPolicy.equals(section.discountingPolicy) :
+                section.discountingPolicy != null) return false;
+        if (progress != null ? !progress.equals(section.progress) : section.progress != null) return false;
+        if (actions != null ? !actions.equals(section.actions) : section.actions != null) return false;
+        if (requiredSection != null ?
+                !requiredSection.equals(section.requiredSection) :
+                section.requiredSection != null)
+            return false;
+        if (examSession != null ? !examSession.equals(section.examSession) : section.examSession != null) return false;
+        if (proctorSession != null ? !proctorSession.equals(section.proctorSession) : section.proctorSession != null)
+            return false;
+        if (description != null ? !description.equals(section.description) : section.description != null) return false;
+        if (title != null ? !title.equals(section.title) : section.title != null) return false;
+        if (slug != null ? !slug.equals(section.slug) : section.slug != null) return false;
+        if (beginDate != null ? !beginDate.equals(section.beginDate) : section.beginDate != null) return false;
+        if (endDate != null ? !endDate.equals(section.endDate) : section.endDate != null) return false;
+        if (softDeadline != null ? !softDeadline.equals(section.softDeadline) : section.softDeadline != null)
+            return false;
+        if (hardDeadline != null ? !hardDeadline.equals(section.hardDeadline) : section.hardDeadline != null)
+            return false;
+        if (gradingPolicy != null ? !gradingPolicy.equals(section.gradingPolicy) : section.gradingPolicy != null)
+            return false;
+        if (beginDateSource != null ?
+                !beginDateSource.equals(section.beginDateSource) :
+                section.beginDateSource != null)
+            return false;
+        if (endDateSource != null ? !endDateSource.equals(section.endDateSource) : section.endDateSource != null)
+            return false;
+        if (softDeadlineSource != null ?
+                !softDeadlineSource.equals(section.softDeadlineSource) :
+                section.softDeadlineSource != null) return false;
+        if (hardDeadlineSource != null ?
+                !hardDeadlineSource.equals(section.hardDeadlineSource) :
+                section.hardDeadlineSource != null) return false;
+        if (gradingPolicySource != null ?
+                !gradingPolicySource.equals(section.gradingPolicySource) :
+                section.gradingPolicySource != null) return false;
+        //noinspection SimplifiableIfStatement
+        if (createDate != null ? !createDate.equals(section.createDate) : section.createDate != null) return false;
+        return updateDate != null ? updateDate.equals(section.updateDate) : section.updateDate == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + course;
+        result = 31 * result + (units != null ? units.hashCode() : 0);
+        result = 31 * result + position;
+        result = 31 * result + (discountingPolicy != null ? discountingPolicy.hashCode() : 0);
+        result = 31 * result + (progress != null ? progress.hashCode() : 0);
+        result = 31 * result + (actions != null ? actions.hashCode() : 0);
+        result = 31 * result + (requiredSection != null ? requiredSection.hashCode() : 0);
+        result = 31 * result + requiredPercent;
+        result = 31 * result + (isRequirementSatisfied ? 1 : 0);
+        result = 31 * result + (isExam ? 1 : 0);
+        result = 31 * result + examDurationMinutes;
+        result = 31 * result + (examSession != null ? examSession.hashCode() : 0);
+        result = 31 * result + (proctorSession != null ? proctorSession.hashCode() : 0);
+        result = 31 * result + (description != null ? description.hashCode() : 0);
+        result = 31 * result + (title != null ? title.hashCode() : 0);
+        result = 31 * result + (slug != null ? slug.hashCode() : 0);
+        result = 31 * result + (beginDate != null ? beginDate.hashCode() : 0);
+        result = 31 * result + (endDate != null ? endDate.hashCode() : 0);
+        result = 31 * result + (softDeadline != null ? softDeadline.hashCode() : 0);
+        result = 31 * result + (hardDeadline != null ? hardDeadline.hashCode() : 0);
+        result = 31 * result + (gradingPolicy != null ? gradingPolicy.hashCode() : 0);
+        result = 31 * result + (beginDateSource != null ? beginDateSource.hashCode() : 0);
+        result = 31 * result + (endDateSource != null ? endDateSource.hashCode() : 0);
+        result = 31 * result + (softDeadlineSource != null ? softDeadlineSource.hashCode() : 0);
+        result = 31 * result + (hardDeadlineSource != null ? hardDeadlineSource.hashCode() : 0);
+        result = 31 * result + (gradingPolicySource != null ? gradingPolicySource.hashCode() : 0);
+        result = 31 * result + (isActive ? 1 : 0);
+        result = 31 * result + (createDate != null ? createDate.hashCode() : 0);
+        result = 31 * result + (updateDate != null ? updateDate.hashCode() : 0);
+        return result;
+    }
+
     @NotNull
     public List<Long> getUnits() {
         if (units == null) {

@@ -8,8 +8,6 @@ import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Set;
-
 /**
  * @author meanmail
  */
@@ -44,10 +42,7 @@ public class ProjectFilesUtils {
                 return false;
             }
             String fileName = dirs[dirs.length - 1];
-            Set<String> filenames = stepNode.getStepFiles().keySet();
-            if (filenames.stream().anyMatch(fileName::equals)) {
-                return true;
-            }
+            return stepNode.isStepFile(fileName);
         }
         return false;
     }
@@ -68,6 +63,7 @@ public class ProjectFilesUtils {
         return path.matches(SRC_PATH_EXPR);
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     static boolean isWithinSandbox(@NotNull String path) {
         return path.matches(EduNames.SANDBOX_DIR + SEPARATOR + ".*");
     }

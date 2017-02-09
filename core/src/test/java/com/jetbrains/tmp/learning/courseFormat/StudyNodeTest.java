@@ -20,24 +20,21 @@ public class StudyNodeTest {
         courseNode = new CourseNode();
 
         sectionNode = new SectionNode();
-        sectionNode.setPosition(1);
         sectionNode.setId(1);
         sectionNode.setCourseNode(courseNode);
 
 
         lessonNode = new LessonNode();
-        lessonNode.setPosition(1);
         lessonNode.setId(1);
         lessonNode.setSectionNode(sectionNode);
 
         stepNode = new StepNode();
-        stepNode.setPosition(1);
         stepNode.setId(1);
         stepNode.setLessonNode(lessonNode);
 
         courseNode.addSection(sectionNode);
-        sectionNode.addLesson(lessonNode);
-        lessonNode.addStep(stepNode);
+        sectionNode.getLessonNodes().add(lessonNode);
+        lessonNode.getStepNodes().add(stepNode);
     }
 
     @Test

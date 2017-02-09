@@ -21,11 +21,9 @@ import com.jetbrains.python.newProject.PythonProjectGenerator;
 import com.jetbrains.python.remote.PyProjectSynchronizer;
 import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.StudyProjectComponent;
-import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.courseFormat.CourseNode;
 import com.jetbrains.tmp.learning.courseFormat.LessonNode;
 import com.jetbrains.tmp.learning.courseFormat.SectionNode;
-import com.jetbrains.tmp.learning.courseFormat.StepFile;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import icons.AllStepikIcons;
@@ -43,6 +41,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+
+import static com.jetbrains.tmp.learning.SupportedLanguages.PYTHON3;
 
 
 class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettings> {
@@ -222,17 +222,15 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
             for (LessonNode lessonNode : sectionNode.getLessonNodes()) {
                 FileUtil.createDirectory(new File(project.getBasePath(), lessonNode.getPath()));
                 for (StepNode stepNode : lessonNode.getStepNodes()) {
-                    stepNode.setCurrentLang(SupportedLanguages.PYTHON3);
+                    stepNode.setCurrentLang(PYTHON3);
                     File stepDir = new File(project.getBasePath(), stepNode.getPath());
                     File srcDir = new File(stepDir, "src");
                     FileUtil.createDirectory(stepDir);
                     FileUtil.createDirectory(srcDir);
 
                     try (BufferedWriter writer = new BufferedWriter(new FileWriter(new File(srcDir, "main.py")))) {
-                        StepFile stepFile = stepNode.getFile("main.py");
-                        if (stepFile != null) {
-                            writer.write(stepFile.getText());
-                        }
+                        String template = stepNode.getCurrentTemplate();
+                        writer.write(template);
                     } catch (IOException e) {
                         logger.warn(e);
                     }

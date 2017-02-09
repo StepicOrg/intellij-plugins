@@ -72,7 +72,7 @@ public class StepikResetStepAction extends AbstractStepAction {
                 () -> ApplicationManager
                         .getApplication()
                         .runWriteAction(() -> {
-                            document.setText(stepNode.getCurrentFileText());
+                            document.setText(stepNode.getCurrentTemplate());
                             Metrics.resetStepAction(project, stepNode, MetricsStatus.SUCCESSFUL);
                         }),
                 "Stepik reset step", "Stepik reset step"

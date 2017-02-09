@@ -13,7 +13,6 @@ import org.stepik.api.objects.steps.Sample;
 import org.stepik.api.objects.steps.Step;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,8 +21,6 @@ import static com.jetbrains.tmp.learning.SupportedLanguages.INVALID;
 public class StepNode implements StudyNode {
     private StudyStatus status;
     private LessonNode lessonNode;
-    private Map<String, StepFile> stepFiles;
-    private Map<SupportedLanguages, Limit> limits;
     private List<SupportedLanguages> supportedLanguages;
     private SupportedLanguages currentLang;
     private Step data;
@@ -43,12 +40,6 @@ public class StepNode implements StudyNode {
         StepNode stepNode = (StepNode) o;
 
         if (status != stepNode.status) return false;
-        if (lessonNode != null ? !lessonNode.equals(stepNode.lessonNode) : stepNode.lessonNode != null) return false;
-        if (stepFiles != null ? !stepFiles.equals(stepNode.stepFiles) : stepNode.stepFiles != null) return false;
-        if (limits != null ? !limits.equals(stepNode.limits) : stepNode.limits != null) return false;
-        if (supportedLanguages != null ?
-                !supportedLanguages.equals(stepNode.supportedLanguages) :
-                stepNode.supportedLanguages != null) return false;
         //noinspection SimplifiableIfStatement
         if (currentLang != stepNode.currentLang) return false;
         return data != null ? data.equals(stepNode.data) : stepNode.data == null;
@@ -57,10 +48,6 @@ public class StepNode implements StudyNode {
     @Override
     public int hashCode() {
         int result = status != null ? status.hashCode() : 0;
-        result = 31 * result + (lessonNode != null ? lessonNode.hashCode() : 0);
-        result = 31 * result + (stepFiles != null ? stepFiles.hashCode() : 0);
-        result = 31 * result + (limits != null ? limits.hashCode() : 0);
-        result = 31 * result + (supportedLanguages != null ? supportedLanguages.hashCode() : 0);
         result = 31 * result + (currentLang != null ? currentLang.hashCode() : 0);
         result = 31 * result + (data != null ? data.hashCode() : 0);
         return result;
@@ -71,42 +58,13 @@ public class StepNode implements StudyNode {
             indicator.setText("Refresh a step: " + getName());
             indicator.setText2("");
         }
-        BlockView block = data.getBlock();
 
-        if (getType() == StepType.CODE) {
-            BlockViewOptions options = block.getOptions();
-            List<SupportedLanguages> languages = new ArrayList<>();
-            Map<String, StepFile> stepFiles = new HashMap<>();
-            Map<String, String> templates = options.getCodeTemplates();
-            templates.entrySet().forEach(entry -> {
-                SupportedLanguages language = SupportedLanguages.langOf(entry.getKey());
-
-                if (language != INVALID && !languages.contains(language)) {
-                    languages.add(language);
-                    StepFile stepFile = new StepFile();
-                    stepFile.setName(language.getMainFileName());
-                    stepFile.setText(entry.getValue());
-                    stepFile.setStepNode(this);
-                    stepFiles.put(language.getMainFileName(), stepFile);
-                }
-            });
-
-            setSupportedLanguages(languages);
-            setStepFiles(stepFiles);
-            Map<SupportedLanguages, Limit> limits = new HashMap<>();
-            options.getLimits().entrySet()
-                    .forEach(entry -> limits.put(SupportedLanguages.langOf(entry.getKey()), entry.getValue()));
-            setLimits(limits);
-        }
+        supportedLanguages = null;
 
         setLessonNode(lessonNode);
 
         if (isRestarted) {
             status = StudyStatus.UNCHECKED;
-        }
-
-        for (StepFile stepFile : getStepFiles().values()) {
-            stepFile.init(this);
         }
     }
 
@@ -122,22 +80,17 @@ public class StepNode implements StudyNode {
         return getData().getBlock().getText();
     }
 
+    @Transient
     @NotNull
-    public Map<String, StepFile> getStepFiles() {
-        if (stepFiles == null) {
-            stepFiles = new HashMap<>();
-        }
-        return stepFiles;
+    public String getTemplate(@NotNull SupportedLanguages language) {
+        Map<String, String> templates = getData().getBlock().getOptions().getCodeTemplates();
+        return templates.getOrDefault(language.getName(), "");
     }
 
-    @SuppressWarnings("unused")
-    public void setStepFiles(@Nullable Map<String, StepFile> stepFiles) {
-        this.stepFiles = stepFiles;
-    }
-
-    @Nullable
-    public StepFile getFile(@NotNull final String fileName) {
-        return getStepFiles().get(fileName);
+    @Transient
+    @NotNull
+    public String getCurrentTemplate() {
+        return getTemplate(getCurrentLang());
     }
 
     @Nullable
@@ -206,34 +159,38 @@ public class StepNode implements StudyNode {
         return getData().getPosition();
     }
 
-    public void setPosition(int position) {
-        getData().setPosition(position);
-    }
-
-    @SuppressWarnings("WeakerAccess")
     @NotNull
-    public Map<SupportedLanguages, Limit> getLimits() {
-        if (limits == null) {
-            limits = new HashMap<>();
-        }
-        return limits;
-    }
-
-    @SuppressWarnings({"WeakerAccess", "unused"})
-    public void setLimits(@Nullable Map<SupportedLanguages, Limit> limits) {
-        this.limits = limits;
+    @Transient
+    private Map<String, Limit> getLimits() {
+        return getData().getBlock().getOptions().getLimits();
     }
 
     @NotNull
     @Transient
     public Limit getLimit() {
-        return getLimits().getOrDefault(getCurrentLang(), new Limit());
+        return getLimits().getOrDefault(getCurrentLang().getName(), new Limit());
     }
 
+    @Transient
     @NotNull
     public List<SupportedLanguages> getSupportedLanguages() {
         if (supportedLanguages == null) {
             supportedLanguages = new ArrayList<>();
+
+            BlockView block = data.getBlock();
+
+            if (getType() == StepType.CODE) {
+                BlockViewOptions options = block.getOptions();
+
+                Map<String, String> templates = options.getCodeTemplates();
+                templates.keySet().forEach(key -> {
+                    SupportedLanguages language = SupportedLanguages.langOf(key);
+
+                    if (language != INVALID && !supportedLanguages.contains(language)) {
+                        supportedLanguages.add(language);
+                    }
+                });
+            }
         }
         return supportedLanguages;
     }
@@ -245,10 +202,8 @@ public class StepNode implements StudyNode {
 
     @NotNull
     public SupportedLanguages getCurrentLang() {
-        if (supportedLanguages == null) {
-            currentLang = INVALID;
-        } else if (currentLang == null || currentLang == INVALID || !supportedLanguages.contains(
-                currentLang)) {
+        List<SupportedLanguages> languages = getSupportedLanguages();
+        if (currentLang == null || currentLang == INVALID || !languages.contains(currentLang)) {
             currentLang = getFirstSupportLang();
         }
         return currentLang;
@@ -297,14 +252,7 @@ public class StepNode implements StudyNode {
         return StepType.of(data.getBlock().getName());
     }
 
-    @Transient
-    @NotNull
-    public String getCurrentFileText() {
-        StepFile file = getFile(getCurrentLang().getMainFileName());
-        if (file == null) {
-            return "";
-        }
-
-        return file.getText();
+    public boolean isStepFile(@NotNull String fileName) {
+        return getCurrentLang().getMainFileName().equals(fileName);
     }
 }
