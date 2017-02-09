@@ -32,27 +32,6 @@ public class StepNode implements StudyNode {
         init(lessonNode, true, null);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        StepNode stepNode = (StepNode) o;
-
-        if (status != stepNode.status) return false;
-        //noinspection SimplifiableIfStatement
-        if (currentLang != stepNode.currentLang) return false;
-        return data != null ? data.equals(stepNode.data) : stepNode.data == null;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = status != null ? status.hashCode() : 0;
-        result = 31 * result + (currentLang != null ? currentLang.hashCode() : 0);
-        result = 31 * result + (data != null ? data.hashCode() : 0);
-        return result;
-    }
-
     void init(@NotNull final LessonNode lessonNode, boolean isRestarted, @Nullable ProgressIndicator indicator) {
         if (indicator != null) {
             indicator.setText("Refresh a step: " + getName());
@@ -60,7 +39,6 @@ public class StepNode implements StudyNode {
         }
 
         supportedLanguages = null;
-
         setLessonNode(lessonNode);
 
         if (isRestarted) {
@@ -254,5 +232,26 @@ public class StepNode implements StudyNode {
 
     public boolean isStepFile(@NotNull String fileName) {
         return getCurrentLang().getMainFileName().equals(fileName);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        StepNode stepNode = (StepNode) o;
+
+        if (status != stepNode.status) return false;
+        //noinspection SimplifiableIfStatement
+        if (currentLang != stepNode.currentLang) return false;
+        return data != null ? data.equals(stepNode.data) : stepNode.data == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = status != null ? status.hashCode() : 0;
+        result = 31 * result + (currentLang != null ? currentLang.hashCode() : 0);
+        result = 31 * result + (data != null ? data.hashCode() : 0);
+        return result;
     }
 }

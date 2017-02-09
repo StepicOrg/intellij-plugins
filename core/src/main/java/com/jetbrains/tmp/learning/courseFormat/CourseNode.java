@@ -17,7 +17,9 @@ import org.stepik.api.objects.users.Users;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.jetbrains.tmp.learning.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
 
@@ -26,6 +28,7 @@ public class CourseNode implements StudyNode {
     private Course data;
     private List<User> authors;
     private List<SectionNode> sectionNodes;
+    private Map<Long, SectionNode> mapSectionNodes;
 
     public CourseNode() {
     }
@@ -35,43 +38,27 @@ public class CourseNode implements StudyNode {
         init(true, indicator);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        CourseNode that = (CourseNode) o;
-
-        return data != null ? data.equals(that.data) : that.data == null;
-    }
-
-    @Override
-    public int hashCode() {
-        return data != null ? data.hashCode() : 0;
-    }
-
     public void init(boolean isRestarted, @Nullable ProgressIndicator indicator) {
         try {
             StepikApiClient stepikApiClient = authAndGetStepikApiClient();
             if (indicator != null) {
                 indicator.setText("Refresh " + getName());
-                indicator.setText2("Update course authors");
+                indicator.setText2("Update sections");
             }
 
             authors = null;
 
-            if (indicator != null) {
-                indicator.setText2("Update sections");
-            }
-            List<Long> sectionsIds = data.getSections();
+            List<Long> sectionsIds = getData().getSections();
             if (sectionsIds.size() > 0) {
                 Sections sections = stepikApiClient.sections()
                         .get()
                         .id(sectionsIds)
                         .execute();
 
+                Map<Long, SectionNode> nodeMap = getMapSectionNodes();
+
                 for (Section section : sections.getSections()) {
-                    SectionNode sectionNode = getSectionById(section.getId());
+                    SectionNode sectionNode = nodeMap.get(section.getId());
                     if (sectionNode != null) {
                         sectionNode.setData(section);
                     } else {
@@ -89,6 +76,15 @@ public class CourseNode implements StudyNode {
         for (SectionNode sectionNode : getSectionNodes()) {
             sectionNode.init(this, isRestarted, indicator);
         }
+    }
+
+    @Transient
+    private Map<Long, SectionNode> getMapSectionNodes() {
+        if (mapSectionNodes == null) {
+            mapSectionNodes = new HashMap<>();
+            getSectionNodes().forEach(sectionNode -> mapSectionNodes.put(sectionNode.getId(), sectionNode));
+        }
+        return mapSectionNodes;
     }
 
     @SuppressWarnings("unused")
@@ -137,28 +133,17 @@ public class CourseNode implements StudyNode {
         return this;
     }
 
-    void addSection(@NotNull SectionNode sectionNode) {
-        getSectionNodes().add(sectionNode);
-        getSectionNodes().sort(StudyNodeComparator.getInstance());
-    }
-
     @Nullable
     public SectionNode getSectionById(long id) {
-        for (SectionNode sectionNode : getSectionNodes()) {
-            if (sectionNode.getId() == id) {
-                return sectionNode;
-            }
-        }
-        return null;
+        return getMapSectionNodes().get(id);
     }
 
     @Nullable
     public LessonNode getLessonById(long id) {
         for (SectionNode sectionNode : getSectionNodes()) {
-            for (LessonNode lessonNode : sectionNode.getLessonNodes()) {
-                if (lessonNode.getId() == id) {
-                    return lessonNode;
-                }
+            LessonNode lessonNode = sectionNode.getLessonById(id);
+            if (lessonNode != null) {
+                return lessonNode;
             }
         }
         return null;
@@ -168,10 +153,9 @@ public class CourseNode implements StudyNode {
     public StepNode getStepById(long id) {
         for (SectionNode sectionNode : getSectionNodes()) {
             for (LessonNode lessonNode : sectionNode.getLessonNodes()) {
-                for (StepNode stepNode : lessonNode.getStepNodes()) {
-                    if (stepNode.getId() == id) {
-                        return stepNode;
-                    }
+                StepNode stepNode = lessonNode.getStepById(id);
+                if (stepNode != null) {
+                    return stepNode;
                 }
             }
         }
@@ -189,6 +173,7 @@ public class CourseNode implements StudyNode {
     @SuppressWarnings("unused")
     public void setSectionNodes(@Nullable List<SectionNode> sectionNodes) {
         this.sectionNodes = sectionNodes;
+        mapSectionNodes = null;
     }
 
     @Nullable
@@ -265,5 +250,20 @@ public class CourseNode implements StudyNode {
     @SuppressWarnings("unused")
     public void setData(@Nullable Course data) {
         this.data = data;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        CourseNode that = (CourseNode) o;
+
+        return data != null ? data.equals(that.data) : that.data == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return data != null ? data.hashCode() : 0;
     }
 }

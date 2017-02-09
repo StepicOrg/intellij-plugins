@@ -29,6 +29,7 @@ public class SectionNode implements StudyNode {
     private Section data;
     private List<LessonNode> lessonNodes;
     private CourseNode courseNode;
+    private Map<Long, LessonNode> mapLessonNodes;
 
     public SectionNode() {
     }
@@ -36,21 +37,6 @@ public class SectionNode implements StudyNode {
     public SectionNode(@NotNull final CourseNode courseNode, @NotNull Section data) {
         this.data = data;
         init(courseNode, true, null);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        SectionNode that = (SectionNode) o;
-
-        return data != null ? data.equals(that.data) : that.data == null;
-    }
-
-    @Override
-    public int hashCode() {
-        return data != null ? data.hashCode() : 0;
     }
 
     void init(@NotNull final CourseNode courseNode, boolean isRestarted, @Nullable ProgressIndicator indicator) {
@@ -62,7 +48,7 @@ public class SectionNode implements StudyNode {
                 indicator.setText2("Update lessons");
             }
 
-            List<Long> unitsIds = data.getUnits();
+            List<Long> unitsIds = getData().getUnits();
 
             if (unitsIds.size() > 0) {
                 Units units = stepikApiClient.units()
@@ -85,8 +71,10 @@ public class SectionNode implements StudyNode {
                         .id(lessonsIds)
                         .execute();
 
+                Map<Long, LessonNode> nodeMap = getMapLessonNodes();
+
                 for (Lesson lesson : lessons.getLessons()) {
-                    LessonNode lessonNode = getLessonById(lesson.getId());
+                    LessonNode lessonNode = nodeMap.get(lesson.getId());
                     if (lessonNode != null) {
                         lessonNode.setData(lesson);
                         lessonNode.setUnit(unitsMap.get(lesson.getId()));
@@ -109,14 +97,13 @@ public class SectionNode implements StudyNode {
         }
     }
 
-    @Nullable
-    private LessonNode getLessonById(long id) {
-        for (LessonNode lessonNode : getLessonNodes()) {
-            if (lessonNode.getId() == id) {
-                return lessonNode;
-            }
+    @Transient
+    private Map<Long, LessonNode> getMapLessonNodes() {
+        if (mapLessonNodes == null) {
+            mapLessonNodes = new HashMap<>();
+            getLessonNodes().forEach(lessonNode -> mapLessonNodes.put(lessonNode.getId(), lessonNode));
         }
-        return null;
+        return mapLessonNodes;
     }
 
     @Transient
@@ -143,6 +130,7 @@ public class SectionNode implements StudyNode {
     @SuppressWarnings("unused")
     public void setLessonNodes(@Nullable List<LessonNode> lessonNodes) {
         this.lessonNodes = lessonNodes;
+        mapLessonNodes = null;
     }
 
     @Transient
@@ -263,5 +251,25 @@ public class SectionNode implements StudyNode {
     @SuppressWarnings("unused")
     public void setData(@Nullable Section data) {
         this.data = data;
+    }
+
+    @Nullable
+    LessonNode getLessonById(long id) {
+        return getMapLessonNodes().get(id);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        SectionNode that = (SectionNode) o;
+
+        return data != null ? data.equals(that.data) : that.data == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return data != null ? data.hashCode() : 0;
     }
 }
