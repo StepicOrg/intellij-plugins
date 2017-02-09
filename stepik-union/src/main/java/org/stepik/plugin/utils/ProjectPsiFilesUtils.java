@@ -4,7 +4,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFileSystemItem;
 import com.jetbrains.tmp.learning.StepikProjectManager;
-import com.jetbrains.tmp.learning.courseFormat.CourseNode;
+import com.jetbrains.tmp.learning.courseFormat.StudyNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.core.utils.ProjectFilesUtils;
@@ -66,7 +66,7 @@ public class ProjectPsiFilesUtils {
     }
 
     @NotNull
-    static String getRelativePath(@NotNull PsiFileSystemItem item) {
+    public static String getRelativePath(@NotNull PsiFileSystemItem item) {
         String path = item.getVirtualFile().getPath();
         String projectPath = item.getProject().getBasePath();
         if (projectPath == null) {
@@ -79,8 +79,12 @@ public class ProjectPsiFilesUtils {
             @NotNull PsiElement element,
             @NotNull Set<Class<? extends PsiElement>> acceptableClasses) {
         Project project = element.getProject();
-        CourseNode courseNode = StepikProjectManager.getInstance(project).getCourseNode();
-        if (courseNode == null) {
+        StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
+        if (projectManager == null) {
+            return false;
+        }
+        StudyNode root = projectManager.getProjectRoot();
+        if (root == null) {
             return false;
         }
 
@@ -93,7 +97,7 @@ public class ProjectPsiFilesUtils {
             return false;
         }
         String path = getRelativePath(file);
-        return ProjectFilesUtils.isNotMovableOrRenameElement(courseNode, path);
+        return ProjectFilesUtils.isNotMovableOrRenameElement(root, path);
     }
 
 }

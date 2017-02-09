@@ -241,7 +241,7 @@ public class StepNode extends Node<StudyNode> {
     }
 
     public boolean isStepFile(@NotNull String fileName) {
-        return getCurrentLang().getMainFileName().equals(fileName);
+        return (EduNames.SRC + "/" + getCurrentLang().getMainFileName()).equals(fileName);
     }
 
     @NotNull
