@@ -1,10 +1,10 @@
 package org.stepik.core.utils;
 
 import com.intellij.openapi.util.io.FileUtil;
+import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.core.EduNames;
-import com.jetbrains.tmp.learning.courseFormat.CourseNode;
-import com.jetbrains.tmp.learning.courseFormat.LessonNode;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
+import com.jetbrains.tmp.learning.courseFormat.StudyNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,26 +30,19 @@ public class ProjectFilesUtils {
         return !(isWithinSrc(targetPath) || isWithinSandbox(targetPath) || isSandbox(targetPath) || isSrc(targetPath));
     }
 
-    private static boolean isStepFile(@NotNull CourseNode courseNode, @NotNull String path) {
-        String[] dirs = splitPath(path);
-        if (dirs.length > 3) {
-            LessonNode lessonNode = courseNode.getLessonByDirName(dirs[1]);
-            if (lessonNode == null) {
-                return false;
-            }
-            StepNode stepNode = lessonNode.getStep(dirs[2]);
-            if (stepNode == null) {
-                return false;
-            }
-            String fileName = dirs[dirs.length - 1];
-            return stepNode.isStepFile(fileName);
+    private static boolean isStepFile(@NotNull StudyNode root, @NotNull String path) {
+        StudyNode studyNode = StudyUtils.getStudyNode(root, path);
+
+        if (studyNode instanceof StepNode) {
+            String filename = getRelativePath(studyNode.getPath(), path);
+            return ((StepNode) studyNode).isStepFile(filename);
         }
         return false;
     }
 
-    public static boolean isNotMovableOrRenameElement(@NotNull CourseNode courseNode, @NotNull String path) {
+    public static boolean isNotMovableOrRenameElement(@NotNull StudyNode node, @NotNull String path) {
         if (isWithinSrc(path)) {
-            return isHideDir(path) || isWithinHideDir(path) || isStepFile(courseNode, path);
+            return isHideDir(path) || isWithinHideDir(path) || isStepFile(node, path);
         }
 
         return !isWithinSandbox(path);

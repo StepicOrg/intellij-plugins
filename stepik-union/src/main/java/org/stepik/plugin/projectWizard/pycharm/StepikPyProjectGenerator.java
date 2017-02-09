@@ -21,10 +21,8 @@ import com.jetbrains.python.newProject.PythonProjectGenerator;
 import com.jetbrains.python.remote.PyProjectSynchronizer;
 import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.StudyProjectComponent;
-import com.jetbrains.tmp.learning.courseFormat.CourseNode;
-import com.jetbrains.tmp.learning.courseFormat.LessonNode;
-import com.jetbrains.tmp.learning.courseFormat.SectionNode;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
+import com.jetbrains.tmp.learning.courseFormat.StudyNode;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import icons.AllStepikIcons;
 import org.jetbrains.annotations.Nls;
@@ -199,13 +197,13 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
             return;
         }
         projectManager.setDefaultLang(generator.getDefaultLang());
-        CourseNode courseNode = projectManager.getCourseNode();
-        if (courseNode == null) {
-            logger.warn("failed to generate builders: CourseNode is null");
+        StudyNode root = projectManager.getProjectRoot();
+        if (root == null) {
+            logger.warn("failed to generate builders: Root is null");
             return;
         }
 
-        createSubDirectories(courseNode, project);
+        createSubDirectories(root, project);
 
         ApplicationManager.getApplication().invokeLater(
                 () -> DumbService.allowStartingDumbModeInside(DumbModePermission.MAY_START_BACKGROUND,
@@ -215,27 +213,28 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
     }
 
     private void createSubDirectories(
-            @NotNull CourseNode courseNode,
+            @NotNull StudyNode<?> root,
             @NotNull Project project) {
-        for (SectionNode sectionNode : courseNode.getSectionNodes()) {
-            FileUtil.createDirectory(new File(project.getBasePath(), sectionNode.getPath()));
-            for (LessonNode lessonNode : sectionNode.getLessonNodes()) {
-                FileUtil.createDirectory(new File(project.getBasePath(), lessonNode.getPath()));
-                for (StepNode stepNode : lessonNode.getStepNodes()) {
-                    stepNode.setCurrentLang(PYTHON3);
-                    File stepDir = new File(project.getBasePath(), stepNode.getPath());
-                    File srcDir = new File(stepDir, "src");
-                    FileUtil.createDirectory(stepDir);
-                    FileUtil.createDirectory(srcDir);
+        root.getChildren()
+                .forEach(child -> {
+                    FileUtil.createDirectory(new File(project.getBasePath(), child.getPath()));
+                    if (child instanceof StepNode) {
+                        StepNode stepNode = (StepNode) child;
+                        stepNode.setCurrentLang(PYTHON3);
+                        File stepDir = new File(project.getBasePath(), stepNode.getPath());
+                        File srcDir = new File(stepDir, "src");
+                        FileUtil.createDirectory(stepDir);
+                        FileUtil.createDirectory(srcDir);
 
-                    try (BufferedWriter writer = new BufferedWriter(new FileWriter(new File(srcDir, "main.py")))) {
-                        String template = stepNode.getCurrentTemplate();
-                        writer.write(template);
-                    } catch (IOException e) {
-                        logger.warn(e);
+                        try (BufferedWriter writer = new BufferedWriter(new FileWriter(new File(srcDir, "main.py")))) {
+                            String template = stepNode.getCurrentTemplate();
+                            writer.write(template);
+                        } catch (IOException e) {
+                            logger.warn(e);
+                        }
+                    } else {
+                        createSubDirectories(child, project);
                     }
-                }
-            }
-        }
+                });
     }
 }

@@ -60,7 +60,7 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
             return false;
         }
         StepikProjectManager instance = getInstance(project);
-        return instance != null && instance.getCourseNode() != null;
+        return instance != null && instance.getProjectRoot() != null;
     }
 
     @Nullable
@@ -75,7 +75,7 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
     @Nullable
     @Override
     public Element getState() {
-        if (courseNode == null) {
+        if (getProjectRoot() == null) {
             return null;
         }
         Element el = new Element("stepikProjectManager");
@@ -114,7 +114,7 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
     }
 
     private void refreshCourse() {
-        if (courseNode == null) {
+        if (getProjectRoot() == null) {
             return;
         }
 

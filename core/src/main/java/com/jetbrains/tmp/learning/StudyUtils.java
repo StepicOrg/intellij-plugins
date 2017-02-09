@@ -199,33 +199,30 @@ public class StudyUtils {
     public static StudyNode getStudyNode(@NotNull Project project, @NotNull VirtualFile nodeVF) {
         String path = getRelativePath(project, nodeVF);
 
-        if (path.equals(".")) {
-            StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
-            if (projectManager != null) {
-                return projectManager.getProjectRoot();
-            }
+        StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
+        if (projectManager == null) {
             return null;
+        }
+
+        StudyNode root = projectManager.getProjectRoot();
+        if (root == null) {
+            return null;
+        }
+
+        return getStudyNode(root, path);
+    }
+
+    @Nullable
+    public static StudyNode getStudyNode(@NotNull StudyNode root, @NotNull String relativePath) {
+        if (relativePath.equals(".")) {
+            return root;
         }
 
         if (pathPattern == null) {
             pathPattern = Pattern.compile(PATH_PATTERN);
         }
-        Matcher matcher = pathPattern.matcher(path);
-        if (matcher.matches()) {
-            return getStudyNode(project, matcher);
-        }
-
-        return null;
-    }
-
-    @Nullable
-    private static StudyNode getStudyNode(@NotNull Project project, Matcher matcher) {
-        StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
-        if (projectManager == null) {
-            return null;
-        }
-        StudyNode projectRoot = projectManager.getProjectRoot();
-        if (projectRoot == null) {
+        Matcher matcher = pathPattern.matcher(relativePath);
+        if (!matcher.matches()) {
             return null;
         }
 
@@ -238,12 +235,12 @@ public class StudyUtils {
 
             int id = Integer.parseInt(idString);
 
-            projectRoot = projectRoot.getChildById(id);
-            if (projectRoot == null) {
+            root = root.getChildById(id);
+            if (root == null) {
                 return null;
             }
         }
 
-        return projectRoot;
+        return root;
     }
 }
