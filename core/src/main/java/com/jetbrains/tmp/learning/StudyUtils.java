@@ -50,7 +50,7 @@ public class StudyUtils {
     }
 
     @Nullable
-    static StudyToolWindow getStudyToolWindow(@NotNull final Project project) {
+    public static StudyToolWindow getStudyToolWindow(@NotNull final Project project) {
         ToolWindow toolWindow = ToolWindowManager.getInstance(project)
                 .getToolWindow(StudyToolWindowFactory.STUDY_TOOL_WINDOW);
         if (toolWindow != null) {
