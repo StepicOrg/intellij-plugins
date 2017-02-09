@@ -3,12 +3,7 @@ package org.stepik.plugin.actions.navigation;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.keymap.KeymapUtil;
-import com.intellij.openapi.project.Project;
-import com.jetbrains.tmp.learning.StepikProjectManager;
-import com.jetbrains.tmp.learning.courseFormat.CourseNode;
-import com.jetbrains.tmp.learning.courseFormat.LessonNode;
-import com.jetbrains.tmp.learning.courseFormat.SectionNode;
-import com.jetbrains.tmp.learning.courseFormat.StepNode;
+import com.jetbrains.tmp.learning.courseFormat.StudyNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -24,31 +19,8 @@ public class StepikNextStepAction extends StepikStepNavigationAction {
     }
 
     @Override
-    protected StepNode getTargetStep(@NotNull final StepNode sourceStepNode) {
-        return StudyNavigator.nextStep(sourceStepNode);
-    }
-
-    @Nullable
-    @Override
-    protected StepNode getDefaultStep(@NotNull final Project project) {
-        StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
-        if (projectManager == null) {
-            return null;
-        }
-        CourseNode courseNode = projectManager.getCourseNode();
-        if (courseNode == null) {
-            return null;
-        }
-
-        for (SectionNode sectionNode : courseNode.getSectionNodes()) {
-            for (LessonNode lessonNode : sectionNode.getLessonNodes()) {
-                if (lessonNode.getStepNodes().size() > 0) {
-                    return lessonNode.getStepNodes().get(0);
-                }
-            }
-        }
-
-        return null;
+    protected StudyNode getTargetStep(@Nullable final StudyNode sourceStepNode) {
+        return StudyNavigator.nextLeaf(sourceStepNode);
     }
 
     @NotNull

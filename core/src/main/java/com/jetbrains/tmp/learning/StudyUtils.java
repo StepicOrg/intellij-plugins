@@ -9,6 +9,7 @@ import com.intellij.ui.content.Content;
 import com.jetbrains.tmp.learning.courseFormat.CourseNode;
 import com.jetbrains.tmp.learning.courseFormat.LessonNode;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
+import com.jetbrains.tmp.learning.courseFormat.StudyNode;
 import com.jetbrains.tmp.learning.ui.StudyToolWindow;
 import com.jetbrains.tmp.learning.ui.StudyToolWindowFactory;
 import org.jetbrains.annotations.Contract;
@@ -75,7 +76,7 @@ public class StudyUtils {
     private static String getTextWithStepLink(StepNode stepNode) {
         StringBuilder stringBuilder = new StringBuilder();
 
-        LessonNode lessonNode = stepNode.getLessonNode();
+        StudyNode lessonNode = stepNode.getParent();
         if (lessonNode != null) {
             stringBuilder.append("<a href=\"https://stepik.org/lesson/")
                     .append(lessonNode.getId())

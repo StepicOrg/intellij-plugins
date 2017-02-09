@@ -24,22 +24,21 @@ import java.util.Map;
  * @author meanmail
  */
 
-public class SectionNode implements StudyNode {
+public class SectionNode extends Node<LessonNode> {
     private static final Logger logger = Logger.getInstance(SectionNode.class);
     private Section data;
     private List<LessonNode> lessonNodes;
-    private CourseNode courseNode;
     private Map<Long, LessonNode> mapLessonNodes;
 
     public SectionNode() {
     }
 
-    public SectionNode(@NotNull final CourseNode courseNode, @NotNull Section data) {
+    public SectionNode(@NotNull final CourseNode parent, @NotNull Section data) {
         this.data = data;
-        init(courseNode, true, null);
+        init(parent, true, null);
     }
 
-    void init(@NotNull final CourseNode courseNode, boolean isRestarted, @Nullable ProgressIndicator indicator) {
+    void init(@NotNull final CourseNode parent, boolean isRestarted, @Nullable ProgressIndicator indicator) {
         try {
             StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
 
@@ -85,16 +84,22 @@ public class SectionNode implements StudyNode {
                         }
                     }
                 }
+
+                clearNodeMap();
             }
         } catch (StepikClientException logged) {
             logger.warn("A section initialization don't is fully", logged);
         }
 
-        setCourseNode(courseNode);
+        setParent(parent);
 
         for (LessonNode lessonNode : getLessonNodes()) {
             lessonNode.init(this, isRestarted, indicator);
         }
+    }
+
+    private void clearNodeMap() {
+        mapLessonNodes = null;
     }
 
     @Transient
@@ -130,7 +135,7 @@ public class SectionNode implements StudyNode {
     @SuppressWarnings("unused")
     public void setLessonNodes(@Nullable List<LessonNode> lessonNodes) {
         this.lessonNodes = lessonNodes;
-        mapLessonNodes = null;
+        clearNodeMap();
     }
 
     @Transient
@@ -152,25 +157,9 @@ public class SectionNode implements StudyNode {
         return EduNames.SECTION + getId();
     }
 
-    @Transient
-    @NotNull
     @Override
-    public String getPath() {
-        if (courseNode != null) {
-            return courseNode.getPath() + "/" + getDirectory();
-        } else {
-            return getDirectory();
-        }
-    }
-
-    @Transient
-    @Nullable
-    public CourseNode getCourseNode() {
-        return courseNode;
-    }
-
-    public void setCourseNode(@Nullable CourseNode courseNode) {
-        this.courseNode = courseNode;
+    protected List<LessonNode> getChildren() {
+        return getLessonNodes();
     }
 
     @Transient
@@ -183,60 +172,9 @@ public class SectionNode implements StudyNode {
         getData().setId(id);
     }
 
-    @Nullable
     @Override
-    public CourseNode getCourse() {
-        return courseNode;
-    }
-
-    @Transient
-    @Nullable
-    public LessonNode getLastLesson() {
-        List<LessonNode> children = getLessonNodes();
-        int lessonsCount = children.size();
-
-        if (lessonsCount == 0) {
-            return null;
-        }
-
-        return children.get(lessonsCount - 1);
-    }
-
-    @Transient
-    @Nullable
-    public LessonNode getFirstLesson() {
-        List<LessonNode> children = getLessonNodes();
-        if (children.size() == 0) {
-            return null;
-        }
-
-        return children.get(0);
-    }
-
-    @Transient
-    @Nullable
-    public LessonNode getPrevLesson(@NotNull LessonNode lessonNode) {
-        int position = lessonNode.getPosition();
-        List<LessonNode> children = getLessonNodes();
-        for (int i = children.size() - 1; i >= 0; i--) {
-            LessonNode item = children.get(i);
-            if (item.getPosition() < position) {
-                return item;
-            }
-        }
-        return null;
-    }
-
-    @Transient
-    @Nullable
-    public LessonNode getNextLesson(@NotNull LessonNode lessonNode) {
-        int position = lessonNode.getPosition();
-        for (LessonNode item : getLessonNodes()) {
-            if (item.getPosition() > position) {
-                return item;
-            }
-        }
-        return null;
+    public long getCourseId() {
+        return getData().getCourse();
     }
 
     @SuppressWarnings("WeakerAccess")

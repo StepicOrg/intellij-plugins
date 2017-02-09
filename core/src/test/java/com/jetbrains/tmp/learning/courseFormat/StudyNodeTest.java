@@ -21,16 +21,16 @@ public class StudyNodeTest {
 
         sectionNode = new SectionNode();
         sectionNode.setId(1);
-        sectionNode.setCourseNode(courseNode);
+        sectionNode.setParent(courseNode);
 
 
         lessonNode = new LessonNode();
         lessonNode.setId(1);
-        lessonNode.setSectionNode(sectionNode);
+        lessonNode.setParent(sectionNode);
 
         stepNode = new StepNode();
         stepNode.setId(1);
-        stepNode.setLessonNode(lessonNode);
+        stepNode.setParent(lessonNode);
 
         courseNode.getSectionNodes().add(sectionNode);
         sectionNode.getLessonNodes().add(lessonNode);

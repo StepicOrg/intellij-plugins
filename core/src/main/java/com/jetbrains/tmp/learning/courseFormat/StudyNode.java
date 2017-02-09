@@ -1,5 +1,6 @@
 package com.jetbrains.tmp.learning.courseFormat;
 
+import com.intellij.util.xmlb.annotations.Transient;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,6 +21,17 @@ public interface StudyNode {
 
     long getId();
 
+    @Transient
     @Nullable
-    CourseNode getCourse();
+    StudyNode getParent();
+
+    @Nullable
+    StudyNode getPrevChild(@Nullable StudyNode current);
+
+    @Nullable
+    StudyNode getNextChild(@Nullable StudyNode current);
+
+    boolean isLeaf();
+
+    long getCourseId();
 }

@@ -23,8 +23,8 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.core.EduNames;
-import com.jetbrains.tmp.learning.courseFormat.LessonNode;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
+import com.jetbrains.tmp.learning.courseFormat.StudyNode;
 import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import icons.AllStepikIcons;
@@ -103,8 +103,8 @@ public class DownloadSubmission extends AbstractStepAction {
                     protected List<Submission> compute(@NotNull ProgressIndicator progressIndicator)
                             throws RuntimeException {
                         progressIndicator.setIndeterminate(true);
-                        LessonNode lessonNode = stepNode.getLessonNode();
-                        String lessonName = lessonNode != null ? lessonNode.getName() : "";
+                        StudyNode parent = stepNode.getParent();
+                        String lessonName = parent != null ? parent.getName() : "";
                         progressIndicator.setText(lessonName);
                         progressIndicator.setText2(stepNode.getName());
                         List<Submission> submissions = getSubmissions(stepNode);

@@ -11,6 +11,7 @@ import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.actions.StudyActionWithShortcut;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
+import com.jetbrains.tmp.learning.courseFormat.StudyNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -74,7 +75,7 @@ abstract class StudyStepNavigationAction extends StudyActionWithShortcut {
         navigateStep(project);
     }
 
-    protected abstract StepNode getTargetStep(@NotNull final StepNode sourceStepNode);
+    protected abstract StudyNode getTargetStep(@Nullable final StudyNode sourceStepNode);
 
     @Override
     public void update(AnActionEvent e) {

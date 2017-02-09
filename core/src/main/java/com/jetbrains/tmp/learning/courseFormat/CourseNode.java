@@ -23,7 +23,7 @@ import java.util.Map;
 
 import static com.jetbrains.tmp.learning.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
 
-public class CourseNode implements StudyNode {
+public class CourseNode extends Node<SectionNode> {
     private static final Logger logger = Logger.getInstance(CourseNode.class);
     private Course data;
     private List<User> authors;
@@ -68,6 +68,8 @@ public class CourseNode implements StudyNode {
                         }
                     }
                 }
+
+                clearNodeMap();
             }
         } catch (StepikClientException logged) {
             logger.warn("A course initialization don't is fully", logged);
@@ -76,6 +78,10 @@ public class CourseNode implements StudyNode {
         for (SectionNode sectionNode : getSectionNodes()) {
             sectionNode.init(this, isRestarted, indicator);
         }
+    }
+
+    private void clearNodeMap() {
+        mapSectionNodes = null;
     }
 
     @Transient
@@ -127,10 +133,9 @@ public class CourseNode implements StudyNode {
         return getData().getId();
     }
 
-    @Nullable
     @Override
-    public CourseNode getCourse() {
-        return this;
+    public long getCourseId() {
+        return getId();
     }
 
     @Nullable
@@ -173,7 +178,7 @@ public class CourseNode implements StudyNode {
     @SuppressWarnings("unused")
     public void setSectionNodes(@Nullable List<SectionNode> sectionNodes) {
         this.sectionNodes = sectionNodes;
-        mapSectionNodes = null;
+        clearNodeMap();
     }
 
     @Nullable
@@ -214,28 +219,9 @@ public class CourseNode implements StudyNode {
         return "";
     }
 
-    @Nullable
-    public SectionNode getPrevSection(@NotNull SectionNode sectionNode) {
-        int position = sectionNode.getPosition();
-        List<SectionNode> children = getSectionNodes();
-        for (int i = children.size() - 1; i >= 0; i--) {
-            SectionNode item = children.get(i);
-            if (item.getPosition() < position) {
-                return item;
-            }
-        }
-        return null;
-    }
-
-    @Nullable
-    public SectionNode getNextSection(@NotNull SectionNode sectionNode) {
-        int position = sectionNode.getPosition();
-        for (SectionNode item : getSectionNodes()) {
-            if (item.getPosition() > position) {
-                return item;
-            }
-        }
-        return null;
+    @Override
+    protected List<SectionNode> getChildren() {
+        return getSectionNodes();
     }
 
     @SuppressWarnings("WeakerAccess")

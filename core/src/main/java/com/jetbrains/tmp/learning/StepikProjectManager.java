@@ -72,35 +72,6 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
         this.courseNode = courseNode;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        StepikProjectManager that = (StepikProjectManager) o;
-
-        if (showHint != that.showHint) return false;
-        if (createdBy != that.createdBy) return false;
-        if (version != that.version) return false;
-        if (project != null ? !project.equals(that.project) : that.project != null) return false;
-        if (courseNode != null ? !courseNode.equals(that.courseNode) : that.courseNode != null) return false;
-        //noinspection SimplifiableIfStatement
-        if (defaultLang != that.defaultLang) return false;
-        return uuid != null ? uuid.equals(that.uuid) : that.uuid == null;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = project != null ? project.hashCode() : 0;
-        result = 31 * result + (courseNode != null ? courseNode.hashCode() : 0);
-        result = 31 * result + (showHint ? 1 : 0);
-        result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
-        result = 31 * result + (defaultLang != null ? defaultLang.hashCode() : 0);
-        result = 31 * result + version;
-        result = 31 * result + (uuid != null ? uuid.hashCode() : 0);
-        return result;
-    }
-
     @Nullable
     @Override
     public Element getState() {
@@ -228,5 +199,34 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
     @Nullable
     public StudyNode getProjectRoot() {
         return courseNode;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        StepikProjectManager that = (StepikProjectManager) o;
+
+        if (showHint != that.showHint) return false;
+        if (createdBy != that.createdBy) return false;
+        if (version != that.version) return false;
+        if (project != null ? !project.equals(that.project) : that.project != null) return false;
+        if (courseNode != null ? !courseNode.equals(that.courseNode) : that.courseNode != null) return false;
+        //noinspection SimplifiableIfStatement
+        if (defaultLang != that.defaultLang) return false;
+        return uuid != null ? uuid.equals(that.uuid) : that.uuid == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = project != null ? project.hashCode() : 0;
+        result = 31 * result + (courseNode != null ? courseNode.hashCode() : 0);
+        result = 31 * result + (showHint ? 1 : 0);
+        result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
+        result = 31 * result + (defaultLang != null ? defaultLang.hashCode() : 0);
+        result = 31 * result + version;
+        result = 31 * result + (uuid != null ? uuid.hashCode() : 0);
+        return result;
     }
 }
