@@ -135,4 +135,8 @@ public abstract class Node<C extends StudyNode> implements StudyNode<C> {
     void clearMapNodes() {
         mapNodes = null;
     }
+
+    void sortChildren() {
+        getChildren().sort(StudyNodeComparator.getInstance());
+    }
 }

@@ -3,8 +3,6 @@ package com.jetbrains.tmp.learning.courseFormat;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.util.xmlb.annotations.Transient;
-import com.jetbrains.tmp.learning.core.EduNames;
-import com.jetbrains.tmp.learning.core.EduUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
@@ -65,6 +63,7 @@ public class CourseNode extends Node<SectionNode> {
                 }
 
                 clearMapNodes();
+                sortChildren();
             }
         } catch (StepikClientException logged) {
             logger.warn("A course initialization don't is fully", logged);
@@ -120,30 +119,6 @@ public class CourseNode extends Node<SectionNode> {
         return getId();
     }
 
-    @Nullable
-    public LessonNode getLessonById(long id) {
-        for (SectionNode sectionNode : getSectionNodes()) {
-            LessonNode lessonNode = sectionNode.getChildById(id);
-            if (lessonNode != null) {
-                return lessonNode;
-            }
-        }
-        return null;
-    }
-
-    @Nullable
-    public StepNode getStepById(long id) {
-        for (SectionNode sectionNode : getSectionNodes()) {
-            for (LessonNode lessonNode : sectionNode.getLessonNodes()) {
-                StepNode stepNode = lessonNode.getChildById(id);
-                if (stepNode != null) {
-                    return stepNode;
-                }
-            }
-        }
-        return null;
-    }
-
     @NotNull
     public List<SectionNode> getSectionNodes() {
         if (sectionNodes == null) {
@@ -155,13 +130,8 @@ public class CourseNode extends Node<SectionNode> {
     @SuppressWarnings("unused")
     public void setSectionNodes(@Nullable List<SectionNode> sectionNodes) {
         this.sectionNodes = sectionNodes;
+        sortChildren();
         clearMapNodes();
-    }
-
-    @Nullable
-    public LessonNode getLessonByDirName(@NotNull String name) {
-        int id = EduUtils.parseDirName(name, EduNames.LESSON);
-        return getLessonById(id);
     }
 
     @Transient

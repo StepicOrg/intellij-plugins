@@ -4,7 +4,6 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.util.xmlb.annotations.Transient;
 import com.jetbrains.tmp.learning.core.EduNames;
-import com.jetbrains.tmp.learning.core.EduUtils;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -72,6 +71,7 @@ public class LessonNode extends Node<StepNode> {
                 }
 
                 clearMapNodes();
+                sortChildren();
             }
         } catch (StepikClientException logged) {
             logger.warn("A lesson initialization don't is fully", logged);
@@ -102,18 +102,8 @@ public class LessonNode extends Node<StepNode> {
     @SuppressWarnings("unused")
     public void setStepNodes(@Nullable List<StepNode> stepNodes) {
         this.stepNodes = stepNodes;
+        sortChildren();
         clearMapNodes();
-    }
-
-    @Nullable
-    public StepNode getStep(@NotNull final String name) {
-        int id = EduUtils.parseDirName(name, EduNames.STEP);
-        for (StepNode stepNode : getStepNodes()) {
-            if (stepNode.getId() == id) {
-                return stepNode;
-            }
-        }
-        return null;
     }
 
     @Transient

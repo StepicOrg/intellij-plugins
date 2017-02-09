@@ -7,9 +7,9 @@ import java.util.Comparator;
  */
 class StudyNodeComparator implements Comparator<StudyNode> {
 
-    private static Comparator<? super SectionNode> instance;
+    private static Comparator<? super StudyNode> instance;
 
-    public static Comparator<? super SectionNode> getInstance() {
+    public static Comparator<? super StudyNode> getInstance() {
         if (instance == null) {
             instance = new StudyNodeComparator();
         }
