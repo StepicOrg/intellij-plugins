@@ -213,7 +213,7 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
     }
 
     private void createSubDirectories(
-            @NotNull StudyNode<?> root,
+            @NotNull StudyNode<?, ?> root,
             @NotNull Project project) {
         root.getChildren()
                 .forEach(child -> {

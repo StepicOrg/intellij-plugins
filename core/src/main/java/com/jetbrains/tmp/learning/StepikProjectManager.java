@@ -21,6 +21,7 @@ import com.jetbrains.tmp.learning.serialization.SupportedLanguagesConverter;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 import org.jdom.Element;
 import org.jdom.input.DOMBuilder;
 import org.jdom.output.XMLOutputter;
@@ -28,9 +29,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.exceptions.StepikClientException;
+import org.stepik.api.objects.courses.Course;
 import org.stepik.api.objects.courses.Courses;
+import org.stepik.api.objects.lessons.CompoundUnitLesson;
+import org.stepik.api.objects.sections.Section;
 import org.stepik.api.objects.steps.Limit;
 import org.stepik.api.objects.steps.Sample;
+import org.stepik.api.objects.steps.Step;
 import org.stepik.api.objects.steps.VideoUrl;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -44,11 +49,6 @@ import java.io.IOException;
 import java.util.UUID;
 
 import static com.jetbrains.tmp.learning.SupportedLanguages.INVALID;
-
-/**
- * Implementation of class which contains all the information
- * about study in context of current project
- */
 
 @State(name = "StepikStudySettings", storages = @Storage("stepik_study_project.xml"))
 public class StepikProjectManager implements PersistentStateComponent<Element>, DumbAware {
@@ -104,7 +104,7 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
     @NotNull
     public static XStream getXStream() {
         if (xStream == null) {
-            xStream = new XStream();
+            xStream = new XStream(new DomDriver());
             xStream.alias("StepikProjectManager", StepikProjectManager.class);
             xStream.alias("CourseNode", CourseNode.class);
             xStream.alias("SectionNode", SectionNode.class);
@@ -115,9 +115,15 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
             xStream.alias("VideoUrl", VideoUrl.class);
             xStream.alias("LinkedTreeMap", LinkedTreeMap.class);
             xStream.alias("Sample", Sample.class);
+            xStream.alias("Course", Course.class);
+            xStream.alias("Section", Section.class);
+            xStream.alias("CompoundUnitLesson", CompoundUnitLesson.class);
+            xStream.alias("Step", Step.class);
             xStream.autodetectAnnotations(true);
             xStream.setClassLoader(StepikProjectManager.class.getClassLoader());
             xStream.registerConverter(new SupportedLanguagesConverter());
+            xStream.ignoreUnknownElements();
+            xStream.setMode(XStream.ID_REFERENCES);
         }
 
         return xStream;

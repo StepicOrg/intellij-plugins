@@ -5,6 +5,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
+import com.jetbrains.tmp.learning.courseFormat.StepType;
 import com.jetbrains.tmp.learning.courseFormat.StudyNode;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
@@ -103,7 +104,8 @@ public class Metrics {
         metric.addTags("action", actionName);
         metric.addData("step_id", stepNode.getId());
         metric.addTags("step_programming_language", stepNode.getCurrentLang().getName());
-        metric.addTags("step_type", stepNode.getData().getBlock().getName());
+        StepType stepType = stepNode.getType();
+        metric.addTags("step_type", stepType != null ? stepType.toString() : "unknown");
 
         postMetrics(project, metric, status);
     }

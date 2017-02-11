@@ -65,6 +65,7 @@ public class StudySerializationUtils {
     private static final String SUPPORTED_LANGUAGES = "supportedLanguages";
     private static final String COMPOUND_UNIT_LESSON_CLASS = "CompoundUnitLesson";
     private static final String LESSON = "lesson";
+    private static final String CHILDREN = "children";
 
     public static int getVersion(Element element) throws StudyUnrecognizedFormatException {
         final Element stepManager = element.getChild(MAIN_ELEMENT);
@@ -361,10 +362,7 @@ public class StudySerializationUtils {
     }
 
     private static List<Element> getSectionNodes(@NotNull Element state) throws StudyUnrecognizedFormatException {
-        final Element stepManager = state.getChild(MAIN_ELEMENT);
-        if (stepManager == null) {
-            throw new StudyUnrecognizedFormatException("Not found element \" + MAIN_ELEMENT + \"");
-        }
+        final Element stepManager = getStepManager(state);
 
         Element defaultLang = getFieldWithNameOrNull(stepManager, DEFAULT_LANG);
         if (defaultLang == null) {
@@ -373,6 +371,28 @@ public class StudySerializationUtils {
         Attribute defaultLangValue = defaultLang.getAttribute(VALUE);
         replaceLanguage(defaultLangValue);
 
+        Element courseNode = getCourseNode(stepManager);
+
+        removeOption(courseNode, DESCRIPTION);
+        removeOption(courseNode, NAME);
+        removeOption(courseNode, ID);
+        removeOption(courseNode, "adaptive");
+        removeOption(stepManager, "user");
+
+        return getListFieldWithNameOrNull(courseNode, SECTIONS_NODES, SECTION_NODE);
+    }
+
+    @NotNull
+    private static Element getStepManager(@NotNull Element state) throws StudyUnrecognizedFormatException {
+        final Element stepManager = state.getChild(MAIN_ELEMENT);
+        if (stepManager == null) {
+            throw new StudyUnrecognizedFormatException("Not found element \" + MAIN_ELEMENT + \"");
+        }
+        return stepManager;
+    }
+
+    @NotNull
+    private static Element getCourseNode(Element stepManager) throws StudyUnrecognizedFormatException {
         Element courseNodeOption = getFieldWithNameOrNull(stepManager, COURSE_NODE);
         if (courseNodeOption == null) {
             String message = String.format("Field %s don't found", COURSE_NODE);
@@ -384,14 +404,7 @@ public class StudySerializationUtils {
             String message = String.format("Field %s is not %s", COURSE_NODE, COURSE_NODE_CLASS);
             throw new StudyUnrecognizedFormatException(message);
         }
-
-        removeOption(courseNode, DESCRIPTION);
-        removeOption(courseNode, NAME);
-        removeOption(courseNode, ID);
-        removeOption(courseNode, "adaptive");
-        removeOption(stepManager, "user");
-
-        return getListFieldWithNameOrNull(courseNode, SECTIONS_NODES, SECTION_NODE);
+        return courseNode;
     }
 
     private static void removeOption(Element parent, String description) {
@@ -476,7 +489,15 @@ public class StudySerializationUtils {
                                     return;
                                 }
                                 stepNodes.forEach(stepNode -> removeOption(stepNode, LIMITS));
+
+                                silentRenameField(lessonNode, STEP_NODES, CHILDREN);
                             }));
+
+            sectionNodes.forEach(sectionNode -> silentRenameField(sectionNode, LESSON_NODES, CHILDREN));
+
+            final Element stepManager = getStepManager(state);
+            Element courseNode = getCourseNode(stepManager);
+            silentRenameField(courseNode, SECTIONS_NODES, CHILDREN);
         }
         final Element stepManager = state.getChild(MAIN_ELEMENT);
         List<Element> elements = stepManager.getChildren();
@@ -484,6 +505,14 @@ public class StudySerializationUtils {
         convertToXStreamStyle(elements);
 
         return state;
+    }
+
+    private static void silentRenameField(@NotNull Element element, @NotNull String oldName, @NotNull String newName) {
+        try {
+            renameField(element, oldName, newName);
+        } catch (StudyUnrecognizedFormatException e) {
+            logger.warn(String.format("Can't rename %s to %s", oldName, newName), e);
+        }
     }
 
     private static void removeChild(Element parent, Element child) {

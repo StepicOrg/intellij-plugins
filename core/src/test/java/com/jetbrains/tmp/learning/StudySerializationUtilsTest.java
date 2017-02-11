@@ -6,6 +6,7 @@ import com.thoughtworks.xstream.XStream;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.stepik.core.TestUtils;
 import org.xml.sax.SAXException;
@@ -22,11 +23,22 @@ import static org.junit.Assert.assertEquals;
  */
 public class StudySerializationUtilsTest {
     private static final int SOURCES_COUNT = 4;
-    private static final XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
+    private static XMLOutputter outputter;
+
+    @BeforeClass
+    public static void before() {
+        outputter = new XMLOutputter();
+        Format format = Format.getPrettyFormat().setLineSeparator("\n");
+        outputter.setFormat(format);
+    }
 
     private static Element readSourceXmlFile(int version, int index)
             throws IOException, SAXException, ParserConfigurationException {
         return TestUtils.readXmlFile(StudySerializationUtilsTest.class, format("version{0}_{1}.xml", version, index));
+    }
+
+    private static String readSourceTextFile(int version, int index) throws IOException {
+        return TestUtils.readTextFile(StudySerializationUtilsTest.class, format("version{0}_{1}.xml", version, index));
     }
 
     @Test
@@ -35,7 +47,7 @@ public class StudySerializationUtilsTest {
         Element stateVersion2 = StudySerializationUtils.convertToSecondVersion(stateVersion1);
 
         String actual = outputter.outputString(stateVersion2);
-        String expected = outputter.outputString(readSourceXmlFile(2, 4));
+        String expected = readSourceTextFile(2, 4);
 
         assertEquals("#4", expected, actual);
     }
@@ -47,7 +59,7 @@ public class StudySerializationUtilsTest {
             Element stateVersion3 = StudySerializationUtils.convertToThirdVersion(stateVersion2);
 
             String actual = outputter.outputString(stateVersion3);
-            String expected = outputter.outputString(readSourceXmlFile(3, i));
+            String expected = readSourceTextFile(3, i);
 
             assertEquals("#" + i, expected, actual);
         }
@@ -70,7 +82,7 @@ public class StudySerializationUtilsTest {
             Object obj = xs.fromXML(outputter.outputString(stateVersion4.getChild(MAIN_ELEMENT)));
 
             String actual = xs.toXML(obj); //outputter.outputString(stateVersion4);
-            String expected = xs.toXML(xs.fromXML(outputter.outputString(readSourceXmlFile(4, i))));
+            String expected = readSourceTextFile(4, i);
 
             assertEquals("#" + i, expected, actual);
         }

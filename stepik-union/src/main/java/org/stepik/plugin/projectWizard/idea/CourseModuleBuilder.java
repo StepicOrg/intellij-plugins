@@ -78,7 +78,7 @@ class CourseModuleBuilder extends AbstractModuleBuilder {
     }
 
     private void createSubDirectories(
-            @NotNull StudyNode<?> root,
+            @NotNull StudyNode<?, ?> root,
             @NotNull ModifiableModuleModel moduleModel,
             @NotNull Project project) {
         root.getChildren()

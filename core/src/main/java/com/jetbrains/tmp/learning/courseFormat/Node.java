@@ -1,9 +1,12 @@
 package com.jetbrains.tmp.learning.courseFormat;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.api.objects.AbstractObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,19 +14,25 @@ import java.util.Map;
 /**
  * @author meanmail
  */
-public abstract class Node<C extends StudyNode, D> implements StudyNode<C> {
+public abstract class Node<
+        D extends AbstractObject,
+        C extends StudyNode<DC, CC>,
+        DC extends AbstractObject,
+        CC extends Node> implements StudyNode<D, C> {
+    private static final Logger logger = Logger.getInstance(Node.class);
     private StudyNode parent;
-    private Map<Long, C> mapNodes;
+    private D data;
+    private List<C> children;
 
-    public Node() {
+    Node() {
     }
 
-    public Node(@NotNull final StudyNode parent, @NotNull D data) {
+    Node(@NotNull final StudyNode parent, @NotNull D data) {
         setData(data);
         init(parent, true, null);
     }
 
-    public Node(@NotNull D data, @Nullable ProgressIndicator indicator) {
+    Node(@NotNull D data, @Nullable ProgressIndicator indicator) {
         setData(data);
         init(null, true, indicator);
     }
@@ -94,7 +103,7 @@ public abstract class Node<C extends StudyNode, D> implements StudyNode<C> {
         return parent;
     }
 
-    public void setParent(StudyNode parent) {
+    public void setParent(@Nullable StudyNode parent) {
         this.parent = parent;
     }
 
@@ -129,51 +138,134 @@ public abstract class Node<C extends StudyNode, D> implements StudyNode<C> {
     @Nullable
     @Override
     public C getChildById(long id) {
-        return getMapNodes().get(id);
-    }
-
-    private Map<Long, C> getMapNodes() {
-        if (mapNodes == null) {
-            mapNodes = new HashMap<>();
-            getChildren().forEach(node -> mapNodes.put(node.getId(), node));
+        for (C child : getChildren()) {
+            if (child.getId() == id) {
+                return child;
+            }
         }
-        return mapNodes;
-    }
 
-    void clearMapNodes() {
-        mapNodes = null;
-    }
-
-    void sortChildren() {
-        getChildren().sort(StudyNodeComparator.getInstance());
-    }
-
-    protected abstract void init(
-            @Nullable final StudyNode parent,
-            boolean isRestarted,
-            @Nullable ProgressIndicator indicator);
-
-    public void init(boolean isRestarted, @Nullable ProgressIndicator indicator) {
-        init(null, isRestarted, indicator);
+        return null;
     }
 
     @NotNull
-    public abstract D getData();
+    private Map<Long, C> getMapNodes() {
+        HashMap<Long, C> mapNodes = new HashMap<>();
+        getChildren().forEach(node -> mapNodes.put(node.getId(), node));
+        return mapNodes;
+    }
 
-    public abstract void setData(@Nullable D data);
+    private void sortChildren() {
+        getChildren().sort(StudyNodeComparator.getInstance());
+    }
+
+    @Override
+    public List<C> getChildren() {
+        if (children == null) {
+            children = new ArrayList<>();
+        }
+
+        return children;
+    }
+
+    protected abstract List<DC> getChildDataList();
+
+    @Override
+    public void init(
+            @Nullable StudyNode parent,
+            boolean isRestarted,
+            @Nullable ProgressIndicator indicator) {
+        Map<Long, C> mapNodes = getMapNodes();
+
+        for (DC data : getChildDataList()) {
+            C child = mapNodes.get(data.getId());
+            if (child != null) {
+                child.setData(data);
+            } else {
+                C item;
+                try {
+                    item = getChildClass().newInstance();
+                } catch (InstantiationException | IllegalAccessException e) {
+                    logger.warn("Can't get new instance for child", e);
+                    break;
+                }
+                item.setParent(this);
+                item.setData(data);
+                if (item.getChildren().size() > 0) {
+                    getChildren().add(item);
+                }
+            }
+        }
+
+        sortChildren();
+
+        setParent(parent);
+
+        for (StudyNode child : getChildren()) {
+            child.init(this, isRestarted, indicator);
+        }
+    }
+
+    protected abstract Class<C> getChildClass();
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Node<?, ?> node = (Node<?, ?>) o;
+        Node<?, ?, ?, ?> node = (Node<?, ?, ?, ?>) o;
 
-        return getData().equals(node.getData());
+        //noinspection SimplifiableIfStatement
+        if (parent != null ? !parent.equals(node.parent) : node.parent != null) return false;
+        return children != null ? children.equals(node.children) : node.children == null;
     }
 
     @Override
     public int hashCode() {
-        return getData().hashCode();
+        int result = parent != null ? parent.hashCode() : 0;
+        result = 31 * result + (children != null ? children.hashCode() : 0);
+        return result;
+    }
+
+    @NotNull
+    @Override
+    public StudyStatus getStatus() {
+        for (StudyNode child : getChildren()) {
+            if (child.getStatus() != StudyStatus.SOLVED)
+                return StudyStatus.UNCHECKED;
+        }
+
+        return StudyStatus.SOLVED;
+    }
+
+    @NotNull
+    @Override
+    public D getData() throws IllegalAccessException, InstantiationException {
+        if (data == null) {
+            data = getDataClass().newInstance();
+        }
+        return data;
+    }
+
+    @Override
+    public void setData(@Nullable D data) {
+        this.data = data;
+    }
+
+    protected abstract Class<D> getDataClass();
+
+    @Override
+    public long getId() {
+        try {
+            return getData().getId();
+        } catch (IllegalAccessException | InstantiationException e) {
+            return 0;
+        }
+    }
+
+    public void setId(long id) {
+        try {
+            getData().setId(id);
+        } catch (IllegalAccessException | InstantiationException ignored) {
+        }
     }
 }

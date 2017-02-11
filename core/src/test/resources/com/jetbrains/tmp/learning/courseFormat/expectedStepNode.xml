@@ -1,30 +1,30 @@
-<StepNode>
-    <data>
-        <id>0</id>
-        <lesson>0</lesson>
-        <position>0</position>
-        <block>
-            <options>
-                <limits>
-                    <entry>
-                        <string>Java 8</string>
-                        <Limit>
-                            <time>8</time>
-                            <memory>256</memory>
-                        </Limit>
-                    </entry>
-                </limits>
-            </options>
-        </block>
-        <viewedBy>0</viewedBy>
-        <passedBy>0</passedBy>
-        <correctRatio>0.0</correctRatio>
-        <worth>0</worth>
-        <isSolutionsUnlocked>false</isSolutionsUnlocked>
-        <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
-        <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
-        <maxSubmissionsCount>0</maxSubmissionsCount>
-        <discussionsCount>0</discussionsCount>
-    </data>
-    <courseId>0</courseId>
+<StepNode id="1">
+  <data class="Step" id="2">
+    <id>0</id>
+    <lesson>0</lesson>
+    <position>0</position>
+    <block id="3">
+      <options id="4">
+        <limits id="5">
+          <entry>
+            <string>Java 8</string>
+            <Limit id="6">
+              <time>8</time>
+              <memory>256</memory>
+            </Limit>
+          </entry>
+        </limits>
+      </options>
+    </block>
+    <viewedBy>0</viewedBy>
+    <passedBy>0</passedBy>
+    <correctRatio>0.0</correctRatio>
+    <worth>0</worth>
+    <isSolutionsUnlocked>false</isSolutionsUnlocked>
+    <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
+    <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+    <maxSubmissionsCount>0</maxSubmissionsCount>
+    <discussionsCount>0</discussionsCount>
+  </data>
+  <courseId>0</courseId>
 </StepNode>

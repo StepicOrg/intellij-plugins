@@ -1,45 +1,25 @@
-<StepikProjectManager>
-    <courseNode>
-        <sectionNodes>
-            <SectionNode>
-                <lessonNodes>
-                    <LessonNode>
-                        <stepNodes>
-                            <StepNode>
-                                <courseId>0</courseId>
-                            </StepNode>
-                        </stepNodes>
-                        <data>
-                            <unit>
-                                <id>0</id>
-                                <section>0</section>
-                                <lesson>0</lesson>
-                                <position>0</position>
-                                <isActive>false</isActive>
-                            </unit>
-                            <lesson>
-                                <id>0</id>
-                                <isPrime>false</isPrime>
-                                <viewedBy>0</viewedBy>
-                                <passedBy>0</passedBy>
-                                <timeToComplete>0</timeToComplete>
-                                <isCommentsEnabled>false</isCommentsEnabled>
-                                <owner>0</owner>
-                                <isFeatured>false</isFeatured>
-                                <isPublic>false</isPublic>
-                                <discussionsCount>0</discussionsCount>
-                                <epicCount>0</epicCount>
-                                <abuseCount>0</abuseCount>
-                            </lesson>
-                        </data>
-                        <courseId>0</courseId>
-                    </LessonNode>
-                </lessonNodes>
-            </SectionNode>
-        </sectionNodes>
-    </courseNode>
-    <showHint>false</showHint>
-    <createdBy>0</createdBy>
-    <defaultLang>invalid</defaultLang>
-    <version>0</version>
+<StepikProjectManager id="1">
+  <courseNode id="2">
+    <children id="3">
+      <SectionNode id="4">
+        <children id="5">
+          <LessonNode id="6">
+            <data id="7">
+              <id>0</id>
+            </data>
+            <children id="8">
+              <StepNode id="9">
+                <courseId>0</courseId>
+              </StepNode>
+            </children>
+            <courseId>0</courseId>
+          </LessonNode>
+        </children>
+      </SectionNode>
+    </children>
+  </courseNode>
+  <showHint>false</showHint>
+  <createdBy>0</createdBy>
+  <defaultLang>invalid</defaultLang>
+  <version>0</version>
 </StepikProjectManager>

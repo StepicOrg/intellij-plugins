@@ -32,9 +32,9 @@ public class StudyNodeTest {
         stepNode.setId(1);
         stepNode.setParent(lessonNode);
 
-        courseNode.getSectionNodes().add(sectionNode);
-        sectionNode.getLessonNodes().add(lessonNode);
-        lessonNode.getStepNodes().add(stepNode);
+        courseNode.getChildren().add(sectionNode);
+        sectionNode.getChildren().add(lessonNode);
+        lessonNode.getChildren().add(stepNode);
     }
 
     @Test

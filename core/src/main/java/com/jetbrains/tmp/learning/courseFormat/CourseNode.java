@@ -12,75 +12,75 @@ import org.stepik.api.objects.sections.Sections;
 import org.stepik.api.objects.users.User;
 import org.stepik.api.objects.users.Users;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import static com.jetbrains.tmp.learning.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
 
-public class CourseNode extends Node<SectionNode, Course> {
+public class CourseNode extends Node<Course, SectionNode, Section, LessonNode> {
     private static final Logger logger = Logger.getInstance(CourseNode.class);
-    private Course data;
     private List<User> authors;
-    private List<SectionNode> sectionNodes;
 
     public CourseNode() {
-    }
-
-    public CourseNode(@NotNull StudyNode parent, @NotNull Course data) {
-        super(parent, data);
     }
 
     public CourseNode(@NotNull Course data, @Nullable ProgressIndicator indicator) {
         super(data, indicator);
     }
 
-    protected void init(@Nullable StudyNode parent, boolean isRestarted, @Nullable ProgressIndicator indicator) {
+    @Override
+    protected List<Section> getChildDataList() {
+        Sections sections = new Sections();
         try {
             StepikApiClient stepikApiClient = authAndGetStepikApiClient();
-            if (indicator != null) {
-                indicator.setText("Refresh " + getName());
-                indicator.setText2("Update sections");
-            }
-
-            authors = null;
 
             List<Long> sectionsIds = getData().getSections();
             if (sectionsIds.size() > 0) {
-                Sections sections = stepikApiClient.sections()
+                sections = stepikApiClient.sections()
                         .get()
                         .id(sectionsIds)
                         .execute();
 
-                for (Section section : sections.getSections()) {
-                    SectionNode sectionNode = getChildById(section.getId());
-                    if (sectionNode != null) {
-                        sectionNode.setData(section);
-                    } else {
-                        SectionNode item = new SectionNode(this, section);
-                        if (item.getLessonNodes().size() > 0) {
-                            getSectionNodes().add(item);
-                        }
-                    }
-                }
 
-                clearMapNodes();
-                sortChildren();
             }
-        } catch (StepikClientException logged) {
+        } catch (StepikClientException | IllegalAccessException | InstantiationException logged) {
             logger.warn("A course initialization don't is fully", logged);
         }
 
-        for (SectionNode sectionNode : getSectionNodes()) {
-            sectionNode.init(this, isRestarted, indicator);
+        return sections.getSections();
+    }
+
+    public void init(@Nullable StudyNode parent, boolean isRestarted, @Nullable ProgressIndicator indicator) {
+        if (indicator != null) {
+            indicator.setText("Refresh " + getName());
+            indicator.setText2("Update sections");
         }
+
+        authors = null;
+
+        super.init(parent, isRestarted, indicator);
+    }
+
+    @Override
+    protected Class<SectionNode> getChildClass() {
+        return SectionNode.class;
+    }
+
+    @Override
+    protected Class<Course> getDataClass() {
+        return Course.class;
     }
 
     @SuppressWarnings("unused")
     @NotNull
     public List<User> getAuthors() {
         if (authors == null) {
-            List<Long> authorsIds = data.getAuthors();
+            List<Long> authorsIds;
+            try {
+                authorsIds = getData().getAuthors();
+            } catch (IllegalAccessException | InstantiationException e) {
+                return Collections.emptyList();
+            }
             if (authorsIds.size() > 0) {
                 try {
                     Users users = authAndGetStepikApiClient().users()
@@ -99,7 +99,11 @@ public class CourseNode extends Node<SectionNode, Course> {
     @NotNull
     @Override
     public String getName() {
-        return getData().getTitle();
+        try {
+            return getData().getTitle();
+        } catch (IllegalAccessException | InstantiationException e) {
+            return "";
+        }
     }
 
     @Override
@@ -108,57 +112,7 @@ public class CourseNode extends Node<SectionNode, Course> {
     }
 
     @Override
-    public long getId() {
-        return getData().getId();
-    }
-
-    @Override
     public long getCourseId() {
         return getId();
-    }
-
-    @NotNull
-    public List<SectionNode> getSectionNodes() {
-        if (sectionNodes == null) {
-            sectionNodes = new ArrayList<>();
-        }
-        return sectionNodes;
-    }
-
-    @SuppressWarnings("unused")
-    public void setSectionNodes(@Nullable List<SectionNode> sectionNodes) {
-        this.sectionNodes = sectionNodes;
-        sortChildren();
-        clearMapNodes();
-    }
-
-    @NotNull
-    @Override
-    public StudyStatus getStatus() {
-        for (SectionNode sectionNode : getSectionNodes()) {
-            if (sectionNode.getStatus() != StudyStatus.SOLVED)
-                return StudyStatus.UNCHECKED;
-        }
-
-        return StudyStatus.SOLVED;
-    }
-
-    @Override
-    public List<SectionNode> getChildren() {
-        return getSectionNodes();
-    }
-
-    @NotNull
-    @Override
-    public Course getData() {
-        if (data == null) {
-            data = new Course();
-        }
-        return data;
-    }
-
-    @Override
-    public void setData(@Nullable Course data) {
-        this.data = data;
     }
 }
