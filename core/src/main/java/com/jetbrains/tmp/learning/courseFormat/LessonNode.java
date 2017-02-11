@@ -13,15 +13,13 @@ import org.stepik.api.objects.sections.Sections;
 import org.stepik.api.objects.steps.Step;
 import org.stepik.api.objects.steps.Steps;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.jetbrains.tmp.learning.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
 
-public class LessonNode extends Node<StepNode, CompoundUnitLesson> {
+public class LessonNode extends Node<CompoundUnitLesson, StepNode, Step, StepNode> {
     private static final Logger logger = Logger.getInstance(LessonNode.class);
-    private List<StepNode> stepNodes;
-    private CompoundUnitLesson data;
     private long courseId;
 
     public LessonNode() {
@@ -31,89 +29,58 @@ public class LessonNode extends Node<StepNode, CompoundUnitLesson> {
         super(parent, data);
     }
 
-    protected void init(@Nullable StudyNode parent, boolean isRestarted, @Nullable ProgressIndicator indicator) {
+
+    @Override
+    protected List<Step> getChildDataList() {
+        Steps steps = new Steps();
         try {
             StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
-
-            if (indicator != null) {
-                indicator.setText("Refresh a lesson: " + getName());
-                indicator.setText2("Update steps");
-            }
-
-            courseId = 0;
 
             List<Long> stepsIds = getData().getLesson().getSteps();
 
             if (stepsIds.size() > 0) {
-                Steps steps = stepikApiClient.steps()
+                steps = stepikApiClient.steps()
                         .get()
                         .id(stepsIds)
                         .execute();
 
-                for (Step step : steps.getSteps()) {
-                    StepNode stepNode = getChildById(step.getId());
-                    if (stepNode != null) {
-                        stepNode.setData(step);
-                    } else {
-                        StepNode item = new StepNode(this, step);
-                        if (item.getType() == StepType.CODE) {
-                            getStepNodes().add(item);
-                        }
-                    }
-                }
 
-                clearMapNodes();
-                sortChildren();
             }
-        } catch (StepikClientException logged) {
+        } catch (StepikClientException | IllegalAccessException | InstantiationException logged) {
             logger.warn("A lesson initialization don't is fully", logged);
         }
 
-        setParent(parent);
+        return steps.getSteps().stream()
+                .filter(step -> StepType.of(step.getBlock().getName()) == StepType.CODE)
+                .collect(Collectors.toList());
+    }
 
-        for (StepNode stepNode : getStepNodes()) {
-            stepNode.init(this, isRestarted, indicator);
+    @Override
+    public void init(@Nullable StudyNode parent, boolean isRestarted, @Nullable ProgressIndicator indicator) {
+        if (indicator != null) {
+            indicator.setText("Refresh a lesson: " + getName());
+            indicator.setText2("Update steps");
         }
+
+        courseId = 0;
+
+        super.init(parent, isRestarted, indicator);
+    }
+
+
+    @Override
+    protected Class<StepNode> getChildClass() {
+        return StepNode.class;
     }
 
     @NotNull
     @Override
     public String getName() {
-        return getData().getLesson().getTitle();
-    }
-
-    @NotNull
-    public List<StepNode> getStepNodes() {
-        if (stepNodes == null) {
-            stepNodes = new ArrayList<>();
+        try {
+            return getData().getLesson().getTitle();
+        } catch (IllegalAccessException | InstantiationException e) {
+            return "";
         }
-        return stepNodes;
-    }
-
-    @SuppressWarnings("unused")
-    public void setStepNodes(@Nullable List<StepNode> stepNodes) {
-        this.stepNodes = stepNodes;
-        sortChildren();
-        clearMapNodes();
-    }
-
-    @NotNull
-    @Override
-    public StudyStatus getStatus() {
-        for (StepNode stepNode : getStepNodes()) {
-            if (stepNode.getStatus() != StudyStatus.SOLVED) {
-                return StudyStatus.UNCHECKED;
-            }
-        }
-        return StudyStatus.SOLVED;
-    }
-
-    public long getId() {
-        return getData().getLesson().getId();
-    }
-
-    public void setId(long id) {
-        getData().getLesson().setId(id);
     }
 
     @Override
@@ -127,7 +94,12 @@ public class LessonNode extends Node<StepNode, CompoundUnitLesson> {
             return courseId;
         }
 
-        int sectionId = getData().getUnit().getSection();
+        int sectionId;
+        try {
+            sectionId = getData().getUnit().getSection();
+        } catch (IllegalAccessException | InstantiationException e) {
+            return 0;
+        }
         if (sectionId == 0) {
             return 0;
         }
@@ -150,32 +122,16 @@ public class LessonNode extends Node<StepNode, CompoundUnitLesson> {
     }
 
     public int getPosition() {
-        return getData().getUnit().getPosition();
-    }
-
-    @NotNull
-    @Override
-    public String toString() {
-        return "LessonNode {id=" + getId() + ", name='" + getName() + "\'}";
-    }
-
-    @Override
-    public List<StepNode> getChildren() {
-        return getStepNodes();
-    }
-
-    @NotNull
-    @Override
-    public CompoundUnitLesson getData() {
-        if (data == null) {
-            data = new CompoundUnitLesson();
+        try {
+            return getData().getUnit().getPosition();
+        } catch (IllegalAccessException | InstantiationException e) {
+            return 0;
         }
-        return data;
     }
 
     @Override
-    public void setData(@Nullable CompoundUnitLesson data) {
-        this.data = data;
+    protected Class<CompoundUnitLesson> getDataClass() {
+        return CompoundUnitLesson.class;
     }
 
     @NotNull

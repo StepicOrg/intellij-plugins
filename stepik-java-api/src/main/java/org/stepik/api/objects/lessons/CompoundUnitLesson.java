@@ -2,12 +2,13 @@ package org.stepik.api.objects.lessons;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.api.objects.AbstractObject;
 import org.stepik.api.objects.units.Unit;
 
 /**
  * @author meanmail
  */
-public class CompoundUnitLesson {
+public class CompoundUnitLesson extends AbstractObject {
     private Unit unit;
     private Lesson lesson;
 
@@ -41,5 +42,14 @@ public class CompoundUnitLesson {
 
     public void setLesson(@Nullable Lesson lesson) {
         this.lesson = lesson;
+    }
+
+    public long getId() {
+        return getLesson().getId();
+    }
+
+    @Override
+    public void setId(long id) {
+        getLesson().setId(id);
     }
 }

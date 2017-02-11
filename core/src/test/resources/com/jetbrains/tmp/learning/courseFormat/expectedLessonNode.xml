@@ -1,26 +1,27 @@
-<LessonNode>
-    <data>
-        <unit>
-            <id>0</id>
-            <section>0</section>
-            <lesson>0</lesson>
-            <position>0</position>
-            <isActive>false</isActive>
-        </unit>
-        <lesson>
-            <id>0</id>
-            <isPrime>false</isPrime>
-            <viewedBy>0</viewedBy>
-            <passedBy>0</passedBy>
-            <timeToComplete>0</timeToComplete>
-            <isCommentsEnabled>false</isCommentsEnabled>
-            <owner>0</owner>
-            <isFeatured>false</isFeatured>
-            <isPublic>false</isPublic>
-            <discussionsCount>0</discussionsCount>
-            <epicCount>0</epicCount>
-            <abuseCount>0</abuseCount>
-        </lesson>
-    </data>
-    <courseId>0</courseId>
+<LessonNode id="1">
+  <data class="CompoundUnitLesson" id="2">
+    <id>0</id>
+    <unit id="3">
+      <id>0</id>
+      <section>0</section>
+      <lesson>0</lesson>
+      <position>0</position>
+      <isActive>false</isActive>
+    </unit>
+    <lesson id="4">
+      <id>0</id>
+      <isPrime>false</isPrime>
+      <viewedBy>0</viewedBy>
+      <passedBy>0</passedBy>
+      <timeToComplete>0</timeToComplete>
+      <isCommentsEnabled>false</isCommentsEnabled>
+      <owner>0</owner>
+      <isFeatured>false</isFeatured>
+      <isPublic>false</isPublic>
+      <discussionsCount>0</discussionsCount>
+      <epicCount>0</epicCount>
+      <abuseCount>0</abuseCount>
+    </lesson>
+  </data>
+  <courseId>0</courseId>
 </LessonNode>

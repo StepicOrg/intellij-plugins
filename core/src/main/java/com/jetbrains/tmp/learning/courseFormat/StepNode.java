@@ -16,17 +16,17 @@ import org.stepik.api.objects.units.Units;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static com.jetbrains.tmp.learning.SupportedLanguages.INVALID;
 import static com.jetbrains.tmp.learning.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
 
-public class StepNode extends Node<StudyNode, Step> {
+public class StepNode extends Node<Step, StepNode, Step, StepNode> {
     private StudyStatus status;
     private List<SupportedLanguages> supportedLanguages;
     private SupportedLanguages currentLang;
-    private Step data;
     private long courseId;
 
     public StepNode() {}
@@ -35,7 +35,7 @@ public class StepNode extends Node<StudyNode, Step> {
         super(parent, data);
     }
 
-    protected void init(@Nullable StudyNode parent, boolean isRestarted, @Nullable ProgressIndicator indicator) {
+    public void init(@Nullable StudyNode parent, boolean isRestarted, @Nullable ProgressIndicator indicator) {
         if (indicator != null) {
             indicator.setText("Refresh a step: " + getName());
             indicator.setText2("");
@@ -43,27 +43,46 @@ public class StepNode extends Node<StudyNode, Step> {
 
         supportedLanguages = null;
         courseId = 0;
-        setParent(parent);
 
         if (isRestarted) {
             status = StudyStatus.UNCHECKED;
         }
+
+        super.init(parent, isRestarted, indicator);
+    }
+
+    @Override
+    protected Class<StepNode> getChildClass() {
+        return StepNode.class;
     }
 
     @NotNull
     public String getName() {
-        return EduNames.STEP + getData().getPosition();
+        try {
+            return EduNames.STEP + getData().getPosition();
+        } catch (IllegalAccessException | InstantiationException e) {
+            return "";
+        }
     }
 
     @NotNull
     public String getText() {
-        return getData().getBlock().getText();
+        try {
+            return getData().getBlock().getText();
+        } catch (IllegalAccessException | InstantiationException e) {
+            return "";
+        }
     }
 
     @NotNull
     public String getTemplate(@NotNull SupportedLanguages language) {
-        Map<String, String> templates = getData().getBlock().getOptions().getCodeTemplates();
-        return templates.getOrDefault(language.getName(), "");
+        Map<String, String> templates;
+        try {
+            templates = getData().getBlock().getOptions().getCodeTemplates();
+            return templates.getOrDefault(language.getName(), "");
+        } catch (IllegalAccessException | InstantiationException e) {
+            return "";
+        }
     }
 
     @NotNull
@@ -72,17 +91,13 @@ public class StepNode extends Node<StudyNode, Step> {
     }
 
     @Override
-    public List<StudyNode> getChildren() {
+    public List<StepNode> getChildren() {
         return Collections.emptyList();
     }
 
     @Override
-    public long getId() {
-        return getData().getId();
-    }
-
-    public void setId(long id) {
-        getData().setId(id);
+    protected List<Step> getChildDataList() {
+        return Collections.emptyList();
     }
 
     @Override
@@ -96,7 +111,12 @@ public class StepNode extends Node<StudyNode, Step> {
             return courseId;
         }
 
-        int lessonId = getData().getLesson();
+        int lessonId;
+        try {
+            lessonId = getData().getLesson();
+        } catch (IllegalAccessException | InstantiationException e) {
+            return 0;
+        }
         if (lessonId == 0) {
             return 0;
         }
@@ -117,7 +137,7 @@ public class StepNode extends Node<StudyNode, Step> {
 
             courseId = lessonNode.getCourseId();
             return courseId;
-        } catch (StepikClientException ignored) {
+        } catch (StepikClientException | IllegalAccessException | InstantiationException ignored) {
         }
         return 0;
     }
@@ -136,12 +156,20 @@ public class StepNode extends Node<StudyNode, Step> {
     }
 
     public int getPosition() {
-        return getData().getPosition();
+        try {
+            return getData().getPosition();
+        } catch (IllegalAccessException | InstantiationException e) {
+            return 0;
+        }
     }
 
     @NotNull
     private Map<String, Limit> getLimits() {
-        return getData().getBlock().getOptions().getLimits();
+        try {
+            return getData().getBlock().getOptions().getLimits();
+        } catch (IllegalAccessException | InstantiationException e) {
+            return new HashMap<>();
+        }
     }
 
     @NotNull
@@ -154,7 +182,12 @@ public class StepNode extends Node<StudyNode, Step> {
         if (supportedLanguages == null) {
             supportedLanguages = new ArrayList<>();
 
-            BlockView block = getData().getBlock();
+            BlockView block;
+            try {
+                block = getData().getBlock();
+            } catch (IllegalAccessException | InstantiationException e) {
+                return supportedLanguages;
+            }
 
             if (getType() == StepType.CODE) {
                 BlockViewOptions options = block.getOptions();
@@ -170,11 +203,6 @@ public class StepNode extends Node<StudyNode, Step> {
             }
         }
         return supportedLanguages;
-    }
-
-    @SuppressWarnings("unused")
-    public void setSupportedLanguages(@Nullable List<SupportedLanguages> supportedLanguages) {
-        this.supportedLanguages = supportedLanguages;
     }
 
     @NotNull
@@ -200,30 +228,30 @@ public class StepNode extends Node<StudyNode, Step> {
         }
     }
 
-    @NotNull
     @Override
-    public Step getData() {
-        if (data == null) {
-            data = new Step();
-        }
-        return data;
-    }
-
-    @Override
-    public void setData(@Nullable Step data) {
-        this.data = data;
+    protected Class<Step> getDataClass() {
+        return Step.class;
     }
 
     @NotNull
     public List<Sample> getSamples() {
-        if (StepType.of(getData().getBlock().getName()) == StepType.CODE) {
-            return getData().getBlock().getOptions().getSamples();
+        try {
+            if (StepType.of(getData().getBlock().getName()) == StepType.CODE) {
+                return getData().getBlock().getOptions().getSamples();
+            }
+        } catch (IllegalAccessException | InstantiationException ignored) {
         }
+
         return new ArrayList<>();
     }
 
-    StepType getType() {
-        return StepType.of(getData().getBlock().getName());
+    @Nullable
+    public StepType getType() {
+        try {
+            return StepType.of(getData().getBlock().getName());
+        } catch (IllegalAccessException | InstantiationException e) {
+            return null;
+        }
     }
 
     public boolean isStepFile(@NotNull String fileName) {
@@ -246,14 +274,14 @@ public class StepNode extends Node<StudyNode, Step> {
         if (status != stepNode.status) return false;
         //noinspection SimplifiableIfStatement
         if (currentLang != stepNode.currentLang) return false;
-        return data != null ? data.equals(stepNode.data) : stepNode.data == null;
+        return super.equals(o);
     }
 
     @Override
     public int hashCode() {
         int result = status != null ? status.hashCode() : 0;
         result = 31 * result + (currentLang != null ? currentLang.hashCode() : 0);
-        result = 31 * result + (data != null ? data.hashCode() : 0);
+        result = 31 * result + super.hashCode();
         return result;
     }
 }

@@ -2,8 +2,6 @@ package com.jetbrains.tmp.learning.courseFormat;
 
 import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.thoughtworks.xstream.XStream;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.stepik.api.objects.lessons.CompoundUnitLesson;
@@ -20,17 +18,18 @@ import static org.junit.Assert.assertEquals;
  * @author meanmail
  */
 public class SerializationTest {
-    private static final XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
 
     @Test
-    public void serializeCourseNode() throws IOException, SAXException, ParserConfigurationException {
+    public void serializeCourseNode()
+            throws IOException, SAXException, ParserConfigurationException, InstantiationException, IllegalAccessException {
         CourseNode node = new CourseNode();
         node.getData();
         serialize("CourseNode", node);
     }
 
     @Test
-    public void serializeSectionNode() throws IOException, SAXException, ParserConfigurationException {
+    public void serializeSectionNode()
+            throws IOException, SAXException, ParserConfigurationException, InstantiationException, IllegalAccessException {
         SectionNode node = new SectionNode();
         node.getData();
         LessonNode lessonNode = new LessonNode();
@@ -38,13 +37,13 @@ public class SerializationTest {
         CompoundUnitLesson data = lessonNode.getData();
         data.getLesson();
         data.getUnit();
-        node.getLessonNodes().add(lessonNode);
-        node.setLessonNodes(node.getLessonNodes());
+        node.getChildren().add(lessonNode);
         serialize("SectionNode", node);
     }
 
     @Test
-    public void serializeLessonNode() throws IOException, SAXException, ParserConfigurationException {
+    public void serializeLessonNode()
+            throws IOException, SAXException, ParserConfigurationException, InstantiationException, IllegalAccessException {
         LessonNode node = new LessonNode();
         CompoundUnitLesson data = node.getData();
         data.getLesson();
@@ -53,7 +52,8 @@ public class SerializationTest {
     }
 
     @Test
-    public void serializeStepNode() throws IOException, SAXException, ParserConfigurationException {
+    public void serializeStepNode()
+            throws IOException, SAXException, ParserConfigurationException, InstantiationException, IllegalAccessException {
         StepNode node = new StepNode();
         node.getData();
         Limit limit = new Limit();
@@ -63,12 +63,10 @@ public class SerializationTest {
         serialize("StepNode", node);
     }
 
-    private void serialize(@NotNull String name, @NotNull StudyNode<?> node)
-            throws IOException, SAXException, ParserConfigurationException {
+    private void serialize(@NotNull String name, @NotNull StudyNode node) throws IOException {
         XStream xs = StepikProjectManager.getXStream();
 
-        String expected = xs.toXML(xs.fromXML(outputter.outputString(TestUtils.readXmlFile(SerializationTest.class,
-                String.format("expected%s.xml", name)))));
+        String expected = TestUtils.readTextFile(SerializationTest.class, String.format("expected%s.xml", name));
 
         assertEquals(name, expected, xs.toXML(node));
     }

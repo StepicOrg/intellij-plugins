@@ -1,7 +1,7 @@
-<StepikProjectManager>
-    <courseNode/>
-    <showHint>false</showHint>
-    <createdBy>0</createdBy>
-    <defaultLang>invalid</defaultLang>
-    <version>0</version>
+<StepikProjectManager id="1">
+  <courseNode id="2"/>
+  <showHint>false</showHint>
+  <createdBy>0</createdBy>
+  <defaultLang>invalid</defaultLang>
+  <version>0</version>
 </StepikProjectManager>
