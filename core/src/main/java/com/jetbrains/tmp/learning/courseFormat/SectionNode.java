@@ -2,13 +2,13 @@ package com.jetbrains.tmp.learning.courseFormat;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.util.xmlb.annotations.Transient;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.exceptions.StepikClientException;
+import org.stepik.api.objects.lessons.CompoundUnitLesson;
 import org.stepik.api.objects.lessons.Lesson;
 import org.stepik.api.objects.lessons.Lessons;
 import org.stepik.api.objects.sections.Section;
@@ -24,7 +24,7 @@ import java.util.Map;
  * @author meanmail
  */
 
-public class SectionNode extends Node<LessonNode> {
+public class SectionNode extends Node<LessonNode, Section> {
     private static final Logger logger = Logger.getInstance(SectionNode.class);
     private Section data;
     private List<LessonNode> lessonNodes;
@@ -32,12 +32,11 @@ public class SectionNode extends Node<LessonNode> {
     public SectionNode() {
     }
 
-    public SectionNode(@NotNull final CourseNode parent, @NotNull Section data) {
-        this.data = data;
-        init(parent, true, null);
+    public SectionNode(@NotNull final StudyNode parent, @NotNull Section data) {
+        super(parent, data);
     }
 
-    void init(@NotNull final CourseNode parent, boolean isRestarted, @Nullable ProgressIndicator indicator) {
+    protected void init(@Nullable final StudyNode parent, boolean isRestarted, @Nullable ProgressIndicator indicator) {
         try {
             StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
 
@@ -72,10 +71,11 @@ public class SectionNode extends Node<LessonNode> {
                 for (Lesson lesson : lessons.getLessons()) {
                     LessonNode lessonNode = getChildById(lesson.getId());
                     if (lessonNode != null) {
-                        lessonNode.setData(lesson);
-                        lessonNode.setUnit(unitsMap.get(lesson.getId()));
+                        lessonNode.getData().setLesson(lesson);
+                        lessonNode.getData().setUnit(unitsMap.get(lesson.getId()));
                     } else {
-                        LessonNode item = new LessonNode(this, lesson, unitsMap.get(lesson.getId()));
+                        LessonNode item = new LessonNode(this, new CompoundUnitLesson(unitsMap.get(lesson.getId()),
+                                lesson));
                         if (item.getStepNodes().size() > 0) {
                             getLessonNodes().add(item);
                         }
@@ -96,14 +96,12 @@ public class SectionNode extends Node<LessonNode> {
         }
     }
 
-    @Transient
     @NotNull
     @Override
     public String getName() {
         return getData().getTitle();
     }
 
-    @Transient
     @Override
     public int getPosition() {
         return getData().getPosition();
@@ -124,7 +122,6 @@ public class SectionNode extends Node<LessonNode> {
         clearMapNodes();
     }
 
-    @Transient
     @NotNull
     @Override
     public StudyStatus getStatus() {
@@ -141,7 +138,6 @@ public class SectionNode extends Node<LessonNode> {
         return getLessonNodes();
     }
 
-    @Transient
     @Override
     public long getId() {
         return getData().getId();
@@ -156,7 +152,6 @@ public class SectionNode extends Node<LessonNode> {
         return getData().getCourse();
     }
 
-    @SuppressWarnings("WeakerAccess")
     @NotNull
     public Section getData() {
         if (data == null) {
@@ -165,7 +160,6 @@ public class SectionNode extends Node<LessonNode> {
         return data;
     }
 
-    @SuppressWarnings("unused")
     public void setData(@Nullable Section data) {
         this.data = data;
     }
@@ -174,20 +168,5 @@ public class SectionNode extends Node<LessonNode> {
     @Override
     String getDirectoryPrefix() {
         return EduNames.SECTION;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        SectionNode that = (SectionNode) o;
-
-        return data != null ? data.equals(that.data) : that.data == null;
-    }
-
-    @Override
-    public int hashCode() {
-        return data != null ? data.hashCode() : 0;
     }
 }

@@ -60,7 +60,7 @@ public class SupportedLanguagesTest {
 
     @Theory
     public void langOf(@FromDataPoints("languages") Pair<SupportedLanguages, String> language) throws Exception {
-        assertEquals(language.getFirst(), SupportedLanguages.langOf(language.getSecond()));
+        assertEquals(language.getFirst(), SupportedLanguages.langOfName(language.getSecond()));
     }
 
 }

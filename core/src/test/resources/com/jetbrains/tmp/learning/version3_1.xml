@@ -2,8 +2,8 @@
 <component name="StepikStudySettings">
     <StepikProjectManager>
         <option name="courseNode">
-            <CourseNode />
+            <CourseNode/>
         </option>
-        <option name="defaultLang" value="invalid" />
+        <option name="defaultLang" value="invalid"/>
     </StepikProjectManager>
 </component>

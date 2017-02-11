@@ -164,11 +164,15 @@ public class Lesson extends AbstractObject {
         return result;
     }
 
+    @NotNull
     public String getTitle() {
+        if (title == null) {
+            title = "";
+        }
         return title;
     }
 
-    public void setTitle(String title) {
+    public void setTitle(@Nullable String title) {
         this.title = title;
     }
 

@@ -1,7 +1,6 @@
 package com.jetbrains.tmp.learning.courseFormat;
 
 import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.util.xmlb.annotations.Transient;
 import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.core.EduNames;
 import org.jetbrains.annotations.NotNull;
@@ -23,7 +22,7 @@ import java.util.Map;
 import static com.jetbrains.tmp.learning.SupportedLanguages.INVALID;
 import static com.jetbrains.tmp.learning.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
 
-public class StepNode extends Node<StudyNode> {
+public class StepNode extends Node<StudyNode, Step> {
     private StudyStatus status;
     private List<SupportedLanguages> supportedLanguages;
     private SupportedLanguages currentLang;
@@ -33,11 +32,10 @@ public class StepNode extends Node<StudyNode> {
     public StepNode() {}
 
     public StepNode(@NotNull final LessonNode parent, @NotNull Step data) {
-        this.data = data;
-        init(parent, true, null);
+        super(parent, data);
     }
 
-    void init(@NotNull final LessonNode parent, boolean isRestarted, @Nullable ProgressIndicator indicator) {
+    protected void init(@Nullable StudyNode parent, boolean isRestarted, @Nullable ProgressIndicator indicator) {
         if (indicator != null) {
             indicator.setText("Refresh a step: " + getName());
             indicator.setText2("");
@@ -52,26 +50,22 @@ public class StepNode extends Node<StudyNode> {
         }
     }
 
-    @Transient
     @NotNull
     public String getName() {
         return EduNames.STEP + getData().getPosition();
     }
 
-    @Transient
     @NotNull
     public String getText() {
         return getData().getBlock().getText();
     }
 
-    @Transient
     @NotNull
     public String getTemplate(@NotNull SupportedLanguages language) {
         Map<String, String> templates = getData().getBlock().getOptions().getCodeTemplates();
         return templates.getOrDefault(language.getName(), "");
     }
 
-    @Transient
     @NotNull
     public String getCurrentTemplate() {
         return getTemplate(getCurrentLang());
@@ -82,7 +76,6 @@ public class StepNode extends Node<StudyNode> {
         return Collections.emptyList();
     }
 
-    @Transient
     @Override
     public long getId() {
         return getData().getId();
@@ -120,7 +113,7 @@ public class StepNode extends Node<StudyNode> {
             }
 
             LessonNode lessonNode = new LessonNode();
-            lessonNode.setUnit(units.getItems().get(0));
+            lessonNode.getData().setUnit(units.getItems().get(0));
 
             courseId = lessonNode.getCourseId();
             return courseId;
@@ -142,37 +135,33 @@ public class StepNode extends Node<StudyNode> {
         this.status = status;
     }
 
-    @Transient
     public int getPosition() {
         return getData().getPosition();
     }
 
     @NotNull
-    @Transient
     private Map<String, Limit> getLimits() {
         return getData().getBlock().getOptions().getLimits();
     }
 
     @NotNull
-    @Transient
     public Limit getLimit() {
         return getLimits().getOrDefault(getCurrentLang().getName(), new Limit());
     }
 
-    @Transient
     @NotNull
     public List<SupportedLanguages> getSupportedLanguages() {
         if (supportedLanguages == null) {
             supportedLanguages = new ArrayList<>();
 
-            BlockView block = data.getBlock();
+            BlockView block = getData().getBlock();
 
             if (getType() == StepType.CODE) {
                 BlockViewOptions options = block.getOptions();
 
                 Map<String, String> templates = options.getCodeTemplates();
                 templates.keySet().forEach(key -> {
-                    SupportedLanguages language = SupportedLanguages.langOf(key);
+                    SupportedLanguages language = SupportedLanguages.langOfName(key);
 
                     if (language != INVALID && !supportedLanguages.contains(language)) {
                         supportedLanguages.add(language);
@@ -201,7 +190,6 @@ public class StepNode extends Node<StudyNode> {
         this.currentLang = currentLang;
     }
 
-    @Transient
     @NotNull
     private SupportedLanguages getFirstSupportLang() {
         List<SupportedLanguages> languages = getSupportedLanguages();
@@ -212,8 +200,8 @@ public class StepNode extends Node<StudyNode> {
         }
     }
 
-    @SuppressWarnings("WeakerAccess")
     @NotNull
+    @Override
     public Step getData() {
         if (data == null) {
             data = new Step();
@@ -221,23 +209,21 @@ public class StepNode extends Node<StudyNode> {
         return data;
     }
 
-    @SuppressWarnings("unused")
+    @Override
     public void setData(@Nullable Step data) {
         this.data = data;
     }
 
-    @Transient
     @NotNull
     public List<Sample> getSamples() {
-        if (StepType.of(data.getBlock().getName()) == StepType.CODE) {
+        if (StepType.of(getData().getBlock().getName()) == StepType.CODE) {
             return getData().getBlock().getOptions().getSamples();
         }
         return new ArrayList<>();
     }
 
-    @Transient
     StepType getType() {
-        return StepType.of(data.getBlock().getName());
+        return StepType.of(getData().getBlock().getName());
     }
 
     public boolean isStepFile(@NotNull String fileName) {

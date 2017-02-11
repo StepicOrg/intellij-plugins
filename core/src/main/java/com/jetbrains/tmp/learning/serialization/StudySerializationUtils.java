@@ -1,4 +1,4 @@
-package com.jetbrains.tmp.learning;
+package com.jetbrains.tmp.learning.serialization;
 
 import com.intellij.openapi.diagnostic.Logger;
 import org.jdom.Attribute;
@@ -14,9 +14,8 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-class StudySerializationUtils {
-
-    final static String MAIN_ELEMENT = "StepikProjectManager";
+public class StudySerializationUtils {
+    public final static String MAIN_ELEMENT = "StepikProjectManager";
     private static final Logger logger = Logger.getInstance(StudySerializationUtils.class);
     private static final String VALUE = "value";
     private static final String NAME = "name";
@@ -64,18 +63,31 @@ class StudySerializationUtils {
     private static final String DEFAULT_LANG = "defaultLang";
     private static final String CURRENT_LANG = "currentLang";
     private static final String SUPPORTED_LANGUAGES = "supportedLanguages";
+    private static final String COMPOUND_UNIT_LESSON_CLASS = "CompoundUnitLesson";
+    private static final String LESSON = "lesson";
 
-    static int getVersion(Element element) throws StudyUnrecognizedFormatException {
+    public static int getVersion(Element element) throws StudyUnrecognizedFormatException {
         final Element stepManager = element.getChild(MAIN_ELEMENT);
         if (stepManager == null) {
             String message = "Can't get a version: not found element \"" + MAIN_ELEMENT + "\"";
             throw new StudyUnrecognizedFormatException(message);
         }
-        Element versionElement = getFieldWithName(stepManager, VERSION);
+
+        Element versionElement = stepManager.getChild(VERSION);
+
+        if (versionElement != null) {
+            return parseVersion(versionElement.getText());
+        }
+
+        versionElement = getFieldWithName(stepManager, VERSION);
+        return parseVersion(versionElement.getAttributeValue(VALUE));
+    }
+
+    private static int parseVersion(@NotNull String version) throws StudyUnrecognizedFormatException {
         try {
-            return Integer.valueOf(versionElement.getAttributeValue(VALUE));
+            return Integer.parseInt(version);
         } catch (NumberFormatException e) {
-            throw new StudyUnrecognizedFormatException("Can't get a version: " + versionElement.toString());
+            throw new StudyUnrecognizedFormatException("Can't get a version: " + version);
         }
     }
 
@@ -143,7 +155,7 @@ class StudySerializationUtils {
     }
 
     @NotNull
-    static Element convertToSecondVersion(@NotNull Element state) throws StudyUnrecognizedFormatException {
+    public static Element convertToSecondVersion(@NotNull Element state) throws StudyUnrecognizedFormatException {
         final Element stepManager = state.getChild(MAIN_ELEMENT);
 
         if (getFieldWithNameOrNull(stepManager, COURSE) == null) {
@@ -295,7 +307,60 @@ class StudySerializationUtils {
         return dataCourseTag;
     }
 
-    static Element convertToThirdVersion(@NotNull Element state) throws StudyUnrecognizedFormatException {
+    public static Element convertToThirdVersion(@NotNull Element state) throws StudyUnrecognizedFormatException {
+        List<Element> sectionNodes = getSectionNodes(state);
+        if (sectionNodes == null) {
+            return state;
+        }
+        sectionNodes.forEach(sectionNode -> {
+            removeOption(sectionNode, ID);
+            removeOption(sectionNode, NAME);
+            removeOption(sectionNode, POSITION);
+        });
+
+        sectionNodes.stream()
+                .map(sectionNode -> getListFieldWithNameOrNull(sectionNode, LESSON_NODES, LESSON_NODE))
+                .filter(Objects::nonNull)
+                .forEach(lessonNodes -> {
+                            lessonNodes.forEach(lessonNode -> {
+                                removeOption(lessonNode, ID);
+                                removeOption(lessonNode, NAME);
+                                removeOption(lessonNode, POSITION);
+                            });
+                            lessonNodes.stream()
+                                    .map(lessonNode -> getListFieldWithNameOrNull(lessonNode, STEP_NODES, STEP_NODE))
+                                    .filter(Objects::nonNull)
+                                    .forEach(stepNodes -> {
+                                        stepNodes.forEach(stepNode -> {
+                                            removeOption(stepNode, ID);
+                                            removeOption(stepNode, NAME);
+                                            removeOption(stepNode, POSITION);
+                                            removeOption(stepNode, "stepFiles");
+                                            removeOption(stepNode, TEXT);
+                                            removeOption(stepNode, TIME_LIMITS);
+                                        });
+                                        stepNodes.forEach(stepNode -> {
+                                            Element currentLang = getFieldWithNameOrNull(stepNode, CURRENT_LANG);
+                                            if (currentLang != null) {
+                                                Attribute currentLangValue = currentLang.getAttribute(VALUE);
+                                                replaceLanguage(currentLangValue);
+                                            }
+
+                                            Element limits = getFieldWithNameOrNull(stepNode, LIMITS);
+                                            replaceLanguages(limits, MAP, ENTRY, KEY);
+
+                                            Element supportedLanguages;
+                                            supportedLanguages = getFieldWithNameOrNull(stepNode, SUPPORTED_LANGUAGES);
+                                            replaceLanguages(supportedLanguages, LIST, OPTION, VALUE);
+                                        });
+                                    });
+                        }
+                );
+
+        return state;
+    }
+
+    private static List<Element> getSectionNodes(@NotNull Element state) throws StudyUnrecognizedFormatException {
         final Element stepManager = state.getChild(MAIN_ELEMENT);
         if (stepManager == null) {
             throw new StudyUnrecognizedFormatException("Not found element \" + MAIN_ELEMENT + \"");
@@ -320,33 +385,20 @@ class StudySerializationUtils {
             throw new StudyUnrecognizedFormatException(message);
         }
 
-        List<Element> sectionNodes = getListFieldWithNameOrNull(courseNode, SECTIONS_NODES, SECTION_NODE);
-        if (sectionNodes == null) {
-            return state;
+        removeOption(courseNode, DESCRIPTION);
+        removeOption(courseNode, NAME);
+        removeOption(courseNode, ID);
+        removeOption(courseNode, "adaptive");
+        removeOption(stepManager, "user");
+
+        return getListFieldWithNameOrNull(courseNode, SECTIONS_NODES, SECTION_NODE);
+    }
+
+    private static void removeOption(Element parent, String description) {
+        Element removed = getFieldWithNameOrNull(parent, description);
+        if (removed != null) {
+            removeChild(parent, removed);
         }
-        sectionNodes.stream()
-                .map(sectionNode -> getListFieldWithNameOrNull(sectionNode, LESSON_NODES, LESSON_NODE))
-                .filter(Objects::nonNull)
-                .forEach(lessonNodes -> lessonNodes.stream()
-                        .map(lessonNode -> getListFieldWithNameOrNull(lessonNode, STEP_NODES, STEP_NODE))
-                        .filter(Objects::nonNull)
-                        .forEach(stepNodes -> stepNodes.forEach(stepNode -> {
-                                    Element currentLang = getFieldWithNameOrNull(stepNode, CURRENT_LANG);
-                                    if (currentLang != null) {
-                                        Attribute currentLangValue = currentLang.getAttribute(VALUE);
-                                        replaceLanguage(currentLangValue);
-                                    }
-
-                                    Element limits = getFieldWithNameOrNull(stepNode, LIMITS);
-                                    replaceLanguages(limits, MAP, ENTRY, KEY);
-
-                                    Element supportedLanguages;
-                                    supportedLanguages = getFieldWithNameOrNull(stepNode, SUPPORTED_LANGUAGES);
-                                    replaceLanguages(supportedLanguages, LIST, OPTION, VALUE);
-                                })
-                        ));
-
-        return state;
     }
 
     private static void replaceLanguages(
@@ -379,5 +431,118 @@ class StudySerializationUtils {
                 attribute.setValue("Python 3");
                 break;
         }
+    }
+
+
+    public static Element convertToFourthVersion(Element state) throws StudyUnrecognizedFormatException {
+        List<Element> sectionNodes = getSectionNodes(state);
+        if (sectionNodes != null) {
+            sectionNodes.stream()
+                    .map(sectionNode -> getListFieldWithNameOrNull(sectionNode, LESSON_NODES, LESSON_NODE))
+                    .filter(Objects::nonNull)
+                    .forEach(lessonNodes -> lessonNodes
+                            .forEach(lessonNode -> {
+                                Element data = getFieldWithNameOrNull(lessonNode, DATA);
+                                Element dataClassTag;
+                                if (data == null) {
+                                    return;
+                                }
+
+                                dataClassTag = data.getChild(LESSON_CLASS);
+
+                                Element dataCloned;
+                                if (dataClassTag == null) {
+                                    dataClassTag = createFieldWithClass(lessonNode, LESSON, LESSON_CLASS);
+                                    dataCloned = dataClassTag.getParentElement();
+                                } else {
+                                    dataCloned = data.clone();
+                                    dataCloned.getAttribute(NAME).setValue(LESSON);
+                                }
+
+                                dataClassTag.removeContent();
+
+                                dataClassTag.addContent(dataCloned);
+                                Element unit = getFieldWithNameOrNull(lessonNode, UNIT);
+                                if (unit != null) {
+                                    Element unitCloned = unit.clone();
+                                    dataClassTag.addContent(unitCloned);
+                                    removeChild(lessonNode, unit);
+                                }
+
+                                dataClassTag.setName(COMPOUND_UNIT_LESSON_CLASS);
+
+                                List<Element> stepNodes = getListFieldWithNameOrNull(lessonNode, STEP_NODES, STEP_NODE);
+                                if (stepNodes == null) {
+                                    return;
+                                }
+                                stepNodes.forEach(stepNode -> removeOption(stepNode, LIMITS));
+                            }));
+        }
+        final Element stepManager = state.getChild(MAIN_ELEMENT);
+        List<Element> elements = stepManager.getChildren();
+
+        convertToXStreamStyle(elements);
+
+        return state;
+    }
+
+    private static void removeChild(Element parent, Element child) {
+        child.setName("WILL_DELETE");
+        parent.removeChild(child.getName());
+    }
+
+    private static void convertToXStreamStyle(List<Element> elements) {
+        elements.forEach(element -> {
+            if (element.getName().equals(OPTION)) {
+                Attribute nameAttr = element.getAttribute(NAME);
+                if (nameAttr != null) {
+                    element.setName(nameAttr.getValue());
+                    element.removeAttribute(nameAttr);
+                }
+
+                Attribute valueAttr = element.getAttribute(VALUE);
+                if (valueAttr != null) {
+                    element.setText(valueAttr.getValue());
+                    element.removeAttribute(valueAttr);
+                    if (nameAttr == null) {
+                        element.setName("string");
+                    }
+                } else {
+                    List<Element> children = element.getChildren();
+
+                    if (children.size() > 0) {
+                        Element child = children.get(0);
+                        element.removeChild(child.getName());
+                        element.addContent(child.cloneContent());
+                    }
+                }
+            } else if (element.getName().equals(ENTRY)) {
+                Attribute keyAttr = element.getAttribute(KEY);
+                if (keyAttr == null) {
+                    return;
+                }
+
+                element.removeAttribute(keyAttr);
+
+                Attribute valueAttr = element.getAttribute(VALUE);
+
+                Element string = new Element("string");
+                string.setText(keyAttr.getValue());
+                element.addContent(string);
+                if (valueAttr != null) {
+                    element.setText(valueAttr.getValue());
+                    element.removeAttribute(valueAttr);
+                } else {
+                    Element value = element.getChild(VALUE);
+                    if (value != null) {
+                        element.removeChild(value.getName());
+                        element.addContent(value.cloneContent());
+                    }
+                }
+
+            }
+
+            convertToXStreamStyle(element.getChildren());
+        });
     }
 }

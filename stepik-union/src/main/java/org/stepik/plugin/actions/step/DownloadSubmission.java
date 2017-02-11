@@ -159,7 +159,7 @@ public class DownloadSubmission extends AbstractStepAction {
             @NotNull List<Submission> submissions,
             @NotNull SupportedLanguages currentLang) {
         return submissions.stream()
-                .filter(submission -> SupportedLanguages.langOf(submission.getReply().getLanguage()) == currentLang)
+                .filter(submission -> SupportedLanguages.langOfName(submission.getReply().getLanguage()) == currentLang)
                 .collect(Collectors.toList());
     }
 

@@ -1,4 +1,4 @@
-<!-- state version 2 | Repair replaceLanguage into supportedLanguages -->
+<!-- state version 2 | Repair currentLang for step -->
 <component name="StepikStudySettings">
     <StepikProjectManager>
         <option name="defaultLang" value="invalid"/>
@@ -10,22 +10,17 @@
                             <option name="lessonNodes">
                                 <list>
                                     <LessonNode>
+                                        <option name="data">
+                                            <Lesson>
+                                            </Lesson>
+                                        </option>
+                                        <option name="unit">
+                                            <Unit>
+                                            </Unit>
+                                        </option>
                                         <option name="stepNodes">
                                             <list>
                                                 <StepNode>
-                                                    <option name="currentLang" value="Java 8"/>
-                                                    <option name="limits">
-                                                        <map>
-                                                            <entry key="Java 8"/>
-                                                            <entry key="Python 3"/>
-                                                        </map>
-                                                    </option>
-                                                    <option name="supportedLanguages">
-                                                        <list>
-                                                            <option value="Java 8"/>
-                                                            <option value="Python 3"/>
-                                                        </list>
-                                                    </option>
                                                 </StepNode>
                                             </list>
                                         </option>
