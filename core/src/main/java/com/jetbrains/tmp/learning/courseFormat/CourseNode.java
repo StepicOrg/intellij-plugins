@@ -2,7 +2,6 @@ package com.jetbrains.tmp.learning.courseFormat;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.util.xmlb.annotations.Transient;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
@@ -19,7 +18,7 @@ import java.util.List;
 
 import static com.jetbrains.tmp.learning.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
 
-public class CourseNode extends Node<SectionNode> {
+public class CourseNode extends Node<SectionNode, Course> {
     private static final Logger logger = Logger.getInstance(CourseNode.class);
     private Course data;
     private List<User> authors;
@@ -28,12 +27,15 @@ public class CourseNode extends Node<SectionNode> {
     public CourseNode() {
     }
 
-    public CourseNode(Course data, ProgressIndicator indicator) {
-        this.data = data;
-        init(true, indicator);
+    public CourseNode(@NotNull StudyNode parent, @NotNull Course data) {
+        super(parent, data);
     }
 
-    public void init(boolean isRestarted, @Nullable ProgressIndicator indicator) {
+    public CourseNode(@NotNull Course data, @Nullable ProgressIndicator indicator) {
+        super(data, indicator);
+    }
+
+    protected void init(@Nullable StudyNode parent, boolean isRestarted, @Nullable ProgressIndicator indicator) {
         try {
             StepikApiClient stepikApiClient = authAndGetStepikApiClient();
             if (indicator != null) {
@@ -76,7 +78,6 @@ public class CourseNode extends Node<SectionNode> {
 
     @SuppressWarnings("unused")
     @NotNull
-    @Transient
     public List<User> getAuthors() {
         if (authors == null) {
             List<Long> authorsIds = data.getAuthors();
@@ -95,20 +96,17 @@ public class CourseNode extends Node<SectionNode> {
         return authors != null ? authors : Collections.emptyList();
     }
 
-    @Transient
     @NotNull
     @Override
     public String getName() {
         return getData().getTitle();
     }
 
-    @Transient
     @Override
     public int getPosition() {
         return 0;
     }
 
-    @Transient
     @Override
     public long getId() {
         return getData().getId();
@@ -134,7 +132,6 @@ public class CourseNode extends Node<SectionNode> {
         clearMapNodes();
     }
 
-    @Transient
     @NotNull
     @Override
     public StudyStatus getStatus() {
@@ -151,8 +148,8 @@ public class CourseNode extends Node<SectionNode> {
         return getSectionNodes();
     }
 
-    @SuppressWarnings("WeakerAccess")
     @NotNull
+    @Override
     public Course getData() {
         if (data == null) {
             data = new Course();
@@ -160,23 +157,8 @@ public class CourseNode extends Node<SectionNode> {
         return data;
     }
 
-    @SuppressWarnings("unused")
+    @Override
     public void setData(@Nullable Course data) {
         this.data = data;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        CourseNode that = (CourseNode) o;
-
-        return data != null ? data.equals(that.data) : that.data == null;
-    }
-
-    @Override
-    public int hashCode() {
-        return data != null ? data.hashCode() : 0;
     }
 }

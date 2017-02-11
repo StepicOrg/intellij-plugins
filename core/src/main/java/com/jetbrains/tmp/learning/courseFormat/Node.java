@@ -1,6 +1,6 @@
 package com.jetbrains.tmp.learning.courseFormat;
 
-import com.intellij.util.xmlb.annotations.Transient;
+import com.intellij.openapi.progress.ProgressIndicator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -11,11 +11,23 @@ import java.util.Map;
 /**
  * @author meanmail
  */
-public abstract class Node<C extends StudyNode> implements StudyNode<C> {
+public abstract class Node<C extends StudyNode, D> implements StudyNode<C> {
     private StudyNode parent;
     private Map<Long, C> mapNodes;
 
-    @Transient
+    public Node() {
+    }
+
+    public Node(@NotNull final StudyNode parent, @NotNull D data) {
+        setData(data);
+        init(parent, true, null);
+    }
+
+    public Node(@NotNull D data, @Nullable ProgressIndicator indicator) {
+        setData(data);
+        init(null, true, indicator);
+    }
+
     @Nullable
     private StudyNode getLastNode() {
         int stepsCount = getChildren().size();
@@ -25,7 +37,6 @@ public abstract class Node<C extends StudyNode> implements StudyNode<C> {
         return getChildren().get(stepsCount - 1);
     }
 
-    @Transient
     @Nullable
     private StudyNode getFirstNode() {
         List<C> children = getChildren();
@@ -36,7 +47,6 @@ public abstract class Node<C extends StudyNode> implements StudyNode<C> {
         return children.get(0);
     }
 
-    @Transient
     @Nullable
     @Override
     public StudyNode getPrevChild(@Nullable StudyNode current) {
@@ -78,7 +88,6 @@ public abstract class Node<C extends StudyNode> implements StudyNode<C> {
         return getChildren().isEmpty();
     }
 
-    @Transient
     @Nullable
     @Override
     public StudyNode getParent() {
@@ -123,7 +132,6 @@ public abstract class Node<C extends StudyNode> implements StudyNode<C> {
         return getMapNodes().get(id);
     }
 
-    @Transient
     private Map<Long, C> getMapNodes() {
         if (mapNodes == null) {
             mapNodes = new HashMap<>();
@@ -138,5 +146,34 @@ public abstract class Node<C extends StudyNode> implements StudyNode<C> {
 
     void sortChildren() {
         getChildren().sort(StudyNodeComparator.getInstance());
+    }
+
+    protected abstract void init(
+            @Nullable final StudyNode parent,
+            boolean isRestarted,
+            @Nullable ProgressIndicator indicator);
+
+    public void init(boolean isRestarted, @Nullable ProgressIndicator indicator) {
+        init(null, isRestarted, indicator);
+    }
+
+    @NotNull
+    public abstract D getData();
+
+    public abstract void setData(@Nullable D data);
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Node<?, ?> node = (Node<?, ?>) o;
+
+        return getData().equals(node.getData());
+    }
+
+    @Override
+    public int hashCode() {
+        return getData().hashCode();
     }
 }

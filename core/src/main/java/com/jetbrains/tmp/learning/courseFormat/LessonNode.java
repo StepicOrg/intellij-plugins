@@ -2,44 +2,36 @@ package com.jetbrains.tmp.learning.courseFormat;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.util.xmlb.annotations.Transient;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.exceptions.StepikClientException;
-import org.stepik.api.objects.lessons.Lesson;
+import org.stepik.api.objects.lessons.CompoundUnitLesson;
 import org.stepik.api.objects.sections.Sections;
 import org.stepik.api.objects.steps.Step;
 import org.stepik.api.objects.steps.Steps;
-import org.stepik.api.objects.units.Unit;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.jetbrains.tmp.learning.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
 
-public class LessonNode extends Node<StepNode> {
+public class LessonNode extends Node<StepNode, CompoundUnitLesson> {
     private static final Logger logger = Logger.getInstance(LessonNode.class);
     private List<StepNode> stepNodes;
-    private Lesson data;
-    private Unit unit;
+    private CompoundUnitLesson data;
     private long courseId;
 
     public LessonNode() {
     }
 
-    public LessonNode(
-            @NotNull final SectionNode parent,
-            @NotNull Lesson data,
-            @NotNull Unit unit) {
-        this.data = data;
-        this.unit = unit;
-        init(parent, true, null);
+    public LessonNode(@NotNull final SectionNode parent, @NotNull CompoundUnitLesson data) {
+        super(parent, data);
     }
 
-    void init(@NotNull final SectionNode parent, boolean isRestarted, @Nullable ProgressIndicator indicator) {
+    protected void init(@Nullable StudyNode parent, boolean isRestarted, @Nullable ProgressIndicator indicator) {
         try {
             StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
 
@@ -50,7 +42,7 @@ public class LessonNode extends Node<StepNode> {
 
             courseId = 0;
 
-            List<Long> stepsIds = getData().getSteps();
+            List<Long> stepsIds = getData().getLesson().getSteps();
 
             if (stepsIds.size() > 0) {
                 Steps steps = stepikApiClient.steps()
@@ -84,11 +76,10 @@ public class LessonNode extends Node<StepNode> {
         }
     }
 
-    @Transient
     @NotNull
     @Override
     public String getName() {
-        return getData().getTitle();
+        return getData().getLesson().getTitle();
     }
 
     @NotNull
@@ -106,7 +97,6 @@ public class LessonNode extends Node<StepNode> {
         clearMapNodes();
     }
 
-    @Transient
     @NotNull
     @Override
     public StudyStatus getStatus() {
@@ -118,13 +108,12 @@ public class LessonNode extends Node<StepNode> {
         return StudyStatus.SOLVED;
     }
 
-    @Transient
     public long getId() {
-        return getData().getId();
+        return getData().getLesson().getId();
     }
 
     public void setId(long id) {
-        getData().setId(id);
+        getData().getLesson().setId(id);
     }
 
     @Override
@@ -138,7 +127,7 @@ public class LessonNode extends Node<StepNode> {
             return courseId;
         }
 
-        int sectionId = getUnit().getSection();
+        int sectionId = getData().getUnit().getSection();
         if (sectionId == 0) {
             return 0;
         }
@@ -160,9 +149,8 @@ public class LessonNode extends Node<StepNode> {
         return 0;
     }
 
-    @Transient
     public int getPosition() {
-        return getUnit().getPosition();
+        return getData().getUnit().getPosition();
     }
 
     @NotNull
@@ -176,56 +164,23 @@ public class LessonNode extends Node<StepNode> {
         return getStepNodes();
     }
 
-    @SuppressWarnings("WeakerAccess")
     @NotNull
-    public Lesson getData() {
+    @Override
+    public CompoundUnitLesson getData() {
         if (data == null) {
-            data = new Lesson();
+            data = new CompoundUnitLesson();
         }
         return data;
     }
 
-    @SuppressWarnings("unused")
-    public void setData(@Nullable Lesson data) {
+    @Override
+    public void setData(@Nullable CompoundUnitLesson data) {
         this.data = data;
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    @NotNull
-    public Unit getUnit() {
-        if (unit == null) {
-            unit = new Unit();
-        }
-        return unit;
-    }
-
-    @SuppressWarnings("unused,WeakerAccess")
-    public void setUnit(@Nullable Unit unit) {
-        this.unit = unit;
     }
 
     @NotNull
     @Override
     String getDirectoryPrefix() {
         return EduNames.LESSON;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        LessonNode that = (LessonNode) o;
-
-        //noinspection SimplifiableIfStatement
-        if (data != null ? !data.equals(that.data) : that.data != null) return false;
-        return unit != null ? unit.equals(that.unit) : that.unit == null;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = data != null ? data.hashCode() : 0;
-        result = 31 * result + (unit != null ? unit.hashCode() : 0);
-        return result;
     }
 }

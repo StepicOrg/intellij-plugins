@@ -1,5 +1,6 @@
 package com.jetbrains.tmp.learning;
 
+import com.google.gson.internal.LinkedTreeMap;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
@@ -9,19 +10,40 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
-import com.intellij.util.xmlb.XmlSerializer;
-import com.intellij.util.xmlb.annotations.Transient;
 import com.jetbrains.tmp.learning.courseFormat.CourseNode;
+import com.jetbrains.tmp.learning.courseFormat.LessonNode;
+import com.jetbrains.tmp.learning.courseFormat.SectionNode;
+import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.courseFormat.StudyNode;
+import com.jetbrains.tmp.learning.serialization.StudySerializationUtils;
+import com.jetbrains.tmp.learning.serialization.StudyUnrecognizedFormatException;
+import com.jetbrains.tmp.learning.serialization.SupportedLanguagesConverter;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import org.jdom.Element;
+import org.jdom.input.DOMBuilder;
+import org.jdom.output.XMLOutputter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.courses.Courses;
+import org.stepik.api.objects.steps.Limit;
+import org.stepik.api.objects.steps.Sample;
+import org.stepik.api.objects.steps.VideoUrl;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.UUID;
+
+import static com.jetbrains.tmp.learning.SupportedLanguages.INVALID;
 
 /**
  * Implementation of class which contains all the information
@@ -30,22 +52,31 @@ import java.util.UUID;
 
 @State(name = "StepikStudySettings", storages = @Storage("stepik_study_project.xml"))
 public class StepikProjectManager implements PersistentStateComponent<Element>, DumbAware {
-    private static final int CURRENT_VERSION = 3;
+    private static final int CURRENT_VERSION = 4;
     private static final Logger logger = Logger.getInstance(StepikProjectManager.class);
+    @XStreamOmitField
+    private static XStream xStream;
+    @XStreamOmitField
+    private static XMLOutputter outputter;
+    @XStreamOmitField
+    private static DocumentBuilderFactory factory;
+    @XStreamOmitField
+    private static DocumentBuilder builder;
+    @XStreamOmitField
+    private static DOMBuilder domBuilder;
+    @XStreamOmitField
     private final Project project;
     private CourseNode courseNode;
     private boolean showHint = false;
     private long createdBy;
-    private SupportedLanguages defaultLang = SupportedLanguages.INVALID;
+    private SupportedLanguages defaultLang = INVALID;
     private int version = CURRENT_VERSION;
     private String uuid;
 
-    @SuppressWarnings({"SameParameterValue", "WeakerAccess"})
     public StepikProjectManager(@Nullable Project project) {
         this.project = project;
     }
 
-    @SuppressWarnings("WeakerAccess")
     public StepikProjectManager() {
         this(null);
     }
@@ -63,9 +94,55 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
         return instance != null && instance.getProjectRoot() != null;
     }
 
-    @Nullable
-    public CourseNode getCourseNode() {
-        return courseNode;
+    private static String elementToXml(@NotNull Element state) {
+        if (outputter == null) {
+            outputter = new XMLOutputter();
+        }
+        return outputter.outputString(state.getChild(StudySerializationUtils.MAIN_ELEMENT));
+    }
+
+    @NotNull
+    public static XStream getXStream() {
+        if (xStream == null) {
+            xStream = new XStream();
+            xStream.alias("StepikProjectManager", StepikProjectManager.class);
+            xStream.alias("CourseNode", CourseNode.class);
+            xStream.alias("SectionNode", SectionNode.class);
+            xStream.alias("LessonNode", LessonNode.class);
+            xStream.alias("StepNode", StepNode.class);
+            xStream.alias("Limit", Limit.class);
+            xStream.alias("SupportedLanguages", SupportedLanguages.class);
+            xStream.alias("VideoUrl", VideoUrl.class);
+            xStream.alias("LinkedTreeMap", LinkedTreeMap.class);
+            xStream.alias("Sample", Sample.class);
+            xStream.autodetectAnnotations(true);
+            xStream.setClassLoader(StepikProjectManager.class.getClassLoader());
+            xStream.registerConverter(new SupportedLanguagesConverter());
+        }
+
+        return xStream;
+    }
+
+    @NotNull
+    private static Element toElement(ByteArrayOutputStream out)
+            throws ParserConfigurationException, SAXException, IOException {
+        if (factory == null) {
+            factory = DocumentBuilderFactory.newInstance();
+            factory.setValidating(false);
+            builder = factory.newDocumentBuilder();
+            domBuilder = new DOMBuilder();
+        }
+        try (ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray())) {
+            Document doc = builder.parse(in);
+            org.jdom.Document document = domBuilder.build(doc);
+
+            Element root = document.getRootElement();
+            document.removeContent(root);
+
+            Element element = new Element("element");
+            element.addContent(root);
+            return element;
+        }
     }
 
     public void setCourseNode(@Nullable CourseNode courseNode) {
@@ -78,18 +155,23 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
         if (getProjectRoot() == null) {
             return null;
         }
-        Element el = new Element("stepikProjectManager");
-        Element courseElement = new Element(StudySerializationUtils.MAIN_ELEMENT);
-        XmlSerializer.serializeInto(this, courseElement);
-        el.addContent(courseElement);
-        logger.info("Getting the StepikProjectManager state");
-        return el;
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            getXStream().toXML(this, out);
+            Element el = toElement(out);
+            logger.info("Getting the StepikProjectManager state");
+
+            return el;
+        } catch (ParserConfigurationException | IOException | SAXException e) {
+            logger.warn("Failed getting the StepikProjectManager state");
+        }
+
+        return null;
     }
 
     @Override
     public void loadState(Element state) {
-        logger.info("Start load the StepikProjectManager state");
         try {
+            logger.info("Start load the StepikProjectManager state");
             int version = StudySerializationUtils.getVersion(state);
 
             switch (version) {
@@ -97,20 +179,23 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
                     state = StudySerializationUtils.convertToSecondVersion(state);
                 case 2:
                     state = StudySerializationUtils.convertToThirdVersion(state);
+                case 3:
+                    state = StudySerializationUtils.convertToFourthVersion(state);
                     //uncomment for future versions
-                    //case 3:
-                    //state = StudySerializationUtils.convertToFourthVersion(state);
+                    //case 4:
+                    //state = StudySerializationUtils.convertToFifthVersion(state);
             }
 
-            XmlSerializer.deserializeInto(this, state.getChild(StudySerializationUtils.MAIN_ELEMENT));
+            String xml = elementToXml(state);
+            XStream xs = getXStream();
+            xs.fromXML(xml, this);
+
             this.version = CURRENT_VERSION;
+            refreshCourse();
+            logger.info("The StepikProjectManager state loaded");
         } catch (StudyUnrecognizedFormatException e) {
             logger.warn("Failed deserialization StepikProjectManager \n" + e.getMessage() + "\n" + project);
-            return;
         }
-
-        refreshCourse();
-        logger.info("The StepikProjectManager state loaded");
     }
 
     private void refreshCourse() {
@@ -156,28 +241,14 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
         this.showHint = showHint;
     }
 
-    @SuppressWarnings("unused")
-    @Transient
     public Project getProject() {
         return project;
     }
 
-    @SuppressWarnings("unused")
     public int getVersion() {
         return version;
     }
 
-    @SuppressWarnings("unused")
-    public void setVersion(int version) {
-        this.version = version;
-    }
-
-    @SuppressWarnings("unused")
-    public long getCreatedBy() {
-        return createdBy;
-    }
-
-    @SuppressWarnings("unused")
     public void setCreatedBy(long createdBy) {
         this.createdBy = createdBy;
     }
@@ -190,12 +261,6 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
         return uuid;
     }
 
-    @SuppressWarnings("unused")
-    public void setUuid(@Nullable String uuid) {
-        this.uuid = uuid;
-    }
-
-    @Transient
     @Nullable
     public StudyNode getProjectRoot() {
         return courseNode;

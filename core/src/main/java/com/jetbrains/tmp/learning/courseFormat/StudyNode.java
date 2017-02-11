@@ -1,6 +1,5 @@
 package com.jetbrains.tmp.learning.courseFormat;
 
-import com.intellij.util.xmlb.annotations.Transient;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,7 +22,6 @@ public interface StudyNode<C extends StudyNode> {
 
     long getId();
 
-    @Transient
     @Nullable
     StudyNode getParent();
 

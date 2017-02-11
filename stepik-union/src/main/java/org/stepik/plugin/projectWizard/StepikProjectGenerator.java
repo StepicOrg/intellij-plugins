@@ -154,6 +154,7 @@ public class StepikProjectGenerator {
         }
         stepikProjectManager.setCourseNode(courseNode);
         stepikProjectManager.setDefaultLang(getDefaultLang());
+        stepikProjectManager.setCreatedBy(StepikConnectorLogin.getCurrentUser().getId());
         Metrics.createProject(project, SUCCESSFUL);
     }
 

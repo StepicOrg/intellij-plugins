@@ -10,12 +10,21 @@
                             <option name="lessonNodes">
                                 <list>
                                     <LessonNode>
+                                        <option name="data">
+                                            <Lesson>
+                                            </Lesson>
+                                        </option>
+                                        <option name="unit">
+                                            <Unit>
+                                            </Unit>
+                                        </option>
                                         <option name="stepNodes">
                                             <list>
                                                 <StepNode>
                                                 </StepNode>
                                             </list>
                                         </option>
+
                                     </LessonNode>
                                 </list>
                             </option>
