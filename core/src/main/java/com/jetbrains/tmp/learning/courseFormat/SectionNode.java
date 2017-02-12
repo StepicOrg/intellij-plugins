@@ -11,6 +11,7 @@ import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.lessons.CompoundUnitLesson;
 import org.stepik.api.objects.lessons.Lessons;
 import org.stepik.api.objects.sections.Section;
+import org.stepik.api.objects.sections.Sections;
 import org.stepik.api.objects.units.Unit;
 import org.stepik.api.objects.units.Units;
 
@@ -36,6 +37,27 @@ public class SectionNode extends Node<Section, LessonNode, CompoundUnitLesson, S
         }
 
         super.init(parent, isRestarted, indicator);
+    }
+
+    @Override
+    protected void loadData(long id) {
+        try {
+            StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
+            Sections sections = stepikApiClient.sections()
+                    .get()
+                    .id(id)
+                    .execute();
+            Section data;
+            if (!sections.isEmpty()) {
+                data = sections.getSections().get(0);
+            } else {
+                data = new Section();
+                data.setId(id);
+            }
+            setData(data);
+        } catch (StepikClientException logged) {
+            logger.warn(String.format("Failed load section data id=%d", id), logged);
+        }
     }
 
     @Override

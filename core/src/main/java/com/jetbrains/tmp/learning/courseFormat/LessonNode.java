@@ -9,6 +9,8 @@ import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.lessons.CompoundUnitLesson;
+import org.stepik.api.objects.lessons.Lesson;
+import org.stepik.api.objects.lessons.Lessons;
 import org.stepik.api.objects.sections.Sections;
 import org.stepik.api.objects.steps.Step;
 import org.stepik.api.objects.steps.Steps;
@@ -65,6 +67,29 @@ public class LessonNode extends Node<CompoundUnitLesson, StepNode, Step, StepNod
         courseId = 0;
 
         super.init(parent, isRestarted, indicator);
+    }
+
+    @Override
+    protected void loadData(long id) {
+        try {
+            StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
+            Lessons lessons = stepikApiClient.lessons()
+                    .get()
+                    .id(id)
+                    .execute();
+
+            Lesson lesson;
+            if (!lessons.isEmpty()) {
+                lesson = lessons.getLessons().get(0);
+                getData().setLesson(lesson);
+            } else {
+                lesson = new Lesson();
+                lesson.setId(id);
+            }
+            getData().setLesson(lesson);
+        } catch (StepikClientException | IllegalAccessException | InstantiationException logged) {
+            logger.warn(String.format("Failed load lesson data id=%d", id), logged);
+        }
     }
 
 

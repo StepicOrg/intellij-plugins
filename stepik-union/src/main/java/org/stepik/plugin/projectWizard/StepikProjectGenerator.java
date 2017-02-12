@@ -7,6 +7,7 @@ import com.intellij.openapi.project.Project;
 import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.courseFormat.CourseNode;
+import com.jetbrains.tmp.learning.courseFormat.StudyNode;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.api.client.StepikApiClient;
@@ -27,7 +28,7 @@ public class StepikProjectGenerator {
     public static final Course EMPTY_COURSE = initEmptyCourse();
     private static final Logger logger = Logger.getInstance(StepikProjectGenerator.class);
     private static StepikProjectGenerator instance;
-    private static CourseNode courseNode;
+    private static StudyNode projectRoot;
     private SupportedLanguages defaultLang = SupportedLanguages.INVALID;
 
     private StepikProjectGenerator() {
@@ -141,7 +142,7 @@ public class StepikProjectGenerator {
 
                     ProgressIndicator indicator = ProgressManager.getInstance().getProgressIndicator();
                     indicator.setIndeterminate(true);
-                    courseNode = new CourseNode(course, indicator);
+                    projectRoot = new CourseNode(course, indicator);
                 }, "Creating project", true, project);
     }
 
@@ -151,7 +152,7 @@ public class StepikProjectGenerator {
             Metrics.createProject(project, TARGET_NOT_FOUND);
             return;
         }
-        stepikProjectManager.setCourseNode(courseNode);
+        stepikProjectManager.setRootNode(projectRoot);
         stepikProjectManager.setDefaultLang(getDefaultLang());
         stepikProjectManager.setCreatedBy(StepikConnectorLogin.getCurrentUser().getId());
         Metrics.createProject(project, SUCCESSFUL);

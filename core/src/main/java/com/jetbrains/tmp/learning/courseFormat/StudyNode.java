@@ -59,4 +59,6 @@ public interface StudyNode<D extends AbstractObject, C extends StudyNode> {
     }
 
     boolean canBeLeaf();
+
+    void reloadData(boolean isRestarted, @NotNull ProgressIndicator indicator);
 }

@@ -1,5 +1,5 @@
 <StepikProjectManager id="1">
-  <courseNode id="2">
+  <root class="CourseNode" id="2">
     <data id="3">
       <id>187</id>
     </data>
@@ -1894,7 +1894,7 @@
       </SectionNode>
     </children>
     <authors id="351"/>
-  </courseNode>
+  </root>
   <showHint>true</showHint>
   <createdBy>0</createdBy>
   <defaultLang>Java 8</defaultLang>

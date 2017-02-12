@@ -205,6 +205,14 @@ public abstract class Node<
         }
     }
 
+    @Override
+    public void reloadData(boolean isRestarted, @NotNull ProgressIndicator indicator) {
+        loadData(data.getId());
+        init(isRestarted, indicator);
+    }
+
+    protected abstract void loadData(long id);
+
     protected abstract Class<C> getChildClass();
 
     @Override

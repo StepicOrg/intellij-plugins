@@ -2,11 +2,13 @@ package com.jetbrains.tmp.learning.courseFormat;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
+import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.courses.Course;
+import org.stepik.api.objects.courses.Courses;
 import org.stepik.api.objects.sections.Section;
 import org.stepik.api.objects.sections.Sections;
 import org.stepik.api.objects.users.User;
@@ -59,6 +61,27 @@ public class CourseNode extends Node<Course, SectionNode, Section, LessonNode> {
         authors = null;
 
         super.init(parent, isRestarted, indicator);
+    }
+
+    @Override
+    protected void loadData(long id) {
+        try {
+            StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
+            Courses courses = stepikApiClient.courses()
+                    .get()
+                    .id(id)
+                    .execute();
+            Course data;
+            if (!courses.isEmpty()) {
+                data = courses.getCourses().get(0);
+            } else {
+                data = new Course();
+                data.setId(id);
+            }
+            setData(data);
+        } catch (StepikClientException logged) {
+            logger.warn(String.format("Failed load course data id=%d", id), logged);
+        }
     }
 
     @Override

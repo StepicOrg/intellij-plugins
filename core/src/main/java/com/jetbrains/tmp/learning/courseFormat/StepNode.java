@@ -1,8 +1,10 @@
 package com.jetbrains.tmp.learning.courseFormat;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.core.EduNames;
+import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
@@ -12,6 +14,7 @@ import org.stepik.api.objects.steps.BlockViewOptions;
 import org.stepik.api.objects.steps.Limit;
 import org.stepik.api.objects.steps.Sample;
 import org.stepik.api.objects.steps.Step;
+import org.stepik.api.objects.steps.Steps;
 import org.stepik.api.objects.units.Units;
 
 import java.util.ArrayList;
@@ -24,6 +27,7 @@ import static com.jetbrains.tmp.learning.SupportedLanguages.INVALID;
 import static com.jetbrains.tmp.learning.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
 
 public class StepNode extends Node<Step, StepNode, Step, StepNode> {
+    private static final Logger logger = Logger.getInstance(StepNode.class);
     private StudyStatus status;
     private List<SupportedLanguages> supportedLanguages;
     private SupportedLanguages currentLang;
@@ -49,6 +53,28 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
         }
 
         super.init(parent, isRestarted, indicator);
+    }
+
+    @Override
+    protected void loadData(long id) {
+        try {
+            StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
+            Steps steps = stepikApiClient.steps()
+                    .get()
+                    .id(id)
+                    .execute();
+
+            Step step;
+            if (!steps.isEmpty()) {
+                step = steps.getSteps().get(0);
+            } else {
+                step = new Step();
+                step.setId(id);
+            }
+            setData(step);
+        } catch (StepikClientException logged) {
+            logger.warn(String.format("Failed step lesson data id=%d", id), logged);
+        }
     }
 
     @Override

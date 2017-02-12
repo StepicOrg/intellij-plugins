@@ -18,7 +18,6 @@ import com.jetbrains.tmp.learning.courseFormat.StudyNode;
 import com.jetbrains.tmp.learning.serialization.StudySerializationUtils;
 import com.jetbrains.tmp.learning.serialization.StudyUnrecognizedFormatException;
 import com.jetbrains.tmp.learning.serialization.SupportedLanguagesConverter;
-import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -27,10 +26,7 @@ import org.jdom.input.DOMBuilder;
 import org.jdom.output.XMLOutputter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.stepik.api.client.StepikApiClient;
-import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.courses.Course;
-import org.stepik.api.objects.courses.Courses;
 import org.stepik.api.objects.lessons.CompoundUnitLesson;
 import org.stepik.api.objects.sections.Section;
 import org.stepik.api.objects.steps.Limit;
@@ -66,7 +62,7 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
     private static DOMBuilder domBuilder;
     @XStreamOmitField
     private final Project project;
-    private CourseNode courseNode;
+    private StudyNode<?, ?> root;
     private boolean showHint = false;
     private long createdBy;
     private SupportedLanguages defaultLang = INVALID;
@@ -151,8 +147,8 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
         }
     }
 
-    public void setCourseNode(@Nullable CourseNode courseNode) {
-        this.courseNode = courseNode;
+    public void setRootNode(@Nullable StudyNode root) {
+        this.root = root;
     }
 
     @Nullable
@@ -214,19 +210,7 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
                     ProgressIndicator indicator = ProgressManager.getInstance()
                             .getProgressIndicator();
                     indicator.setIndeterminate(true);
-                    try {
-                        StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
-                        Courses courses = stepikApiClient.courses()
-                                .get()
-                                .id(courseNode.getId())
-                                .execute();
-                        if (!courses.isEmpty()) {
-                            courseNode.setData(courses.getCourses().get(0));
-                        }
-                    } catch (StepikClientException logged) {
-                        logger.warn("A course initialization don't is fully", logged);
-                    }
-                    courseNode.init(false, indicator);
+                    root.reloadData(false, indicator);
                 }, "Refreshing Course", true, project);
     }
 
@@ -269,7 +253,7 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
 
     @Nullable
     public StudyNode getProjectRoot() {
-        return courseNode;
+        return root;
     }
 
     @Override
@@ -283,7 +267,7 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
         if (createdBy != that.createdBy) return false;
         if (version != that.version) return false;
         if (project != null ? !project.equals(that.project) : that.project != null) return false;
-        if (courseNode != null ? !courseNode.equals(that.courseNode) : that.courseNode != null) return false;
+        if (root != null ? !root.equals(that.root) : that.root != null) return false;
         //noinspection SimplifiableIfStatement
         if (defaultLang != that.defaultLang) return false;
         return uuid != null ? uuid.equals(that.uuid) : that.uuid == null;
@@ -292,7 +276,7 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
     @Override
     public int hashCode() {
         int result = project != null ? project.hashCode() : 0;
-        result = 31 * result + (courseNode != null ? courseNode.hashCode() : 0);
+        result = 31 * result + (root != null ? root.hashCode() : 0);
         result = 31 * result + (showHint ? 1 : 0);
         result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
         result = 31 * result + (defaultLang != null ? defaultLang.hashCode() : 0);

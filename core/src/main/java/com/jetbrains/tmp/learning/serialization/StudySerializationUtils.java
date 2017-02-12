@@ -70,6 +70,7 @@ public class StudySerializationUtils {
     private static final String ADAPTIVE = "adaptive";
     private static final String USER = "user";
     private static final String INVALID = "invalid";
+    private static final String ROOT = "root";
 
     public static int getVersion(Element element) throws StudyUnrecognizedFormatException {
         final Element stepManager = element.getChild(MAIN_ELEMENT);
@@ -313,10 +314,20 @@ public class StudySerializationUtils {
     }
 
     public static Element convertToThirdVersion(@NotNull Element state) throws StudyUnrecognizedFormatException {
-        List<Element> sectionNodes = getSectionNodes(state);
+        Element stepManager = getStepManager(state);
+        Element courseNode = getCourseNode(stepManager);
+
+        removeOption(courseNode, DESCRIPTION);
+        removeOption(courseNode, NAME);
+        removeOption(courseNode, ID);
+        removeOption(courseNode, ADAPTIVE);
+        removeOption(stepManager, USER);
+
+        List<Element> sectionNodes = getSectionNodes(stepManager);
         if (sectionNodes == null) {
             return state;
         }
+
         sectionNodes.forEach(sectionNode -> {
             removeOption(sectionNode, ID);
             removeOption(sectionNode, NAME);
@@ -366,9 +377,7 @@ public class StudySerializationUtils {
         return state;
     }
 
-    private static List<Element> getSectionNodes(@NotNull Element state) throws StudyUnrecognizedFormatException {
-        final Element stepManager = getStepManager(state);
-
+    private static List<Element> getSectionNodes(@NotNull Element stepManager) throws StudyUnrecognizedFormatException {
         Element defaultLang = getFieldWithNameOrNull(stepManager, DEFAULT_LANG);
         if (defaultLang == null) {
             defaultLang = createField(stepManager, DEFAULT_LANG, INVALID);
@@ -377,12 +386,6 @@ public class StudySerializationUtils {
         replaceLanguage(defaultLangValue);
 
         Element courseNode = getCourseNode(stepManager);
-
-        removeOption(courseNode, DESCRIPTION);
-        removeOption(courseNode, NAME);
-        removeOption(courseNode, ID);
-        removeOption(courseNode, ADAPTIVE);
-        removeOption(stepManager, USER);
 
         return getListFieldWithNameOrNull(courseNode, SECTIONS_NODES, SECTION_NODE_CLASS);
     }
@@ -397,7 +400,7 @@ public class StudySerializationUtils {
     }
 
     @NotNull
-    private static Element getCourseNode(Element stepManager) throws StudyUnrecognizedFormatException {
+    private static Element getCourseNode(@NotNull Element stepManager) throws StudyUnrecognizedFormatException {
         Element courseNodeOption = getFieldWithNameOrNull(stepManager, COURSE_NODE);
         if (courseNodeOption == null) {
             String message = String.format("Field %s don't found", COURSE_NODE);
@@ -453,7 +456,9 @@ public class StudySerializationUtils {
 
 
     public static Element convertToFourthVersion(Element state) throws StudyUnrecognizedFormatException {
-        List<Element> sectionNodes = getSectionNodes(state);
+        Element stepManager = getStepManager(state);
+        Element courseNode = getCourseNode(stepManager);
+        List<Element> sectionNodes = getSectionNodes(stepManager);
         if (sectionNodes != null) {
             sectionNodes.stream()
                     .map(sectionNode -> getListFieldWithNameOrNull(sectionNode, LESSON_NODES, LESSON_NODE_CLASS))
@@ -501,12 +506,12 @@ public class StudySerializationUtils {
 
             sectionNodes.forEach(sectionNode -> silentRenameField(sectionNode, LESSON_NODES, CHILDREN));
 
-            final Element stepManager = getStepManager(state);
-            Element courseNode = getCourseNode(stepManager);
             silentRenameField(courseNode, SECTIONS_NODES, CHILDREN);
         }
-        final Element stepManager = state.getChild(MAIN_ELEMENT);
         List<Element> elements = stepManager.getChildren();
+
+        Element root = renameField(stepManager, COURSE_NODE, ROOT);
+        root.setAttribute("class", COURSE_NODE_CLASS);
 
         convertToXStreamStyle(elements);
 
