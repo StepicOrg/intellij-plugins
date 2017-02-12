@@ -50,6 +50,7 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
     private static final String MODULE_NAME = "Stepik";
     private final StepikProjectGenerator generator;
     private final PyCharmWizardStep wizardStep;
+    private final Project project;
     private TextFieldWithBrowseButton locationField;
     private boolean locationSetting;
     private boolean keepLocation;
@@ -57,8 +58,8 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
     private StepikPyProjectGenerator() {
         super(true);
         generator = StepikProjectGenerator.getInstance();
-        Project defaultProject = DefaultProjectFactory.getInstance().getDefaultProject();
-        wizardStep = new PyCharmWizardStep(this, defaultProject);
+        this.project = DefaultProjectFactory.getInstance().getDefaultProject();
+        wizardStep = new PyCharmWizardStep(this, project);
     }
 
     @Nullable
@@ -163,12 +164,12 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
                 return false;
             }
 
-            this.generator.setSelectedCourse(course);
             StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
             stepikApiClient.enrollments()
                     .post()
                     .course(course.getId())
                     .execute();
+            this.generator.createCourseNodeUnderProgress(project, course);
             return true;
         };
     }

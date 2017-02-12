@@ -1,6 +1,7 @@
 package org.stepik.plugin.projectWizard;
 
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import com.jetbrains.tmp.learning.StepikProjectManager;
@@ -8,11 +9,9 @@ import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.courseFormat.CourseNode;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.courses.Course;
-import org.stepik.api.objects.courses.Courses;
 import org.stepik.core.metrics.Metrics;
 
 import java.util.ArrayList;
@@ -20,7 +19,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static com.jetbrains.tmp.learning.StudyUtils.execCancelable;
 import static org.stepik.core.metrics.MetricsStatus.DATA_NOT_LOADED;
 import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
 import static org.stepik.core.metrics.MetricsStatus.TARGET_NOT_FOUND;
@@ -29,8 +27,8 @@ public class StepikProjectGenerator {
     public static final Course EMPTY_COURSE = initEmptyCourse();
     private static final Logger logger = Logger.getInstance(StepikProjectGenerator.class);
     private static StepikProjectGenerator instance;
+    private static CourseNode courseNode;
     private SupportedLanguages defaultLang = SupportedLanguages.INVALID;
-    private Course selectedCourse = EMPTY_COURSE;
 
     private StepikProjectGenerator() {
     }
@@ -132,51 +130,28 @@ public class StepikProjectGenerator {
         }
     }
 
-    private static Course getCourseUnderProgress(@Nullable Project project, long id) {
-        return ProgressManager.getInstance().runProcessWithProgressSynchronously(() -> {
-            ProgressManager.getInstance().getProgressIndicator().setIndeterminate(true);
-            return execCancelable(() -> {
-                StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
-                Courses courses;
-                try {
-                    courses = stepikApiClient.courses()
-                            .get()
-                            .id(id)
-                            .execute();
-                } catch (StepikClientException e) {
-                    return null;
-                }
-                if (courses.getCount() == 0) {
-                    return null;
-                }
+    public void createCourseNodeUnderProgress(@NotNull final Project project, @NotNull Course course) {
+        ProgressManager.getInstance()
+                .runProcessWithProgressSynchronously(() -> {
+                    if (course.getId() == 0) {
+                        logger.warn("Failed to get a course");
+                        Metrics.createProject(project, DATA_NOT_LOADED);
+                        return;
+                    }
 
-                return courses.getCourses().get(0);
-            });
-        }, "Downloading Course", true, project);
-    }
-
-    public void setSelectedCourse(@Nullable Course course) {
-        if (course == null) {
-            selectedCourse = StepikProjectGenerator.EMPTY_COURSE;
-        } else {
-            selectedCourse = course;
-        }
+                    ProgressIndicator indicator = ProgressManager.getInstance().getProgressIndicator();
+                    indicator.setIndeterminate(true);
+                    courseNode = new CourseNode(course, indicator);
+                }, "Creating project", true, project);
     }
 
     public void generateProject(@NotNull Project project) {
-        long courseId = selectedCourse.getId();
-        final Course course = getCourseUnderProgress(project, courseId);
-        if (course == null) {
-            logger.warn("Failed to get a course: id = " + courseId);
-            Metrics.createProject(project, DATA_NOT_LOADED);
-            return;
-        }
         StepikProjectManager stepikProjectManager = StepikProjectManager.getInstance(project);
         if (stepikProjectManager == null) {
             Metrics.createProject(project, TARGET_NOT_FOUND);
             return;
         }
-        stepikProjectManager.setCourseNode(new CourseNode(course));
+        stepikProjectManager.setCourseNode(courseNode);
         stepikProjectManager.setDefaultLang(getDefaultLang());
         Metrics.createProject(project, SUCCESSFUL);
     }
