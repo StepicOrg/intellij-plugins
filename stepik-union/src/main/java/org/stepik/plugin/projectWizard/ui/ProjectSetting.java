@@ -2,13 +2,13 @@ package org.stepik.plugin.projectWizard.ui;
 
 import com.jetbrains.tmp.learning.SupportedLanguages;
 import org.jetbrains.annotations.NotNull;
-import org.stepik.api.objects.courses.Course;
+import org.stepik.api.objects.StudyObject;
 
 /**
  * @author meanmail
  */
 interface ProjectSetting {
-    void selectedCourse(@NotNull Course course);
+    void selectedStudyNode(@NotNull StudyObject course);
 
     void addListener(@NotNull ProjectSettingListener listener);
 

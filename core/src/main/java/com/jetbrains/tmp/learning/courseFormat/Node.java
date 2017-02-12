@@ -4,7 +4,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.stepik.api.objects.AbstractObject;
+import org.stepik.api.objects.StudyObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,9 +15,9 @@ import java.util.Map;
  * @author meanmail
  */
 public abstract class Node<
-        D extends AbstractObject,
+        D extends StudyObject,
         C extends StudyNode<DC, CC>,
-        DC extends AbstractObject,
+        DC extends StudyObject,
         CC extends Node> implements StudyNode<D, C> {
     private static final Logger logger = Logger.getInstance(Node.class);
     private StudyNode parent;
@@ -197,7 +197,6 @@ public abstract class Node<
         }
 
         sortChildren();
-
         setParent(parent);
 
         for (StudyNode child : getChildren()) {

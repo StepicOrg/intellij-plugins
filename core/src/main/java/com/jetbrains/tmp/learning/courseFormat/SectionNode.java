@@ -30,6 +30,10 @@ public class SectionNode extends Node<Section, LessonNode, CompoundUnitLesson, S
     public SectionNode() {
     }
 
+    public SectionNode(@NotNull Section data, @Nullable ProgressIndicator indicator) {
+        super(data, indicator);
+    }
+
     public void init(@Nullable final StudyNode parent, boolean isRestarted, @Nullable ProgressIndicator indicator) {
         if (indicator != null) {
             indicator.setText("Refresh a section: " + getName());

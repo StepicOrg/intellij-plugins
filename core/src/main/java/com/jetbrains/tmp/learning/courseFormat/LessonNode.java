@@ -31,6 +31,9 @@ public class LessonNode extends Node<CompoundUnitLesson, StepNode, Step, StepNod
         super(parent, data);
     }
 
+    public LessonNode(@NotNull CompoundUnitLesson data, @Nullable ProgressIndicator indicator) {
+        super(data, indicator);
+    }
 
     @Override
     protected List<Step> getChildDataList() {

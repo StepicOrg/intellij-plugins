@@ -3,7 +3,8 @@ package org.stepik.api.objects.lessons;
 import com.google.gson.annotations.SerializedName;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.stepik.api.objects.AbstractObject;
+import org.stepik.api.objects.StudyObject;
+import org.stepik.api.urls.Urls;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +13,7 @@ import java.util.Map;
 /**
  * @author meanmail
  */
-public class Lesson extends AbstractObject {
+public class Lesson extends StudyObject {
     private List<Long> steps;
     private Map<String, String> actions;
     private List<Integer> tags;
@@ -174,6 +175,12 @@ public class Lesson extends AbstractObject {
 
     public void setTitle(@Nullable String title) {
         this.title = title;
+    }
+
+    @NotNull
+    @Override
+    public String getDescription() {
+        return String.format("Lesson %s/lesson/%d", Urls.STEPIK_URL, getId());
     }
 
     @NotNull
@@ -484,5 +491,10 @@ public class Lesson extends AbstractObject {
 
     public void setVote(@Nullable String vote) {
         this.vote = vote;
+    }
+
+    @Override
+    public String toString() {
+        return getTitle();
     }
 }

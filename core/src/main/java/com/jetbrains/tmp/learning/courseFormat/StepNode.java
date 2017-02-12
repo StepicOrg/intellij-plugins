@@ -39,6 +39,10 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
         super(parent, data);
     }
 
+    public StepNode(@NotNull Step data, @Nullable ProgressIndicator indicator) {
+        super(data, indicator);
+    }
+
     public void init(@Nullable StudyNode parent, boolean isRestarted, @Nullable ProgressIndicator indicator) {
         if (indicator != null) {
             indicator.setText("Refresh a step: " + getName());

@@ -3,7 +3,7 @@ package org.stepik.api.objects.sections;
 import com.google.gson.annotations.SerializedName;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.stepik.api.objects.AbstractObject;
+import org.stepik.api.objects.StudyObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * @author meanmail
  */
-public class Section extends AbstractObject {
+public class Section extends StudyObject {
     private int course;
     private List<Long> units;
     private int position;
@@ -284,8 +284,11 @@ public class Section extends AbstractObject {
         this.proctorSession = proctorSession;
     }
 
-    @Nullable
+    @NotNull
     public String getDescription() {
+        if (description == null) {
+            description = "";
+        }
         return description;
     }
 
@@ -416,5 +419,10 @@ public class Section extends AbstractObject {
 
     public void setUpdateDate(@Nullable String updateDate) {
         this.updateDate = updateDate;
+    }
+
+    @Override
+    public String toString() {
+        return getTitle();
     }
 }

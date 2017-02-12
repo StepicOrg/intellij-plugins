@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.stepik.api.objects.AbstractObject;
+import org.stepik.api.objects.StudyObject;
 import org.stepik.api.objects.steps.Video;
 import org.stepik.api.urls.Urls;
 
@@ -15,7 +15,7 @@ import java.util.Map;
 /**
  * @author meanmail
  */
-public class Course extends AbstractObject {
+public class Course extends StudyObject {
     private String summary;
     private String workload;
     private String cover;
@@ -161,8 +161,11 @@ public class Course extends AbstractObject {
         this.authors = authors;
     }
 
-    @Nullable
+    @NotNull
     public String getDescription() {
+        if (description == null) {
+            description = "";
+        }
         return description;
     }
 

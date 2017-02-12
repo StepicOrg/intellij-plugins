@@ -3,11 +3,11 @@ package com.jetbrains.tmp.learning.courseFormat;
 import com.intellij.openapi.progress.ProgressIndicator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.stepik.api.objects.AbstractObject;
+import org.stepik.api.objects.StudyObject;
 
 import java.util.List;
 
-public interface StudyNode<D extends AbstractObject, C extends StudyNode> {
+public interface StudyNode<D extends StudyObject, C extends StudyNode> {
     @NotNull
     String getName();
 

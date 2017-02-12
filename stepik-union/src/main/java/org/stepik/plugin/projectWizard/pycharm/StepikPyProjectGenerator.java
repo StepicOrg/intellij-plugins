@@ -29,7 +29,7 @@ import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
-import org.stepik.api.objects.courses.Course;
+import org.stepik.api.objects.StudyObject;
 import org.stepik.plugin.projectWizard.ProjectWizardUtils;
 import org.stepik.plugin.projectWizard.StepikProjectGenerator;
 
@@ -157,7 +157,7 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
     @Override
     public BooleanFunction<PythonProjectGenerator> beforeProjectGenerated(@Nullable Sdk sdk) {
         return generator -> {
-            final Course course = wizardStep.getSelectedCourse();
+            final StudyObject course = wizardStep.getSelectedCourse();
             if (course.getId() == 0) {
                 return false;
             }

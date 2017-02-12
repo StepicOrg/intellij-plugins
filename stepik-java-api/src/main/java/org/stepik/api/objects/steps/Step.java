@@ -3,7 +3,8 @@ package org.stepik.api.objects.steps;
 import com.google.gson.annotations.SerializedName;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.stepik.api.objects.AbstractObject;
+import org.stepik.api.objects.StudyObject;
+import org.stepik.api.urls.Urls;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,7 +14,7 @@ import java.util.Map;
 /**
  * @author meanmail
  */
-public class Step extends AbstractObject {
+public class Step extends StudyObject {
     private int lesson;
     private int position;
     private String status;
@@ -330,5 +331,22 @@ public class Step extends AbstractObject {
 
     public void setDiscussionThreads(@Nullable List<String> discussionThreads) {
         this.discussionThreads = discussionThreads;
+    }
+
+    @NotNull
+    @Override
+    public String getTitle() {
+        return "Step" + position;
+    }
+
+    @NotNull
+    @Override
+    public String getDescription() {
+        return String.format("%s in %s/lesson/%d", getTitle(), Urls.STEPIK_URL, getLesson());
+    }
+
+    @Override
+    public String toString() {
+        return getTitle();
     }
 }

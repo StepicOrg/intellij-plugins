@@ -6,12 +6,13 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.SupportedLanguages;
-import com.jetbrains.tmp.learning.courseFormat.CourseNode;
 import com.jetbrains.tmp.learning.courseFormat.StudyNode;
+import com.jetbrains.tmp.learning.courseFormat.StudyNodeFactory;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.exceptions.StepikClientException;
+import org.stepik.api.objects.StudyObject;
 import org.stepik.api.objects.courses.Course;
 import org.stepik.core.metrics.Metrics;
 
@@ -19,13 +20,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.stepik.core.metrics.MetricsStatus.DATA_NOT_LOADED;
 import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
 import static org.stepik.core.metrics.MetricsStatus.TARGET_NOT_FOUND;
 
 public class StepikProjectGenerator {
-    public static final Course EMPTY_COURSE = initEmptyCourse();
+    public static final StudyObject EMPTY_STUDY_NODE = initEmptyStudyNode();
     private static final Logger logger = Logger.getInstance(StepikProjectGenerator.class);
     private static StepikProjectGenerator instance;
     private static StudyNode projectRoot;
@@ -35,8 +37,8 @@ public class StepikProjectGenerator {
     }
 
     @NotNull
-    private static Course initEmptyCourse() {
-        Course course = new Course();
+    private static StudyObject initEmptyStudyNode() {
+        StudyObject course = new Course();
         course.setTitle("Empty");
         course.setDescription("Please, press refresh button");
         return course;
@@ -51,8 +53,8 @@ public class StepikProjectGenerator {
     }
 
     @NotNull
-    private static List<Course> getCourses(@NotNull SupportedLanguages programmingLanguage) {
-        List<Course> courses = new ArrayList<>();
+    private static List<StudyObject> getCourses(@NotNull SupportedLanguages programmingLanguage) {
+        List<StudyObject> courses = new ArrayList<>();
         List<Long> coursesIds = getHardcodedCoursesId(programmingLanguage);
 
         if (!coursesIds.isEmpty()) {
@@ -62,7 +64,10 @@ public class StepikProjectGenerator {
                         .get()
                         .id(coursesIds)
                         .execute()
-                        .getCourses();
+                        .getCourses()
+                        .stream()
+                        .map(course -> (StudyObject) course)
+                        .collect(Collectors.toList());
             } catch (StepikClientException e) {
                 logger.warn("Failed get courses", e);
             }
@@ -113,28 +118,28 @@ public class StepikProjectGenerator {
     }
 
     @NotNull
-    public static List<Course> getCoursesUnderProgress(
+    public static List<StudyObject> getCoursesUnderProgress(
             @NotNull final Project project,
             @NotNull SupportedLanguages programmingLanguage) {
         try {
             return ProgressManager.getInstance()
                     .runProcessWithProgressSynchronously(() -> {
                         ProgressManager.getInstance().getProgressIndicator().setIndeterminate(true);
-                        List<Course> courses = getCourses(programmingLanguage);
+                        List<StudyObject> courses = getCourses(programmingLanguage);
                         if (courses.isEmpty()) {
-                            courses.add(EMPTY_COURSE);
+                            courses.add(EMPTY_STUDY_NODE);
                         }
                         return courses;
                     }, "Refreshing Course List", true, project);
         } catch (RuntimeException e) {
-            return Collections.singletonList(EMPTY_COURSE);
+            return Collections.singletonList(EMPTY_STUDY_NODE);
         }
     }
 
-    public void createCourseNodeUnderProgress(@NotNull final Project project, @NotNull Course course) {
+    public void createCourseNodeUnderProgress(@NotNull final Project project, @NotNull StudyObject data) {
         ProgressManager.getInstance()
                 .runProcessWithProgressSynchronously(() -> {
-                    if (course.getId() == 0) {
+                    if (data.getId() == 0) {
                         logger.warn("Failed to get a course");
                         Metrics.createProject(project, DATA_NOT_LOADED);
                         return;
@@ -142,7 +147,8 @@ public class StepikProjectGenerator {
 
                     ProgressIndicator indicator = ProgressManager.getInstance().getProgressIndicator();
                     indicator.setIndeterminate(true);
-                    projectRoot = new CourseNode(course, indicator);
+
+                    projectRoot = StudyNodeFactory.createTree(data, indicator);
                 }, "Creating project", true, project);
     }
 
