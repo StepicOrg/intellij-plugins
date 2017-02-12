@@ -66,6 +66,10 @@ public class StudySerializationUtils {
     private static final String COMPOUND_UNIT_LESSON_CLASS = "CompoundUnitLesson";
     private static final String LESSON = "lesson";
     private static final String CHILDREN = "children";
+    private static final String STEP_FILES = "stepFiles";
+    private static final String ADAPTIVE = "adaptive";
+    private static final String USER = "user";
+    private static final String INVALID = "invalid";
 
     public static int getVersion(Element element) throws StudyUnrecognizedFormatException {
         final Element stepManager = element.getChild(MAIN_ELEMENT);
@@ -313,30 +317,50 @@ public class StudySerializationUtils {
         if (sectionNodes == null) {
             return state;
         }
+        sectionNodes.forEach(sectionNode -> {
+            removeOption(sectionNode, ID);
+            removeOption(sectionNode, NAME);
+            removeOption(sectionNode, POSITION);
+        });
 
         sectionNodes.stream()
                 .map(sectionNode -> getListFieldWithNameOrNull(sectionNode, LESSON_NODES, LESSON_NODE_CLASS))
                 .filter(Objects::nonNull)
-                .forEach(lessonNodes -> lessonNodes.stream()
-                        .map(lessonNode -> getListFieldWithNameOrNull(lessonNode, STEP_NODES,
-                                STEP_NODE_CLASS))
-                        .filter(Objects::nonNull)
-                        .forEach(stepNodes -> {
-                            stepNodes.forEach(stepNode -> {
-                                Element currentLang = getFieldWithNameOrNull(stepNode, CURRENT_LANG);
-                                if (currentLang != null) {
-                                    Attribute currentLangValue = currentLang.getAttribute(VALUE);
-                                    replaceLanguage(currentLangValue);
-                                }
-
-                                Element limits = getFieldWithNameOrNull(stepNode, LIMITS);
-                                replaceLanguages(limits, MAP, ENTRY, KEY);
-
-                                Element supportedLanguages;
-                                supportedLanguages = getFieldWithNameOrNull(stepNode, SUPPORTED_LANGUAGES);
-                                replaceLanguages(supportedLanguages, LIST, OPTION, VALUE);
+                .forEach(lessonNodes -> {
+                            lessonNodes.forEach(lessonNode -> {
+                                removeOption(lessonNode, ID);
+                                removeOption(lessonNode, NAME);
+                                removeOption(lessonNode, POSITION);
                             });
-                        })
+                            lessonNodes.stream()
+                                    .map(lessonNode -> getListFieldWithNameOrNull(lessonNode, STEP_NODES,
+                                            STEP_NODE_CLASS))
+                                    .filter(Objects::nonNull)
+                                    .forEach(stepNodes -> {
+                                        stepNodes.forEach(stepNode -> {
+                                            removeOption(stepNode, ID);
+                                            removeOption(stepNode, NAME);
+                                            removeOption(stepNode, POSITION);
+                                            removeOption(stepNode, STEP_FILES);
+                                            removeOption(stepNode, TEXT);
+                                            removeOption(stepNode, TIME_LIMITS);
+                                        });
+                                        stepNodes.forEach(stepNode -> {
+                                            Element currentLang = getFieldWithNameOrNull(stepNode, CURRENT_LANG);
+                                            if (currentLang != null) {
+                                                Attribute currentLangValue = currentLang.getAttribute(VALUE);
+                                                replaceLanguage(currentLangValue);
+                                            }
+
+                                            Element limits = getFieldWithNameOrNull(stepNode, LIMITS);
+                                            replaceLanguages(limits, MAP, ENTRY, KEY);
+
+                                            Element supportedLanguages;
+                                            supportedLanguages = getFieldWithNameOrNull(stepNode, SUPPORTED_LANGUAGES);
+                                            replaceLanguages(supportedLanguages, LIST, OPTION, VALUE);
+                                        });
+                                    });
+                        }
                 );
 
         return state;
@@ -347,12 +371,18 @@ public class StudySerializationUtils {
 
         Element defaultLang = getFieldWithNameOrNull(stepManager, DEFAULT_LANG);
         if (defaultLang == null) {
-            defaultLang = createField(stepManager, DEFAULT_LANG, "invalid");
+            defaultLang = createField(stepManager, DEFAULT_LANG, INVALID);
         }
         Attribute defaultLangValue = defaultLang.getAttribute(VALUE);
         replaceLanguage(defaultLangValue);
 
         Element courseNode = getCourseNode(stepManager);
+
+        removeOption(courseNode, DESCRIPTION);
+        removeOption(courseNode, NAME);
+        removeOption(courseNode, ID);
+        removeOption(courseNode, ADAPTIVE);
+        removeOption(stepManager, USER);
 
         return getListFieldWithNameOrNull(courseNode, SECTIONS_NODES, SECTION_NODE_CLASS);
     }
@@ -361,7 +391,7 @@ public class StudySerializationUtils {
     private static Element getStepManager(@NotNull Element state) throws StudyUnrecognizedFormatException {
         final Element stepManager = state.getChild(MAIN_ELEMENT);
         if (stepManager == null) {
-            throw new StudyUnrecognizedFormatException("Not found element \" + MAIN_ELEMENT + \"");
+            throw new StudyUnrecognizedFormatException("Not found element \"" + MAIN_ELEMENT + "\"");
         }
         return stepManager;
     }
@@ -380,6 +410,13 @@ public class StudySerializationUtils {
             throw new StudyUnrecognizedFormatException(message);
         }
         return courseNode;
+    }
+
+    private static void removeOption(Element parent, String description) {
+        Element removed = getFieldWithNameOrNull(parent, description);
+        if (removed != null) {
+            removeChild(parent, removed);
+        }
     }
 
     private static void replaceLanguages(
@@ -457,6 +494,7 @@ public class StudySerializationUtils {
                                 if (stepNodes == null) {
                                     return;
                                 }
+                                stepNodes.forEach(stepNode -> removeOption(stepNode, LIMITS));
 
                                 silentRenameField(lessonNode, STEP_NODES, CHILDREN);
                             }));
@@ -516,11 +554,6 @@ public class StudySerializationUtils {
                         }
                         if (dataClass != null) {
                             element.setAttribute("class", dataClass);
-                            Element child = element.getChild(dataClass);
-                            if (child != null) {
-                                removeChild(element, child);
-                                element.addContent(child.cloneContent());
-                            }
                         }
                     }
                 }
