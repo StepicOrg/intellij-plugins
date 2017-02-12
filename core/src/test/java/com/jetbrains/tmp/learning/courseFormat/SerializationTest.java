@@ -56,6 +56,7 @@ public class SerializationTest {
             throws IOException, SAXException, ParserConfigurationException, InstantiationException, IllegalAccessException {
         StepNode node = new StepNode();
         node.getData();
+        node.setId(100);
         Limit limit = new Limit();
         limit.setMemory(256);
         limit.setTime(8);

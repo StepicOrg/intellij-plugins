@@ -31,15 +31,15 @@ public class StudySerializationUtils {
     private static final String TITLE = "title";
     private static final String LIST = "list";
     private static final String SECTIONS = "sections";
-    private static final String SECTION_NODE = "SectionNode";
+    private static final String SECTION_NODE_CLASS = "SectionNode";
     private static final String SECTION_CLASS = "Section";
     private static final String POSITION = "position";
     private static final String LESSONS = "lessons";
     private static final String LESSON_CLASS = "Lesson";
-    private static final String LESSON_NODE = "LessonNode";
+    private static final String LESSON_NODE_CLASS = "LessonNode";
     private static final String UNIT_CLASS = "Unit";
     private static final String STEP_LIST = "stepList";
-    private static final String STEP_NODE = "StepNode";
+    private static final String STEP_NODE_CLASS = "StepNode";
     private static final String STEP_CLASS = "Step";
     private static final String BLOCK = "block";
     private static final String BLOCK_VIEW_CLASS = "BlockView";
@@ -172,7 +172,7 @@ public class StudySerializationUtils {
         renameField(courseTag, SECTIONS, SECTIONS_NODES);
 
         for (Element section : sections) {
-            section.setName(SECTION_NODE);
+            section.setName(SECTION_NODE_CLASS);
             Element data = createFieldWithClass(section, DATA, SECTION_CLASS);
             moveIdAndNameAsTitle(section, data);
             moveField(section, data, POSITION);
@@ -181,7 +181,7 @@ public class StudySerializationUtils {
             renameField(section, LESSONS, LESSON_NODES);
 
             for (Element lesson : lessons) {
-                lesson.setName(LESSON_NODE);
+                lesson.setName(LESSON_NODE_CLASS);
                 data = createFieldWithClass(lesson, DATA, LESSON_CLASS);
                 moveIdAndNameAsTitle(lesson, data);
 
@@ -192,7 +192,7 @@ public class StudySerializationUtils {
                 renameField(lesson, STEP_LIST, STEP_NODES);
 
                 for (Element step : steps) {
-                    step.setName(STEP_NODE);
+                    step.setName(STEP_NODE_CLASS);
                     data = createFieldWithClass(step, DATA, STEP_CLASS);
                     moveField(step, data, ID);
                     moveField(step, data, POSITION);
@@ -313,49 +313,30 @@ public class StudySerializationUtils {
         if (sectionNodes == null) {
             return state;
         }
-        sectionNodes.forEach(sectionNode -> {
-            removeOption(sectionNode, ID);
-            removeOption(sectionNode, NAME);
-            removeOption(sectionNode, POSITION);
-        });
 
         sectionNodes.stream()
-                .map(sectionNode -> getListFieldWithNameOrNull(sectionNode, LESSON_NODES, LESSON_NODE))
+                .map(sectionNode -> getListFieldWithNameOrNull(sectionNode, LESSON_NODES, LESSON_NODE_CLASS))
                 .filter(Objects::nonNull)
-                .forEach(lessonNodes -> {
-                            lessonNodes.forEach(lessonNode -> {
-                                removeOption(lessonNode, ID);
-                                removeOption(lessonNode, NAME);
-                                removeOption(lessonNode, POSITION);
+                .forEach(lessonNodes -> lessonNodes.stream()
+                        .map(lessonNode -> getListFieldWithNameOrNull(lessonNode, STEP_NODES,
+                                STEP_NODE_CLASS))
+                        .filter(Objects::nonNull)
+                        .forEach(stepNodes -> {
+                            stepNodes.forEach(stepNode -> {
+                                Element currentLang = getFieldWithNameOrNull(stepNode, CURRENT_LANG);
+                                if (currentLang != null) {
+                                    Attribute currentLangValue = currentLang.getAttribute(VALUE);
+                                    replaceLanguage(currentLangValue);
+                                }
+
+                                Element limits = getFieldWithNameOrNull(stepNode, LIMITS);
+                                replaceLanguages(limits, MAP, ENTRY, KEY);
+
+                                Element supportedLanguages;
+                                supportedLanguages = getFieldWithNameOrNull(stepNode, SUPPORTED_LANGUAGES);
+                                replaceLanguages(supportedLanguages, LIST, OPTION, VALUE);
                             });
-                            lessonNodes.stream()
-                                    .map(lessonNode -> getListFieldWithNameOrNull(lessonNode, STEP_NODES, STEP_NODE))
-                                    .filter(Objects::nonNull)
-                                    .forEach(stepNodes -> {
-                                        stepNodes.forEach(stepNode -> {
-                                            removeOption(stepNode, ID);
-                                            removeOption(stepNode, NAME);
-                                            removeOption(stepNode, POSITION);
-                                            removeOption(stepNode, "stepFiles");
-                                            removeOption(stepNode, TEXT);
-                                            removeOption(stepNode, TIME_LIMITS);
-                                        });
-                                        stepNodes.forEach(stepNode -> {
-                                            Element currentLang = getFieldWithNameOrNull(stepNode, CURRENT_LANG);
-                                            if (currentLang != null) {
-                                                Attribute currentLangValue = currentLang.getAttribute(VALUE);
-                                                replaceLanguage(currentLangValue);
-                                            }
-
-                                            Element limits = getFieldWithNameOrNull(stepNode, LIMITS);
-                                            replaceLanguages(limits, MAP, ENTRY, KEY);
-
-                                            Element supportedLanguages;
-                                            supportedLanguages = getFieldWithNameOrNull(stepNode, SUPPORTED_LANGUAGES);
-                                            replaceLanguages(supportedLanguages, LIST, OPTION, VALUE);
-                                        });
-                                    });
-                        }
+                        })
                 );
 
         return state;
@@ -373,13 +354,7 @@ public class StudySerializationUtils {
 
         Element courseNode = getCourseNode(stepManager);
 
-        removeOption(courseNode, DESCRIPTION);
-        removeOption(courseNode, NAME);
-        removeOption(courseNode, ID);
-        removeOption(courseNode, "adaptive");
-        removeOption(stepManager, "user");
-
-        return getListFieldWithNameOrNull(courseNode, SECTIONS_NODES, SECTION_NODE);
+        return getListFieldWithNameOrNull(courseNode, SECTIONS_NODES, SECTION_NODE_CLASS);
     }
 
     @NotNull
@@ -405,13 +380,6 @@ public class StudySerializationUtils {
             throw new StudyUnrecognizedFormatException(message);
         }
         return courseNode;
-    }
-
-    private static void removeOption(Element parent, String description) {
-        Element removed = getFieldWithNameOrNull(parent, description);
-        if (removed != null) {
-            removeChild(parent, removed);
-        }
     }
 
     private static void replaceLanguages(
@@ -451,7 +419,7 @@ public class StudySerializationUtils {
         List<Element> sectionNodes = getSectionNodes(state);
         if (sectionNodes != null) {
             sectionNodes.stream()
-                    .map(sectionNode -> getListFieldWithNameOrNull(sectionNode, LESSON_NODES, LESSON_NODE))
+                    .map(sectionNode -> getListFieldWithNameOrNull(sectionNode, LESSON_NODES, LESSON_NODE_CLASS))
                     .filter(Objects::nonNull)
                     .forEach(lessonNodes -> lessonNodes
                             .forEach(lessonNode -> {
@@ -484,11 +452,11 @@ public class StudySerializationUtils {
 
                                 dataClassTag.setName(COMPOUND_UNIT_LESSON_CLASS);
 
-                                List<Element> stepNodes = getListFieldWithNameOrNull(lessonNode, STEP_NODES, STEP_NODE);
+                                List<Element> stepNodes = getListFieldWithNameOrNull(lessonNode, STEP_NODES,
+                                        STEP_NODE_CLASS);
                                 if (stepNodes == null) {
                                     return;
                                 }
-                                stepNodes.forEach(stepNode -> removeOption(stepNode, LIMITS));
 
                                 silentRenameField(lessonNode, STEP_NODES, CHILDREN);
                             }));
@@ -525,8 +493,36 @@ public class StudySerializationUtils {
             if (element.getName().equals(OPTION)) {
                 Attribute nameAttr = element.getAttribute(NAME);
                 if (nameAttr != null) {
+                    String name = nameAttr.getValue();
                     element.setName(nameAttr.getValue());
                     element.removeAttribute(nameAttr);
+
+                    if (name.equals(DATA)) {
+                        Element parent = element.getParentElement();
+                        String dataClass = null;
+                        switch (parent.getName()) {
+                            case COURSE_NODE_CLASS:
+                                dataClass = COURSE_CLASS;
+                                break;
+                            case SECTION_NODE_CLASS:
+                                dataClass = SECTION_CLASS;
+                                break;
+                            case LESSON_NODE_CLASS:
+                                dataClass = COMPOUND_UNIT_LESSON_CLASS;
+                                break;
+                            case STEP_NODE_CLASS:
+                                dataClass = STEP_CLASS;
+                                break;
+                        }
+                        if (dataClass != null) {
+                            element.setAttribute("class", dataClass);
+                            Element child = element.getChild(dataClass);
+                            if (child != null) {
+                                removeChild(element, child);
+                                element.addContent(child.cloneContent());
+                            }
+                        }
+                    }
                 }
 
                 Attribute valueAttr = element.getAttribute(VALUE);
@@ -541,7 +537,7 @@ public class StudySerializationUtils {
 
                     if (children.size() > 0) {
                         Element child = children.get(0);
-                        element.removeChild(child.getName());
+                        removeChild(element, child);
                         element.addContent(child.cloneContent());
                     }
                 }

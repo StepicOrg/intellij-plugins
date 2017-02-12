@@ -4,11 +4,18 @@
       <SectionNode id="4">
         <children id="5">
           <LessonNode id="6">
-            <data id="7">
+            <data class="CompoundUnitLesson" id="7">
               <id>0</id>
+              <unit id="8">
+                <id>0</id>
+                <section>0</section>
+                <lesson>0</lesson>
+                <position>0</position>
+                <isActive>false</isActive>
+              </unit>
             </data>
-            <children id="8">
-              <StepNode id="9">
+            <children id="9">
+              <StepNode id="10">
                 <courseId>0</courseId>
               </StepNode>
             </children>

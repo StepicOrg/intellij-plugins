@@ -2,24 +2,53 @@
   <StepikProjectManager>
     <option name="courseNode">
       <CourseNode>
+        <option name="adaptive" value="false" />
         <option name="authors">
           <list />
         </option>
+        <option name="description" value="Simple text" />
+        <option name="id" value="187" />
+        <option name="name" value="Java. Базовый курс" />
         <option name="sectionNodes">
           <list>
             <SectionNode>
+              <option name="id" value="537" />
               <option name="lessonNodes">
                 <list>
                   <LessonNode>
+                    <option name="id" value="12755" />
+                    <option name="name" value="Первый контакт — Hello World" />
+                    <option name="position" value="2" />
                     <option name="stepNodes">
                       <list>
                         <StepNode>
                           <option name="currentLang" value="Java 8" />
+                          <option name="id" value="44236" />
+                          <option name="name" value="step14" />
+                          <option name="position" value="14" />
                           <option name="status" value="SOLVED" />
+                          <option name="stepFiles">
+                            <map>
+                              <entry key="Main.java">
+                                <value>
+                                  <StepFile>
+                                    <option name="name" value="Main.java" />
+                                    <option name="text" value="Simple text" />
+                                  </StepFile>
+                                </value>
+                              </entry>
+                            </map>
+                          </option>
                           <option name="supportedLanguages">
                             <list>
                               <option value="Java 8" />
                             </list>
+                          </option>
+                          <option name="text" value="Simple text" />
+                          <option name="timeLimits">
+                            <map>
+                              <entry key="java8" value="&lt;b&gt;Memory limit&lt;/b&gt;: 256 Mb&lt;br&gt;&lt;b&gt;Time limit&lt;/b&gt;: 5s&lt;br&gt;&lt;br&gt;" />
+                            </map>
                           </option>
                           <option name="data">
                             <Step>
@@ -66,6 +95,8 @@
                   </LessonNode>
                 </list>
               </option>
+              <option name="name" value="Введение в Java" />
+              <option name="position" value="1" />
               <option name="data">
                 <Section>
                   <option name="id" value="537" />
@@ -75,18 +106,43 @@
               </option>
             </SectionNode>
             <SectionNode>
+              <option name="id" value="538" />
               <option name="lessonNodes">
                 <list>
                   <LessonNode>
+                    <option name="id" value="12759" />
+                    <option name="name" value="Примитивные типы" />
+                    <option name="position" value="1" />
                     <option name="stepNodes">
                       <list>
                         <StepNode>
                           <option name="currentLang" value="Java 8" />
+                          <option name="id" value="47519" />
+                          <option name="name" value="step6" />
+                          <option name="position" value="6" />
                           <option name="status" value="UNCHECKED" />
+                          <option name="stepFiles">
+                            <map>
+                              <entry key="Main.java">
+                                <value>
+                                  <StepFile>
+                                    <option name="name" value="Main.java" />
+                                    <option name="text" value="Simple text" />
+                                  </StepFile>
+                                </value>
+                              </entry>
+                            </map>
+                          </option>
                           <option name="supportedLanguages">
                             <list>
                               <option value="Java 8" />
                             </list>
+                          </option>
+                          <option name="text" value="Simple text" />
+                          <option name="timeLimits">
+                            <map>
+                              <entry key="java8" value="&lt;b&gt;Memory limit&lt;/b&gt;: 64 Mb&lt;br&gt;&lt;b&gt;Time limit&lt;/b&gt;: 2s&lt;br&gt;&lt;br&gt;" />
+                            </map>
                           </option>
                           <option name="data">
                             <Step>
@@ -119,11 +175,32 @@
                         </StepNode>
                         <StepNode>
                           <option name="currentLang" value="Java 8" />
+                          <option name="id" value="47533" />
+                          <option name="name" value="step8" />
+                          <option name="position" value="8" />
                           <option name="status" value="UNCHECKED" />
+                          <option name="stepFiles">
+                            <map>
+                              <entry key="Main.java">
+                                <value>
+                                  <StepFile>
+                                    <option name="name" value="Main.java" />
+                                    <option name="text" value="Simple text" />
+                                  </StepFile>
+                                </value>
+                              </entry>
+                            </map>
+                          </option>
                           <option name="supportedLanguages">
                             <list>
                               <option value="Java 8" />
                             </list>
+                          </option>
+                          <option name="text" value="Simple text" />
+                          <option name="timeLimits">
+                            <map>
+                              <entry key="java8" value="&lt;b&gt;Memory limit&lt;/b&gt;: 64 Mb&lt;br&gt;&lt;b&gt;Time limit&lt;/b&gt;: 2s&lt;br&gt;&lt;br&gt;" />
+                            </map>
                           </option>
                           <option name="data">
                             <Step>
@@ -156,11 +233,32 @@
                         </StepNode>
                         <StepNode>
                           <option name="currentLang" value="Java 8" />
+                          <option name="id" value="47538" />
+                          <option name="name" value="step12" />
+                          <option name="position" value="12" />
                           <option name="status" value="UNCHECKED" />
+                          <option name="stepFiles">
+                            <map>
+                              <entry key="Main.java">
+                                <value>
+                                  <StepFile>
+                                    <option name="name" value="Main.java" />
+                                    <option name="text" value="Simple text" />
+                                  </StepFile>
+                                </value>
+                              </entry>
+                            </map>
+                          </option>
                           <option name="supportedLanguages">
                             <list>
                               <option value="Java 8" />
                             </list>
+                          </option>
+                          <option name="text" value="Simple text" />
+                          <option name="timeLimits">
+                            <map>
+                              <entry key="java8" value="&lt;b&gt;Memory limit&lt;/b&gt;: 64 Mb&lt;br&gt;&lt;b&gt;Time limit&lt;/b&gt;: 2s&lt;br&gt;&lt;br&gt;" />
+                            </map>
                           </option>
                           <option name="data">
                             <Step>
@@ -193,11 +291,32 @@
                         </StepNode>
                         <StepNode>
                           <option name="currentLang" value="Java 8" />
+                          <option name="id" value="47316" />
+                          <option name="name" value="step15" />
+                          <option name="position" value="15" />
                           <option name="status" value="UNCHECKED" />
+                          <option name="stepFiles">
+                            <map>
+                              <entry key="Main.java">
+                                <value>
+                                  <StepFile>
+                                    <option name="name" value="Main.java" />
+                                    <option name="text" value="Simple text" />
+                                  </StepFile>
+                                </value>
+                              </entry>
+                            </map>
+                          </option>
                           <option name="supportedLanguages">
                             <list>
                               <option value="Java 8" />
                             </list>
+                          </option>
+                          <option name="text" value="Simple text" />
+                          <option name="timeLimits">
+                            <map>
+                              <entry key="java8" value="&lt;b&gt;Memory limit&lt;/b&gt;: 256 Mb&lt;br&gt;&lt;b&gt;Time limit&lt;/b&gt;: 8s&lt;br&gt;&lt;br&gt;" />
+                            </map>
                           </option>
                           <option name="data">
                             <Step>
@@ -243,15 +362,39 @@
                     </option>
                   </LessonNode>
                   <LessonNode>
+                    <option name="id" value="12760" />
+                    <option name="name" value="Преобразование типов" />
+                    <option name="position" value="2" />
                     <option name="stepNodes">
                       <list>
                         <StepNode>
                           <option name="currentLang" value="Java 8" />
+                          <option name="id" value="47682" />
+                          <option name="name" value="step3" />
+                          <option name="position" value="3" />
                           <option name="status" value="UNCHECKED" />
+                          <option name="stepFiles">
+                            <map>
+                              <entry key="Main.java">
+                                <value>
+                                  <StepFile>
+                                    <option name="name" value="Main.java" />
+                                    <option name="text" value="Simple text" />
+                                  </StepFile>
+                                </value>
+                              </entry>
+                            </map>
+                          </option>
                           <option name="supportedLanguages">
                             <list>
                               <option value="Java 8" />
                             </list>
+                          </option>
+                          <option name="text" value="Simple text" />
+                          <option name="timeLimits">
+                            <map>
+                              <entry key="java8" value="&lt;b&gt;Memory limit&lt;/b&gt;: 256 Mb&lt;br&gt;&lt;b&gt;Time limit&lt;/b&gt;: 2s&lt;br&gt;&lt;br&gt;" />
+                            </map>
                           </option>
                           <option name="data">
                             <Step>
@@ -284,11 +427,32 @@
                         </StepNode>
                         <StepNode>
                           <option name="currentLang" value="Java 8" />
+                          <option name="id" value="47329" />
+                          <option name="name" value="step9" />
+                          <option name="position" value="9" />
                           <option name="status" value="UNCHECKED" />
+                          <option name="stepFiles">
+                            <map>
+                              <entry key="Main.java">
+                                <value>
+                                  <StepFile>
+                                    <option name="name" value="Main.java" />
+                                    <option name="text" value="Simple text" />
+                                  </StepFile>
+                                </value>
+                              </entry>
+                            </map>
+                          </option>
                           <option name="supportedLanguages">
                             <list>
                               <option value="Java 8" />
                             </list>
+                          </option>
+                          <option name="text" value="Simple text" />
+                          <option name="timeLimits">
+                            <map>
+                              <entry key="java8" value="&lt;b&gt;Memory limit&lt;/b&gt;: 256 Mb&lt;br&gt;&lt;b&gt;Time limit&lt;/b&gt;: 8s&lt;br&gt;&lt;br&gt;" />
+                            </map>
                           </option>
                           <option name="data">
                             <Step>
@@ -334,15 +498,39 @@
                     </option>
                   </LessonNode>
                   <LessonNode>
+                    <option name="id" value="12761" />
+                    <option name="name" value="Массивы и строки" />
+                    <option name="position" value="3" />
                     <option name="stepNodes">
                       <list>
                         <StepNode>
                           <option name="currentLang" value="Java 8" />
+                          <option name="id" value="47333" />
+                          <option name="name" value="step10" />
+                          <option name="position" value="10" />
                           <option name="status" value="UNCHECKED" />
+                          <option name="stepFiles">
+                            <map>
+                              <entry key="Main.java">
+                                <value>
+                                  <StepFile>
+                                    <option name="name" value="Main.java" />
+                                    <option name="text" value="Simple text" />
+                                  </StepFile>
+                                </value>
+                              </entry>
+                            </map>
+                          </option>
                           <option name="supportedLanguages">
                             <list>
                               <option value="Java 8" />
                             </list>
+                          </option>
+                          <option name="text" value="Simple text" />
+                          <option name="timeLimits">
+                            <map>
+                              <entry key="java8" value="&lt;b&gt;Memory limit&lt;/b&gt;: 256 Mb&lt;br&gt;&lt;b&gt;Time limit&lt;/b&gt;: 8s&lt;br&gt;&lt;br&gt;" />
+                            </map>
                           </option>
                           <option name="data">
                             <Step>
@@ -388,15 +576,39 @@
                     </option>
                   </LessonNode>
                   <LessonNode>
+                    <option name="id" value="12762" />
+                    <option name="name" value="Управляющие конструкции: условные операторы и циклы" />
+                    <option name="position" value="4" />
                     <option name="stepNodes">
                       <list>
                         <StepNode>
                           <option name="currentLang" value="Java 8" />
+                          <option name="id" value="47334" />
+                          <option name="name" value="step8" />
+                          <option name="position" value="8" />
                           <option name="status" value="UNCHECKED" />
+                          <option name="stepFiles">
+                            <map>
+                              <entry key="Main.java">
+                                <value>
+                                  <StepFile>
+                                    <option name="name" value="Main.java" />
+                                    <option name="text" value="Simple text" />
+                                  </StepFile>
+                                </value>
+                              </entry>
+                            </map>
+                          </option>
                           <option name="supportedLanguages">
                             <list>
                               <option value="Java 8" />
                             </list>
+                          </option>
+                          <option name="text" value="Simple text" />
+                          <option name="timeLimits">
+                            <map>
+                              <entry key="java8" value="&lt;b&gt;Memory limit&lt;/b&gt;: 256 Mb&lt;br&gt;&lt;b&gt;Time limit&lt;/b&gt;: 8s&lt;br&gt;&lt;br&gt;" />
+                            </map>
                           </option>
                           <option name="data">
                             <Step>
@@ -429,11 +641,32 @@
                         </StepNode>
                         <StepNode>
                           <option name="currentLang" value="Java 8" />
+                          <option name="id" value="47347" />
+                          <option name="name" value="step9" />
+                          <option name="position" value="9" />
                           <option name="status" value="UNCHECKED" />
+                          <option name="stepFiles">
+                            <map>
+                              <entry key="Main.java">
+                                <value>
+                                  <StepFile>
+                                    <option name="name" value="Main.java" />
+                                    <option name="text" value="Simple text" />
+                                  </StepFile>
+                                </value>
+                              </entry>
+                            </map>
+                          </option>
                           <option name="supportedLanguages">
                             <list>
                               <option value="Java 8" />
                             </list>
+                          </option>
+                          <option name="text" value="Simple text" />
+                          <option name="timeLimits">
+                            <map>
+                              <entry key="java8" value="&lt;b&gt;Memory limit&lt;/b&gt;: 256 Mb&lt;br&gt;&lt;b&gt;Time limit&lt;/b&gt;: 6s&lt;br&gt;&lt;br&gt;" />
+                            </map>
                           </option>
                           <option name="data">
                             <Step>
@@ -466,11 +699,32 @@
                         </StepNode>
                         <StepNode>
                           <option name="currentLang" value="Java 8" />
+                          <option name="id" value="47721" />
+                          <option name="name" value="step10" />
+                          <option name="position" value="10" />
                           <option name="status" value="UNCHECKED" />
+                          <option name="stepFiles">
+                            <map>
+                              <entry key="Main.java">
+                                <value>
+                                  <StepFile>
+                                    <option name="name" value="Main.java" />
+                                    <option name="text" value="Simple text" />
+                                  </StepFile>
+                                </value>
+                              </entry>
+                            </map>
+                          </option>
                           <option name="supportedLanguages">
                             <list>
                               <option value="Java 8" />
                             </list>
+                          </option>
+                          <option name="text" value="Simple text" />
+                          <option name="timeLimits">
+                            <map>
+                              <entry key="java8" value="&lt;b&gt;Memory limit&lt;/b&gt;: 256 Mb&lt;br&gt;&lt;b&gt;Time limit&lt;/b&gt;: 8s&lt;br&gt;&lt;br&gt;" />
+                            </map>
                           </option>
                           <option name="data">
                             <Step>
@@ -517,6 +771,8 @@
                   </LessonNode>
                 </list>
               </option>
+              <option name="name" value="Базовый синтаксис Java" />
+              <option name="position" value="2" />
               <option name="data">
                 <Section>
                   <option name="id" value="538" />
@@ -526,18 +782,43 @@
               </option>
             </SectionNode>
             <SectionNode>
+              <option name="id" value="539" />
               <option name="lessonNodes">
                 <list>
                   <LessonNode>
+                    <option name="id" value="12766" />
+                    <option name="name" value="Объявление класса" />
+                    <option name="position" value="3" />
                     <option name="stepNodes">
                       <list>
                         <StepNode>
                           <option name="currentLang" value="Java 8" />
+                          <option name="id" value="49992" />
+                          <option name="name" value="step12" />
+                          <option name="position" value="12" />
                           <option name="status" value="UNCHECKED" />
+                          <option name="stepFiles">
+                            <map>
+                              <entry key="Main.java">
+                                <value>
+                                  <StepFile>
+                                    <option name="name" value="Main.java" />
+                                    <option name="text" value="Simple text" />
+                                  </StepFile>
+                                </value>
+                              </entry>
+                            </map>
+                          </option>
                           <option name="supportedLanguages">
                             <list>
                               <option value="Java 8" />
                             </list>
+                          </option>
+                          <option name="text" value="Simple text" />
+                          <option name="timeLimits">
+                            <map>
+                              <entry key="java8" value="&lt;b&gt;Memory limit&lt;/b&gt;: 256 Mb&lt;br&gt;&lt;b&gt;Time limit&lt;/b&gt;: 8s&lt;br&gt;&lt;br&gt;" />
+                            </map>
                           </option>
                           <option name="data">
                             <Step>
@@ -583,15 +864,39 @@
                     </option>
                   </LessonNode>
                   <LessonNode>
+                    <option name="id" value="12769" />
+                    <option name="name" value="Наследование. Класс Object" />
+                    <option name="position" value="4" />
                     <option name="stepNodes">
                       <list>
                         <StepNode>
                           <option name="currentLang" value="Java 8" />
+                          <option name="id" value="49971" />
+                          <option name="name" value="step9" />
+                          <option name="position" value="9" />
                           <option name="status" value="UNCHECKED" />
+                          <option name="stepFiles">
+                            <map>
+                              <entry key="Main.java">
+                                <value>
+                                  <StepFile>
+                                    <option name="name" value="Main.java" />
+                                    <option name="text" value="Simple text" />
+                                  </StepFile>
+                                </value>
+                              </entry>
+                            </map>
+                          </option>
                           <option name="supportedLanguages">
                             <list>
                               <option value="Java 8" />
                             </list>
+                          </option>
+                          <option name="text" value="Simple text" />
+                          <option name="timeLimits">
+                            <map>
+                              <entry key="java8" value="&lt;b&gt;Memory limit&lt;/b&gt;: 256 Mb&lt;br&gt;&lt;b&gt;Time limit&lt;/b&gt;: 8s&lt;br&gt;&lt;br&gt;" />
+                            </map>
                           </option>
                           <option name="data">
                             <Step>
@@ -637,15 +942,39 @@
                     </option>
                   </LessonNode>
                   <LessonNode>
+                    <option name="id" value="14513" />
+                    <option name="name" value="Абстрактные классы и интерфейсы" />
+                    <option name="position" value="5" />
                     <option name="stepNodes">
                       <list>
                         <StepNode>
                           <option name="currentLang" value="Java 8" />
+                          <option name="id" value="49950" />
+                          <option name="name" value="step7" />
+                          <option name="position" value="7" />
                           <option name="status" value="UNCHECKED" />
+                          <option name="stepFiles">
+                            <map>
+                              <entry key="Main.java">
+                                <value>
+                                  <StepFile>
+                                    <option name="name" value="Main.java" />
+                                    <option name="text" value="Simple text" />
+                                  </StepFile>
+                                </value>
+                              </entry>
+                            </map>
+                          </option>
                           <option name="supportedLanguages">
                             <list>
                               <option value="Java 8" />
                             </list>
+                          </option>
+                          <option name="text" value="Simple text" />
+                          <option name="timeLimits">
+                            <map>
+                              <entry key="java8" value="&lt;b&gt;Memory limit&lt;/b&gt;: 256 Mb&lt;br&gt;&lt;b&gt;Time limit&lt;/b&gt;: 8s&lt;br&gt;&lt;br&gt;" />
+                            </map>
                           </option>
                           <option name="data">
                             <Step>
@@ -678,11 +1007,32 @@
                         </StepNode>
                         <StepNode>
                           <option name="currentLang" value="Java 8" />
+                          <option name="id" value="50005" />
+                          <option name="name" value="step8" />
+                          <option name="position" value="8" />
                           <option name="status" value="UNCHECKED" />
+                          <option name="stepFiles">
+                            <map>
+                              <entry key="Main.java">
+                                <value>
+                                  <StepFile>
+                                    <option name="name" value="Main.java" />
+                                    <option name="text" value="Simple text" />
+                                  </StepFile>
+                                </value>
+                              </entry>
+                            </map>
+                          </option>
                           <option name="supportedLanguages">
                             <list>
                               <option value="Java 8" />
                             </list>
+                          </option>
+                          <option name="text" value="Simple text" />
+                          <option name="timeLimits">
+                            <map>
+                              <entry key="java8" value="&lt;b&gt;Memory limit&lt;/b&gt;: 256 Mb&lt;br&gt;&lt;b&gt;Time limit&lt;/b&gt;: 8s&lt;br&gt;&lt;br&gt;" />
+                            </map>
                           </option>
                           <option name="data">
                             <Step>
@@ -715,11 +1065,32 @@
                         </StepNode>
                         <StepNode>
                           <option name="currentLang" value="Java 8" />
+                          <option name="id" value="50386" />
+                          <option name="name" value="step9" />
+                          <option name="position" value="9" />
                           <option name="status" value="UNCHECKED" />
+                          <option name="stepFiles">
+                            <map>
+                              <entry key="Main.java">
+                                <value>
+                                  <StepFile>
+                                    <option name="name" value="Main.java" />
+                                    <option name="text" value="Simple text" />
+                                  </StepFile>
+                                </value>
+                              </entry>
+                            </map>
+                          </option>
                           <option name="supportedLanguages">
                             <list>
                               <option value="Java 8" />
                             </list>
+                          </option>
+                          <option name="text" value="Simple text" />
+                          <option name="timeLimits">
+                            <map>
+                              <entry key="java8" value="&lt;b&gt;Memory limit&lt;/b&gt;: 256 Mb&lt;br&gt;&lt;b&gt;Time limit&lt;/b&gt;: 8s&lt;br&gt;&lt;br&gt;" />
+                            </map>
                           </option>
                           <option name="data">
                             <Step>
@@ -766,6 +1137,8 @@
                   </LessonNode>
                 </list>
               </option>
+              <option name="name" value="Объекты, классы и пакеты в Java" />
+              <option name="position" value="3" />
               <option name="data">
                 <Section>
                   <option name="id" value="539" />
@@ -775,18 +1148,43 @@
               </option>
             </SectionNode>
             <SectionNode>
+              <option name="id" value="540" />
               <option name="lessonNodes">
                 <list>
                   <LessonNode>
+                    <option name="id" value="12772" />
+                    <option name="name" value="Знакомство с исключениями" />
+                    <option name="position" value="1" />
                     <option name="stepNodes">
                       <list>
                         <StepNode>
                           <option name="currentLang" value="Java 8" />
+                          <option name="id" value="53596" />
+                          <option name="name" value="step9" />
+                          <option name="position" value="9" />
                           <option name="status" value="UNCHECKED" />
+                          <option name="stepFiles">
+                            <map>
+                              <entry key="Main.java">
+                                <value>
+                                  <StepFile>
+                                    <option name="name" value="Main.java" />
+                                    <option name="text" value="Simple text" />
+                                  </StepFile>
+                                </value>
+                              </entry>
+                            </map>
+                          </option>
                           <option name="supportedLanguages">
                             <list>
                               <option value="Java 8" />
                             </list>
+                          </option>
+                          <option name="text" value="Simple text" />
+                          <option name="timeLimits">
+                            <map>
+                              <entry key="java8" value="&lt;b&gt;Memory limit&lt;/b&gt;: 256 Mb&lt;br&gt;&lt;b&gt;Time limit&lt;/b&gt;: 8s&lt;br&gt;&lt;br&gt;" />
+                            </map>
                           </option>
                           <option name="data">
                             <Step>
@@ -819,11 +1217,32 @@
                         </StepNode>
                         <StepNode>
                           <option name="currentLang" value="Java 8" />
+                          <option name="id" value="53676" />
+                          <option name="name" value="step10" />
+                          <option name="position" value="10" />
                           <option name="status" value="UNCHECKED" />
+                          <option name="stepFiles">
+                            <map>
+                              <entry key="Main.java">
+                                <value>
+                                  <StepFile>
+                                    <option name="name" value="Main.java" />
+                                    <option name="text" value="Simple text" />
+                                  </StepFile>
+                                </value>
+                              </entry>
+                            </map>
+                          </option>
                           <option name="supportedLanguages">
                             <list>
                               <option value="Java 8" />
                             </list>
+                          </option>
+                          <option name="text" value="Simple text" />
+                          <option name="timeLimits">
+                            <map>
+                              <entry key="java8" value="&lt;b&gt;Memory limit&lt;/b&gt;: 256 Mb&lt;br&gt;&lt;b&gt;Time limit&lt;/b&gt;: 8s&lt;br&gt;&lt;br&gt;" />
+                            </map>
                           </option>
                           <option name="data">
                             <Step>
@@ -869,15 +1288,39 @@
                     </option>
                   </LessonNode>
                   <LessonNode>
+                    <option name="id" value="12773" />
+                    <option name="name" value="Обработка исключений. Try-catch" />
+                    <option name="position" value="2" />
                     <option name="stepNodes">
                       <list>
                         <StepNode>
                           <option name="currentLang" value="Java 8" />
+                          <option name="id" value="53606" />
+                          <option name="name" value="step7" />
+                          <option name="position" value="7" />
                           <option name="status" value="UNCHECKED" />
+                          <option name="stepFiles">
+                            <map>
+                              <entry key="Main.java">
+                                <value>
+                                  <StepFile>
+                                    <option name="name" value="Main.java" />
+                                    <option name="text" value="Simple text" />
+                                  </StepFile>
+                                </value>
+                              </entry>
+                            </map>
+                          </option>
                           <option name="supportedLanguages">
                             <list>
                               <option value="Java 8" />
                             </list>
+                          </option>
+                          <option name="text" value="Simple text" />
+                          <option name="timeLimits">
+                            <map>
+                              <entry key="java8" value="&lt;b&gt;Memory limit&lt;/b&gt;: 256 Mb&lt;br&gt;&lt;b&gt;Time limit&lt;/b&gt;: 8s&lt;br&gt;&lt;br&gt;" />
+                            </map>
                           </option>
                           <option name="data">
                             <Step>
@@ -923,15 +1366,39 @@
                     </option>
                   </LessonNode>
                   <LessonNode>
+                    <option name="id" value="12774" />
+                    <option name="name" value="Логирование" />
+                    <option name="position" value="3" />
                     <option name="stepNodes">
                       <list>
                         <StepNode>
                           <option name="currentLang" value="Java 8" />
+                          <option name="id" value="53619" />
+                          <option name="name" value="step8" />
+                          <option name="position" value="8" />
                           <option name="status" value="UNCHECKED" />
+                          <option name="stepFiles">
+                            <map>
+                              <entry key="Main.java">
+                                <value>
+                                  <StepFile>
+                                    <option name="name" value="Main.java" />
+                                    <option name="text" value="Simple text" />
+                                  </StepFile>
+                                </value>
+                              </entry>
+                            </map>
+                          </option>
                           <option name="supportedLanguages">
                             <list>
                               <option value="Java 8" />
                             </list>
+                          </option>
+                          <option name="text" value="Simple text" />
+                          <option name="timeLimits">
+                            <map>
+                              <entry key="java8" value="&lt;b&gt;Memory limit&lt;/b&gt;: 256 Mb&lt;br&gt;&lt;b&gt;Time limit&lt;/b&gt;: 8s&lt;br&gt;&lt;br&gt;" />
+                            </map>
                           </option>
                           <option name="data">
                             <Step>
@@ -964,11 +1431,32 @@
                         </StepNode>
                         <StepNode>
                           <option name="currentLang" value="Java 8" />
+                          <option name="id" value="53996" />
+                          <option name="name" value="step9" />
+                          <option name="position" value="9" />
                           <option name="status" value="UNCHECKED" />
+                          <option name="stepFiles">
+                            <map>
+                              <entry key="Main.java">
+                                <value>
+                                  <StepFile>
+                                    <option name="name" value="Main.java" />
+                                    <option name="text" value="Simple text" />
+                                  </StepFile>
+                                </value>
+                              </entry>
+                            </map>
+                          </option>
                           <option name="supportedLanguages">
                             <list>
                               <option value="Java 8" />
                             </list>
+                          </option>
+                          <option name="text" value="Simple text" />
+                          <option name="timeLimits">
+                            <map>
+                              <entry key="java8" value="&lt;b&gt;Memory limit&lt;/b&gt;: 256 Mb&lt;br&gt;&lt;b&gt;Time limit&lt;/b&gt;: 8s&lt;br&gt;&lt;br&gt;" />
+                            </map>
                           </option>
                           <option name="data">
                             <Step>
@@ -1015,6 +1503,8 @@
                   </LessonNode>
                 </list>
               </option>
+              <option name="name" value="Обработка ошибок, исключения, отладка" />
+              <option name="position" value="4" />
               <option name="data">
                 <Section>
                   <option name="id" value="540" />
@@ -1024,18 +1514,43 @@
               </option>
             </SectionNode>
             <SectionNode>
+              <option name="id" value="542" />
               <option name="lessonNodes">
                 <list>
                   <LessonNode>
+                    <option name="id" value="12783" />
+                    <option name="name" value="Потоки байт" />
+                    <option name="position" value="2" />
                     <option name="stepNodes">
                       <list>
                         <StepNode>
                           <option name="currentLang" value="Java 8" />
+                          <option name="id" value="55630" />
+                          <option name="name" value="step8" />
+                          <option name="position" value="8" />
                           <option name="status" value="UNCHECKED" />
+                          <option name="stepFiles">
+                            <map>
+                              <entry key="Main.java">
+                                <value>
+                                  <StepFile>
+                                    <option name="name" value="Main.java" />
+                                    <option name="text" value="Simple text" />
+                                  </StepFile>
+                                </value>
+                              </entry>
+                            </map>
+                          </option>
                           <option name="supportedLanguages">
                             <list>
                               <option value="Java 8" />
                             </list>
+                          </option>
+                          <option name="text" value="Simple text" />
+                          <option name="timeLimits">
+                            <map>
+                              <entry key="java8" value="&lt;b&gt;Memory limit&lt;/b&gt;: 256 Mb&lt;br&gt;&lt;b&gt;Time limit&lt;/b&gt;: 8s&lt;br&gt;&lt;br&gt;" />
+                            </map>
                           </option>
                           <option name="data">
                             <Step>
@@ -1068,11 +1583,32 @@
                         </StepNode>
                         <StepNode>
                           <option name="currentLang" value="Java 8" />
+                          <option name="id" value="55646" />
+                          <option name="name" value="step9" />
+                          <option name="position" value="9" />
                           <option name="status" value="UNCHECKED" />
+                          <option name="stepFiles">
+                            <map>
+                              <entry key="Main.java">
+                                <value>
+                                  <StepFile>
+                                    <option name="name" value="Main.java" />
+                                    <option name="text" value="Simple text" />
+                                  </StepFile>
+                                </value>
+                              </entry>
+                            </map>
+                          </option>
                           <option name="supportedLanguages">
                             <list>
                               <option value="Java 8" />
                             </list>
+                          </option>
+                          <option name="text" value="Simple text" />
+                          <option name="timeLimits">
+                            <map>
+                              <entry key="java8" value="&lt;b&gt;Memory limit&lt;/b&gt;: 256 Mb&lt;br&gt;&lt;b&gt;Time limit&lt;/b&gt;: 8s&lt;br&gt;&lt;br&gt;" />
+                            </map>
                           </option>
                           <option name="data">
                             <Step>
@@ -1118,15 +1654,39 @@
                     </option>
                   </LessonNode>
                   <LessonNode>
+                    <option name="id" value="12784" />
+                    <option name="name" value="Потоки символов" />
+                    <option name="position" value="3" />
                     <option name="stepNodes">
                       <list>
                         <StepNode>
                           <option name="currentLang" value="Java 8" />
+                          <option name="id" value="55673" />
+                          <option name="name" value="step12" />
+                          <option name="position" value="12" />
                           <option name="status" value="UNCHECKED" />
+                          <option name="stepFiles">
+                            <map>
+                              <entry key="Main.java">
+                                <value>
+                                  <StepFile>
+                                    <option name="name" value="Main.java" />
+                                    <option name="text" value="Simple text" />
+                                  </StepFile>
+                                </value>
+                              </entry>
+                            </map>
+                          </option>
                           <option name="supportedLanguages">
                             <list>
                               <option value="Java 8" />
                             </list>
+                          </option>
+                          <option name="text" value="Simple text" />
+                          <option name="timeLimits">
+                            <map>
+                              <entry key="java8" value="&lt;b&gt;Memory limit&lt;/b&gt;: 256 Mb&lt;br&gt;&lt;b&gt;Time limit&lt;/b&gt;: 8s&lt;br&gt;&lt;br&gt;" />
+                            </map>
                           </option>
                           <option name="data">
                             <Step>
@@ -1159,11 +1719,32 @@
                         </StepNode>
                         <StepNode>
                           <option name="currentLang" value="Java 8" />
+                          <option name="id" value="55689" />
+                          <option name="name" value="step13" />
+                          <option name="position" value="13" />
                           <option name="status" value="UNCHECKED" />
+                          <option name="stepFiles">
+                            <map>
+                              <entry key="Main.java">
+                                <value>
+                                  <StepFile>
+                                    <option name="name" value="Main.java" />
+                                    <option name="text" value="Simple text" />
+                                  </StepFile>
+                                </value>
+                              </entry>
+                            </map>
+                          </option>
                           <option name="supportedLanguages">
                             <list>
                               <option value="Java 8" />
                             </list>
+                          </option>
+                          <option name="text" value="Simple text" />
+                          <option name="timeLimits">
+                            <map>
+                              <entry key="java8" value="&lt;b&gt;Memory limit&lt;/b&gt;: 256 Mb&lt;br&gt;&lt;b&gt;Time limit&lt;/b&gt;: 8s&lt;br&gt;&lt;br&gt;" />
+                            </map>
                           </option>
                           <option name="data">
                             <Step>
@@ -1209,15 +1790,39 @@
                     </option>
                   </LessonNode>
                   <LessonNode>
+                    <option name="id" value="12785" />
+                    <option name="name" value="Продвинутые возможности" />
+                    <option name="position" value="4" />
                     <option name="stepNodes">
                       <list>
                         <StepNode>
                           <option name="currentLang" value="Java 8" />
+                          <option name="id" value="55715" />
+                          <option name="name" value="step8" />
+                          <option name="position" value="8" />
                           <option name="status" value="UNCHECKED" />
+                          <option name="stepFiles">
+                            <map>
+                              <entry key="Main.java">
+                                <value>
+                                  <StepFile>
+                                    <option name="name" value="Main.java" />
+                                    <option name="text" value="Simple text" />
+                                  </StepFile>
+                                </value>
+                              </entry>
+                            </map>
+                          </option>
                           <option name="supportedLanguages">
                             <list>
                               <option value="Java 8" />
                             </list>
+                          </option>
+                          <option name="text" value="Simple text" />
+                          <option name="timeLimits">
+                            <map>
+                              <entry key="java8" value="&lt;b&gt;Memory limit&lt;/b&gt;: 256 Mb&lt;br&gt;&lt;b&gt;Time limit&lt;/b&gt;: 8s&lt;br&gt;&lt;br&gt;" />
+                            </map>
                           </option>
                           <option name="data">
                             <Step>
@@ -1264,6 +1869,8 @@
                   </LessonNode>
                 </list>
               </option>
+              <option name="name" value="Ввод-вывод, доступ к файловой системе" />
+              <option name="position" value="5" />
               <option name="data">
                 <Section>
                   <option name="id" value="542" />
@@ -1273,18 +1880,43 @@
               </option>
             </SectionNode>
             <SectionNode>
+              <option name="id" value="541" />
               <option name="lessonNodes">
                 <list>
                   <LessonNode>
+                    <option name="id" value="12775" />
+                    <option name="name" value="Generics" />
+                    <option name="position" value="1" />
                     <option name="stepNodes">
                       <list>
                         <StepNode>
                           <option name="currentLang" value="Java 8" />
+                          <option name="id" value="57792" />
+                          <option name="name" value="step12" />
+                          <option name="position" value="12" />
                           <option name="status" value="UNCHECKED" />
+                          <option name="stepFiles">
+                            <map>
+                              <entry key="Main.java">
+                                <value>
+                                  <StepFile>
+                                    <option name="name" value="Main.java" />
+                                    <option name="text" value="Simple text" />
+                                  </StepFile>
+                                </value>
+                              </entry>
+                            </map>
+                          </option>
                           <option name="supportedLanguages">
                             <list>
                               <option value="Java 8" />
                             </list>
+                          </option>
+                          <option name="text" value="Simple text" />
+                          <option name="timeLimits">
+                            <map>
+                              <entry key="java8" value="&lt;b&gt;Memory limit&lt;/b&gt;: 256 Mb&lt;br&gt;&lt;b&gt;Time limit&lt;/b&gt;: 8s&lt;br&gt;&lt;br&gt;" />
+                            </map>
                           </option>
                           <option name="data">
                             <Step>
@@ -1330,15 +1962,39 @@
                     </option>
                   </LessonNode>
                   <LessonNode>
+                    <option name="id" value="12776" />
+                    <option name="name" value="Коллекции" />
+                    <option name="position" value="2" />
                     <option name="stepNodes">
                       <list>
                         <StepNode>
                           <option name="currentLang" value="Java 8" />
+                          <option name="id" value="58081" />
+                          <option name="name" value="step14" />
+                          <option name="position" value="14" />
                           <option name="status" value="UNCHECKED" />
+                          <option name="stepFiles">
+                            <map>
+                              <entry key="Main.java">
+                                <value>
+                                  <StepFile>
+                                    <option name="name" value="Main.java" />
+                                    <option name="text" value="Simple text" />
+                                  </StepFile>
+                                </value>
+                              </entry>
+                            </map>
+                          </option>
                           <option name="supportedLanguages">
                             <list>
                               <option value="Java 8" />
                             </list>
+                          </option>
+                          <option name="text" value="Simple text" />
+                          <option name="timeLimits">
+                            <map>
+                              <entry key="java8" value="&lt;b&gt;Memory limit&lt;/b&gt;: 256 Mb&lt;br&gt;&lt;b&gt;Time limit&lt;/b&gt;: 8s&lt;br&gt;&lt;br&gt;" />
+                            </map>
                           </option>
                           <option name="data">
                             <Step>
@@ -1371,11 +2027,32 @@
                         </StepNode>
                         <StepNode>
                           <option name="currentLang" value="Java 8" />
+                          <option name="id" value="57810" />
+                          <option name="name" value="step15" />
+                          <option name="position" value="15" />
                           <option name="status" value="UNCHECKED" />
+                          <option name="stepFiles">
+                            <map>
+                              <entry key="Main.java">
+                                <value>
+                                  <StepFile>
+                                    <option name="name" value="Main.java" />
+                                    <option name="text" value="Simple text" />
+                                  </StepFile>
+                                </value>
+                              </entry>
+                            </map>
+                          </option>
                           <option name="supportedLanguages">
                             <list>
                               <option value="Java 8" />
                             </list>
+                          </option>
+                          <option name="text" value="Simple text" />
+                          <option name="timeLimits">
+                            <map>
+                              <entry key="java8" value="&lt;b&gt;Memory limit&lt;/b&gt;: 256 Mb&lt;br&gt;&lt;b&gt;Time limit&lt;/b&gt;: 8s&lt;br&gt;&lt;br&gt;" />
+                            </map>
                           </option>
                           <option name="data">
                             <Step>
@@ -1421,15 +2098,39 @@
                     </option>
                   </LessonNode>
                   <LessonNode>
+                    <option name="id" value="12777" />
+                    <option name="name" value="Функциональные интерфейсы" />
+                    <option name="position" value="3" />
                     <option name="stepNodes">
                       <list>
                         <StepNode>
                           <option name="currentLang" value="Java 8" />
+                          <option name="id" value="57838" />
+                          <option name="name" value="step8" />
+                          <option name="position" value="8" />
                           <option name="status" value="UNCHECKED" />
+                          <option name="stepFiles">
+                            <map>
+                              <entry key="Main.java">
+                                <value>
+                                  <StepFile>
+                                    <option name="name" value="Main.java" />
+                                    <option name="text" value="Simple text" />
+                                  </StepFile>
+                                </value>
+                              </entry>
+                            </map>
+                          </option>
                           <option name="supportedLanguages">
                             <list>
                               <option value="Java 8" />
                             </list>
+                          </option>
+                          <option name="text" value="Simple text" />
+                          <option name="timeLimits">
+                            <map>
+                              <entry key="java8" value="&lt;b&gt;Memory limit&lt;/b&gt;: 256 Mb&lt;br&gt;&lt;b&gt;Time limit&lt;/b&gt;: 8s&lt;br&gt;&lt;br&gt;" />
+                            </map>
                           </option>
                           <option name="data">
                             <Step>
@@ -1475,15 +2176,39 @@
                     </option>
                   </LessonNode>
                   <LessonNode>
+                    <option name="id" value="12781" />
+                    <option name="name" value="Stream API" />
+                    <option name="position" value="4" />
                     <option name="stepNodes">
                       <list>
                         <StepNode>
                           <option name="currentLang" value="Java 8" />
+                          <option name="id" value="57848" />
+                          <option name="name" value="step11" />
+                          <option name="position" value="11" />
                           <option name="status" value="UNCHECKED" />
+                          <option name="stepFiles">
+                            <map>
+                              <entry key="Main.java">
+                                <value>
+                                  <StepFile>
+                                    <option name="name" value="Main.java" />
+                                    <option name="text" value="Simple text" />
+                                  </StepFile>
+                                </value>
+                              </entry>
+                            </map>
+                          </option>
                           <option name="supportedLanguages">
                             <list>
                               <option value="Java 8" />
                             </list>
+                          </option>
+                          <option name="text" value="Simple text" />
+                          <option name="timeLimits">
+                            <map>
+                              <entry key="java8" value="&lt;b&gt;Memory limit&lt;/b&gt;: 256 Mb&lt;br&gt;&lt;b&gt;Time limit&lt;/b&gt;: 8s&lt;br&gt;&lt;br&gt;" />
+                            </map>
                           </option>
                           <option name="data">
                             <Step>
@@ -1516,11 +2241,32 @@
                         </StepNode>
                         <StepNode>
                           <option name="currentLang" value="Java 8" />
+                          <option name="id" value="58088" />
+                          <option name="name" value="step12" />
+                          <option name="position" value="12" />
                           <option name="status" value="UNCHECKED" />
+                          <option name="stepFiles">
+                            <map>
+                              <entry key="Main.java">
+                                <value>
+                                  <StepFile>
+                                    <option name="name" value="Main.java" />
+                                    <option name="text" value="Simple text" />
+                                  </StepFile>
+                                </value>
+                              </entry>
+                            </map>
+                          </option>
                           <option name="supportedLanguages">
                             <list>
                               <option value="Java 8" />
                             </list>
+                          </option>
+                          <option name="text" value="Simple text" />
+                          <option name="timeLimits">
+                            <map>
+                              <entry key="java8" value="&lt;b&gt;Memory limit&lt;/b&gt;: 256 Mb&lt;br&gt;&lt;b&gt;Time limit&lt;/b&gt;: 8s&lt;br&gt;&lt;br&gt;" />
+                            </map>
                           </option>
                           <option name="data">
                             <Step>
@@ -1553,11 +2299,32 @@
                         </StepNode>
                         <StepNode>
                           <option name="currentLang" value="Java 8" />
+                          <option name="id" value="57858" />
+                          <option name="name" value="step13" />
+                          <option name="position" value="13" />
                           <option name="status" value="UNCHECKED" />
+                          <option name="stepFiles">
+                            <map>
+                              <entry key="Main.java">
+                                <value>
+                                  <StepFile>
+                                    <option name="name" value="Main.java" />
+                                    <option name="text" value="Simple text" />
+                                  </StepFile>
+                                </value>
+                              </entry>
+                            </map>
+                          </option>
                           <option name="supportedLanguages">
                             <list>
                               <option value="Java 8" />
                             </list>
+                          </option>
+                          <option name="text" value="Simple text" />
+                          <option name="timeLimits">
+                            <map>
+                              <entry key="java8" value="&lt;b&gt;Memory limit&lt;/b&gt;: 256 Mb&lt;br&gt;&lt;b&gt;Time limit&lt;/b&gt;: 8s&lt;br&gt;&lt;br&gt;" />
+                            </map>
                           </option>
                           <option name="data">
                             <Step>
@@ -1590,11 +2357,32 @@
                         </StepNode>
                         <StepNode>
                           <option name="currentLang" value="Java 8" />
+                          <option name="id" value="58108" />
+                          <option name="name" value="step14" />
+                          <option name="position" value="14" />
                           <option name="status" value="UNCHECKED" />
+                          <option name="stepFiles">
+                            <map>
+                              <entry key="Main.java">
+                                <value>
+                                  <StepFile>
+                                    <option name="name" value="Main.java" />
+                                    <option name="text" value="Simple text" />
+                                  </StepFile>
+                                </value>
+                              </entry>
+                            </map>
+                          </option>
                           <option name="supportedLanguages">
                             <list>
                               <option value="Java 8" />
                             </list>
+                          </option>
+                          <option name="text" value="Simple text" />
+                          <option name="timeLimits">
+                            <map>
+                              <entry key="java8" value="&lt;b&gt;Memory limit&lt;/b&gt;: 256 Mb&lt;br&gt;&lt;b&gt;Time limit&lt;/b&gt;: 8s&lt;br&gt;&lt;br&gt;" />
+                            </map>
                           </option>
                           <option name="data">
                             <Step>
@@ -1641,6 +2429,8 @@
                   </LessonNode>
                 </list>
               </option>
+              <option name="name" value="Generics. Collections. Streams" />
+              <option name="position" value="6" />
               <option name="data">
                 <Section>
                   <option name="id" value="541" />
@@ -1662,6 +2452,16 @@
     </option>
     <option name="defaultLang" value="Java 8" />
     <option name="showHint" value="true" />
+    <option name="user">
+      <StepikUser>
+        <option name="accessToken" value="213123123123123123123" />
+        <option name="email" value="mail@mail.ru" />
+        <option name="firstName" value="Name" />
+        <option name="id" value="12345678" />
+        <option name="lastName" value="Family" />
+        <option name="refreshToken" value="123123123123123123123123" />
+      </StepikUser>
+    </option>
     <option name="version" value="1" />
   </StepikProjectManager>
 </component>
