@@ -188,9 +188,9 @@ public abstract class Node<
                     logger.warn("Can't get new instance for child", e);
                     break;
                 }
-                item.setParent(this);
                 item.setData(data);
-                if (item.getChildren().size() > 0) {
+                item.init(this, isRestarted, indicator);
+                if (item.canBeLeaf() || !item.isLeaf()) {
                     getChildren().add(item);
                 }
             }
@@ -267,5 +267,10 @@ public abstract class Node<
             getData().setId(id);
         } catch (IllegalAccessException | InstantiationException ignored) {
         }
+    }
+
+    @Override
+    public boolean canBeLeaf() {
+        return false;
     }
 }

@@ -148,7 +148,7 @@ public class StudyUtils {
 
     @Nullable
     public static StepNode getSelectedStep(@NotNull Project project) {
-        VirtualFile[] files = FileEditorManager.getInstance(project).getOpenFiles();
+        VirtualFile[] files = FileEditorManager.getInstance(project).getSelectedFiles();
         if (files.length == 0) {
             return null;
         }

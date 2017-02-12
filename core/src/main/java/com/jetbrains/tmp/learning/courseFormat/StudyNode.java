@@ -57,4 +57,6 @@ public interface StudyNode<D extends AbstractObject, C extends StudyNode> {
     default void init(boolean isRestarted, @Nullable ProgressIndicator indicator) {
         init(null, isRestarted, indicator);
     }
+
+    boolean canBeLeaf();
 }
