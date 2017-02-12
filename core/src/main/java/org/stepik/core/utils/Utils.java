@@ -1,5 +1,7 @@
 package org.stepik.core.utils;
 
+import com.intellij.openapi.progress.ProcessCanceledException;
+import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import org.jetbrains.annotations.NotNull;
@@ -16,5 +18,14 @@ public class Utils {
         } else {
             return projectManger.getOpenProjects()[0];
         }
+    }
+
+    public static boolean isCanceled() {
+        try {
+            ProgressManager.checkCanceled();
+        } catch (ProcessCanceledException e) {
+            return true;
+        }
+        return false;
     }
 }
