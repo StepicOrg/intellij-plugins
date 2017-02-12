@@ -13,6 +13,7 @@ import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.courses.Course;
 import org.stepik.api.objects.courses.Courses;
+import org.stepik.core.metrics.Metrics;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,6 +21,9 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.jetbrains.tmp.learning.StudyUtils.execCancelable;
+import static org.stepik.core.metrics.MetricsStatus.DATA_NOT_LOADED;
+import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
+import static org.stepik.core.metrics.MetricsStatus.TARGET_NOT_FOUND;
 
 public class StepikProjectGenerator {
     public static final Course EMPTY_COURSE = initEmptyCourse();
@@ -160,13 +164,21 @@ public class StepikProjectGenerator {
     }
 
     public void generateProject(@NotNull Project project) {
-        final Course course = getCourseUnderProgress(project, selectedCourse.getId());
+        long courseId = selectedCourse.getId();
+        final Course course = getCourseUnderProgress(project, courseId);
         if (course == null) {
-            logger.warn("Failed to get a course: id = " + selectedCourse.getId());
+            logger.warn("Failed to get a course: id = " + courseId);
+            Metrics.createProject(project, DATA_NOT_LOADED);
             return;
         }
         StepikProjectManager stepikProjectManager = StepikProjectManager.getInstance(project);
+        if (stepikProjectManager == null) {
+            Metrics.createProject(project, TARGET_NOT_FOUND);
+            return;
+        }
         stepikProjectManager.setCourseNode(new CourseNode(course));
+        stepikProjectManager.setDefaultLang(getDefaultLang());
+        Metrics.createProject(project, SUCCESSFUL);
     }
 
     @NotNull

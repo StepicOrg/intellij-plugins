@@ -548,19 +548,15 @@ public class StepikApiClient {
     }
 
     @NotNull
-    public TokenInfo getTokenInfo() {
+    public synchronized TokenInfo getTokenInfo() {
         if (tokenInfo == null) {
             tokenInfo = new TokenInfo();
         }
         return tokenInfo;
     }
 
-    public void setTokenInfo(@Nullable TokenInfo tokenInfo) {
+    public synchronized void setTokenInfo(@Nullable TokenInfo tokenInfo) {
         this.tokenInfo = tokenInfo;
-    }
-
-    public void reset() {
-        tokenInfo = null;
     }
 
     @NotNull

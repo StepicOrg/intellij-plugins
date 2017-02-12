@@ -28,7 +28,7 @@ public enum SupportedLanguages {
     RUST("Rust", "rust", "main.rs", "//", null, null),
     SHELL("Shell", "shell", "main.sh", "#", null, null),
     SCALA("Scala", "scala", "Main.scala", "//", null, null),
-    INVALID("invalid", "", "", "", null, null);
+    INVALID("invalid", "invalid", "", "", null, null);
 
     private static Map<String, SupportedLanguages> map;
     private final String name;

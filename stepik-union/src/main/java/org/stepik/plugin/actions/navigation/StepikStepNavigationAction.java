@@ -12,11 +12,14 @@ import com.jetbrains.tmp.learning.courseFormat.StepFile;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.core.metrics.Metrics;
 
 import javax.swing.*;
 import java.util.Map;
 
-public abstract class StepikStepNavigationAction extends StudyStepNavigationAction {
+import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
+
+abstract class StepikStepNavigationAction extends StudyStepNavigationAction {
     StepikStepNavigationAction(@Nullable String text, @Nullable String description, @Nullable Icon icon) {
         super(text, description, icon);
     }
@@ -58,6 +61,7 @@ public abstract class StepikStepNavigationAction extends StudyStepNavigationActi
         VirtualFile shouldBeActive = getFileToActivate(project, nextStepFiles, stepDir);
 
         updateProjectView(project, shouldBeActive);
+        Metrics.navigateAction(project, targetStepNode, SUCCESSFUL);
 
         ToolWindow runToolWindow = ToolWindowManager.getInstance(project).getToolWindow(ToolWindowId.RUN);
         if (runToolWindow != null) {

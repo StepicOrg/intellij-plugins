@@ -12,6 +12,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.util.xmlb.XmlSerializer;
 import com.intellij.util.xmlb.annotations.Transient;
 import com.jetbrains.tmp.learning.courseFormat.CourseNode;
+import com.jetbrains.tmp.learning.courseFormat.StudyNode;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
@@ -20,6 +21,8 @@ import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.courses.Courses;
 
+import java.util.UUID;
+
 /**
  * Implementation of class which contains all the information
  * about study in context of current project
@@ -27,14 +30,15 @@ import org.stepik.api.objects.courses.Courses;
 
 @State(name = "StepikStudySettings", storages = @Storage("stepik_study_project.xml"))
 public class StepikProjectManager implements PersistentStateComponent<Element>, DumbAware {
-    private static final Logger logger = Logger.getInstance(StepikProjectManager.class);
     private static final int CURRENT_VERSION = 3;
+    private static final Logger logger = Logger.getInstance(StepikProjectManager.class);
     private final Project project;
     private CourseNode courseNode;
     private boolean showHint = false;
     private long createdBy;
     private SupportedLanguages defaultLang = SupportedLanguages.INVALID;
     private int version = CURRENT_VERSION;
+    private String uuid;
 
     @SuppressWarnings({"SameParameterValue", "WeakerAccess"})
     public StepikProjectManager(@Nullable Project project) {
@@ -46,12 +50,17 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
         this(null);
     }
 
+    @Nullable
     public static StepikProjectManager getInstance(@NotNull final Project project) {
         return ServiceManager.getService(project, StepikProjectManager.class);
     }
 
     public static boolean isStepikProject(@Nullable Project project) {
-        return project != null && getInstance(project).getCourseNode() != null;
+        if (project == null) {
+            return false;
+        }
+        StepikProjectManager instance = getInstance(project);
+        return instance != null && instance.getCourseNode() != null;
     }
 
     @Nullable
@@ -74,9 +83,10 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
         if (createdBy != that.createdBy) return false;
         if (version != that.version) return false;
         if (project != null ? !project.equals(that.project) : that.project != null) return false;
-        //noinspection SimplifiableIfStatement
         if (courseNode != null ? !courseNode.equals(that.courseNode) : that.courseNode != null) return false;
-        return defaultLang == that.defaultLang;
+        //noinspection SimplifiableIfStatement
+        if (defaultLang != that.defaultLang) return false;
+        return uuid != null ? uuid.equals(that.uuid) : that.uuid == null;
     }
 
     @Override
@@ -87,6 +97,7 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
         result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
         result = 31 * result + (defaultLang != null ? defaultLang.hashCode() : 0);
         result = 31 * result + version;
+        result = 31 * result + (uuid != null ? uuid.hashCode() : 0);
         return result;
     }
 
@@ -198,5 +209,24 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
     @SuppressWarnings("unused")
     public void setCreatedBy(long createdBy) {
         this.createdBy = createdBy;
+    }
+
+    @NotNull
+    public String getUuid() {
+        if (uuid == null) {
+            uuid = UUID.randomUUID().toString();
+        }
+        return uuid;
+    }
+
+    @SuppressWarnings("unused")
+    public void setUuid(@Nullable String uuid) {
+        this.uuid = uuid;
+    }
+
+    @Transient
+    @Nullable
+    public StudyNode getProjectRoot() {
+        return courseNode;
     }
 }

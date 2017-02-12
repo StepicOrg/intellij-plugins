@@ -2,17 +2,12 @@ package com.jetbrains.tmp.learning;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
-import com.intellij.ui.awt.RelativePoint;
 import com.intellij.ui.content.Content;
 import com.intellij.util.TimeoutUtil;
 import com.jetbrains.tmp.learning.core.EduNames;
@@ -21,7 +16,6 @@ import com.jetbrains.tmp.learning.courseFormat.CourseNode;
 import com.jetbrains.tmp.learning.courseFormat.LessonNode;
 import com.jetbrains.tmp.learning.courseFormat.StepFile;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
-import com.jetbrains.tmp.learning.editor.StudyEditor;
 import com.jetbrains.tmp.learning.ui.StudyToolWindow;
 import com.jetbrains.tmp.learning.ui.StudyToolWindowFactory;
 import org.jetbrains.annotations.Contract;
@@ -32,7 +26,6 @@ import org.stepik.api.objects.steps.Sample;
 import org.stepik.core.utils.ProjectFilesUtils;
 
 import javax.swing.*;
-import java.awt.*;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -80,16 +73,13 @@ public class StudyUtils {
         return null;
     }
 
-    public static RelativePoint computeLocation(Editor editor) {
-        final Rectangle visibleRect = editor.getComponent().getVisibleRect();
-        Point point = new Point(visibleRect.x + visibleRect.width + 10,
-                visibleRect.y + 10);
-        return new RelativePoint(editor.getComponent(), point);
-    }
-
     @Nullable
     public static StepFile getStepFile(@NotNull final Project project, @NotNull final VirtualFile file) {
-        final CourseNode courseNode = StepikProjectManager.getInstance(project).getCourseNode();
+        StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
+        if (projectManager == null) {
+            return null;
+        }
+        final CourseNode courseNode = projectManager.getCourseNode();
         if (courseNode == null) {
             return null;
         }
@@ -112,29 +102,6 @@ public class StudyUtils {
                 return null;
             }
             return stepNode.getFile(file.getName());
-        }
-        return null;
-    }
-
-    @Nullable
-    public static StudyEditor getSelectedStudyEditor(@NotNull final Project project) {
-        try {
-            final FileEditor fileEditor = FileEditorManagerEx.getInstanceEx(project).getSplitters().getCurrentWindow().
-                    getSelectedEditor().getSelectedEditorWithProvider().getFirst();
-            if (fileEditor instanceof StudyEditor) {
-                return (StudyEditor) fileEditor;
-            }
-        } catch (Exception e) {
-            return null;
-        }
-        return null;
-    }
-
-    @Nullable
-    public static Editor getSelectedEditor(@NotNull final Project project) {
-        final StudyEditor studyEditor = getSelectedStudyEditor(project);
-        if (studyEditor != null) {
-            return studyEditor.getEditor();
         }
         return null;
     }
@@ -225,24 +192,6 @@ public class StudyUtils {
         return getStep(project, files[0]);
     }
 
-    @Nullable
-    public static Project getStudyProject() {
-        Project studyProject = null;
-        Project[] openProjects = ProjectManager.getInstance().getOpenProjects();
-        for (Project project : openProjects) {
-            if (StepikProjectManager.isStepikProject(project)) {
-                studyProject = project;
-                break;
-            }
-        }
-        if (studyProject == null) {
-            logger.info("return default project");
-            return ProjectManager.getInstance().getDefaultProject();
-        }
-        logger.info("return regular project");
-        return studyProject;
-    }
-
     public static boolean hasJavaFx() {
         try {
             Class.forName("javafx.application.Platform");
@@ -260,7 +209,11 @@ public class StudyUtils {
         }
         Matcher matcher = stepPathPattern.matcher(path);
         if (matcher.matches()) {
-            CourseNode courseNode = StepikProjectManager.getInstance(project).getCourseNode();
+            StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
+            if (projectManager == null) {
+                return null;
+            }
+            CourseNode courseNode = projectManager.getCourseNode();
             if (courseNode == null) {
                 return null;
             }

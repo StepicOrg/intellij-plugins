@@ -12,7 +12,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.core.EduNames;
-import com.jetbrains.tmp.learning.courseFormat.CourseNode;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
@@ -23,9 +22,17 @@ import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.attempts.Attempts;
 import org.stepik.api.objects.submissions.Submission;
 import org.stepik.api.objects.submissions.Submissions;
+import org.stepik.core.metrics.Metrics;
+import org.stepik.core.metrics.MetricsStatus;
 import org.stepik.plugin.utils.DirectivesUtils;
 
 import java.util.List;
+
+import static org.stepik.core.metrics.MetricsStatus.DATA_NOT_LOADED;
+import static org.stepik.core.metrics.MetricsStatus.FAILED_POST;
+import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
+import static org.stepik.core.metrics.MetricsStatus.TIME_OVER;
+import static org.stepik.core.metrics.MetricsStatus.USER_CANCELED;
 
 public class StepikJavaPostAction extends StudyCheckAction {
     private static final String EVALUATION = "evaluation";
@@ -48,17 +55,20 @@ public class StepikJavaPostAction extends StudyCheckAction {
 
         Long intAttemptId = getAttemptId(project, stepikApiClient, stepNode);
         if (intAttemptId == null) {
+            Metrics.sendAction(project, stepNode, DATA_NOT_LOADED);
             return null;
         }
 
         Long submissionId = getSubmissionId(project, stepikApiClient, stepNode, intAttemptId);
         if (submissionId == null) {
+            Metrics.sendAction(project, stepNode, FAILED_POST);
             return null;
         }
 
         logger.info(String.format("Finish sending step: id=%s", stepId));
 
         if (isCanceled()) {
+            Metrics.sendAction(project, stepNode, USER_CANCELED);
             return null;
         }
 
@@ -164,26 +174,6 @@ public class StepikJavaPostAction extends StudyCheckAction {
         return false;
     }
 
-    private static void sendMetric(@NotNull StepNode stepNode) {
-        StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
-        CourseNode courseNode = stepNode.getCourse();
-
-        try {
-            stepikApiClient.metrics()
-                    .post()
-                    .name("ide_plugin")
-                    .tags("name", "S_Union")
-                    .tags("action", "send")
-                    .data("courseId", courseNode != null ? courseNode.getId() : 0)
-                    .data("stepId", stepNode.getId())
-                    .execute();
-        } catch (StepikClientException e) {
-            logger.warn("Failed send metric", e);
-            return;
-        }
-        logger.info("Sending metric was successfully");
-    }
-
     private static void checkStepStatus(
             @NotNull Project project,
             @NotNull StepNode stepNode,
@@ -202,6 +192,7 @@ public class StepikJavaPostAction extends StudyCheckAction {
             try {
                 Thread.sleep(PERIOD);
                 if (isCanceled()) {
+                    Metrics.getStepStatusAction(project, stepNode, USER_CANCELED);
                     return;
                 }
                 timer += PERIOD;
@@ -225,6 +216,8 @@ public class StepikJavaPostAction extends StudyCheckAction {
             logger.info(String.format("Stop check a status for step: %s without result", stepIdString));
             return;
         }
+        MetricsStatus actionStatus = EVALUATION.equals(stepStatus) ? TIME_OVER : SUCCESSFUL;
+        Metrics.getStepStatusAction(project, stepNode, actionStatus);
 
         indicator.setIndeterminate(true);
         indicator.setText("");
@@ -277,7 +270,7 @@ public class StepikJavaPostAction extends StudyCheckAction {
                     return;
                 }
 
-                sendMetric(stepNode);
+                Metrics.sendAction(project, stepNode, SUCCESSFUL);
 
                 checkStepStatus(project, stepNode, submissionId, indicator);
                 logger.info(String.format("Finish checking step: id=%s", stepNode.getId()));

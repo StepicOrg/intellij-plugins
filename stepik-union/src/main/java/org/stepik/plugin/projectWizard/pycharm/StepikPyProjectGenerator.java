@@ -190,15 +190,19 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
             @NotNull Project project) {
         generator.generateProject(project);
 
-        StepikProjectManager stepManager = StepikProjectManager.getInstance(project);
-        stepManager.setDefaultLang(generator.getDefaultLang());
-        CourseNode courseNode = stepManager.getCourseNode();
-        if (courseNode == null) {
-            logger.warn("failed to generate builders");
+        FileUtil.createDirectory(new File(project.getBasePath(), "Sandbox"));
+
+        StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
+        if (projectManager == null) {
+            logger.warn("failed to generate builders: StepikProjectManager is null");
             return;
         }
-
-        FileUtil.createDirectory(new File(project.getBasePath(), "Sandbox"));
+        projectManager.setDefaultLang(generator.getDefaultLang());
+        CourseNode courseNode = projectManager.getCourseNode();
+        if (courseNode == null) {
+            logger.warn("failed to generate builders: CourseNode is null");
+            return;
+        }
 
         createSubDirectories(courseNode, project);
 
@@ -206,7 +210,7 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
                 () -> DumbService.allowStartingDumbModeInside(DumbModePermission.MAY_START_BACKGROUND,
                         () -> ApplicationManager.getApplication().runWriteAction(
                                 () -> StudyProjectComponent.getInstance(project)
-                                        .registerStudyToolWindow(courseNode))));
+                                        .registerStudyToolWindow())));
     }
 
     private void createSubDirectories(

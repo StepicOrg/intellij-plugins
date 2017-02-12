@@ -5,35 +5,27 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.MessageType;
-import com.intellij.openapi.ui.popup.Balloon;
-import com.intellij.openapi.ui.popup.BalloonBuilder;
-import com.intellij.openapi.ui.popup.JBPopupFactory;
-import com.intellij.openapi.util.Disposer;
-import com.intellij.openapi.wm.IdeFocusManager;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.problems.WolfTheProblemSolver;
-import com.jetbrains.tmp.learning.StudyState;
 import com.jetbrains.tmp.learning.StudyUtils;
-import com.jetbrains.tmp.learning.courseFormat.StepFile;
+import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
-import com.jetbrains.tmp.learning.editor.StudyEditor;
 import icons.AllStepikIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.core.metrics.Metrics;
+import org.stepik.core.metrics.MetricsStatus;
 
 import javax.swing.*;
 
 public class StepikResetStepAction extends AbstractStepAction {
     private static final String ACTION_ID = "STEPIK.ResetStepAction";
     private static final String SHORTCUT = "ctrl shift pressed X";
-    private static final Logger logger = Logger
-            .getInstance(StepikResetStepAction.class.getName());
 
     public StepikResetStepAction() {
         super("Reset Step File (" + KeymapUtil.getShortcutText(
@@ -41,66 +33,49 @@ public class StepikResetStepAction extends AbstractStepAction {
                 "Reset current step", AllStepikIcons.ToolWindow.resetTaskFile);
     }
 
-    private static void refresh(@NotNull final Project project) {
+    private static void reset(@NotNull final Project project) {
         ApplicationManager.getApplication()
-                .invokeLater(() -> ApplicationManager.getApplication().runWriteAction(() -> {
-                    StudyEditor studyEditor = StudyUtils.getSelectedStudyEditor(project);
-                    StudyState studyState = new StudyState(studyEditor);
-                    if (studyEditor == null || !studyState.isValid()) {
-                        logger.info("ResetStepAction was invoked outside of Study Editor");
-                        return;
-                    }
-                    refreshFile(studyState, project);
-                }));
+                .invokeLater(() -> ApplicationManager.getApplication().runWriteAction(() -> resetFile(project)));
     }
 
-    private static void refreshFile(
-            @NotNull final StudyState studyState,
-            @NotNull final Project project) {
-        final Editor editor = studyState.getEditor();
-        final StepFile stepFile = studyState.getStepFile();
-        resetStepFile(editor.getDocument(), project, stepFile);
-        WolfTheProblemSolver.getInstance(project).clearProblems(studyState.getVirtualFile());
-        ApplicationManager.getApplication().invokeLater(
-                () -> IdeFocusManager.getInstance(project)
-                        .requestFocus(editor.getContentComponent(), true));
-        showBalloon(project);
-    }
-
-    private static void resetStepFile(
-            @NotNull final Document document,
-            @NotNull final Project project,
-            StepFile stepFile) {
-        resetDocument(document, stepFile, project);
-        StepNode stepNode = stepFile.getStepNode();
-        if (stepNode != null) {
-            stepNode.setStatus(StudyStatus.UNCHECKED);
+    private static void resetFile(@NotNull final Project project) {
+        StepNode stepNode = StudyUtils.getSelectedStep(project);
+        if (stepNode == null) {
+            return;
         }
-        ProjectView.getInstance(project).refresh();
-        StudyUtils.updateToolWindows(project);
-    }
 
-    private static void showBalloon(
-            @NotNull final Project project) {
-        BalloonBuilder balloonBuilder = JBPopupFactory.getInstance()
-                .createHtmlTextBalloonBuilder("You can start again now", MessageType.INFO, null);
-        final Balloon balloon = balloonBuilder.createBalloon();
-        StudyEditor selectedStudyEditor = StudyUtils.getSelectedStudyEditor(project);
-        assert selectedStudyEditor != null;
-        balloon.show(StudyUtils.computeLocation(selectedStudyEditor.getEditor()),
-                Balloon.Position.above);
-        Disposer.register(project, balloon);
+        VirtualFile stepDirectory = project.getBaseDir().findFileByRelativePath(stepNode.getPath());
+        if (stepDirectory == null) {
+            return;
+        }
+        String mainFileName = stepNode.getCurrentLang().getMainFileName();
+        VirtualFile mainFile = stepDirectory.findFileByRelativePath(EduNames.SRC + "/" + mainFileName);
+
+        if (mainFile != null) {
+            FileDocumentManager documentManager = FileDocumentManager.getInstance();
+            Document document = documentManager.getDocument(mainFile);
+            if (document != null) {
+                resetDocument(project, document, stepNode);
+                stepNode.setStatus(StudyStatus.UNCHECKED);
+                ProjectView.getInstance(project).refresh();
+                StudyUtils.updateToolWindows(project);
+                WolfTheProblemSolver.getInstance(project).clearProblems(mainFile);
+            }
+        }
     }
 
     private static void resetDocument(
+            @NotNull Project project,
             @NotNull final Document document,
-            @NotNull final StepFile stepFile,
-            @NotNull Project project) {
+            @NotNull final StepNode stepNode) {
         CommandProcessor.getInstance().executeCommand(project,
                 () -> ApplicationManager
                         .getApplication()
-                        .runWriteAction(() -> document.setText(stepFile.getText())),
-                "Stepik refresh step", "Stepik refresh step"
+                        .runWriteAction(() -> {
+                            document.setText(stepNode.getCurrentFileText());
+                            Metrics.resetStepAction(project, stepNode, MetricsStatus.SUCCESSFUL);
+                        }),
+                "Stepik reset step", "Stepik reset step"
         );
     }
 
@@ -110,7 +85,7 @@ public class StepikResetStepAction extends AbstractStepAction {
             return;
         }
 
-        refresh(project);
+        reset(project);
     }
 
     @NotNull

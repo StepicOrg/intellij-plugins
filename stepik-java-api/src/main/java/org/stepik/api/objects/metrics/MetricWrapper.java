@@ -6,12 +6,12 @@ import org.jetbrains.annotations.NotNull;
  * @author meanmail
  */
 public class MetricWrapper<T> {
-    private Metric<T> metric = new Metric<>();
+    private Metric metric = new Metric();
 
     @NotNull
-    public Metric<T> getMetric() {
+    public Metric getMetric() {
         if (metric == null) {
-            metric = new Metric<>();
+            metric = new Metric();
         }
         return metric;
     }

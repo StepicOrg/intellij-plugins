@@ -50,14 +50,6 @@ class CourseModuleBuilder extends AbstractModuleBuilder {
             throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
         generator.generateProject(project);
 
-        StepikProjectManager stepManager = StepikProjectManager.getInstance(project);
-        stepManager.setDefaultLang(generator.getDefaultLang());
-        CourseNode courseNode = stepManager.getCourseNode();
-        if (courseNode == null) {
-            logger.info("Failed to generate builders");
-            return;
-        }
-
         String moduleDir = getModuleFileDirectory();
         if (moduleDir == null) {
             return;
@@ -66,13 +58,25 @@ class CourseModuleBuilder extends AbstractModuleBuilder {
         logger.info("Module dir = " + moduleDir);
         new SandboxModuleBuilder(moduleDir).createModule(moduleModel);
 
+        StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
+        if (projectManager == null) {
+            logger.info("Failed to generate builders: StepikProjectManager is null");
+            return;
+        }
+
+        CourseNode courseNode = projectManager.getCourseNode();
+        if (courseNode == null) {
+            logger.info("Failed to generate builders: courseNode is null");
+            return;
+        }
+
         createSubDirectories(courseNode, moduleModel, project);
 
         ApplicationManager.getApplication().invokeLater(
                 () -> DumbService.allowStartingDumbModeInside(DumbModePermission.MAY_START_BACKGROUND,
                         () -> ApplicationManager.getApplication().runWriteAction(
                                 () -> StudyProjectComponent.getInstance(project)
-                                        .registerStudyToolWindow(courseNode))));
+                                        .registerStudyToolWindow())));
     }
 
     private void createSubDirectories(
