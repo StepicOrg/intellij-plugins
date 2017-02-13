@@ -454,7 +454,6 @@ public class StudySerializationUtils {
         }
     }
 
-
     public static Element convertToFourthVersion(Element state) throws StudyUnrecognizedFormatException {
         Element stepManager = getStepManager(state);
         Element courseNode = getCourseNode(stepManager);
@@ -505,7 +504,6 @@ public class StudySerializationUtils {
                             }));
 
             sectionNodes.forEach(sectionNode -> silentRenameField(sectionNode, LESSON_NODES, CHILDREN));
-
             silentRenameField(courseNode, SECTIONS_NODES, CHILDREN);
         }
         List<Element> elements = stepManager.getChildren();
