@@ -573,7 +573,7 @@ public class StudySerializationUtils {
                 } else {
                     List<Element> children = element.getChildren();
 
-                    if (children.size() > 0) {
+                    if (!children.isEmpty()) {
                         Element child = children.get(0);
                         removeChild(element, child);
                         element.addContent(child.cloneContent());

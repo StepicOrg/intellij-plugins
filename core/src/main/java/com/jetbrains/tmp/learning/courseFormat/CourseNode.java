@@ -35,9 +35,9 @@ public class CourseNode extends Node<Course, SectionNode, Section, LessonNode> {
         Sections sections = new Sections();
         try {
             StepikApiClient stepikApiClient = authAndGetStepikApiClient();
-
-            List<Long> sectionsIds = getData().getSections();
-            if (sectionsIds.size() > 0) {
+            Course data = getData();
+            List<Long> sectionsIds = data != null ? getData().getSections() : Collections.emptyList();
+            if (!sectionsIds.isEmpty()) {
                 sections = stepikApiClient.sections()
                         .get()
                         .id(sectionsIds)
@@ -45,7 +45,7 @@ public class CourseNode extends Node<Course, SectionNode, Section, LessonNode> {
 
 
             }
-        } catch (StepikClientException | IllegalAccessException | InstantiationException logged) {
+        } catch (StepikClientException logged) {
             logger.warn("A course initialization don't is fully", logged);
         }
 
@@ -99,12 +99,9 @@ public class CourseNode extends Node<Course, SectionNode, Section, LessonNode> {
     public List<User> getAuthors() {
         if (authors == null) {
             List<Long> authorsIds;
-            try {
-                authorsIds = getData().getAuthors();
-            } catch (IllegalAccessException | InstantiationException e) {
-                return Collections.emptyList();
-            }
-            if (authorsIds.size() > 0) {
+            Course data = getData();
+            authorsIds = data != null ? data.getAuthors() : Collections.emptyList();
+            if (!authorsIds.isEmpty()) {
                 try {
                     Users users = authAndGetStepikApiClient().users()
                             .get()
@@ -117,21 +114,6 @@ public class CourseNode extends Node<Course, SectionNode, Section, LessonNode> {
             }
         }
         return authors != null ? authors : Collections.emptyList();
-    }
-
-    @NotNull
-    @Override
-    public String getName() {
-        try {
-            return getData().getTitle();
-        } catch (IllegalAccessException | InstantiationException e) {
-            return "";
-        }
-    }
-
-    @Override
-    public int getPosition() {
-        return 0;
     }
 
     @Override

@@ -16,6 +16,7 @@ import org.stepik.api.objects.units.Unit;
 import org.stepik.api.objects.units.Units;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,32 +70,10 @@ public class SectionNode extends Node<Section, LessonNode, CompoundUnitLesson, S
         return LessonNode.class;
     }
 
-    @NotNull
-    @Override
-    public String getName() {
-        try {
-            return getData().getTitle();
-        } catch (IllegalAccessException | InstantiationException e) {
-            return "";
-        }
-    }
-
-    @Override
-    public int getPosition() {
-        try {
-            return getData().getPosition();
-        } catch (IllegalAccessException | InstantiationException e) {
-            return 0;
-        }
-    }
-
     @Override
     public long getCourseId() {
-        try {
-            return getData().getCourse();
-        } catch (IllegalAccessException | InstantiationException e) {
-            return 0;
-        }
+        Section data = getData();
+        return data != null ? getData().getCourse() : 0;
     }
 
     @Override
@@ -115,13 +94,10 @@ public class SectionNode extends Node<Section, LessonNode, CompoundUnitLesson, S
             StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
 
             List<Long> unitsIds;
-            try {
-                unitsIds = getData().getUnits();
-            } catch (IllegalAccessException | InstantiationException e) {
-                return objects;
-            }
+            Section data = getData();
+            unitsIds = data != null ? data.getUnits() : Collections.emptyList();
 
-            if (unitsIds.size() > 0) {
+            if (!unitsIds.isEmpty()) {
                 Units units = stepikApiClient.units()
                         .get()
                         .id(unitsIds)

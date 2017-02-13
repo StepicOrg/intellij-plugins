@@ -79,11 +79,8 @@ public class ProjectPsiFilesUtils {
             @NotNull PsiElement element,
             @NotNull Set<Class<? extends PsiElement>> acceptableClasses) {
         Project project = element.getProject();
-        StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
-        if (projectManager == null) {
-            return false;
-        }
-        StudyNode root = projectManager.getProjectRoot();
+
+        StudyNode root = StepikProjectManager.getProjectRoot(project);
         if (root == null) {
             return false;
         }

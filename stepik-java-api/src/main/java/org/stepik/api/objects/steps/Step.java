@@ -336,7 +336,7 @@ public class Step extends StudyObject {
     @NotNull
     @Override
     public String getTitle() {
-        return "Step" + position;
+        return "step" + position;
     }
 
     @NotNull

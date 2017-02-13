@@ -199,12 +199,7 @@ public class StudyUtils {
     public static StudyNode getStudyNode(@NotNull Project project, @NotNull VirtualFile nodeVF) {
         String path = getRelativePath(project, nodeVF);
 
-        StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
-        if (projectManager == null) {
-            return null;
-        }
-
-        StudyNode root = projectManager.getProjectRoot();
+        StudyNode root = StepikProjectManager.getProjectRoot(project);
         if (root == null) {
             return null;
         }

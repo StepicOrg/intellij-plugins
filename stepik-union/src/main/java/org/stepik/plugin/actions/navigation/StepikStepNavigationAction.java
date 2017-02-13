@@ -30,11 +30,7 @@ abstract class StepikStepNavigationAction extends StudyStepNavigationAction {
     public void navigateStep(@NotNull final Project project) {
         StudyNode currentNode = StudyUtils.getSelectedNode(project);
         if (currentNode == null) {
-            StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
-            if (projectManager == null) {
-                return;
-            }
-            currentNode = projectManager.getProjectRoot();
+            currentNode = StepikProjectManager.getProjectRoot(project);
         }
 
         StudyNode targetNode;

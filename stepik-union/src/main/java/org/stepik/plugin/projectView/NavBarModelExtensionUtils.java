@@ -21,11 +21,8 @@ public class NavBarModelExtensionUtils {
     public static String getPresentableText(@Nullable final Object object) {
         if (object instanceof Project) {
             Project project = (Project) object;
-            StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
-            if (projectManager == null) {
-                return null;
-            }
-            StudyNode root = projectManager.getProjectRoot();
+
+            StudyNode root = StepikProjectManager.getProjectRoot(project);
             if (root == null) {
                 return null;
             }
@@ -47,11 +44,8 @@ public class NavBarModelExtensionUtils {
     @Nullable
     public static PsiElement adjustElement(final PsiElement psiElement) {
         Project project = psiElement.getProject();
-        StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
-        if (projectManager == null) {
-            return null;
-        }
-        StudyNode root = projectManager.getProjectRoot();
+
+        StudyNode root = StepikProjectManager.getProjectRoot(project);
         if (root == null)
             return psiElement;
 

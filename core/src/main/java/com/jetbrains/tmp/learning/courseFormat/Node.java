@@ -175,6 +175,7 @@ public abstract class Node<
             boolean isRestarted,
             @Nullable ProgressIndicator indicator) {
         Map<Long, C> mapNodes = getMapNodes();
+        List<C> needInit = getChildren();
 
         for (DC data : getChildDataList()) {
             C child = mapNodes.get(data.getId());
@@ -199,15 +200,15 @@ public abstract class Node<
         sortChildren();
         setParent(parent);
 
-        for (StudyNode child : getChildren()) {
+        for (StudyNode child : needInit) {
             child.init(this, isRestarted, indicator);
         }
     }
 
     @Override
-    public void reloadData(boolean isRestarted, @NotNull ProgressIndicator indicator) {
+    public void reloadData(@NotNull ProgressIndicator indicator) {
         loadData(data.getId());
-        init(isRestarted, indicator);
+        init(indicator);
     }
 
     protected abstract void loadData(long id);
@@ -244,11 +245,16 @@ public abstract class Node<
         return StudyStatus.SOLVED;
     }
 
-    @NotNull
+    @Nullable
     @Override
-    public D getData() throws IllegalAccessException, InstantiationException {
+    public D getData() {
         if (data == null) {
-            data = getDataClass().newInstance();
+            try {
+                data = getDataClass().newInstance();
+            } catch (InstantiationException | IllegalAccessException e) {
+                logger.warn("Can't create data instance: " + getDataClass().getName());
+                return null;
+            }
         }
         return data;
     }
@@ -262,22 +268,32 @@ public abstract class Node<
 
     @Override
     public long getId() {
-        try {
-            return getData().getId();
-        } catch (IllegalAccessException | InstantiationException e) {
-            return 0;
-        }
+        StudyObject data = getData();
+        return data != null ? data.getId() : 0;
     }
 
     public void setId(long id) {
-        try {
-            getData().setId(id);
-        } catch (IllegalAccessException | InstantiationException ignored) {
+        StudyObject data = getData();
+        if (data != null) {
+            data.setId(id);
         }
     }
 
     @Override
     public boolean canBeLeaf() {
         return false;
+    }
+
+    @Override
+    public int getPosition() {
+        StudyObject data = getData();
+        return data != null ? data.getPosition() : 0;
+    }
+
+    @NotNull
+    @Override
+    public String getName() {
+        StudyObject data = getData();
+        return data != null ? data.getTitle() : "";
     }
 }

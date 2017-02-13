@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.exceptions.StepikClientException;
+import org.stepik.api.objects.lessons.CompoundUnitLesson;
 import org.stepik.api.objects.steps.BlockView;
 import org.stepik.api.objects.steps.BlockViewOptions;
 import org.stepik.api.objects.steps.Limit;
@@ -19,7 +20,6 @@ import org.stepik.api.objects.units.Units;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -87,32 +87,20 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
     }
 
     @NotNull
-    public String getName() {
-        try {
-            return EduNames.STEP + getData().getPosition();
-        } catch (IllegalAccessException | InstantiationException e) {
-            return "";
-        }
-    }
-
-    @NotNull
     public String getText() {
-        try {
-            return getData().getBlock().getText();
-        } catch (IllegalAccessException | InstantiationException e) {
-            return "";
-        }
+        Step data = getData();
+        return data != null ? data.getBlock().getText() : "";
     }
 
     @NotNull
     public String getTemplate(@NotNull SupportedLanguages language) {
         Map<String, String> templates;
-        try {
-            templates = getData().getBlock().getOptions().getCodeTemplates();
-            return templates.getOrDefault(language.getName(), "");
-        } catch (IllegalAccessException | InstantiationException e) {
+        Step data = getData();
+        if (data == null) {
             return "";
         }
+        templates = getData().getBlock().getOptions().getCodeTemplates();
+        return templates.getOrDefault(language.getName(), "");
     }
 
     @NotNull
@@ -141,12 +129,12 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
             return courseId;
         }
 
-        int lessonId;
-        try {
-            lessonId = getData().getLesson();
-        } catch (IllegalAccessException | InstantiationException e) {
+        Step data = getData();
+        if (data == null) {
             return 0;
         }
+
+        int lessonId = data.getLesson();
         if (lessonId == 0) {
             return 0;
         }
@@ -163,11 +151,14 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
             }
 
             LessonNode lessonNode = new LessonNode();
-            lessonNode.getData().setUnit(units.getItems().get(0));
+            CompoundUnitLesson lessonData = lessonNode.getData();
+            if (lessonData != null) {
+                lessonData.setUnit(units.getItems().get(0));
+            }
 
             courseId = lessonNode.getCourseId();
             return courseId;
-        } catch (StepikClientException | IllegalAccessException | InstantiationException ignored) {
+        } catch (StepikClientException ignored) {
         }
         return 0;
     }
@@ -185,21 +176,13 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
         this.status = status;
     }
 
-    public int getPosition() {
-        try {
-            return getData().getPosition();
-        } catch (IllegalAccessException | InstantiationException e) {
-            return 0;
-        }
-    }
-
     @NotNull
     private Map<String, Limit> getLimits() {
-        try {
-            return getData().getBlock().getOptions().getLimits();
-        } catch (IllegalAccessException | InstantiationException e) {
-            return new HashMap<>();
+        Step data = getData();
+        if (data == null) {
+            return Collections.emptyMap();
         }
+        return data.getBlock().getOptions().getLimits();
     }
 
     @NotNull
@@ -213,11 +196,12 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
             supportedLanguages = new ArrayList<>();
 
             BlockView block;
-            try {
-                block = getData().getBlock();
-            } catch (IllegalAccessException | InstantiationException e) {
+            Step data = getData();
+            if (data == null) {
                 return supportedLanguages;
             }
+
+            block = data.getBlock();
 
             if (getType() == StepType.CODE) {
                 BlockViewOptions options = block.getOptions();
@@ -265,23 +249,21 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
 
     @NotNull
     public List<Sample> getSamples() {
-        try {
-            if (StepType.of(getData().getBlock().getName()) == StepType.CODE) {
-                return getData().getBlock().getOptions().getSamples();
-            }
-        } catch (IllegalAccessException | InstantiationException ignored) {
+        Step data = getData();
+        if (data != null && getType() == StepType.CODE) {
+            return data.getBlock().getOptions().getSamples();
         }
 
-        return new ArrayList<>();
+        return Collections.emptyList();
     }
 
     @Nullable
     public StepType getType() {
-        try {
-            return StepType.of(getData().getBlock().getName());
-        } catch (IllegalAccessException | InstantiationException e) {
+        Step data = getData();
+        if (data == null) {
             return null;
         }
+        return StepType.of(data.getBlock().getName());
     }
 
     public boolean isStepFile(@NotNull String fileName) {

@@ -41,7 +41,7 @@ class CourseListModel extends AbstractListModel<StudyObject> implements ComboBox
         StudyObject selectedCourse = getSelectedItem();
         courses.clear();
 
-        if (newCourseList.size() > 0) {
+        if (!newCourseList.isEmpty()) {
             courses.addAll(newCourseList);
             if (selectedCourse == StepikProjectGenerator.EMPTY_STUDY_NODE || !courses.contains(selectedCourse)) {
                 selectedCourse = courses.get(0);

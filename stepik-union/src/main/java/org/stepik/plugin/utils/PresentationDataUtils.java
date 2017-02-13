@@ -31,11 +31,8 @@ public class PresentationDataUtils {
     public static void updatePresentationData(@NotNull PresentationData data, @NotNull PsiDirectory psiDirectory) {
         Project project = psiDirectory.getProject();
         String valueName = psiDirectory.getName();
-        StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
-        if (projectManager == null) {
-            return;
-        }
-        StudyNode root = projectManager.getProjectRoot();
+
+        StudyNode root = StepikProjectManager.getProjectRoot(project);
         if (root == null) {
             return;
         }

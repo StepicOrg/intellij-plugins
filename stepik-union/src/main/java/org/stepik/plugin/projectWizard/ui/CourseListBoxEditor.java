@@ -69,7 +69,7 @@ class CourseListBoxEditor extends BasicComboBoxEditor {
                     .limit(1)
                     .collect(Collectors.toList());
 
-            if (candidates.size() > 0) {
+            if (!candidates.isEmpty()) {
                 StudyObject candidate = candidates.get(0);
                 model.setSelectedItem(candidate);
                 String newText = candidate.getTitle();

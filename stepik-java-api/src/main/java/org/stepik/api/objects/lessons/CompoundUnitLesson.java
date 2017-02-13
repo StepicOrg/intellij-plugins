@@ -74,4 +74,9 @@ public class CompoundUnitLesson extends StudyObject {
     public String toString() {
         return getTitle();
     }
+
+    @Override
+    public int getPosition() {
+        return getUnit().getPosition();
+    }
 }

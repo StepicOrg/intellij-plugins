@@ -15,6 +15,7 @@ import org.stepik.api.objects.sections.Sections;
 import org.stepik.api.objects.steps.Step;
 import org.stepik.api.objects.steps.Steps;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,9 +42,10 @@ public class LessonNode extends Node<CompoundUnitLesson, StepNode, Step, StepNod
         try {
             StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
 
-            List<Long> stepsIds = getData().getLesson().getSteps();
+            CompoundUnitLesson data = getData();
+            List<Long> stepsIds = data != null ? data.getLesson().getSteps() : Collections.emptyList();
 
-            if (stepsIds.size() > 0) {
+            if (!stepsIds.isEmpty()) {
                 steps = stepikApiClient.steps()
                         .get()
                         .id(stepsIds)
@@ -51,7 +53,7 @@ public class LessonNode extends Node<CompoundUnitLesson, StepNode, Step, StepNod
 
 
             }
-        } catch (StepikClientException | IllegalAccessException | InstantiationException logged) {
+        } catch (StepikClientException logged) {
             logger.warn("A lesson initialization don't is fully", logged);
         }
 
@@ -75,6 +77,11 @@ public class LessonNode extends Node<CompoundUnitLesson, StepNode, Step, StepNod
     @Override
     protected void loadData(long id) {
         try {
+            CompoundUnitLesson data = getData();
+            if (data == null) {
+                return;
+            }
+
             StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
             Lessons lessons = stepikApiClient.lessons()
                     .get()
@@ -84,13 +91,13 @@ public class LessonNode extends Node<CompoundUnitLesson, StepNode, Step, StepNod
             Lesson lesson;
             if (!lessons.isEmpty()) {
                 lesson = lessons.getLessons().get(0);
-                getData().setLesson(lesson);
+                data.setLesson(lesson);
             } else {
                 lesson = new Lesson();
                 lesson.setId(id);
             }
-            getData().setLesson(lesson);
-        } catch (StepikClientException | IllegalAccessException | InstantiationException logged) {
+            data.setLesson(lesson);
+        } catch (StepikClientException logged) {
             logger.warn(String.format("Failed load lesson data id=%d", id), logged);
         }
     }
@@ -99,16 +106,6 @@ public class LessonNode extends Node<CompoundUnitLesson, StepNode, Step, StepNod
     @Override
     protected Class<StepNode> getChildClass() {
         return StepNode.class;
-    }
-
-    @NotNull
-    @Override
-    public String getName() {
-        try {
-            return getData().getLesson().getTitle();
-        } catch (IllegalAccessException | InstantiationException e) {
-            return "";
-        }
     }
 
     @Override
@@ -122,12 +119,8 @@ public class LessonNode extends Node<CompoundUnitLesson, StepNode, Step, StepNod
             return courseId;
         }
 
-        int sectionId;
-        try {
-            sectionId = getData().getUnit().getSection();
-        } catch (IllegalAccessException | InstantiationException e) {
-            return 0;
-        }
+        CompoundUnitLesson data = getData();
+        int sectionId = data != null ? data.getUnit().getSection() : 0;
         if (sectionId == 0) {
             return 0;
         }
@@ -147,14 +140,6 @@ public class LessonNode extends Node<CompoundUnitLesson, StepNode, Step, StepNod
         } catch (StepikClientException ignored) {
         }
         return 0;
-    }
-
-    public int getPosition() {
-        try {
-            return getData().getUnit().getPosition();
-        } catch (IllegalAccessException | InstantiationException e) {
-            return 0;
-        }
     }
 
     @Override

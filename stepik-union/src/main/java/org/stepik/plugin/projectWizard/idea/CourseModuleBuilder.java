@@ -56,15 +56,9 @@ class CourseModuleBuilder extends AbstractModuleBuilder {
         logger.info("Module dir = " + moduleDir);
         new SandboxModuleBuilder(moduleDir).createModule(moduleModel);
 
-        StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
-        if (projectManager == null) {
-            logger.info("Failed to generate builders: StepikProjectManager is null");
-            return;
-        }
-
-        StudyNode root = projectManager.getProjectRoot();
+        StudyNode root = StepikProjectManager.getProjectRoot(project);
         if (root == null) {
-            logger.info("Failed to generate builders: courseNode is null");
+            logger.info("Failed to generate builders: project root is null");
             return;
         }
 

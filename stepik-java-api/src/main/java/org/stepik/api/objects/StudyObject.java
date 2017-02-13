@@ -26,4 +26,8 @@ public class StudyObject extends AbstractObject {
 
     public void setDescription(@Nullable String description) {
     }
+
+    public int getPosition() {
+        return 0;
+    }
 }

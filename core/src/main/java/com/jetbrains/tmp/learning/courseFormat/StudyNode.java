@@ -44,8 +44,8 @@ public interface StudyNode<D extends StudyObject, C extends StudyNode> {
 
     List<C> getChildren();
 
-    @NotNull
-    D getData() throws IllegalAccessException, InstantiationException;
+    @Nullable
+    D getData();
 
     void setData(@Nullable D data);
 
@@ -54,11 +54,11 @@ public interface StudyNode<D extends StudyObject, C extends StudyNode> {
             boolean isRestarted,
             @Nullable ProgressIndicator indicator);
 
-    default void init(boolean isRestarted, @Nullable ProgressIndicator indicator) {
-        init(null, isRestarted, indicator);
+    default void init(@Nullable ProgressIndicator indicator) {
+        init(null, false, indicator);
     }
 
     boolean canBeLeaf();
 
-    void reloadData(boolean isRestarted, @NotNull ProgressIndicator indicator);
+    void reloadData(@NotNull ProgressIndicator indicator);
 }

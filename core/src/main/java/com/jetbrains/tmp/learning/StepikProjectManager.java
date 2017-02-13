@@ -82,6 +82,17 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
         return ServiceManager.getService(project, StepikProjectManager.class);
     }
 
+    @Nullable
+    public static StudyNode getProjectRoot(@NotNull final Project project) {
+        StepikProjectManager instance = getInstance(project);
+
+        if (instance == null) {
+            return null;
+        }
+
+        return instance.getProjectRoot();
+    }
+
     public static boolean isStepikProject(@Nullable Project project) {
         if (project == null) {
             return false;
@@ -210,7 +221,7 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
                     ProgressIndicator indicator = ProgressManager.getInstance()
                             .getProgressIndicator();
                     indicator.setIndeterminate(true);
-                    root.reloadData(false, indicator);
+                    root.reloadData(indicator);
                 }, "Refreshing Course", true, project);
     }
 

@@ -170,7 +170,7 @@ public class DownloadSubmission extends AbstractStepAction {
         JBPopupFactory popupFactory = JBPopupFactory.getInstance();
 
         PopupChooserBuilder builder;
-        if (submissions.size() > 0) {
+        if (!submissions.isEmpty()) {
             JList<SubmissionDecorator> list;
 
             List<SubmissionDecorator> submissionDecorators = submissions.stream()
