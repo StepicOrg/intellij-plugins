@@ -68,7 +68,11 @@ class CourseModuleBuilder extends AbstractModuleBuilder {
             return;
         }
 
-        createSubDirectories(root, moduleModel, project);
+        if (root instanceof StepNode) {
+            createStepModule(project, (StepNode) root, moduleModel);
+        } else {
+            createSubDirectories(root, moduleModel, project);
+        }
 
         ApplicationManager.getApplication().invokeLater(
                 () -> DumbService.allowStartingDumbModeInside(DumbModePermission.MAY_START_BACKGROUND,
@@ -85,22 +89,24 @@ class CourseModuleBuilder extends AbstractModuleBuilder {
                 .forEach(child -> {
                     FileUtil.createDirectory(new File(project.getBasePath(), child.getPath()));
                     if (child instanceof StepNode) {
-                        StudyNode lesson = child.getParent();
-                        if (lesson != null) {
-                            StepModuleBuilder stepModuleBuilder = new StepModuleBuilder(
-                                    String.join("/", project.getBasePath(), lesson.getPath()),
-                                    (StepNode) child,
-                                    project);
-                            try {
-                                stepModuleBuilder.createModule(moduleModel);
-                            } catch (IOException | ModuleWithNameAlreadyExists | JDOMException | ConfigurationException e) {
-                                logger.warn("Cannot create step: " + child.getDirectory(), e);
-                            }
-                        }
+                        createStepModule(project, (StepNode) child, moduleModel);
                     } else {
                         createSubDirectories(child, moduleModel, project);
                     }
                 });
+    }
+
+    private void createStepModule(@NotNull Project project, StepNode step, ModifiableModuleModel moduleModel) {
+        StudyNode lesson = step.getParent();
+        if (lesson != null) {
+            String moduleDir = String.join("/", project.getBasePath(), lesson.getPath());
+            StepModuleBuilder stepModuleBuilder = new StepModuleBuilder(moduleDir, step, project);
+            try {
+                stepModuleBuilder.createModule(moduleModel);
+            } catch (IOException | ModuleWithNameAlreadyExists | JDOMException | ConfigurationException e) {
+                logger.warn("Cannot create step: " + step.getDirectory(), e);
+            }
+        }
     }
 
     @Override

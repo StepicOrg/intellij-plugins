@@ -15,11 +15,11 @@ public class ProjectFilesUtils {
 
     public static final String SEPARATOR = "/";
     private static final char SEPARATOR_CHAR = '/';
-    private static final String SECTION_EXPR = EduNames.SECTION + "[0-9]+";
-    private static final String LESSON_PATH_EXPR = SECTION_EXPR + SEPARATOR + EduNames.LESSON + "[0-9]+";
-    private static final String TASK_PATH_EXPR = LESSON_PATH_EXPR + SEPARATOR + EduNames.STEP + "[0-9]+";
-    private static final String SRC_PATH_EXPR = TASK_PATH_EXPR + SEPARATOR + EduNames.SRC;
-    private static final String COURSE_DIRECTORIES = "\\.|" + SECTION_EXPR + "|" + LESSON_PATH_EXPR + "|" + TASK_PATH_EXPR + "|" + SRC_PATH_EXPR;
+    private static final String SECTION_EXPR = "(section[0-9]+)";
+    private static final String LESSON_PATH_EXPR = "(section[0-9]+/lesson[0-9]+|lesson[0-9]+)";
+    private static final String STEP_PATH_EXPR = "(section[0-9]+/lesson[0-9]+/step[0-9]+|lesson[0-9]+/step[0-9]+|step[0-9]+)";
+    private static final String SRC_PATH_EXPR = "(" + STEP_PATH_EXPR + SEPARATOR + EduNames.SRC + "|" + EduNames.SRC + ")";
+    private static final String COURSE_DIRECTORIES = "\\.|" + SECTION_EXPR + "|" + LESSON_PATH_EXPR + "|" + STEP_PATH_EXPR + "|" + SRC_PATH_EXPR;
     private static final String HIDE_PATH_EXPR = SRC_PATH_EXPR + SEPARATOR + EduNames.HIDE;
 
     public static boolean isCanNotBeTarget(@NotNull String targetPath) {

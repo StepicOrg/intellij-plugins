@@ -30,6 +30,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.objects.StudyObject;
+import org.stepik.api.objects.courses.Course;
 import org.stepik.plugin.projectWizard.ProjectWizardUtils;
 import org.stepik.plugin.projectWizard.StepikProjectGenerator;
 
@@ -157,17 +158,19 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
     @Override
     public BooleanFunction<PythonProjectGenerator> beforeProjectGenerated(@Nullable Sdk sdk) {
         return generator -> {
-            final StudyObject course = wizardStep.getSelectedCourse();
-            if (course.getId() == 0) {
+            final StudyObject studyObject = wizardStep.getSelectedCourse();
+            if (studyObject.getId() == 0) {
                 return false;
             }
 
-            StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
-            stepikApiClient.enrollments()
-                    .post()
-                    .course(course.getId())
-                    .execute();
-            this.generator.createCourseNodeUnderProgress(project, course);
+            if (studyObject instanceof Course) {
+                StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
+                stepikApiClient.enrollments()
+                        .post()
+                        .course(studyObject.getId())
+                        .execute();
+            }
+            this.generator.createCourseNodeUnderProgress(project, studyObject);
             return true;
         };
     }
@@ -203,7 +206,11 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
             return;
         }
 
-        createSubDirectories(root, project);
+        if (root instanceof StepNode) {
+            createStepDirectory(project, (StepNode) root);
+        } else {
+            createSubDirectories(root, project);
+        }
 
         ApplicationManager.getApplication().invokeLater(
                 () -> DumbService.allowStartingDumbModeInside(DumbModePermission.MAY_START_BACKGROUND,
@@ -219,22 +226,25 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
                 .forEach(child -> {
                     FileUtil.createDirectory(new File(project.getBasePath(), child.getPath()));
                     if (child instanceof StepNode) {
-                        StepNode stepNode = (StepNode) child;
-                        stepNode.setCurrentLang(PYTHON3);
-                        File stepDir = new File(project.getBasePath(), stepNode.getPath());
-                        File srcDir = new File(stepDir, "src");
-                        FileUtil.createDirectory(stepDir);
-                        FileUtil.createDirectory(srcDir);
-
-                        try (BufferedWriter writer = new BufferedWriter(new FileWriter(new File(srcDir, "main.py")))) {
-                            String template = stepNode.getCurrentTemplate();
-                            writer.write(template);
-                        } catch (IOException e) {
-                            logger.warn(e);
-                        }
+                        createStepDirectory(project, (StepNode) child);
                     } else {
                         createSubDirectories(child, project);
                     }
                 });
+    }
+
+    private void createStepDirectory(@NotNull Project project, StepNode stepNode) {
+        stepNode.setCurrentLang(PYTHON3);
+        File stepDir = new File(project.getBasePath(), stepNode.getPath());
+        File srcDir = new File(stepDir, "src");
+        FileUtil.createDirectory(stepDir);
+        FileUtil.createDirectory(srcDir);
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(new File(srcDir, "main.py")))) {
+            String template = stepNode.getCurrentTemplate();
+            writer.write(template);
+        } catch (IOException e) {
+            logger.warn(e);
+        }
     }
 }
