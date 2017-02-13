@@ -138,11 +138,10 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
     @Override
     public void fireStateChanged() {
         if (!keepLocation && getLocationField() != null) {
-            long id = wizardStep.getSelectedCourse().getId();
-            String projectName = "course" + id;
-            String projectDir = new File(getLocation()).getParent();
-            projectName = ProjectWizardUtils.findNonExistingFileName(projectDir, projectName);
-            setLocation(projectDir + "/" + projectName);
+            StudyObject studyObject = wizardStep.getSelectedStudyObject();
+            String projectDirectory = new File(getLocation()).getParent();
+            String projectName = ProjectWizardUtils.getProjectDefaultName(projectDirectory, studyObject);
+            setLocation(projectDirectory + "/" + projectName);
         }
 
         super.fireStateChanged();
@@ -158,7 +157,7 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
     @Override
     public BooleanFunction<PythonProjectGenerator> beforeProjectGenerated(@Nullable Sdk sdk) {
         return generator -> {
-            final StudyObject studyObject = wizardStep.getSelectedCourse();
+            final StudyObject studyObject = wizardStep.getSelectedStudyObject();
             if (studyObject.getId() == 0) {
                 return false;
             }

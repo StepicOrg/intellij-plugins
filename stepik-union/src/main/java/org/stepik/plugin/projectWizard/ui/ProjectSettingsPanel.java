@@ -29,7 +29,7 @@ public class ProjectSettingsPanel implements ProjectSetting, HierarchyListener {
     private RefreshButton refreshListButton;
     private CourseDescriptionPane courseListDescription;
     private JScrollPane scrollPane;
-    private StudyObject selectedCourse = StepikProjectGenerator.EMPTY_STUDY_NODE;
+    private StudyObject selectedStudyObject = StepikProjectGenerator.EMPTY_STUDY_NODE;
 
     public ProjectSettingsPanel(@NotNull Project project, boolean visibleLangBox) {
         this.project = project;
@@ -58,20 +58,20 @@ public class ProjectSettingsPanel implements ProjectSetting, HierarchyListener {
     }
 
     public boolean validate() {
-        boolean valid = !selectedCourse.isAdaptive() && selectedCourse.getId() != 0;
+        boolean valid = !selectedStudyObject.isAdaptive() && selectedStudyObject.getId() != 0;
         logger.info("Validation is " + valid);
         return valid;
     }
 
     @Override
-    public void selectedStudyNode(@NotNull StudyObject course) {
-        selectedCourse = course;
-        String description = Utils.getCourseDescription(course);
+    public void selectedStudyNode(@NotNull StudyObject studyObject) {
+        selectedStudyObject = studyObject;
+        String description = Utils.getCourseDescription(studyObject);
         courseListDescription.setText(description);
         // Scroll to top
         courseListDescription.setSelectionStart(0);
         courseListDescription.setSelectionEnd(0);
-        logger.info("Has selected the course: " + course);
+        logger.info("Has selected the course: " + studyObject);
         notifyListeners();
     }
 
@@ -104,8 +104,8 @@ public class ProjectSettingsPanel implements ProjectSetting, HierarchyListener {
     }
 
     @NotNull
-    public StudyObject getSelectedCourse() {
-        return selectedCourse;
+    public StudyObject getSelectedStudyObject() {
+        return selectedStudyObject;
     }
 
     @Override

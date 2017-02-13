@@ -67,7 +67,7 @@ class JavaWizardStep extends ModuleWizardStep {
 
         SupportedLanguages selectedLang = panel.getLanguage();
         generator.setDefaultLang(selectedLang);
-        StudyObject selectedCourse = panel.getSelectedCourse();
+        StudyObject selectedCourse = panel.getSelectedStudyObject();
         generator.createCourseNodeUnderProgress(project, selectedCourse);
 
         long id = selectedCourse.getId();
@@ -93,7 +93,7 @@ class JavaWizardStep extends ModuleWizardStep {
                 id, selectedCourse.getTitle()));
     }
 
-    StudyObject getSelectedCourse() {
-        return panel.getSelectedCourse();
+    StudyObject getSelectedStudyObject() {
+        return panel.getSelectedStudyObject();
     }
 }

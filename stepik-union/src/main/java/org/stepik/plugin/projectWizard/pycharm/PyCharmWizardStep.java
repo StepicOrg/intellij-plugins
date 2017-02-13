@@ -25,8 +25,8 @@ class PyCharmWizardStep implements ProjectSettingListener {
     }
 
     @NotNull
-    StudyObject getSelectedCourse() {
-        return panel.getSelectedCourse();
+    StudyObject getSelectedStudyObject() {
+        return panel.getSelectedStudyObject();
     }
 
     @NotNull
@@ -36,12 +36,12 @@ class PyCharmWizardStep implements ProjectSettingListener {
 
     @NotNull
     ValidationResult check() {
-        StudyObject selectedCourse = panel.getSelectedCourse();
+        StudyObject selectedStudyObject = panel.getSelectedStudyObject();
 
-        if (selectedCourse.isAdaptive()) {
+        if (selectedStudyObject.isAdaptive()) {
             return adaptiveCourse;
         }
-        if (selectedCourse.getId() == 0) {
+        if (selectedStudyObject.getId() == 0) {
             return invalidCourse;
         }
         return ValidationResult.OK;
