@@ -23,14 +23,11 @@ import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.StudyProjectComponent;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.courseFormat.StudyNode;
-import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import icons.AllStepikIcons;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.objects.StudyObject;
-import org.stepik.api.objects.courses.Course;
 import org.stepik.plugin.projectWizard.ProjectWizardUtils;
 import org.stepik.plugin.projectWizard.StepikProjectGenerator;
 
@@ -162,13 +159,8 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
                 return false;
             }
 
-            if (studyObject instanceof Course) {
-                StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
-                stepikApiClient.enrollments()
-                        .post()
-                        .course(studyObject.getId())
-                        .execute();
-            }
+            ProjectWizardUtils.enrollmentCourse(studyObject);
+
             this.generator.createCourseNodeUnderProgress(project, studyObject);
             return true;
         };

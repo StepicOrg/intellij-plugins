@@ -6,12 +6,9 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
 import com.jetbrains.tmp.learning.SupportedLanguages;
-import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
-import org.stepik.api.client.StepikApiClient;
-import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.StudyObject;
-import org.stepik.api.objects.courses.Course;
+import org.stepik.plugin.projectWizard.ProjectWizardUtils;
 import org.stepik.plugin.projectWizard.StepikProjectGenerator;
 import org.stepik.plugin.projectWizard.ui.ProjectSettingsPanel;
 
@@ -67,30 +64,19 @@ class JavaWizardStep extends ModuleWizardStep {
 
         SupportedLanguages selectedLang = panel.getLanguage();
         generator.setDefaultLang(selectedLang);
-        StudyObject selectedCourse = panel.getSelectedStudyObject();
-        generator.createCourseNodeUnderProgress(project, selectedCourse);
+        StudyObject studyObject = panel.getSelectedStudyObject();
+        generator.createCourseNodeUnderProgress(project, studyObject);
 
-        long id = selectedCourse.getId();
+        long id = studyObject.getId();
 
         if (id == 0) {
             return;
         }
 
-        if (selectedCourse instanceof Course) {
-            StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
-            try {
-                stepikApiClient.enrollments()
-                        .post()
-                        .course(id)
-                        .execute();
-            } catch (StepikClientException e) {
-                String message = String.format("Can't enrollment on a course: id = %s, name = %s",
-                        id, selectedCourse.getTitle());
-                logger.error(message, e);
-            }
-        }
-        logger.info(String.format("Leaving step the project wizard with the selected course: id = %s, name = %s",
-                id, selectedCourse.getTitle()));
+        ProjectWizardUtils.enrollmentCourse(studyObject);
+
+        String messageTemplate = "Leaving step the project wizard with the selected study object: type=%s, id = %s, name = %s";
+        logger.info(String.format(messageTemplate, studyObject.getClass().getSimpleName(), id, studyObject.getTitle()));
     }
 
     StudyObject getSelectedStudyObject() {
