@@ -17,7 +17,6 @@ import org.stepik.api.objects.steps.Steps;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.jetbrains.tmp.learning.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
 
@@ -26,10 +25,6 @@ public class LessonNode extends Node<CompoundUnitLesson, StepNode, Step, StepNod
     private long courseId;
 
     public LessonNode() {
-    }
-
-    public LessonNode(@NotNull final SectionNode parent, @NotNull CompoundUnitLesson data) {
-        super(parent, data);
     }
 
     public LessonNode(@NotNull CompoundUnitLesson data, @Nullable ProgressIndicator indicator) {
@@ -57,9 +52,7 @@ public class LessonNode extends Node<CompoundUnitLesson, StepNode, Step, StepNod
             logger.warn("A lesson initialization don't is fully", logged);
         }
 
-        return steps.getSteps().stream()
-                .filter(step -> StepType.of(step.getBlock().getName()) == StepType.CODE)
-                .collect(Collectors.toList());
+        return steps.getSteps();
     }
 
     @Override

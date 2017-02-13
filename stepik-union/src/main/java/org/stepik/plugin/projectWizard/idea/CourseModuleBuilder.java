@@ -14,7 +14,6 @@ import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ui.configuration.ModulesProvider;
 import com.intellij.openapi.util.InvalidDataException;
-import com.intellij.openapi.util.io.FileUtil;
 import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.StudyProjectComponent;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
@@ -23,10 +22,11 @@ import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.plugin.projectWizard.StepikProjectGenerator;
 
-import java.io.File;
 import java.io.IOException;
 
-class CourseModuleBuilder extends AbstractModuleBuilder {
+import static org.stepik.plugin.projectWizard.ProjectWizardUtils.createSubDirectories;
+
+public class CourseModuleBuilder extends AbstractModuleBuilder {
     private static final Logger logger = Logger.getInstance(CourseModuleBuilder.class);
     private final StepikProjectGenerator generator = StepikProjectGenerator.getInstance();
     private JavaWizardStep wizardStep;
@@ -65,7 +65,7 @@ class CourseModuleBuilder extends AbstractModuleBuilder {
         if (root instanceof StepNode) {
             createStepModule(project, (StepNode) root, moduleModel);
         } else {
-            createSubDirectories(root, moduleModel, project);
+            createSubDirectories(project, root, (stepNode) -> createStepModule(project, stepNode, moduleModel));
         }
 
         ApplicationManager.getApplication().invokeLater(
@@ -75,22 +75,10 @@ class CourseModuleBuilder extends AbstractModuleBuilder {
                                         .registerStudyToolWindow())));
     }
 
-    private void createSubDirectories(
-            @NotNull StudyNode<?, ?> root,
-            @NotNull ModifiableModuleModel moduleModel,
-            @NotNull Project project) {
-        root.getChildren()
-                .forEach(child -> {
-                    FileUtil.createDirectory(new File(project.getBasePath(), child.getPath()));
-                    if (child instanceof StepNode) {
-                        createStepModule(project, (StepNode) child, moduleModel);
-                    } else {
-                        createSubDirectories(child, moduleModel, project);
-                    }
-                });
-    }
-
-    private void createStepModule(@NotNull Project project, StepNode step, ModifiableModuleModel moduleModel) {
+    private void createStepModule(
+            @NotNull Project project,
+            @NotNull StepNode step,
+            @NotNull ModifiableModuleModel moduleModel) {
         StudyNode lesson = step.getParent();
         if (lesson != null) {
             String moduleDir = String.join("/", project.getBasePath(), lesson.getPath());

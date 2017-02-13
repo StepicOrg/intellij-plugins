@@ -105,7 +105,7 @@ public class Metrics {
         metric.addData("step_id", stepNode.getId());
         metric.addTags("step_programming_language", stepNode.getCurrentLang().getName());
         StepType stepType = stepNode.getType();
-        metric.addTags("step_type", stepType != null ? stepType.toString() : "unknown");
+        metric.addTags("step_type", stepType.toString());
 
         postMetrics(project, metric, status);
     }

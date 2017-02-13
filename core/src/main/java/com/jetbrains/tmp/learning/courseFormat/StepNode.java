@@ -257,11 +257,11 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
         return Collections.emptyList();
     }
 
-    @Nullable
+    @NotNull
     public StepType getType() {
         Step data = getData();
         if (data == null) {
-            return null;
+            return StepType.UNKNOWN;
         }
         return StepType.of(data.getBlock().getName());
     }
