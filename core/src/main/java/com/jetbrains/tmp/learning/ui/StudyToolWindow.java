@@ -1,5 +1,6 @@
 package com.jetbrains.tmp.learning.ui;
 
+import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.ActionManager;
@@ -22,6 +23,7 @@ import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.courseFormat.StudyNode;
+import com.jetbrains.tmp.learning.courseFormat.VideoStepNodeHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.core.utils.ProgrammingLanguageUtils;
@@ -33,15 +35,25 @@ import java.awt.event.ActionListener;
 import java.util.Comparator;
 import java.util.Map;
 
+import static com.jetbrains.tmp.learning.StudyUtils.getCodeStepText;
+import static com.jetbrains.tmp.learning.StudyUtils.getTextStepText;
+import static com.jetbrains.tmp.learning.StudyUtils.getUnknownStepText;
+import static com.jetbrains.tmp.learning.StudyUtils.getVideoStepText;
+import static org.stepik.core.utils.PluginUtils.PLUGIN_ID;
+
 public abstract class StudyToolWindow extends SimpleToolWindowPanel implements DataProvider, Disposable, ActionListener {
     private static final Logger logger = Logger.getInstance(StudyToolWindow.class);
     private static final String STEP_INFO_ID = "stepInfo";
     private static final String EMPTY_STEP_TEXT = "Please, open any step to see step description";
+    private static final String VIDEO_QUALITY_PROPERTY_NAME = PLUGIN_ID + ".VIDEO_QUALITY";
     private final JComboBox<SupportedLanguages> languageBox;
+    private final JComboBox<Integer> videoQualityBox;
 
     private final JBCardLayout cardLayout;
     private final JPanel contentPanel;
     private final OnePixelSplitter splitPane;
+    private final Panel rightPanel;
+    private final CardLayout layout;
     private Project project;
     private StepNode stepNode;
 
@@ -51,8 +63,16 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
         contentPanel = new JPanel(cardLayout);
         splitPane = new OnePixelSplitter(myVertical = true);
         languageBox = new JComboBox<>();
-        languageBox.setVisible(false);
         languageBox.addActionListener(this);
+
+        videoQualityBox = new JComboBox<>();
+        videoQualityBox.addActionListener(e -> setText());
+
+        layout = new CardLayout();
+        rightPanel = new Panel(layout);
+        rightPanel.add("language", languageBox);
+        rightPanel.add("quality", videoQualityBox);
+        rightPanel.setVisible(false);
     }
 
     @NotNull
@@ -75,7 +95,7 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
     private JPanel createToolbarPanel(ActionGroup group) {
         final ActionToolbar actionToolBar = ActionManager.getInstance().createActionToolbar("Study", group, true);
         BorderLayoutPanel toolBar = JBUI.Panels.simplePanel(actionToolBar.getComponent());
-        toolBar.addToRight(languageBox);
+        toolBar.addToRight(rightPanel);
         return toolBar;
     }
 
@@ -102,6 +122,10 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
             project.getMessageBus().connect().subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, listener);
         }
 
+        videoQualityBox.removeAllItems();
+        videoQualityBox.addItem(loadVideoQuality());
+        videoQualityBox.setSelectedIndex(0);
+
         StepNode stepNode = StudyUtils.getSelectedStep(project);
         setStepNode(stepNode);
     }
@@ -127,35 +151,75 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
     public abstract JComponent createStepInfoPanel(Project project);
 
     public void setStepNode(@Nullable StudyNode studyNode) {
-        if (this.stepNode == studyNode) {
+        if (stepNode == studyNode) {
             return;
         }
 
         if (studyNode != null && !(studyNode instanceof StepNode)) {
+            setText(EMPTY_STEP_TEXT);
+            stepNode = null;
+            rightPanel.setVisible(false);
             return;
         }
 
-        this.stepNode = (StepNode) studyNode;
-        languageBox.removeAllItems();
-        languageBox.setVisible(stepNode != null);
+        stepNode = (StepNode) studyNode;
 
+        setText();
+    }
+
+    private void setText() {
         if (stepNode == null) {
             setText(EMPTY_STEP_TEXT);
+            rightPanel.setVisible(false);
             return;
         }
-
-        String text = StudyUtils.getStepTextFromStep(stepNode);
-        if (text == null) {
-            text = EMPTY_STEP_TEXT;
+        String text = null;
+        switch (stepNode.getType()) {
+            case UNKNOWN:
+                text = getUnknownStepText(stepNode);
+                rightPanel.setVisible(false);
+                break;
+            case CODE:
+                text = getCodeStepText(stepNode);
+                languageBox.removeAllItems();
+                stepNode.getSupportedLanguages().stream()
+                        .sorted(Comparator.comparingInt(Enum::ordinal))
+                        .forEach(languageBox::addItem);
+                layout.show(rightPanel, "language");
+                rightPanel.setVisible(languageBox.getModel().getSize() != 0);
+                languageBox.setSelectedItem(stepNode.getCurrentLang());
+                break;
+            case TEXT:
+                text = getTextStepText(stepNode);
+                rightPanel.setVisible(false);
+                break;
+            case VIDEO:
+                VideoStepNodeHelper videoStepNode = stepNode.asVideoStep();
+                text = getVideoStepText(videoStepNode, getVideoQuality());
+                videoQualityBox.removeAllItems();
+                videoStepNode.getQualitySet().forEach(videoQualityBox::addItem);
+                int quality = videoStepNode.getQuality();
+                videoQualityBox.setSelectedItem(quality);
+                layout.show(rightPanel, "quality");
+                rightPanel.setVisible(videoQualityBox.getModel().getSize() != 0);
+                storeVideoQuality(quality);
+                break;
         }
 
-        stepNode.getSupportedLanguages().stream()
-                .sorted(Comparator.comparingInt(Enum::ordinal))
-                .forEach(languageBox::addItem);
-        languageBox.setSelectedItem(stepNode.getCurrentLang());
-        languageBox.setVisible(languageBox.getModel().getSize() != 0);
-
+        if (text == null) {
+            text = EMPTY_STEP_TEXT;
+            rightPanel.setVisible(false);
+        }
         setText(text);
+    }
+
+    private int loadVideoQuality() {
+        return Integer.parseInt(PropertiesComponent.getInstance()
+                .getValue(VIDEO_QUALITY_PROPERTY_NAME, String.valueOf(0)));
+    }
+
+    private void storeVideoQuality(int quality) {
+        PropertiesComponent.getInstance().setValue(VIDEO_QUALITY_PROPERTY_NAME, String.valueOf(quality));
     }
 
     protected abstract void setText(@NotNull String text);
@@ -174,11 +238,21 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
 
         ApplicationManager.getApplication().invokeLater(() -> {
                     SupportedLanguages selectedLang = (SupportedLanguages) languageBox.getSelectedItem();
-                    ProgrammingLanguageUtils.switchProgrammingLanguage(project, stepNode, selectedLang);
-                    if (stepNode != null && selectedLang != stepNode.getCurrentLang()) {
-                        languageBox.setSelectedItem(stepNode.getCurrentLang());
+                    if (selectedLang != null) {
+                        ProgrammingLanguageUtils.switchProgrammingLanguage(project, stepNode, selectedLang);
+                        if (stepNode != null && selectedLang != stepNode.getCurrentLang()) {
+                            languageBox.setSelectedItem(stepNode.getCurrentLang());
+                        }
                     }
                 }
         );
+    }
+
+    private int getVideoQuality() {
+        Integer quality = (Integer) videoQualityBox.getSelectedItem();
+        if (quality == null) {
+            return 0;
+        }
+        return quality;
     }
 }

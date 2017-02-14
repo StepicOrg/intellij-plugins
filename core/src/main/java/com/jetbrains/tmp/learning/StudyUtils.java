@@ -10,15 +10,15 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFileSystemItem;
 import com.intellij.ui.content.Content;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
-import com.jetbrains.tmp.learning.courseFormat.StepType;
 import com.jetbrains.tmp.learning.courseFormat.StudyNode;
+import com.jetbrains.tmp.learning.courseFormat.VideoStepNodeHelper;
 import com.jetbrains.tmp.learning.ui.StudyToolWindow;
 import com.jetbrains.tmp.learning.ui.StudyToolWindowFactory;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.objects.steps.Limit;
 import org.stepik.api.objects.steps.Sample;
+import org.stepik.api.objects.steps.Step;
 import org.stepik.core.utils.ProjectFilesUtils;
 
 import javax.swing.*;
@@ -33,6 +33,11 @@ public class StudyUtils {
             "(?:section([0-9]+)/lesson([0-9]+))|" +
             "(?:section([0-9]+))" +
             ").*$";
+    private static final String UNKNOWN_STEP_TEXT = "This step can take place in the web version (%s)";
+    private static final String STEP_LINK_TEXT = "View step on Stepik.org";
+    private static final String VIDEO_LINK_TEXT = "Play video in the web version";
+    private static final String VIDEO_BLOCK = "<video src=\"%s\" style width=\"100%%\" preload controls autoplay></video>";
+    private static final String STEP_LINK_TEMPLATE = "<a href='https://stepik.org/lesson/%d/step/%d'>%s</a>";
     private static Pattern pathPattern;
 
     private StudyUtils() {
@@ -71,27 +76,25 @@ public class StudyUtils {
         return null;
     }
 
-    @Nullable
-    @Contract("null -> null")
-    public static String getStepTextFromStep(@Nullable final StepNode stepNode) {
-        if (stepNode == null) {
-            return null;
+    public static String getVideoStepText(
+            @NotNull VideoStepNodeHelper videoStepNode,
+            int quality) {
+        videoStepNode.setQuality(quality);
+        String text = getLink(videoStepNode.getStepNode(), VIDEO_LINK_TEXT);
+        if (videoStepNode.hasContent()) {
+            return text + "<br>" + String.format(VIDEO_BLOCK, videoStepNode.getUrl());
         }
-        return getTextWithStepLink(stepNode);
+
+        return text;
     }
 
-    @NotNull
-    private static String getTextWithStepLink(StepNode stepNode) {
-        StringBuilder stringBuilder = new StringBuilder();
+    public static String getTextStepText(@NotNull StepNode stepNode) {
+        return getStepText(stepNode, STEP_LINK_TEXT);
+    }
 
-        StudyNode lessonNode = stepNode.getParent();
-        if (lessonNode != null) {
-            stringBuilder.append("<a href=\"https://stepik.org/lesson/")
-                    .append(lessonNode.getId())
-                    .append("/step/")
-                    .append(stepNode.getPosition())
-                    .append("\">View step on Stepik.org</a>");
-        }
+    private static String getStepText(@NotNull StepNode stepNode, @NotNull String linkText, Object... params) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(getLink(stepNode, String.format(linkText, params)));
 
         if (!stepNode.getText().startsWith("<p>") && !stepNode.getText().startsWith("<h")) {
             stringBuilder.append("<br><br>");
@@ -99,32 +102,51 @@ public class StudyUtils {
 
         stringBuilder.append(stepNode.getText());
 
-        if (stepNode.getType() == StepType.CODE) {
-            List<Sample> samples = stepNode.getSamples();
+        return stringBuilder.toString();
+    }
 
-            for (int i = 1; i <= samples.size(); i++) {
-                Sample sample = samples.get(i - 1);
-                stringBuilder.append("<p><b>Sample Input ")
-                        .append(i)
-                        .append(":</b><br>")
-                        .append(sample.getInput().replaceAll("\\n", "<br>"))
-                        .append("<br>")
-                        .append("<b>Sample Output ")
-                        .append(i)
-                        .append(":</b><br>")
-                        .append(sample.getOutput().replaceAll("\\n", "<br>"))
-                        .append("<br>");
-            }
+    public static String getUnknownStepText(@NotNull StepNode stepNode) {
+        Step data = stepNode.getData();
+        String stepType = data != null ? data.getBlock().getName() : stepNode.getType().toString();
+        return getStepText(stepNode, UNKNOWN_STEP_TEXT, stepType);
+    }
 
-            Limit limit = stepNode.getLimit();
-            stringBuilder.append("<p><b>Limits: </b>")
-                    .append(limit.getTime())
-                    .append("s; ")
-                    .append(limit.getMemory())
-                    .append("Mib</p>");
+    public static String getCodeStepText(@NotNull StepNode stepNode) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(getTextStepText(stepNode));
+
+        List<Sample> samples = stepNode.getSamples();
+
+        for (int i = 1; i <= samples.size(); i++) {
+            Sample sample = samples.get(i - 1);
+            stringBuilder.append("<p><b>Sample Input ")
+                    .append(i)
+                    .append(":</b><br>")
+                    .append(sample.getInput().replaceAll("\\n", "<br>"))
+                    .append("<br>")
+                    .append("<b>Sample Output ")
+                    .append(i)
+                    .append(":</b><br>")
+                    .append(sample.getOutput().replaceAll("\\n", "<br>"))
+                    .append("<br>");
         }
 
+        Limit limit = stepNode.getLimit();
+        stringBuilder.append("<p><b>Limits: </b>")
+                .append(limit.getTime())
+                .append("s; ")
+                .append(limit.getMemory())
+                .append("Mib</p>");
+
         return stringBuilder.toString();
+    }
+
+    private static String getLink(@NotNull StepNode stepNode, @NotNull String text) {
+        StudyNode lessonNode = stepNode.getParent();
+        if (lessonNode != null) {
+            return String.format(STEP_LINK_TEMPLATE, lessonNode.getId(), stepNode.getId(), text);
+        }
+        return text;
     }
 
     @Nullable

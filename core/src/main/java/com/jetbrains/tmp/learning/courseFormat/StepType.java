@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
  * @author meanmail
  */
 public enum StepType {
-    UNKNOWN, CODE;
+    UNKNOWN, CODE, TEXT, VIDEO;
 
     @NotNull
     public static StepType of(String name) {
@@ -15,5 +15,10 @@ public enum StepType {
         } catch (IllegalArgumentException e) {
             return UNKNOWN;
         }
+    }
+
+    @Override
+    public String toString() {
+        return name().toLowerCase();
     }
 }

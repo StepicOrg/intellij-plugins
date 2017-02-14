@@ -55,8 +55,11 @@ public class BlockView {
         this.text = text;
     }
 
-    @Nullable
+    @NotNull
     public Video getVideo() {
+        if (video == null) {
+            video = new Video();
+        }
         return video;
     }
 

@@ -35,10 +35,6 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
 
     public StepNode() {}
 
-    public StepNode(@NotNull final LessonNode parent, @NotNull Step data) {
-        super(parent, data);
-    }
-
     public StepNode(@NotNull Step data, @Nullable ProgressIndicator indicator) {
         super(data, indicator);
     }
@@ -300,5 +296,10 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
         result = 31 * result + (currentLang != null ? currentLang.hashCode() : 0);
         result = 31 * result + super.hashCode();
         return result;
+    }
+
+    @NotNull
+    public VideoStepNodeHelper asVideoStep() {
+        return new VideoStepNodeHelper(this);
     }
 }
