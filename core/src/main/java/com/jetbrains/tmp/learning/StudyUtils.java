@@ -10,6 +10,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFileSystemItem;
 import com.intellij.ui.content.Content;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
+import com.jetbrains.tmp.learning.courseFormat.StepType;
 import com.jetbrains.tmp.learning.courseFormat.StudyNode;
 import com.jetbrains.tmp.learning.ui.StudyToolWindow;
 import com.jetbrains.tmp.learning.ui.StudyToolWindowFactory;
@@ -98,28 +99,30 @@ public class StudyUtils {
 
         stringBuilder.append(stepNode.getText());
 
-        List<Sample> samples = stepNode.getSamples();
+        if (stepNode.getType() == StepType.CODE) {
+            List<Sample> samples = stepNode.getSamples();
 
-        for (int i = 1; i <= samples.size(); i++) {
-            Sample sample = samples.get(i - 1);
-            stringBuilder.append("<p><b>Sample Input ")
-                    .append(i)
-                    .append(":</b><br>")
-                    .append(sample.getInput().replaceAll("\\n", "<br>"))
-                    .append("<br>")
-                    .append("<b>Sample Output ")
-                    .append(i)
-                    .append(":</b><br>")
-                    .append(sample.getOutput().replaceAll("\\n", "<br>"))
-                    .append("<br>");
+            for (int i = 1; i <= samples.size(); i++) {
+                Sample sample = samples.get(i - 1);
+                stringBuilder.append("<p><b>Sample Input ")
+                        .append(i)
+                        .append(":</b><br>")
+                        .append(sample.getInput().replaceAll("\\n", "<br>"))
+                        .append("<br>")
+                        .append("<b>Sample Output ")
+                        .append(i)
+                        .append(":</b><br>")
+                        .append(sample.getOutput().replaceAll("\\n", "<br>"))
+                        .append("<br>");
+            }
+
+            Limit limit = stepNode.getLimit();
+            stringBuilder.append("<p><b>Limits: </b>")
+                    .append(limit.getTime())
+                    .append("s; ")
+                    .append(limit.getMemory())
+                    .append("Mib</p>");
         }
-
-        Limit limit = stepNode.getLimit();
-        stringBuilder.append("<p><b>Limits: </b>")
-                .append(limit.getTime())
-                .append("s; ")
-                .append(limit.getMemory())
-                .append("Mib</p>");
 
         return stringBuilder.toString();
     }
