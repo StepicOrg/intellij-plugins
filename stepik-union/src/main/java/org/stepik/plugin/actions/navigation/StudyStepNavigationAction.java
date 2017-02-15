@@ -126,7 +126,7 @@ abstract class StudyStepNavigationAction extends StudyActionWithShortcut {
             return;
         }
 
-        StudyNode stepNode = StudyUtils.getSelectedNode(project);
+        StudyNode stepNode = StudyUtils.getSelectedNodeInTree(project);
         presentation.setEnabled(stepNode == null || getTargetStep(stepNode) != null);
     }
 }

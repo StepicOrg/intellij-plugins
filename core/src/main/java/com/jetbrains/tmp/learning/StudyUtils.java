@@ -3,6 +3,7 @@ package com.jetbrains.tmp.learning;
 import com.intellij.ide.projectView.ProjectView;
 import com.intellij.ide.projectView.ProjectViewNode;
 import com.intellij.ide.projectView.impl.AbstractProjectViewPane;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -77,6 +78,13 @@ public class StudyUtils {
             }
         }
         return null;
+    }
+
+    public static void setStudyNode(@NotNull final Project project, @Nullable StudyNode studyNode) {
+        StudyToolWindow toolWindow = getStudyToolWindow(project);
+        if (toolWindow != null) {
+            ApplicationManager.getApplication().invokeLater(() -> toolWindow.setStepNode(studyNode));
+        }
     }
 
     public static String getVideoStepText(
@@ -187,12 +195,7 @@ public class StudyUtils {
     }
 
     @Nullable
-    public static StudyNode getSelectedNode(@NotNull Project project) {
-        StepNode stepNode = getSelectedStep(project);
-        if (stepNode != null) {
-            return stepNode;
-        }
-
+    public static StudyNode getSelectedNodeInTree(@NotNull Project project) {
         PsiElement element = getSelectedPsiElement(project);
         if (element == null) {
             return null;
