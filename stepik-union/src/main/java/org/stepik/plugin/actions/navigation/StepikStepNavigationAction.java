@@ -60,13 +60,19 @@ abstract class StepikStepNavigationAction extends StudyStepNavigationAction {
 
             mainFile = srcDir.findChild(stepNode.getCurrentLang().getMainFileName());
             if (mainFile == null) {
-                mainFile = srcDir;
+                if (srcDir.getChildren().length > 0) {
+                    mainFile = srcDir;
+                } else {
+                    mainFile = srcDir.getParent();
+                }
             }
         } else {
             mainFile = projectDir.findFileByRelativePath(targetNode.getPath());
         }
 
-        updateProjectView(project, mainFile);
+        if (mainFile != null) {
+            updateProjectView(project, mainFile);
+        }
         Metrics.navigateAction(project, targetNode, SUCCESSFUL);
 
         StudyToolWindow toolWindow = StudyUtils.getStudyToolWindow(project);

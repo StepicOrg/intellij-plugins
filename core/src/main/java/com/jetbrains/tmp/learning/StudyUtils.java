@@ -1,6 +1,8 @@
 package com.jetbrains.tmp.learning;
 
 import com.intellij.ide.projectView.ProjectView;
+import com.intellij.ide.projectView.ProjectViewNode;
+import com.intellij.ide.projectView.impl.AbstractProjectViewPane;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -22,6 +24,7 @@ import org.stepik.api.objects.steps.Step;
 import org.stepik.core.utils.ProjectFilesUtils;
 
 import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -190,18 +193,17 @@ public class StudyUtils {
             return stepNode;
         }
 
-        PsiElement node = ProjectView.getInstance(project)
-                .getParentOfCurrentSelection();
-        if (node == null) {
+        PsiElement element = getSelectedPsiElement(project);
+        if (element == null) {
             return null;
         }
 
         PsiFileSystemItem file;
 
-        if (node instanceof PsiFileSystemItem) {
-            file = (PsiFileSystemItem) node;
+        if (element instanceof PsiFileSystemItem) {
+            file = (PsiFileSystemItem) element;
         } else {
-            file = node.getContainingFile();
+            file = element.getContainingFile();
         }
 
         if (file == null) {
@@ -209,6 +211,32 @@ public class StudyUtils {
         }
 
         return getStudyNode(project, file.getVirtualFile());
+    }
+
+    private static PsiElement getSelectedPsiElement(@NotNull Project project) {
+        ProjectView projectView = ProjectView.getInstance(project);
+        AbstractProjectViewPane currentProjectViewPane = projectView.getCurrentProjectViewPane();
+        if (currentProjectViewPane == null) {
+            return null;
+        }
+        DefaultMutableTreeNode node = currentProjectViewPane.getSelectedNode();
+        if (node == null) {
+            return null;
+        }
+
+        Object userObject = node.getUserObject();
+        if (userObject instanceof ProjectViewNode) {
+            ProjectViewNode descriptor = (ProjectViewNode) userObject;
+            Object element = descriptor.getValue();
+            if (element instanceof PsiElement) {
+                PsiElement psiElement = (PsiElement) element;
+                return !psiElement.isValid() ? null : psiElement;
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
     }
 
     public static boolean hasJavaFx() {
