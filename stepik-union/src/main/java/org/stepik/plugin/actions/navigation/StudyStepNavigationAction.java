@@ -34,48 +34,56 @@ abstract class StudyStepNavigationAction extends StudyActionWithShortcut {
     }
 
     static void updateProjectView(@NotNull Project project, @NotNull VirtualFile shouldBeActive) {
-        JTree tree = ProjectView.getInstance(project).getCurrentProjectViewPane().getTree();
-        ProjectView.getInstance(project).selectCB(shouldBeActive, shouldBeActive, false).doWhenDone(() -> {
-            PsiFileSystemItem file;
-            if (shouldBeActive.isDirectory()) {
-                file = PsiManager.getInstance(project).findDirectory(shouldBeActive);
-            } else {
-                file = PsiManager.getInstance(project).findFile(shouldBeActive);
-                FileEditorManager.getInstance(project).openFile(shouldBeActive, false);
-                if (file != null) {
-                    file = file.getParent();
+        PsiFileSystemItem file;
+        if (shouldBeActive.isDirectory()) {
+            file = PsiManager.getInstance(project).findDirectory(shouldBeActive);
+        } else {
+            file = PsiManager.getInstance(project).findFile(shouldBeActive);
+            FileEditorManager.getInstance(project).openFile(shouldBeActive, false);
+            if (file != null) {
+                file = file.getParent();
+            }
+        }
+
+        if (file != null) {
+            if (file.canNavigate()) {
+                file.navigate(true);
+            }
+            collapseNonSelected(file);
+        }
+    }
+
+    private static void collapseNonSelected(@NotNull PsiFileSystemItem file) {
+        JTree tree = ProjectView.getInstance(file.getProject()).getCurrentProjectViewPane().getTree();
+        Set<TreePath> paths = new HashSet<>(TreeUtil.collectExpandedPaths(tree));
+        DefaultMutableTreeNode root = (DefaultMutableTreeNode) tree.getModel().getRoot();
+        DefaultMutableTreeNode selectionNode = findNodeWithObject(root, file);
+
+        if (selectionNode != null) {
+            List<TreePath> toCollapse = new ArrayList<>();
+            TreePath selectedPath = TreeUtil.getPathFromRoot(selectionNode);
+            for (TreePath treePath : paths) {
+                if (treePath.isDescendant(selectedPath)) {
+                    continue;
+                }
+                TreePath currPath = treePath;
+                TreePath parent = treePath.getParentPath();
+
+                while (parent != null) {
+                    if (parent.isDescendant(selectedPath)) {
+                        toCollapse.add(currPath);
+                        break;
+                    }
+                    currPath = parent;
+                    parent = parent.getParentPath();
                 }
             }
-            Set<TreePath> paths = new HashSet<>(TreeUtil.collectExpandedPaths(tree));
-            DefaultMutableTreeNode root = (DefaultMutableTreeNode) tree.getModel().getRoot();
-            DefaultMutableTreeNode selectionNode = findNodeWithObject(root, file);
 
-            if (selectionNode != null) {
-                List<TreePath> toCollapse = new ArrayList<>();
-                TreePath selectedPath = TreeUtil.getPathFromRoot(selectionNode);
-                for (TreePath treePath : paths) {
-                    if (treePath.isDescendant(selectedPath)) {
-                        continue;
-                    }
-                    TreePath currPath = treePath;
-                    TreePath parent = treePath.getParentPath();
-
-                    while (parent != null) {
-                        if (parent.isDescendant(selectedPath)) {
-                            toCollapse.add(currPath);
-                            break;
-                        }
-                        currPath = parent;
-                        parent = parent.getParentPath();
-                    }
-                }
-
-                for (TreePath path : toCollapse) {
-                    tree.collapsePath(path);
-                    tree.fireTreeCollapsed(path);
-                }
+            for (TreePath path : toCollapse) {
+                tree.collapsePath(path);
+                tree.fireTreeCollapsed(path);
             }
-        });
+        }
     }
 
     @Nullable
