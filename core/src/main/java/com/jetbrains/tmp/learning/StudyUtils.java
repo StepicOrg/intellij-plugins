@@ -195,6 +195,17 @@ public class StudyUtils {
     }
 
     @Nullable
+    public static StudyNode getSelectedNode(@NotNull Project project) {
+        StudyNode studyNode = getSelectedStep(project);
+
+        if (studyNode == null) {
+            studyNode = getSelectedNodeInTree(project);
+        }
+
+        return studyNode;
+    }
+
+    @Nullable
     public static StudyNode getSelectedNodeInTree(@NotNull Project project) {
         PsiElement element = getSelectedPsiElement(project);
         if (element == null) {
