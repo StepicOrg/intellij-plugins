@@ -146,6 +146,7 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
     }
 
     public void dispose() {
+        setStepNode(null);
     }
 
     public abstract JComponent createStepInfoPanel(Project project);

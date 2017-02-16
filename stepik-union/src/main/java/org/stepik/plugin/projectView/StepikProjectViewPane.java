@@ -5,6 +5,7 @@ import com.intellij.openapi.project.Project;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.courseFormat.StudyNode;
 import icons.AllStepikIcons;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -13,6 +14,9 @@ import javax.swing.*;
  * @author meanmail
  */
 public class StepikProjectViewPane extends ProjectViewPane {
+    @NonNls
+    public static final String ID = "StepikProjectPane";
+
     protected StepikProjectViewPane(@NotNull Project project) {
         super(project);
     }
