@@ -62,6 +62,6 @@
         <toolWindow id="Step Description" anchor="right" factoryClass="com.jetbrains.tmp.learning.ui.StudyToolWindowFactory" conditionClass="com.jetbrains.tmp.learning.ui.StudyCondition"/>
         <projectService serviceInterface="com.jetbrains.tmp.learning.StepikProjectManager" serviceImplementation="com.jetbrains.tmp.learning.StepikProjectManager"/>
         <applicationService serviceImplementation="com.jetbrains.tmp.learning.stepik.StepikUpdateSettings"/>
-        <projectViewPane implementation="org.stepik.plugin.projectView.StepikProjectViewPane" order="FIRST" id="StepikProjectPane"/>
+        <projectViewPane implementation="org.stepik.plugin.projectView.StepikProjectViewPane" order="FIRST" id="ProjectPane"/>
     </extensions>
 </idea-plugin>

@@ -13,8 +13,6 @@ import javax.swing.*;
  * @author meanmail
  */
 public class StepikProjectViewPane extends ProjectViewPane {
-    public static final String ID = "StepikProjectPane";
-
     protected StepikProjectViewPane(@NotNull Project project) {
         super(project);
     }
