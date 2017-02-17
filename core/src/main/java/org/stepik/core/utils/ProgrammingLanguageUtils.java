@@ -75,13 +75,13 @@ public class ProgrammingLanguageUtils {
             first = src.findFile(currentLang.getMainFileName());
         }
 
-        exchangeFiles(src, hide, first, second, moveFirst, moveSecond);
-
         targetStepNode.setCurrentLang(language);
         ArrayList<VirtualFile> needClose = closeStepNodeFile(project, targetStepNode);
         FileEditorManager.getInstance(project).openFile(second.getVirtualFile(), true);
         FileEditorManager editorManager = FileEditorManager.getInstance(project);
         needClose.forEach(editorManager::closeFile);
+
+        exchangeFiles(src, hide, first, second, moveFirst, moveSecond);
 
         Metrics.switchLanguage(project, targetStepNode, SUCCESSFUL);
     }
