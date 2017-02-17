@@ -27,6 +27,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static com.intellij.util.ui.tree.TreeUtil.getPathFromRoot;
+
 
 abstract class StudyStepNavigationAction extends StudyActionWithShortcut {
     StudyStepNavigationAction(@Nullable String text, @Nullable String description, @Nullable Icon icon) {
@@ -61,7 +63,7 @@ abstract class StudyStepNavigationAction extends StudyActionWithShortcut {
 
         if (selectionNode != null) {
             List<TreePath> toCollapse = new ArrayList<>();
-            TreePath selectedPath = TreeUtil.getPathFromRoot(selectionNode);
+            TreePath selectedPath = getPathFromRoot(selectionNode);
             for (TreePath treePath : paths) {
                 if (treePath.isDescendant(selectedPath)) {
                     continue;

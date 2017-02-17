@@ -22,7 +22,6 @@ import com.intellij.openapi.ui.popup.PopupChooserBuilder;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.SupportedLanguages;
-import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.courseFormat.StudyNode;
 import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
@@ -36,6 +35,7 @@ import org.stepik.api.objects.submissions.Submission;
 import org.stepik.api.objects.submissions.Submissions;
 import org.stepik.api.queries.Order;
 import org.stepik.core.metrics.Metrics;
+import org.stepik.core.utils.ProjectFilesUtils;
 import org.stepik.core.utils.Utils;
 
 import javax.swing.*;
@@ -197,8 +197,13 @@ public class DownloadSubmission extends AbstractStepAction {
 
         String fileName = stepNode.getCurrentLang().getMainFileName();
 
-        String mainFilePath = String.join("/", stepNode.getPath(), EduNames.SRC, fileName);
-        VirtualFile mainFile = project.getBaseDir().findFileByRelativePath(mainFilePath);
+        VirtualFile src = ProjectFilesUtils.getOrCreateSrcDirectory(project, stepNode);
+        if (src == null) {
+            Metrics.downloadAction(project, stepNode, TARGET_NOT_FOUND);
+            return;
+        }
+
+        VirtualFile mainFile = src.findChild(fileName);
         if (mainFile == null) {
             Metrics.downloadAction(project, stepNode, TARGET_NOT_FOUND);
             return;
