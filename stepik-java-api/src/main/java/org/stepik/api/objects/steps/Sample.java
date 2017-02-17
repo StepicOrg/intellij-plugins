@@ -1,46 +1,52 @@
 package org.stepik.api.objects.steps;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+
 /**
  * @author meanmail
  */
-public class Sample {
-    private String input;
-    private String output;
-
+public class Sample extends ArrayList<String> {
+    @NotNull
     public String getInput() {
-        return input;
+        if (size() == 0) {
+            setInput("");
+        }
+        return get(0);
     }
 
-    public void setInput(String input) {
-        this.input = input;
+    public void setInput(@Nullable String input) {
+        if (input == null) {
+            input = "";
+        }
+        if (size() == 0) {
+            add(input);
+        } else {
+            set(0, input);
+        }
     }
 
+    @NotNull
     public String getOutput() {
-        return output;
+        if (size() < 2) {
+            setOutput("");
+        }
+        return get(1);
     }
 
-    public void setOutput(String output) {
-        this.output = output;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-
-        Sample strings = (Sample) o;
-
-        //noinspection SimplifiableIfStatement
-        if (input != null ? !input.equals(strings.input) : strings.input != null) return false;
-        return output != null ? output.equals(strings.output) : strings.output == null;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + (input != null ? input.hashCode() : 0);
-        result = 31 * result + (output != null ? output.hashCode() : 0);
-        return result;
+    public void setOutput(@Nullable String output) {
+        if (output == null) {
+            output = "";
+        }
+        if (size() == 0) {
+            setInput("");
+            add(output);
+        } else if (size() == 1) {
+            add(output);
+        } else {
+            set(1, output);
+        }
     }
 }

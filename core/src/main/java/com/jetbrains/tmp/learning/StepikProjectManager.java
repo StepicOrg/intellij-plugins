@@ -22,6 +22,7 @@ import com.jetbrains.tmp.learning.courseFormat.LessonNode;
 import com.jetbrains.tmp.learning.courseFormat.SectionNode;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.courseFormat.StudyNode;
+import com.jetbrains.tmp.learning.serialization.SampleConverter;
 import com.jetbrains.tmp.learning.serialization.StudySerializationUtils;
 import com.jetbrains.tmp.learning.serialization.StudyUnrecognizedFormatException;
 import com.jetbrains.tmp.learning.serialization.SupportedLanguagesConverter;
@@ -142,6 +143,7 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
             xStream.autodetectAnnotations(true);
             xStream.setClassLoader(StepikProjectManager.class.getClassLoader());
             xStream.registerConverter(new SupportedLanguagesConverter());
+            xStream.registerConverter(new SampleConverter());
             xStream.ignoreUnknownElements();
             xStream.setMode(XStream.ID_REFERENCES);
         }
