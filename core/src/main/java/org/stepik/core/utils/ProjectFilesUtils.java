@@ -120,11 +120,11 @@ public class ProjectFilesUtils {
     }
 
     @Nullable
-    public static VirtualFile getOrCreateSrcDirectory(@NotNull Project project,@NotNull StepNode stepNode) {
+    public static VirtualFile getOrCreateSrcDirectory(@NotNull Project project, @NotNull StepNode stepNode) {
         VirtualFile baseDir = project.getBaseDir();
         String srcPath = stepNode.getPath() + "/" + EduNames.SRC;
         VirtualFile srcDirectory = baseDir.findFileByRelativePath(srcPath);
-        if (srcDirectory == null) {
+        if (srcDirectory == null && !stepNode.getWasDeleted()) {
             srcDirectory = getOrCreateDirectory(baseDir, srcPath);
             if (srcDirectory != null && PluginUtils.isCurrent(IDEA)) {
                 ModifiableModuleModel model = ModuleManager.getInstance(project).getModifiableModel();

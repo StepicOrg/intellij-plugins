@@ -39,7 +39,7 @@ public class PresentationDataUtils {
 
         String path = getRelativePath(psiDirectory);
         if (isSandbox(path)) {
-            setAttributes(data, EduNames.SANDBOX_DIR, JBColor.BLACK, AllStepikIcons.ProjectTree.sandbox);
+            setAttributes(data, EduNames.SANDBOX_DIR, JBColor.BLACK, AllStepikIcons.ProjectTree.sandbox, false);
             return;
         }
 
@@ -58,12 +58,21 @@ public class PresentationDataUtils {
         StudyStatus status = item.getStatus();
         JBColor color = getColor(status);
         Icon icon = getIcon(item.getClass(), status);
-        setAttributes(data, text, color, icon);
+        setAttributes(data, text, color, icon, item.getWasDeleted());
     }
 
-    private static void setAttributes(@NotNull PresentationData data, String text, JBColor color, Icon icon) {
+    private static void setAttributes(
+            @NotNull PresentationData data,
+            String text,
+            JBColor color,
+            Icon icon,
+            boolean deleted) {
         data.clearText();
-        data.addText(text, new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, color));
+        int textStyle = SimpleTextAttributes.STYLE_PLAIN;
+        if (deleted) {
+            textStyle |= SimpleTextAttributes.STYLE_STRIKEOUT;
+        }
+        data.addText(text, new SimpleTextAttributes(textStyle, color));
         data.setIcon(icon);
         data.setPresentableText(text);
     }
