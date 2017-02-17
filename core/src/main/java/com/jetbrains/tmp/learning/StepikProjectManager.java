@@ -33,6 +33,7 @@ import org.stepik.api.objects.steps.Limit;
 import org.stepik.api.objects.steps.Sample;
 import org.stepik.api.objects.steps.Step;
 import org.stepik.api.objects.steps.VideoUrl;
+import org.stepik.core.utils.ProjectFilesUtils;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -222,7 +223,18 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
                             .getProgressIndicator();
                     indicator.setIndeterminate(true);
                     root.reloadData(indicator);
+
+                    repairProjectFiles(root);
                 }, "Refreshing Course", true, project);
+    }
+
+    private void repairProjectFiles(StudyNode<?, ?> node) {
+        if (project != null) {
+            if (node instanceof StepNode) {
+                ProjectFilesUtils.getOrCreateSrcDirectory(project, (StepNode) node);
+            }
+            node.getChildren().forEach(this::repairProjectFiles);
+        }
     }
 
     @NotNull
