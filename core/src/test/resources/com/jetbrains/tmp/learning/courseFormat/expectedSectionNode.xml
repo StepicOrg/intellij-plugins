@@ -36,7 +36,9 @@
           <abuseCount>0</abuseCount>
         </lesson>
       </data>
+      <wasDeleted>false</wasDeleted>
       <courseId>0</courseId>
     </LessonNode>
   </children>
+  <wasDeleted>false</wasDeleted>
 </SectionNode>

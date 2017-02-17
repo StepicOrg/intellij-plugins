@@ -30,6 +30,7 @@
             </data>
             <children id="10">
               <StepNode id="11">
+                <wasDeleted>false</wasDeleted>
                 <supportedLanguages id="12">
                   <string>Java 8</string>
                   <string>Python 3</string>
@@ -38,11 +39,14 @@
                 <courseId>0</courseId>
               </StepNode>
             </children>
+            <wasDeleted>false</wasDeleted>
             <courseId>0</courseId>
           </LessonNode>
         </children>
+        <wasDeleted>false</wasDeleted>
       </SectionNode>
     </children>
+    <wasDeleted>false</wasDeleted>
   </root>
   <showHint>false</showHint>
   <createdBy>0</createdBy>
