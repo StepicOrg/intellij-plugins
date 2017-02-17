@@ -14,13 +14,13 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
-import static org.stepik.plugin.projectWizard.ProjectWizardUtils.createStepDirectory;
+import static org.stepik.core.projectWizard.ProjectWizardUtils.createStepDirectory;
 
-class StepModuleBuilder extends ModuleBuilderWithSrc {
+public class StepModuleBuilder extends ModuleBuilderWithSrc {
     private final StepNode stepNode;
     private final Project project;
 
-    StepModuleBuilder(String moduleDir, @NotNull StepNode stepNode, @NotNull Project project) {
+    public StepModuleBuilder(String moduleDir, @NotNull StepNode stepNode, @NotNull Project project) {
         this.stepNode = stepNode;
         this.project = project;
         String stepName = stepNode.getDirectory();

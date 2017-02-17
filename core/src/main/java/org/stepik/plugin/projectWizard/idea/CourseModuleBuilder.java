@@ -24,7 +24,8 @@ import org.stepik.plugin.projectWizard.StepikProjectGenerator;
 
 import java.io.IOException;
 
-import static org.stepik.plugin.projectWizard.ProjectWizardUtils.createSubDirectories;
+import static org.stepik.core.projectWizard.ProjectWizardUtils.createSubDirectories;
+import static org.stepik.core.utils.ModuleUtils.createStepModule;
 
 public class CourseModuleBuilder extends AbstractModuleBuilder {
     private static final Logger logger = Logger.getInstance(CourseModuleBuilder.class);
@@ -73,22 +74,6 @@ public class CourseModuleBuilder extends AbstractModuleBuilder {
                         () -> ApplicationManager.getApplication().runWriteAction(
                                 () -> StudyProjectComponent.getInstance(project)
                                         .registerStudyToolWindow())));
-    }
-
-    private void createStepModule(
-            @NotNull Project project,
-            @NotNull StepNode step,
-            @NotNull ModifiableModuleModel moduleModel) {
-        StudyNode lesson = step.getParent();
-        if (lesson != null) {
-            String moduleDir = String.join("/", project.getBasePath(), lesson.getPath());
-            StepModuleBuilder stepModuleBuilder = new StepModuleBuilder(moduleDir, step, project);
-            try {
-                stepModuleBuilder.createModule(moduleModel);
-            } catch (IOException | ModuleWithNameAlreadyExists | JDOMException | ConfigurationException e) {
-                logger.warn("Cannot create step: " + step.getDirectory(), e);
-            }
-        }
     }
 
     @Override
