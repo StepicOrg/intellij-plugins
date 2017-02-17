@@ -1,6 +1,7 @@
 package com.jetbrains.tmp.learning;
 
 import com.google.gson.internal.LinkedTreeMap;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
@@ -223,12 +224,11 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
                             .getProgressIndicator();
                     indicator.setIndeterminate(true);
                     root.reloadData(indicator);
-
-                    repairProjectFiles(root);
                 }, "Refreshing Course", true, project);
+        ApplicationManager.getApplication().invokeLater(() -> repairProjectFiles(root));
     }
 
-    private void repairProjectFiles(StudyNode<?, ?> node) {
+    private void repairProjectFiles(@NotNull StudyNode<?, ?> node) {
         if (project != null) {
             if (node instanceof StepNode) {
                 ProjectFilesUtils.getOrCreateSrcDirectory(project, (StepNode) node);
