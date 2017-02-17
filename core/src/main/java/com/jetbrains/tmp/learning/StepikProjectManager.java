@@ -26,6 +26,7 @@ import com.jetbrains.tmp.learning.serialization.StudySerializationUtils;
 import com.jetbrains.tmp.learning.serialization.StudyUnrecognizedFormatException;
 import com.jetbrains.tmp.learning.serialization.SupportedLanguagesConverter;
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.XStreamException;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import org.jdom.Element;
@@ -41,6 +42,7 @@ import org.stepik.api.objects.steps.Limit;
 import org.stepik.api.objects.steps.Sample;
 import org.stepik.api.objects.steps.Step;
 import org.stepik.api.objects.steps.VideoUrl;
+import org.stepik.api.objects.users.User;
 import org.stepik.core.utils.ProjectFilesUtils;
 import org.stepik.plugin.projectWizard.idea.SandboxModuleBuilder;
 import org.w3c.dom.Document;
@@ -136,6 +138,7 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
             xStream.alias("Section", Section.class);
             xStream.alias("CompoundUnitLesson", CompoundUnitLesson.class);
             xStream.alias("Step", Step.class);
+            xStream.alias("User", User.class);
             xStream.autodetectAnnotations(true);
             xStream.setClassLoader(StepikProjectManager.class.getClassLoader());
             xStream.registerConverter(new SupportedLanguagesConverter());
@@ -216,7 +219,7 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
             this.version = CURRENT_VERSION;
             refreshCourse();
             logger.info("The StepikProjectManager state loaded");
-        } catch (StudyUnrecognizedFormatException e) {
+        } catch (XStreamException | StudyUnrecognizedFormatException e) {
             logger.warn("Failed deserialization StepikProjectManager \n" + e.getMessage() + "\n" + project);
         }
     }
