@@ -155,7 +155,7 @@ public class StudyUtils {
     private static String getLink(@NotNull StepNode stepNode, @NotNull String text) {
         StudyNode lessonNode = stepNode.getParent();
         if (lessonNode != null) {
-            return String.format(STEP_LINK_TEMPLATE, lessonNode.getId(), stepNode.getId(), text);
+            return String.format(STEP_LINK_TEMPLATE, lessonNode.getId(), stepNode.getPosition(), text);
         }
         return text;
     }
