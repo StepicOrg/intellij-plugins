@@ -10,7 +10,7 @@ class CLionPlugin extends BasePlugin {
     private static final PRODUCT_NAME = "CLion"
     private static final EXTENSION_NAME = "clion"
     private static final DEFAULT_REPO =
-            'http://download.jetbrains.com/cpp/CLion-[version].[archiveType]'
+            'https://download.jetbrains.com/cpp/CLion-[version].[archiveType]'
 
     CLionPlugin() {
         extensionName = EXTENSION_NAME
