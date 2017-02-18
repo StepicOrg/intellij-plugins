@@ -22,6 +22,8 @@ clion {
 
 dependencies {
     compile project(":stepik-java-api")
+    compile 'org.freemarker:freemarker:2.3.23'
+
 }
 
 group 'org.stepik'
