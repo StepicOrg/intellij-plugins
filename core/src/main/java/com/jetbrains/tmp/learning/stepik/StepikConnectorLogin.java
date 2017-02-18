@@ -30,6 +30,10 @@ public class StepikConnectorLogin {
         return PropertiesComponent.getInstance().getOrInitLong(LAST_USER_PROPERTY_NAME, 0);
     }
 
+    private static void setLastUser(long userId) {
+        PropertiesComponent.getInstance().setValue(LAST_USER_PROPERTY_NAME, String.valueOf(userId));
+    }
+
     @NotNull
     private static StepikApiClient initStepikApiClient() {
         HttpConfigurable instance = HttpConfigurable.getInstance();
@@ -162,7 +166,7 @@ public class StepikConnectorLogin {
         String serializedAuthInfo = stepikApiClient.getJsonConverter().toJson(authInfo);
         synchronized (StepikConnectorLogin.class) {
             PasswordSafe.getInstance().setPassword(attributes, serializedAuthInfo);
-            PropertiesComponent.getInstance().setValue(LAST_USER_PROPERTY_NAME, String.valueOf(userId));
+            setLastUser(userId);
         }
     }
 
@@ -242,7 +246,12 @@ public class StepikConnectorLogin {
     }
 
     public static void logout() {
-        stepikApiClient.setTokenInfo(null);
-        logger.info("Logout successfully");
+        synchronized (StepikConnectorLogin.class) {
+            stepikApiClient.setTokenInfo(null);
+            long userId = getLastUser();
+            setAuthInfo(userId, new AuthInfo());
+            setLastUser(0);
+            logger.info("Logout successfully");
+        }
     }
 }
