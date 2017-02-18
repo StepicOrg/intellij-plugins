@@ -240,4 +240,9 @@ public class StepikConnectorLogin {
         StepikConnectorLogin.authentication();
         return stepikApiClient;
     }
+
+    public static void logout() {
+        stepikApiClient.setTokenInfo(null);
+        logger.info("Logout successfully");
+    }
 }
