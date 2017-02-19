@@ -4,7 +4,7 @@ import com.intellij.facet.ui.ValidationResult;
 import com.intellij.openapi.project.Project;
 import com.jetbrains.tmp.learning.SupportedLanguages;
 import org.jetbrains.annotations.NotNull;
-import org.stepik.api.objects.courses.Course;
+import org.stepik.api.objects.StudyObject;
 import org.stepik.plugin.projectWizard.ui.ProjectSettingListener;
 import org.stepik.plugin.projectWizard.ui.ProjectSettingsPanel;
 
@@ -25,8 +25,8 @@ class PyCharmWizardStep implements ProjectSettingListener {
     }
 
     @NotNull
-    Course getSelectedCourse() {
-        return panel.getSelectedCourse();
+    StudyObject getSelectedStudyObject() {
+        return panel.getSelectedStudyObject();
     }
 
     @NotNull
@@ -36,12 +36,12 @@ class PyCharmWizardStep implements ProjectSettingListener {
 
     @NotNull
     ValidationResult check() {
-        Course selectedCourse = panel.getSelectedCourse();
+        StudyObject selectedStudyObject = panel.getSelectedStudyObject();
 
-        if (selectedCourse.isAdaptive()) {
+        if (selectedStudyObject.isAdaptive()) {
             return adaptiveCourse;
         }
-        if (selectedCourse.getId() == 0) {
+        if (selectedStudyObject.getId() == 0) {
             return invalidCourse;
         }
         return ValidationResult.OK;

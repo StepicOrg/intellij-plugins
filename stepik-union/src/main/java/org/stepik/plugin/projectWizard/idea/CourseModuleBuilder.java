@@ -17,10 +17,8 @@ import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.io.FileUtil;
 import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.StudyProjectComponent;
-import com.jetbrains.tmp.learning.courseFormat.CourseNode;
-import com.jetbrains.tmp.learning.courseFormat.LessonNode;
-import com.jetbrains.tmp.learning.courseFormat.SectionNode;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
+import com.jetbrains.tmp.learning.courseFormat.StudyNode;
 import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.plugin.projectWizard.StepikProjectGenerator;
@@ -58,19 +56,17 @@ class CourseModuleBuilder extends AbstractModuleBuilder {
         logger.info("Module dir = " + moduleDir);
         new SandboxModuleBuilder(moduleDir).createModule(moduleModel);
 
-        StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
-        if (projectManager == null) {
-            logger.info("Failed to generate builders: StepikProjectManager is null");
+        StudyNode root = StepikProjectManager.getProjectRoot(project);
+        if (root == null) {
+            logger.info("Failed to generate builders: project root is null");
             return;
         }
 
-        CourseNode courseNode = projectManager.getCourseNode();
-        if (courseNode == null) {
-            logger.info("Failed to generate builders: courseNode is null");
-            return;
+        if (root instanceof StepNode) {
+            createStepModule(project, (StepNode) root, moduleModel);
+        } else {
+            createSubDirectories(root, moduleModel, project);
         }
-
-        createSubDirectories(courseNode, moduleModel, project);
 
         ApplicationManager.getApplication().invokeLater(
                 () -> DumbService.allowStartingDumbModeInside(DumbModePermission.MAY_START_BACKGROUND,
@@ -80,24 +76,29 @@ class CourseModuleBuilder extends AbstractModuleBuilder {
     }
 
     private void createSubDirectories(
-            @NotNull CourseNode courseNode,
+            @NotNull StudyNode<?, ?> root,
             @NotNull ModifiableModuleModel moduleModel,
             @NotNull Project project) {
-        for (SectionNode sectionNode : courseNode.getSectionNodes()) {
-            FileUtil.createDirectory(new File(project.getBasePath(), sectionNode.getPath()));
-            for (LessonNode lessonNode : sectionNode.getLessonNodes()) {
-                FileUtil.createDirectory(new File(project.getBasePath(), lessonNode.getPath()));
-                for (StepNode stepNode : lessonNode.getStepNodes()) {
-                    StepModuleBuilder stepModuleBuilder = new StepModuleBuilder(
-                            project.getBasePath() + lessonNode.getPath(),
-                            stepNode,
-                            project);
-                    try {
-                        stepModuleBuilder.createModule(moduleModel);
-                    } catch (IOException | ModuleWithNameAlreadyExists | JDOMException | ConfigurationException e) {
-                        logger.warn("Cannot create step: " + stepNode.getDirectory(), e);
+        root.getChildren()
+                .forEach(child -> {
+                    FileUtil.createDirectory(new File(project.getBasePath(), child.getPath()));
+                    if (child instanceof StepNode) {
+                        createStepModule(project, (StepNode) child, moduleModel);
+                    } else {
+                        createSubDirectories(child, moduleModel, project);
                     }
-                }
+                });
+    }
+
+    private void createStepModule(@NotNull Project project, StepNode step, ModifiableModuleModel moduleModel) {
+        StudyNode lesson = step.getParent();
+        if (lesson != null) {
+            String moduleDir = String.join("/", project.getBasePath(), lesson.getPath());
+            StepModuleBuilder stepModuleBuilder = new StepModuleBuilder(moduleDir, step, project);
+            try {
+                stepModuleBuilder.createModule(moduleModel);
+            } catch (IOException | ModuleWithNameAlreadyExists | JDOMException | ConfigurationException e) {
+                logger.warn("Cannot create step: " + step.getDirectory(), e);
             }
         }
     }

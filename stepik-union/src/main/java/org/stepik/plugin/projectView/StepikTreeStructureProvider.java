@@ -8,7 +8,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.jetbrains.tmp.learning.StepikProjectManager;
-import com.jetbrains.tmp.learning.courseFormat.CourseNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -53,13 +52,7 @@ public abstract class StepikTreeStructureProvider implements TreeStructureProvid
     protected abstract boolean shouldAdd(@NotNull Object object);
 
     private boolean needModify(@NotNull final AbstractTreeNode parent) {
-        final Project project = parent.getProject();
-        if (project == null) {
-            return false;
-        }
-        final StepikProjectManager stepikProjectManager = StepikProjectManager.getInstance(project);
-        CourseNode courseNode = stepikProjectManager.getCourseNode();
-        return courseNode != null;
+        return StepikProjectManager.isStepikProject(parent.getProject());
     }
 
     @Nullable

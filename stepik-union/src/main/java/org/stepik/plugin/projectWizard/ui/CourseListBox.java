@@ -4,7 +4,7 @@ import com.intellij.openapi.project.Project;
 import com.jetbrains.tmp.learning.SupportedLanguages;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.stepik.api.objects.courses.Course;
+import org.stepik.api.objects.StudyObject;
 
 import javax.swing.*;
 import java.awt.event.ItemEvent;
@@ -12,7 +12,7 @@ import java.awt.event.ItemEvent;
 /**
  * @author meanmail
  */
-public class CourseListBox extends JComboBox<Course> {
+public class CourseListBox extends JComboBox<StudyObject> {
     private final CourseListModel courseListModel;
     private ProjectSetting target;
     private SupportedLanguages programmingLanguage = SupportedLanguages.INVALID;
@@ -42,7 +42,7 @@ public class CourseListBox extends JComboBox<Course> {
 
     @NotNull
     @Override
-    public Course getSelectedItem() {
+    public StudyObject getSelectedItem() {
         return courseListModel.getSelectedItem();
     }
 
@@ -51,7 +51,7 @@ public class CourseListBox extends JComboBox<Course> {
         super.fireItemStateChanged(e);
 
         if (target != null && e.getStateChange() == ItemEvent.SELECTED) {
-            target.selectedCourse((Course) e.getItem());
+            target.selectedStudyNode((StudyObject) e.getItem());
         }
     }
 }

@@ -3,7 +3,8 @@ package org.stepik.api.objects.lessons;
 import com.google.gson.annotations.SerializedName;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.stepik.api.objects.AbstractObject;
+import org.stepik.api.objects.StudyObject;
+import org.stepik.api.urls.Urls;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +13,7 @@ import java.util.Map;
 /**
  * @author meanmail
  */
-public class Lesson extends AbstractObject {
+public class Lesson extends StudyObject {
     private List<Long> steps;
     private Map<String, String> actions;
     private List<Integer> tags;
@@ -69,12 +70,117 @@ public class Lesson extends AbstractObject {
     private int abuseCount;
     private String vote;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        Lesson lesson = (Lesson) o;
+
+        if (isPrime != lesson.isPrime) return false;
+        if (viewedBy != lesson.viewedBy) return false;
+        if (passedBy != lesson.passedBy) return false;
+        if (timeToComplete != lesson.timeToComplete) return false;
+        if (isCommentsEnabled != lesson.isCommentsEnabled) return false;
+        if (owner != lesson.owner) return false;
+        if (isFeatured != lesson.isFeatured) return false;
+        if (isPublic != lesson.isPublic) return false;
+        if (discussionsCount != lesson.discussionsCount) return false;
+        if (epicCount != lesson.epicCount) return false;
+        if (abuseCount != lesson.abuseCount) return false;
+        if (steps != null ? !steps.equals(lesson.steps) : lesson.steps != null) return false;
+        if (actions != null ? !actions.equals(lesson.actions) : lesson.actions != null) return false;
+        if (tags != null ? !tags.equals(lesson.tags) : lesson.tags != null) return false;
+        if (requiredTags != null ? !requiredTags.equals(lesson.requiredTags) : lesson.requiredTags != null)
+            return false;
+        if (playlists != null ? !playlists.equals(lesson.playlists) : lesson.playlists != null) return false;
+        if (progress != null ? !progress.equals(lesson.progress) : lesson.progress != null) return false;
+        if (subscriptions != null ? !subscriptions.equals(lesson.subscriptions) : lesson.subscriptions != null)
+            return false;
+        if (dependencies != null ? !dependencies.equals(lesson.dependencies) : lesson.dependencies != null)
+            return false;
+        if (followers != null ? !followers.equals(lesson.followers) : lesson.followers != null) return false;
+        if (coverUrl != null ? !coverUrl.equals(lesson.coverUrl) : lesson.coverUrl != null) return false;
+        if (language != null ? !language.equals(lesson.language) : lesson.language != null) return false;
+        if (title != null ? !title.equals(lesson.title) : lesson.title != null) return false;
+        if (slug != null ? !slug.equals(lesson.slug) : lesson.slug != null) return false;
+        if (createDate != null ? !createDate.equals(lesson.createDate) : lesson.createDate != null) return false;
+        if (updateDate != null ? !updateDate.equals(lesson.updateDate) : lesson.updateDate != null) return false;
+        if (learnersGroup != null ? !learnersGroup.equals(lesson.learnersGroup) : lesson.learnersGroup != null)
+            return false;
+        if (testersGroup != null ? !testersGroup.equals(lesson.testersGroup) : lesson.testersGroup != null)
+            return false;
+        if (moderatorsGroup != null ? !moderatorsGroup.equals(lesson.moderatorsGroup) : lesson.moderatorsGroup != null)
+            return false;
+        if (teachersGroup != null ? !teachersGroup.equals(lesson.teachersGroup) : lesson.teachersGroup != null)
+            return false;
+        if (adminsGroup != null ? !adminsGroup.equals(lesson.adminsGroup) : lesson.adminsGroup != null) return false;
+        if (discussionProxy != null ? !discussionProxy.equals(lesson.discussionProxy) : lesson.discussionProxy != null)
+            return false;
+        //noinspection SimplifiableIfStatement
+        if (discussionThreads != null ?
+                !discussionThreads.equals(lesson.discussionThreads) :
+                lesson.discussionThreads != null) return false;
+        return vote != null ? vote.equals(lesson.vote) : lesson.vote == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (steps != null ? steps.hashCode() : 0);
+        result = 31 * result + (actions != null ? actions.hashCode() : 0);
+        result = 31 * result + (tags != null ? tags.hashCode() : 0);
+        result = 31 * result + (requiredTags != null ? requiredTags.hashCode() : 0);
+        result = 31 * result + (playlists != null ? playlists.hashCode() : 0);
+        result = 31 * result + (isPrime ? 1 : 0);
+        result = 31 * result + (progress != null ? progress.hashCode() : 0);
+        result = 31 * result + (subscriptions != null ? subscriptions.hashCode() : 0);
+        result = 31 * result + viewedBy;
+        result = 31 * result + passedBy;
+        result = 31 * result + (dependencies != null ? dependencies.hashCode() : 0);
+        result = 31 * result + (followers != null ? followers.hashCode() : 0);
+        result = 31 * result + timeToComplete;
+        result = 31 * result + (coverUrl != null ? coverUrl.hashCode() : 0);
+        result = 31 * result + (isCommentsEnabled ? 1 : 0);
+        result = 31 * result + owner;
+        result = 31 * result + (language != null ? language.hashCode() : 0);
+        result = 31 * result + (isFeatured ? 1 : 0);
+        result = 31 * result + (isPublic ? 1 : 0);
+        result = 31 * result + (title != null ? title.hashCode() : 0);
+        result = 31 * result + (slug != null ? slug.hashCode() : 0);
+        result = 31 * result + (createDate != null ? createDate.hashCode() : 0);
+        result = 31 * result + (updateDate != null ? updateDate.hashCode() : 0);
+        result = 31 * result + (learnersGroup != null ? learnersGroup.hashCode() : 0);
+        result = 31 * result + (testersGroup != null ? testersGroup.hashCode() : 0);
+        result = 31 * result + (moderatorsGroup != null ? moderatorsGroup.hashCode() : 0);
+        result = 31 * result + (teachersGroup != null ? teachersGroup.hashCode() : 0);
+        result = 31 * result + (adminsGroup != null ? adminsGroup.hashCode() : 0);
+        result = 31 * result + discussionsCount;
+        result = 31 * result + (discussionProxy != null ? discussionProxy.hashCode() : 0);
+        result = 31 * result + (discussionThreads != null ? discussionThreads.hashCode() : 0);
+        result = 31 * result + epicCount;
+        result = 31 * result + abuseCount;
+        result = 31 * result + (vote != null ? vote.hashCode() : 0);
+        return result;
+    }
+
+    @NotNull
     public String getTitle() {
+        if (title == null) {
+            title = "";
+        }
         return title;
     }
 
-    public void setTitle(String title) {
+    public void setTitle(@Nullable String title) {
         this.title = title;
+    }
+
+    @NotNull
+    @Override
+    public String getDescription() {
+        return String.format("Lesson %s/lesson/%d", Urls.STEPIK_URL, getId());
     }
 
     @NotNull
@@ -385,5 +491,10 @@ public class Lesson extends AbstractObject {
 
     public void setVote(@Nullable String vote) {
         this.vote = vote;
+    }
+
+    @Override
+    public String toString() {
+        return getTitle();
     }
 }

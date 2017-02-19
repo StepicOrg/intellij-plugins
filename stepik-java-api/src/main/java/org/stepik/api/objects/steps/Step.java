@@ -3,7 +3,8 @@ package org.stepik.api.objects.steps;
 import com.google.gson.annotations.SerializedName;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.stepik.api.objects.AbstractObject;
+import org.stepik.api.objects.StudyObject;
+import org.stepik.api.urls.Urls;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,7 +14,7 @@ import java.util.Map;
 /**
  * @author meanmail
  */
-public class Step extends AbstractObject {
+public class Step extends StudyObject {
     private int lesson;
     private int position;
     private String status;
@@ -50,6 +51,76 @@ public class Step extends AbstractObject {
     private String discussionProxy;
     @SerializedName("discussion_threads")
     private List<String> discussionThreads;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        Step step = (Step) o;
+
+        if (lesson != step.lesson) return false;
+        if (position != step.position) return false;
+        if (viewedBy != step.viewedBy) return false;
+        if (passedBy != step.passedBy) return false;
+        if (Double.compare(step.correctRatio, correctRatio) != 0) return false;
+        if (worth != step.worth) return false;
+        if (isSolutionsUnlocked != step.isSolutionsUnlocked) return false;
+        if (solutionsUnlockedAttempts != step.solutionsUnlockedAttempts) return false;
+        if (hasSubmissionsRestrictions != step.hasSubmissionsRestrictions) return false;
+        if (maxSubmissionsCount != step.maxSubmissionsCount) return false;
+        if (discussionsCount != step.discussionsCount) return false;
+        if (status != null ? !status.equals(step.status) : step.status != null) return false;
+        if (block != null ? !block.equals(step.block) : step.block != null) return false;
+        if (actions != null ? !actions.equals(step.actions) : step.actions != null) return false;
+        if (progress != null ? !progress.equals(step.progress) : step.progress != null) return false;
+        if (subscriptions != null ? !subscriptions.equals(step.subscriptions) : step.subscriptions != null)
+            return false;
+        if (instruction != null ? !instruction.equals(step.instruction) : step.instruction != null) return false;
+        if (session != null ? !session.equals(step.session) : step.session != null) return false;
+        if (instructionType != null ? !instructionType.equals(step.instructionType) : step.instructionType != null)
+            return false;
+        if (createDate != null ? !createDate.equals(step.createDate) : step.createDate != null) return false;
+        if (updateDate != null ? !updateDate.equals(step.updateDate) : step.updateDate != null) return false;
+        //noinspection SimplifiableIfStatement
+        if (discussionProxy != null ? !discussionProxy.equals(step.discussionProxy) : step.discussionProxy != null)
+            return false;
+        return discussionThreads != null ?
+                discussionThreads.equals(step.discussionThreads) :
+                step.discussionThreads == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        long temp;
+        result = 31 * result + lesson;
+        result = 31 * result + position;
+        result = 31 * result + (status != null ? status.hashCode() : 0);
+        result = 31 * result + (block != null ? block.hashCode() : 0);
+        result = 31 * result + (actions != null ? actions.hashCode() : 0);
+        result = 31 * result + (progress != null ? progress.hashCode() : 0);
+        result = 31 * result + (subscriptions != null ? subscriptions.hashCode() : 0);
+        result = 31 * result + (instruction != null ? instruction.hashCode() : 0);
+        result = 31 * result + (session != null ? session.hashCode() : 0);
+        result = 31 * result + (instructionType != null ? instructionType.hashCode() : 0);
+        result = 31 * result + viewedBy;
+        result = 31 * result + passedBy;
+        temp = Double.doubleToLongBits(correctRatio);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        result = 31 * result + worth;
+        result = 31 * result + (isSolutionsUnlocked ? 1 : 0);
+        result = 31 * result + solutionsUnlockedAttempts;
+        result = 31 * result + (hasSubmissionsRestrictions ? 1 : 0);
+        result = 31 * result + maxSubmissionsCount;
+        result = 31 * result + (createDate != null ? createDate.hashCode() : 0);
+        result = 31 * result + (updateDate != null ? updateDate.hashCode() : 0);
+        result = 31 * result + discussionsCount;
+        result = 31 * result + (discussionProxy != null ? discussionProxy.hashCode() : 0);
+        result = 31 * result + (discussionThreads != null ? discussionThreads.hashCode() : 0);
+        return result;
+    }
 
     @NotNull
     public BlockView getBlock() {
@@ -260,5 +331,22 @@ public class Step extends AbstractObject {
 
     public void setDiscussionThreads(@Nullable List<String> discussionThreads) {
         this.discussionThreads = discussionThreads;
+    }
+
+    @NotNull
+    @Override
+    public String getTitle() {
+        return "step" + position;
+    }
+
+    @NotNull
+    @Override
+    public String getDescription() {
+        return String.format("%s in %s/lesson/%d", getTitle(), Urls.STEPIK_URL, getLesson());
+    }
+
+    @Override
+    public String toString() {
+        return getTitle();
     }
 }

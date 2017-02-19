@@ -21,19 +21,13 @@ import com.jetbrains.python.newProject.PythonProjectGenerator;
 import com.jetbrains.python.remote.PyProjectSynchronizer;
 import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.StudyProjectComponent;
-import com.jetbrains.tmp.learning.SupportedLanguages;
-import com.jetbrains.tmp.learning.courseFormat.CourseNode;
-import com.jetbrains.tmp.learning.courseFormat.LessonNode;
-import com.jetbrains.tmp.learning.courseFormat.SectionNode;
-import com.jetbrains.tmp.learning.courseFormat.StepFile;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
-import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
+import com.jetbrains.tmp.learning.courseFormat.StudyNode;
 import icons.AllStepikIcons;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.stepik.api.client.StepikApiClient;
-import org.stepik.api.objects.courses.Course;
+import org.stepik.api.objects.StudyObject;
 import org.stepik.plugin.projectWizard.ProjectWizardUtils;
 import org.stepik.plugin.projectWizard.StepikProjectGenerator;
 
@@ -43,6 +37,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+
+import static com.jetbrains.tmp.learning.SupportedLanguages.PYTHON3;
 
 
 class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettings> {
@@ -139,11 +135,10 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
     @Override
     public void fireStateChanged() {
         if (!keepLocation && getLocationField() != null) {
-            long id = wizardStep.getSelectedCourse().getId();
-            String projectName = "course" + id;
-            String projectDir = new File(getLocation()).getParent();
-            projectName = ProjectWizardUtils.findNonExistingFileName(projectDir, projectName);
-            setLocation(projectDir + "/" + projectName);
+            StudyObject studyObject = wizardStep.getSelectedStudyObject();
+            String projectDirectory = new File(getLocation()).getParent();
+            String projectName = ProjectWizardUtils.getProjectDefaultName(projectDirectory, studyObject);
+            setLocation(projectDirectory + "/" + projectName);
         }
 
         super.fireStateChanged();
@@ -159,17 +154,14 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
     @Override
     public BooleanFunction<PythonProjectGenerator> beforeProjectGenerated(@Nullable Sdk sdk) {
         return generator -> {
-            final Course course = wizardStep.getSelectedCourse();
-            if (course.getId() == 0) {
+            final StudyObject studyObject = wizardStep.getSelectedStudyObject();
+            if (studyObject.getId() == 0) {
                 return false;
             }
 
-            StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
-            stepikApiClient.enrollments()
-                    .post()
-                    .course(course.getId())
-                    .execute();
-            this.generator.createCourseNodeUnderProgress(project, course);
+            ProjectWizardUtils.enrollmentCourse(studyObject);
+
+            this.generator.createCourseNodeUnderProgress(project, studyObject);
             return true;
         };
     }
@@ -199,13 +191,17 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
             return;
         }
         projectManager.setDefaultLang(generator.getDefaultLang());
-        CourseNode courseNode = projectManager.getCourseNode();
-        if (courseNode == null) {
-            logger.warn("failed to generate builders: CourseNode is null");
+        StudyNode root = projectManager.getProjectRoot();
+        if (root == null) {
+            logger.warn("failed to generate builders: Root is null");
             return;
         }
 
-        createSubDirectories(courseNode, project);
+        if (root instanceof StepNode) {
+            createStepDirectory(project, (StepNode) root);
+        } else {
+            createSubDirectories(root, project);
+        }
 
         ApplicationManager.getApplication().invokeLater(
                 () -> DumbService.allowStartingDumbModeInside(DumbModePermission.MAY_START_BACKGROUND,
@@ -215,29 +211,31 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
     }
 
     private void createSubDirectories(
-            @NotNull CourseNode courseNode,
+            @NotNull StudyNode<?, ?> root,
             @NotNull Project project) {
-        for (SectionNode sectionNode : courseNode.getSectionNodes()) {
-            FileUtil.createDirectory(new File(project.getBasePath(), sectionNode.getPath()));
-            for (LessonNode lessonNode : sectionNode.getLessonNodes()) {
-                FileUtil.createDirectory(new File(project.getBasePath(), lessonNode.getPath()));
-                for (StepNode stepNode : lessonNode.getStepNodes()) {
-                    stepNode.setCurrentLang(SupportedLanguages.PYTHON3);
-                    File stepDir = new File(project.getBasePath(), stepNode.getPath());
-                    File srcDir = new File(stepDir, "src");
-                    FileUtil.createDirectory(stepDir);
-                    FileUtil.createDirectory(srcDir);
-
-                    try (BufferedWriter writer = new BufferedWriter(new FileWriter(new File(srcDir, "main.py")))) {
-                        StepFile stepFile = stepNode.getFile("main.py");
-                        if (stepFile != null) {
-                            writer.write(stepFile.getText());
-                        }
-                    } catch (IOException e) {
-                        logger.warn(e);
+        root.getChildren()
+                .forEach(child -> {
+                    FileUtil.createDirectory(new File(project.getBasePath(), child.getPath()));
+                    if (child instanceof StepNode) {
+                        createStepDirectory(project, (StepNode) child);
+                    } else {
+                        createSubDirectories(child, project);
                     }
-                }
-            }
+                });
+    }
+
+    private void createStepDirectory(@NotNull Project project, StepNode stepNode) {
+        stepNode.setCurrentLang(PYTHON3);
+        File stepDir = new File(project.getBasePath(), stepNode.getPath());
+        File srcDir = new File(stepDir, "src");
+        FileUtil.createDirectory(stepDir);
+        FileUtil.createDirectory(srcDir);
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(new File(srcDir, "main.py")))) {
+            String template = stepNode.getCurrentTemplate();
+            writer.write(template);
+        } catch (IOException e) {
+            logger.warn(e);
         }
     }
 }

@@ -1,9 +1,13 @@
 package com.jetbrains.tmp.learning.courseFormat;
 
+import com.intellij.openapi.progress.ProgressIndicator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.api.objects.StudyObject;
 
-public interface StudyNode {
+import java.util.List;
+
+public interface StudyNode<D extends StudyObject, C extends StudyNode> {
     @NotNull
     String getName();
 
@@ -21,5 +25,40 @@ public interface StudyNode {
     long getId();
 
     @Nullable
-    CourseNode getCourse();
+    StudyNode getParent();
+
+    void setParent(@Nullable StudyNode parent);
+
+    @Nullable
+    StudyNode getPrevChild(@Nullable StudyNode current);
+
+    @Nullable
+    StudyNode getNextChild(@Nullable StudyNode current);
+
+    boolean isLeaf();
+
+    long getCourseId();
+
+    @Nullable
+    C getChildById(long id);
+
+    List<C> getChildren();
+
+    @Nullable
+    D getData();
+
+    void setData(@Nullable D data);
+
+    void init(
+            @Nullable final StudyNode parent,
+            boolean isRestarted,
+            @Nullable ProgressIndicator indicator);
+
+    default void init(@Nullable ProgressIndicator indicator) {
+        init(null, false, indicator);
+    }
+
+    boolean canBeLeaf();
+
+    void reloadData(@NotNull ProgressIndicator indicator);
 }

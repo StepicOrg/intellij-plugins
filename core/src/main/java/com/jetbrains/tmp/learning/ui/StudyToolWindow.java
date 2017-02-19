@@ -21,6 +21,7 @@ import com.jetbrains.tmp.learning.StudyPluginConfigurator;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
+import com.jetbrains.tmp.learning.courseFormat.StudyNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.core.utils.ProgrammingLanguageUtils;
@@ -125,12 +126,16 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
 
     public abstract JComponent createStepInfoPanel(Project project);
 
-    public void setStepNode(@Nullable StepNode stepNode) {
-        if (this.stepNode == stepNode) {
+    public void setStepNode(@Nullable StudyNode studyNode) {
+        if (this.stepNode == studyNode) {
             return;
         }
 
-        this.stepNode = stepNode;
+        if (studyNode != null && !(studyNode instanceof StepNode)) {
+            return;
+        }
+
+        this.stepNode = (StepNode) studyNode;
         languageBox.removeAllItems();
         languageBox.setVisible(stepNode != null);
 

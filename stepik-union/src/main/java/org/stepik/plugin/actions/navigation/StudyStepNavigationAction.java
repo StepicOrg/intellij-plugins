@@ -10,9 +10,7 @@ import com.intellij.util.ui.tree.TreeUtil;
 import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.actions.StudyActionWithShortcut;
-import com.jetbrains.tmp.learning.core.EduNames;
-import com.jetbrains.tmp.learning.courseFormat.StepFile;
-import com.jetbrains.tmp.learning.courseFormat.StepNode;
+import com.jetbrains.tmp.learning.courseFormat.StudyNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,7 +18,6 @@ import javax.swing.*;
 import javax.swing.tree.TreePath;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 
 abstract class StudyStepNavigationAction extends StudyActionWithShortcut {
@@ -59,44 +56,14 @@ abstract class StudyStepNavigationAction extends StudyActionWithShortcut {
                     tree.fireTreeCollapsed(path);
                 }
             });
-            FileEditorManager.getInstance(project).openFile(shouldBeActive, true);
-        }
-    }
 
-    @Nullable
-    private static VirtualFile getFirstStepFile(@NotNull final VirtualFile stepDir, @NotNull final Project project) {
-        for (VirtualFile virtualFile : stepDir.getChildren()) {
-            if (StudyUtils.getStepFile(project, virtualFile) != null) {
-                return virtualFile;
+            if (!shouldBeActive.isDirectory()) {
+                FileEditorManager.getInstance(project).openFile(shouldBeActive, true);
             }
         }
-        return null;
     }
 
     protected abstract void navigateStep(@NotNull final Project project);
-
-    @Nullable
-    VirtualFile getFileToActivate(
-            @NotNull Project project,
-            @NotNull Map<String, StepFile> nextStepFiles,
-            @NotNull VirtualFile stepDir) {
-        VirtualFile shouldBeActive = null;
-        VirtualFile srcDir = stepDir.findChild(EduNames.SRC);
-
-        for (Map.Entry<String, StepFile> entry : nextStepFiles.entrySet()) {
-            String name = entry.getKey();
-
-            VirtualFile vf = srcDir != null ? srcDir.findChild(name) : null;
-            if (vf != null) {
-                if (shouldBeActive != null) {
-                    FileEditorManager.getInstance(project).openFile(vf, true);
-                } else {
-                    shouldBeActive = vf;
-                }
-            }
-        }
-        return shouldBeActive != null ? shouldBeActive : getFirstStepFile(stepDir, project);
-    }
 
     @Override
     public void actionPerformed(AnActionEvent e) {
@@ -107,7 +74,7 @@ abstract class StudyStepNavigationAction extends StudyActionWithShortcut {
         navigateStep(project);
     }
 
-    protected abstract StepNode getTargetStep(@NotNull final StepNode sourceStepNode);
+    protected abstract StudyNode getTargetStep(@Nullable final StudyNode sourceStepNode);
 
     @Override
     public void update(AnActionEvent e) {
@@ -119,7 +86,7 @@ abstract class StudyStepNavigationAction extends StudyActionWithShortcut {
             return;
         }
 
-        StepNode stepNode = StudyUtils.getSelectedStep(project);
+        StudyNode stepNode = StudyUtils.getSelectedNode(project);
         presentation.setEnabled(stepNode == null || getTargetStep(stepNode) != null);
     }
 }

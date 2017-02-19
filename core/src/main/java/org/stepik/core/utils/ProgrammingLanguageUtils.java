@@ -14,7 +14,6 @@ import com.intellij.refactoring.move.moveFilesOrDirectories.MoveFilesOrDirectori
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.core.EduNames;
-import com.jetbrains.tmp.learning.courseFormat.StepFile;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -113,8 +112,7 @@ public class ProgrammingLanguageUtils {
         FileDocumentManager documentManager = FileDocumentManager.getInstance();
         FileEditorManager editorManager = FileEditorManager.getInstance(project);
         for (VirtualFile file : FileEditorManager.getInstance(project).getOpenFiles()) {
-            StudyUtils.getStep(project, file);
-            if (StudyUtils.getStep(project, file) != targetStepNode) {
+            if (StudyUtils.getStudyNode(project, file) != targetStepNode) {
                 continue;
             }
             Document document = documentManager.getDocument(file);
@@ -165,11 +163,8 @@ public class ProgrammingLanguageUtils {
                     .runWriteAction(() -> {
                         try {
                             file[0] = parent.createChildData(null, fileName);
-
-                            StepFile stepFile = stepNode.getStepFiles().get(fileName);
-                            if (stepFile != null) {
-                                file[0].setBinaryContent(stepFile.getText().getBytes());
-                            }
+                            String template = stepNode.getTemplate(language);
+                            file[0].setBinaryContent(template.getBytes());
                         } catch (IOException e) {
                             file[0] = null;
                         }

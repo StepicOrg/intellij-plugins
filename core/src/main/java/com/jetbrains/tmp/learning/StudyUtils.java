@@ -1,21 +1,16 @@
 package com.jetbrains.tmp.learning;
 
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.ide.projectView.ProjectView;
 import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFileSystemItem;
 import com.intellij.ui.content.Content;
-import com.intellij.util.TimeoutUtil;
-import com.jetbrains.tmp.learning.core.EduNames;
-import com.jetbrains.tmp.learning.core.EduUtils;
-import com.jetbrains.tmp.learning.courseFormat.CourseNode;
-import com.jetbrains.tmp.learning.courseFormat.LessonNode;
-import com.jetbrains.tmp.learning.courseFormat.StepFile;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
+import com.jetbrains.tmp.learning.courseFormat.StudyNode;
 import com.jetbrains.tmp.learning.ui.StudyToolWindow;
 import com.jetbrains.tmp.learning.ui.StudyToolWindowFactory;
 import org.jetbrains.annotations.Contract;
@@ -27,15 +22,17 @@ import org.stepik.core.utils.ProjectFilesUtils;
 
 import javax.swing.*;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StudyUtils {
-    private static final Logger logger = Logger.getInstance(StudyUtils.class.getName());
-    private static Pattern stepPathPattern;
+    private static final String PATH_PATTERN = "^(?:(?:section([0-9]+)/lesson([0-9]+)/step([0-9]+))|" +
+            "(?:lesson([0-9]+)/step([0-9]+))|" +
+            "(?:step([0-9]+))|" +
+            "(?:section([0-9]+)/lesson([0-9]+))|" +
+            "(?:section([0-9]+))" +
+            ").*$";
+    private static Pattern pathPattern;
 
     private StudyUtils() {
     }
@@ -58,7 +55,7 @@ public class StudyUtils {
     }
 
     @Nullable
-    static StudyToolWindow getStudyToolWindow(@NotNull final Project project) {
+    public static StudyToolWindow getStudyToolWindow(@NotNull final Project project) {
         ToolWindow toolWindow = ToolWindowManager.getInstance(project)
                 .getToolWindow(StudyToolWindowFactory.STUDY_TOOL_WINDOW);
         if (toolWindow != null) {
@@ -69,39 +66,6 @@ public class StudyUtils {
                     return (StudyToolWindow) component;
                 }
             }
-        }
-        return null;
-    }
-
-    @Nullable
-    public static StepFile getStepFile(@NotNull final Project project, @NotNull final VirtualFile file) {
-        StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
-        if (projectManager == null) {
-            return null;
-        }
-        final CourseNode courseNode = projectManager.getCourseNode();
-        if (courseNode == null) {
-            return null;
-        }
-        VirtualFile stepDir = file.getParent();
-        if (stepDir == null) {
-            return null;
-        }
-        //need this because of multi-module generation
-        if (EduNames.SRC.equals(stepDir.getName())) {
-            stepDir = stepDir.getParent();
-            if (stepDir == null) {
-                return null;
-            }
-        }
-        final String stepDirName = stepDir.getName();
-        if (stepDirName.contains(EduNames.STEP)) {
-            int stepId = EduUtils.parseDirName(stepDirName, EduNames.STEP);
-            final StepNode stepNode = courseNode.getStepById(stepId);
-            if (stepNode == null) {
-                return null;
-            }
-            return stepNode.getFile(file.getName());
         }
         return null;
     }
@@ -119,7 +83,7 @@ public class StudyUtils {
     private static String getTextWithStepLink(StepNode stepNode) {
         StringBuilder stringBuilder = new StringBuilder();
 
-        LessonNode lessonNode = stepNode.getLessonNode();
+        StudyNode lessonNode = stepNode.getParent();
         if (lessonNode != null) {
             stringBuilder.append("<a href=\"https://stepik.org/lesson/")
                     .append(lessonNode.getId())
@@ -189,7 +153,37 @@ public class StudyUtils {
             return null;
         }
 
-        return getStep(project, files[0]);
+        StudyNode studyNode = getStudyNode(project, files[0]);
+
+        return studyNode instanceof StepNode ? (StepNode) studyNode : null;
+    }
+
+    @Nullable
+    public static StudyNode getSelectedNode(@NotNull Project project) {
+        StepNode stepNode = getSelectedStep(project);
+        if (stepNode != null) {
+            return stepNode;
+        }
+
+        PsiElement node = ProjectView.getInstance(project)
+                .getParentOfCurrentSelection();
+        if (node == null) {
+            return null;
+        }
+
+        PsiFileSystemItem file;
+
+        if (node instanceof PsiFileSystemItem) {
+            file = (PsiFileSystemItem) node;
+        } else {
+            file = node.getContainingFile();
+        }
+
+        if (file == null) {
+            return null;
+        }
+
+        return getStudyNode(project, file.getVirtualFile());
     }
 
     public static boolean hasJavaFx() {
@@ -202,45 +196,46 @@ public class StudyUtils {
     }
 
     @Nullable
-    public static StepNode getStep(@NotNull Project project, @NotNull VirtualFile stepVF) {
-        String path = getRelativePath(project, stepVF);
-        if (stepPathPattern == null) {
-            stepPathPattern = Pattern.compile("^(section[0-9]+)/(lesson[0-9]+)/(step[0-9]+)/src/.*");
+    public static StudyNode getStudyNode(@NotNull Project project, @NotNull VirtualFile nodeVF) {
+        String path = getRelativePath(project, nodeVF);
+
+        StudyNode root = StepikProjectManager.getProjectRoot(project);
+        if (root == null) {
+            return null;
         }
-        Matcher matcher = stepPathPattern.matcher(path);
-        if (matcher.matches()) {
-            StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
-            if (projectManager == null) {
-                return null;
-            }
-            CourseNode courseNode = projectManager.getCourseNode();
-            if (courseNode == null) {
-                return null;
-            }
-            LessonNode lessonNode = courseNode.getLessonByDirName(matcher.group(2));
-            if (lessonNode == null) {
-                return null;
-            }
-            return lessonNode.getStep(matcher.group(3));
-        }
-        return null;
+
+        return getStudyNode(root, path);
     }
 
-    // supposed to be called under progress
     @Nullable
-    public static <T> T execCancelable(@NotNull final Callable<T> callable) {
-        final Future<T> future = ApplicationManager.getApplication().executeOnPooledThread(callable);
+    public static StudyNode getStudyNode(@NotNull StudyNode root, @NotNull String relativePath) {
+        if (relativePath.equals(".")) {
+            return root;
+        }
 
-        while (!future.isCancelled() && !future.isDone()) {
-            ProgressManager.checkCanceled();
-            TimeoutUtil.sleep(500);
+        if (pathPattern == null) {
+            pathPattern = Pattern.compile(PATH_PATTERN);
         }
-        T result = null;
-        try {
-            result = future.get();
-        } catch (InterruptedException | ExecutionException e) {
-            logger.warn(e.getMessage());
+        Matcher matcher = pathPattern.matcher(relativePath);
+        if (!matcher.matches()) {
+            return null;
         }
-        return result;
+
+        for (int i = 1; i <= matcher.groupCount(); i++) {
+            String idString = matcher.group(i);
+
+            if (idString == null) {
+                continue;
+            }
+
+            int id = Integer.parseInt(idString);
+
+            root = root.getChildById(id);
+            if (root == null) {
+                return null;
+            }
+        }
+
+        return root;
     }
 }

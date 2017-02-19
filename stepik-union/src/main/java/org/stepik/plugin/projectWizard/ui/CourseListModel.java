@@ -2,12 +2,9 @@ package org.stepik.plugin.projectWizard.ui;
 
 import com.intellij.openapi.project.Project;
 import com.jetbrains.tmp.learning.SupportedLanguages;
-import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.stepik.api.client.StepikApiClient;
-import org.stepik.api.objects.courses.Course;
-import org.stepik.api.objects.courses.Courses;
+import org.stepik.api.objects.StudyObject;
 import org.stepik.plugin.projectWizard.StepikProjectGenerator;
 import org.stepik.plugin.utils.Utils;
 
@@ -20,8 +17,8 @@ import java.util.stream.Collectors;
 /**
  * @author meanmail
  */
-class CourseListModel extends AbstractListModel<Course> implements ComboBoxModel<Course>, Serializable {
-    private final List<Course> courses = new ArrayList<>();
+class CourseListModel extends AbstractListModel<StudyObject> implements ComboBoxModel<StudyObject>, Serializable {
+    private final List<StudyObject> courses = new ArrayList<>();
     private Object selectedItem;
 
     @Override
@@ -31,26 +28,26 @@ class CourseListModel extends AbstractListModel<Course> implements ComboBoxModel
 
     @NotNull
     @Override
-    public Course getElementAt(int index) {
+    public StudyObject getElementAt(int index) {
         if (index >= 0 && index < courses.size()) {
             return courses.get(index);
         } else {
-            return StepikProjectGenerator.EMPTY_COURSE;
+            return StepikProjectGenerator.EMPTY_STUDY_NODE;
         }
     }
 
     void update(@NotNull Project project, @NotNull SupportedLanguages programmingLanguage) {
-        List<Course> newCourseList = StepikProjectGenerator.getCoursesUnderProgress(project, programmingLanguage);
-        Course selectedCourse = getSelectedItem();
+        List<StudyObject> newCourseList = StepikProjectGenerator.getCoursesUnderProgress(project, programmingLanguage);
+        StudyObject selectedCourse = getSelectedItem();
         courses.clear();
 
-        if (newCourseList.size() > 0) {
+        if (!newCourseList.isEmpty()) {
             courses.addAll(newCourseList);
-            if (selectedCourse == StepikProjectGenerator.EMPTY_COURSE || !courses.contains(selectedCourse)) {
+            if (selectedCourse == StepikProjectGenerator.EMPTY_STUDY_NODE || !courses.contains(selectedCourse)) {
                 selectedCourse = courses.get(0);
             }
         } else {
-            courses.add(StepikProjectGenerator.EMPTY_COURSE);
+            courses.add(StepikProjectGenerator.EMPTY_STUDY_NODE);
         }
 
         setSelectedItem(selectedCourse);
@@ -59,16 +56,16 @@ class CourseListModel extends AbstractListModel<Course> implements ComboBoxModel
 
     @NotNull
     @Override
-    public Course getSelectedItem() {
-        if (selectedItem == null || !(selectedItem instanceof Course)) {
-            return StepikProjectGenerator.EMPTY_COURSE;
+    public StudyObject getSelectedItem() {
+        if (selectedItem == null || !(selectedItem instanceof StudyObject)) {
+            return StepikProjectGenerator.EMPTY_STUDY_NODE;
         }
-        return (Course) selectedItem;
+        return (StudyObject) selectedItem;
     }
 
     @Override
     public void setSelectedItem(@Nullable Object anItem) {
-        if (anItem != null && !(anItem instanceof Course)) {
+        if (anItem != null && !(anItem instanceof StudyObject)) {
             selectedItem = getCourse(anItem.toString());
         } else {
             selectedItem = anItem;
@@ -80,41 +77,18 @@ class CourseListModel extends AbstractListModel<Course> implements ComboBoxModel
     private Object getCourse(@NotNull String link) {
         final String finalLink = link.toLowerCase();
 
-        List<Course> filteredCourses = courses.stream()
-                .filter(course -> course.getTitle().toLowerCase().equals(finalLink))
+        List<StudyObject> filteredCourses = courses.stream()
+                .filter(studyObject -> studyObject.getTitle().toLowerCase().equals(finalLink))
                 .collect(Collectors.toList());
 
-        if (filteredCourses.size() > 0) {
+        if (!filteredCourses.isEmpty()) {
             return filteredCourses.get(0);
         }
 
-        int courseId = Utils.getCourseIdFromLink(link);
-
-        StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
-
-        Courses courses = null;
-
-        if (courseId != 0) {
-            courses = stepikApiClient.courses()
-                    .get()
-                    .id(courseId)
-                    .execute();
-        }
-
-        Course course;
-
-        if (courseId == 0 || courses.isEmpty()) {
-            course = new Course();
-            course.setTitle(link);
-            course.setDescription("Wrong link");
-        } else {
-            course = courses.getCourses().get(0);
-        }
-
-        return course;
+        return Utils.getStudyObjectFromLink(link);
     }
 
-    public List<Course> getCourses() {
+    List<StudyObject> getCourses() {
         return courses;
     }
 }

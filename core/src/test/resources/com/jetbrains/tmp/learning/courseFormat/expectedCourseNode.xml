@@ -1,0 +1,26 @@
+<CourseNode id="1">
+  <data class="Course" id="2">
+    <id>0</id>
+    <isCertificateAutoIssued>false</isCertificateAutoIssued>
+    <certificateRegularThreshold>0</certificateRegularThreshold>
+    <certificateDistinctionThreshold>0</certificateDistinctionThreshold>
+    <totalUnits>0</totalUnits>
+    <enrollment>0</enrollment>
+    <isFavorite>false</isFavorite>
+    <isContest>false</isContest>
+    <isSelfPaced>false</isSelfPaced>
+    <isAdaptive>false</isAdaptive>
+    <isIdeaCompatible>false</isIdeaCompatible>
+    <hasTutors>false</hasTutors>
+    <isEnabled>false</isEnabled>
+    <isProctored>false</isProctored>
+    <reviewSummary>0</reviewSummary>
+    <certificatesCount>0</certificatesCount>
+    <learnersCount>0</learnersCount>
+    <owner>0</owner>
+    <isFeatured>false</isFeatured>
+    <isPublic>false</isPublic>
+    <isActive>false</isActive>
+    <discussionsCount>0</discussionsCount>
+  </data>
+</CourseNode>

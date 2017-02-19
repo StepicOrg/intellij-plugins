@@ -1,7 +1,7 @@
 package org.stepik.plugin.projectWizard.ui;
 
 import org.jetbrains.annotations.NotNull;
-import org.stepik.api.objects.courses.Course;
+import org.stepik.api.objects.StudyObject;
 
 import javax.swing.plaf.basic.BasicComboBoxEditor;
 import java.awt.event.KeyAdapter;
@@ -63,14 +63,14 @@ class CourseListBoxEditor extends BasicComboBoxEditor {
 
             final String finalInputtedText = inputtedText.toLowerCase();
 
-            List<Course> candidates = model.getCourses().stream()
+            List<StudyObject> candidates = model.getCourses().stream()
                     .filter(course -> course.getTitle().toLowerCase().startsWith(finalInputtedText))
                     .sorted(Comparator.comparingInt(o -> o.getTitle().length()))
                     .limit(1)
                     .collect(Collectors.toList());
 
-            if (candidates.size() > 0) {
-                Course candidate = candidates.get(0);
+            if (!candidates.isEmpty()) {
+                StudyObject candidate = candidates.get(0);
                 model.setSelectedItem(candidate);
                 String newText = candidate.getTitle();
                 editor.setText(newText);

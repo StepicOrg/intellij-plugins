@@ -10,9 +10,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.io.FileUtil;
 import com.jetbrains.tmp.learning.StepikProjectManager;
-import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.core.EduNames;
-import com.jetbrains.tmp.learning.courseFormat.StepFile;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
@@ -45,24 +43,24 @@ class StepModuleBuilder extends ModuleBuilderWithSrc {
     }
 
     private void createStepContent() {
-        StepikProjectManager stepManager = StepikProjectManager.getInstance(project);
-        stepNode.setCurrentLang(stepManager.getDefaultLang());
+        StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
+        if (projectManager == null) {
+            return;
+        }
+        stepNode.setCurrentLang(projectManager.getDefaultLang());
 
-        String src = stepManager.getProject().getBasePath() + String.join("/", stepNode.getPath(), EduNames.SRC);
+        String src = String.join("/", projectManager.getProject().getBasePath(), stepNode.getPath(), EduNames.SRC);
         createMainFile(stepNode, src);
     }
 
     private void createMainFile(@NotNull StepNode stepNode, @NotNull String src) {
-        SupportedLanguages currentLang = stepNode.getCurrentLang();
-        String name = currentLang.getMainFileName();
-        final StepFile stepFile = stepNode.getStepFiles().get(name);
-        final String text = stepFile.getText();
-        final File file = new File(src, name);
-
+        String name = stepNode.getCurrentLang().getMainFileName();
         try {
+            final File file = new File(src, name);
+            final String text = stepNode.getCurrentTemplate();
             FileUtil.writeToFile(file, text);
         } catch (IOException e) {
-            logger.error("Failed create main file: " + file);
+            logger.error("Failed create main file: " + name);
         }
     }
 }
