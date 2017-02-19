@@ -7,6 +7,8 @@ import org.stepik.api.objects.submissions.SubmissionsPost;
 import org.stepik.api.queries.StepikAbstractPostQuery;
 import org.stepik.api.urls.Urls;
 
+import java.util.List;
+
 /**
  * @author meanmail
  */
@@ -26,6 +28,12 @@ public class StepikSubmissionsPostQuery extends StepikAbstractPostQuery<Submissi
     @NotNull
     public StepikSubmissionsPostQuery attempt(long id) {
         submissions.getSubmission().setAttempt(id);
+        return this;
+    }
+
+    @NotNull
+    public StepikSubmissionsPostQuery choices(List<Boolean> choices) {
+        submissions.getSubmission().getReply().setChoices(choices);
         return this;
     }
 

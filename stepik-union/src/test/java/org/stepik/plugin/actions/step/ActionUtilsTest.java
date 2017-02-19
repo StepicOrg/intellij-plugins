@@ -1,6 +1,7 @@
 package org.stepik.plugin.actions.step;
 
 import org.junit.Test;
+import org.stepik.plugin.actions.ActionUtils;
 
 import static org.junit.Assert.assertEquals;
 

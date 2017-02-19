@@ -2,40 +2,47 @@
 <#-- @ftlvariable name="text" type="java.lang.String" -->
 
 ${text}<br>
-<form>
-<#if choiceStepNode.isMultipleChoice()>
-    <#assign inputType = "checkbox" />
-<#else>
-    <#assign inputType = "radio" />
-</#if>
 
-<#if !choiceStepNode.isActive()>
-    <#assign disabled = "disabled" />
-<#else>
-    <#assign disabled = "" />
-</#if>
+<div>
+<#assign status = choiceStepNode.getStatus()/>
 
-<#assign index = 0 />
+    <form action="${choiceStepNode.getPath()}" method="get">
 
-<#list choiceStepNode.getOptions() as option>
-    <#if option.getSecond()>
-        <#assign checked = "checked" />
-    <#else>
-        <#assign checked = "" />
+    <#if status != "active">
+        <#assign disabled = "disabled" />
     </#if>
 
-    <input type="${inputType}" name="options" value="${index}" ${disabled} ${checked}> ${option.getFirst()} </input><br>
-    <#assign index++ />
-</#list>
+    <#if status == "wrong">
+        <p style="color: #dd4444">Wrong</p>
+    <#elseif status == "correct">
+        <p style="color: #117700">Correct</p>
+    </#if>
 
-    <br>
+    <#assign index = 0 />
 
-<#if choiceStepNode.isEmpty()>
-    <#assign submitCaption = "Solve" />
-<#elseif choiceStepNode.isActive()>
-    <#assign submitCaption = "Submit" />
-<#else>
-    <#assign submitCaption = "Solve again" />
-</#if>
-    <input type="submit" value="${submitCaption}"/>
-</form>
+    <#assign type=choiceStepNode.isMultipleChoice()?string("checkbox", "radio") />
+
+    <#list choiceStepNode.getOptions() as option>
+        <input type="${type}" name="option"
+               value="${index}" ${disabled!""} ${option.getSecond()?string("checked", "")}> ${option.getFirst()} </input>
+        <br>
+        <#assign index++ />
+    </#list>
+        <input type="hidden" name="status" value="${status}"/>
+        <input type="hidden" name="attemptId" value="${choiceStepNode.getAttemptId()?string("#")}"/>
+        <input type="hidden" name="count" value="${index}"/>
+        <br>
+
+    <#if status == "empty">
+        <#assign submitCaption = "Solve" />
+    <#elseif status == "active">
+        <#assign submitCaption = "Submit" />
+    <#elseif status != "evaluation">
+        <#assign submitCaption = "Solve again" />
+    <#else>
+        <#assign submitCaption = "Evaluation" />
+        <#assign disabledSubmit = "disabled" />
+    </#if>
+        <input type="submit" value="${submitCaption}" ${disabledSubmit!""}/>
+    </form>
+</div>
