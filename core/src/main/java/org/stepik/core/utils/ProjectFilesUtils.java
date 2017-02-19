@@ -1,12 +1,25 @@
 package org.stepik.core.utils;
 
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.module.ModifiableModuleModel;
+import com.intellij.openapi.module.ModuleManager;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.io.FileUtil;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileManager;
+import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiManager;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.courseFormat.StudyNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.io.IOException;
+
+import static org.stepik.core.utils.ProductGroup.IDEA;
 
 /**
  * @author meanmail
@@ -104,5 +117,69 @@ public class ProjectFilesUtils {
         }
 
         return parentPath.toString();
+    }
+
+    @Nullable
+    public static VirtualFile getOrCreateSrcDirectory(@NotNull Project project, @NotNull StepNode stepNode) {
+        VirtualFile baseDir = project.getBaseDir();
+        String srcPath = stepNode.getPath() + "/" + EduNames.SRC;
+        VirtualFile srcDirectory = baseDir.findFileByRelativePath(srcPath);
+        if (srcDirectory == null && !stepNode.getWasDeleted()) {
+            srcDirectory = getOrCreateDirectory(baseDir, srcPath);
+            if (srcDirectory != null && PluginUtils.isCurrent(IDEA)) {
+                ModifiableModuleModel model = ModuleManager.getInstance(project).getModifiableModel();
+                ApplicationManager.getApplication().runWriteAction(() -> {
+                    ModuleUtils.createStepModule(project, stepNode, model);
+                    model.commit();
+                });
+                VirtualFileManager.getInstance().syncRefresh();
+            }
+        }
+        return srcDirectory;
+    }
+
+    @Nullable
+    static PsiDirectory getOrCreateSrcPsiDirectory(@NotNull Project project, @NotNull StepNode stepNode) {
+        VirtualFile directory = getOrCreateSrcDirectory(project, stepNode);
+        if (directory == null) {
+            return null;
+        }
+        return PsiManager.getInstance(project).findDirectory(directory);
+    }
+
+    @Nullable
+    private static VirtualFile getOrCreateDirectory(@NotNull VirtualFile baseDir, @NotNull String directoryPath) {
+        VirtualFile srcDir = baseDir.findFileByRelativePath(directoryPath);
+        if (srcDir == null) {
+            srcDir = ApplicationManager.getApplication().runWriteAction((Computable<VirtualFile>) () -> {
+                VirtualFile dir;
+                try {
+                    String[] paths = directoryPath.split("/");
+                    dir = baseDir;
+                    for (String path : paths) {
+                        VirtualFile child = dir.findChild(path);
+                        if (child == null) {
+                            dir = dir.createChildDirectory(null, path);
+                        } else {
+                            dir = child;
+                        }
+                    }
+                } catch (IOException e) {
+                    return null;
+                }
+
+                return dir;
+            });
+        }
+        return srcDir;
+    }
+
+    static PsiDirectory getOrCreatePsiDirectory(@NotNull Project project, @NotNull String directoryPath) {
+        VirtualFile baseDir = project.getBaseDir();
+        VirtualFile directory = getOrCreateDirectory(baseDir, directoryPath);
+        if (directory == null) {
+            return null;
+        }
+        return PsiManager.getInstance(project).findDirectory(directory);
     }
 }

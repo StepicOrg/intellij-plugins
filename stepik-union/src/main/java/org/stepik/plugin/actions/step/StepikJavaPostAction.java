@@ -10,7 +10,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.SupportedLanguages;
-import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
@@ -23,6 +22,7 @@ import org.stepik.api.objects.submissions.Submission;
 import org.stepik.api.objects.submissions.Submissions;
 import org.stepik.core.metrics.Metrics;
 import org.stepik.core.metrics.MetricsStatus;
+import org.stepik.core.utils.ProjectFilesUtils;
 import org.stepik.core.utils.Utils;
 import org.stepik.plugin.utils.DirectivesUtils;
 
@@ -104,10 +104,6 @@ public class StepikJavaPostAction extends StudyCheckAction {
             @NotNull StepikApiClient stepikApiClient,
             @NotNull StepNode stepNode,
             long intAttemptId) {
-        if (!ActionUtils.checkLangSettings(stepNode, project)) {
-            return null;
-        }
-
         SupportedLanguages currentLang = stepNode.getCurrentLang();
 
         String code = getCode(project, stepNode, currentLang);
@@ -143,9 +139,12 @@ public class StepikJavaPostAction extends StudyCheckAction {
             @NotNull Project project,
             @NotNull StepNode stepNode,
             @NotNull SupportedLanguages currentLang) {
-        String activateFileName = currentLang.getMainFileName();
-        String mainFilePath = String.join("/", stepNode.getPath(), EduNames.SRC, activateFileName);
-        VirtualFile mainFile = project.getBaseDir().findFileByRelativePath(mainFilePath);
+        VirtualFile src = ProjectFilesUtils.getOrCreateSrcDirectory(project, stepNode);
+        if (src == null) {
+            return null;
+        }
+
+        VirtualFile mainFile = src.findChild(currentLang.getMainFileName());
         if (mainFile == null) {
             return null;
         }

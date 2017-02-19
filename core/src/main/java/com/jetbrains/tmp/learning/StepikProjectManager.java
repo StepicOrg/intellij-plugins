@@ -1,27 +1,37 @@
 package com.jetbrains.tmp.learning;
 
 import com.google.gson.internal.LinkedTreeMap;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.module.ModifiableModuleModel;
+import com.intellij.openapi.module.ModuleManager;
+import com.intellij.openapi.module.ModuleWithNameAlreadyExists;
+import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.CourseNode;
 import com.jetbrains.tmp.learning.courseFormat.LessonNode;
 import com.jetbrains.tmp.learning.courseFormat.SectionNode;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.courseFormat.StudyNode;
+import com.jetbrains.tmp.learning.serialization.SampleConverter;
 import com.jetbrains.tmp.learning.serialization.StudySerializationUtils;
 import com.jetbrains.tmp.learning.serialization.StudyUnrecognizedFormatException;
 import com.jetbrains.tmp.learning.serialization.SupportedLanguagesConverter;
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.XStreamException;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import org.jdom.Element;
+import org.jdom.JDOMException;
 import org.jdom.input.DOMBuilder;
 import org.jdom.output.XMLOutputter;
 import org.jetbrains.annotations.NotNull;
@@ -33,6 +43,9 @@ import org.stepik.api.objects.steps.Limit;
 import org.stepik.api.objects.steps.Sample;
 import org.stepik.api.objects.steps.Step;
 import org.stepik.api.objects.steps.VideoUrl;
+import org.stepik.api.objects.users.User;
+import org.stepik.core.utils.ProjectFilesUtils;
+import org.stepik.plugin.projectWizard.idea.SandboxModuleBuilder;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -126,9 +139,11 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
             xStream.alias("Section", Section.class);
             xStream.alias("CompoundUnitLesson", CompoundUnitLesson.class);
             xStream.alias("Step", Step.class);
+            xStream.alias("User", User.class);
             xStream.autodetectAnnotations(true);
             xStream.setClassLoader(StepikProjectManager.class.getClassLoader());
             xStream.registerConverter(new SupportedLanguagesConverter());
+            xStream.registerConverter(new SampleConverter());
             xStream.ignoreUnknownElements();
             xStream.setMode(XStream.ID_REFERENCES);
         }
@@ -206,7 +221,7 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
             this.version = CURRENT_VERSION;
             refreshCourse();
             logger.info("The StepikProjectManager state loaded");
-        } catch (StudyUnrecognizedFormatException e) {
+        } catch (XStreamException | StudyUnrecognizedFormatException e) {
             logger.warn("Failed deserialization StepikProjectManager \n" + e.getMessage() + "\n" + project);
         }
     }
@@ -223,6 +238,32 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
                     indicator.setIndeterminate(true);
                     root.reloadData(indicator);
                 }, "Refreshing Course", true, project);
+        ApplicationManager.getApplication().invokeLater(() -> {
+            repairProjectFiles(root);
+
+            VirtualFile projectDir = project != null ? project.getBaseDir() : null;
+            if (projectDir != null && projectDir.findChild(EduNames.SANDBOX_DIR) == null) {
+                ModifiableModuleModel model = ModuleManager.getInstance(project).getModifiableModel();
+
+                ApplicationManager.getApplication().runWriteAction(() -> {
+                    try {
+                        new SandboxModuleBuilder(projectDir.getPath()).createModule(model);
+                        model.commit();
+                    } catch (IOException | ConfigurationException | JDOMException | ModuleWithNameAlreadyExists e) {
+                        logger.warn("Failed repair Sandbox", e);
+                    }
+                });
+            }
+        });
+    }
+
+    private void repairProjectFiles(@NotNull StudyNode<?, ?> node) {
+        if (project != null) {
+            if (node instanceof StepNode) {
+                ProjectFilesUtils.getOrCreateSrcDirectory(project, (StepNode) node);
+            }
+            node.getChildren().forEach(this::repairProjectFiles);
+        }
     }
 
     @NotNull

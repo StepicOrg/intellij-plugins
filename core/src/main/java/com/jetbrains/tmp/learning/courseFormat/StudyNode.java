@@ -61,4 +61,8 @@ public interface StudyNode<D extends StudyObject, C extends StudyNode> {
     boolean canBeLeaf();
 
     void reloadData(@NotNull ProgressIndicator indicator);
+
+    boolean getWasDeleted();
+
+    void setWasDeleted(boolean wasDeleted);
 }

@@ -13,11 +13,11 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.SupportedLanguages;
-import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.core.metrics.Metrics;
+import org.stepik.core.utils.ProjectFilesUtils;
 import org.stepik.plugin.utils.DirectivesUtils;
 import org.stepik.plugin.utils.ReformatUtils;
 
@@ -72,18 +72,17 @@ public class InsertStepikDirectives extends AbstractStepAction {
         }
 
         SupportedLanguages currentLang = targetStepNode.getCurrentLang();
-        VirtualFile stepDir = project.getBaseDir().findFileByRelativePath(targetStepNode.getPath());
-        if (stepDir == null) {
-            return;
-        }
-        VirtualFile src = stepDir.findChild(EduNames.SRC);
+
+        VirtualFile src = ProjectFilesUtils.getOrCreateSrcDirectory(project, targetStepNode);
         if (src == null) {
             return;
         }
+
         VirtualFile file = src.findChild(currentLang.getMainFileName());
         if (file == null) {
             return;
         }
+
         String[] text = DirectivesUtils.getFileText(file);
 
         Pair<Integer, Integer> locations = DirectivesUtils.findDirectives(text, currentLang);

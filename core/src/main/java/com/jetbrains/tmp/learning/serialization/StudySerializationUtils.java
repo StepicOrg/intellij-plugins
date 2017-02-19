@@ -583,16 +583,12 @@ public class StudySerializationUtils {
                     return;
                 }
 
-                element.removeAttribute(keyAttr);
+                addAttributeAsChild(element, keyAttr);
 
                 Attribute valueAttr = element.getAttribute(VALUE);
 
-                Element string = new Element("string");
-                string.setText(keyAttr.getValue());
-                element.addContent(string);
                 if (valueAttr != null) {
-                    element.setText(valueAttr.getValue());
-                    element.removeAttribute(valueAttr);
+                    addAttributeAsChild(element, valueAttr);
                 } else {
                     Element value = element.getChild(VALUE);
                     if (value != null) {
@@ -600,10 +596,16 @@ public class StudySerializationUtils {
                         element.addContent(value.cloneContent());
                     }
                 }
-
             }
 
             convertToXStreamStyle(element.getChildren());
         });
+    }
+
+    private static void addAttributeAsChild(Element element, Attribute attribute) {
+        Element string = new Element("string");
+        string.setText(attribute.getValue());
+        element.removeAttribute(attribute);
+        element.addContent(string);
     }
 }

@@ -237,12 +237,14 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
             return;
         }
 
+        final StepNode targetNode = stepNode;
+
         ApplicationManager.getApplication().invokeLater(() -> {
                     SupportedLanguages selectedLang = (SupportedLanguages) languageBox.getSelectedItem();
                     if (selectedLang != null) {
-                        ProgrammingLanguageUtils.switchProgrammingLanguage(project, stepNode, selectedLang);
-                        if (stepNode != null && selectedLang != stepNode.getCurrentLang()) {
-                            languageBox.setSelectedItem(stepNode.getCurrentLang());
+                        ProgrammingLanguageUtils.switchProgrammingLanguage(project, targetNode, selectedLang);
+                        if (selectedLang != targetNode.getCurrentLang()) {
+                            languageBox.setSelectedItem(targetNode.getCurrentLang());
                         }
                     }
                 }

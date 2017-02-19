@@ -8,12 +8,12 @@ import com.intellij.openapi.wm.ToolWindowId;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.StudyUtils;
-import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.courseFormat.StudyNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.core.metrics.Metrics;
+import org.stepik.core.utils.ProjectFilesUtils;
 
 import javax.swing.*;
 
@@ -49,7 +49,7 @@ abstract class StepikStepNavigationAction extends StudyStepNavigationAction {
 
         VirtualFile mainFile;
         if (targetNode instanceof StepNode) {
-            VirtualFile srcDir = projectDir.findFileByRelativePath(targetNode.getPath() + "/" + EduNames.SRC);
+            VirtualFile srcDir = ProjectFilesUtils.getOrCreateSrcDirectory(project, (StepNode) targetNode);
             if (srcDir == null) {
                 return;
             }
@@ -58,11 +58,7 @@ abstract class StepikStepNavigationAction extends StudyStepNavigationAction {
 
             mainFile = srcDir.findChild(stepNode.getCurrentLang().getMainFileName());
             if (mainFile == null) {
-                if (srcDir.getChildren().length > 0) {
-                    mainFile = srcDir;
-                } else {
-                    mainFile = srcDir.getParent();
-                }
+                mainFile = srcDir.getChildren().length > 0 ? srcDir : srcDir.getParent();
             }
         } else {
             mainFile = projectDir.findFileByRelativePath(targetNode.getPath());
