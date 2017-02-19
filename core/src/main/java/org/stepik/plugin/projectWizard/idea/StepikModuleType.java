@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jps.model.java.JavaModuleSourceRootTypes;
 import org.stepik.api.objects.StudyObject;
-import org.stepik.plugin.projectWizard.ProjectWizardUtils;
+import org.stepik.core.projectWizard.ProjectWizardUtils;
 
 import javax.swing.*;
 

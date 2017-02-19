@@ -26,5 +26,6 @@
     <maxSubmissionsCount>0</maxSubmissionsCount>
     <discussionsCount>0</discussionsCount>
   </data>
+  <wasDeleted>false</wasDeleted>
   <courseId>0</courseId>
 </StepNode>

@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
+import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcPsiDirectory;
 
 public class ProgrammingLanguageUtils {
     private static final Logger logger = Logger.getInstance(ProgrammingLanguageUtils.class);
@@ -47,17 +48,12 @@ public class ProgrammingLanguageUtils {
             return;
         }
 
-        VirtualFile srcParent = project.getBaseDir().findFileByRelativePath(targetStepNode.getPath());
-        if (srcParent == null) {
-            return;
-        }
-
-        PsiDirectory src = getOrCreateDir(project, srcParent, EduNames.SRC);
+        PsiDirectory src = getOrCreateSrcPsiDirectory(project, targetStepNode);
         if (src == null) {
             return;
         }
 
-        PsiDirectory hide = getOrCreateDir(project, src.getVirtualFile(), EduNames.HIDE);
+        PsiDirectory hide = ProjectFilesUtils.getOrCreatePsiDirectory(project, EduNames.HIDE);
         if (hide == null) {
             return;
         }
@@ -79,13 +75,13 @@ public class ProgrammingLanguageUtils {
             first = src.findFile(currentLang.getMainFileName());
         }
 
-        exchangeFiles(src, hide, first, second, moveFirst, moveSecond);
-
         targetStepNode.setCurrentLang(language);
         ArrayList<VirtualFile> needClose = closeStepNodeFile(project, targetStepNode);
         FileEditorManager.getInstance(project).openFile(second.getVirtualFile(), true);
         FileEditorManager editorManager = FileEditorManager.getInstance(project);
         needClose.forEach(editorManager::closeFile);
+
+        exchangeFiles(src, hide, first, second, moveFirst, moveSecond);
 
         Metrics.switchLanguage(project, targetStepNode, SUCCESSFUL);
     }
@@ -129,30 +125,6 @@ public class ProgrammingLanguageUtils {
         }
 
         return needClose;
-    }
-
-    private static PsiDirectory getOrCreateDir(
-            @NotNull Project project,
-            @NotNull VirtualFile parent,
-            @NotNull String name) {
-        final VirtualFile[] hideVF = {parent.findChild(name)};
-
-        if (hideVF[0] == null) {
-            ApplicationManager
-                    .getApplication()
-                    .runWriteAction(() -> {
-                        try {
-                            hideVF[0] = parent.createChildDirectory(null, name);
-                        } catch (IOException e) {
-                            hideVF[0] = null;
-                        }
-                    });
-            if (hideVF[0] == null) {
-                return null;
-            }
-        }
-
-        return PsiManager.getInstance(project).findDirectory(hideVF[0]);
     }
 
     @Nullable

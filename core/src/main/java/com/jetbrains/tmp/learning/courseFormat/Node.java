@@ -23,13 +23,9 @@ public abstract class Node<
     private StudyNode parent;
     private D data;
     private List<C> children;
+    private boolean wasDeleted;
 
     Node() {
-    }
-
-    Node(@NotNull final StudyNode parent, @NotNull D data) {
-        setData(data);
-        init(parent, true, null);
     }
 
     Node(@NotNull D data, @Nullable ProgressIndicator indicator) {
@@ -39,21 +35,26 @@ public abstract class Node<
 
     @Nullable
     private StudyNode getLastNode() {
-        int stepsCount = getChildren().size();
-        if (stepsCount == 0) {
-            return null;
+        List<C> children = getChildren();
+
+        for (int i = children.size() - 1; i > 0; i--) {
+            C child = children.get(i);
+            if (!child.getWasDeleted()) {
+                return child;
+            }
         }
-        return getChildren().get(stepsCount - 1);
+        return null;
     }
 
     @Nullable
     private StudyNode getFirstNode() {
-        List<C> children = getChildren();
-        if (children.size() == 0) {
-            return null;
+        for (C child : getChildren()) {
+            if (!child.getWasDeleted()) {
+                return child;
+            }
         }
 
-        return children.get(0);
+        return null;
     }
 
     @Nullable
@@ -68,7 +69,7 @@ public abstract class Node<
 
         for (int i = children.size() - 1; i >= 0; i--) {
             StudyNode item = children.get(i);
-            if (item.getPosition() < position) {
+            if (!item.getWasDeleted() && item.getPosition() < position) {
                 return item;
             }
         }
@@ -85,7 +86,7 @@ public abstract class Node<
 
         int position = current.getPosition();
         for (StudyNode item : children) {
-            if (item.getPosition() > position) {
+            if (!item.getWasDeleted() && item.getPosition() > position) {
                 return item;
             }
         }
@@ -176,11 +177,13 @@ public abstract class Node<
             @Nullable ProgressIndicator indicator) {
         Map<Long, C> mapNodes = getMapNodes();
         List<C> needInit = getChildren();
+        setChildrenDeletedFlag();
 
         for (DC data : getChildDataList()) {
             C child = mapNodes.get(data.getId());
             if (child != null) {
                 child.setData(data);
+                child.setWasDeleted(wasDeleted);
             } else {
                 C item;
                 try {
@@ -190,6 +193,7 @@ public abstract class Node<
                     break;
                 }
                 item.setData(data);
+                item.setWasDeleted(wasDeleted);
                 item.init(this, isRestarted, indicator);
                 if (item.canBeLeaf() || !item.isLeaf()) {
                     getChildren().add(item);
@@ -203,6 +207,10 @@ public abstract class Node<
         for (StudyNode child : needInit) {
             child.init(this, isRestarted, indicator);
         }
+    }
+
+    private void setChildrenDeletedFlag() {
+        getChildren().forEach(child -> child.setWasDeleted(true));
     }
 
     @Override
@@ -295,5 +303,15 @@ public abstract class Node<
     public String getName() {
         StudyObject data = getData();
         return data != null ? data.getTitle() : "";
+    }
+
+    @Override
+    public boolean getWasDeleted() {
+        return wasDeleted;
+    }
+
+    @Override
+    public void setWasDeleted(boolean wasDeleted) {
+        this.wasDeleted = wasDeleted;
     }
 }

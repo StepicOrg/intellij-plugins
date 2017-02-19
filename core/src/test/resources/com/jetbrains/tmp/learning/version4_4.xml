@@ -74,6 +74,7 @@
                   <maxSubmissionsCount>0</maxSubmissionsCount>
                   <discussionsCount>0</discussionsCount>
                 </data>
+                <wasDeleted>false</wasDeleted>
                 <status>SOLVED</status>
                 <supportedLanguages id="19">
                   <string>Java 8</string>
@@ -82,9 +83,11 @@
                 <courseId>0</courseId>
               </StepNode>
             </children>
+            <wasDeleted>false</wasDeleted>
             <courseId>0</courseId>
           </LessonNode>
         </children>
+        <wasDeleted>false</wasDeleted>
       </SectionNode>
       <SectionNode id="20">
         <data class="Section" id="21">
@@ -156,6 +159,7 @@
                   <maxSubmissionsCount>0</maxSubmissionsCount>
                   <discussionsCount>0</discussionsCount>
                 </data>
+                <wasDeleted>false</wasDeleted>
                 <status>UNCHECKED</status>
                 <supportedLanguages id="34">
                   <string>Java 8</string>
@@ -193,6 +197,7 @@
                   <maxSubmissionsCount>0</maxSubmissionsCount>
                   <discussionsCount>0</discussionsCount>
                 </data>
+                <wasDeleted>false</wasDeleted>
                 <status>UNCHECKED</status>
                 <supportedLanguages id="41">
                   <string>Java 8</string>
@@ -230,6 +235,7 @@
                   <maxSubmissionsCount>0</maxSubmissionsCount>
                   <discussionsCount>0</discussionsCount>
                 </data>
+                <wasDeleted>false</wasDeleted>
                 <status>UNCHECKED</status>
                 <supportedLanguages id="48">
                   <string>Java 8</string>
@@ -267,6 +273,7 @@
                   <maxSubmissionsCount>0</maxSubmissionsCount>
                   <discussionsCount>0</discussionsCount>
                 </data>
+                <wasDeleted>false</wasDeleted>
                 <status>UNCHECKED</status>
                 <supportedLanguages id="55">
                   <string>Java 8</string>
@@ -275,6 +282,7 @@
                 <courseId>0</courseId>
               </StepNode>
             </children>
+            <wasDeleted>false</wasDeleted>
             <courseId>0</courseId>
           </LessonNode>
           <LessonNode id="56">
@@ -334,6 +342,7 @@
                   <maxSubmissionsCount>0</maxSubmissionsCount>
                   <discussionsCount>0</discussionsCount>
                 </data>
+                <wasDeleted>false</wasDeleted>
                 <status>UNCHECKED</status>
                 <supportedLanguages id="67">
                   <string>Java 8</string>
@@ -371,6 +380,7 @@
                   <maxSubmissionsCount>0</maxSubmissionsCount>
                   <discussionsCount>0</discussionsCount>
                 </data>
+                <wasDeleted>false</wasDeleted>
                 <status>UNCHECKED</status>
                 <supportedLanguages id="74">
                   <string>Java 8</string>
@@ -379,6 +389,7 @@
                 <courseId>0</courseId>
               </StepNode>
             </children>
+            <wasDeleted>false</wasDeleted>
             <courseId>0</courseId>
           </LessonNode>
           <LessonNode id="75">
@@ -438,6 +449,7 @@
                   <maxSubmissionsCount>0</maxSubmissionsCount>
                   <discussionsCount>0</discussionsCount>
                 </data>
+                <wasDeleted>false</wasDeleted>
                 <status>UNCHECKED</status>
                 <supportedLanguages id="86">
                   <string>Java 8</string>
@@ -446,6 +458,7 @@
                 <courseId>0</courseId>
               </StepNode>
             </children>
+            <wasDeleted>false</wasDeleted>
             <courseId>0</courseId>
           </LessonNode>
           <LessonNode id="87">
@@ -505,6 +518,7 @@
                   <maxSubmissionsCount>0</maxSubmissionsCount>
                   <discussionsCount>0</discussionsCount>
                 </data>
+                <wasDeleted>false</wasDeleted>
                 <status>UNCHECKED</status>
                 <supportedLanguages id="98">
                   <string>Java 8</string>
@@ -542,6 +556,7 @@
                   <maxSubmissionsCount>0</maxSubmissionsCount>
                   <discussionsCount>0</discussionsCount>
                 </data>
+                <wasDeleted>false</wasDeleted>
                 <status>UNCHECKED</status>
                 <supportedLanguages id="105">
                   <string>Java 8</string>
@@ -579,6 +594,7 @@
                   <maxSubmissionsCount>0</maxSubmissionsCount>
                   <discussionsCount>0</discussionsCount>
                 </data>
+                <wasDeleted>false</wasDeleted>
                 <status>UNCHECKED</status>
                 <supportedLanguages id="112">
                   <string>Java 8</string>
@@ -587,9 +603,11 @@
                 <courseId>0</courseId>
               </StepNode>
             </children>
+            <wasDeleted>false</wasDeleted>
             <courseId>0</courseId>
           </LessonNode>
         </children>
+        <wasDeleted>false</wasDeleted>
       </SectionNode>
       <SectionNode id="113">
         <data class="Section" id="114">
@@ -661,6 +679,7 @@
                   <maxSubmissionsCount>0</maxSubmissionsCount>
                   <discussionsCount>0</discussionsCount>
                 </data>
+                <wasDeleted>false</wasDeleted>
                 <status>UNCHECKED</status>
                 <supportedLanguages id="127">
                   <string>Java 8</string>
@@ -669,6 +688,7 @@
                 <courseId>0</courseId>
               </StepNode>
             </children>
+            <wasDeleted>false</wasDeleted>
             <courseId>0</courseId>
           </LessonNode>
           <LessonNode id="128">
@@ -728,6 +748,7 @@
                   <maxSubmissionsCount>0</maxSubmissionsCount>
                   <discussionsCount>0</discussionsCount>
                 </data>
+                <wasDeleted>false</wasDeleted>
                 <status>UNCHECKED</status>
                 <supportedLanguages id="139">
                   <string>Java 8</string>
@@ -736,6 +757,7 @@
                 <courseId>0</courseId>
               </StepNode>
             </children>
+            <wasDeleted>false</wasDeleted>
             <courseId>0</courseId>
           </LessonNode>
           <LessonNode id="140">
@@ -795,6 +817,7 @@
                   <maxSubmissionsCount>0</maxSubmissionsCount>
                   <discussionsCount>0</discussionsCount>
                 </data>
+                <wasDeleted>false</wasDeleted>
                 <status>UNCHECKED</status>
                 <supportedLanguages id="151">
                   <string>Java 8</string>
@@ -832,6 +855,7 @@
                   <maxSubmissionsCount>0</maxSubmissionsCount>
                   <discussionsCount>0</discussionsCount>
                 </data>
+                <wasDeleted>false</wasDeleted>
                 <status>UNCHECKED</status>
                 <supportedLanguages id="158">
                   <string>Java 8</string>
@@ -869,6 +893,7 @@
                   <maxSubmissionsCount>0</maxSubmissionsCount>
                   <discussionsCount>0</discussionsCount>
                 </data>
+                <wasDeleted>false</wasDeleted>
                 <status>UNCHECKED</status>
                 <supportedLanguages id="165">
                   <string>Java 8</string>
@@ -877,9 +902,11 @@
                 <courseId>0</courseId>
               </StepNode>
             </children>
+            <wasDeleted>false</wasDeleted>
             <courseId>0</courseId>
           </LessonNode>
         </children>
+        <wasDeleted>false</wasDeleted>
       </SectionNode>
       <SectionNode id="166">
         <data class="Section" id="167">
@@ -951,6 +978,7 @@
                   <maxSubmissionsCount>0</maxSubmissionsCount>
                   <discussionsCount>0</discussionsCount>
                 </data>
+                <wasDeleted>false</wasDeleted>
                 <status>UNCHECKED</status>
                 <supportedLanguages id="180">
                   <string>Java 8</string>
@@ -988,6 +1016,7 @@
                   <maxSubmissionsCount>0</maxSubmissionsCount>
                   <discussionsCount>0</discussionsCount>
                 </data>
+                <wasDeleted>false</wasDeleted>
                 <status>UNCHECKED</status>
                 <supportedLanguages id="187">
                   <string>Java 8</string>
@@ -996,6 +1025,7 @@
                 <courseId>0</courseId>
               </StepNode>
             </children>
+            <wasDeleted>false</wasDeleted>
             <courseId>0</courseId>
           </LessonNode>
           <LessonNode id="188">
@@ -1055,6 +1085,7 @@
                   <maxSubmissionsCount>0</maxSubmissionsCount>
                   <discussionsCount>0</discussionsCount>
                 </data>
+                <wasDeleted>false</wasDeleted>
                 <status>UNCHECKED</status>
                 <supportedLanguages id="199">
                   <string>Java 8</string>
@@ -1063,6 +1094,7 @@
                 <courseId>0</courseId>
               </StepNode>
             </children>
+            <wasDeleted>false</wasDeleted>
             <courseId>0</courseId>
           </LessonNode>
           <LessonNode id="200">
@@ -1122,6 +1154,7 @@
                   <maxSubmissionsCount>0</maxSubmissionsCount>
                   <discussionsCount>0</discussionsCount>
                 </data>
+                <wasDeleted>false</wasDeleted>
                 <status>UNCHECKED</status>
                 <supportedLanguages id="211">
                   <string>Java 8</string>
@@ -1159,6 +1192,7 @@
                   <maxSubmissionsCount>0</maxSubmissionsCount>
                   <discussionsCount>0</discussionsCount>
                 </data>
+                <wasDeleted>false</wasDeleted>
                 <status>UNCHECKED</status>
                 <supportedLanguages id="218">
                   <string>Java 8</string>
@@ -1167,9 +1201,11 @@
                 <courseId>0</courseId>
               </StepNode>
             </children>
+            <wasDeleted>false</wasDeleted>
             <courseId>0</courseId>
           </LessonNode>
         </children>
+        <wasDeleted>false</wasDeleted>
       </SectionNode>
       <SectionNode id="219">
         <data class="Section" id="220">
@@ -1241,6 +1277,7 @@
                   <maxSubmissionsCount>0</maxSubmissionsCount>
                   <discussionsCount>0</discussionsCount>
                 </data>
+                <wasDeleted>false</wasDeleted>
                 <status>UNCHECKED</status>
                 <supportedLanguages id="233">
                   <string>Java 8</string>
@@ -1278,6 +1315,7 @@
                   <maxSubmissionsCount>0</maxSubmissionsCount>
                   <discussionsCount>0</discussionsCount>
                 </data>
+                <wasDeleted>false</wasDeleted>
                 <status>UNCHECKED</status>
                 <supportedLanguages id="240">
                   <string>Java 8</string>
@@ -1286,6 +1324,7 @@
                 <courseId>0</courseId>
               </StepNode>
             </children>
+            <wasDeleted>false</wasDeleted>
             <courseId>0</courseId>
           </LessonNode>
           <LessonNode id="241">
@@ -1345,6 +1384,7 @@
                   <maxSubmissionsCount>0</maxSubmissionsCount>
                   <discussionsCount>0</discussionsCount>
                 </data>
+                <wasDeleted>false</wasDeleted>
                 <status>UNCHECKED</status>
                 <supportedLanguages id="252">
                   <string>Java 8</string>
@@ -1382,6 +1422,7 @@
                   <maxSubmissionsCount>0</maxSubmissionsCount>
                   <discussionsCount>0</discussionsCount>
                 </data>
+                <wasDeleted>false</wasDeleted>
                 <status>UNCHECKED</status>
                 <supportedLanguages id="259">
                   <string>Java 8</string>
@@ -1390,6 +1431,7 @@
                 <courseId>0</courseId>
               </StepNode>
             </children>
+            <wasDeleted>false</wasDeleted>
             <courseId>0</courseId>
           </LessonNode>
           <LessonNode id="260">
@@ -1449,6 +1491,7 @@
                   <maxSubmissionsCount>0</maxSubmissionsCount>
                   <discussionsCount>0</discussionsCount>
                 </data>
+                <wasDeleted>false</wasDeleted>
                 <status>UNCHECKED</status>
                 <supportedLanguages id="271">
                   <string>Java 8</string>
@@ -1457,9 +1500,11 @@
                 <courseId>0</courseId>
               </StepNode>
             </children>
+            <wasDeleted>false</wasDeleted>
             <courseId>0</courseId>
           </LessonNode>
         </children>
+        <wasDeleted>false</wasDeleted>
       </SectionNode>
       <SectionNode id="272">
         <data class="Section" id="273">
@@ -1531,6 +1576,7 @@
                   <maxSubmissionsCount>0</maxSubmissionsCount>
                   <discussionsCount>0</discussionsCount>
                 </data>
+                <wasDeleted>false</wasDeleted>
                 <status>UNCHECKED</status>
                 <supportedLanguages id="286">
                   <string>Java 8</string>
@@ -1539,6 +1585,7 @@
                 <courseId>0</courseId>
               </StepNode>
             </children>
+            <wasDeleted>false</wasDeleted>
             <courseId>0</courseId>
           </LessonNode>
           <LessonNode id="287">
@@ -1598,6 +1645,7 @@
                   <maxSubmissionsCount>0</maxSubmissionsCount>
                   <discussionsCount>0</discussionsCount>
                 </data>
+                <wasDeleted>false</wasDeleted>
                 <status>UNCHECKED</status>
                 <supportedLanguages id="298">
                   <string>Java 8</string>
@@ -1635,6 +1683,7 @@
                   <maxSubmissionsCount>0</maxSubmissionsCount>
                   <discussionsCount>0</discussionsCount>
                 </data>
+                <wasDeleted>false</wasDeleted>
                 <status>UNCHECKED</status>
                 <supportedLanguages id="305">
                   <string>Java 8</string>
@@ -1643,6 +1692,7 @@
                 <courseId>0</courseId>
               </StepNode>
             </children>
+            <wasDeleted>false</wasDeleted>
             <courseId>0</courseId>
           </LessonNode>
           <LessonNode id="306">
@@ -1702,6 +1752,7 @@
                   <maxSubmissionsCount>0</maxSubmissionsCount>
                   <discussionsCount>0</discussionsCount>
                 </data>
+                <wasDeleted>false</wasDeleted>
                 <status>UNCHECKED</status>
                 <supportedLanguages id="317">
                   <string>Java 8</string>
@@ -1710,6 +1761,7 @@
                 <courseId>0</courseId>
               </StepNode>
             </children>
+            <wasDeleted>false</wasDeleted>
             <courseId>0</courseId>
           </LessonNode>
           <LessonNode id="318">
@@ -1769,6 +1821,7 @@
                   <maxSubmissionsCount>0</maxSubmissionsCount>
                   <discussionsCount>0</discussionsCount>
                 </data>
+                <wasDeleted>false</wasDeleted>
                 <status>UNCHECKED</status>
                 <supportedLanguages id="329">
                   <string>Java 8</string>
@@ -1806,6 +1859,7 @@
                   <maxSubmissionsCount>0</maxSubmissionsCount>
                   <discussionsCount>0</discussionsCount>
                 </data>
+                <wasDeleted>false</wasDeleted>
                 <status>UNCHECKED</status>
                 <supportedLanguages id="336">
                   <string>Java 8</string>
@@ -1843,6 +1897,7 @@
                   <maxSubmissionsCount>0</maxSubmissionsCount>
                   <discussionsCount>0</discussionsCount>
                 </data>
+                <wasDeleted>false</wasDeleted>
                 <status>UNCHECKED</status>
                 <supportedLanguages id="343">
                   <string>Java 8</string>
@@ -1880,6 +1935,7 @@
                   <maxSubmissionsCount>0</maxSubmissionsCount>
                   <discussionsCount>0</discussionsCount>
                 </data>
+                <wasDeleted>false</wasDeleted>
                 <status>UNCHECKED</status>
                 <supportedLanguages id="350">
                   <string>Java 8</string>
@@ -1888,11 +1944,14 @@
                 <courseId>0</courseId>
               </StepNode>
             </children>
+            <wasDeleted>false</wasDeleted>
             <courseId>0</courseId>
           </LessonNode>
         </children>
+        <wasDeleted>false</wasDeleted>
       </SectionNode>
     </children>
+    <wasDeleted>false</wasDeleted>
     <authors id="351"/>
   </root>
   <showHint>true</showHint>

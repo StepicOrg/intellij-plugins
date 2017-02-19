@@ -28,15 +28,15 @@ import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.objects.StudyObject;
-import org.stepik.plugin.projectWizard.ProjectWizardUtils;
+import org.stepik.core.projectWizard.ProjectWizardUtils;
 import org.stepik.plugin.projectWizard.StepikProjectGenerator;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 
-import static org.stepik.plugin.projectWizard.ProjectWizardUtils.createStepDirectory;
-import static org.stepik.plugin.projectWizard.ProjectWizardUtils.createSubDirectories;
+import static org.stepik.core.projectWizard.ProjectWizardUtils.createStepDirectory;
+import static org.stepik.core.projectWizard.ProjectWizardUtils.createSubDirectories;
 
 
 class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettings> {

@@ -1,4 +1,4 @@
-package org.stepik.plugin.projectWizard;
+package org.stepik.core.projectWizard;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;

@@ -5,8 +5,8 @@ import com.intellij.openapi.util.io.FileUtil;
 import com.jetbrains.tmp.learning.core.EduNames;
 import org.jetbrains.annotations.NotNull;
 
-class SandboxModuleBuilder extends ModuleBuilderWithSrc {
-    SandboxModuleBuilder(@NotNull String moduleDir) {
+public class SandboxModuleBuilder extends ModuleBuilderWithSrc {
+    public SandboxModuleBuilder(@NotNull String moduleDir) {
         super();
         setName(EduNames.SANDBOX_DIR);
         setModuleFilePath(FileUtil.join(moduleDir,

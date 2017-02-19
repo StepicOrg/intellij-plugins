@@ -12,7 +12,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.problems.WolfTheProblemSolver;
 import com.jetbrains.tmp.learning.StudyUtils;
-import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
 import icons.AllStepikIcons;
@@ -20,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.core.metrics.Metrics;
 import org.stepik.core.metrics.MetricsStatus;
+import org.stepik.core.utils.ProjectFilesUtils;
 
 import javax.swing.*;
 
@@ -44,12 +44,13 @@ public class StepikResetStepAction extends AbstractStepAction {
             return;
         }
 
-        VirtualFile stepDirectory = project.getBaseDir().findFileByRelativePath(stepNode.getPath());
-        if (stepDirectory == null) {
+        VirtualFile src = ProjectFilesUtils.getOrCreateSrcDirectory(project, stepNode);
+        if (src == null) {
             return;
         }
+
         String mainFileName = stepNode.getCurrentLang().getMainFileName();
-        VirtualFile mainFile = stepDirectory.findFileByRelativePath(EduNames.SRC + "/" + mainFileName);
+        VirtualFile mainFile = src.findChild(mainFileName);
 
         if (mainFile != null) {
             FileDocumentManager documentManager = FileDocumentManager.getInstance();

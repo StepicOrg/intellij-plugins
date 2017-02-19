@@ -29,6 +29,6 @@ abstract class AbstractStepAction extends StudyActionWithShortcut {
         }
 
         StepNode targetStepNode = StudyUtils.getSelectedStep(project);
-        presentation.setEnabled(targetStepNode != null);
+        presentation.setEnabled(targetStepNode != null && !targetStepNode.getWasDeleted());
     }
 }
