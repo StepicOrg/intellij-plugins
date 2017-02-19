@@ -9,8 +9,17 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.StreamUtil;
+import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.StudyPluginConfigurator;
+import com.jetbrains.tmp.learning.StudyUtils;
+import com.jetbrains.tmp.learning.courseFormat.StepNode;
+import com.jetbrains.tmp.learning.courseFormat.StudyNode;
+import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import javafx.application.Platform;
 import javafx.concurrent.Worker;
 import javafx.embed.swing.JFXPanel;
@@ -22,6 +31,11 @@ import javafx.scene.web.WebHistory;
 import javafx.scene.web.WebView;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.api.client.StepikApiClient;
+import org.stepik.api.exceptions.StepikClientException;
+import org.stepik.api.objects.submissions.Submission;
+import org.stepik.api.objects.submissions.Submissions;
+import org.stepik.plugin.actions.SendAction;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -30,6 +44,9 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.events.Event;
 import org.w3c.dom.events.EventListener;
 import org.w3c.dom.events.EventTarget;
+import org.w3c.dom.html.HTMLCollection;
+import org.w3c.dom.html.HTMLFormElement;
+import org.w3c.dom.html.HTMLInputElement;
 
 import javax.swing.*;
 import java.awt.*;
@@ -38,10 +55,14 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 class StudyBrowserWindow extends JFrame {
     private static final Logger logger = Logger.getInstance(StudyToolWindow.class);
     private static final String EVENT_TYPE_CLICK = "click";
+    private static final String EVENT_TYPE_SUBMIT = "submit";
+    private final Project project;
     private JFXPanel panel;
     private WebView webComponent;
     private StackPane pane;
@@ -51,7 +72,8 @@ class StudyBrowserWindow extends JFrame {
     private boolean linkInNewBrowser = true;
     private boolean showProgress = false;
 
-    StudyBrowserWindow(final boolean linkInNewWindow, final boolean showProgress) {
+    StudyBrowserWindow(@NotNull Project project, final boolean linkInNewWindow, final boolean showProgress) {
+        this.project = project;
         linkInNewBrowser = linkInNewWindow;
         this.showProgress = showProgress;
         setSize(new Dimension(900, 800));
@@ -96,7 +118,6 @@ class StudyBrowserWindow extends JFrame {
             pane = new StackPane();
             webComponent = new WebView();
             engine = webComponent.getEngine();
-
 
             if (showProgress) {
                 progressBar = makeProgressBarWithListener();
@@ -191,9 +212,12 @@ class StudyBrowserWindow extends JFrame {
     private void initHyperlinkListener() {
         engine.getLoadWorker().stateProperty().addListener((ov, oldState, newState) -> {
             if (newState == Worker.State.SUCCEEDED) {
-                final EventListener listener = makeHyperLinkListener();
+                final EventListener linkListener = makeHyperLinkListener();
+                addListenerToAllHyperlinkItems(linkListener);
 
-                addListenerToAllHyperlinkItems(listener);
+                final EventListener formListener = makeFormListener();
+                final Document doc = engine.getDocument();
+                ((EventTarget) doc).addEventListener(EVENT_TYPE_SUBMIT, formListener, false);
             }
         });
     }
@@ -242,6 +266,93 @@ class StudyBrowserWindow extends JFrame {
                 return attributes.getNamedItem("href").getNodeValue();
             }
         };
+    }
+
+    @NotNull
+    private EventListener makeFormListener() {
+        return event -> {
+            String domEventType = event.getType();
+            if (domEventType.equals(EVENT_TYPE_SUBMIT)) {
+                HTMLFormElement form = (HTMLFormElement) event.getTarget();
+
+                StudyNode root = StepikProjectManager.getProjectRoot(project);
+                if (root == null) {
+                    return;
+                }
+
+                StudyNode node = StudyUtils.getStudyNode(root, form.getAction());
+                if (node == null || !(node instanceof StepNode)) {
+                    return;
+                }
+
+                StepNode stepNode = (StepNode) node;
+
+                HTMLCollection elements = form.getElements();
+
+                String status = ((HTMLInputElement) elements.namedItem("status")).getValue();
+                long attemptId = Long.parseLong(((HTMLInputElement) elements
+                        .namedItem("attemptId")).getValue());
+
+                StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
+
+                try {
+                    switch (status) {
+                        case "empty":
+                        case "correct":
+                        case "wrong":
+                            getAttempt(stepNode, stepikApiClient);
+                            StudyUtils.setStudyNode(project, node, true);
+                            break;
+                        case "active":
+                            Node parent = form.getParentNode();
+                            parent.removeChild(form);
+                            sendStep(stepNode, elements, attemptId, stepikApiClient);
+                            break;
+                        default:
+                            return;
+                    }
+                } catch (StepikClientException e) {
+                    logger.warn(e);
+                }
+                event.preventDefault();
+            }
+        };
+    }
+
+    private void getAttempt(StudyNode node, StepikApiClient stepikApiClient) {
+        stepikApiClient.attempts()
+                .post()
+                .step(node.getId())
+                .execute();
+    }
+
+    private void sendStep(StepNode stepNode, HTMLCollection elements, long attemptId, StepikApiClient stepikApiClient) {
+        String title = "Checking Step: " + stepNode.getName();
+        ProgressManager.getInstance().run(new Task.Backgroundable(project, title) {
+            @Override
+            public void run(@NotNull ProgressIndicator indicator) {
+                indicator.setIndeterminate(true);
+                int count = Integer.parseInt(((HTMLInputElement) elements.namedItem("count")).getValue());
+                List<Boolean> choices = new ArrayList<>(count);
+                for (int i = 0; i < elements.getLength() && choices.size() < count; i++) {
+                    HTMLInputElement option = ((HTMLInputElement) elements.item(i));
+                    if (option != null && option.getName().equals("option")) {
+                        choices.add(option.getChecked());
+                    }
+                }
+
+                Submissions submissions = stepikApiClient.submissions()
+                        .post()
+                        .attempt(attemptId)
+                        .choices(choices)
+                        .execute();
+
+                if (!submissions.isEmpty()) {
+                    Submission submission = submissions.getSubmissions().get(0);
+                    SendAction.checkStepStatus(project, stepNode, submission.getId(), indicator);
+                }
+            }
+        });
     }
 
     void addBackAndOpenButtons() {

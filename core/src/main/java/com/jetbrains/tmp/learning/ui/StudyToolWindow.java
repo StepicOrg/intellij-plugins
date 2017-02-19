@@ -156,7 +156,11 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
     public abstract JComponent createStepInfoPanel(Project project);
 
     public void setStepNode(@Nullable StudyNode studyNode) {
-        if (stepNode == studyNode) {
+        setStepNode(studyNode, false);
+    }
+
+    public void setStepNode(@Nullable StudyNode studyNode, boolean force) {
+        if (!force && stepNode == studyNode) {
             return;
         }
 

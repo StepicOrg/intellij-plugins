@@ -116,7 +116,6 @@ abstract class StepikAbstractQuery<T> {
         }
         headers.put(HttpHeaders.CONTENT_TYPE, getContentType());
 
-
         ClientResponse response = null;
         switch (method) {
             case GET:
@@ -152,9 +151,7 @@ abstract class StepikAbstractQuery<T> {
     }
 
     @NotNull
-    protected String getContentType() {
-        return "application/json";
-    }
+    protected abstract String getContentType();
 
     @NotNull
     protected String getBody() {

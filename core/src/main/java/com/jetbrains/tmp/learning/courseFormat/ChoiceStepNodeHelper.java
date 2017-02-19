@@ -25,7 +25,8 @@ public class ChoiceStepNodeHelper {
     private final StepNode stepNode;
     private boolean isMultipleChoice;
     private List<Pair<String, Boolean>> stepOptions;
-    private boolean active;
+    private String status;
+    private long attemptId;
 
     ChoiceStepNodeHelper(@NotNull StepNode stepNode) {
         this.stepNode = stepNode;
@@ -47,6 +48,7 @@ public class ChoiceStepNodeHelper {
             return;
         }
         stepOptions = new ArrayList<>();
+        status = "empty";
         try {
             StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
 
@@ -59,6 +61,7 @@ public class ChoiceStepNodeHelper {
             }
 
             Attempt attempt = attempts.getAttempts().get(0);
+            attemptId = attempt.getId();
             Dataset dataset = attempt.getDataset();
             isMultipleChoice = dataset.isMultipleChoice();
             String[] options = dataset.getOptions();
@@ -72,15 +75,14 @@ public class ChoiceStepNodeHelper {
             List<Boolean> choices = null;
             if (!submissions.isEmpty()) {
                 Submission submission = submissions.getSubmissions().get(0);
-                stepNode.setStatus(StudyStatus.of(submission.getStatus()));
                 Reply reply = submission.getReply();
                 choices = reply.getChoices();
                 stepNode.setStatus(StudyStatus.of(submission.getStatus()));
+                status = submission.getStatus();
             } else {
                 stepNode.setStatus(StudyStatus.UNCHECKED);
+                status = "active";
             }
-
-            active = choices == null;
 
             for (int i = 0; i < options.length; i++) {
                 boolean checked = choices != null && choices.get(i);
@@ -96,12 +98,17 @@ public class ChoiceStepNodeHelper {
         return isMultipleChoice;
     }
 
-    public boolean isActive() {
-        initStepOptions();
-        return active;
+    public String getPath() {
+        return stepNode.getPath();
     }
 
-    public boolean isEmpty() {
-        return getOptions().isEmpty();
+    public String getStatus() {
+        initStepOptions();
+        return status;
+    }
+
+    public long getAttemptId() {
+        initStepOptions();
+        return attemptId;
     }
 }

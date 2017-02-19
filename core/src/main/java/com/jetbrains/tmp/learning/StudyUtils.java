@@ -51,11 +51,8 @@ public class StudyUtils {
     }
 
     public static void updateToolWindows(@NotNull final Project project) {
-        final StudyToolWindow studyToolWindow = getStudyToolWindow(project);
-        if (studyToolWindow != null) {
-            StepNode stepNode = getSelectedStep(project);
-            studyToolWindow.setStepNode(stepNode);
-        }
+        StudyNode stepNode = getSelectedNode(project);
+        setStudyNode(project, stepNode, true);
     }
 
     static void initToolWindows(@NotNull final Project project) {
@@ -84,9 +81,13 @@ public class StudyUtils {
     }
 
     public static void setStudyNode(@NotNull final Project project, @Nullable StudyNode studyNode) {
+        setStudyNode(project, studyNode, false);
+    }
+
+    public static void setStudyNode(@NotNull final Project project, @Nullable StudyNode studyNode, boolean force) {
         StudyToolWindow toolWindow = getStudyToolWindow(project);
         if (toolWindow != null) {
-            ApplicationManager.getApplication().invokeLater(() -> toolWindow.setStepNode(studyNode));
+            ApplicationManager.getApplication().invokeLater(() -> toolWindow.setStepNode(studyNode, force));
         }
     }
 

@@ -1,4 +1,4 @@
-package org.stepik.plugin.actions.step;
+package org.stepik.plugin.actions;
 
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
@@ -7,14 +7,14 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.api.objects.submissions.Submission;
 
-class ActionUtils {
+public class ActionUtils {
     static final int MILLISECONDS_IN_MINUTES = 60 * 1000;
     private static final int MILLISECONDS_IN_HOUR = 60 * MILLISECONDS_IN_MINUTES;
     private static final String HOUR = "hour";
     private static final String MINUTE = "minute";
     private static final String SECOND = "second";
 
-    static String etaAsString(long eta) {
+    public static String etaAsString(long eta) {
         StringBuilder result = new StringBuilder();
 
         long hours = eta / MILLISECONDS_IN_HOUR;
@@ -58,7 +58,7 @@ class ActionUtils {
         notification.notify(project);
     }
 
-    static void notifyError(
+    public static void notifyError(
             @NotNull Project project,
             @NotNull String title,
             @NotNull String content) {
