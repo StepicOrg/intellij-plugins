@@ -44,6 +44,11 @@ public abstract class StepikAbstractGetQuery<T extends StepikAbstractGetQuery, R
         return (T) this;
     }
 
+    @NotNull
+    protected String getContentType() {
+        return "application/json";
+    }
+
     protected boolean isCacheEnabled() {
         return true;
     }
