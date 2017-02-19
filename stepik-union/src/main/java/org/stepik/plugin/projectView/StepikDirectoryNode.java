@@ -4,6 +4,7 @@ import com.intellij.ide.projectView.PresentationData;
 import com.intellij.ide.projectView.ViewSettings;
 import com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.courseFormat.StudyNode;
@@ -60,5 +61,15 @@ class StepikDirectoryNode extends PsiDirectoryNode {
     @Override
     public String getNavigateActionText(boolean focusEditor) {
         return null;
+    }
+
+    @Override
+    public void navigate(boolean requestFocus) {
+        VirtualFile virtualFile = getVirtualFile();
+        StudyNode studyNode;
+        if (virtualFile != null) {
+            studyNode = StudyUtils.getStudyNode(myProject, virtualFile);
+            StudyUtils.setStudyNode(myProject, studyNode);
+        }
     }
 }

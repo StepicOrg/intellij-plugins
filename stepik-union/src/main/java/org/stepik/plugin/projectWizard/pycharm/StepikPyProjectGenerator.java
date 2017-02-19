@@ -33,12 +33,10 @@ import org.stepik.plugin.projectWizard.StepikProjectGenerator;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 
-import static com.jetbrains.tmp.learning.SupportedLanguages.PYTHON3;
+import static org.stepik.plugin.projectWizard.ProjectWizardUtils.createStepDirectory;
+import static org.stepik.plugin.projectWizard.ProjectWizardUtils.createSubDirectories;
 
 
 class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettings> {
@@ -200,7 +198,7 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
         if (root instanceof StepNode) {
             createStepDirectory(project, (StepNode) root);
         } else {
-            createSubDirectories(root, project);
+            createSubDirectories(project, root, (step) -> createStepDirectory(project, step));
         }
 
         ApplicationManager.getApplication().invokeLater(
@@ -210,32 +208,4 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
                                         .registerStudyToolWindow())));
     }
 
-    private void createSubDirectories(
-            @NotNull StudyNode<?, ?> root,
-            @NotNull Project project) {
-        root.getChildren()
-                .forEach(child -> {
-                    FileUtil.createDirectory(new File(project.getBasePath(), child.getPath()));
-                    if (child instanceof StepNode) {
-                        createStepDirectory(project, (StepNode) child);
-                    } else {
-                        createSubDirectories(child, project);
-                    }
-                });
-    }
-
-    private void createStepDirectory(@NotNull Project project, StepNode stepNode) {
-        stepNode.setCurrentLang(PYTHON3);
-        File stepDir = new File(project.getBasePath(), stepNode.getPath());
-        File srcDir = new File(stepDir, "src");
-        FileUtil.createDirectory(stepDir);
-        FileUtil.createDirectory(srcDir);
-
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(new File(srcDir, "main.py")))) {
-            String template = stepNode.getCurrentTemplate();
-            writer.write(template);
-        } catch (IOException e) {
-            logger.warn(e);
-        }
-    }
 }

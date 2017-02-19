@@ -16,4 +16,9 @@ public enum StepType {
             return UNKNOWN;
         }
     }
+
+    @Override
+    public String toString() {
+        return name().toLowerCase();
+    }
 }

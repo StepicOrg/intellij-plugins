@@ -20,6 +20,7 @@ import org.jetbrains.annotations.Nullable;
 import org.stepik.core.metrics.Metrics;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
 
@@ -45,8 +46,6 @@ public class ProgrammingLanguageUtils {
             Metrics.switchLanguage(project, targetStepNode, SUCCESSFUL);
             return;
         }
-
-        closeStepNodeFile(project, targetStepNode);
 
         VirtualFile srcParent = project.getBaseDir().findFileByRelativePath(targetStepNode.getPath());
         if (srcParent == null) {
@@ -83,7 +82,11 @@ public class ProgrammingLanguageUtils {
         exchangeFiles(src, hide, first, second, moveFirst, moveSecond);
 
         targetStepNode.setCurrentLang(language);
+        ArrayList<VirtualFile> needClose = closeStepNodeFile(project, targetStepNode);
         FileEditorManager.getInstance(project).openFile(second.getVirtualFile(), true);
+        FileEditorManager editorManager = FileEditorManager.getInstance(project);
+        needClose.forEach(editorManager::closeFile);
+
         Metrics.switchLanguage(project, targetStepNode, SUCCESSFUL);
     }
 
@@ -108,9 +111,11 @@ public class ProgrammingLanguageUtils {
         }
     }
 
-    private static void closeStepNodeFile(@NotNull Project project, @NotNull StepNode targetStepNode) {
+    private static ArrayList<VirtualFile> closeStepNodeFile(
+            @NotNull Project project,
+            @NotNull StepNode targetStepNode) {
         FileDocumentManager documentManager = FileDocumentManager.getInstance();
-        FileEditorManager editorManager = FileEditorManager.getInstance(project);
+        ArrayList<VirtualFile> needClose = new ArrayList<>();
         for (VirtualFile file : FileEditorManager.getInstance(project).getOpenFiles()) {
             if (StudyUtils.getStudyNode(project, file) != targetStepNode) {
                 continue;
@@ -120,8 +125,10 @@ public class ProgrammingLanguageUtils {
                 continue;
             }
             documentManager.saveDocument(document);
-            editorManager.closeFile(file);
+            needClose.add(file);
         }
+
+        return needClose;
     }
 
     private static PsiDirectory getOrCreateDir(

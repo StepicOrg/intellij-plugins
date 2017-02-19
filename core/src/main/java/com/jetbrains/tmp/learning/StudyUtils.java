@@ -1,6 +1,9 @@
 package com.jetbrains.tmp.learning;
 
 import com.intellij.ide.projectView.ProjectView;
+import com.intellij.ide.projectView.ProjectViewNode;
+import com.intellij.ide.projectView.impl.AbstractProjectViewPane;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -11,16 +14,18 @@ import com.intellij.psi.PsiFileSystemItem;
 import com.intellij.ui.content.Content;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.courseFormat.StudyNode;
+import com.jetbrains.tmp.learning.courseFormat.VideoStepNodeHelper;
 import com.jetbrains.tmp.learning.ui.StudyToolWindow;
 import com.jetbrains.tmp.learning.ui.StudyToolWindowFactory;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.objects.steps.Limit;
 import org.stepik.api.objects.steps.Sample;
+import org.stepik.api.objects.steps.Step;
 import org.stepik.core.utils.ProjectFilesUtils;
 
 import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -32,6 +37,11 @@ public class StudyUtils {
             "(?:section([0-9]+)/lesson([0-9]+))|" +
             "(?:section([0-9]+))" +
             ").*$";
+    private static final String UNKNOWN_STEP_TEXT = "This step can take place in the web version (%s)";
+    private static final String STEP_LINK_TEXT = "View step on Stepik.org";
+    private static final String VIDEO_LINK_TEXT = "Play video in the web version";
+    private static final String VIDEO_BLOCK = "<video src=\"%s\" style width=\"100%%\" preload controls autoplay></video>";
+    private static final String STEP_LINK_TEMPLATE = "<a href='https://stepik.org/lesson/%d/step/%d'>%s</a>";
     private static Pattern pathPattern;
 
     private StudyUtils() {
@@ -70,33 +80,51 @@ public class StudyUtils {
         return null;
     }
 
-    @Nullable
-    @Contract("null -> null")
-    public static String getStepTextFromStep(@Nullable final StepNode stepNode) {
-        if (stepNode == null) {
-            return null;
+    public static void setStudyNode(@NotNull final Project project, @Nullable StudyNode studyNode) {
+        StudyToolWindow toolWindow = getStudyToolWindow(project);
+        if (toolWindow != null) {
+            ApplicationManager.getApplication().invokeLater(() -> toolWindow.setStepNode(studyNode));
         }
-        return getTextWithStepLink(stepNode);
     }
 
-    @NotNull
-    private static String getTextWithStepLink(StepNode stepNode) {
-        StringBuilder stringBuilder = new StringBuilder();
-
-        StudyNode lessonNode = stepNode.getParent();
-        if (lessonNode != null) {
-            stringBuilder.append("<a href=\"https://stepik.org/lesson/")
-                    .append(lessonNode.getId())
-                    .append("/step/")
-                    .append(stepNode.getPosition())
-                    .append("\">View step on Stepik.org</a>");
+    public static String getVideoStepText(
+            @NotNull VideoStepNodeHelper videoStepNode,
+            int quality) {
+        videoStepNode.setQuality(quality);
+        String text = getLink(videoStepNode.getStepNode(), VIDEO_LINK_TEXT);
+        if (videoStepNode.hasContent()) {
+            return text + "<br>" + String.format(VIDEO_BLOCK, videoStepNode.getUrl());
         }
+
+        return text;
+    }
+
+    public static String getTextStepText(@NotNull StepNode stepNode) {
+        return getStepText(stepNode, STEP_LINK_TEXT);
+    }
+
+    private static String getStepText(@NotNull StepNode stepNode, @NotNull String linkText, Object... params) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(getLink(stepNode, String.format(linkText, params)));
 
         if (!stepNode.getText().startsWith("<p>") && !stepNode.getText().startsWith("<h")) {
             stringBuilder.append("<br><br>");
         }
 
         stringBuilder.append(stepNode.getText());
+
+        return stringBuilder.toString();
+    }
+
+    public static String getUnknownStepText(@NotNull StepNode stepNode) {
+        Step data = stepNode.getData();
+        String stepType = data != null ? data.getBlock().getName() : stepNode.getType().toString();
+        return getStepText(stepNode, UNKNOWN_STEP_TEXT, stepType);
+    }
+
+    public static String getCodeStepText(@NotNull StepNode stepNode) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(getTextStepText(stepNode));
 
         List<Sample> samples = stepNode.getSamples();
 
@@ -122,6 +150,14 @@ public class StudyUtils {
                 .append("Mib</p>");
 
         return stringBuilder.toString();
+    }
+
+    private static String getLink(@NotNull StepNode stepNode, @NotNull String text) {
+        StudyNode lessonNode = stepNode.getParent();
+        if (lessonNode != null) {
+            return String.format(STEP_LINK_TEMPLATE, lessonNode.getId(), stepNode.getPosition(), text);
+        }
+        return text;
     }
 
     @Nullable
@@ -160,23 +196,28 @@ public class StudyUtils {
 
     @Nullable
     public static StudyNode getSelectedNode(@NotNull Project project) {
-        StepNode stepNode = getSelectedStep(project);
-        if (stepNode != null) {
-            return stepNode;
+        StudyNode studyNode = getSelectedStep(project);
+
+        if (studyNode == null) {
+            studyNode = getSelectedNodeInTree(project);
         }
 
-        PsiElement node = ProjectView.getInstance(project)
-                .getParentOfCurrentSelection();
-        if (node == null) {
+        return studyNode;
+    }
+
+    @Nullable
+    public static StudyNode getSelectedNodeInTree(@NotNull Project project) {
+        PsiElement element = getSelectedPsiElement(project);
+        if (element == null) {
             return null;
         }
 
         PsiFileSystemItem file;
 
-        if (node instanceof PsiFileSystemItem) {
-            file = (PsiFileSystemItem) node;
+        if (element instanceof PsiFileSystemItem) {
+            file = (PsiFileSystemItem) element;
         } else {
-            file = node.getContainingFile();
+            file = element.getContainingFile();
         }
 
         if (file == null) {
@@ -184,6 +225,32 @@ public class StudyUtils {
         }
 
         return getStudyNode(project, file.getVirtualFile());
+    }
+
+    private static PsiElement getSelectedPsiElement(@NotNull Project project) {
+        ProjectView projectView = ProjectView.getInstance(project);
+        AbstractProjectViewPane currentProjectViewPane = projectView.getCurrentProjectViewPane();
+        if (currentProjectViewPane == null) {
+            return null;
+        }
+        DefaultMutableTreeNode node = currentProjectViewPane.getSelectedNode();
+        if (node == null) {
+            return null;
+        }
+
+        Object userObject = node.getUserObject();
+        if (userObject instanceof ProjectViewNode) {
+            ProjectViewNode descriptor = (ProjectViewNode) userObject;
+            Object element = descriptor.getValue();
+            if (element instanceof PsiElement) {
+                PsiElement psiElement = (PsiElement) element;
+                return !psiElement.isValid() ? null : psiElement;
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
     }
 
     public static boolean hasJavaFx() {

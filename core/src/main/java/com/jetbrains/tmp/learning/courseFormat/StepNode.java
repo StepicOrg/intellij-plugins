@@ -35,10 +35,6 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
 
     public StepNode() {}
 
-    public StepNode(@NotNull final LessonNode parent, @NotNull Step data) {
-        super(parent, data);
-    }
-
     public StepNode(@NotNull Step data, @Nullable ProgressIndicator indicator) {
         super(data, indicator);
     }
@@ -257,11 +253,11 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
         return Collections.emptyList();
     }
 
-    @Nullable
+    @NotNull
     public StepType getType() {
         Step data = getData();
         if (data == null) {
-            return null;
+            return StepType.UNKNOWN;
         }
         return StepType.of(data.getBlock().getName());
     }
@@ -300,5 +296,10 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
         result = 31 * result + (currentLang != null ? currentLang.hashCode() : 0);
         result = 31 * result + super.hashCode();
         return result;
+    }
+
+    @NotNull
+    public VideoStepNodeHelper asVideoStep() {
+        return new VideoStepNodeHelper(this);
     }
 }

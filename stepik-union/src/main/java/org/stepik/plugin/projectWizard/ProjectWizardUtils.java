@@ -1,6 +1,13 @@
 package org.stepik.plugin.projectWizard;
 
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.io.FileUtil;
+import com.jetbrains.tmp.learning.StepikProjectManager;
+import com.jetbrains.tmp.learning.core.EduNames;
+import com.jetbrains.tmp.learning.courseFormat.StepNode;
+import com.jetbrains.tmp.learning.courseFormat.StepType;
+import com.jetbrains.tmp.learning.courseFormat.StudyNode;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -14,7 +21,14 @@ import org.stepik.api.objects.sections.Section;
 import org.stepik.api.objects.sections.Sections;
 import org.stepik.api.objects.steps.Step;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.function.Consumer;
 
 /**
  * @author meanmail
@@ -107,5 +121,55 @@ public class ProjectWizardUtils {
             String message = String.format(messageTemplate, id, studyObject.getTitle());
             logger.error(message, e);
         }
+    }
+
+    public static void createStepDirectory(@NotNull Project project, @NotNull StepNode stepNode) {
+        StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
+        if (projectManager == null) {
+            return;
+        }
+        stepNode.setCurrentLang(projectManager.getDefaultLang());
+
+        String baseDir = project.getBasePath();
+
+        if (baseDir == null) {
+            return;
+        }
+
+        Path srcDir = Paths.get(baseDir, stepNode.getPath(), EduNames.SRC);
+
+        String name = "unknown";
+        try {
+            Files.createDirectories(srcDir);
+
+            if (stepNode.getType() != StepType.CODE) {
+                return;
+            }
+
+            name = stepNode.getCurrentLang().getMainFileName();
+
+            final Path file = srcDir.resolve(name);
+            try (BufferedWriter out = Files.newBufferedWriter(file, StandardCharsets.UTF_8)) {
+                final String text = stepNode.getCurrentTemplate();
+                out.write(text);
+            }
+        } catch (IOException e) {
+            logger.error("Failed create main file: " + name);
+        }
+    }
+
+    public static void createSubDirectories(
+            @NotNull Project project,
+            @NotNull StudyNode<?, ?> root,
+            @NotNull Consumer<StepNode> stepDirectoryCreator) {
+        root.getChildren()
+                .forEach(child -> {
+                    FileUtil.createDirectory(new File(project.getBasePath(), child.getPath()));
+                    if (child instanceof StepNode) {
+                        stepDirectoryCreator.accept((StepNode) child);
+                    } else {
+                        createSubDirectories(project, child, stepDirectoryCreator);
+                    }
+                });
     }
 }

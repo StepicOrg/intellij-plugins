@@ -1,5 +1,6 @@
 package org.stepik.api.objects.steps;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -37,12 +38,16 @@ public class VideoUrl {
         this.url = url;
     }
 
-    @Nullable
-    public String getQuality() {
-        return quality;
+    @NotNull
+    public Integer getQuality() {
+        try {
+            return Integer.valueOf(quality);
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
 
-    public void setQuality(@Nullable String quality) {
-        this.quality = quality;
+    public void setQuality(@Nullable Integer quality) {
+        this.quality = String.valueOf(quality);
     }
 }

@@ -49,13 +49,8 @@ public abstract class StudyBasePluginConfigurator implements StudyPluginConfigur
 
             @Override
             public void selectionChanged(@NotNull FileEditorManagerEvent event) {
-                VirtualFile file = event.getNewFile();
-                if (file != null) {
-                    StudyNode stepNode = StudyUtils.getStudyNode(event.getManager().getProject(), file);
-                    toolWindow.setStepNode(stepNode);
-                } else {
-                    toolWindow.setStepNode(null);
-                }
+                StudyNode stepNode = StudyUtils.getSelectedNode(event.getManager().getProject());
+                toolWindow.setStepNode(stepNode);
             }
         };
     }

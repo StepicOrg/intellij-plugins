@@ -175,7 +175,7 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
 
             return el;
         } catch (ParserConfigurationException | IOException | SAXException e) {
-            logger.warn("Failed getting the StepikProjectManager state");
+            logger.warn("Failed getting the StepikProjectManager state", e);
         }
 
         return null;
