@@ -50,6 +50,9 @@ public class ActionUtils {
             @NotNull String title,
             @NotNull String content,
             @NotNull NotificationType type) {
+        if (content.isEmpty()) {
+            content = "<empty>";
+        }
         Notification notification = new Notification(
                 "Step.sending",
                 title,
