@@ -174,9 +174,8 @@ public class ProjectFilesUtils {
         return srcDir;
     }
 
-    static PsiDirectory getOrCreatePsiDirectory(@NotNull Project project, @NotNull String directoryPath) {
-        VirtualFile baseDir = project.getBaseDir();
-        VirtualFile directory = getOrCreateDirectory(baseDir, directoryPath);
+    static PsiDirectory getOrCreatePsiDirectory(@NotNull Project project, @NotNull PsiDirectory baseDir, @NotNull String relativePath) {
+        VirtualFile directory = getOrCreateDirectory(baseDir.getVirtualFile(), relativePath);
         if (directory == null) {
             return null;
         }

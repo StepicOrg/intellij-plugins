@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
+import static org.stepik.core.utils.ProjectFilesUtils.getOrCreatePsiDirectory;
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcPsiDirectory;
 
 public class ProgrammingLanguageUtils {
@@ -53,7 +54,7 @@ public class ProgrammingLanguageUtils {
             return;
         }
 
-        PsiDirectory hide = ProjectFilesUtils.getOrCreatePsiDirectory(project, EduNames.HIDE);
+        PsiDirectory hide = getOrCreatePsiDirectory(project, src, EduNames.HIDE);
         if (hide == null) {
             return;
         }
