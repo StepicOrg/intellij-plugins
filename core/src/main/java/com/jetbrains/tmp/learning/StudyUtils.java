@@ -12,6 +12,7 @@ import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFileSystemItem;
 import com.intellij.ui.content.Content;
+import com.jetbrains.tmp.learning.courseFormat.ChoiceStepNodeHelper;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.courseFormat.StudyNode;
 import com.jetbrains.tmp.learning.courseFormat.VideoStepNodeHelper;
@@ -22,10 +23,12 @@ import org.jetbrains.annotations.Nullable;
 import org.stepik.api.objects.steps.Limit;
 import org.stepik.api.objects.steps.Sample;
 import org.stepik.api.objects.steps.Step;
+import org.stepik.core.templates.Templater;
 import org.stepik.core.utils.ProjectFilesUtils;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
+import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -65,7 +68,7 @@ public class StudyUtils {
     }
 
     @Nullable
-    public static StudyToolWindow getStudyToolWindow(@NotNull final Project project) {
+    static StudyToolWindow getStudyToolWindow(@NotNull final Project project) {
         ToolWindow toolWindow = ToolWindowManager.getInstance(project)
                 .getToolWindow(StudyToolWindowFactory.STUDY_TOOL_WINDOW);
         if (toolWindow != null) {
@@ -97,6 +100,16 @@ public class StudyUtils {
         }
 
         return text;
+    }
+
+    public static String getChoiceStepText(@NotNull ChoiceStepNodeHelper choiceStepNode) {
+        String text = getTextStepText(choiceStepNode.getStepNode());
+
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("text", text);
+        params.put("choiceStepNode", choiceStepNode);
+
+        return Templater.processTemplate("choice_block", params);
     }
 
     public static String getTextStepText(@NotNull StepNode stepNode) {
@@ -195,7 +208,7 @@ public class StudyUtils {
     }
 
     @Nullable
-    public static StudyNode getSelectedNode(@NotNull Project project) {
+    static StudyNode getSelectedNode(@NotNull Project project) {
         StudyNode studyNode = getSelectedStep(project);
 
         if (studyNode == null) {

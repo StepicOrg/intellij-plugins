@@ -302,4 +302,8 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
     public VideoStepNodeHelper asVideoStep() {
         return new VideoStepNodeHelper(this);
     }
+
+    public ChoiceStepNodeHelper asChoiceStep() {
+        return new ChoiceStepNodeHelper(this);
+    }
 }

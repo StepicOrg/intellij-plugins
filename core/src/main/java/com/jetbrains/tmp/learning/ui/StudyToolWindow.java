@@ -1,5 +1,6 @@
 package com.jetbrains.tmp.learning.ui;
 
+import com.intellij.ide.projectView.ProjectView;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.ActionGroup;
@@ -21,8 +22,10 @@ import com.jetbrains.tmp.learning.StudyBasePluginConfigurator;
 import com.jetbrains.tmp.learning.StudyPluginConfigurator;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.SupportedLanguages;
+import com.jetbrains.tmp.learning.courseFormat.ChoiceStepNodeHelper;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.courseFormat.StudyNode;
+import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
 import com.jetbrains.tmp.learning.courseFormat.VideoStepNodeHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -35,6 +38,7 @@ import java.awt.event.ActionListener;
 import java.util.Comparator;
 import java.util.Map;
 
+import static com.jetbrains.tmp.learning.StudyUtils.getChoiceStepText;
 import static com.jetbrains.tmp.learning.StudyUtils.getCodeStepText;
 import static com.jetbrains.tmp.learning.StudyUtils.getTextStepText;
 import static com.jetbrains.tmp.learning.StudyUtils.getUnknownStepText;
@@ -174,11 +178,12 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
             rightPanel.setVisible(false);
             return;
         }
-        String text = null;
+        String text;
+        boolean rightPanelVisible = false;
+
         switch (stepNode.getType()) {
             case UNKNOWN:
                 text = getUnknownStepText(stepNode);
-                rightPanel.setVisible(false);
                 break;
             case CODE:
                 text = getCodeStepText(stepNode);
@@ -187,12 +192,12 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
                         .sorted(Comparator.comparingInt(Enum::ordinal))
                         .forEach(languageBox::addItem);
                 layout.show(rightPanel, "language");
-                rightPanel.setVisible(languageBox.getModel().getSize() != 0);
+                rightPanelVisible = languageBox.getModel().getSize() != 0;
                 languageBox.setSelectedItem(stepNode.getCurrentLang());
                 break;
             case TEXT:
                 text = getTextStepText(stepNode);
-                rightPanel.setVisible(false);
+                stepNode.setStatus(StudyStatus.SOLVED);
                 break;
             case VIDEO:
                 VideoStepNodeHelper videoStepNode = stepNode.asVideoStep();
@@ -202,16 +207,22 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
                 int quality = videoStepNode.getQuality();
                 videoQualityBox.setSelectedItem(quality);
                 layout.show(rightPanel, "quality");
-                rightPanel.setVisible(videoQualityBox.getModel().getSize() != 0);
+                rightPanelVisible = videoQualityBox.getModel().getSize() != 0;
                 storeVideoQuality(quality);
+                stepNode.setStatus(StudyStatus.SOLVED);
+                break;
+            case CHOICE:
+                ChoiceStepNodeHelper choiceStepNode = stepNode.asChoiceStep();
+                text = getChoiceStepText(choiceStepNode);
+                break;
+            default:
+                text = EMPTY_STEP_TEXT;
                 break;
         }
 
-        if (text == null) {
-            text = EMPTY_STEP_TEXT;
-            rightPanel.setVisible(false);
-        }
+        rightPanel.setVisible(rightPanelVisible);
         setText(text);
+        ProjectView.getInstance(project).refresh();
     }
 
     private int loadVideoQuality() {
