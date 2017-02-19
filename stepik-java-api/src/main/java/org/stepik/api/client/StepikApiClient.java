@@ -99,7 +99,7 @@ public class StepikApiClient {
     private static final String VERSION = "0.1";
     private final TransportClient transportClient;
     private final JsonConverter jsonConverter;
-    private TokenInfo tokenInfo;
+    private volatile TokenInfo tokenInfo;
     private Path cachePath = Paths.get(System.getProperty("user.home"), ".stepik", "stepik-api", "cache");
     private boolean cacheEnabled = true;
 

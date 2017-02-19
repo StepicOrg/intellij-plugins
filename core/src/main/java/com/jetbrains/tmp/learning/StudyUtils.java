@@ -209,7 +209,7 @@ public class StudyUtils {
     }
 
     @Nullable
-    static StudyNode getSelectedNode(@NotNull Project project) {
+    public static StudyNode getSelectedNode(@NotNull Project project) {
         StudyNode studyNode = getSelectedStep(project);
 
         if (studyNode == null) {
