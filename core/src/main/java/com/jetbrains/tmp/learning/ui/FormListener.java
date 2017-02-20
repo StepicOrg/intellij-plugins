@@ -8,6 +8,7 @@ import com.intellij.openapi.project.Project;
 import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
+import com.jetbrains.tmp.learning.courseFormat.StepType;
 import com.jetbrains.tmp.learning.courseFormat.StudyNode;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
@@ -15,6 +16,7 @@ import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.submissions.Submission;
 import org.stepik.api.objects.submissions.Submissions;
+import org.stepik.api.queries.submissions.StepikSubmissionsPostQuery;
 import org.stepik.plugin.actions.SendAction;
 import org.w3c.dom.events.Event;
 import org.w3c.dom.events.EventListener;
@@ -23,6 +25,7 @@ import org.w3c.dom.html.HTMLFormElement;
 import org.w3c.dom.html.HTMLInputElement;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 class FormListener implements EventListener {
@@ -58,6 +61,11 @@ class FormListener implements EventListener {
             long attemptId = Long.parseLong(((HTMLInputElement) elements
                     .namedItem("attemptId")).getValue());
 
+            String typeStr = ((HTMLInputElement) elements
+                    .namedItem("type")).getValue();
+
+            StepType type = StepType.of(typeStr);
+
             try {
                 switch (status) {
                     case "empty":
@@ -67,7 +75,7 @@ class FormListener implements EventListener {
                         StudyUtils.setStudyNode(project, node, true);
                         break;
                     case "active":
-                        sendStep(stepNode, elements, attemptId);
+                        sendStep(stepNode, elements, type, attemptId);
                         break;
                     default:
                         return;
@@ -90,10 +98,50 @@ class FormListener implements EventListener {
     private void sendStep(
             @NotNull StepNode stepNode,
             @NotNull HTMLCollection elements,
+            @NotNull StepType type,
             long attemptId) {
+        String title = "Checking Step: " + stepNode.getName();
+
+        ProgressManager.getInstance().run(new Task.Backgroundable(project, title) {
+            @Override
+            public void run(@NotNull ProgressIndicator indicator) {
+                indicator.setIndeterminate(true);
+
+                try {
+                    StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
+
+                    StepikSubmissionsPostQuery query = stepikApiClient.submissions()
+                            .post()
+                            .attempt(attemptId);
+                    switch (type) {
+                        case CHOICE:
+                            List<Boolean> choices = getChoiceData(elements);
+                            query.choices(choices);
+                            break;
+                        case STRING:
+                            String text = getStringData(elements);
+                            query.text(text);
+                            break;
+                    }
+
+                    Submissions submissions = query.execute();
+
+                    if (!submissions.isEmpty()) {
+                        Submission submission = submissions.getSubmissions().get(0);
+                        SendAction.checkStepStatus(project, stepNode, submission.getId(), indicator);
+                    }
+                } catch (StepikClientException e) {
+                    logger.warn("Failed send step from browser", e);
+                }
+            }
+        });
+    }
+
+    @NotNull
+    private List<Boolean> getChoiceData(@NotNull HTMLCollection elements) {
         HTMLInputElement countElement = (HTMLInputElement) elements.namedItem("count");
         if (countElement == null) {
-            return;
+            return Collections.emptyList();
         }
 
         int count = Integer.parseInt(countElement.getValue());
@@ -109,31 +157,16 @@ class FormListener implements EventListener {
                 }
             }
         }
+        return choices;
+    }
 
-        String title = "Checking Step: " + stepNode.getName();
-
-        ProgressManager.getInstance().run(new Task.Backgroundable(project, title) {
-            @Override
-            public void run(@NotNull ProgressIndicator indicator) {
-                indicator.setIndeterminate(true);
-
-                try {
-                    StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
-
-                    Submissions submissions = stepikApiClient.submissions()
-                            .post()
-                            .attempt(attemptId)
-                            .choices(choices)
-                            .execute();
-
-                    if (!submissions.isEmpty()) {
-                        Submission submission = submissions.getSubmissions().get(0);
-                        SendAction.checkStepStatus(project, stepNode, submission.getId(), indicator);
-                    }
-                } catch (StepikClientException e) {
-                    logger.warn("Failed send step from browser", e);
-                }
+    private String getStringData(@NotNull HTMLCollection elements) {
+        for (int i = 0; i < elements.getLength(); i++) {
+            HTMLInputElement element = ((HTMLInputElement) elements.item(i));
+            if (!"hidden".equals(element.getType())) {
+                element.setDisabled(true);
             }
-        });
+        }
+        return ((HTMLInputElement) elements.namedItem("text")).getValue();
     }
 }

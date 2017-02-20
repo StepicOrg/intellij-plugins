@@ -1,7 +1,6 @@
 package com.jetbrains.tmp.learning.courseFormat;
 
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.util.Pair;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.api.client.StepikApiClient;
@@ -14,34 +13,36 @@ import org.stepik.api.objects.submissions.Submission;
 import org.stepik.api.objects.submissions.Submissions;
 import org.stepik.api.queries.Order;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * @author meanmail
  */
-public class ChoiceStepNodeHelper extends StepHelper {
+public class StringStepNodeHelper extends StepHelper {
     private static final Logger logger = Logger.getInstance(ChoiceStepNodeHelper.class);
-    private boolean isMultipleChoice;
-    private List<Pair<String, Boolean>> stepOptions;
+    private boolean isTextDisabled;
     private String status;
     private long attemptId;
+    private String text;
 
-    ChoiceStepNodeHelper(@NotNull StepNode stepNode) {
+    StringStepNodeHelper(@NotNull StepNode stepNode) {
         super(stepNode);
     }
 
     @NotNull
-    public List<Pair<String, Boolean>> getOptions() {
+    public StepNode getStepNode() {
+        return stepNode;
+    }
+
+    @NotNull
+    public String getText() {
         initStepOptions();
-        return stepOptions;
+        return text;
     }
 
     private void initStepOptions() {
-        if (stepOptions != null) {
+        if (text != null) {
             return;
         }
-        stepOptions = new ArrayList<>();
+        text = "";
         status = "empty";
         try {
             StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
@@ -57,8 +58,7 @@ public class ChoiceStepNodeHelper extends StepHelper {
             Attempt attempt = attempts.getAttempts().get(0);
             attemptId = attempt.getId();
             Dataset dataset = attempt.getDataset();
-            isMultipleChoice = dataset.isMultipleChoice();
-            String[] options = dataset.getOptions();
+            isTextDisabled = dataset.isTextDisabled();
 
             Submissions submissions = stepikApiClient.submissions()
                     .get()
@@ -66,30 +66,26 @@ public class ChoiceStepNodeHelper extends StepHelper {
                     .attempt(attempt.getId())
                     .execute();
 
-            List<Boolean> choices = null;
             if (!submissions.isEmpty()) {
                 Submission submission = submissions.getSubmissions().get(0);
                 Reply reply = submission.getReply();
-                choices = reply.getChoices();
+                text = reply.getText();
+                text = text != null ? text : "";
                 stepNode.setStatus(StudyStatus.of(submission.getStatus()));
                 status = submission.getStatus();
             } else {
                 stepNode.setStatus(StudyStatus.UNCHECKED);
                 status = "active";
             }
-
-            for (int i = 0; i < options.length; i++) {
-                boolean checked = choices != null && choices.get(i);
-                stepOptions.add(Pair.create(options[i], checked));
-            }
         } catch (StepikClientException e) {
-            logger.warn("Failed init test-step options", e);
+            logger.warn("Failed init text-step options", e);
+            text = null;
         }
     }
 
-    public boolean isMultipleChoice() {
+    public boolean isTextDisabled() {
         initStepOptions();
-        return isMultipleChoice;
+        return isTextDisabled;
     }
 
     public String getPath() {

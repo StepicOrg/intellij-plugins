@@ -1,14 +1,22 @@
-<#-- @ftlvariable name="stepNode" type="com.jetbrains.tmp.learning.courseFormat.ChoiceStepNodeHelper" -->
+<#-- @ftlvariable name="stepNode" type="com.jetbrains.tmp.learning.courseFormat.StringStepNodeHelper" -->
 <#-- @ftlvariable name="text" type="java.lang.String" -->
 
 ${text}<br>
+
+<style>
+    #text {
+        display: block;
+        margin: 10px auto;
+        width: 100%;
+    }
+</style>
 
 <div>
 <#assign status = stepNode.getStatus()/>
 
     <form action="${stepNode.getPath()}" method="get">
 
-    <#if status != "active">
+    <#if status != "active" || stepNode.isTextDisabled()>
         <#assign disabled = "disabled" />
     </#if>
 
@@ -18,20 +26,11 @@ ${text}<br>
         <p style="color: #117700">Correct</p>
     </#if>
 
-    <#assign index = 0 />
-
-    <#assign type=stepNode.isMultipleChoice()?string("checkbox", "radio") />
-
-    <#list stepNode.getOptions() as option>
-        <input type="${type}" name="option"
-               value="${index}" ${disabled!""} ${option.getSecond()?string("checked", "")}> ${option.getFirst()} </input>
-        <br>
-        <#assign index++ />
-    </#list>
+        <input id="text" type="text" name="value" placeholder="Input your answer here" ${disabled!""}
+               value="${stepNode.getText()}"/>
         <input type="hidden" name="status" value="${status}"/>
         <input type="hidden" name="attemptId" value="${stepNode.getAttemptId()?string("#")}"/>
-        <input type="hidden" name="count" value="${index}"/>
-        <input type="hidden" name="type" value="choice"/>
+        <input type="hidden" name="type" value="string"/>
         <br>
 
     <#if status == "empty">

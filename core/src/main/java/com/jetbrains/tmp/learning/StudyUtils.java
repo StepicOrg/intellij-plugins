@@ -13,7 +13,9 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFileSystemItem;
 import com.intellij.ui.content.Content;
 import com.jetbrains.tmp.learning.courseFormat.ChoiceStepNodeHelper;
+import com.jetbrains.tmp.learning.courseFormat.StepHelper;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
+import com.jetbrains.tmp.learning.courseFormat.StringStepNodeHelper;
 import com.jetbrains.tmp.learning.courseFormat.StudyNode;
 import com.jetbrains.tmp.learning.courseFormat.VideoStepNodeHelper;
 import com.jetbrains.tmp.learning.ui.StudyToolWindow;
@@ -103,14 +105,25 @@ public class StudyUtils {
         return text;
     }
 
-    public static String getChoiceStepText(@NotNull ChoiceStepNodeHelper choiceStepNode) {
-        String text = getTextStepText(choiceStepNode.getStepNode());
+    public static String getChoiceStepText(@NotNull StepNode stepNode) {
+        ChoiceStepNodeHelper stepNodeHelper = stepNode.asChoiceStep();
+        return processTemplate(stepNodeHelper, "choice_block");
+    }
+
+    public static String getStringStepText(@NotNull StepNode stepNode) {
+        StringStepNodeHelper stepNodeHelper = stepNode.asStringStep();
+        return processTemplate(stepNodeHelper, "string_block");
+    }
+
+    @NotNull
+    private static String processTemplate(@NotNull StepHelper stepNodeHelper, @NotNull String choice_block) {
+        String text = getTextStepText(stepNodeHelper.getStepNode());
 
         HashMap<String, Object> params = new HashMap<>();
         params.put("text", text);
-        params.put("choiceStepNode", choiceStepNode);
+        params.put("stepNode", stepNodeHelper);
 
-        return Templater.processTemplate("choice_block", params);
+        return Templater.processTemplate(choice_block, params);
     }
 
     public static String getTextStepText(@NotNull StepNode stepNode) {
