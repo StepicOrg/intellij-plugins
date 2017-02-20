@@ -116,14 +116,14 @@ public class StudyUtils {
     }
 
     @NotNull
-    private static String processTemplate(@NotNull StepHelper stepNodeHelper, @NotNull String choice_block) {
+    private static String processTemplate(@NotNull StepHelper stepNodeHelper, @NotNull String templateName) {
         String text = getTextStepText(stepNodeHelper.getStepNode());
 
         HashMap<String, Object> params = new HashMap<>();
         params.put("text", text);
         params.put("stepNode", stepNodeHelper);
 
-        return Templater.processTemplate(choice_block, params);
+        return Templater.processTemplate(templateName, params);
     }
 
     public static String getTextStepText(@NotNull StepNode stepNode) {
