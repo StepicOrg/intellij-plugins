@@ -11,6 +11,7 @@ import org.stepik.api.objects.attempts.Dataset;
 import org.stepik.api.objects.submissions.Reply;
 import org.stepik.api.objects.submissions.Submission;
 import org.stepik.api.objects.submissions.Submissions;
+import org.stepik.api.objects.users.User;
 import org.stepik.api.queries.Order;
 
 import static com.jetbrains.tmp.learning.courseFormat.StudyStatus.UNCHECKED;
@@ -22,12 +23,12 @@ public class StepHelper {
     private static final Logger logger = Logger.getInstance(StepHelper.class);
     final StepNode stepNode;
     @NotNull
-    Dataset dataset = new Dataset();
-    @NotNull
     Reply reply = new Reply();
     @NotNull
     private String status = "empty";
-    private long attemptId;
+    @NotNull
+    private Attempt attempt = new Attempt();
+    private int submissionsCount = -1;
 
     StepHelper(@NotNull StepNode stepNode) {
         this.stepNode = stepNode;
@@ -38,27 +39,28 @@ public class StepHelper {
         return stepNode;
     }
 
-    private boolean loadAttempt(@NotNull StepikApiClient stepikApiClient) {
+    private boolean loadAttempt(@NotNull StepikApiClient stepikApiClient, long userId) {
         Attempts attempts = stepikApiClient.attempts()
                 .get()
                 .step(stepNode.getId())
+                .user(userId)
                 .execute();
         if (attempts.isEmpty()) {
+            attempt = new Attempt();
             return false;
         }
-        Attempt attempt = attempts.getAttempts().get(0);
 
-        attemptId = attempt.getId();
-        dataset = attempt.getDataset();
+        attempt = attempts.getAttempts().get(0);
         return true;
     }
 
 
-    private boolean loadSubmission(StepikApiClient stepikApiClient) {
+    private boolean loadSubmission(StepikApiClient stepikApiClient, long userId) {
         Submissions submissions = stepikApiClient.submissions()
                 .get()
                 .order(Order.DESC)
-                .attempt(attemptId)
+                .attempt(attempt.getId())
+                .user(userId)
                 .execute();
 
         if (!submissions.isEmpty()) {
@@ -90,7 +92,12 @@ public class StepHelper {
 
     public long getAttemptId() {
         initStepOptions();
-        return attemptId;
+        return attempt.getId();
+    }
+
+    @NotNull
+    Dataset getDataset() {
+        return attempt.getDataset();
     }
 
     void initStepOptions() {
@@ -100,16 +107,19 @@ public class StepHelper {
 
         onStartInit();
         status = "empty";
+
         try {
             StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
+            User user = StepikConnectorLogin.getCurrentUser();
+            long userId = user.getId();
 
-            if (!loadAttempt(stepikApiClient)) {
+            if (!loadAttempt(stepikApiClient, userId)) {
                 return;
             }
 
             onAttemptLoaded();
 
-            if (loadSubmission(stepikApiClient)) {
+            if (loadSubmission(stepikApiClient, userId)) {
                 onSubmissionLoaded();
             }
 
@@ -137,6 +147,26 @@ public class StepHelper {
     }
 
     void onInitFailed() {
+    }
 
+    public int getSubmissionsCount() {
+        if (submissionsCount == -1) {
+            try {
+                StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
+                User user = StepikConnectorLogin.getCurrentUser();
+                long userId = user.getId();
+
+                Submissions submissions = stepikApiClient.submissions()
+                        .get()
+                        .step(stepNode.getId())
+                        .user(userId)
+                        .execute();
+                submissionsCount = submissions.getCount();
+            } catch (StepikClientException e) {
+                logger.warn("Failed get submissions count", e);
+                return 0;
+            }
+        }
+        return submissionsCount;
     }
 }

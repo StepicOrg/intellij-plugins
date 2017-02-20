@@ -1,5 +1,6 @@
 package com.jetbrains.tmp.learning.courseFormat;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -21,7 +22,7 @@ public class StringStepNodeHelper extends StepHelper {
     @NotNull
     public String getText() {
         initStepOptions();
-        return text != null ? text : "";
+        return StringEscapeUtils.escapeHtml(text != null ? text : "");
     }
 
     @Override
@@ -36,7 +37,7 @@ public class StringStepNodeHelper extends StepHelper {
 
     @Override
     protected void onAttemptLoaded() {
-        isTextDisabled = dataset.isTextDisabled();
+        isTextDisabled = getDataset().isTextDisabled();
     }
 
     @Override

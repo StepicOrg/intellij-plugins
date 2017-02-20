@@ -37,8 +37,8 @@ public class ChoiceStepNodeHelper extends StepHelper {
 
     @Override
     protected void onAttemptLoaded() {
-        isMultipleChoice = dataset.isMultipleChoice();
-        options = dataset.getOptions();
+        isMultipleChoice = getDataset().isMultipleChoice();
+        options = getDataset().getOptions();
         choices = null;
     }
 

@@ -45,4 +45,13 @@ ${text}<br>
     </#if>
         <input type="submit" value="${submitCaption}" ${disabledSubmit!""}/>
     </form>
+
+<#assign isHasSubmissionsRestrictions = stepNode.getStepNode().getData().isHasSubmissionsRestrictions() />
+<#assign maxSubmissionsCount = stepNode.getStepNode().getData().getMaxSubmissionsCount() />
+<#assign submissionsCount = stepNode.getSubmissionsCount() />
+
+<#if isHasSubmissionsRestrictions>
+    <p>${submissionsCount} of ${maxSubmissionsCount} attempts</p>
+</#if>
+
 </div>
