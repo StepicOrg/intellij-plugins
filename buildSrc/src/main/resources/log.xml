@@ -61,7 +61,6 @@
         <level value="DEBUG"/>
         <appender-ref ref="DIALOG"/>
         <appender-ref ref="FILE"/>
-        <appender-ref ref="CONSOLE-DEBUG"/>
     </logger>
 
     <root>
