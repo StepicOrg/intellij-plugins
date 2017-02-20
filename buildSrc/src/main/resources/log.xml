@@ -30,7 +30,7 @@
 
     <appender name="DIALOG" class="com.intellij.diagnostic.DialogAppender">
         <filter class="org.apache.log4j.varia.LevelRangeFilter">
-            <param name="LevelMin" value="INFO"/>
+            <param name="LevelMin" value="DEBUG"/>
         </filter>
     </appender>
 
@@ -50,6 +50,19 @@
             <param name="ConversionPattern" value="%d [%7r] %6p - %30.30c - %m \n"/>
         </layout>
     </appender>
+
+    <logger name="#org.stepik" additivity="false">
+        <level value="DEBUG"/>
+        <appender-ref ref="DIALOG"/>
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <logger name="#com.jetbrains.tmp" additivity="false">
+        <level value="DEBUG"/>
+        <appender-ref ref="DIALOG"/>
+        <appender-ref ref="FILE"/>
+        <appender-ref ref="CONSOLE-DEBUG"/>
+    </logger>
 
     <root>
         <priority value="INFO"/>
