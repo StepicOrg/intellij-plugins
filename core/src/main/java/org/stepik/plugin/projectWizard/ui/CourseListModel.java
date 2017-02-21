@@ -32,7 +32,7 @@ class CourseListModel extends AbstractListModel<StudyObject> implements ComboBox
         if (index >= 0 && index < courses.size()) {
             return courses.get(index);
         } else {
-            return StepikProjectGenerator.EMPTY_STUDY_NODE;
+            return StepikProjectGenerator.EMPTY_STUDY_OBJECT;
         }
     }
 
@@ -43,11 +43,11 @@ class CourseListModel extends AbstractListModel<StudyObject> implements ComboBox
 
         if (!newCourseList.isEmpty()) {
             courses.addAll(newCourseList);
-            if (selectedCourse == StepikProjectGenerator.EMPTY_STUDY_NODE || !courses.contains(selectedCourse)) {
+            if (selectedCourse == StepikProjectGenerator.EMPTY_STUDY_OBJECT || !courses.contains(selectedCourse)) {
                 selectedCourse = courses.get(0);
             }
         } else {
-            courses.add(StepikProjectGenerator.EMPTY_STUDY_NODE);
+            courses.add(StepikProjectGenerator.EMPTY_STUDY_OBJECT);
         }
 
         setSelectedItem(selectedCourse);
@@ -58,7 +58,7 @@ class CourseListModel extends AbstractListModel<StudyObject> implements ComboBox
     @Override
     public StudyObject getSelectedItem() {
         if (selectedItem == null || !(selectedItem instanceof StudyObject)) {
-            return StepikProjectGenerator.EMPTY_STUDY_NODE;
+            return StepikProjectGenerator.EMPTY_STUDY_OBJECT;
         }
         return (StudyObject) selectedItem;
     }

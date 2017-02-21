@@ -19,7 +19,7 @@ import org.stepik.api.objects.units.Units;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.stepik.plugin.projectWizard.StepikProjectGenerator.EMPTY_STUDY_NODE;
+import static org.stepik.plugin.projectWizard.StepikProjectGenerator.EMPTY_STUDY_OBJECT;
 
 /**
  * @author meanmail
@@ -38,6 +38,10 @@ public class Utils {
             "<p style='font-weight: bold;'>This course is adaptive.<br>" +
                     "Sorry, but we don't support adaptive courses yet</p>";
 
+    private static final Pattern mainPattern = Pattern.compile(
+            "(?:^|.*/)(course|lesson)(?=(?:(?:/[^/]*-)|/)(\\d+)(?:/|$))(.*)");
+    private static final Pattern unitPattern = Pattern.compile("(?:.*)[?|&]unit=(\\d+)(?:$|&)");
+
     public static StudyObject getStudyObjectFromLink(@NotNull String link) {
         // https://stepik.org/course/Основы-программирования-для-Linux-548
         // https://stepik.org/course/548
@@ -46,35 +50,61 @@ public class Utils {
         // 548
 
         if (isFillOfInt(link)) {
-            return getCourseStudyObject(Integer.parseInt(link));
+            return getCourseStudyObject(Long.parseLong(link));
         }
 
-        Pattern mainPattern = Pattern.compile("(?:^|.*/)(course|lesson)(?=(?:(?:/[^/]*-)|/)(\\d+)(?:/|$))(.*)");
         Matcher matcher = mainPattern.matcher(link);
 
         if (matcher.matches()) {
             String object = matcher.group(1);
-            int id = Integer.parseInt(matcher.group(2));
+            long id = Long.parseLong(matcher.group(2));
             String params = matcher.group(3);
 
             if ("course".equals(object)) {
                 return getCourseStudyObject(id);
             } else if ("lesson".equals(object)) {
-                Pattern unitPattern = Pattern.compile("(?:.*)[?|&]unit=(\\d+)(?:$|&)");
-                matcher = unitPattern.matcher(params);
-                int unitId = 0;
-                if (matcher.matches()) {
-                    unitId = Integer.parseInt(matcher.group(1));
-                }
-
-                return getLessonStudyObject(id, unitId);
+                return getLessonStudyObject(id, params);
             }
         }
 
-        return EMPTY_STUDY_NODE;
+        return EMPTY_STUDY_OBJECT;
     }
 
-    private static StudyObject getLessonStudyObject(int lessonId, int unitId) {
+    private static StudyObject getLessonStudyObject(long id, String params) {
+        long unitId = parseUnitId(params);
+
+        return getLessonStudyObject(id, unitId);
+    }
+
+    public static long parseUnitId(String link) {
+        Matcher matcher;
+        matcher = unitPattern.matcher(link);
+        long unitId = 0;
+        if (matcher.matches()) {
+            unitId = Long.parseLong(matcher.group(1));
+        }
+        return unitId;
+    }
+
+    private static StudyObject getLessonStudyObject(long lessonId, long unitId) {
+        CompoundUnitLesson unitLesson = getCompoundUnitLessonStudyObject(lessonId, unitId);
+
+        Unit unit = unitLesson.getUnit();
+
+        if (unit.getId() != 0) {
+            StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
+            Section section = getSectionStudyObject(unit.getSection(), stepikApiClient);
+
+            if (section != null) {
+                return getCourseStudyObject(section.getCourse());
+            }
+        }
+
+        return unitLesson;
+    }
+
+    @NotNull
+    private static CompoundUnitLesson getCompoundUnitLessonStudyObject(long lessonId, long unitId) {
         StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
 
         Units units = null;
@@ -90,19 +120,14 @@ public class Utils {
 
         if (unitId != 0 && !units.isEmpty()) {
             unit = units.getItems().get(0);
-            Section section = getSectionStudyObject(unit.getSection(), stepikApiClient);
-
-            if (section != null) {
-                return getCourseStudyObject(section.getCourse());
-            }
         }
 
         Lesson lesson = getLesson(lessonId, stepikApiClient);
 
-        return lesson != null ? new CompoundUnitLesson(unit, lesson) : EMPTY_STUDY_NODE;
+        return lesson != null ? new CompoundUnitLesson(unit, lesson) : new CompoundUnitLesson();
     }
 
-    private static Section getSectionStudyObject(int sectionId, @NotNull StepikApiClient stepikApiClient) {
+    private static Section getSectionStudyObject(long sectionId, @NotNull StepikApiClient stepikApiClient) {
         Sections sections = null;
 
         if (sectionId != 0) {
@@ -121,7 +146,7 @@ public class Utils {
     }
 
     @Nullable
-    private static Lesson getLesson(int lessonId, StepikApiClient stepikApiClient) {
+    private static Lesson getLesson(long lessonId, StepikApiClient stepikApiClient) {
         Lessons lessons = null;
 
         if (lessonId != 0) {
@@ -140,14 +165,14 @@ public class Utils {
     }
 
     @NotNull
-    private static StudyObject getCourseStudyObject(int id) {
+    private static StudyObject getCourseStudyObject(long id) {
         StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
         Course course = getCourse(id, stepikApiClient);
-        return course != null ? course : EMPTY_STUDY_NODE;
+        return course != null ? course : EMPTY_STUDY_OBJECT;
     }
 
     @Nullable
-    private static Course getCourse(int id, StepikApiClient stepikApiClient) {
+    private static Course getCourse(long id, StepikApiClient stepikApiClient) {
         Courses courses = null;
 
         if (id != 0) {
