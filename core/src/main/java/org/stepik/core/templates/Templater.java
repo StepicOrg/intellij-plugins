@@ -27,7 +27,7 @@ public class Templater {
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             Template template = config.getTemplate(templateName + ".ftl");
             template.process(map, new PrintWriter(out));
-            return out.toString("UTF-8");
+            return out.toString();
         } catch (TemplateException | IOException e) {
             logger.warn(e);
         }
