@@ -29,6 +29,7 @@ import javafx.scene.web.WebHistory;
 import javafx.scene.web.WebView;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.api.urls.Urls;
 import org.stepik.plugin.utils.NavigationUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -234,13 +235,17 @@ class StudyBrowserWindow extends JFrame {
                     engine.setJavaScriptEnabled(true);
                     engine.getLoadWorker().cancel();
                     ev.preventDefault();
-                    final String href = getLink((Element) ev.getTarget());
+                    String href = getLink((Element) ev.getTarget());
                     if (href == null) {
                         return;
                     }
 
                     if (browseProject(href)) {
                         return;
+                    }
+
+                    if (href.startsWith("/")) {
+                        href = Urls.STEPIK_URL + href;
                     }
 
                     BrowserUtil.browse(href);
