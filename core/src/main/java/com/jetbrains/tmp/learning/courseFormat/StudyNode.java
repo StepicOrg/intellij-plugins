@@ -42,6 +42,9 @@ public interface StudyNode<D extends StudyObject, C extends StudyNode> {
     @Nullable
     C getChildById(long id);
 
+    @Nullable
+    C getChildByPosition(int position);
+
     List<C> getChildren();
 
     @Nullable

@@ -27,7 +27,7 @@ import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
 import static org.stepik.core.metrics.MetricsStatus.TARGET_NOT_FOUND;
 
 public class StepikProjectGenerator {
-    public static final StudyObject EMPTY_STUDY_NODE = initEmptyStudyNode();
+    public static final StudyObject EMPTY_STUDY_OBJECT = initEmptyStudyNode();
     private static final Logger logger = Logger.getInstance(StepikProjectGenerator.class);
     private static StepikProjectGenerator instance;
     private static StudyNode projectRoot;
@@ -127,12 +127,12 @@ public class StepikProjectGenerator {
                         ProgressManager.getInstance().getProgressIndicator().setIndeterminate(true);
                         List<StudyObject> courses = getCourses(programmingLanguage);
                         if (courses.isEmpty()) {
-                            courses.add(EMPTY_STUDY_NODE);
+                            courses.add(EMPTY_STUDY_OBJECT);
                         }
                         return courses;
                     }, "Refreshing Course List", true, project);
         } catch (RuntimeException e) {
-            return Collections.singletonList(EMPTY_STUDY_NODE);
+            return Collections.singletonList(EMPTY_STUDY_OBJECT);
         }
     }
 
