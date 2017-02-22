@@ -25,7 +25,7 @@ public class StepHelper {
     @NotNull
     Reply reply = new Reply();
     @NotNull
-    private String status = "empty";
+    private String status = "";
     @NotNull
     private Attempt attempt = new Attempt();
     private int submissionsCount = -1;
@@ -67,9 +67,6 @@ public class StepHelper {
             Submission submission = submissions.getSubmissions().get(0);
             reply = submission.getReply();
             status = submission.getStatus();
-            if (status.isEmpty()) {
-                status = "empty";
-            }
             stepNode.setStatus(StudyStatus.of(status));
             return true;
         }
@@ -106,7 +103,7 @@ public class StepHelper {
         }
 
         onStartInit();
-        status = "empty";
+        status = "";
 
         try {
             StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
@@ -155,13 +152,19 @@ public class StepHelper {
                 StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
                 User user = StepikConnectorLogin.getCurrentUser();
                 long userId = user.getId();
-
-                Submissions submissions = stepikApiClient.submissions()
-                        .get()
-                        .step(stepNode.getId())
-                        .user(userId)
-                        .execute();
-                submissionsCount = submissions.getCount();
+                submissionsCount = 0;
+                Submissions submissions;
+                int page = 1;
+                do {
+                    submissions = stepikApiClient.submissions()
+                            .get()
+                            .step(stepNode.getId())
+                            .user(userId)
+                            .page(page)
+                            .execute();
+                    submissionsCount += submissions.getCount();
+                    page++;
+                } while (submissions.getMeta().getHasNext());
             } catch (StepikClientException e) {
                 logger.warn("Failed get submissions count", e);
                 return 0;

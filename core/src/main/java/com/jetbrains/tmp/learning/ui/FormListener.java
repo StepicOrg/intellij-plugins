@@ -64,15 +64,20 @@ class FormListener implements EventListener {
             String typeStr = ((HTMLInputElement) elements
                     .namedItem("type")).getValue();
 
+            boolean locked = Boolean.valueOf(((HTMLInputElement) elements
+                    .namedItem("locked")).getValue());
+
             StepType type = StepType.of(typeStr);
 
             try {
                 switch (status) {
-                    case "empty":
+                    case "":
                     case "correct":
                     case "wrong":
-                        getAttempt(stepNode);
-                        StudyUtils.setStudyNode(project, node, true);
+                        if (!locked) {
+                            getAttempt(stepNode);
+                            StudyUtils.setStudyNode(project, node, true);
+                        }
                         break;
                     case "active":
                         sendStep(stepNode, elements, type, attemptId);
@@ -87,7 +92,7 @@ class FormListener implements EventListener {
         }
     }
 
-    private void getAttempt(@NotNull StudyNode node) {
+    private void getAttempt(@NotNull StepNode node) {
         StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
 
         stepikApiClient.attempts()

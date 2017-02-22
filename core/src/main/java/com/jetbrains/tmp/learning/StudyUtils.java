@@ -107,12 +107,12 @@ public class StudyUtils {
 
     public static String getChoiceStepText(@NotNull StepNode stepNode) {
         ChoiceStepNodeHelper stepNodeHelper = stepNode.asChoiceStep();
-        return processTemplate(stepNodeHelper, "choice_block");
+        return processTemplate(stepNodeHelper, "quiz/choice");
     }
 
     public static String getStringStepText(@NotNull StepNode stepNode) {
         StringStepNodeHelper stepNodeHelper = stepNode.asStringStep();
-        return processTemplate(stepNodeHelper, "string_block");
+        return processTemplate(stepNodeHelper, "quiz/string");
     }
 
     @NotNull
