@@ -9,9 +9,6 @@ import org.gradle.internal.jvm.Jvm
 import org.gradle.internal.os.OperatingSystem
 import org.jetbrains.annotations.NotNull
 
-import java.nio.file.Files
-import java.nio.file.StandardCopyOption
-
 /**
  * @author meanmail
  */
@@ -65,7 +62,6 @@ abstract class BaseRunTask extends JavaExec {
         configureClasspath()
         configureSystemProperties()
         configureJvmArgs()
-        configureLogProperties()
         super.exec()
     }
 
@@ -110,18 +106,6 @@ abstract class BaseRunTask extends JavaExec {
 
     private void configureJvmArgs() {
         jvmArgs = Utils.getProductJvmArgs(this, jvmArgs, idePath)
-    }
-
-    private void configureLogProperties() {
-        def logURL = this.getClass().getResource("/log.xml")
-        if (logURL == null){
-            println "there is no log.xml"
-            return
-        }
-
-        def source = new File(logURL.toURI())
-        def target = new File(workingDir, "log.xml")
-        Files.copy(source.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING)
     }
 
     void setExtension(ProductPluginExtension extension) {
