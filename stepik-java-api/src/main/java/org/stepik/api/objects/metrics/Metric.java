@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * @author meanmail
  */
-public class Metric<T> {
+public class Metric {
     private String name;
     private Integer timestamp;
     private Map<String, String> tags;

@@ -2,23 +2,18 @@ package org.stepik.plugin.utils;
 
 import com.intellij.codeInsight.actions.OptimizeImportsProcessor;
 import com.intellij.codeInsight.actions.ReformatCodeProcessor;
-import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
-import com.jetbrains.tmp.learning.StudyUtils;
 import org.jetbrains.annotations.NotNull;
 
 public class ReformatUtils {
 
-    public static void reformatSelectedEditor(@NotNull Project project) {
+    public static void reformatSelectedEditor(@NotNull Project project, @NotNull Document document) {
         PsiDocumentManager.getInstance(project).commitAllDocuments();
 
-        final Editor editor = StudyUtils.getSelectedEditor(project);
-        if (editor == null)
-            return;
-
-        PsiFile file = PsiDocumentManager.getInstance(project).getPsiFile(editor.getDocument());
+        PsiFile file = PsiDocumentManager.getInstance(project).getPsiFile(document);
         if (file == null)
             return;
 

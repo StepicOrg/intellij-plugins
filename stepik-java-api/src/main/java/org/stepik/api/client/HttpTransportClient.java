@@ -1,6 +1,7 @@
 package org.stepik.api.client;
 
 import javafx.util.Pair;
+import org.apache.http.Consts;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
@@ -13,6 +14,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.DefaultConnectionReuseStrategy;
 import org.apache.http.impl.client.BasicCookieStore;
@@ -30,7 +32,6 @@ import javax.net.ssl.SSLContext;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -142,15 +143,16 @@ public class HttpTransportClient implements TransportClient {
             @Nullable String body,
             @Nullable Map<String, String> headers) {
         HttpPost request = new HttpPost(url);
-        if (headers != null) {
-            headers.entrySet().forEach(entry -> request.setHeader(entry.getKey(), entry.getValue()));
+        if (headers == null) {
+            headers = new HashMap<>();
         }
+
+        headers.entrySet().forEach(entry -> request.setHeader(entry.getKey(), entry.getValue()));
+
         if (body != null) {
-            try {
-                request.setEntity(new StringEntity(body));
-            } catch (UnsupportedEncodingException e) {
-                throw new StepikClientException("Failed setting entity", e);
-            }
+            ContentType contentType;
+            contentType = ContentType.create(headers.getOrDefault(CONTENT_TYPE_HEADER, CONTENT_TYPE), Consts.UTF_8);
+            request.setEntity(new StringEntity(body, contentType));
         }
         return call(stepikApiClient, request);
     }
@@ -171,34 +173,39 @@ public class HttpTransportClient implements TransportClient {
     private ClientResponse call(
             @NotNull StepikApiClient stepikApiClient,
             @NotNull HttpUriRequest request) {
-        CloseableHttpResponse response;
-        try {
-            response = httpClient.execute(request);
+        int statusCode;
+        StringBuilder result;
+        Map<String, String> headers;
+
+        try (CloseableHttpResponse response = httpClient.execute(request)) {
+            statusCode = response.getStatusLine().getStatusCode();
+
+            HttpEntity entity = response.getEntity();
+            result = new StringBuilder();
+
+            if (entity != null) {
+                try (BufferedReader content = new BufferedReader(
+                        new InputStreamReader(entity.getContent(), ENCODING))) {
+
+                    String line;
+                    while ((line = content.readLine()) != null) {
+                        result.append("\n").append(line);
+                    }
+
+                    if (result.length() > 0) {
+                        result.deleteCharAt(0); // Delete first break line
+                    }
+                } catch (IOException | UnsupportedOperationException e) {
+                    throw new StepikClientException("Failed getting a content", e);
+                }
+            }
+
+            headers = getHeaders(response.getAllHeaders());
         } catch (IOException e) {
             throw new StepikClientException("Failed a request", e);
         }
-        int statusCode = response.getStatusLine().getStatusCode();
 
-        StringBuilder result = new StringBuilder();
-        HttpEntity entity = response.getEntity();
-        if (entity != null) {
-            try (BufferedReader content = new BufferedReader(
-                    new InputStreamReader(entity.getContent(), ENCODING))) {
-
-                String line;
-                while ((line = content.readLine()) != null) {
-                    result.append("\n").append(line);
-                }
-
-                if (result.length() > 0) {
-                    result.deleteCharAt(0); // Delete first break line
-                }
-            } catch (IOException | UnsupportedOperationException e) {
-                throw new StepikClientException("Failed getting a content", e);
-            }
-        }
-
-        return new ClientResponse(stepikApiClient, statusCode, result.toString(), getHeaders(response.getAllHeaders()));
+        return new ClientResponse(stepikApiClient, statusCode, result.toString(), headers);
     }
 
     @NotNull

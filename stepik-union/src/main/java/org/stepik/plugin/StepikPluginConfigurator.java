@@ -4,7 +4,6 @@ import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.project.Project;
 import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.StudyBasePluginConfigurator;
-import com.jetbrains.tmp.learning.courseFormat.CourseNode;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.plugin.actions.navigation.StepikNextStepAction;
 import org.stepik.plugin.actions.navigation.StepikPreviousStepAction;
@@ -37,12 +36,7 @@ public class StepikPluginConfigurator extends StudyBasePluginConfigurator {
 
     @Override
     public boolean accept(@NotNull Project project) {
-        StepikProjectManager stepikProjectManager = StepikProjectManager.getInstance(project);
-        if (stepikProjectManager == null)
-            return false;
-        CourseNode courseNode = stepikProjectManager.getCourseNode();
-
-        return courseNode != null;
+        return StepikProjectManager.isStepikProject(project);
     }
 
     @NotNull

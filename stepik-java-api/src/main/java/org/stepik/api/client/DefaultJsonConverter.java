@@ -1,16 +1,28 @@
 package org.stepik.api.client;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.stepik.api.objects.attempts.Dataset;
+import org.stepik.api.objects.attempts.DatasetDeserializer;
 
 /**
  * @author meanmail
  */
 public class DefaultJsonConverter implements JsonConverter {
+    private static final Logger logger = LoggerFactory.getLogger(DefaultJsonConverter.class);
     private static JsonConverter instance;
-    private final Gson gson = new Gson();
+    private final Gson gson;
+
+    private DefaultJsonConverter() {
+        gson = new GsonBuilder()
+                .registerTypeAdapter(Dataset.class, new DatasetDeserializer())
+                .create();
+    }
 
     @NotNull
     public static JsonConverter getInstance() {
@@ -30,6 +42,7 @@ public class DefaultJsonConverter implements JsonConverter {
         try {
             return gson.fromJson(json, clazz);
         } catch (JsonSyntaxException e) {
+            logger.warn(String.format("Failed %s fromJson %s ", clazz.getSimpleName(), json), e);
             return null;
         }
     }

@@ -4,16 +4,14 @@ import com.intellij.ide.projectView.PresentationData;
 import com.intellij.ide.projectView.ViewSettings;
 import com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
-import com.jetbrains.tmp.learning.StepikProjectManager;
-import com.jetbrains.tmp.learning.core.EduNames;
-import com.jetbrains.tmp.learning.core.EduUtils;
-import com.jetbrains.tmp.learning.courseFormat.CourseNode;
-import com.jetbrains.tmp.learning.courseFormat.LessonNode;
-import com.jetbrains.tmp.learning.courseFormat.SectionNode;
-import com.jetbrains.tmp.learning.courseFormat.StepNode;
+import com.jetbrains.tmp.learning.StudyUtils;
+import com.jetbrains.tmp.learning.courseFormat.StudyNode;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.plugin.utils.PresentationDataUtils;
+
+import static org.stepik.plugin.utils.ProjectPsiFilesUtils.getRelativePath;
 
 /**
  * @author meanmail
@@ -34,36 +32,12 @@ class StepikDirectoryNode extends PsiDirectoryNode {
 
     @Override
     public int getTypeSortWeight(boolean sortByType) {
-        String name = getValue().getName();
-        StepikProjectManager stepManager = StepikProjectManager.getInstance(getValue().getProject());
-        CourseNode courseNode = stepManager.getCourseNode();
-        if (courseNode == null) {
-            return 0;
-        }
+        StudyNode node = StudyUtils.getStudyNode(myProject, getValue().getVirtualFile());
 
-        if (name.startsWith(EduNames.SECTION)) {
-            int id = EduUtils.parseDirName(name, EduNames.SECTION);
-            SectionNode sectionNode = courseNode.getSectionById(id);
-            if (sectionNode == null) {
-                return id;
-            }
-            return sectionNode.getPosition();
-        }
-        if (name.startsWith(EduNames.LESSON)) {
-            int id = EduUtils.parseDirName(name, EduNames.LESSON);
-            LessonNode lessonNode = courseNode.getLessonById(id);
-            if (lessonNode == null) {
-                return id;
-            }
-            return lessonNode.getPosition();
-        }
-        if (name.startsWith(EduNames.STEP)) {
-            int id = EduUtils.parseDirName(name, EduNames.STEP);
-            StepNode stepNode = courseNode.getStepById(id);
-            if (stepNode == null) {
-                return id;
-            }
-            return stepNode.getPosition();
+        String path = getRelativePath(getValue());
+
+        if (node != null && node.getPath().equals(path)) {
+            return node.getPosition();
         }
 
         return Integer.MAX_VALUE;
@@ -87,5 +61,15 @@ class StepikDirectoryNode extends PsiDirectoryNode {
     @Override
     public String getNavigateActionText(boolean focusEditor) {
         return null;
+    }
+
+    @Override
+    public void navigate(boolean requestFocus) {
+        VirtualFile virtualFile = getVirtualFile();
+        StudyNode studyNode;
+        if (virtualFile != null) {
+            studyNode = StudyUtils.getStudyNode(myProject, virtualFile);
+            StudyUtils.setStudyNode(myProject, studyNode);
+        }
     }
 }

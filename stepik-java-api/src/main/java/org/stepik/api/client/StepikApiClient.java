@@ -99,7 +99,7 @@ public class StepikApiClient {
     private static final String VERSION = "0.1";
     private final TransportClient transportClient;
     private final JsonConverter jsonConverter;
-    private TokenInfo tokenInfo;
+    private volatile TokenInfo tokenInfo;
     private Path cachePath = Paths.get(System.getProperty("user.home"), ".stepik", "stepik-api", "cache");
     private boolean cacheEnabled = true;
 
@@ -548,19 +548,15 @@ public class StepikApiClient {
     }
 
     @NotNull
-    public TokenInfo getTokenInfo() {
+    public synchronized TokenInfo getTokenInfo() {
         if (tokenInfo == null) {
             tokenInfo = new TokenInfo();
         }
         return tokenInfo;
     }
 
-    public void setTokenInfo(@Nullable TokenInfo tokenInfo) {
+    public synchronized void setTokenInfo(@Nullable TokenInfo tokenInfo) {
         this.tokenInfo = tokenInfo;
-    }
-
-    public void reset() {
-        tokenInfo = null;
     }
 
     @NotNull

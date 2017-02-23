@@ -9,6 +9,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.StreamUtil;
 import com.jetbrains.tmp.learning.StudyPluginConfigurator;
 import javafx.application.Platform;
@@ -40,8 +41,9 @@ import java.io.InputStream;
 import java.net.URL;
 
 class StudyBrowserWindow extends JFrame {
-    private static final Logger logger = Logger.getInstance(StudyToolWindow.class);
+    private static final Logger logger = Logger.getInstance(StudyBrowserWindow.class);
     private static final String EVENT_TYPE_CLICK = "click";
+    private final Project project;
     private JFXPanel panel;
     private WebView webComponent;
     private StackPane pane;
@@ -51,7 +53,8 @@ class StudyBrowserWindow extends JFrame {
     private boolean linkInNewBrowser = true;
     private boolean showProgress = false;
 
-    StudyBrowserWindow(final boolean linkInNewWindow, final boolean showProgress) {
+    StudyBrowserWindow(@NotNull Project project, final boolean linkInNewWindow, final boolean showProgress) {
+        this.project = project;
         linkInNewBrowser = linkInNewWindow;
         this.showProgress = showProgress;
         setSize(new Dimension(900, 800));
@@ -96,7 +99,6 @@ class StudyBrowserWindow extends JFrame {
             pane = new StackPane();
             webComponent = new WebView();
             engine = webComponent.getEngine();
-
 
             if (showProgress) {
                 progressBar = makeProgressBarWithListener();
@@ -191,9 +193,12 @@ class StudyBrowserWindow extends JFrame {
     private void initHyperlinkListener() {
         engine.getLoadWorker().stateProperty().addListener((ov, oldState, newState) -> {
             if (newState == Worker.State.SUCCEEDED) {
-                final EventListener listener = makeHyperLinkListener();
+                final EventListener linkListener = makeHyperLinkListener();
+                addListenerToAllHyperlinkItems(linkListener);
 
-                addListenerToAllHyperlinkItems(listener);
+                final EventListener formListener = new FormListener(project);
+                final Document doc = engine.getDocument();
+                ((EventTarget) doc).addEventListener(FormListener.EVENT_TYPE_SUBMIT, formListener, false);
             }
         });
     }

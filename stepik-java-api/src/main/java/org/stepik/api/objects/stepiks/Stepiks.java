@@ -30,7 +30,7 @@ public class Stepiks extends ObjectsContainer<Stepik> {
 
     @NotNull
     public User getUser() {
-        if (users != null && users.size() > 0) {
+        if (users != null && !users.isEmpty()) {
             return users.get(0);
         }
 

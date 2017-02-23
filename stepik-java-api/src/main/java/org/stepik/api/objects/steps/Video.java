@@ -19,6 +19,33 @@ public class Video extends AbstractObjectWithStringId {
     private String uploadDate;
     private String filename;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        Video video = (Video) o;
+
+        if (thumbnail != null ? !thumbnail.equals(video.thumbnail) : video.thumbnail != null) return false;
+        if (urls != null ? !urls.equals(video.urls) : video.urls != null) return false;
+        if (status != null ? !status.equals(video.status) : video.status != null) return false;
+        //noinspection SimplifiableIfStatement
+        if (uploadDate != null ? !uploadDate.equals(video.uploadDate) : video.uploadDate != null) return false;
+        return filename != null ? filename.equals(video.filename) : video.filename == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (thumbnail != null ? thumbnail.hashCode() : 0);
+        result = 31 * result + (urls != null ? urls.hashCode() : 0);
+        result = 31 * result + (status != null ? status.hashCode() : 0);
+        result = 31 * result + (uploadDate != null ? uploadDate.hashCode() : 0);
+        result = 31 * result + (filename != null ? filename.hashCode() : 0);
+        return result;
+    }
+
     @Nullable
     public String getThumbnail() {
         return thumbnail;

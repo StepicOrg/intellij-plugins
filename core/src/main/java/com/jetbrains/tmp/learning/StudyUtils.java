@@ -1,58 +1,58 @@
 package com.jetbrains.tmp.learning;
 
+import com.intellij.ide.projectView.ProjectView;
+import com.intellij.ide.projectView.ProjectViewNode;
+import com.intellij.ide.projectView.impl.AbstractProjectViewPane;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx;
-import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
-import com.intellij.ui.awt.RelativePoint;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFileSystemItem;
 import com.intellij.ui.content.Content;
-import com.intellij.util.TimeoutUtil;
-import com.jetbrains.tmp.learning.core.EduNames;
-import com.jetbrains.tmp.learning.core.EduUtils;
-import com.jetbrains.tmp.learning.courseFormat.CourseNode;
-import com.jetbrains.tmp.learning.courseFormat.LessonNode;
-import com.jetbrains.tmp.learning.courseFormat.StepFile;
+import com.jetbrains.tmp.learning.courseFormat.ChoiceStepNodeHelper;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
-import com.jetbrains.tmp.learning.editor.StudyEditor;
+import com.jetbrains.tmp.learning.courseFormat.StudyNode;
+import com.jetbrains.tmp.learning.courseFormat.VideoStepNodeHelper;
 import com.jetbrains.tmp.learning.ui.StudyToolWindow;
 import com.jetbrains.tmp.learning.ui.StudyToolWindowFactory;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.objects.steps.Limit;
 import org.stepik.api.objects.steps.Sample;
+import org.stepik.api.objects.steps.Step;
+import org.stepik.core.templates.Templater;
 import org.stepik.core.utils.ProjectFilesUtils;
 
 import javax.swing.*;
-import java.awt.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StudyUtils {
-    private static final Logger logger = Logger.getInstance(StudyUtils.class.getName());
-    private static Pattern stepPathPattern;
+    private static final String PATH_PATTERN = "^(?:(?:section([0-9]+)/lesson([0-9]+)/step([0-9]+))|" +
+            "(?:lesson([0-9]+)/step([0-9]+))|" +
+            "(?:step([0-9]+))|" +
+            "(?:section([0-9]+)/lesson([0-9]+))|" +
+            "(?:section([0-9]+))" +
+            ").*$";
+    private static final String UNKNOWN_STEP_TEXT = "This step can take place in the web version (%s)";
+    private static final String STEP_LINK_TEXT = "View step on Stepik.org";
+    private static final String VIDEO_LINK_TEXT = "Play video in the web version";
+    private static final String VIDEO_BLOCK = "<video src=\"%s\" style width=\"100%%\" preload controls autoplay></video>";
+    private static final String STEP_LINK_TEMPLATE = "<a href='https://stepik.org/lesson/%d/step/%d'>%s</a>";
+    private static Pattern pathPattern;
 
     private StudyUtils() {
     }
 
     public static void updateToolWindows(@NotNull final Project project) {
-        final StudyToolWindow studyToolWindow = getStudyToolWindow(project);
-        if (studyToolWindow != null) {
-            StepNode stepNode = getSelectedStep(project);
-            studyToolWindow.setStepNode(stepNode);
-        }
+        StudyNode stepNode = getSelectedNode(project);
+        setStudyNode(project, stepNode, true);
     }
 
     static void initToolWindows(@NotNull final Project project) {
@@ -80,92 +80,65 @@ public class StudyUtils {
         return null;
     }
 
-    public static RelativePoint computeLocation(Editor editor) {
-        final Rectangle visibleRect = editor.getComponent().getVisibleRect();
-        Point point = new Point(visibleRect.x + visibleRect.width + 10,
-                visibleRect.y + 10);
-        return new RelativePoint(editor.getComponent(), point);
+    public static void setStudyNode(@NotNull final Project project, @Nullable StudyNode studyNode) {
+        setStudyNode(project, studyNode, false);
     }
 
-    @Nullable
-    public static StepFile getStepFile(@NotNull final Project project, @NotNull final VirtualFile file) {
-        final CourseNode courseNode = StepikProjectManager.getInstance(project).getCourseNode();
-        if (courseNode == null) {
-            return null;
+    public static void setStudyNode(@NotNull final Project project, @Nullable StudyNode studyNode, boolean force) {
+        StudyToolWindow toolWindow = getStudyToolWindow(project);
+        if (toolWindow != null) {
+            ApplicationManager.getApplication().invokeLater(() -> toolWindow.setStepNode(studyNode, force));
         }
-        VirtualFile stepDir = file.getParent();
-        if (stepDir == null) {
-            return null;
-        }
-        //need this because of multi-module generation
-        if (EduNames.SRC.equals(stepDir.getName())) {
-            stepDir = stepDir.getParent();
-            if (stepDir == null) {
-                return null;
-            }
-        }
-        final String stepDirName = stepDir.getName();
-        if (stepDirName.contains(EduNames.STEP)) {
-            int stepId = EduUtils.parseDirName(stepDirName, EduNames.STEP);
-            final StepNode stepNode = courseNode.getStepById(stepId);
-            if (stepNode == null) {
-                return null;
-            }
-            return stepNode.getFile(file.getName());
-        }
-        return null;
     }
 
-    @Nullable
-    public static StudyEditor getSelectedStudyEditor(@NotNull final Project project) {
-        try {
-            final FileEditor fileEditor = FileEditorManagerEx.getInstanceEx(project).getSplitters().getCurrentWindow().
-                    getSelectedEditor().getSelectedEditorWithProvider().getFirst();
-            if (fileEditor instanceof StudyEditor) {
-                return (StudyEditor) fileEditor;
-            }
-        } catch (Exception e) {
-            return null;
+    public static String getVideoStepText(
+            @NotNull VideoStepNodeHelper videoStepNode,
+            int quality) {
+        videoStepNode.setQuality(quality);
+        String text = getLink(videoStepNode.getStepNode(), VIDEO_LINK_TEXT);
+        if (videoStepNode.hasContent()) {
+            return text + "<br>" + String.format(VIDEO_BLOCK, videoStepNode.getUrl());
         }
-        return null;
+
+        return text;
     }
 
-    @Nullable
-    public static Editor getSelectedEditor(@NotNull final Project project) {
-        final StudyEditor studyEditor = getSelectedStudyEditor(project);
-        if (studyEditor != null) {
-            return studyEditor.getEditor();
-        }
-        return null;
+    public static String getChoiceStepText(@NotNull ChoiceStepNodeHelper choiceStepNode) {
+        String text = getTextStepText(choiceStepNode.getStepNode());
+
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("text", text);
+        params.put("choiceStepNode", choiceStepNode);
+
+        return Templater.processTemplate("choice_block", params);
     }
 
-    @Nullable
-    @Contract("null -> null")
-    public static String getStepTextFromStep(@Nullable final StepNode stepNode) {
-        if (stepNode == null) {
-            return null;
-        }
-        return getTextWithStepLink(stepNode);
+    public static String getTextStepText(@NotNull StepNode stepNode) {
+        return getStepText(stepNode, STEP_LINK_TEXT);
     }
 
-    @NotNull
-    private static String getTextWithStepLink(StepNode stepNode) {
+    private static String getStepText(@NotNull StepNode stepNode, @NotNull String linkText, Object... params) {
         StringBuilder stringBuilder = new StringBuilder();
-
-        LessonNode lessonNode = stepNode.getLessonNode();
-        if (lessonNode != null) {
-            stringBuilder.append("<a href=\"https://stepik.org/lesson/")
-                    .append(lessonNode.getId())
-                    .append("/step/")
-                    .append(stepNode.getPosition())
-                    .append("\">View step on Stepik.org</a>");
-        }
+        stringBuilder.append(getLink(stepNode, String.format(linkText, params)));
 
         if (!stepNode.getText().startsWith("<p>") && !stepNode.getText().startsWith("<h")) {
             stringBuilder.append("<br><br>");
         }
 
         stringBuilder.append(stepNode.getText());
+
+        return stringBuilder.toString();
+    }
+
+    public static String getUnknownStepText(@NotNull StepNode stepNode) {
+        Step data = stepNode.getData();
+        String stepType = data != null ? data.getBlock().getName() : stepNode.getType().toString();
+        return getStepText(stepNode, UNKNOWN_STEP_TEXT, stepType);
+    }
+
+    public static String getCodeStepText(@NotNull StepNode stepNode) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(getTextStepText(stepNode));
 
         List<Sample> samples = stepNode.getSamples();
 
@@ -191,6 +164,14 @@ public class StudyUtils {
                 .append("Mib</p>");
 
         return stringBuilder.toString();
+    }
+
+    private static String getLink(@NotNull StepNode stepNode, @NotNull String text) {
+        StudyNode lessonNode = stepNode.getParent();
+        if (lessonNode != null) {
+            return String.format(STEP_LINK_TEMPLATE, lessonNode.getId(), stepNode.getPosition(), text);
+        }
+        return text;
     }
 
     @Nullable
@@ -222,25 +203,68 @@ public class StudyUtils {
             return null;
         }
 
-        return getStep(project, files[0]);
+        StudyNode studyNode = getStudyNode(project, files[0]);
+
+        return studyNode instanceof StepNode ? (StepNode) studyNode : null;
     }
 
     @Nullable
-    public static Project getStudyProject() {
-        Project studyProject = null;
-        Project[] openProjects = ProjectManager.getInstance().getOpenProjects();
-        for (Project project : openProjects) {
-            if (StepikProjectManager.isStepikProject(project)) {
-                studyProject = project;
-                break;
+    public static StudyNode getSelectedNode(@NotNull Project project) {
+        StudyNode studyNode = getSelectedStep(project);
+
+        if (studyNode == null) {
+            studyNode = getSelectedNodeInTree(project);
+        }
+
+        return studyNode;
+    }
+
+    @Nullable
+    public static StudyNode getSelectedNodeInTree(@NotNull Project project) {
+        PsiElement element = getSelectedPsiElement(project);
+        if (element == null) {
+            return null;
+        }
+
+        PsiFileSystemItem file;
+
+        if (element instanceof PsiFileSystemItem) {
+            file = (PsiFileSystemItem) element;
+        } else {
+            file = element.getContainingFile();
+        }
+
+        if (file == null) {
+            return null;
+        }
+
+        return getStudyNode(project, file.getVirtualFile());
+    }
+
+    private static PsiElement getSelectedPsiElement(@NotNull Project project) {
+        ProjectView projectView = ProjectView.getInstance(project);
+        AbstractProjectViewPane currentProjectViewPane = projectView.getCurrentProjectViewPane();
+        if (currentProjectViewPane == null) {
+            return null;
+        }
+        DefaultMutableTreeNode node = currentProjectViewPane.getSelectedNode();
+        if (node == null) {
+            return null;
+        }
+
+        Object userObject = node.getUserObject();
+        if (userObject instanceof ProjectViewNode) {
+            ProjectViewNode descriptor = (ProjectViewNode) userObject;
+            Object element = descriptor.getValue();
+            if (element instanceof PsiElement) {
+                PsiElement psiElement = (PsiElement) element;
+                return !psiElement.isValid() ? null : psiElement;
+            } else {
+                return null;
             }
+        } else {
+            return null;
         }
-        if (studyProject == null) {
-            logger.info("return default project");
-            return ProjectManager.getInstance().getDefaultProject();
-        }
-        logger.info("return regular project");
-        return studyProject;
     }
 
     public static boolean hasJavaFx() {
@@ -253,41 +277,46 @@ public class StudyUtils {
     }
 
     @Nullable
-    public static StepNode getStep(@NotNull Project project, @NotNull VirtualFile stepVF) {
-        String path = getRelativePath(project, stepVF);
-        if (stepPathPattern == null) {
-            stepPathPattern = Pattern.compile("^(section[0-9]+)/(lesson[0-9]+)/(step[0-9]+)/src/.*");
+    public static StudyNode getStudyNode(@NotNull Project project, @NotNull VirtualFile nodeVF) {
+        String path = getRelativePath(project, nodeVF);
+
+        StudyNode root = StepikProjectManager.getProjectRoot(project);
+        if (root == null) {
+            return null;
         }
-        Matcher matcher = stepPathPattern.matcher(path);
-        if (matcher.matches()) {
-            CourseNode courseNode = StepikProjectManager.getInstance(project).getCourseNode();
-            if (courseNode == null) {
-                return null;
-            }
-            LessonNode lessonNode = courseNode.getLessonByDirName(matcher.group(2));
-            if (lessonNode == null) {
-                return null;
-            }
-            return lessonNode.getStep(matcher.group(3));
-        }
-        return null;
+
+        return getStudyNode(root, path);
     }
 
-    // supposed to be called under progress
     @Nullable
-    public static <T> T execCancelable(@NotNull final Callable<T> callable) {
-        final Future<T> future = ApplicationManager.getApplication().executeOnPooledThread(callable);
+    public static StudyNode getStudyNode(@NotNull StudyNode root, @NotNull String relativePath) {
+        if (relativePath.equals(".")) {
+            return root;
+        }
 
-        while (!future.isCancelled() && !future.isDone()) {
-            ProgressManager.checkCanceled();
-            TimeoutUtil.sleep(500);
+        if (pathPattern == null) {
+            pathPattern = Pattern.compile(PATH_PATTERN);
         }
-        T result = null;
-        try {
-            result = future.get();
-        } catch (InterruptedException | ExecutionException e) {
-            logger.warn(e.getMessage());
+        Matcher matcher = pathPattern.matcher(relativePath);
+        if (!matcher.matches()) {
+            return null;
         }
-        return result;
+
+        for (int i = 1; i <= matcher.groupCount(); i++) {
+            String idString = matcher.group(i);
+
+            if (idString == null) {
+                continue;
+            }
+
+            int id = Integer.parseInt(idString);
+
+            root = root.getChildById(id);
+            if (root == null) {
+                return null;
+            }
+        }
+
+        return root;
     }
 }

@@ -20,24 +20,21 @@ public class StudyNodeTest {
         courseNode = new CourseNode();
 
         sectionNode = new SectionNode();
-        sectionNode.setPosition(1);
         sectionNode.setId(1);
-        sectionNode.setCourseNode(courseNode);
+        sectionNode.setParent(courseNode);
 
 
         lessonNode = new LessonNode();
-        lessonNode.setPosition(1);
         lessonNode.setId(1);
-        lessonNode.setSectionNode(sectionNode);
+        lessonNode.setParent(sectionNode);
 
         stepNode = new StepNode();
-        stepNode.setPosition(1);
         stepNode.setId(1);
-        stepNode.setLessonNode(lessonNode);
+        stepNode.setParent(lessonNode);
 
-        courseNode.addSection(sectionNode);
-        sectionNode.addLesson(lessonNode);
-        lessonNode.addStep(stepNode);
+        courseNode.getChildren().add(sectionNode);
+        sectionNode.getChildren().add(lessonNode);
+        lessonNode.getChildren().add(stepNode);
     }
 
     @Test
@@ -57,7 +54,7 @@ public class StudyNodeTest {
 
     @Test
     public void getSectionPath() throws Exception {
-        assertEquals("/section1", sectionNode.getPath());
+        assertEquals("section1", sectionNode.getPath());
     }
 
     @Test
@@ -67,7 +64,7 @@ public class StudyNodeTest {
 
     @Test
     public void getLessonPath() throws Exception {
-        assertEquals("/section1/lesson1", lessonNode.getPath());
+        assertEquals("section1/lesson1", lessonNode.getPath());
     }
 
     @Test
@@ -77,7 +74,7 @@ public class StudyNodeTest {
 
     @Test
     public void getStepPath() throws Exception {
-        assertEquals("/section1/lesson1/step1", stepNode.getPath());
+        assertEquals("section1/lesson1/step1", stepNode.getPath());
     }
 
     @Test
@@ -89,7 +86,7 @@ public class StudyNodeTest {
     @Test
     public void getSectionPathAfterChangeId() throws Exception {
         sectionNode.setId(2);
-        assertEquals("/section2", sectionNode.getPath());
+        assertEquals("section2", sectionNode.getPath());
     }
 
     @Test
@@ -101,7 +98,7 @@ public class StudyNodeTest {
     @Test
     public void getLessonPathAfterChangeId() throws Exception {
         lessonNode.setId(2);
-        assertEquals("/section1/lesson2", lessonNode.getPath());
+        assertEquals("section1/lesson2", lessonNode.getPath());
     }
 
     @Test
@@ -113,20 +110,20 @@ public class StudyNodeTest {
     @Test
     public void getStepPathAfterChangeId() throws Exception {
         stepNode.setId(2);
-        assertEquals("/section1/lesson1/step2", stepNode.getPath());
+        assertEquals("section1/lesson1/step2", stepNode.getPath());
     }
 
     @Test
     public void getLessonPathAfterChangeSectionId() throws Exception {
-        assertEquals("/section1/lesson1", lessonNode.getPath());
+        assertEquals("section1/lesson1", lessonNode.getPath());
         sectionNode.setId(2);
-        assertEquals("/section2/lesson1", lessonNode.getPath());
+        assertEquals("section2/lesson1", lessonNode.getPath());
     }
 
     @Test
     public void getStepPathAfterChangeLessonId() throws Exception {
-        assertEquals("/section1/lesson1/step1", stepNode.getPath());
+        assertEquals("section1/lesson1/step1", stepNode.getPath());
         lessonNode.setId(2);
-        assertEquals("/section1/lesson2/step1", stepNode.getPath());
+        assertEquals("section1/lesson2/step1", stepNode.getPath());
     }
 }

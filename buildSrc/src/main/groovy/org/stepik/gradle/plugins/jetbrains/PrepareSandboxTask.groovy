@@ -25,7 +25,7 @@ import java.nio.file.StandardCopyOption
  * @author meanmail
  */
 class PrepareSandboxTask extends DefaultTask {
-    private static final Logger LOG = Logging.getLogger(PrepareSandboxTask.class)
+    private static final Logger logger = Logging.getLogger(PrepareSandboxTask.class)
 
     private ProductPluginExtension extension
 
@@ -80,12 +80,12 @@ class PrepareSandboxTask extends DefaultTask {
     @TaskAction
     protected void copy() {
         if (pluginJar == null) {
-            LOG.error("Failed prepare sandbox task: plugin jar is null")
+            logger.error("Failed prepare sandbox task: plugin jar is null")
             return
         }
 
         if (destinationDir == null) {
-            LOG.error("Failed prepare sandbox task: plugins directory is null")
+            logger.error("Failed prepare sandbox task: plugins directory is null")
             return
         }
         def dependenciesJars = getDependenciesJars(project)
@@ -100,7 +100,7 @@ class PrepareSandboxTask extends DefaultTask {
                 Files.copy(it, target, StandardCopyOption.REPLACE_EXISTING)
             }
         } catch (IOException ignored) {
-            LOG.error("Failed prepare sandbox task: copy from " + dependenciesJars + " to " + libPath)
+            logger.error("Failed prepare sandbox task: copy from " + dependenciesJars + " to " + libPath)
             return
         }
         disableIdeUpdate()
@@ -145,28 +145,9 @@ class PrepareSandboxTask extends DefaultTask {
             return
         }
 
-        def updatesConfig = new File(optionsDir, "updates.xml")
-        try {
-            if (!updatesConfig.exists() && !updatesConfig.createNewFile()) {
-                return
-            }
-        } catch (IOException ignore) {
-            return
-        }
-
-        def doc = Utils.getXmlDocument(updatesConfig)
-
-        if (!doc || !doc.hasRootElement()) {
-            doc = Utils.createUpdatesXml()
-        } else {
-            Utils.repairUpdateXml(doc)
-        }
-
-        try {
-            Utils.outputXml(doc, updatesConfig)
-        } catch (IOException ignored) {
-            LOG.warn("Failed write to " + updatesConfig)
-        }
+        Utils.createOrRepairUpdateXml(optionsDir)
+        Utils.createOrRepairIdeGeneralXml(optionsDir)
+        Utils.createOrRepairOptionsXml(optionsDir)
     }
 
     void setExtension(@NotNull ProductPluginExtension extension) {

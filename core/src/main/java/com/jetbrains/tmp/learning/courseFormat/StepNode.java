@@ -1,172 +1,162 @@
 package com.jetbrains.tmp.learning.courseFormat;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.util.xmlb.annotations.Transient;
 import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.core.EduNames;
+import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.api.client.StepikApiClient;
+import org.stepik.api.exceptions.StepikClientException;
+import org.stepik.api.objects.lessons.CompoundUnitLesson;
 import org.stepik.api.objects.steps.BlockView;
 import org.stepik.api.objects.steps.BlockViewOptions;
 import org.stepik.api.objects.steps.Limit;
 import org.stepik.api.objects.steps.Sample;
 import org.stepik.api.objects.steps.Step;
+import org.stepik.api.objects.steps.Steps;
+import org.stepik.api.objects.units.Units;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import static com.jetbrains.tmp.learning.SupportedLanguages.INVALID;
+import static com.jetbrains.tmp.learning.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
 
-public class StepNode implements StudyNode {
+public class StepNode extends Node<Step, StepNode, Step, StepNode> {
+    private static final Logger logger = Logger.getInstance(StepNode.class);
     private StudyStatus status;
-    private LessonNode lessonNode;
-    private Map<String, StepFile> stepFiles;
-    private Map<SupportedLanguages, Limit> limits;
     private List<SupportedLanguages> supportedLanguages;
     private SupportedLanguages currentLang;
-    private Step data;
+    private long courseId;
 
     public StepNode() {}
 
-    public StepNode(@NotNull final LessonNode lessonNode, @NotNull Step data) {
-        this.data = data;
-        init(lessonNode, true, null);
+    public StepNode(@NotNull Step data, @Nullable ProgressIndicator indicator) {
+        super(data, indicator);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        StepNode stepNode = (StepNode) o;
-
-        if (status != stepNode.status) return false;
-        if (lessonNode != null ? !lessonNode.equals(stepNode.lessonNode) : stepNode.lessonNode != null) return false;
-        if (stepFiles != null ? !stepFiles.equals(stepNode.stepFiles) : stepNode.stepFiles != null) return false;
-        if (limits != null ? !limits.equals(stepNode.limits) : stepNode.limits != null) return false;
-        if (supportedLanguages != null ?
-                !supportedLanguages.equals(stepNode.supportedLanguages) :
-                stepNode.supportedLanguages != null) return false;
-        //noinspection SimplifiableIfStatement
-        if (currentLang != stepNode.currentLang) return false;
-        return data != null ? data.equals(stepNode.data) : stepNode.data == null;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = status != null ? status.hashCode() : 0;
-        result = 31 * result + (lessonNode != null ? lessonNode.hashCode() : 0);
-        result = 31 * result + (stepFiles != null ? stepFiles.hashCode() : 0);
-        result = 31 * result + (limits != null ? limits.hashCode() : 0);
-        result = 31 * result + (supportedLanguages != null ? supportedLanguages.hashCode() : 0);
-        result = 31 * result + (currentLang != null ? currentLang.hashCode() : 0);
-        result = 31 * result + (data != null ? data.hashCode() : 0);
-        return result;
-    }
-
-    void init(@NotNull final LessonNode lessonNode, boolean isRestarted, @Nullable ProgressIndicator indicator) {
+    public void init(@Nullable StudyNode parent, boolean isRestarted, @Nullable ProgressIndicator indicator) {
         if (indicator != null) {
             indicator.setText("Refresh a step: " + getName());
             indicator.setText2("");
         }
-        BlockView block = data.getBlock();
 
-        if (getType() == StepType.CODE) {
-            BlockViewOptions options = block.getOptions();
-            List<SupportedLanguages> languages = new ArrayList<>();
-            Map<String, StepFile> stepFiles = new HashMap<>();
-            Map<String, String> templates = options.getCodeTemplates();
-            templates.entrySet().forEach(entry -> {
-                SupportedLanguages language = SupportedLanguages.langOf(entry.getKey());
-
-                if (language != INVALID && !languages.contains(language)) {
-                    languages.add(language);
-                    StepFile stepFile = new StepFile();
-                    stepFile.setName(language.getMainFileName());
-                    stepFile.setText(entry.getValue());
-                    stepFile.setStepNode(this);
-                    stepFiles.put(language.getMainFileName(), stepFile);
-                }
-            });
-
-            setSupportedLanguages(languages);
-            setStepFiles(stepFiles);
-            Map<SupportedLanguages, Limit> limits = new HashMap<>();
-            options.getLimits().entrySet()
-                    .forEach(entry -> limits.put(SupportedLanguages.langOf(entry.getKey()), entry.getValue()));
-            setLimits(limits);
-        }
-
-        setLessonNode(lessonNode);
+        supportedLanguages = null;
+        courseId = 0;
 
         if (isRestarted) {
             status = StudyStatus.UNCHECKED;
         }
 
-        for (StepFile stepFile : getStepFiles().values()) {
-            stepFile.init(this);
+        super.init(parent, isRestarted, indicator);
+    }
+
+    @Override
+    protected void loadData(long id) {
+        try {
+            StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
+            Steps steps = stepikApiClient.steps()
+                    .get()
+                    .id(id)
+                    .execute();
+
+            Step step;
+            if (!steps.isEmpty()) {
+                step = steps.getSteps().get(0);
+            } else {
+                step = new Step();
+                step.setId(id);
+            }
+            setData(step);
+        } catch (StepikClientException logged) {
+            logger.warn(String.format("Failed step lesson data id=%d", id), logged);
         }
     }
 
-    @Transient
-    @NotNull
-    public String getName() {
-        return EduNames.STEP + getData().getPosition();
+    @Override
+    protected Class<StepNode> getChildClass() {
+        return StepNode.class;
     }
 
-    @Transient
     @NotNull
     public String getText() {
-        return getData().getBlock().getText();
+        Step data = getData();
+        return data != null ? data.getBlock().getText() : "";
     }
 
     @NotNull
-    public Map<String, StepFile> getStepFiles() {
-        if (stepFiles == null) {
-            stepFiles = new HashMap<>();
+    public String getTemplate(@NotNull SupportedLanguages language) {
+        Map<String, String> templates;
+        Step data = getData();
+        if (data == null) {
+            return "";
         }
-        return stepFiles;
+        templates = getData().getBlock().getOptions().getCodeTemplates();
+        return templates.getOrDefault(language.getName(), "");
     }
 
-    @SuppressWarnings("unused")
-    public void setStepFiles(@Nullable Map<String, StepFile> stepFiles) {
-        this.stepFiles = stepFiles;
+    @NotNull
+    public String getCurrentTemplate() {
+        return getTemplate(getCurrentLang());
     }
 
-    @Nullable
-    public StepFile getFile(@NotNull final String fileName) {
-        return getStepFiles().get(fileName);
-    }
-
-    @Nullable
-    @Transient
-    public LessonNode getLessonNode() {
-        return lessonNode;
-    }
-
-    public void setLessonNode(@Nullable LessonNode lessonNode) {
-        this.lessonNode = lessonNode;
-    }
-
-    @Transient
-    @Nullable
-    public CourseNode getCourse() {
-        if (lessonNode == null) {
-            return null;
-        }
-        return lessonNode.getCourse();
-    }
-
-    @Transient
     @Override
-    public long getId() {
-        return getData().getId();
+    public List<StepNode> getChildren() {
+        return Collections.emptyList();
     }
 
-    public void setId(long id) {
-        getData().setId(id);
+    @Override
+    protected List<Step> getChildDataList() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public long getCourseId() {
+        StudyNode parent = getParent();
+        if (parent != null) {
+            return parent.getCourseId();
+        }
+
+        if (courseId != 0) {
+            return courseId;
+        }
+
+        Step data = getData();
+        if (data == null) {
+            return 0;
+        }
+
+        int lessonId = data.getLesson();
+        if (lessonId == 0) {
+            return 0;
+        }
+
+        try {
+            StepikApiClient stepikApiClient = authAndGetStepikApiClient();
+
+            Units units = stepikApiClient.units()
+                    .get()
+                    .lesson(lessonId)
+                    .execute();
+            if (units.isEmpty()) {
+                return 0;
+            }
+
+            LessonNode lessonNode = new LessonNode();
+            CompoundUnitLesson lessonData = lessonNode.getData();
+            if (lessonData != null) {
+                lessonData.setUnit(units.getItems().get(0));
+            }
+
+            courseId = lessonNode.getCourseId();
+            return courseId;
+        } catch (StepikClientException ignored) {
+        }
+        return 0;
     }
 
     @Override
@@ -182,72 +172,53 @@ public class StepNode implements StudyNode {
         this.status = status;
     }
 
-    @Transient
     @NotNull
-    @Override
-    public String getDirectory() {
-        return EduNames.STEP + getId();
-    }
-
-    @Transient
-    @NotNull
-    @Override
-    public String getPath() {
-        if (lessonNode != null) {
-            return lessonNode.getPath() + "/" + getDirectory();
-        } else {
-            return getDirectory();
+    private Map<String, Limit> getLimits() {
+        Step data = getData();
+        if (data == null) {
+            return Collections.emptyMap();
         }
-    }
-
-    @Transient
-    public int getPosition() {
-        return getData().getPosition();
-    }
-
-    public void setPosition(int position) {
-        getData().setPosition(position);
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    @NotNull
-    public Map<SupportedLanguages, Limit> getLimits() {
-        if (limits == null) {
-            limits = new HashMap<>();
-        }
-        return limits;
-    }
-
-    @SuppressWarnings({"WeakerAccess", "unused"})
-    public void setLimits(@Nullable Map<SupportedLanguages, Limit> limits) {
-        this.limits = limits;
+        return data.getBlock().getOptions().getLimits();
     }
 
     @NotNull
-    @Transient
     public Limit getLimit() {
-        return getLimits().getOrDefault(getCurrentLang(), new Limit());
+        return getLimits().getOrDefault(getCurrentLang().getName(), new Limit());
     }
 
     @NotNull
     public List<SupportedLanguages> getSupportedLanguages() {
         if (supportedLanguages == null) {
             supportedLanguages = new ArrayList<>();
+
+            BlockView block;
+            Step data = getData();
+            if (data == null) {
+                return supportedLanguages;
+            }
+
+            block = data.getBlock();
+
+            if (getType() == StepType.CODE) {
+                BlockViewOptions options = block.getOptions();
+
+                Map<String, String> templates = options.getCodeTemplates();
+                templates.keySet().forEach(key -> {
+                    SupportedLanguages language = SupportedLanguages.langOfName(key);
+
+                    if (language != INVALID && !supportedLanguages.contains(language)) {
+                        supportedLanguages.add(language);
+                    }
+                });
+            }
         }
         return supportedLanguages;
     }
 
-    @SuppressWarnings("unused")
-    public void setSupportedLanguages(@Nullable List<SupportedLanguages> supportedLanguages) {
-        this.supportedLanguages = supportedLanguages;
-    }
-
     @NotNull
     public SupportedLanguages getCurrentLang() {
-        if (supportedLanguages == null) {
-            currentLang = INVALID;
-        } else if (currentLang == null || currentLang == INVALID || !supportedLanguages.contains(
-                currentLang)) {
+        List<SupportedLanguages> languages = getSupportedLanguages();
+        if (currentLang == null || currentLang == INVALID || !languages.contains(currentLang)) {
             currentLang = getFirstSupportLang();
         }
         return currentLang;
@@ -257,7 +228,6 @@ public class StepNode implements StudyNode {
         this.currentLang = currentLang;
     }
 
-    @Transient
     @NotNull
     private SupportedLanguages getFirstSupportLang() {
         List<SupportedLanguages> languages = getSupportedLanguages();
@@ -268,31 +238,72 @@ public class StepNode implements StudyNode {
         }
     }
 
-    @SuppressWarnings("WeakerAccess")
-    @NotNull
-    public Step getData() {
-        if (data == null) {
-            data = new Step();
-        }
-        return data;
+    @Override
+    protected Class<Step> getDataClass() {
+        return Step.class;
     }
 
-    @SuppressWarnings("unused")
-    public void setData(@Nullable Step data) {
-        this.data = data;
-    }
-
-    @Transient
     @NotNull
     public List<Sample> getSamples() {
-        if (StepType.of(data.getBlock().getName()) == StepType.CODE) {
-            return getData().getBlock().getOptions().getSamples();
+        Step data = getData();
+        if (data != null && getType() == StepType.CODE) {
+            return data.getBlock().getOptions().getSamples();
         }
-        return new ArrayList<>();
+
+        return Collections.emptyList();
     }
 
-    @Transient
+    @NotNull
     public StepType getType() {
+        Step data = getData();
+        if (data == null) {
+            return StepType.UNKNOWN;
+        }
         return StepType.of(data.getBlock().getName());
+    }
+
+    public boolean isStepFile(@NotNull String fileName) {
+        return (EduNames.SRC + "/" + getCurrentLang().getMainFileName()).equals(fileName);
+    }
+
+    @NotNull
+    @Override
+    String getDirectoryPrefix() {
+        return EduNames.STEP;
+    }
+
+    @Override
+    public boolean canBeLeaf() {
+        return true;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        StepNode stepNode = (StepNode) o;
+
+        if (status != stepNode.status) return false;
+        //noinspection SimplifiableIfStatement
+        if (currentLang != stepNode.currentLang) return false;
+        return super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = status != null ? status.hashCode() : 0;
+        result = 31 * result + (currentLang != null ? currentLang.hashCode() : 0);
+        result = 31 * result + super.hashCode();
+        return result;
+    }
+
+    @NotNull
+    public VideoStepNodeHelper asVideoStep() {
+        return new VideoStepNodeHelper(this);
+    }
+
+    public ChoiceStepNodeHelper asChoiceStep() {
+        return new ChoiceStepNodeHelper(this);
     }
 }

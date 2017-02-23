@@ -15,19 +15,23 @@ import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.auth.TokenInfo;
 import org.stepik.api.objects.users.User;
+import org.stepik.core.metrics.Metrics;
+
+import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
+import static org.stepik.core.utils.PluginUtils.PLUGIN_ID;
 
 public class StepikConnectorLogin {
     private static final Logger logger = Logger.getInstance(StepikConnectorLogin.class);
     private static final String CLIENT_ID = "hUCWcq3hZHCmz0DKrDtwOWITLcYutzot7p4n59vU";
-    private static final String LAST_USER_PROPERTY_NAME = "org.stepik.plugin.union.LAST_USER";
+    private static final String LAST_USER_PROPERTY_NAME = PLUGIN_ID + ".LAST_USER";
     private static final StepikApiClient stepikApiClient = initStepikApiClient();
 
     private static long getLastUser() {
         return PropertiesComponent.getInstance().getOrInitLong(LAST_USER_PROPERTY_NAME, 0);
     }
 
-    private static void setLastUser(long lastUser) {
-        PropertiesComponent.getInstance().setValue(LAST_USER_PROPERTY_NAME, String.valueOf(lastUser));
+    private static void setLastUser(long userId) {
+        PropertiesComponent.getInstance().setValue(LAST_USER_PROPERTY_NAME, String.valueOf(userId));
     }
 
     @NotNull
@@ -135,7 +139,10 @@ public class StepikConnectorLogin {
                 String.valueOf(userId),
                 StepikProjectManager.class,
                 false);
-        String serializedAuthInfo = PasswordSafe.getInstance().getPassword(attributes);
+        String serializedAuthInfo;
+        synchronized (StepikConnectorLogin.class) {
+            serializedAuthInfo = PasswordSafe.getInstance().getPassword(attributes);
+        }
         AuthInfo authInfo = client.getJsonConverter().fromJson(serializedAuthInfo, AuthInfo.class);
 
         if (authInfo == null) {
@@ -157,8 +164,10 @@ public class StepikConnectorLogin {
                 StepikProjectManager.class,
                 false);
         String serializedAuthInfo = stepikApiClient.getJsonConverter().toJson(authInfo);
-        PasswordSafe.getInstance().setPassword(attributes, serializedAuthInfo);
-        setLastUser(userId);
+        synchronized (StepikConnectorLogin.class) {
+            PasswordSafe.getInstance().setPassword(attributes, serializedAuthInfo);
+            setLastUser(userId);
+        }
     }
 
     @NotNull
@@ -212,6 +221,7 @@ public class StepikConnectorLogin {
             long userId = getCurrentUser().getId();
             setAuthInfo(userId, authInfo);
             logger.info("Authentication is successfully");
+            Metrics.authenticate(SUCCESSFUL);
         } catch (StepikClientException e) {
             logger.warn("Authentication failed", e);
             throw e;
@@ -233,5 +243,15 @@ public class StepikConnectorLogin {
     public static StepikApiClient authAndGetStepikApiClient() {
         StepikConnectorLogin.authentication();
         return stepikApiClient;
+    }
+
+    public static void logout() {
+        synchronized (StepikConnectorLogin.class) {
+            stepikApiClient.setTokenInfo(null);
+            long userId = getLastUser();
+            setAuthInfo(userId, new AuthInfo());
+            setLastUser(0);
+            logger.info("Logout successfully");
+        }
     }
 }

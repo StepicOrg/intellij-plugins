@@ -60,7 +60,6 @@
     <extensions defaultExtensionNs="com.intellij">
         <projectService serviceInterface="com.intellij.codeInsight.documentation.DocumentationManager" serviceImplementation="com.jetbrains.tmp.learning.StudyDocumentationManager" overrides="true"/>
         <toolWindow id="Step Description" anchor="right" factoryClass="com.jetbrains.tmp.learning.ui.StudyToolWindowFactory" conditionClass="com.jetbrains.tmp.learning.ui.StudyCondition"/>
-        <fileEditorProvider implementation="com.jetbrains.tmp.learning.editor.StudyFileEditorProvider"/>
         <projectService serviceInterface="com.jetbrains.tmp.learning.StepikProjectManager" serviceImplementation="com.jetbrains.tmp.learning.StepikProjectManager"/>
         <applicationService serviceImplementation="com.jetbrains.tmp.learning.stepik.StepikUpdateSettings"/>
     </extensions>

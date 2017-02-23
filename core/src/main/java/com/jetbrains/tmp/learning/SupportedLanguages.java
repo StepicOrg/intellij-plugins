@@ -28,9 +28,10 @@ public enum SupportedLanguages {
     RUST("Rust", "rust", "main.rs", "//", null, null),
     SHELL("Shell", "shell", "main.sh", "#", null, null),
     SCALA("Scala", "scala", "Main.scala", "//", null, null),
-    INVALID("invalid", "", "", "", null, null);
+    INVALID("invalid", "invalid", "", "", null, null);
 
-    private static Map<String, SupportedLanguages> map;
+    private static Map<String, SupportedLanguages> nameMap;
+    private static Map<String, SupportedLanguages> titleMap;
     private final String name;
     private final String comment;
     private final String mainFileName;
@@ -62,13 +63,23 @@ public enum SupportedLanguages {
     }
 
     @NotNull
-    public static SupportedLanguages langOf(@NotNull String lang) {
-        if (map == null) {
-            map = new HashMap<>();
-            Arrays.stream(values()).forEach(value -> map.put(value.getName(), value));
+    public static SupportedLanguages langOfName(@NotNull String lang) {
+        if (nameMap == null) {
+            nameMap = new HashMap<>();
+            Arrays.stream(values()).forEach(value -> nameMap.put(value.getName(), value));
         }
 
-        return map.getOrDefault(lang, INVALID);
+        return nameMap.getOrDefault(lang, INVALID);
+    }
+
+    @NotNull
+    public static SupportedLanguages langOfTitle(@NotNull String lang) {
+        if (titleMap == null) {
+            titleMap = new HashMap<>();
+            Arrays.stream(values()).forEach(value -> titleMap.put(value.getTitle(), value));
+        }
+
+        return titleMap.getOrDefault(lang, INVALID);
     }
 
     @NotNull
@@ -109,6 +120,10 @@ public enum SupportedLanguages {
     @NotNull
     @Override
     public String toString() {
+        return title;
+    }
+
+    public String getTitle() {
         return title;
     }
 }

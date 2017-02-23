@@ -14,12 +14,17 @@ import com.intellij.refactoring.move.moveFilesOrDirectories.MoveFilesOrDirectori
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.core.EduNames;
-import com.jetbrains.tmp.learning.courseFormat.StepFile;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.core.metrics.Metrics;
 
 import java.io.IOException;
+import java.util.ArrayList;
+
+import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
+import static org.stepik.core.utils.ProjectFilesUtils.getOrCreatePsiDirectory;
+import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcPsiDirectory;
 
 public class ProgrammingLanguageUtils {
     private static final Logger logger = Logger.getInstance(ProgrammingLanguageUtils.class);
@@ -40,22 +45,16 @@ public class ProgrammingLanguageUtils {
 
         if (currentLang.getMainFileName().equals(language.getMainFileName())) {
             targetStepNode.setCurrentLang(language);
+            Metrics.switchLanguage(project, targetStepNode, SUCCESSFUL);
             return;
         }
 
-        closeStepNodeFile(project, targetStepNode);
-
-        VirtualFile srcParent = project.getBaseDir().findFileByRelativePath(targetStepNode.getPath());
-        if (srcParent == null) {
-            return;
-        }
-
-        PsiDirectory src = getOrCreateDir(project, srcParent, EduNames.SRC);
+        PsiDirectory src = getOrCreateSrcPsiDirectory(project, targetStepNode);
         if (src == null) {
             return;
         }
 
-        PsiDirectory hide = getOrCreateDir(project, src.getVirtualFile(), EduNames.HIDE);
+        PsiDirectory hide = getOrCreatePsiDirectory(project, src, EduNames.HIDE);
         if (hide == null) {
             return;
         }
@@ -77,10 +76,15 @@ public class ProgrammingLanguageUtils {
             first = src.findFile(currentLang.getMainFileName());
         }
 
+        targetStepNode.setCurrentLang(language);
+        ArrayList<VirtualFile> needClose = closeStepNodeFile(project, targetStepNode);
+        FileEditorManager.getInstance(project).openFile(second.getVirtualFile(), true);
+        FileEditorManager editorManager = FileEditorManager.getInstance(project);
+        needClose.forEach(editorManager::closeFile);
+
         exchangeFiles(src, hide, first, second, moveFirst, moveSecond);
 
-        targetStepNode.setCurrentLang(language);
-        FileEditorManager.getInstance(project).openFile(second.getVirtualFile(), true);
+        Metrics.switchLanguage(project, targetStepNode, SUCCESSFUL);
     }
 
     private static void exchangeFiles(
@@ -104,12 +108,13 @@ public class ProgrammingLanguageUtils {
         }
     }
 
-    private static void closeStepNodeFile(@NotNull Project project, @NotNull StepNode targetStepNode) {
+    private static ArrayList<VirtualFile> closeStepNodeFile(
+            @NotNull Project project,
+            @NotNull StepNode targetStepNode) {
         FileDocumentManager documentManager = FileDocumentManager.getInstance();
-        FileEditorManager editorManager = FileEditorManager.getInstance(project);
+        ArrayList<VirtualFile> needClose = new ArrayList<>();
         for (VirtualFile file : FileEditorManager.getInstance(project).getOpenFiles()) {
-            StudyUtils.getStep(project, file);
-            if (StudyUtils.getStep(project, file) != targetStepNode) {
+            if (StudyUtils.getStudyNode(project, file) != targetStepNode) {
                 continue;
             }
             Document document = documentManager.getDocument(file);
@@ -117,32 +122,10 @@ public class ProgrammingLanguageUtils {
                 continue;
             }
             documentManager.saveDocument(document);
-            editorManager.closeFile(file);
-        }
-    }
-
-    private static PsiDirectory getOrCreateDir(
-            @NotNull Project project,
-            @NotNull VirtualFile parent,
-            @NotNull String name) {
-        final VirtualFile[] hideVF = {parent.findChild(name)};
-
-        if (hideVF[0] == null) {
-            ApplicationManager
-                    .getApplication()
-                    .runWriteAction(() -> {
-                        try {
-                            hideVF[0] = parent.createChildDirectory(null, name);
-                        } catch (IOException e) {
-                            hideVF[0] = null;
-                        }
-                    });
-            if (hideVF[0] == null) {
-                return null;
-            }
+            needClose.add(file);
         }
 
-        return PsiManager.getInstance(project).findDirectory(hideVF[0]);
+        return needClose;
     }
 
     @Nullable
@@ -160,11 +143,8 @@ public class ProgrammingLanguageUtils {
                     .runWriteAction(() -> {
                         try {
                             file[0] = parent.createChildData(null, fileName);
-
-                            StepFile stepFile = stepNode.getStepFiles().get(fileName);
-                            if (stepFile != null) {
-                                file[0].setBinaryContent(stepFile.getText().getBytes());
-                            }
+                            String template = stepNode.getTemplate(language);
+                            file[0].setBinaryContent(template.getBytes());
                         } catch (IOException e) {
                             file[0] = null;
                         }

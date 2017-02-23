@@ -1,14 +1,25 @@
 package org.stepik.core.utils;
 
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.module.ModifiableModuleModel;
+import com.intellij.openapi.module.ModuleManager;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.io.FileUtil;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileManager;
+import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiManager;
+import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.core.EduNames;
-import com.jetbrains.tmp.learning.courseFormat.CourseNode;
-import com.jetbrains.tmp.learning.courseFormat.LessonNode;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
+import com.jetbrains.tmp.learning.courseFormat.StudyNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Set;
+import java.io.IOException;
+
+import static org.stepik.core.utils.ProductGroup.IDEA;
 
 /**
  * @author meanmail
@@ -17,11 +28,11 @@ public class ProjectFilesUtils {
 
     public static final String SEPARATOR = "/";
     private static final char SEPARATOR_CHAR = '/';
-    private static final String SECTION_EXPR = EduNames.SECTION + "[0-9]+";
-    private static final String LESSON_PATH_EXPR = SECTION_EXPR + SEPARATOR + EduNames.LESSON + "[0-9]+";
-    private static final String TASK_PATH_EXPR = LESSON_PATH_EXPR + SEPARATOR + EduNames.STEP + "[0-9]+";
-    private static final String SRC_PATH_EXPR = TASK_PATH_EXPR + SEPARATOR + EduNames.SRC;
-    private static final String COURSE_DIRECTORIES = "\\.|" + SECTION_EXPR + "|" + LESSON_PATH_EXPR + "|" + TASK_PATH_EXPR + "|" + SRC_PATH_EXPR;
+    private static final String SECTION_EXPR = "(section[0-9]+)";
+    private static final String LESSON_PATH_EXPR = "(section[0-9]+/lesson[0-9]+|lesson[0-9]+)";
+    private static final String STEP_PATH_EXPR = "(section[0-9]+/lesson[0-9]+/step[0-9]+|lesson[0-9]+/step[0-9]+|step[0-9]+)";
+    private static final String SRC_PATH_EXPR = "(" + STEP_PATH_EXPR + SEPARATOR + EduNames.SRC + "|" + EduNames.SRC + ")";
+    private static final String COURSE_DIRECTORIES = "\\.|" + SECTION_EXPR + "|" + LESSON_PATH_EXPR + "|" + STEP_PATH_EXPR + "|" + SRC_PATH_EXPR;
     private static final String HIDE_PATH_EXPR = SRC_PATH_EXPR + SEPARATOR + EduNames.HIDE;
 
     public static boolean isCanNotBeTarget(@NotNull String targetPath) {
@@ -32,35 +43,25 @@ public class ProjectFilesUtils {
         return !(isWithinSrc(targetPath) || isWithinSandbox(targetPath) || isSandbox(targetPath) || isSrc(targetPath));
     }
 
-    private static boolean isStepFile(@NotNull CourseNode courseNode, @NotNull String path) {
-        String[] dirs = splitPath(path);
-        if (dirs.length > 3) {
-            LessonNode lessonNode = courseNode.getLessonByDirName(dirs[1]);
-            if (lessonNode == null) {
-                return false;
-            }
-            StepNode stepNode = lessonNode.getStep(dirs[2]);
-            if (stepNode == null) {
-                return false;
-            }
-            String fileName = dirs[dirs.length - 1];
-            Set<String> filenames = stepNode.getStepFiles().keySet();
-            if (filenames.stream().anyMatch(fileName::equals)) {
-                return true;
-            }
+    private static boolean isStepFile(@NotNull StudyNode root, @NotNull String path) {
+        StudyNode studyNode = StudyUtils.getStudyNode(root, path);
+
+        if (studyNode instanceof StepNode) {
+            String filename = getRelativePath(studyNode.getPath(), path);
+            return ((StepNode) studyNode).isStepFile(filename);
         }
         return false;
     }
 
-    public static boolean isNotMovableOrRenameElement(@NotNull CourseNode courseNode, @NotNull String path) {
+    public static boolean isNotMovableOrRenameElement(@NotNull StudyNode node, @NotNull String path) {
         if (isWithinSrc(path)) {
-            return isHideDir(path) || isWithinHideDir(path) || isStepFile(courseNode, path);
+            return isHideDir(path) || isWithinHideDir(path) || isStepFile(node, path);
         }
 
         return !isWithinSandbox(path);
     }
 
-    static boolean isSandbox(@NotNull String path) {
+    public static boolean isSandbox(@NotNull String path) {
         return path.matches(EduNames.SANDBOX_DIR);
     }
 
@@ -68,6 +69,7 @@ public class ProjectFilesUtils {
         return path.matches(SRC_PATH_EXPR);
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     static boolean isWithinSandbox(@NotNull String path) {
         return path.matches(EduNames.SANDBOX_DIR + SEPARATOR + ".*");
     }
@@ -115,5 +117,68 @@ public class ProjectFilesUtils {
         }
 
         return parentPath.toString();
+    }
+
+    @Nullable
+    public static VirtualFile getOrCreateSrcDirectory(@NotNull Project project, @NotNull StepNode stepNode) {
+        VirtualFile baseDir = project.getBaseDir();
+        String srcPath = stepNode.getPath() + "/" + EduNames.SRC;
+        VirtualFile srcDirectory = baseDir.findFileByRelativePath(srcPath);
+        if (srcDirectory == null && !stepNode.getWasDeleted()) {
+            srcDirectory = getOrCreateDirectory(baseDir, srcPath);
+            if (srcDirectory != null && PluginUtils.isCurrent(IDEA)) {
+                ModifiableModuleModel model = ModuleManager.getInstance(project).getModifiableModel();
+                ApplicationManager.getApplication().runWriteAction(() -> {
+                    ModuleUtils.createStepModule(project, stepNode, model);
+                    model.commit();
+                });
+                VirtualFileManager.getInstance().syncRefresh();
+            }
+        }
+        return srcDirectory;
+    }
+
+    @Nullable
+    static PsiDirectory getOrCreateSrcPsiDirectory(@NotNull Project project, @NotNull StepNode stepNode) {
+        VirtualFile directory = getOrCreateSrcDirectory(project, stepNode);
+        if (directory == null) {
+            return null;
+        }
+        return PsiManager.getInstance(project).findDirectory(directory);
+    }
+
+    @Nullable
+    private static VirtualFile getOrCreateDirectory(@NotNull VirtualFile baseDir, @NotNull String directoryPath) {
+        VirtualFile srcDir = baseDir.findFileByRelativePath(directoryPath);
+        if (srcDir == null) {
+            srcDir = ApplicationManager.getApplication().runWriteAction((Computable<VirtualFile>) () -> {
+                VirtualFile dir;
+                try {
+                    String[] paths = directoryPath.split("/");
+                    dir = baseDir;
+                    for (String path : paths) {
+                        VirtualFile child = dir.findChild(path);
+                        if (child == null) {
+                            dir = dir.createChildDirectory(null, path);
+                        } else {
+                            dir = child;
+                        }
+                    }
+                } catch (IOException e) {
+                    return null;
+                }
+
+                return dir;
+            });
+        }
+        return srcDir;
+    }
+
+    static PsiDirectory getOrCreatePsiDirectory(@NotNull Project project, @NotNull PsiDirectory baseDir, @NotNull String relativePath) {
+        VirtualFile directory = getOrCreateDirectory(baseDir.getVirtualFile(), relativePath);
+        if (directory == null) {
+            return null;
+        }
+        return PsiManager.getInstance(project).findDirectory(directory);
     }
 }

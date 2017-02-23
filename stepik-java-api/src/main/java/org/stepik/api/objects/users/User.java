@@ -46,6 +46,66 @@ public class User extends AbstractObject {
     @SerializedName("social_profiles")
     private List<Integer> socialProfiles;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        User user = (User) o;
+
+        if (profile != user.profile) return false;
+        if (isPrivate != user.isPrivate) return false;
+        if (isActive != user.isActive) return false;
+        if (isGuest != user.isGuest) return false;
+        if (isOrganization != user.isOrganization) return false;
+        if (level != user.level) return false;
+        if (knowledge != user.knowledge) return false;
+        if (knowledgeRank != user.knowledgeRank) return false;
+        if (reputation != user.reputation) return false;
+        if (reputationRank != user.reputationRank) return false;
+        if (shortBio != null ? !shortBio.equals(user.shortBio) : user.shortBio != null) return false;
+        if (details != null ? !details.equals(user.details) : user.details != null) return false;
+        if (firstName != null ? !firstName.equals(user.firstName) : user.firstName != null) return false;
+        if (lastName != null ? !lastName.equals(user.lastName) : user.lastName != null) return false;
+        if (alias != null ? !alias.equals(user.alias) : user.alias != null) return false;
+        if (avatar != null ? !avatar.equals(user.avatar) : user.avatar != null) return false;
+        if (cover != null ? !cover.equals(user.cover) : user.cover != null) return false;
+        if (levelTitle != null ? !levelTitle.equals(user.levelTitle) : user.levelTitle != null) return false;
+        if (tagProgresses != null ? !tagProgresses.equals(user.tagProgresses) : user.tagProgresses != null)
+            return false;
+        //noinspection SimplifiableIfStatement
+        if (joinDate != null ? !joinDate.equals(user.joinDate) : user.joinDate != null) return false;
+        return socialProfiles != null ? socialProfiles.equals(user.socialProfiles) : user.socialProfiles == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + profile;
+        result = 31 * result + (isPrivate ? 1 : 0);
+        result = 31 * result + (isActive ? 1 : 0);
+        result = 31 * result + (isGuest ? 1 : 0);
+        result = 31 * result + (isOrganization ? 1 : 0);
+        result = 31 * result + (shortBio != null ? shortBio.hashCode() : 0);
+        result = 31 * result + (details != null ? details.hashCode() : 0);
+        result = 31 * result + (firstName != null ? firstName.hashCode() : 0);
+        result = 31 * result + (lastName != null ? lastName.hashCode() : 0);
+        result = 31 * result + (alias != null ? alias.hashCode() : 0);
+        result = 31 * result + (avatar != null ? avatar.hashCode() : 0);
+        result = 31 * result + (cover != null ? cover.hashCode() : 0);
+        result = 31 * result + level;
+        result = 31 * result + (levelTitle != null ? levelTitle.hashCode() : 0);
+        result = 31 * result + (tagProgresses != null ? tagProgresses.hashCode() : 0);
+        result = 31 * result + knowledge;
+        result = 31 * result + knowledgeRank;
+        result = 31 * result + reputation;
+        result = 31 * result + reputationRank;
+        result = 31 * result + (joinDate != null ? joinDate.hashCode() : 0);
+        result = 31 * result + (socialProfiles != null ? socialProfiles.hashCode() : 0);
+        return result;
+    }
+
     @NotNull
     public String getFirstName() {
         if (firstName == null) {

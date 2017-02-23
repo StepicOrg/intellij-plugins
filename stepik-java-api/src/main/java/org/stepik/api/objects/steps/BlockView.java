@@ -55,8 +55,11 @@ public class BlockView {
         this.text = text;
     }
 
-    @Nullable
+    @NotNull
     public Video getVideo() {
+        if (video == null) {
+            video = new Video();
+        }
         return video;
     }
 
@@ -83,5 +86,32 @@ public class BlockView {
 
     public void setSubtitleFiles(@Nullable List<String> subtitleFiles) {
         this.subtitleFiles = subtitleFiles;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        BlockView blockView = (BlockView) o;
+
+        if (name != null ? !name.equals(blockView.name) : blockView.name != null) return false;
+        if (text != null ? !text.equals(blockView.text) : blockView.text != null) return false;
+        if (video != null ? !video.equals(blockView.video) : blockView.video != null) return false;
+        if (animation != null ? !animation.equals(blockView.animation) : blockView.animation != null) return false;
+        //noinspection SimplifiableIfStatement
+        if (options != null ? !options.equals(blockView.options) : blockView.options != null) return false;
+        return subtitleFiles != null ? subtitleFiles.equals(blockView.subtitleFiles) : blockView.subtitleFiles == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name != null ? name.hashCode() : 0;
+        result = 31 * result + (text != null ? text.hashCode() : 0);
+        result = 31 * result + (video != null ? video.hashCode() : 0);
+        result = 31 * result + (animation != null ? animation.hashCode() : 0);
+        result = 31 * result + (options != null ? options.hashCode() : 0);
+        result = 31 * result + (subtitleFiles != null ? subtitleFiles.hashCode() : 0);
+        return result;
     }
 }
