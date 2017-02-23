@@ -55,9 +55,11 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.UUID;
 
 import static com.jetbrains.tmp.learning.SupportedLanguages.INVALID;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 @State(name = "StepikStudySettings", storages = @Storage("stepik_study_project.xml"))
 public class StepikProjectManager implements PersistentStateComponent<Element>, DumbAware {
@@ -184,7 +186,7 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
             return null;
         }
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            getXStream().toXML(this, out);
+            getXStream().toXML(this, new OutputStreamWriter(out, UTF_8));
             Element el = toElement(out);
             logger.info("Getting the StepikProjectManager state");
 
