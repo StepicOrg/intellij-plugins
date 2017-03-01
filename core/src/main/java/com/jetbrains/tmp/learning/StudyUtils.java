@@ -3,6 +3,8 @@ package com.jetbrains.tmp.learning;
 import com.intellij.ide.projectView.ProjectView;
 import com.intellij.ide.projectView.ProjectViewNode;
 import com.intellij.ide.projectView.impl.AbstractProjectViewPane;
+import com.intellij.ide.ui.LafManager;
+import com.intellij.ide.ui.laf.darcula.DarculaLookAndFeelInfo;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
@@ -12,12 +14,13 @@ import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFileSystemItem;
 import com.intellij.ui.content.Content;
-import com.jetbrains.tmp.learning.courseFormat.ChoiceStepNodeHelper;
-import com.jetbrains.tmp.learning.courseFormat.StepHelper;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
-import com.jetbrains.tmp.learning.courseFormat.StringStepNodeHelper;
 import com.jetbrains.tmp.learning.courseFormat.StudyNode;
-import com.jetbrains.tmp.learning.courseFormat.VideoStepNodeHelper;
+import com.jetbrains.tmp.learning.courseFormat.stepHelpers.ChoiceStepNodeHelper;
+import com.jetbrains.tmp.learning.courseFormat.stepHelpers.SortingStepNodeHelper;
+import com.jetbrains.tmp.learning.courseFormat.stepHelpers.StepHelper;
+import com.jetbrains.tmp.learning.courseFormat.stepHelpers.StringStepNodeHelper;
+import com.jetbrains.tmp.learning.courseFormat.stepHelpers.VideoStepNodeHelper;
 import com.jetbrains.tmp.learning.ui.StudyToolWindow;
 import com.jetbrains.tmp.learning.ui.StudyToolWindowFactory;
 import org.jetbrains.annotations.NotNull;
@@ -115,6 +118,11 @@ public class StudyUtils {
         return processTemplate(stepNodeHelper, "quiz/string");
     }
 
+    public static String getSortingStepText(@NotNull StepNode stepNode) {
+        SortingStepNodeHelper stepNodeHelper = stepNode.asSortingStep();
+        return processTemplate(stepNodeHelper, "quiz/sorting");
+    }
+
     @NotNull
     private static String processTemplate(@NotNull StepHelper stepNodeHelper, @NotNull String templateName) {
         String text = getTextStepText(stepNodeHelper.getStepNode());
@@ -122,6 +130,7 @@ public class StudyUtils {
         HashMap<String, Object> params = new HashMap<>();
         params.put("text", text);
         params.put("stepNode", stepNodeHelper);
+        params.put("darcula", LafManager.getInstance().getCurrentLookAndFeel() instanceof DarculaLookAndFeelInfo);
 
         return Templater.processTemplate(templateName, params);
     }

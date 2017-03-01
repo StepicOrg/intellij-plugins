@@ -1,5 +1,6 @@
-package com.jetbrains.tmp.learning.courseFormat;
+package com.jetbrains.tmp.learning.courseFormat.stepHelpers;
 
+import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.objects.steps.Step;
@@ -21,7 +22,7 @@ public class VideoStepNodeHelper {
     private int quality;
     private List<VideoUrl> urls;
 
-    VideoStepNodeHelper(@NotNull StepNode stepNode) {
+    public VideoStepNodeHelper(@NotNull StepNode stepNode) {
         this.stepNode = stepNode;
     }
 

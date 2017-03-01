@@ -25,7 +25,7 @@ import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.courseFormat.StudyNode;
 import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
-import com.jetbrains.tmp.learning.courseFormat.VideoStepNodeHelper;
+import com.jetbrains.tmp.learning.courseFormat.stepHelpers.VideoStepNodeHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.core.utils.ProgrammingLanguageUtils;
@@ -39,6 +39,7 @@ import java.util.Map;
 
 import static com.jetbrains.tmp.learning.StudyUtils.getChoiceStepText;
 import static com.jetbrains.tmp.learning.StudyUtils.getCodeStepText;
+import static com.jetbrains.tmp.learning.StudyUtils.getSortingStepText;
 import static com.jetbrains.tmp.learning.StudyUtils.getStringStepText;
 import static com.jetbrains.tmp.learning.StudyUtils.getTextStepText;
 import static com.jetbrains.tmp.learning.StudyUtils.getUnknownStepText;
@@ -220,6 +221,9 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
                 break;
             case STRING:
                 text = getStringStepText(stepNode);
+                break;
+            case SORTING:
+                text = getSortingStepText(stepNode);
                 break;
             default:
                 text = EMPTY_STEP_TEXT;

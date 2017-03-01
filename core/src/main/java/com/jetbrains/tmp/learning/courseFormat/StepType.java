@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
  * @author meanmail
  */
 public enum StepType {
-    UNKNOWN, CODE, TEXT, VIDEO, CHOICE, STRING;
+    UNKNOWN, CODE, TEXT, VIDEO, CHOICE, STRING, SORTING;
 
     @NotNull
     public static StepType of(String name) {

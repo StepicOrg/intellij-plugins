@@ -45,6 +45,12 @@ public class StepikSubmissionsPostQuery extends StepikAbstractPostQuery<Submissi
     }
 
     @NotNull
+    public StepikSubmissionsPostQuery ordering(List<Integer> ordering) {
+        submissions.getSubmission().getReply().setOrdering(ordering);
+        return this;
+    }
+
+    @NotNull
     public StepikSubmissionsPostQuery language(@NotNull String value) {
         submissions.getSubmission().getReply().setLanguage(value);
         return this;

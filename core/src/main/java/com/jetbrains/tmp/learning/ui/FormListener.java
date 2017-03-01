@@ -128,6 +128,10 @@ class FormListener implements EventListener {
                             String text = getStringData(elements);
                             query.text(text);
                             break;
+                        case SORTING:
+                            List<Integer> ordering = getOrderingData(elements);
+                            query.ordering(ordering);
+                            break;
                     }
 
                     Submissions submissions = query.execute();
@@ -165,6 +169,31 @@ class FormListener implements EventListener {
             }
         }
         return choices;
+    }
+
+    @NotNull
+    private List<Integer> getOrderingData(@NotNull HTMLCollection elements) {
+        HTMLInputElement countElement = (HTMLInputElement) elements.namedItem("count");
+        if (countElement == null) {
+            return Collections.emptyList();
+        }
+
+        int count = Integer.parseInt(countElement.getValue());
+        List<Integer> ordering = new ArrayList<>(count);
+        for (int i = 0; i < elements.getLength(); i++) {
+
+            HTMLInputElement option = ((HTMLInputElement) elements.item(i));
+            if (option != null) {
+                if ("index".equals(option.getName())) {
+                    String indexAttr = option.getValue();
+                    ordering.add(Integer.valueOf(indexAttr));
+                }
+                if (!"hidden".equals(option.getType())) {
+                    option.setDisabled(true);
+                }
+            }
+        }
+        return ordering;
     }
 
     private String getStringData(@NotNull HTMLCollection elements) {

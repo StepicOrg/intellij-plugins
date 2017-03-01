@@ -1,6 +1,8 @@
-package com.jetbrains.tmp.learning.courseFormat;
+package com.jetbrains.tmp.learning.courseFormat.stepHelpers;
 
 import com.intellij.openapi.diagnostic.Logger;
+import com.jetbrains.tmp.learning.courseFormat.StepNode;
+import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.api.client.StepikApiClient;
@@ -21,7 +23,7 @@ import static com.jetbrains.tmp.learning.courseFormat.StudyStatus.UNCHECKED;
  */
 public class StepHelper {
     private static final Logger logger = Logger.getInstance(StepHelper.class);
-    final StepNode stepNode;
+    private final StepNode stepNode;
     @NotNull
     Reply reply = new Reply();
     @NotNull

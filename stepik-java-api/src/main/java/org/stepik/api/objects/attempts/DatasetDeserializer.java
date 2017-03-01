@@ -32,6 +32,11 @@ public class DatasetDeserializer implements JsonDeserializer<Dataset> {
             dataset.setMultipleChoice(multipleChoice.getAsBoolean());
         }
 
+        JsonPrimitive textDisabled = object.getAsJsonPrimitive("is_text_disabled");
+        if (textDisabled != null) {
+            dataset.setTextDisabled(textDisabled.getAsBoolean());
+        }
+
         JsonArray options = object.getAsJsonArray("options");
         if (options != null) {
             List<String> optionsArray = new ArrayList<>();

@@ -1,4 +1,4 @@
-<#-- @ftlvariable name="stepNode" type="com.jetbrains.tmp.learning.courseFormat.StringStepNodeHelper" -->
+<#-- @ftlvariable name="stepNode" type="com.jetbrains.tmp.learning.courseFormat.stepHelpers.StringStepNodeHelper" -->
 <#-- @ftlvariable name="text" type="java.lang.String" -->
 
 <style>

@@ -9,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.stepik.api.objects.attempts.Dataset;
 import org.stepik.api.objects.attempts.DatasetDeserializer;
+import org.stepik.api.objects.submissions.Reply;
+import org.stepik.api.objects.submissions.ReplyDeserializer;
 
 /**
  * @author meanmail
@@ -21,6 +23,7 @@ public class DefaultJsonConverter implements JsonConverter {
     private DefaultJsonConverter() {
         gson = new GsonBuilder()
                 .registerTypeAdapter(Dataset.class, new DatasetDeserializer())
+                .registerTypeAdapter(Reply.class, new ReplyDeserializer())
                 .create();
     }
 
