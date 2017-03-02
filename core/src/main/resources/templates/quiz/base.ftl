@@ -1,4 +1,4 @@
-<#-- @ftlvariable name="stepNode" type="com.jetbrains.tmp.learning.courseFormat.stepHelpers.ChoiceStepNodeHelper" -->
+<#-- @ftlvariable name="stepNode" type="com.jetbrains.tmp.learning.courseFormat.stepHelpers.StepHelper" -->
 <#-- @ftlvariable name="text" type="java.lang.String" -->
 <#macro quiz_content>
 ${text}<br>
@@ -26,6 +26,7 @@ ${text}<br>
         <input type="hidden" name="status" value="${status}"/>
         <input type="hidden" name="attemptId" value="${stepNode.getAttemptId()?string("#")}"/>
         <input type="hidden" name="locked" value="${locked?string("true", "false")}"/>
+        <input type="hidden" name="type" value="${stepNode.getType()}"/>
         <br>
 
         <#if !locked>

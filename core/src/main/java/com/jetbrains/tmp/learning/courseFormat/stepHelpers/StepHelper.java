@@ -174,4 +174,8 @@ public class StepHelper {
         }
         return submissionsCount;
     }
+
+    public String getType() {
+        return stepNode.getType().toString().toLowerCase();
+    }
 }
