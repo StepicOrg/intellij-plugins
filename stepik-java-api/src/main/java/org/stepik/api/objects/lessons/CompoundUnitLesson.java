@@ -79,4 +79,10 @@ public class CompoundUnitLesson extends StudyObject {
     public int getPosition() {
         return getUnit().getPosition();
     }
+
+    @Nullable
+    @Override
+    public String getProgress() {
+        return getLesson().getProgress();
+    }
 }

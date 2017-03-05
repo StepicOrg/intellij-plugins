@@ -2,14 +2,20 @@ package com.jetbrains.tmp.learning.courseFormat;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
+import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.api.client.StepikApiClient;
+import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.StudyObject;
+import org.stepik.api.objects.progresses.Progresses;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author meanmail
@@ -24,6 +30,8 @@ public abstract class Node<
     private D data;
     private List<C> children;
     private boolean wasDeleted;
+    @XStreamOmitField
+    private StudyStatus status;
 
     Node() {
     }
@@ -187,6 +195,9 @@ public abstract class Node<
             @Nullable StudyNode parent,
             boolean isRestarted,
             @Nullable ProgressIndicator indicator) {
+        if (isRestarted) {
+            status = StudyStatus.UNCHECKED;
+        }
         Map<Long, C> mapNodes = getMapNodes();
         List<C> needInit = getChildren();
         setChildrenDeletedFlag();
@@ -236,33 +247,64 @@ public abstract class Node<
     protected abstract Class<C> getChildClass();
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Node<?, ?, ?, ?> node = (Node<?, ?, ?, ?>) o;
-
-        //noinspection SimplifiableIfStatement
-        if (parent != null ? !parent.equals(node.parent) : node.parent != null) return false;
-        return children != null ? children.equals(node.children) : node.children == null;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = parent != null ? parent.hashCode() : 0;
-        result = 31 * result + (children != null ? children.hashCode() : 0);
-        return result;
+    public void updateParentStatus() {
+        if (parent != null) {
+            parent.setStatus(null);
+            parent.updateParentStatus();
+        }
     }
 
     @NotNull
     @Override
     public StudyStatus getStatus() {
-        for (StudyNode child : getChildren()) {
-            if (child.getStatus() != StudyStatus.SOLVED)
-                return StudyStatus.UNCHECKED;
+        if (status == null) {
+            status = StudyStatus.UNCHECKED;
+
+            try {
+                Map<String, StudyNode> progressMap = new HashMap<>();
+                getChildren().forEach(child -> {
+                    DC data = child.getData();
+                    if (data != null) {
+                        progressMap.put(data.getProgress(), child);
+                    }
+                });
+                D data = getData();
+                if (data != null) {
+                    String progressId = data.getProgress();
+                    if (progressId != null) {
+                        progressMap.put(progressId, this);
+                    }
+
+                    Set<String> progressIds = progressMap.keySet();
+
+                    if (progressIds.size() != 0) {
+                        StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
+
+                        Progresses progresses = stepikApiClient.progresses()
+                                .get()
+                                .id(progressIds.toArray(new String[progressIds.size()]))
+                                .execute();
+
+                        progresses.getItems().forEach(progress -> {
+                            String id = progress.getId();
+                            StudyNode node = progressMap.get(id);
+                            if (progress.isPassed()) {
+                                node.setStatus(StudyStatus.SOLVED);
+                            }
+                        });
+                    }
+                }
+            } catch (StepikClientException e) {
+                logger.warn(e);
+            }
         }
 
-        return StudyStatus.SOLVED;
+        return status;
+    }
+
+    @Override
+    public void setStatus(@Nullable StudyStatus status) {
+        this.status = status;
     }
 
     @Nullable
@@ -325,5 +367,28 @@ public abstract class Node<
     @Override
     public void setWasDeleted(boolean wasDeleted) {
         this.wasDeleted = wasDeleted;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Node<?, ?, ?, ?> node = (Node<?, ?, ?, ?>) o;
+
+        if (wasDeleted != node.wasDeleted) return false;
+        if (data != null ? !data.equals(node.data) : node.data != null) return false;
+        //noinspection SimplifiableIfStatement
+        if (children != null ? !children.equals(node.children) : node.children != null) return false;
+        return status == node.status;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (data != null ? data.hashCode() : 0);
+        result = 31 * result + (children != null ? children.hashCode() : 0);
+        result = 31 * result + (wasDeleted ? 1 : 0);
+        result = 31 * result + (status != null ? status.hashCode() : 0);
+        return result;
     }
 }

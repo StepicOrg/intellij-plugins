@@ -33,7 +33,6 @@ import static com.jetbrains.tmp.learning.stepik.StepikConnectorLogin.authAndGetS
 
 public class StepNode extends Node<Step, StepNode, Step, StepNode> {
     private static final Logger logger = Logger.getInstance(StepNode.class);
-    private StudyStatus status;
     private List<SupportedLanguages> supportedLanguages;
     private SupportedLanguages currentLang;
     private long courseId;
@@ -52,10 +51,6 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
 
         supportedLanguages = null;
         courseId = 0;
-
-        if (isRestarted) {
-            status = StudyStatus.UNCHECKED;
-        }
 
         super.init(parent, isRestarted, indicator);
     }
@@ -162,19 +157,6 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
         } catch (StepikClientException ignored) {
         }
         return 0;
-    }
-
-    @Override
-    @NotNull
-    public StudyStatus getStatus() {
-        if (status == null) {
-            status = StudyStatus.UNCHECKED;
-        }
-        return status;
-    }
-
-    public void setStatus(@Nullable StudyStatus status) {
-        this.status = status;
     }
 
     @NotNull
@@ -286,20 +268,24 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
 
         StepNode stepNode = (StepNode) o;
 
-        if (status != stepNode.status) return false;
+        if (courseId != stepNode.courseId) return false;
         //noinspection SimplifiableIfStatement
-        if (currentLang != stepNode.currentLang) return false;
-        return super.equals(o);
+        if (supportedLanguages != null ?
+                !supportedLanguages.equals(stepNode.supportedLanguages) :
+                stepNode.supportedLanguages != null) return false;
+        return currentLang == stepNode.currentLang;
     }
 
     @Override
     public int hashCode() {
-        int result = status != null ? status.hashCode() : 0;
+        int result = super.hashCode();
+        result = 31 * result + (supportedLanguages != null ? supportedLanguages.hashCode() : 0);
         result = 31 * result + (currentLang != null ? currentLang.hashCode() : 0);
-        result = 31 * result + super.hashCode();
+        result = 31 * result + (int) (courseId ^ (courseId >>> 32));
         return result;
     }
 
