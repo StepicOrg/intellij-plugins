@@ -47,6 +47,7 @@ import java.util.List;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 
+import static com.jetbrains.tmp.learning.courseFormat.StudyStatus.SOLVED;
 import static org.stepik.core.metrics.MetricsStatus.DATA_NOT_LOADED;
 import static org.stepik.core.metrics.MetricsStatus.EMPTY_SOURCE;
 import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
@@ -222,7 +223,11 @@ public class DownloadSubmission extends AbstractStepAction {
 
                             if (document != null) {
                                 document.setText(finalCode);
-                                stepNode.setStatus(StudyStatus.of(submission.getStatus()));
+                                StudyStatus status = StudyStatus.of(submission.getStatus());
+                                stepNode.setStatus(status);
+                                if (status == SOLVED) {
+                                    stepNode.updateParentStatus();
+                                }
                                 FileEditorManager.getInstance(project).openFile(mainFile, true);
                                 ProjectView.getInstance(project).refresh();
                                 Metrics.downloadAction(project, stepNode, SUCCESSFUL);

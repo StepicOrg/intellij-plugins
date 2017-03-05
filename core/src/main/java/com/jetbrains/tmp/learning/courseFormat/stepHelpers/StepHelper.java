@@ -16,6 +16,7 @@ import org.stepik.api.objects.submissions.Submissions;
 import org.stepik.api.objects.users.User;
 import org.stepik.api.queries.Order;
 
+import static com.jetbrains.tmp.learning.courseFormat.StudyStatus.SOLVED;
 import static com.jetbrains.tmp.learning.courseFormat.StudyStatus.UNCHECKED;
 
 /**
@@ -70,6 +71,9 @@ public class StepHelper {
             reply = submission.getReply();
             status = submission.getStatus();
             stepNode.setStatus(StudyStatus.of(status));
+            if (stepNode.getStatus() == SOLVED) {
+                stepNode.updateParentStatus();
+            }
             return true;
         }
 

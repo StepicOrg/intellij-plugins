@@ -16,6 +16,10 @@ public interface StudyNode<D extends StudyObject, C extends StudyNode> {
     @NotNull
     StudyStatus getStatus();
 
+    void setStatus(@Nullable StudyStatus status);
+
+    void updateParentStatus();
+
     @NotNull
     String getDirectory();
 

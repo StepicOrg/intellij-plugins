@@ -45,8 +45,6 @@ public class LessonNode extends Node<CompoundUnitLesson, StepNode, Step, StepNod
                         .get()
                         .id(stepsIds)
                         .execute();
-
-
             }
         } catch (StepikClientException logged) {
             logger.warn("A lesson initialization don't is fully", logged);

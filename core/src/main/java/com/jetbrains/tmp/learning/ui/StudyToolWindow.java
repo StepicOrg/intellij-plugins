@@ -24,7 +24,6 @@ import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.courseFormat.StudyNode;
-import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
 import com.jetbrains.tmp.learning.courseFormat.stepHelpers.VideoStepNodeHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -45,6 +44,7 @@ import static com.jetbrains.tmp.learning.StudyUtils.getStringStepText;
 import static com.jetbrains.tmp.learning.StudyUtils.getTextStepText;
 import static com.jetbrains.tmp.learning.StudyUtils.getUnknownStepText;
 import static com.jetbrains.tmp.learning.StudyUtils.getVideoStepText;
+import static com.jetbrains.tmp.learning.courseFormat.StudyStatus.SOLVED;
 import static org.stepik.core.utils.PluginUtils.PLUGIN_ID;
 
 public abstract class StudyToolWindow extends SimpleToolWindowPanel implements DataProvider, Disposable, ActionListener {
@@ -203,7 +203,8 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
                 break;
             case TEXT:
                 text = getTextStepText(stepNode);
-                stepNode.setStatus(StudyStatus.SOLVED);
+                stepNode.setStatus(SOLVED);
+                stepNode.updateParentStatus();
                 break;
             case VIDEO:
                 VideoStepNodeHelper videoStepNode = stepNode.asVideoStep();
@@ -215,7 +216,8 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
                 layout.show(rightPanel, "quality");
                 rightPanelVisible = videoQualityBox.getModel().getSize() != 0;
                 storeVideoQuality(quality);
-                stepNode.setStatus(StudyStatus.SOLVED);
+                stepNode.setStatus(SOLVED);
+                stepNode.updateParentStatus();
                 break;
             case CHOICE:
                 text = getChoiceStepText(stepNode);
