@@ -18,7 +18,6 @@ import com.jetbrains.tmp.learning.courseFormat.StudyNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.core.metrics.Metrics;
-import org.stepik.core.utils.ProjectFilesUtils;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -31,6 +30,7 @@ import java.util.Set;
 
 import static com.intellij.util.ui.tree.TreeUtil.getPathFromRoot;
 import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
+import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
 
 /**
  * @author meanmail
@@ -49,7 +49,7 @@ public class NavigationUtils {
 
         VirtualFile mainFile;
         if (targetNode instanceof StepNode) {
-            VirtualFile srcDir = ProjectFilesUtils.getOrCreateSrcDirectory(project, (StepNode) targetNode);
+            VirtualFile srcDir = getOrCreateSrcDirectory(project, (StepNode) targetNode, true);
             if (srcDir == null) {
                 return;
             }

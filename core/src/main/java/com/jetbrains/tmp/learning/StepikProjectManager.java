@@ -16,6 +16,7 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileManager;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.CourseNode;
 import com.jetbrains.tmp.learning.courseFormat.LessonNode;
@@ -44,7 +45,6 @@ import org.stepik.api.objects.steps.Sample;
 import org.stepik.api.objects.steps.Step;
 import org.stepik.api.objects.steps.VideoUrl;
 import org.stepik.api.objects.users.User;
-import org.stepik.core.utils.ProjectFilesUtils;
 import org.stepik.plugin.projectWizard.idea.SandboxModuleBuilder;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -58,6 +58,7 @@ import java.io.IOException;
 import java.util.UUID;
 
 import static com.jetbrains.tmp.learning.SupportedLanguages.INVALID;
+import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
 
 @State(name = "StepikStudySettings", storages = @Storage("stepik_study_project.xml"))
 public class StepikProjectManager implements PersistentStateComponent<Element>, DumbAware {
@@ -240,6 +241,7 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
                 }, "Refreshing Course", true, project);
         ApplicationManager.getApplication().invokeLater(() -> {
             repairProjectFiles(root);
+            VirtualFileManager.getInstance().syncRefresh();
 
             VirtualFile projectDir = project != null ? project.getBaseDir() : null;
             if (projectDir != null && projectDir.findChild(EduNames.SANDBOX_DIR) == null) {
@@ -260,7 +262,7 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
     private void repairProjectFiles(@NotNull StudyNode<?, ?> node) {
         if (project != null) {
             if (node instanceof StepNode) {
-                ProjectFilesUtils.getOrCreateSrcDirectory(project, (StepNode) node);
+                getOrCreateSrcDirectory(project, (StepNode) node, false);
             }
             node.getChildren().forEach(this::repairProjectFiles);
         }

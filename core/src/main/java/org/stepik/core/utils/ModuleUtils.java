@@ -16,17 +16,17 @@ import java.io.IOException;
 /**
  * @author meanmail
  */
-public class ModuleUtils {
+class ModuleUtils {
     private static final Logger logger = Logger.getInstance(ModuleUtils.class);
 
-    public static void createStepModule(
+    static void createStepModule(
             @NotNull Project project,
             @NotNull StepNode step,
             @NotNull ModifiableModuleModel moduleModel) {
         StudyNode lesson = step.getParent();
         if (lesson != null) {
             String moduleDir = String.join("/", project.getBasePath(), lesson.getPath());
-            StepModuleBuilder stepModuleBuilder = new StepModuleBuilder(moduleDir, step, project);
+            StepModuleBuilder stepModuleBuilder = new StepModuleBuilder(moduleDir, step);
             try {
                 stepModuleBuilder.createModule(moduleModel);
             } catch (IOException | ModuleWithNameAlreadyExists | JDOMException | ConfigurationException e) {
