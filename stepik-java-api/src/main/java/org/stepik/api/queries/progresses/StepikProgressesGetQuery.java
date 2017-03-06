@@ -19,4 +19,9 @@ public class StepikProgressesGetQuery extends StepikAbstractGetQuery<StepikProgr
     protected String getUrl() {
         return Urls.PROGRESSES;
     }
+
+    @Override
+    protected boolean isCacheEnabled() {
+        return false;
+    }
 }

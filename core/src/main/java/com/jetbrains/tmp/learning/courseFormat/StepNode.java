@@ -10,6 +10,7 @@ import com.jetbrains.tmp.learning.courseFormat.stepHelpers.SortingStepNodeHelper
 import com.jetbrains.tmp.learning.courseFormat.stepHelpers.StringStepNodeHelper;
 import com.jetbrains.tmp.learning.courseFormat.stepHelpers.VideoStepNodeHelper;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
@@ -36,6 +37,8 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
     private List<SupportedLanguages> supportedLanguages;
     private SupportedLanguages currentLang;
     private long courseId;
+    @XStreamOmitField
+    private int assignment;
 
     public StepNode() {}
 
@@ -313,5 +316,25 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
     @NotNull
     public MatchingStepNodeHelper asMatchingStep() {
         return new MatchingStepNodeHelper(this);
+    }
+
+    public long getAssignment() {
+        if (assignment == 0) {
+            StudyNode parent = getParent();
+            if (parent != null && parent instanceof LessonNode) {
+                LessonNode lesson = (LessonNode) parent;
+                CompoundUnitLesson data = lesson.getData();
+                if (data != null) {
+                    List<Long> steps = data.getLesson().getSteps();
+                    steps.sort(Long::compareTo);
+                    int index;
+                    if ((index = steps.indexOf(getId())) != -1) {
+                        List<Integer> assignments = data.getUnit().getAssignments();
+                        assignment = assignments.get(index);
+                    }
+                }
+            }
+        }
+        return assignment;
     }
 }
