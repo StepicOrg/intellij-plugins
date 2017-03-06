@@ -52,7 +52,8 @@ public class CourseNode extends Node<Course, SectionNode, Section, LessonNode> {
         return sections.getSections();
     }
 
-    public void init(@Nullable StudyNode parent, boolean isRestarted, @Nullable ProgressIndicator indicator) {
+    @Override
+    public void init(@Nullable StudyNode parent, @Nullable ProgressIndicator indicator) {
         if (indicator != null) {
             indicator.setText("Refresh " + getName());
             indicator.setText2("Update sections");
@@ -60,7 +61,7 @@ public class CourseNode extends Node<Course, SectionNode, Section, LessonNode> {
 
         authors = null;
 
-        super.init(parent, isRestarted, indicator);
+        super.init(parent, indicator);
     }
 
     @Override

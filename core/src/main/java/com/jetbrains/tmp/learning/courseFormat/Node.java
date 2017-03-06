@@ -40,7 +40,7 @@ public abstract class Node<
 
     Node(@NotNull D data, @Nullable ProgressIndicator indicator) {
         setData(data);
-        init(null, true, indicator);
+        init(null, indicator);
     }
 
     @Nullable
@@ -193,13 +193,7 @@ public abstract class Node<
     protected abstract List<DC> getChildDataList();
 
     @Override
-    public void init(
-            @Nullable StudyNode parent,
-            boolean isRestarted,
-            @Nullable ProgressIndicator indicator) {
-        if (isRestarted) {
-            status = StudyStatus.UNCHECKED;
-        }
+    public void init(@Nullable StudyNode parent, @Nullable ProgressIndicator indicator) {
         Map<Long, C> mapNodes = getMapNodes();
         List<C> needInit = getChildren();
         setChildrenDeletedFlag();
@@ -219,7 +213,7 @@ public abstract class Node<
                 }
                 item.setData(data);
                 item.setWasDeleted(wasDeleted);
-                item.init(this, isRestarted, indicator);
+                item.init(this, indicator);
                 if (item.canBeLeaf() || !item.isLeaf()) {
                     getChildren().add(item);
                 }
@@ -230,7 +224,7 @@ public abstract class Node<
         setParent(parent);
 
         for (StudyNode child : needInit) {
-            child.init(this, isRestarted, indicator);
+            child.init(this, indicator);
         }
     }
 

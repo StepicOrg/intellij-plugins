@@ -43,7 +43,8 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
         super(data, indicator);
     }
 
-    public void init(@Nullable StudyNode parent, boolean isRestarted, @Nullable ProgressIndicator indicator) {
+    @Override
+    public void init(@Nullable StudyNode parent, @Nullable ProgressIndicator indicator) {
         if (indicator != null) {
             indicator.setText("Refresh a step: " + getName());
             indicator.setText2("");
@@ -52,7 +53,7 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
         supportedLanguages = null;
         courseId = 0;
 
-        super.init(parent, isRestarted, indicator);
+        super.init(parent, indicator);
     }
 
     @Override
