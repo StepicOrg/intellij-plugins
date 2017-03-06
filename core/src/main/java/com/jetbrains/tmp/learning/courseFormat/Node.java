@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static com.jetbrains.tmp.learning.courseFormat.StudyStatus.SOLVED;
+
 /**
  * @author meanmail
  */
@@ -247,11 +249,8 @@ public abstract class Node<
     protected abstract Class<C> getChildClass();
 
     @Override
-    public void updateParentStatus() {
-        if (parent != null) {
-            parent.setStatus(null);
-            parent.updateParentStatus();
-        }
+    public boolean isUnknownStatus() {
+        return status == null;
     }
 
     @NotNull
@@ -262,12 +261,14 @@ public abstract class Node<
 
             try {
                 Map<String, StudyNode> progressMap = new HashMap<>();
-                getChildren().forEach(child -> {
-                    DC data = child.getData();
-                    if (data != null) {
-                        progressMap.put(data.getProgress(), child);
-                    }
-                });
+                getChildren().stream()
+                        .filter(StudyNode::isUnknownStatus)
+                        .forEach(child -> {
+                            DC data = child.getData();
+                            if (data != null) {
+                                progressMap.put(data.getProgress(), child);
+                            }
+                        });
                 D data = getData();
                 if (data != null) {
                     String progressId = data.getProgress();
@@ -289,7 +290,7 @@ public abstract class Node<
                             String id = progress.getId();
                             StudyNode node = progressMap.get(id);
                             if (progress.isPassed()) {
-                                node.setStatus(StudyStatus.SOLVED);
+                                node.setRawStatus(SOLVED);
                             }
                         });
                     }
@@ -304,7 +305,26 @@ public abstract class Node<
 
     @Override
     public void setStatus(@Nullable StudyStatus status) {
+        if (status == SOLVED && this.status != status) {
+            this.status = SOLVED;
+
+            StudyNode parent = getParent();
+
+            while (parent != null) {
+                parent.setRawStatus(null);
+                parent = parent.getParent();
+            }
+        }
+    }
+
+    @Override
+    public void setRawStatus(@Nullable StudyStatus status) {
         this.status = status;
+    }
+
+    @Override
+    public void passed() {
+        setStatus(SOLVED);
     }
 
     @Nullable

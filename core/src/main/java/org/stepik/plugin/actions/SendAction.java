@@ -96,19 +96,13 @@ public class SendAction {
             @NotNull StepNode stepNode,
             @Nullable String stepStatus,
             @NotNull String hint) {
-        StudyStatus status = StudyStatus.of(stepStatus);
-
         NotificationType notificationType;
-        if (status == StudyStatus.SOLVED) {
+        if (StudyStatus.of(stepStatus) == SOLVED) {
             notificationType = NotificationType.INFORMATION;
             hint = "Success!";
+            stepNode.passed();
         } else {
             notificationType = NotificationType.WARNING;
-        }
-
-        stepNode.setStatus(status);
-        if (status == SOLVED) {
-            stepNode.updateParentStatus();
         }
 
         String title = String.format("%s is %s", stepNode.getName(), stepStatus);

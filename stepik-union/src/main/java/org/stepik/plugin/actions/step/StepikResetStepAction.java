@@ -13,7 +13,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.problems.WolfTheProblemSolver;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
-import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
 import icons.AllStepikIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -57,7 +56,6 @@ public class StepikResetStepAction extends AbstractStepAction {
             Document document = documentManager.getDocument(mainFile);
             if (document != null) {
                 resetDocument(project, document, stepNode);
-                stepNode.setStatus(StudyStatus.UNCHECKED);
                 ProjectView.getInstance(project).refresh();
                 StudyUtils.updateToolWindows(project);
                 WolfTheProblemSolver.getInstance(project).clearProblems(mainFile);
