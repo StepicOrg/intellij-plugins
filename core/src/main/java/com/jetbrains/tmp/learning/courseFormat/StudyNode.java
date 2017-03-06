@@ -18,8 +18,6 @@ public interface StudyNode<D extends StudyObject, C extends StudyNode> {
 
     void setStatus(@Nullable StudyStatus status);
 
-    void updateParentStatus();
-
     @NotNull
     String getDirectory();
 
@@ -72,4 +70,10 @@ public interface StudyNode<D extends StudyObject, C extends StudyNode> {
     boolean getWasDeleted();
 
     void setWasDeleted(boolean wasDeleted);
+
+    boolean isUnknownStatus();
+
+    void setRawStatus(@Nullable StudyStatus status);
+
+    void passed();
 }
