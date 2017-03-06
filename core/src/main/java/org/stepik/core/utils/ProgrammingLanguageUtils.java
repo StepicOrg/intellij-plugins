@@ -1,5 +1,6 @@
 package org.stepik.core.utils;
 
+import com.intellij.ide.projectView.ProjectView;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
@@ -46,11 +47,19 @@ public class ProgrammingLanguageUtils {
 
         SupportedLanguages currentLang = targetStepNode.getCurrentLang();
 
-        if (currentLang == language) {
+        String mainFilePath = String.join("/",
+                targetStepNode.getPath(),
+                EduNames.SRC,
+                currentLang.getMainFileName());
+        VirtualFile mainFile = project.getBaseDir().findFileByRelativePath(mainFilePath);
+
+        boolean mainFileExists = mainFile != null;
+
+        if (currentLang == language && mainFileExists) {
             return;
         }
 
-        if (currentLang.getMainFileName().equals(language.getMainFileName())) {
+        if (currentLang.getMainFileName().equals(language.getMainFileName()) && mainFileExists) {
             targetStepNode.setCurrentLang(language);
             Metrics.switchLanguage(project, targetStepNode, SUCCESSFUL);
             return;
@@ -81,6 +90,7 @@ public class ProgrammingLanguageUtils {
 
         if (moveFirst) {
             first = src.findFile(currentLang.getMainFileName());
+            moveFirst = !second.isEquivalentTo(first);
         }
 
         targetStepNode.setCurrentLang(language);
@@ -91,6 +101,7 @@ public class ProgrammingLanguageUtils {
 
         exchangeFiles(src, hide, first, second, moveFirst, moveSecond);
 
+        ProjectView.getInstance(project).selectPsiElement(second, false);
         Metrics.switchLanguage(project, targetStepNode, SUCCESSFUL);
     }
 
@@ -101,18 +112,19 @@ public class ProgrammingLanguageUtils {
             @NotNull PsiFile second,
             boolean moveFirst,
             boolean moveSecond) {
-
-        if (moveFirst || moveSecond) {
-            ApplicationManager.getApplication().runWriteAction(() -> {
-                if (moveFirst && first != null) {
-                    MoveFilesOrDirectoriesUtil.doMoveFile(first, hide);
-                }
-
-                if (moveSecond) {
-                    MoveFilesOrDirectoriesUtil.doMoveFile(second, src);
-                }
-            });
+        if (!moveFirst && !moveSecond) {
+            return;
         }
+
+        ApplicationManager.getApplication().runWriteAction(() -> {
+            if (moveFirst && first != null) {
+                MoveFilesOrDirectoriesUtil.doMoveFile(first, hide);
+            }
+
+            if (moveSecond) {
+                MoveFilesOrDirectoriesUtil.doMoveFile(second, src);
+            }
+        });
     }
 
     private static ArrayList<VirtualFile> closeStepNodeFile(

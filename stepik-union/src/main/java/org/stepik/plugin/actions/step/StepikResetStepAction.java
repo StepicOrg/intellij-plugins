@@ -18,9 +18,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.core.metrics.Metrics;
 import org.stepik.core.metrics.MetricsStatus;
-import org.stepik.core.utils.ProjectFilesUtils;
 
 import javax.swing.*;
+
+import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
 
 public class StepikResetStepAction extends AbstractStepAction {
     private static final String ACTION_ID = "STEPIK.ResetStepAction";
@@ -43,7 +44,7 @@ public class StepikResetStepAction extends AbstractStepAction {
             return;
         }
 
-        VirtualFile src = ProjectFilesUtils.getOrCreateSrcDirectory(project, stepNode);
+        VirtualFile src = getOrCreateSrcDirectory(project, stepNode, true);
         if (src == null) {
             return;
         }
