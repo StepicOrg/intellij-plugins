@@ -54,13 +54,10 @@ public interface StudyNode<D extends StudyObject, C extends StudyNode> {
 
     void setData(@Nullable D data);
 
-    void init(
-            @Nullable final StudyNode parent,
-            boolean isRestarted,
-            @Nullable ProgressIndicator indicator);
+    void init(@Nullable final StudyNode parent, @Nullable ProgressIndicator indicator);
 
     default void init(@Nullable ProgressIndicator indicator) {
-        init(null, false, indicator);
+        init(null, indicator);
     }
 
     boolean canBeLeaf();
