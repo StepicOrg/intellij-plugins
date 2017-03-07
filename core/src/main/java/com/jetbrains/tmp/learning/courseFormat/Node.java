@@ -148,6 +148,18 @@ public abstract class Node<
         return null;
     }
 
+    @Nullable
+    @Override
+    public C getChildByPosition(int position) {
+        for (C child : getChildren()) {
+            if (child.getPosition() == position) {
+                return child;
+            }
+        }
+
+        return null;
+    }
+
     @NotNull
     private Map<Long, C> getMapNodes() {
         HashMap<Long, C> mapNodes = new HashMap<>();

@@ -11,7 +11,13 @@ import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.StreamUtil;
+import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.StudyPluginConfigurator;
+import com.jetbrains.tmp.learning.courseFormat.CourseNode;
+import com.jetbrains.tmp.learning.courseFormat.LessonNode;
+import com.jetbrains.tmp.learning.courseFormat.SectionNode;
+import com.jetbrains.tmp.learning.courseFormat.StepNode;
+import com.jetbrains.tmp.learning.courseFormat.StudyNode;
 import javafx.application.Platform;
 import javafx.concurrent.Worker;
 import javafx.embed.swing.JFXPanel;
@@ -23,6 +29,8 @@ import javafx.scene.web.WebHistory;
 import javafx.scene.web.WebView;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.api.urls.Urls;
+import org.stepik.plugin.utils.NavigationUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -39,6 +47,8 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 class StudyBrowserWindow extends JFrame {
     private static final Logger logger = Logger.getInstance(StudyBrowserWindow.class);
@@ -216,6 +226,8 @@ class StudyBrowserWindow extends JFrame {
     @NotNull
     private EventListener makeHyperLinkListener() {
         return new EventListener() {
+            private final Pattern pattern = Pattern.compile("/lesson(?:/|/[^/]*-)(\\d+)/step/(\\d+).*");
+
             @Override
             public void handleEvent(Event ev) {
                 String domEventType = ev.getType();
@@ -223,11 +235,55 @@ class StudyBrowserWindow extends JFrame {
                     engine.setJavaScriptEnabled(true);
                     engine.getLoadWorker().cancel();
                     ev.preventDefault();
-                    final String href = getLink((Element) ev.getTarget());
-                    if (href == null) return;
-                    BrowserUtil.browse(href);
+                    String href = getLink((Element) ev.getTarget());
+                    if (href == null) {
+                        return;
+                    }
 
+                    if (browseProject(href)) {
+                        return;
+                    }
+
+                    if (href.startsWith("/")) {
+                        href = Urls.STEPIK_URL + href;
+                    }
+
+                    BrowserUtil.browse(href);
                 }
+            }
+
+            private boolean browseProject(@NotNull String href) {
+                Matcher matcher = pattern.matcher(href);
+                if (matcher.matches()) {
+                    long lessonId = Long.parseLong(matcher.group(1));
+                    int stepPosition = Integer.parseInt(matcher.group(2));
+
+                    StepNode step = null;
+
+                    StudyNode root = StepikProjectManager.getProjectRoot(project);
+                    if (root != null) {
+                        if (root instanceof CourseNode) {
+                            for (SectionNode section : ((CourseNode) root).getChildren()) {
+                                LessonNode lessonNode = section.getChildById(lessonId);
+                                if (lessonNode != null) {
+                                    step = lessonNode.getChildByPosition(stepPosition);
+                                }
+                            }
+                        } else if (root instanceof LessonNode) {
+                            if (root.getId() == lessonId) {
+                                step = ((LessonNode) root).getChildByPosition(stepPosition);
+                            }
+                        }
+
+                        if (step != null) {
+                            StepNode finalStep = step;
+                            ApplicationManager.getApplication().invokeLater(() ->
+                                    NavigationUtils.navigate(project, finalStep));
+                            return true;
+                        }
+                    }
+                }
+                return false;
             }
 
             @Nullable
