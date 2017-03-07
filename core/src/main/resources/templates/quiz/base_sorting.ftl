@@ -11,7 +11,7 @@
     </#if>
 
 <style>
-    input[type="text"] {
+    .textarea {
         width: 100%;
         padding: 15px;
         box-sizing: border-box;
@@ -21,6 +21,7 @@
         border-radius: 5px;
         margin: 0;
         display: flex;
+        overflow-wrap: break-word;
     }
 
     .line {
@@ -28,6 +29,7 @@
         flex-direction: row;
         margin: 5px 0;
         width: 100%;
+        min-width: 200px;
     }
 
     .second {
@@ -43,6 +45,7 @@
         border-radius: 5px;
         width: 50%;
         margin-right: 5px;
+        overflow-wrap: break-word;
     }
 
     .buttons {
@@ -100,16 +103,25 @@
         });
     }
 
+
     function swapOptions(event, direction) {
         var button = event.target;
         var index = button.getAttribute("index");
         var option1 = document.querySelector("#option" + (+index + direction));
         var option2 = document.querySelector("#option" + index);
-        swapValue(option1, option2);
+        swapInnerHtml(option1, option2);
 
         var index1 = document.querySelector("#index" + (+index + direction));
         var index2 = document.querySelector("#index" + index);
         swapValue(index1, index2);
+    }
+
+    function swapInnerHtml(option1, option2) {
+        if (option1 && option2) {
+            var value = option1.innerHTML;
+            option1.innerHTML = option2.innerHTML;
+            option2.innerHTML = value;
+        }
     }
 
     function swapValue(option1, option2) {

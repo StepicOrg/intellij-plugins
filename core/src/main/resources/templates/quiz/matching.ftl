@@ -11,7 +11,7 @@
             <#if status == "active">
                 <#include "arrows.ftl"/>
             </#if>
-            <input id="option${index}" type="text" name="option" value="${option.getSecond()}" readonly/>
+            <div class="textarea" id="option${index}">${option.getSecond()}</div>
             <input id="index${index}" type="hidden" name="index" value="${index}">
         </div>
     </div>
