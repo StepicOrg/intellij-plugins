@@ -100,6 +100,10 @@ public class PresentationUtils {
     }
 
     public static boolean isVisibleDirectory(@NotNull String relPath) {
+        if (relPath.startsWith("../")) {
+            return true;
+        }
+
         if (isHideDir(relPath) || isWithinHideDir(relPath)) {
             return false;
         }
@@ -113,6 +117,10 @@ public class PresentationUtils {
     }
 
     public static boolean isVisibleFile(@NotNull String relFilePath) {
+        if (relFilePath.startsWith("../")) {
+            return true;
+        }
+
         String parentDir = getParent(relFilePath);
         //noinspection SimplifiableIfStatement
         if (parentDir == null || !isVisibleDirectory(parentDir)) {

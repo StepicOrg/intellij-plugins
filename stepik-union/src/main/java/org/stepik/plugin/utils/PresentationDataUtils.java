@@ -14,7 +14,6 @@ import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
 import icons.AllStepikIcons;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.core.utils.PresentationUtils;
-import org.stepik.core.utils.ProjectFilesUtils;
 
 import javax.swing.*;
 
@@ -78,19 +77,12 @@ public class PresentationDataUtils {
     }
 
     public static boolean isVisibleDirectory(@NotNull PsiDirectory psiDirectory) {
-        Project project = psiDirectory.getProject();
-        String basePath = project.getBasePath();
-        if (basePath == null) {
-            return false;
-        }
-        String path = psiDirectory.getVirtualFile().getPath();
-        String relPath = ProjectFilesUtils.getRelativePath(basePath, path);
-
+        String relPath = getRelativePath(psiDirectory);
         return PresentationUtils.isVisibleDirectory(relPath);
     }
 
     public static boolean isVisibleFile(@NotNull PsiFile psiFile) {
-        String path = getRelativePath(psiFile);
-        return PresentationUtils.isVisibleFile(path);
+        String relPath = getRelativePath(psiFile);
+        return PresentationUtils.isVisibleFile(relPath);
     }
 }
