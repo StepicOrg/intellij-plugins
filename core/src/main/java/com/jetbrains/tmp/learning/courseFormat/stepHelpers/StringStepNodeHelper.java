@@ -1,5 +1,6 @@
-package com.jetbrains.tmp.learning.courseFormat;
+package com.jetbrains.tmp.learning.courseFormat.stepHelpers;
 
+import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -10,13 +11,8 @@ public class StringStepNodeHelper extends StepHelper {
     private boolean isTextDisabled;
     private String text;
 
-    StringStepNodeHelper(@NotNull StepNode stepNode) {
+    public StringStepNodeHelper(@NotNull StepNode stepNode) {
         super(stepNode);
-    }
-
-    @NotNull
-    public StepNode getStepNode() {
-        return stepNode;
     }
 
     @NotNull

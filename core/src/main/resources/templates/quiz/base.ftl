@@ -1,4 +1,4 @@
-<#-- @ftlvariable name="stepNode" type="com.jetbrains.tmp.learning.courseFormat.ChoiceStepNodeHelper" -->
+<#-- @ftlvariable name="stepNode" type="com.jetbrains.tmp.learning.courseFormat.stepHelpers.ChoiceStepNodeHelper" -->
 <#-- @ftlvariable name="text" type="java.lang.String" -->
 <#macro quiz_content>
 ${text}<br>

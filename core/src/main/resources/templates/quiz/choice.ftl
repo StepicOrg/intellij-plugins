@@ -1,5 +1,5 @@
-<#-- @ftlvariable name="stepNode" type="com.jetbrains.tmp.learning.courseFormat.ChoiceStepNodeHelper" -->
-<#-- @ftlvariable name="text" type="java.lang.String" -->
+<#-- @ftlvariable name="disabled" type="java.lang.String" -->
+<#-- @ftlvariable name="stepNode" type="com.jetbrains.tmp.learning.courseFormat.stepHelpers.ChoiceStepNodeHelper" -->
 
 <#include "base.ftl">
 
@@ -9,8 +9,9 @@
     <#assign type=stepNode.isMultipleChoice()?string("checkbox", "radio") />
 
     <#list stepNode.getOptions() as option>
-    <input type="${type}" name="option"
-           value="${index}" ${disabled!""} ${option.getSecond()?string("checked", "")}> ${option.getFirst()} </input>
+    <label><input type="${type}" name="option"
+                  value="${index}" ${disabled!""} ${option.getSecond()?string("checked", "")}/> ${option.getFirst()}
+    </label>
     <br>
         <#assign index++ />
     </#list>

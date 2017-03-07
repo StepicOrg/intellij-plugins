@@ -1,6 +1,7 @@
-package com.jetbrains.tmp.learning.courseFormat;
+package com.jetbrains.tmp.learning.courseFormat.stepHelpers;
 
 import com.intellij.openapi.util.Pair;
+import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ public class ChoiceStepNodeHelper extends StepHelper {
     private String[] options;
     private List<Boolean> choices;
 
-    ChoiceStepNodeHelper(@NotNull StepNode stepNode) {
+    public ChoiceStepNodeHelper(@NotNull StepNode stepNode) {
         super(stepNode);
     }
 
@@ -58,5 +59,10 @@ public class ChoiceStepNodeHelper extends StepHelper {
     public boolean isMultipleChoice() {
         initStepOptions();
         return isMultipleChoice;
+    }
+
+    @Override
+    void onInitFailed() {
+        stepOptions = null;
     }
 }
