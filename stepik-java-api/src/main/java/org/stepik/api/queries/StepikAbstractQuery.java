@@ -54,6 +54,10 @@ abstract class StepikAbstractQuery<T> {
         params.put(key, new String[]{value});
     }
 
+    protected void addParam(@NotNull String key, @NotNull String... values) {
+        params.put(key, values);
+    }
+
     protected void addParam(@NotNull String key, boolean value) {
         params.put(key, new String[]{String.valueOf(value)});
     }

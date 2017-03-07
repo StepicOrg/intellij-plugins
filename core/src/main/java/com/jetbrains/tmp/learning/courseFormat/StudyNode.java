@@ -16,6 +16,8 @@ public interface StudyNode<D extends StudyObject, C extends StudyNode> {
     @NotNull
     StudyStatus getStatus();
 
+    void setStatus(@Nullable StudyStatus status);
+
     @NotNull
     String getDirectory();
 
@@ -52,13 +54,10 @@ public interface StudyNode<D extends StudyObject, C extends StudyNode> {
 
     void setData(@Nullable D data);
 
-    void init(
-            @Nullable final StudyNode parent,
-            boolean isRestarted,
-            @Nullable ProgressIndicator indicator);
+    void init(@Nullable final StudyNode parent, @Nullable ProgressIndicator indicator);
 
     default void init(@Nullable ProgressIndicator indicator) {
-        init(null, false, indicator);
+        init(null, indicator);
     }
 
     boolean canBeLeaf();
@@ -68,4 +67,10 @@ public interface StudyNode<D extends StudyObject, C extends StudyNode> {
     boolean getWasDeleted();
 
     void setWasDeleted(boolean wasDeleted);
+
+    boolean isUnknownStatus();
+
+    void setRawStatus(@Nullable StudyStatus status);
+
+    void passed();
 }

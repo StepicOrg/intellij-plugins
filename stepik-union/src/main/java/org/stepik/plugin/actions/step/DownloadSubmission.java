@@ -35,7 +35,6 @@ import org.stepik.api.objects.submissions.Submission;
 import org.stepik.api.objects.submissions.Submissions;
 import org.stepik.api.queries.Order;
 import org.stepik.core.metrics.Metrics;
-import org.stepik.core.utils.ProjectFilesUtils;
 import org.stepik.core.utils.Utils;
 
 import javax.swing.*;
@@ -52,6 +51,7 @@ import static org.stepik.core.metrics.MetricsStatus.EMPTY_SOURCE;
 import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
 import static org.stepik.core.metrics.MetricsStatus.TARGET_NOT_FOUND;
 import static org.stepik.core.metrics.MetricsStatus.USER_CANCELED;
+import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
 
 /**
  * @author meanmail
@@ -200,7 +200,7 @@ public class DownloadSubmission extends AbstractStepAction {
 
         String fileName = stepNode.getCurrentLang().getMainFileName();
 
-        VirtualFile src = ProjectFilesUtils.getOrCreateSrcDirectory(project, stepNode);
+        VirtualFile src = getOrCreateSrcDirectory(project, stepNode, true);
         if (src == null) {
             Metrics.downloadAction(project, stepNode, TARGET_NOT_FOUND);
             return;
@@ -222,7 +222,8 @@ public class DownloadSubmission extends AbstractStepAction {
 
                             if (document != null) {
                                 document.setText(finalCode);
-                                stepNode.setStatus(StudyStatus.of(submission.getStatus()));
+                                StudyStatus status = StudyStatus.of(submission.getStatus());
+                                stepNode.setStatus(status);
                                 FileEditorManager.getInstance(project).openFile(mainFile, true);
                                 ProjectView.getInstance(project).refresh();
                                 Metrics.downloadAction(project, stepNode, SUCCESSFUL);

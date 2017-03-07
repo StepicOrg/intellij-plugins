@@ -18,7 +18,6 @@ import org.stepik.api.objects.attempts.Attempts;
 import org.stepik.api.objects.submissions.Submission;
 import org.stepik.api.objects.submissions.Submissions;
 import org.stepik.core.metrics.Metrics;
-import org.stepik.core.utils.ProjectFilesUtils;
 import org.stepik.core.utils.Utils;
 import org.stepik.plugin.actions.ActionUtils;
 import org.stepik.plugin.actions.SendAction;
@@ -30,6 +29,7 @@ import static org.stepik.core.metrics.MetricsStatus.DATA_NOT_LOADED;
 import static org.stepik.core.metrics.MetricsStatus.FAILED_POST;
 import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
 import static org.stepik.core.metrics.MetricsStatus.USER_CANCELED;
+import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
 
 public class StepikJavaPostAction extends StudyCheckAction {
     private static final Logger logger = Logger.getInstance(StepikJavaPostAction.class);
@@ -132,7 +132,7 @@ public class StepikJavaPostAction extends StudyCheckAction {
             @NotNull Project project,
             @NotNull StepNode stepNode,
             @NotNull SupportedLanguages currentLang) {
-        VirtualFile src = ProjectFilesUtils.getOrCreateSrcDirectory(project, stepNode);
+        VirtualFile src = getOrCreateSrcDirectory(project, stepNode, true);
         if (src == null) {
             return null;
         }

@@ -45,8 +45,6 @@ public class LessonNode extends Node<CompoundUnitLesson, StepNode, Step, StepNod
                         .get()
                         .id(stepsIds)
                         .execute();
-
-
             }
         } catch (StepikClientException logged) {
             logger.warn("A lesson initialization don't is fully", logged);
@@ -56,7 +54,7 @@ public class LessonNode extends Node<CompoundUnitLesson, StepNode, Step, StepNod
     }
 
     @Override
-    public void init(@Nullable StudyNode parent, boolean isRestarted, @Nullable ProgressIndicator indicator) {
+    public void init(@Nullable StudyNode parent, @Nullable ProgressIndicator indicator) {
         if (indicator != null) {
             indicator.setText("Refresh a lesson: " + getName());
             indicator.setText2("Update steps");
@@ -64,7 +62,7 @@ public class LessonNode extends Node<CompoundUnitLesson, StepNode, Step, StepNod
 
         courseId = 0;
 
-        super.init(parent, isRestarted, indicator);
+        super.init(parent, indicator);
     }
 
     @Override

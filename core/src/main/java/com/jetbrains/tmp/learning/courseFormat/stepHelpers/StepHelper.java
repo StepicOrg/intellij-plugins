@@ -16,8 +16,6 @@ import org.stepik.api.objects.submissions.Submissions;
 import org.stepik.api.objects.users.User;
 import org.stepik.api.queries.Order;
 
-import static com.jetbrains.tmp.learning.courseFormat.StudyStatus.UNCHECKED;
-
 /**
  * @author meanmail
  */
@@ -73,7 +71,6 @@ public class StepHelper {
             return true;
         }
 
-        stepNode.setStatus(UNCHECKED);
         status = "active";
         return false;
     }

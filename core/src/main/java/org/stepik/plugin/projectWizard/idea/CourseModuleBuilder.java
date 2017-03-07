@@ -14,6 +14,7 @@ import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ui.configuration.ModulesProvider;
 import com.intellij.openapi.util.InvalidDataException;
+import com.intellij.openapi.vfs.VirtualFileManager;
 import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.StudyProjectComponent;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
@@ -25,7 +26,7 @@ import org.stepik.plugin.projectWizard.StepikProjectGenerator;
 import java.io.IOException;
 
 import static org.stepik.core.projectWizard.ProjectWizardUtils.createSubDirectories;
-import static org.stepik.core.utils.ModuleUtils.createStepModule;
+import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
 
 public class CourseModuleBuilder extends AbstractModuleBuilder {
     private static final Logger logger = Logger.getInstance(CourseModuleBuilder.class);
@@ -64,9 +65,10 @@ public class CourseModuleBuilder extends AbstractModuleBuilder {
         }
 
         if (root instanceof StepNode) {
-            createStepModule(project, (StepNode) root, moduleModel);
+            getOrCreateSrcDirectory(project, (StepNode) root, true, moduleModel);
         } else {
-            createSubDirectories(project, root, (stepNode) -> createStepModule(project, stepNode, moduleModel));
+            createSubDirectories(project, generator.getDefaultLang(), root, moduleModel);
+            VirtualFileManager.getInstance().syncRefresh();
         }
 
         ApplicationManager.getApplication().invokeLater(

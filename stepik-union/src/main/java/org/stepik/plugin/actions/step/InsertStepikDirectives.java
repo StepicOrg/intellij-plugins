@@ -17,13 +17,13 @@ import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.core.metrics.Metrics;
-import org.stepik.core.utils.ProjectFilesUtils;
 import org.stepik.plugin.utils.DirectivesUtils;
 import org.stepik.plugin.utils.ReformatUtils;
 
 import javax.swing.*;
 
 import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
+import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
 import static org.stepik.plugin.utils.DirectivesUtils.insertAmbientCode;
 import static org.stepik.plugin.utils.DirectivesUtils.removeAmbientCode;
 import static org.stepik.plugin.utils.DirectivesUtils.writeInToFile;
@@ -73,7 +73,7 @@ public class InsertStepikDirectives extends AbstractStepAction {
 
         SupportedLanguages currentLang = targetStepNode.getCurrentLang();
 
-        VirtualFile src = ProjectFilesUtils.getOrCreateSrcDirectory(project, targetStepNode);
+        VirtualFile src = getOrCreateSrcDirectory(project, targetStepNode, true);
         if (src == null) {
             return;
         }

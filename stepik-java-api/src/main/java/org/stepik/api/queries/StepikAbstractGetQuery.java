@@ -45,6 +45,13 @@ public abstract class StepikAbstractGetQuery<T extends StepikAbstractGetQuery, R
     }
 
     @NotNull
+    public T id(@NotNull String... values) {
+        addParam(IDS_KEY, values);
+        //noinspection unchecked
+        return (T) this;
+    }
+
+    @NotNull
     protected String getContentType() {
         return "application/json";
     }
