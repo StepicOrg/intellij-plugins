@@ -32,14 +32,5 @@ public interface StudyPluginConfigurator {
             @NotNull final Project project,
             @NotNull final StudyToolWindow toolWindow);
 
-    /**
-     * @return parameter for CodeMirror script. Available languages: @see <@linktourl http://codemirror.net/mode/>
-     */
-    @NotNull
-    String getDefaultHighlightingMode();
-
-    @NotNull
-    String getLanguageScriptUrl();
-
     boolean accept(@NotNull final Project project);
 }

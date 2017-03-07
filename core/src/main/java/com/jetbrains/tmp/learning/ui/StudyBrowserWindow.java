@@ -6,13 +6,10 @@ import com.intellij.ide.ui.LafManager;
 import com.intellij.ide.ui.LafManagerListener;
 import com.intellij.ide.ui.laf.darcula.DarculaLookAndFeelInfo;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.io.StreamUtil;
 import com.jetbrains.tmp.learning.StepikProjectManager;
-import com.jetbrains.tmp.learning.StudyPluginConfigurator;
 import com.jetbrains.tmp.learning.courseFormat.CourseNode;
 import com.jetbrains.tmp.learning.courseFormat.LessonNode;
 import com.jetbrains.tmp.learning.courseFormat.SectionNode;
@@ -30,6 +27,7 @@ import javafx.scene.web.WebView;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.urls.Urls;
+import org.stepik.core.templates.Templater;
 import org.stepik.plugin.utils.NavigationUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -44,14 +42,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 class StudyBrowserWindow extends JFrame {
-    private static final Logger logger = Logger.getInstance(StudyBrowserWindow.class);
     private static final String EVENT_TYPE_CLICK = "click";
     private final Project project;
     private JFXPanel panel;
@@ -85,8 +81,8 @@ class StudyBrowserWindow extends JFrame {
 
     private void updateIntellijAndGTKLaf() {
         Platform.runLater(() -> {
-            final URL scrollBarStyleUrl = getClass().getResource("/style/javaFXBrowserScrollBar.css");
-            pane.getStylesheets().add(scrollBarStyleUrl.toExternalForm());
+            final String scrollBarStyleUrl = getExternalURL("/style/javaFXBrowserScrollBar.css");
+            pane.getStylesheets().add(scrollBarStyleUrl);
             engine.setUserStyleSheetLocation(null);
             engine.reload();
         });
@@ -94,12 +90,12 @@ class StudyBrowserWindow extends JFrame {
 
     private void updateLafDarcula() {
         Platform.runLater(() -> {
-            final URL engineStyleUrl = getClass().getResource("/style/javaFXBrowserDarcula.css");
-            final URL scrollBarStyleUrl = getClass().getResource("/style/javaFXBrowserDarculaScrollBar.css");
-            engine.setUserStyleSheetLocation(engineStyleUrl.toExternalForm());
-            pane.getStylesheets().add(scrollBarStyleUrl.toExternalForm());
+            final String engineStyleUrl = getExternalURL("/style/javaFXBrowserDarcula.css");
+            final String scrollBarStyleUrl = getExternalURL("/style/javaFXBrowserDarculaScrollBar.css");
+            engine.setUserStyleSheetLocation(engineStyleUrl);
+            pane.getStylesheets().add(scrollBarStyleUrl);
             pane.setStyle("-fx-background-color: #3c3f41");
-            panel.getScene().getStylesheets().add(engineStyleUrl.toExternalForm());
+            panel.getScene().getStylesheets().add(engineStyleUrl);
             engine.reload();
         });
     }
@@ -130,67 +126,34 @@ class StudyBrowserWindow extends JFrame {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     }
 
-    void loadContent(@NotNull final String content, @Nullable StudyPluginConfigurator configurator) {
-        if (configurator == null) {
-            Platform.runLater(() -> engine.loadContent(content));
-        } else {
-            String withCodeHighlighting = createHtmlWithCodeHighlighting(content, configurator);
-            Platform.runLater(() -> {
-                updateLookWithProgressBarIfNeeded();
-                engine.loadContent(withCodeHighlighting);
-            });
-        }
+    void loadContent(@NotNull final String content) {
+        String withCodeHighlighting = createHtmlWithCodeHighlighting(content);
+        Platform.runLater(() -> {
+            updateLookWithProgressBarIfNeeded();
+            engine.loadContent(withCodeHighlighting);
+        });
     }
 
     @Nullable
-    private String createHtmlWithCodeHighlighting(
-            @NotNull final String content,
-            @NotNull StudyPluginConfigurator configurator) {
-        String template = null;
-        InputStream stream = getClass().getResourceAsStream("/code-mirror/template.html");
-        try {
-            template = StreamUtil.readText(stream, "utf-8");
-        } catch (IOException e) {
-            logger.warn(e.getMessage());
-        } finally {
-            try {
-                stream.close();
-            } catch (IOException e) {
-                logger.warn(e.getMessage());
-            }
-        }
-
-        if (template == null) {
-            logger.warn("Code mirror template is null");
-            return null;
-        }
-
+    private String createHtmlWithCodeHighlighting(@NotNull final String content) {
         final EditorColorsScheme editorColorsScheme = EditorColorsManager.getInstance().getGlobalScheme();
         int fontSize = editorColorsScheme.getEditorFontSize();
 
-        template = template.replace("${font_size}", String.valueOf(fontSize - 2));
-        template = template.replace("${codemirror}",
-                getClass().getResource("/code-mirror/codemirror.js").toExternalForm());
-        template = template.replace("${language_script}", configurator.getLanguageScriptUrl());
-        template = template.replace("${default_mode}", configurator.getDefaultHighlightingMode());
-        template = template.replace("${runmode}", getClass().getResource("/code-mirror/runmode.js").toExternalForm());
-        template = template.replace("${colorize}", getClass().getResource("/code-mirror/colorize.js").toExternalForm());
-        template = template.replace("${javascript}",
-                getClass().getResource("/code-mirror/javascript.js").toExternalForm());
+        Map<String, Object> map = new HashMap<>();
+        map.put("font_size", String.valueOf(fontSize - 2));
+        map.put("highlight", getExternalURL("/highlight/highlight.pack.js"));
         if (LafManager.getInstance().getCurrentLookAndFeel() instanceof DarculaLookAndFeelInfo) {
-            template = template.replace("${css_oldcodemirror}",
-                    getClass().getResource("/code-mirror/codemirror-old-darcula.css").toExternalForm());
-            template = template.replace("${css_codemirror}",
-                    getClass().getResource("/code-mirror/codemirror-darcula.css").toExternalForm());
+            map.put("css_highlight", getExternalURL("/highlight/styles/darcula.css"));
         } else {
-            template = template.replace("${css_oldcodemirror}",
-                    getClass().getResource("/code-mirror/codemirror-old.css").toExternalForm());
-            template = template.replace("${css_codemirror}",
-                    getClass().getResource("/code-mirror/codemirror.css").toExternalForm());
+            map.put("css_highlight", getExternalURL("/highlight/styles/idea.css"));
         }
-        template = template.replace("${code}", content);
+        map.put("code", content);
 
-        return template;
+        return Templater.processTemplate("template", map);
+    }
+
+    private String getExternalURL(@NotNull String internalPath) {
+        return getClass().getResource(internalPath).toExternalForm();
     }
 
     private void updateLookWithProgressBarIfNeeded() {
