@@ -251,7 +251,7 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
     private void postView(boolean needPassed) {
         StepNode finalStepNode = stepNode;
         new Thread(() -> {
-            long assignment = finalStepNode.getAssignment();
+            Long assignment = finalStepNode.getAssignment();
             long stepId = finalStepNode.getId();
             try {
                 if (assignment != 0) {
@@ -263,7 +263,7 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
                             .execute();
                 }
             } catch (StepikClientException e) {
-                logger.warn(e);
+                logger.warn("Failed post view: stepId=" + stepId + "; assignment=" + assignment, e);
             }
 
             if (needPassed) {

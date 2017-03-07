@@ -6,14 +6,14 @@ import org.stepik.api.objects.AbstractObject;
  * @author meanmail
  */
 public class View extends AbstractObject {
-    private long assignment;
+    private Long assignment;
     private long step;
 
-    public long getAssignment() {
+    public Long getAssignment() {
         return assignment;
     }
 
-    public void setAssignment(long assignment) {
+    public void setAssignment(Long assignment) {
         this.assignment = assignment;
     }
 

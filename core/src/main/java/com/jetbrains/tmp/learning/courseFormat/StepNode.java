@@ -38,7 +38,7 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
     private SupportedLanguages currentLang;
     private long courseId;
     @XStreamOmitField
-    private int assignment;
+    private Long assignment;
 
     public StepNode() {}
 
@@ -318,8 +318,8 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
         return new MatchingStepNodeHelper(this);
     }
 
-    public long getAssignment() {
-        if (assignment == 0) {
+    public Long getAssignment() {
+        if (assignment == null) {
             StudyNode parent = getParent();
             if (parent != null && parent instanceof LessonNode) {
                 LessonNode lesson = (LessonNode) parent;
@@ -329,8 +329,10 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
                     steps.sort(Long::compareTo);
                     int index;
                     if ((index = steps.indexOf(getId())) != -1) {
-                        List<Integer> assignments = data.getUnit().getAssignments();
-                        assignment = assignments.get(index);
+                        List<Long> assignments = data.getUnit().getAssignments();
+                        if (index < assignments.size()) {
+                            assignment = assignments.get(index);
+                        }
                     }
                 }
             }

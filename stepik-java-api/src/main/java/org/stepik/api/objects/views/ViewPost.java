@@ -1,17 +1,20 @@
 package org.stepik.api.objects.views;
 
+import org.jetbrains.annotations.Nullable;
+
 /**
  * @author meanmail
  */
 public class ViewPost {
-    private long assignment;
+    private Long assignment;
     private long step;
 
-    public long getAssignment() {
+    @Nullable
+    public Long getAssignment() {
         return assignment;
     }
 
-    public void setAssignment(long assignment) {
+    public void setAssignment(@Nullable Long assignment) {
         this.assignment = assignment;
     }
 
