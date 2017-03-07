@@ -143,7 +143,7 @@ class FormListener implements EventListener {
                     }
                 } catch (StepikClientException e) {
                     logger.warn("Failed send step from browser", e);
-                    StudyUtils.setStudyNode(project, stepNode, true);
+                    StudyUtils.updateToolWindows(project);
                 }
             }
         });
