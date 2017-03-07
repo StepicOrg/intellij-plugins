@@ -4,7 +4,9 @@ import com.google.gson.annotations.SerializedName;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author meanmail
@@ -15,6 +17,7 @@ public class Dataset {
     private String[] options;
     @SerializedName("is_text_disabled")
     private boolean textDisabled;
+    private List<Pair> pairs;
 
     public boolean isMultipleChoice() {
         return multipleChoice;
@@ -63,5 +66,16 @@ public class Dataset {
         result = 31 * result + Arrays.hashCode(options);
         result = 31 * result + (textDisabled ? 1 : 0);
         return result;
+    }
+
+    public List<Pair> getPairs() {
+        if (pairs == null) {
+            pairs = new ArrayList<>();
+        }
+        return pairs;
+    }
+
+    public void setPairs(List<Pair> pairs) {
+        this.pairs = pairs;
     }
 }

@@ -14,5 +14,5 @@
 <@quiz_content>
 <input id="text" type="text" name="value" placeholder="Input your answer here" ${disabled!""}
        value="${stepNode.getText()}"/>
-<input type="hidden" name="type" value="string"/>
+
 </@quiz_content>

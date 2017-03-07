@@ -15,7 +15,7 @@
     <br>
         <#assign index++ />
     </#list>
-<input type="hidden" name="type" value="choice"/>
+
 <input type="hidden" name="count" value="${index}"/>
 </@quiz_content>
 

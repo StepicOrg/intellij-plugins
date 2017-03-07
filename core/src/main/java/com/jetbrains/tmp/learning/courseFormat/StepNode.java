@@ -5,6 +5,7 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.stepHelpers.ChoiceStepNodeHelper;
+import com.jetbrains.tmp.learning.courseFormat.stepHelpers.MatchingStepNodeHelper;
 import com.jetbrains.tmp.learning.courseFormat.stepHelpers.SortingStepNodeHelper;
 import com.jetbrains.tmp.learning.courseFormat.stepHelpers.StringStepNodeHelper;
 import com.jetbrains.tmp.learning.courseFormat.stepHelpers.VideoStepNodeHelper;
@@ -320,5 +321,10 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
     @NotNull
     public SortingStepNodeHelper asSortingStep() {
         return new SortingStepNodeHelper(this);
+    }
+
+    @NotNull
+    public MatchingStepNodeHelper asMatchingStep() {
+        return new MatchingStepNodeHelper(this);
     }
 }
