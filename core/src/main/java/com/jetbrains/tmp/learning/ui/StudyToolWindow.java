@@ -22,7 +22,6 @@ import com.jetbrains.tmp.learning.StudyBasePluginConfigurator;
 import com.jetbrains.tmp.learning.StudyPluginConfigurator;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.SupportedLanguages;
-import com.jetbrains.tmp.learning.courseFormat.ChoiceStepNodeHelper;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.courseFormat.StudyNode;
 import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
@@ -40,6 +39,7 @@ import java.util.Map;
 
 import static com.jetbrains.tmp.learning.StudyUtils.getChoiceStepText;
 import static com.jetbrains.tmp.learning.StudyUtils.getCodeStepText;
+import static com.jetbrains.tmp.learning.StudyUtils.getStringStepText;
 import static com.jetbrains.tmp.learning.StudyUtils.getTextStepText;
 import static com.jetbrains.tmp.learning.StudyUtils.getUnknownStepText;
 import static com.jetbrains.tmp.learning.StudyUtils.getVideoStepText;
@@ -216,8 +216,10 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
                 stepNode.setStatus(StudyStatus.SOLVED);
                 break;
             case CHOICE:
-                ChoiceStepNodeHelper choiceStepNode = stepNode.asChoiceStep();
-                text = getChoiceStepText(choiceStepNode);
+                text = getChoiceStepText(stepNode);
+                break;
+            case STRING:
+                text = getStringStepText(stepNode);
                 break;
             default:
                 text = EMPTY_STEP_TEXT;

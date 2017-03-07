@@ -1,6 +1,7 @@
 package org.stepik.api.queries.submissions;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.stepik.api.actions.StepikAbstractAction;
 import org.stepik.api.objects.submissions.Submissions;
 import org.stepik.api.objects.submissions.SubmissionsPost;
@@ -28,6 +29,12 @@ public class StepikSubmissionsPostQuery extends StepikAbstractPostQuery<Submissi
     @NotNull
     public StepikSubmissionsPostQuery attempt(long id) {
         submissions.getSubmission().setAttempt(id);
+        return this;
+    }
+
+    @NotNull
+    public StepikSubmissionsPostQuery text(@Nullable String text) {
+        submissions.getSubmission().getReply().setText(text);
         return this;
     }
 

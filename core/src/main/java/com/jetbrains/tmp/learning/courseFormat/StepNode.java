@@ -306,4 +306,8 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
     public ChoiceStepNodeHelper asChoiceStep() {
         return new ChoiceStepNodeHelper(this);
     }
+
+    public StringStepNodeHelper asStringStep() {
+        return new StringStepNodeHelper(this);
+    }
 }

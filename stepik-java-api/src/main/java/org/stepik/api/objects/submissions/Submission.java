@@ -21,8 +21,11 @@ public class Submission extends AbstractObject {
     private String session;
     private double eta;
 
-    @Nullable
+    @NotNull
     public String getStatus() {
+        if (status == null) {
+            status = "";
+        }
         return status;
     }
 

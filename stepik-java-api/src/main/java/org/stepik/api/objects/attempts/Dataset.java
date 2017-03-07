@@ -11,15 +11,17 @@ import java.util.Arrays;
  */
 public class Dataset {
     @SerializedName("is_multiple_choice")
-    private boolean isMultipleChoice;
+    private boolean multipleChoice;
     private String[] options;
+    @SerializedName("is_text_disabled")
+    private boolean textDisabled;
 
     public boolean isMultipleChoice() {
-        return isMultipleChoice;
+        return multipleChoice;
     }
 
     public void setMultipleChoice(boolean multipleChoice) {
-        isMultipleChoice = multipleChoice;
+        this.multipleChoice = multipleChoice;
     }
 
     @NotNull
@@ -34,6 +36,14 @@ public class Dataset {
         this.options = options;
     }
 
+    public boolean isTextDisabled() {
+        return textDisabled;
+    }
+
+    public void setTextDisabled(boolean textDisabled) {
+        this.textDisabled = textDisabled;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -41,15 +51,17 @@ public class Dataset {
 
         Dataset dataset = (Dataset) o;
 
-        if (isMultipleChoice != dataset.isMultipleChoice) return false;
+        if (multipleChoice != dataset.multipleChoice) return false;
+        if (textDisabled != dataset.textDisabled) return false;
         // Probably incorrect - comparing Object[] arrays with Arrays.equals
         return Arrays.equals(options, dataset.options);
     }
 
     @Override
     public int hashCode() {
-        int result = (isMultipleChoice ? 1 : 0);
+        int result = (multipleChoice ? 1 : 0);
         result = 31 * result + Arrays.hashCode(options);
+        result = 31 * result + (textDisabled ? 1 : 0);
         return result;
     }
 }
