@@ -10,6 +10,7 @@
     <style media="screen" type="text/css">
         body {
             font-size: ${font_size}pt !important;
+            padding: 10px 15px;
         }
 
     </style>
