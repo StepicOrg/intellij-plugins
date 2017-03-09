@@ -56,7 +56,7 @@ public class PresentationDataUtils {
         String text = item.getName();
         StudyStatus status = item.getStatus();
         JBColor color = getColor(status);
-        Icon icon = getIcon(item.getClass(), status);
+        Icon icon = getIcon(item, status);
         setAttributes(data, text, color, icon, item.getWasDeleted());
     }
 
