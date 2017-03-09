@@ -17,7 +17,7 @@ public class Reply {
     private String text;
     private List<String> files;
     private List<Boolean> choices;
-    private List<Double> ordering;
+    private List<Integer> ordering;
     private String number;
 
     @NotNull
@@ -99,14 +99,14 @@ public class Reply {
     }
 
     @NotNull
-    public List<Double> getOrdering() {
+    public List<Integer> getOrdering() {
         if (ordering == null) {
             ordering = new ArrayList<>();
         }
         return ordering;
     }
 
-    public void setOrdering(@Nullable List<Double> ordering) {
+    public void setOrdering(@Nullable List<Integer> ordering) {
         this.ordering = ordering;
     }
 

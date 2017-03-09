@@ -15,6 +15,7 @@ import com.intellij.openapi.ui.LabeledComponent;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.util.BooleanFunction;
 import com.jetbrains.python.newProject.PyNewProjectSettings;
 import com.jetbrains.python.newProject.PythonProjectGenerator;
@@ -35,8 +36,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 
-import static org.stepik.core.projectWizard.ProjectWizardUtils.createStepDirectory;
 import static org.stepik.core.projectWizard.ProjectWizardUtils.createSubDirectories;
+import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
 
 
 class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettings> {
@@ -177,8 +178,7 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
         createCourseFromGenerator(project);
     }
 
-    private void createCourseFromGenerator(
-            @NotNull Project project) {
+    private void createCourseFromGenerator(@NotNull Project project) {
         generator.generateProject(project);
 
         FileUtil.createDirectory(new File(project.getBasePath(), "Sandbox"));
@@ -196,9 +196,10 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
         }
 
         if (root instanceof StepNode) {
-            createStepDirectory(project, (StepNode) root);
+            getOrCreateSrcDirectory(project, (StepNode) root, true);
         } else {
-            createSubDirectories(project, root, (step) -> createStepDirectory(project, step));
+            createSubDirectories(project, generator.getDefaultLang(), root, null);
+            VirtualFileManager.getInstance().syncRefresh();
         }
 
         ApplicationManager.getApplication().invokeLater(

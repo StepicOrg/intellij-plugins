@@ -28,20 +28,8 @@ public class StepikPluginConfigurator extends StudyBasePluginConfigurator {
         return group;
     }
 
-    @NotNull
-    @Override
-    public String getDefaultHighlightingMode() {
-        return "text/x-java";
-    }
-
     @Override
     public boolean accept(@NotNull Project project) {
         return StepikProjectManager.isStepikProject(project);
-    }
-
-    @NotNull
-    @Override
-    public String getLanguageScriptUrl() {
-        return getClass().getResource("/code_mirror/clike.js").toExternalForm();
     }
 }

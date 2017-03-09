@@ -1,5 +1,6 @@
 package org.stepik.core.utils;
 
+import com.intellij.ide.projectView.ProjectView;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
@@ -15,12 +16,19 @@ import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
+import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.api.client.StepikApiClient;
+import org.stepik.api.exceptions.StepikClientException;
+import org.stepik.api.objects.submissions.Submission;
+import org.stepik.api.objects.submissions.Submissions;
+import org.stepik.api.queries.Order;
 import org.stepik.core.metrics.Metrics;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Optional;
 
 import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreatePsiDirectory;
@@ -39,11 +47,19 @@ public class ProgrammingLanguageUtils {
 
         SupportedLanguages currentLang = targetStepNode.getCurrentLang();
 
-        if (currentLang == language) {
+        String mainFilePath = String.join("/",
+                targetStepNode.getPath(),
+                EduNames.SRC,
+                currentLang.getMainFileName());
+        VirtualFile mainFile = project.getBaseDir().findFileByRelativePath(mainFilePath);
+
+        boolean mainFileExists = mainFile != null;
+
+        if (currentLang == language && mainFileExists) {
             return;
         }
 
-        if (currentLang.getMainFileName().equals(language.getMainFileName())) {
+        if (currentLang.getMainFileName().equals(language.getMainFileName()) && mainFileExists) {
             targetStepNode.setCurrentLang(language);
             Metrics.switchLanguage(project, targetStepNode, SUCCESSFUL);
             return;
@@ -74,6 +90,7 @@ public class ProgrammingLanguageUtils {
 
         if (moveFirst) {
             first = src.findFile(currentLang.getMainFileName());
+            moveFirst = !second.isEquivalentTo(first);
         }
 
         targetStepNode.setCurrentLang(language);
@@ -84,6 +101,7 @@ public class ProgrammingLanguageUtils {
 
         exchangeFiles(src, hide, first, second, moveFirst, moveSecond);
 
+        ProjectView.getInstance(project).selectPsiElement(second, false);
         Metrics.switchLanguage(project, targetStepNode, SUCCESSFUL);
     }
 
@@ -94,18 +112,19 @@ public class ProgrammingLanguageUtils {
             @NotNull PsiFile second,
             boolean moveFirst,
             boolean moveSecond) {
-
-        if (moveFirst || moveSecond) {
-            ApplicationManager.getApplication().runWriteAction(() -> {
-                if (moveFirst && first != null) {
-                    MoveFilesOrDirectoriesUtil.doMoveFile(first, hide);
-                }
-
-                if (moveSecond) {
-                    MoveFilesOrDirectoriesUtil.doMoveFile(second, src);
-                }
-            });
+        if (!moveFirst && !moveSecond) {
+            return;
         }
+
+        ApplicationManager.getApplication().runWriteAction(() -> {
+            if (moveFirst && first != null) {
+                MoveFilesOrDirectoriesUtil.doMoveFile(first, hide);
+            }
+
+            if (moveSecond) {
+                MoveFilesOrDirectoriesUtil.doMoveFile(second, src);
+            }
+        });
     }
 
     private static ArrayList<VirtualFile> closeStepNodeFile(
@@ -143,7 +162,36 @@ public class ProgrammingLanguageUtils {
                     .runWriteAction(() -> {
                         try {
                             file[0] = parent.createChildData(null, fileName);
-                            String template = stepNode.getTemplate(language);
+                            String template = null;
+                            try {
+                                StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
+                                long userId = StepikConnectorLogin.getCurrentUser().getId();
+                                Submissions submissions = stepikApiClient.submissions()
+                                        .get()
+                                        .user(userId)
+                                        .order(Order.DESC)
+                                        .step(stepNode.getId())
+                                        .execute();
+
+                                if (!submissions.isEmpty()) {
+                                    Optional<Submission> lastSubmission = submissions.getItems()
+                                            .stream()
+                                            .filter(submission -> SupportedLanguages.langOfName(submission.getReply()
+                                                    .getLanguage()) == language)
+                                            .limit(1)
+                                            .findFirst();
+                                    if (lastSubmission.isPresent()) {
+                                        template = lastSubmission.get().getReply().getCode();
+                                    }
+                                }
+                            } catch (StepikClientException e) {
+                                logger.warn(e);
+                            }
+
+                            if (template == null) {
+                                template = stepNode.getTemplate(language);
+                            }
+
                             file[0].setBinaryContent(template.getBytes());
                         } catch (IOException e) {
                             file[0] = null;

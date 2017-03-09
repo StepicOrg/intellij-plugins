@@ -17,8 +17,8 @@ public enum SupportedLanguages {
     HASKELL("Haskell", "haskell", "Main.hs", "--", null, null),
     HASKELL_7_10("Haskell 7.10", "haskell 7.10", "Main_7.10.hs", "--", null, null),
     HASKELL_8_0("Haskell 8.0", "haskell 8.0", "Main_8.0.hs", "--", null, null),
-    JAVA("Java", "java", "Main.java", "//", new String[]{"class Main {"}, new String[]{"}"}),
     JAVA8("Java 8", "java8", "Main.java", "//", new String[]{"class Main {"}, new String[]{"}"}),
+    JAVA("Java", "java", "Main.java", "//", new String[]{"class Main {"}, new String[]{"}"}, JAVA8),
     JAVASCRIPT("JavaScript", "javascript", "main.js", "//", null, null),
     MONO_CS("Mono c#", "mono c#", "main.cs", "//", null, null),
     OCTAVE("Octave", "octave", "main.m", "%", null, null),
@@ -38,6 +38,7 @@ public enum SupportedLanguages {
     private final String[] beforeCode;
     private final String[] afterCode;
     private final String title;
+    private final SupportedLanguages nextVersion;
 
     /**
      * A Constructor for a supported language.
@@ -54,12 +55,25 @@ public enum SupportedLanguages {
             @NotNull String comment,
             @Nullable String[] beforeCode,
             @Nullable String[] afterCode) {
+        this(title, name, mainFileName, comment, beforeCode, afterCode, null);
+
+    }
+
+    SupportedLanguages(
+            @NotNull String title,
+            @NotNull String name,
+            @NotNull String mainFileName,
+            @NotNull String comment,
+            @Nullable String[] beforeCode,
+            @Nullable String[] afterCode,
+            @Nullable SupportedLanguages nextVersion) {
         this.title = title;
         this.name = name;
         this.mainFileName = mainFileName;
         this.comment = comment;
         this.beforeCode = beforeCode;
         this.afterCode = afterCode;
+        this.nextVersion = nextVersion;
     }
 
     @NotNull
@@ -125,5 +139,9 @@ public enum SupportedLanguages {
 
     public String getTitle() {
         return title;
+    }
+
+    public boolean upgradedTo(@NotNull SupportedLanguages languages) {
+        return languages == this || (this.nextVersion != null && this.nextVersion.upgradedTo(languages));
     }
 }

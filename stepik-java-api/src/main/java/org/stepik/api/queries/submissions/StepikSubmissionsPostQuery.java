@@ -1,6 +1,7 @@
 package org.stepik.api.queries.submissions;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.stepik.api.actions.StepikAbstractAction;
 import org.stepik.api.objects.submissions.Submissions;
 import org.stepik.api.objects.submissions.SubmissionsPost;
@@ -32,8 +33,20 @@ public class StepikSubmissionsPostQuery extends StepikAbstractPostQuery<Submissi
     }
 
     @NotNull
+    public StepikSubmissionsPostQuery text(@Nullable String text) {
+        submissions.getSubmission().getReply().setText(text);
+        return this;
+    }
+
+    @NotNull
     public StepikSubmissionsPostQuery choices(List<Boolean> choices) {
         submissions.getSubmission().getReply().setChoices(choices);
+        return this;
+    }
+
+    @NotNull
+    public StepikSubmissionsPostQuery ordering(List<Integer> ordering) {
+        submissions.getSubmission().getReply().setOrdering(ordering);
         return this;
     }
 

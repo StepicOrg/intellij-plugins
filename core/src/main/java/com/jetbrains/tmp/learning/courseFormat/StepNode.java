@@ -4,7 +4,13 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.core.EduNames;
+import com.jetbrains.tmp.learning.courseFormat.stepHelpers.ChoiceStepNodeHelper;
+import com.jetbrains.tmp.learning.courseFormat.stepHelpers.MatchingStepNodeHelper;
+import com.jetbrains.tmp.learning.courseFormat.stepHelpers.SortingStepNodeHelper;
+import com.jetbrains.tmp.learning.courseFormat.stepHelpers.StringStepNodeHelper;
+import com.jetbrains.tmp.learning.courseFormat.stepHelpers.VideoStepNodeHelper;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
@@ -28,10 +34,11 @@ import static com.jetbrains.tmp.learning.stepik.StepikConnectorLogin.authAndGetS
 
 public class StepNode extends Node<Step, StepNode, Step, StepNode> {
     private static final Logger logger = Logger.getInstance(StepNode.class);
-    private StudyStatus status;
     private List<SupportedLanguages> supportedLanguages;
     private SupportedLanguages currentLang;
     private long courseId;
+    @XStreamOmitField
+    private Long assignment;
 
     public StepNode() {}
 
@@ -39,7 +46,8 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
         super(data, indicator);
     }
 
-    public void init(@Nullable StudyNode parent, boolean isRestarted, @Nullable ProgressIndicator indicator) {
+    @Override
+    public void init(@Nullable StudyNode parent, @Nullable ProgressIndicator indicator) {
         if (indicator != null) {
             indicator.setText("Refresh a step: " + getName());
             indicator.setText2("");
@@ -48,11 +56,7 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
         supportedLanguages = null;
         courseId = 0;
 
-        if (isRestarted) {
-            status = StudyStatus.UNCHECKED;
-        }
-
-        super.init(parent, isRestarted, indicator);
+        super.init(parent, indicator);
     }
 
     @Override
@@ -157,19 +161,6 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
         } catch (StepikClientException ignored) {
         }
         return 0;
-    }
-
-    @Override
-    @NotNull
-    public StudyStatus getStatus() {
-        if (status == null) {
-            status = StudyStatus.UNCHECKED;
-        }
-        return status;
-    }
-
-    public void setStatus(@Nullable StudyStatus status) {
-        this.status = status;
     }
 
     @NotNull
@@ -281,20 +272,24 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
 
         StepNode stepNode = (StepNode) o;
 
-        if (status != stepNode.status) return false;
+        if (courseId != stepNode.courseId) return false;
         //noinspection SimplifiableIfStatement
-        if (currentLang != stepNode.currentLang) return false;
-        return super.equals(o);
+        if (supportedLanguages != null ?
+                !supportedLanguages.equals(stepNode.supportedLanguages) :
+                stepNode.supportedLanguages != null) return false;
+        return currentLang == stepNode.currentLang;
     }
 
     @Override
     public int hashCode() {
-        int result = status != null ? status.hashCode() : 0;
+        int result = super.hashCode();
+        result = 31 * result + (supportedLanguages != null ? supportedLanguages.hashCode() : 0);
         result = 31 * result + (currentLang != null ? currentLang.hashCode() : 0);
-        result = 31 * result + super.hashCode();
+        result = 31 * result + (int) (courseId ^ (courseId >>> 32));
         return result;
     }
 
@@ -303,7 +298,45 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
         return new VideoStepNodeHelper(this);
     }
 
+    @NotNull
     public ChoiceStepNodeHelper asChoiceStep() {
         return new ChoiceStepNodeHelper(this);
+    }
+
+    @NotNull
+    public StringStepNodeHelper asStringStep() {
+        return new StringStepNodeHelper(this);
+    }
+
+    @NotNull
+    public SortingStepNodeHelper asSortingStep() {
+        return new SortingStepNodeHelper(this);
+    }
+
+    @NotNull
+    public MatchingStepNodeHelper asMatchingStep() {
+        return new MatchingStepNodeHelper(this);
+    }
+
+    public Long getAssignment() {
+        if (assignment == null) {
+            StudyNode parent = getParent();
+            if (parent != null && parent instanceof LessonNode) {
+                LessonNode lesson = (LessonNode) parent;
+                CompoundUnitLesson data = lesson.getData();
+                if (data != null) {
+                    List<Long> steps = data.getLesson().getSteps();
+                    steps.sort(Long::compareTo);
+                    int index;
+                    if ((index = steps.indexOf(getId())) != -1) {
+                        List<Long> assignments = data.getUnit().getAssignments();
+                        if (index < assignments.size()) {
+                            assignment = assignments.get(index);
+                        }
+                    }
+                }
+            }
+        }
+        return assignment;
     }
 }

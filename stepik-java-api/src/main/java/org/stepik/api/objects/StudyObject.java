@@ -30,4 +30,9 @@ public class StudyObject extends AbstractObject {
     public int getPosition() {
         return 0;
     }
+
+    @Nullable
+    public String getProgress() {
+        return null;
+    }
 }

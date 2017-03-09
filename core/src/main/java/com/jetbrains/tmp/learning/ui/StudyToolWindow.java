@@ -22,13 +22,15 @@ import com.jetbrains.tmp.learning.StudyBasePluginConfigurator;
 import com.jetbrains.tmp.learning.StudyPluginConfigurator;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.SupportedLanguages;
-import com.jetbrains.tmp.learning.courseFormat.ChoiceStepNodeHelper;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
+import com.jetbrains.tmp.learning.courseFormat.StepType;
 import com.jetbrains.tmp.learning.courseFormat.StudyNode;
-import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
-import com.jetbrains.tmp.learning.courseFormat.VideoStepNodeHelper;
+import com.jetbrains.tmp.learning.courseFormat.stepHelpers.VideoStepNodeHelper;
+import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.api.client.StepikApiClient;
+import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.core.utils.ProgrammingLanguageUtils;
 
 import javax.swing.*;
@@ -40,9 +42,14 @@ import java.util.Map;
 
 import static com.jetbrains.tmp.learning.StudyUtils.getChoiceStepText;
 import static com.jetbrains.tmp.learning.StudyUtils.getCodeStepText;
+import static com.jetbrains.tmp.learning.StudyUtils.getMatchingStepText;
+import static com.jetbrains.tmp.learning.StudyUtils.getSortingStepText;
+import static com.jetbrains.tmp.learning.StudyUtils.getStringStepText;
 import static com.jetbrains.tmp.learning.StudyUtils.getTextStepText;
 import static com.jetbrains.tmp.learning.StudyUtils.getUnknownStepText;
 import static com.jetbrains.tmp.learning.StudyUtils.getVideoStepText;
+import static com.jetbrains.tmp.learning.courseFormat.StepType.TEXT;
+import static com.jetbrains.tmp.learning.courseFormat.StepType.VIDEO;
 import static org.stepik.core.utils.PluginUtils.PLUGIN_ID;
 
 public abstract class StudyToolWindow extends SimpleToolWindowPanel implements DataProvider, Disposable, ActionListener {
@@ -58,6 +65,7 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
     private final OnePixelSplitter splitPane;
     private final Panel rightPanel;
     private final CardLayout layout;
+    private final ActionListener qualityListener;
     private Project project;
     private StepNode stepNode;
 
@@ -69,8 +77,8 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
         languageBox = new JComboBox<>();
         languageBox.addActionListener(this);
 
+        qualityListener = e -> setText();
         videoQualityBox = new JComboBox<>();
-        videoQualityBox.addActionListener(e -> setText());
 
         layout = new CardLayout();
         rightPanel = new Panel(layout);
@@ -184,8 +192,11 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
         }
         String text;
         boolean rightPanelVisible = false;
+        StepType stepType = stepNode.getType();
+        boolean theory = stepType == VIDEO || stepType == TEXT;
+        postView(theory);
 
-        switch (stepNode.getType()) {
+        switch (stepType) {
             case UNKNOWN:
                 text = getUnknownStepText(stepNode);
                 break;
@@ -201,23 +212,31 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
                 break;
             case TEXT:
                 text = getTextStepText(stepNode);
-                stepNode.setStatus(StudyStatus.SOLVED);
                 break;
             case VIDEO:
                 VideoStepNodeHelper videoStepNode = stepNode.asVideoStep();
                 text = getVideoStepText(videoStepNode, getVideoQuality());
+                videoQualityBox.removeActionListener(qualityListener);
                 videoQualityBox.removeAllItems();
                 videoStepNode.getQualitySet().forEach(videoQualityBox::addItem);
                 int quality = videoStepNode.getQuality();
                 videoQualityBox.setSelectedItem(quality);
+                videoQualityBox.addActionListener(qualityListener);
                 layout.show(rightPanel, "quality");
                 rightPanelVisible = videoQualityBox.getModel().getSize() != 0;
                 storeVideoQuality(quality);
-                stepNode.setStatus(StudyStatus.SOLVED);
                 break;
             case CHOICE:
-                ChoiceStepNodeHelper choiceStepNode = stepNode.asChoiceStep();
-                text = getChoiceStepText(choiceStepNode);
+                text = getChoiceStepText(stepNode);
+                break;
+            case STRING:
+                text = getStringStepText(stepNode);
+                break;
+            case SORTING:
+                text = getSortingStepText(stepNode);
+                break;
+            case MATCHING:
+                text = getMatchingStepText(stepNode);
                 break;
             default:
                 text = EMPTY_STEP_TEXT;
@@ -227,6 +246,30 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
         rightPanel.setVisible(rightPanelVisible);
         setText(text);
         ProjectView.getInstance(project).refresh();
+    }
+
+    private void postView(boolean needPassed) {
+        StepNode finalStepNode = stepNode;
+        new Thread(() -> {
+            Long assignment = finalStepNode.getAssignment();
+            long stepId = finalStepNode.getId();
+            try {
+                if (assignment != 0) {
+                    StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
+                    stepikApiClient.views()
+                            .post()
+                            .assignment(assignment)
+                            .step(stepId)
+                            .execute();
+                }
+            } catch (StepikClientException e) {
+                logger.warn("Failed post view: stepId=" + stepId + "; assignment=" + assignment, e);
+            }
+
+            if (needPassed) {
+                finalStepNode.passed();
+            }
+        }).run();
     }
 
     private int loadVideoQuality() {

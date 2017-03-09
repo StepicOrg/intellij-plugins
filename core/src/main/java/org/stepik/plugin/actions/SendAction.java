@@ -20,6 +20,7 @@ import org.stepik.core.metrics.Metrics;
 import org.stepik.core.metrics.MetricsStatus;
 import org.stepik.core.utils.Utils;
 
+import static com.jetbrains.tmp.learning.courseFormat.StudyStatus.SOLVED;
 import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
 import static org.stepik.core.metrics.MetricsStatus.TIME_OVER;
 import static org.stepik.core.metrics.MetricsStatus.USER_CANCELED;
@@ -95,17 +96,14 @@ public class SendAction {
             @NotNull StepNode stepNode,
             @Nullable String stepStatus,
             @NotNull String hint) {
-        StudyStatus status = StudyStatus.of(stepStatus);
-
         NotificationType notificationType;
-        if (status == StudyStatus.SOLVED) {
+        if (StudyStatus.of(stepStatus) == SOLVED) {
             notificationType = NotificationType.INFORMATION;
             hint = "Success!";
+            stepNode.passed();
         } else {
             notificationType = NotificationType.WARNING;
         }
-
-        stepNode.setStatus(status);
 
         String title = String.format("%s is %s", stepNode.getName(), stepStatus);
         ActionUtils.notify(project, title, hint, notificationType);

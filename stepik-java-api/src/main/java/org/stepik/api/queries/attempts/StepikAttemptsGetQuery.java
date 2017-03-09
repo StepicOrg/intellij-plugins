@@ -19,6 +19,11 @@ public class StepikAttemptsGetQuery extends StepikAbstractGetQuery<StepikAttempt
         return this;
     }
 
+    public StepikAttemptsGetQuery user(long userId) {
+        addParam("user", userId);
+        return this;
+    }
+
     @NotNull
     @Override
     protected String getUrl() {

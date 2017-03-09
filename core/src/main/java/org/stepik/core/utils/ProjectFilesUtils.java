@@ -120,19 +120,40 @@ public class ProjectFilesUtils {
     }
 
     @Nullable
-    public static VirtualFile getOrCreateSrcDirectory(@NotNull Project project, @NotNull StepNode stepNode) {
+    public static VirtualFile getOrCreateSrcDirectory(
+            @NotNull Project project,
+            @NotNull StepNode stepNode,
+            boolean refresh) {
+        return getOrCreateSrcDirectory(project, stepNode, refresh, null);
+    }
+
+
+    @Nullable
+    public static VirtualFile getOrCreateSrcDirectory(
+            @NotNull Project project,
+            @NotNull StepNode stepNode,
+            boolean refresh,
+            @Nullable ModifiableModuleModel model) {
         VirtualFile baseDir = project.getBaseDir();
         String srcPath = stepNode.getPath() + "/" + EduNames.SRC;
         VirtualFile srcDirectory = baseDir.findFileByRelativePath(srcPath);
         if (srcDirectory == null && !stepNode.getWasDeleted()) {
             srcDirectory = getOrCreateDirectory(baseDir, srcPath);
             if (srcDirectory != null && PluginUtils.isCurrent(IDEA)) {
-                ModifiableModuleModel model = ModuleManager.getInstance(project).getModifiableModel();
+                boolean modelOwner = model == null;
+                if (modelOwner) {
+                    model = ModuleManager.getInstance(project).getModifiableModel();
+                }
+                ModifiableModuleModel finalModel = model;
                 ApplicationManager.getApplication().runWriteAction(() -> {
-                    ModuleUtils.createStepModule(project, stepNode, model);
-                    model.commit();
+                    ModuleUtils.createStepModule(project, stepNode, finalModel);
+                    if (modelOwner) {
+                        finalModel.commit();
+                    }
                 });
-                VirtualFileManager.getInstance().syncRefresh();
+                if (refresh) {
+                    VirtualFileManager.getInstance().syncRefresh();
+                }
             }
         }
         return srcDirectory;
@@ -140,7 +161,7 @@ public class ProjectFilesUtils {
 
     @Nullable
     static PsiDirectory getOrCreateSrcPsiDirectory(@NotNull Project project, @NotNull StepNode stepNode) {
-        VirtualFile directory = getOrCreateSrcDirectory(project, stepNode);
+        VirtualFile directory = getOrCreateSrcDirectory(project, stepNode, true);
         if (directory == null) {
             return null;
         }
@@ -174,7 +195,10 @@ public class ProjectFilesUtils {
         return srcDir;
     }
 
-    static PsiDirectory getOrCreatePsiDirectory(@NotNull Project project, @NotNull PsiDirectory baseDir, @NotNull String relativePath) {
+    static PsiDirectory getOrCreatePsiDirectory(
+            @NotNull Project project,
+            @NotNull PsiDirectory baseDir,
+            @NotNull String relativePath) {
         VirtualFile directory = getOrCreateDirectory(baseDir.getVirtualFile(), relativePath);
         if (directory == null) {
             return null;

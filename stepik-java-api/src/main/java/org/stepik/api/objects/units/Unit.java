@@ -14,7 +14,7 @@ import java.util.List;
 public class Unit extends AbstractObject {
     private int section;
     private int lesson;
-    private List<Integer> assignments;
+    private List<Long> assignments;
     private int position;
     private String progress;
     @SerializedName("begin_date")
@@ -131,14 +131,14 @@ public class Unit extends AbstractObject {
     }
 
     @NotNull
-    public List<Integer> getAssignments() {
+    public List<Long> getAssignments() {
         if (assignments == null) {
             assignments = new ArrayList<>();
         }
         return assignments;
     }
 
-    public void setAssignments(@Nullable List<Integer> assignments) {
+    public void setAssignments(@Nullable List<Long> assignments) {
         this.assignments = assignments;
     }
 

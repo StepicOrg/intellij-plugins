@@ -30,7 +30,7 @@ public class ProjectSettingsPanel implements ProjectSetting, HierarchyListener {
     private CourseDescriptionPane courseListDescription;
     private JScrollPane scrollPane;
     private JButton logoutButton;
-    private StudyObject selectedStudyObject = StepikProjectGenerator.EMPTY_STUDY_NODE;
+    private StudyObject selectedStudyObject = StepikProjectGenerator.EMPTY_STUDY_OBJECT;
 
     public ProjectSettingsPanel(@NotNull Project project, boolean visibleLangBox) {
         this.project = project;

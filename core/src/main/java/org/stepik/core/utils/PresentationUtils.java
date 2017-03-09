@@ -5,6 +5,7 @@ import com.jetbrains.tmp.learning.courseFormat.CourseNode;
 import com.jetbrains.tmp.learning.courseFormat.LessonNode;
 import com.jetbrains.tmp.learning.courseFormat.SectionNode;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
+import com.jetbrains.tmp.learning.courseFormat.StudyNode;
 import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
 import icons.AllStepikIcons;
 import org.jetbrains.annotations.NotNull;
@@ -31,33 +32,43 @@ public class PresentationUtils {
     private static Icon[][] icons = null;
 
     @Nullable
-    public static Icon getIcon(@NotNull Object subjectClass, StudyStatus status) {
+    public static Icon getIcon(@NotNull StudyNode studyNode, StudyStatus status) {
         if (icons == null) {
             icons = getIcons();
         }
 
         Icon[] set;
+        Class<? extends StudyNode> clazz = studyNode.getClass();
 
-        if (subjectClass == StepNode.class) {
-            set = icons[3];
-        } else if (subjectClass == LessonNode.class) {
+        if (clazz == StepNode.class) {
+            switch (((StepNode) studyNode).getType()) {
+                case CODE:
+                    set = icons[3];
+                    break;
+                case TEXT:
+                    set = icons[4];
+                    break;
+                case VIDEO:
+                    set = icons[5];
+                    break;
+                default:
+                    set = icons[6];
+            }
+        } else if (clazz == LessonNode.class) {
             set = icons[2];
-        } else if (subjectClass == SectionNode.class) {
+        } else if (clazz == SectionNode.class) {
             set = icons[1];
-        } else if (subjectClass == CourseNode.class) {
+        } else if (clazz == CourseNode.class) {
             set = icons[0];
         } else
             return null;
 
         switch (status) {
-            case UNCHECKED:
-                return set[0];
             case SOLVED:
                 return set[1];
-            case FAILED:
-                return set[2];
+            default:
+                return set[0];
         }
-        return null;
     }
 
     @NotNull
@@ -65,23 +76,31 @@ public class PresentationUtils {
         return new Icon[][]{
                 {
                         AllStepikIcons.ProjectTree.course,
-                        AllStepikIcons.ProjectTree.courseCorrect,
-                        AllStepikIcons.ProjectTree.course
+                        AllStepikIcons.ProjectTree.courseCorrect
                 },
                 {
                         AllStepikIcons.ProjectTree.module,
-                        AllStepikIcons.ProjectTree.moduleCorrect,
-                        AllStepikIcons.ProjectTree.module
+                        AllStepikIcons.ProjectTree.moduleCorrect
                 },
                 {
                         AllStepikIcons.ProjectTree.lesson,
-                        AllStepikIcons.ProjectTree.lessonCorrect,
-                        AllStepikIcons.ProjectTree.lesson
+                        AllStepikIcons.ProjectTree.lessonCorrect
                 },
                 {
-                        AllStepikIcons.ProjectTree.step,
-                        AllStepikIcons.ProjectTree.stepCorrect,
-                        AllStepikIcons.ProjectTree.stepWrong
+                        AllStepikIcons.ProjectTree.stepCode,
+                        AllStepikIcons.ProjectTree.stepCodeCorrect
+                },
+                {
+                        AllStepikIcons.ProjectTree.stepText,
+                        AllStepikIcons.ProjectTree.stepTextCorrect
+                },
+                {
+                        AllStepikIcons.ProjectTree.stepVideo,
+                        AllStepikIcons.ProjectTree.stepVideoCorrect
+                },
+                {
+                        AllStepikIcons.ProjectTree.stepProblem,
+                        AllStepikIcons.ProjectTree.stepProblemCorrect
                 }
         };
     }
@@ -100,6 +119,10 @@ public class PresentationUtils {
     }
 
     public static boolean isVisibleDirectory(@NotNull String relPath) {
+        if (relPath.startsWith("../")) {
+            return true;
+        }
+
         if (isHideDir(relPath) || isWithinHideDir(relPath)) {
             return false;
         }
@@ -113,6 +136,10 @@ public class PresentationUtils {
     }
 
     public static boolean isVisibleFile(@NotNull String relFilePath) {
+        if (relFilePath.startsWith("../")) {
+            return true;
+        }
+
         String parentDir = getParent(relFilePath);
         //noinspection SimplifiableIfStatement
         if (parentDir == null || !isVisibleDirectory(parentDir)) {

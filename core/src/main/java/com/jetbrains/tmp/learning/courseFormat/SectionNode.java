@@ -35,13 +35,14 @@ public class SectionNode extends Node<Section, LessonNode, CompoundUnitLesson, S
         super(data, indicator);
     }
 
-    public void init(@Nullable final StudyNode parent, boolean isRestarted, @Nullable ProgressIndicator indicator) {
+    @Override
+    public void init(@Nullable final StudyNode parent, @Nullable ProgressIndicator indicator) {
         if (indicator != null) {
             indicator.setText("Refresh a section: " + getName());
             indicator.setText2("Update lessons");
         }
 
-        super.init(parent, isRestarted, indicator);
+        super.init(parent, indicator);
     }
 
     @Override

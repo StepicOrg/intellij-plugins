@@ -3,6 +3,8 @@ package com.jetbrains.tmp.learning;
 import com.intellij.ide.projectView.ProjectView;
 import com.intellij.ide.projectView.ProjectViewNode;
 import com.intellij.ide.projectView.impl.AbstractProjectViewPane;
+import com.intellij.ide.ui.LafManager;
+import com.intellij.ide.ui.laf.darcula.DarculaLookAndFeelInfo;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
@@ -12,10 +14,14 @@ import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFileSystemItem;
 import com.intellij.ui.content.Content;
-import com.jetbrains.tmp.learning.courseFormat.ChoiceStepNodeHelper;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.courseFormat.StudyNode;
-import com.jetbrains.tmp.learning.courseFormat.VideoStepNodeHelper;
+import com.jetbrains.tmp.learning.courseFormat.stepHelpers.ChoiceStepNodeHelper;
+import com.jetbrains.tmp.learning.courseFormat.stepHelpers.MatchingStepNodeHelper;
+import com.jetbrains.tmp.learning.courseFormat.stepHelpers.SortingStepNodeHelper;
+import com.jetbrains.tmp.learning.courseFormat.stepHelpers.StepHelper;
+import com.jetbrains.tmp.learning.courseFormat.stepHelpers.StringStepNodeHelper;
+import com.jetbrains.tmp.learning.courseFormat.stepHelpers.VideoStepNodeHelper;
 import com.jetbrains.tmp.learning.ui.StudyToolWindow;
 import com.jetbrains.tmp.learning.ui.StudyToolWindowFactory;
 import org.jetbrains.annotations.NotNull;
@@ -91,6 +97,7 @@ public class StudyUtils {
         }
     }
 
+    @NotNull
     public static String getVideoStepText(
             @NotNull VideoStepNodeHelper videoStepNode,
             int quality) {
@@ -103,20 +110,48 @@ public class StudyUtils {
         return text;
     }
 
-    public static String getChoiceStepText(@NotNull ChoiceStepNodeHelper choiceStepNode) {
-        String text = getTextStepText(choiceStepNode.getStepNode());
+    @NotNull
+    public static String getChoiceStepText(@NotNull StepNode stepNode) {
+        ChoiceStepNodeHelper stepNodeHelper = stepNode.asChoiceStep();
+        return processTemplate(stepNodeHelper, "quiz/choice");
+    }
+
+    @NotNull
+    public static String getStringStepText(@NotNull StepNode stepNode) {
+        StringStepNodeHelper stepNodeHelper = stepNode.asStringStep();
+        return processTemplate(stepNodeHelper, "quiz/string");
+    }
+
+    @NotNull
+    public static String getSortingStepText(@NotNull StepNode stepNode) {
+        SortingStepNodeHelper stepNodeHelper = stepNode.asSortingStep();
+        return processTemplate(stepNodeHelper, "quiz/sorting");
+    }
+
+    @NotNull
+    public static String getMatchingStepText(@NotNull StepNode stepNode) {
+        MatchingStepNodeHelper stepNodeHelper = stepNode.asMatchingStep();
+        return processTemplate(stepNodeHelper, "quiz/matching");
+    }
+
+    @NotNull
+    private static String processTemplate(@NotNull StepHelper stepNodeHelper, @NotNull String templateName) {
+        String text = getTextStepText(stepNodeHelper.getStepNode());
 
         HashMap<String, Object> params = new HashMap<>();
         params.put("text", text);
-        params.put("choiceStepNode", choiceStepNode);
+        params.put("stepNode", stepNodeHelper);
+        params.put("darcula", LafManager.getInstance().getCurrentLookAndFeel() instanceof DarculaLookAndFeelInfo);
 
-        return Templater.processTemplate("choice_block", params);
+        return Templater.processTemplate(templateName, params);
     }
 
+    @NotNull
     public static String getTextStepText(@NotNull StepNode stepNode) {
         return getStepText(stepNode, STEP_LINK_TEXT);
     }
 
+    @NotNull
     private static String getStepText(@NotNull StepNode stepNode, @NotNull String linkText, Object... params) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(getLink(stepNode, String.format(linkText, params)));
@@ -130,12 +165,14 @@ public class StudyUtils {
         return stringBuilder.toString();
     }
 
+    @NotNull
     public static String getUnknownStepText(@NotNull StepNode stepNode) {
         Step data = stepNode.getData();
         String stepType = data != null ? data.getBlock().getName() : stepNode.getType().toString();
         return getStepText(stepNode, UNKNOWN_STEP_TEXT, stepType);
     }
 
+    @NotNull
     public static String getCodeStepText(@NotNull StepNode stepNode) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(getTextStepText(stepNode));
@@ -166,6 +203,7 @@ public class StudyUtils {
         return stringBuilder.toString();
     }
 
+    @NotNull
     private static String getLink(@NotNull StepNode stepNode, @NotNull String text) {
         StudyNode lessonNode = stepNode.getParent();
         if (lessonNode != null) {
@@ -185,6 +223,7 @@ public class StudyUtils {
         return null;
     }
 
+    @NotNull
     private static String getRelativePath(@NotNull Project project, @NotNull VirtualFile item) {
         String path = item.getPath();
         String basePath = project.getBasePath();
@@ -241,6 +280,7 @@ public class StudyUtils {
         return getStudyNode(project, file.getVirtualFile());
     }
 
+    @Nullable
     private static PsiElement getSelectedPsiElement(@NotNull Project project) {
         ProjectView projectView = ProjectView.getInstance(project);
         AbstractProjectViewPane currentProjectViewPane = projectView.getCurrentProjectViewPane();
