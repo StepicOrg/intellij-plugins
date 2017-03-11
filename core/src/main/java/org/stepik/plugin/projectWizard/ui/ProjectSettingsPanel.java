@@ -44,8 +44,7 @@ public class ProjectSettingsPanel implements ProjectSetting, HierarchyListener {
         mainPanel.addHierarchyListener(this);
 
         logoutButton.addActionListener(e -> {
-            StepikConnectorLogin.logout();
-            StepikConnectorLogin.authentication();
+            StepikConnectorLogin.logoutAndAuth();
             setUsername();
         });
     }
