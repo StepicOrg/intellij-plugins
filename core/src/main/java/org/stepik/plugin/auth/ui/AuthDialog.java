@@ -13,6 +13,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import org.stepik.api.urls.Urls;
+import org.stepik.core.templates.Templater;
 
 import javax.swing.*;
 import java.awt.*;
@@ -83,6 +84,15 @@ public class AuthDialog extends JDialog {
                         if (newState == Worker.State.CANCELLED) {
                             return;
                         }
+
+                        if (newState == Worker.State.FAILED) {
+                            Map<String, Object> map = new HashMap<>();
+                            map.put("url", engine.getLocation());
+                            String content = Templater.processTemplate("error", map);
+                            engine.loadContent(content);
+                            return;
+                        }
+
                         String location = engine.getLocation();
 
                         if (location != null) {
