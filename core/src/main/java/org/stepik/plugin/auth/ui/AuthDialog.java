@@ -84,7 +84,7 @@ public class AuthDialog extends JDialog {
                             return;
                         }
                         String location = engine.getLocation();
-                        System.out.println(location);
+
                         if (location != null) {
                             if (location.startsWith(Urls.STEPIK_URL + "/#")) {
                                 String paramString = location.split("#")[1];
