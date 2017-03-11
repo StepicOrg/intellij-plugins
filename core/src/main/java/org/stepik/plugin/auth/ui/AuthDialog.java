@@ -1,22 +1,32 @@
 package org.stepik.plugin.auth.ui;
 
+import com.intellij.icons.AllIcons;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker;
 import javafx.embed.swing.JFXPanel;
+import javafx.embed.swing.SwingFXUtils;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.layout.StackPane;
+import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebHistory;
 import javafx.scene.web.WebView;
 import org.stepik.api.urls.Urls;
 import org.stepik.core.templates.Templater;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.util.Arrays;
@@ -29,7 +39,6 @@ import java.util.Map;
 public class AuthDialog extends JDialog {
     private final Map<String, String> map = new HashMap<>();
     private WebEngine engine;
-    private WebView webComponent;
     private Node progressBar;
     private JFXPanel panel;
 
@@ -40,16 +49,25 @@ public class AuthDialog extends JDialog {
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
         setPanel(new JFXPanel());
+
         Platform.runLater(() -> {
-            StackPane pane = new StackPane();
-            webComponent = new WebView();
+            BorderPane pane = new BorderPane();
+            HBox toolPane = new HBox();
+            toolPane.setSpacing(5);
+            toolPane.setAlignment(Pos.CENTER_LEFT);
+            WebView webComponent = new WebView();
             engine = webComponent.getEngine();
             progressBar = makeProgressBarWithListener();
-            webComponent.setVisible(false);
-            pane.getChildren().addAll(webComponent, progressBar);
+            pane.setTop(toolPane);
+            pane.setCenter(webComponent);
             Scene scene = new Scene(pane);
             panel.setScene(scene);
             panel.setVisible(true);
+
+            Button backButton = makeGoBackButton();
+            addButtonsAvailabilityListeners(backButton);
+            toolPane.getChildren().addAll(backButton, progressBar);
+            toolPane.setPadding(new Insets(5));
 
             if (clear) {
                 CookieManager manager = new CookieManager();
@@ -67,6 +85,30 @@ public class AuthDialog extends JDialog {
         AuthDialog instance = new AuthDialog(clear);
         instance.setVisible(true);
         return instance.map;
+    }
+
+    private void addButtonsAvailabilityListeners(Button goBackButton) {
+        Platform.runLater(() -> engine.getLoadWorker().stateProperty().addListener((ov, oldState, newState) -> {
+            if (newState == Worker.State.SUCCEEDED) {
+                WebHistory history = engine.getHistory();
+                boolean isGoBackDisable = history.getCurrentIndex() <= 0;
+                goBackButton.setDisable(isGoBackDisable);
+            }
+        }));
+    }
+
+    private Button makeGoBackButton() {
+        Icon icon = AllIcons.Actions.Back;
+        BufferedImage bImg = new BufferedImage(icon.getIconWidth(), icon.getIconWidth(), BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics = bImg.createGraphics();
+        icon.paintIcon(null, graphics, 0, 0);
+        graphics.dispose();
+        WritableImage image = SwingFXUtils.toFXImage(bImg, null);
+        final Button button = new Button(null, new ImageView(image));
+        button.setDisable(true);
+        button.setOnAction(event -> Platform.runLater(() -> engine.getHistory().go(-1)));
+
+        return button;
     }
 
     private ProgressBar makeProgressBarWithListener() {
@@ -116,9 +158,9 @@ public class AuthDialog extends JDialog {
                             }
                         }
 
+                        progressBar.setVisible(newState == Worker.State.RUNNING);
+
                         if (newState == Worker.State.SUCCEEDED) {
-                            progressBar.setVisible(false);
-                            webComponent.setVisible(true);
                             AuthDialog.this.setTitle(engine.getTitle());
                         }
                     }
