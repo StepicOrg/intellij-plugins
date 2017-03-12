@@ -21,6 +21,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebHistory;
 import javafx.scene.web.WebView;
+import org.jetbrains.annotations.NotNull;
 import org.stepik.api.urls.Urls;
 import org.stepik.core.templates.Templater;
 
@@ -38,6 +39,7 @@ import java.util.Map;
  */
 public class AuthDialog extends JDialog {
     private final Map<String, String> map = new HashMap<>();
+    private String url;
     private WebEngine engine;
     private Node progressBar;
     private JFXPanel panel;
@@ -66,7 +68,8 @@ public class AuthDialog extends JDialog {
 
             Button backButton = makeGoBackButton();
             addButtonsAvailabilityListeners(backButton);
-            toolPane.getChildren().addAll(backButton, progressBar);
+            Button homeButton = makeHomeButton();
+            toolPane.getChildren().addAll(backButton, homeButton, progressBar);
             toolPane.setPadding(new Insets(5));
 
             if (clear) {
@@ -74,7 +77,7 @@ public class AuthDialog extends JDialog {
                 CookieHandler.setDefault(manager);
                 manager.getCookieStore().removeAll();
             }
-            String url = StepikConnectorLogin.getImplicitGrantUrl();
+            url = StepikConnectorLogin.getImplicitGrantUrl();
             engine.load(url);
         });
         add(panel, BorderLayout.CENTER);
@@ -98,17 +101,28 @@ public class AuthDialog extends JDialog {
     }
 
     private Button makeGoBackButton() {
-        Icon icon = AllIcons.Actions.Back;
+        Button button = createButtonWithImage(AllIcons.Actions.Back);
+        button.setDisable(true);
+        button.setOnAction(event -> Platform.runLater(() -> engine.getHistory().go(-1)));
+
+        return button;
+    }
+
+    private Button makeHomeButton() {
+        Button button = createButtonWithImage(AllIcons.Actions.Refresh);
+        button.setOnAction(event -> Platform.runLater(() -> engine.load(url)));
+
+        return button;
+    }
+
+    @NotNull
+    private Button createButtonWithImage(@NotNull Icon icon) {
         BufferedImage bImg = new BufferedImage(icon.getIconWidth(), icon.getIconWidth(), BufferedImage.TYPE_INT_ARGB);
         Graphics2D graphics = bImg.createGraphics();
         icon.paintIcon(null, graphics, 0, 0);
         graphics.dispose();
         WritableImage image = SwingFXUtils.toFXImage(bImg, null);
-        final Button button = new Button(null, new ImageView(image));
-        button.setDisable(true);
-        button.setOnAction(event -> Platform.runLater(() -> engine.getHistory().go(-1)));
-
-        return button;
+        return new Button(null, new ImageView(image));
     }
 
     private ProgressBar makeProgressBarWithListener() {
