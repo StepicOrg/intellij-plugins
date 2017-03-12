@@ -159,7 +159,7 @@ public class AuthDialog extends JDialog {
                                 Arrays.stream(params).forEach(param -> {
                                     String[] entry = param.split("=");
                                     String value = "";
-                                    if (entry.length > 0) {
+                                    if (entry.length > 1) {
                                         value = entry[1];
                                     }
                                     map.put(entry[0], value);
