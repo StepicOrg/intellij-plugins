@@ -18,25 +18,21 @@ import org.stepik.api.objects.users.User;
 import org.stepik.core.metrics.Metrics;
 import org.stepik.plugin.auth.ui.AuthDialog;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.Map;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
 import static org.stepik.core.utils.PluginUtils.PLUGIN_ID;
 
 public class StepikConnectorLogin {
     private static final Logger logger = Logger.getInstance(StepikConnectorLogin.class);
     private static final String CLIENT_ID = "vV8giW7KTPMOTriOUBwyGLvXbKV0Cc4GPBnyCJPd";
-    private static final String REDIRECT_URI = "https://stepik.org";
+    private static final String REDIRECT_URI = "https%3A%2F%2Fstepik.org";
     private static final String LAST_USER_PROPERTY_NAME = PLUGIN_ID + ".LAST_USER";
     private static final StepikApiClient stepikApiClient = initStepikApiClient();
-    private static final String IMPLICIT_GRANT_URL_TEMPLATE = "https://stepik.org/oauth2/authorize/" +
+    private static final String IMPLICIT_GRANT_URL = "https://stepik.org/oauth2/authorize/" +
             "?client_id=" + CLIENT_ID +
-            "&redirect_uri=%s" +
+            "&redirect_uri=" + REDIRECT_URI +
             "&scope=write" +
-            "&state=%s" +
             "&response_type=token";
 
     private static long getLastUser() {
@@ -215,11 +211,7 @@ public class StepikConnectorLogin {
 
     @Nullable
     public static String getImplicitGrantUrl() {
-        try {
-            return String.format(IMPLICIT_GRANT_URL_TEMPLATE, URLEncoder.encode(REDIRECT_URI, UTF_8.name()), "1234");
-        } catch (UnsupportedEncodingException e) {
-            return null;
-        }
+        return IMPLICIT_GRANT_URL;
     }
 
     public static void logoutAndAuth() {
