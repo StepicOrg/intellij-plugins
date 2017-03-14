@@ -6,25 +6,22 @@
         display: block;
         margin: 10px auto;
         width: 100%;
+        min-height: 200px;
+    }
+
+    .dataset-url {
+        display: inline-block;
+        padding: 5px;
+        text-decoration: none;
+        border: 1px solid beige;
+        background-color: beige;
+        border-radius: 5px;
+    }
+
+    .dataset-url:hover {
+        background-color: darkkhaki;
     }
 </style>
-
-<script>
-    var time_left = ${stepNode.getTimeLeft()};
-    var clock = document.getElementById("time-left");
-
-    var timerId = setTimeout(function () {
-        time_left--;
-        if (time_left <= 0) {
-            clearTimeout(timerId);
-            clock.innerHTML = "Time left";
-            return;
-        }
-        var min = time_left / 60;
-        var sec = time_left - min * 60;
-        clock.innerHTML = "Time left:" + (min > 0 ? min + " m") + sec + " s";
-    }, 1000);
-</script>
 
 <#include "base.ftl">
 
@@ -34,12 +31,49 @@
     <#assign reply_url = stepNode.getReplyUrl()/>
 
     <#if dataset_url != "">
-    <a href="${stepNode.getBaseUrl()}${dataset_url}">Download dataset</a>
+    <a class="dataset-url" href="${stepNode.getBaseUrl()}${dataset_url}">Download dataset</a>
     </#if>
 
     <#if reply_url != "" >
-    <a href="${stepNode.getBaseUrl()}${reply_url}">Download last submission dataset</a>
+    <a class="dataset-url" href="${stepNode.getBaseUrl()}${reply_url}">Download last submission dataset</a>
     </#if>
 <textarea id="text" name="value" placeholder="Input your answer here" ${disabled!""}>${stepNode.getData()}</textarea>
 
 </@quiz_content>
+
+<script>
+    var time_left = ${stepNode.getTimeLeft()};
+    var clock = document.getElementById("time-left");
+    <#if status == "active">
+    var active = true;
+    <#else>
+    var active = false;
+    </#if>
+
+    if (time_left > 0) {
+        clock.innerHTML = timeToString(time_left);
+    }
+
+    if (active) {
+        var timerId = setInterval(function () {
+            time_left--;
+
+            if (time_left <= 0) {
+                clearTimeout(timerId);
+                clock.innerHTML = "Time left (5 minutes)";
+                document.getElementById("text").setAttribute("readonly", true);
+                document.getElementById("status").setAttribute("value", "timeleft");
+                updateSubmitCaption();
+                return;
+            }
+            clock.innerHTML = timeToString(time_left);
+        }, 1000);
+    }
+
+    function timeToString(time) {
+        var min = Math.floor(time / 60);
+        var sec = time - min * 60;
+
+        return "Time left: " + (min > 0 ? min + " m " : "") + sec + " s";
+    }
+</script>

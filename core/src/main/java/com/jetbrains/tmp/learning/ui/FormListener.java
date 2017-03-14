@@ -76,6 +76,7 @@ class FormListener implements EventListener {
                     case "":
                     case "correct":
                     case "wrong":
+                    case "timeleft":
                         if (!locked) {
                             getAttempt(stepNode);
                             StudyUtils.setStudyNode(project, node, true);
