@@ -17,6 +17,7 @@ import com.intellij.ui.content.Content;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.courseFormat.StudyNode;
 import com.jetbrains.tmp.learning.courseFormat.stepHelpers.ChoiceStepNodeHelper;
+import com.jetbrains.tmp.learning.courseFormat.stepHelpers.DatasetStepNodeHelper;
 import com.jetbrains.tmp.learning.courseFormat.stepHelpers.MatchingStepNodeHelper;
 import com.jetbrains.tmp.learning.courseFormat.stepHelpers.NumberStepNodeHelper;
 import com.jetbrains.tmp.learning.courseFormat.stepHelpers.SortingStepNodeHelper;
@@ -139,6 +140,12 @@ public class StudyUtils {
     public static String getNumberStepText(@NotNull StepNode stepNode) {
         NumberStepNodeHelper stepNodeHelper = stepNode.asNumberStep();
         return processTemplate(stepNodeHelper, "quiz/number");
+    }
+
+    @NotNull
+    public static String getDatasetStepText(@NotNull StepNode stepNode) {
+        DatasetStepNodeHelper stepNodeHelper = stepNode.asDatasetStep();
+        return processTemplate(stepNodeHelper, "quiz/dataset");
     }
 
     @NotNull

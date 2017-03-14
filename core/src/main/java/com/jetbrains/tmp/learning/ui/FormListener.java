@@ -18,11 +18,13 @@ import org.stepik.api.objects.submissions.Submission;
 import org.stepik.api.objects.submissions.Submissions;
 import org.stepik.api.queries.submissions.StepikSubmissionsPostQuery;
 import org.stepik.plugin.actions.SendAction;
+import org.w3c.dom.Node;
 import org.w3c.dom.events.Event;
 import org.w3c.dom.events.EventListener;
 import org.w3c.dom.html.HTMLCollection;
 import org.w3c.dom.html.HTMLFormElement;
 import org.w3c.dom.html.HTMLInputElement;
+import org.w3c.dom.html.HTMLTextAreaElement;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -132,6 +134,10 @@ class FormListener implements EventListener {
                             String number = getStringData(elements);
                             query.number(number);
                             break;
+                        case DATASET:
+                            String dataset = getDataset(elements);
+                            query.file(dataset);
+                            break;
                         case SORTING:
                         case MATCHING:
                             List<Integer> ordering = getOrderingData(elements);
@@ -209,5 +215,18 @@ class FormListener implements EventListener {
             }
         }
         return ((HTMLInputElement) elements.namedItem("text")).getValue();
+    }
+
+    private String getDataset(@NotNull HTMLCollection elements) {
+        for (int i = 0; i < elements.getLength(); i++) {
+            Node item = elements.item(i);
+            if (item instanceof HTMLInputElement) {
+                HTMLInputElement element = ((HTMLInputElement) elements.item(i));
+                if (!"hidden".equals(element.getType())) {
+                    element.setDisabled(true);
+                }
+            }
+        }
+        return ((HTMLTextAreaElement) elements.namedItem("text")).getValue();
     }
 }
