@@ -5,13 +5,16 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.courseFormat.StepType;
 import com.jetbrains.tmp.learning.courseFormat.StudyNode;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
+import javafx.stage.FileChooser;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.submissions.Submission;
@@ -26,9 +29,15 @@ import org.w3c.dom.html.HTMLFormElement;
 import org.w3c.dom.html.HTMLInputElement;
 import org.w3c.dom.html.HTMLTextAreaElement;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
 
 class FormListener implements EventListener {
     static final String EVENT_TYPE_SUBMIT = "submit";
@@ -69,6 +78,36 @@ class FormListener implements EventListener {
             boolean locked = Boolean.valueOf(((HTMLInputElement) elements
                     .namedItem("locked")).getValue());
 
+            HTMLInputElement isFromFileElement = ((HTMLInputElement) elements.namedItem("isFromFile"));
+            boolean isFromFile = isFromFileElement != null && isFromFileElement.getValue().equals("true");
+
+            String data = null;
+            if (isFromFile) {
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.setTitle("Open file");
+                VirtualFile srcDirectory = getOrCreateSrcDirectory(project, stepNode, true);
+                if (srcDirectory != null) {
+                    File initialDir = new File(srcDirectory.getPath());
+                    fileChooser.setInitialDirectory(initialDir);
+                }
+                File file = fileChooser.showOpenDialog(null);
+                if (file != null) {
+                    try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                        StringBuilder fileData = new StringBuilder();
+                        char[] buffer = new char[1024];
+                        int number;
+                        while ((number = reader.read(buffer)) != -1) {
+                            String readData = String.valueOf(buffer, 0, number);
+                            fileData.append(readData);
+                        }
+                        reader.close();
+                        data = fileData.toString();
+                    } catch (IOException e) {
+                        logger.warn(e);
+                    }
+                }
+            }
+
             StepType type = StepType.of(typeStr);
 
             try {
@@ -76,14 +115,18 @@ class FormListener implements EventListener {
                     case "":
                     case "correct":
                     case "wrong":
-                    case "timeleft":
+                    case "timeLeft":
                         if (!locked) {
                             getAttempt(stepNode);
                             StudyUtils.setStudyNode(project, node, true);
                         }
                         break;
                     case "active":
-                        sendStep(stepNode, elements, type, attemptId);
+                        if (!isFromFile) {
+                            sendStep(stepNode, elements, type, attemptId, null);
+                        } else if (data != null) {
+                            sendStep(stepNode, elements, type, attemptId, data);
+                        }
                         break;
                     default:
                         return;
@@ -108,7 +151,8 @@ class FormListener implements EventListener {
             @NotNull StepNode stepNode,
             @NotNull HTMLCollection elements,
             @NotNull StepType type,
-            long attemptId) {
+            long attemptId,
+            @Nullable String data) {
         String title = "Checking Step: " + stepNode.getName();
 
         ProgressManager.getInstance().run(new Task.Backgroundable(project, title) {
@@ -136,7 +180,12 @@ class FormListener implements EventListener {
                             query.number(number);
                             break;
                         case DATASET:
-                            String dataset = getDataset(elements);
+                            String dataset;
+                            if (data == null) {
+                                dataset = getDataset(elements);
+                            } else {
+                                dataset = data;
+                            }
                             query.file(dataset);
                             break;
                         case SORTING:

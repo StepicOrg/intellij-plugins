@@ -2,10 +2,13 @@
 <#-- @ftlvariable name="text" type="java.lang.String" -->
 
 <style>
-    #text {
+    .row {
         display: block;
         margin: 10px auto;
         width: 100%;
+    }
+
+    #text {
         min-height: 200px;
     }
 
@@ -40,8 +43,12 @@
        data-content-type="application/txt" data-file-prefix="reply" data-file-ext=".txt">Download last submission
         dataset</a>
     </#if>
-<textarea id="text" name="value" placeholder="Input your answer here" ${disabled!""}>${stepNode.getData()}</textarea>
-
+<textarea id="text" class="row" name="value"
+          placeholder="Input your answer here" ${disabled!""}>${stepNode.getData()}</textarea>
+    <#if status == "active">
+    <input id="filename" type="submit" name="filename" value="Send file">
+    </#if>
+<input id="isFromFile" type="hidden" name="isFromFile" value="false">
 </@quiz_content>
 
 <script>
@@ -65,7 +72,8 @@
                 clearTimeout(timerId);
                 clock.innerHTML = "Time left (5 minutes)";
                 document.getElementById("text").setAttribute("readonly", true);
-                document.getElementById("status").setAttribute("value", "timeleft");
+                document.getElementById("filename").setAttribute("type", "hidden");
+                document.getElementById("status").setAttribute("value", "timeLeft");
                 updateSubmitCaption();
                 return;
             }
@@ -78,5 +86,9 @@
         var sec = time - min * 60;
 
         return "Time left: " + (min > 0 ? min + " m " : "") + sec + " s";
+    }
+
+    document.getElementById("filename").onclick = function () {
+        document.getElementById("isFromFile").setAttribute("value", "true");
     }
 </script>
