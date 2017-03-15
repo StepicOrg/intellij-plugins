@@ -31,11 +31,14 @@
     <#assign reply_url = stepNode.getReplyUrl()/>
 
     <#if dataset_url != "">
-    <a class="dataset-url" href="${stepNode.getBaseUrl()}${dataset_url}">Download dataset</a>
+    <a class="dataset-url" href="inner:${stepNode.getBaseUrl()}${dataset_url}" data-step-path="${stepNode.getPath()}"
+       data-content-type="application/txt" data-file-prefix="dataset" data-file-ext=".txt">Download dataset</a>
     </#if>
 
     <#if reply_url != "" >
-    <a class="dataset-url" href="${stepNode.getBaseUrl()}${reply_url}">Download last submission dataset</a>
+    <a class="dataset-url" href="inner:${stepNode.getBaseUrl()}${reply_url}" data-step-path="${stepNode.getPath()}"
+       data-content-type="application/txt" data-file-prefix="reply" data-file-ext=".txt">Download last submission
+        dataset</a>
     </#if>
 <textarea id="text" name="value" placeholder="Input your answer here" ${disabled!""}>${stepNode.getData()}</textarea>
 
