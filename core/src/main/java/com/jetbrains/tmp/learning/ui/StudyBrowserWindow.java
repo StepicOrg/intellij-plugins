@@ -217,50 +217,7 @@ class StudyBrowserWindow extends JFrame {
                     }
 
                     if (href.startsWith("inner:")) {
-                        href = href.substring(6);
-                        StudyNode root = StepikProjectManager.getProjectRoot(project);
-                        if (root == null) {
-                            return;
-                        }
-
-                        String stepPath = target.getAttribute("data-step-path");
-
-                        StudyNode node = StudyUtils.getStudyNode(root, stepPath);
-                        if (node == null || !(node instanceof StepNode)) {
-                            return;
-                        }
-
-                        String contentType = target.getAttribute("data-content-type");
-                        String prefix = target.getAttribute("data-file-prefix");
-                        String extension = target.getAttribute("data-file-ext");
-
-                        try {
-                            StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
-                            String content = stepikApiClient.files().get(href, contentType);
-                            VirtualFile srcDirectory = getOrCreateSrcDirectory(project, (StepNode) node, true);
-                            if (srcDirectory == null) {
-                                return;
-                            }
-                            Application application = ApplicationManager.getApplication();
-                            application.invokeLater(() -> application.runWriteAction(() -> {
-                                try {
-                                    int index = 1;
-                                    String filename = prefix + "_" + node.getId();
-                                    String currentFileName = filename + extension;
-                                    while (srcDirectory.findChild(currentFileName) != null) {
-                                        currentFileName = filename + "_" + index++ + extension;
-                                    }
-                                    VirtualFile file = srcDirectory.createChildData(null, currentFileName);
-                                    file.setBinaryContent(content.getBytes());
-                                    FileEditorManager.getInstance(project).openFile(file, false);
-                                } catch (IOException e) {
-                                    logger.warn(e);
-                                }
-                            }));
-                        } catch (StepikClientException e) {
-                            logger.warn(e);
-                        }
-
+                        browseInnerLink(target, href);
                         return;
                     }
 
@@ -273,6 +230,52 @@ class StudyBrowserWindow extends JFrame {
                     }
 
                     BrowserUtil.browse(href);
+                }
+            }
+
+            private void browseInnerLink(Element target, String href) {
+                href = href.substring(6);
+                StudyNode root = StepikProjectManager.getProjectRoot(project);
+                if (root == null) {
+                    return;
+                }
+
+                String stepPath = target.getAttribute("data-step-path");
+
+                StudyNode node = StudyUtils.getStudyNode(root, stepPath);
+                if (node == null || !(node instanceof StepNode)) {
+                    return;
+                }
+
+                String contentType = target.getAttribute("data-content-type");
+                String prefix = target.getAttribute("data-file-prefix");
+                String extension = target.getAttribute("data-file-ext");
+
+                try {
+                    StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
+                    String content = stepikApiClient.files().get(href, contentType);
+                    VirtualFile srcDirectory = getOrCreateSrcDirectory(project, (StepNode) node, true);
+                    if (srcDirectory == null) {
+                        return;
+                    }
+                    Application application = ApplicationManager.getApplication();
+                    application.invokeLater(() -> application.runWriteAction(() -> {
+                        try {
+                            int index = 1;
+                            String filename = prefix + "_" + node.getId();
+                            String currentFileName = filename + extension;
+                            while (srcDirectory.findChild(currentFileName) != null) {
+                                currentFileName = filename + "_" + index++ + extension;
+                            }
+                            VirtualFile file = srcDirectory.createChildData(null, currentFileName);
+                            file.setBinaryContent(content.getBytes());
+                            FileEditorManager.getInstance(project).openFile(file, false);
+                        } catch (IOException e) {
+                            logger.warn(e);
+                        }
+                    }));
+                } catch (StepikClientException e) {
+                    logger.warn(e);
                 }
             }
 

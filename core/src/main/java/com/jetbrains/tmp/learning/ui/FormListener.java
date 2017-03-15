@@ -29,13 +29,13 @@ import org.w3c.dom.html.HTMLFormElement;
 import org.w3c.dom.html.HTMLInputElement;
 import org.w3c.dom.html.HTMLTextAreaElement;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
 
@@ -81,32 +81,7 @@ class FormListener implements EventListener {
             HTMLInputElement isFromFileElement = ((HTMLInputElement) elements.namedItem("isFromFile"));
             boolean isFromFile = isFromFileElement != null && isFromFileElement.getValue().equals("true");
 
-            String data = null;
-            if (isFromFile) {
-                FileChooser fileChooser = new FileChooser();
-                fileChooser.setTitle("Open file");
-                VirtualFile srcDirectory = getOrCreateSrcDirectory(project, stepNode, true);
-                if (srcDirectory != null) {
-                    File initialDir = new File(srcDirectory.getPath());
-                    fileChooser.setInitialDirectory(initialDir);
-                }
-                File file = fileChooser.showOpenDialog(null);
-                if (file != null) {
-                    try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-                        StringBuilder fileData = new StringBuilder();
-                        char[] buffer = new char[1024];
-                        int number;
-                        while ((number = reader.read(buffer)) != -1) {
-                            String readData = String.valueOf(buffer, 0, number);
-                            fileData.append(readData);
-                        }
-                        reader.close();
-                        data = fileData.toString();
-                    } catch (IOException e) {
-                        logger.warn(e);
-                    }
-                }
-            }
+            String data = isFromFile ? getDataFromFile(stepNode) : null;
 
             StepType type = StepType.of(typeStr);
 
@@ -136,6 +111,27 @@ class FormListener implements EventListener {
             }
             event.preventDefault();
         }
+    }
+
+    @Nullable
+    private String getDataFromFile(StepNode stepNode) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open file");
+        VirtualFile srcDirectory = getOrCreateSrcDirectory(project, stepNode, true);
+        if (srcDirectory != null) {
+            File initialDir = new File(srcDirectory.getPath());
+            fileChooser.setInitialDirectory(initialDir);
+        }
+        File file = fileChooser.showOpenDialog(null);
+        if (file != null) {
+            try {
+                List<String> lines = Files.readAllLines(file.toPath());
+                return lines.stream().collect(Collectors.joining("\n"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
     }
 
     private void getAttempt(@NotNull StepNode node) {
