@@ -10,6 +10,7 @@ import com.jetbrains.tmp.learning.courseFormat.stepHelpers.MatchingStepNodeHelpe
 import com.jetbrains.tmp.learning.courseFormat.stepHelpers.NumberStepNodeHelper;
 import com.jetbrains.tmp.learning.courseFormat.stepHelpers.SortingStepNodeHelper;
 import com.jetbrains.tmp.learning.courseFormat.stepHelpers.StringStepNodeHelper;
+import com.jetbrains.tmp.learning.courseFormat.stepHelpers.TableStepNodeHelper;
 import com.jetbrains.tmp.learning.courseFormat.stepHelpers.VideoStepNodeHelper;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
@@ -328,6 +329,11 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
     @NotNull
     public DatasetStepNodeHelper asDatasetStep() {
         return new DatasetStepNodeHelper(this);
+    }
+
+    @NotNull
+    public TableStepNodeHelper asTableStep() {
+        return new TableStepNodeHelper(this);
     }
 
     public Long getAssignment() {

@@ -56,7 +56,6 @@ public class StepHelper {
         return true;
     }
 
-
     private boolean loadSubmission(StepikApiClient stepikApiClient, long userId) {
         Submissions submissions = stepikApiClient.submissions()
                 .get()
