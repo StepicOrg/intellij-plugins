@@ -17,6 +17,7 @@ public class Reply {
     private String text;
     private List<String> files;
     private List<Boolean> choices;
+    private List<Choice> tableChoices;
     private List<Integer> ordering;
     private String number;
     private String file;
@@ -125,7 +126,16 @@ public class Reply {
         return file;
     }
 
-    public void setFile(String file) {
+    public void setFile(@Nullable String file) {
         this.file = file;
+    }
+
+    @Nullable
+    public List<Choice> getTableChoices() {
+        return tableChoices;
+    }
+
+    public void setTableChoices(@Nullable List<Choice> tableChoices) {
+        this.tableChoices = tableChoices;
     }
 }

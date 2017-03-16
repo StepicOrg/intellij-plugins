@@ -7,9 +7,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -51,6 +53,28 @@ public class DatasetDeserializer implements JsonDeserializer<Dataset> {
             dataset.setPairs(array);
         }
 
+        dataset.setRows(getStringList(object, "rows"));
+        dataset.setColumns(getStringList(object, "columns"));
+
+        JsonPrimitive isCheckbox = object.getAsJsonPrimitive("is_checkbox");
+        if (isCheckbox != null) {
+            dataset.setCheckbox(isCheckbox.getAsBoolean());
+        }
+
+        JsonPrimitive description = object.getAsJsonPrimitive("description");
+        dataset.setDescription(description.getAsString());
+
         return dataset;
+    }
+
+    @NotNull
+    private static List<String> getStringList(@NotNull JsonObject object, @NotNull String memberName) {
+        JsonArray jsonArray = object.getAsJsonArray(memberName);
+        if (jsonArray != null) {
+            List<String> array = new ArrayList<>();
+            jsonArray.forEach(element -> array.add(element.getAsString()));
+            return array;
+        }
+        return Collections.emptyList();
     }
 }

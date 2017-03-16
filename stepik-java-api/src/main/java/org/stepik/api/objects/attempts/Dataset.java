@@ -18,6 +18,55 @@ public class Dataset {
     @SerializedName("is_text_disabled")
     private boolean textDisabled;
     private List<Pair> pairs;
+    private List<String> rows;
+    private List<String> columns;
+    @SerializedName("is_checkbox")
+    private boolean isCheckbox;
+    private String description;
+
+    @NotNull
+    public List<String> getRows() {
+        if (rows == null) {
+            rows = new ArrayList<>();
+        }
+        return rows;
+    }
+
+    public void setRows(@Nullable List<String> rows) {
+        this.rows = rows;
+    }
+
+    @NotNull
+    public List<String> getColumns() {
+        if (columns == null) {
+            columns = new ArrayList<>();
+        }
+        return columns;
+    }
+
+    public void setColumns(@Nullable List<String> columns) {
+        this.columns = columns;
+    }
+
+    public boolean isCheckbox() {
+        return isCheckbox;
+    }
+
+    public void setCheckbox(boolean checkbox) {
+        isCheckbox = checkbox;
+    }
+
+    @NotNull
+    public String getDescription() {
+        if (description == null) {
+            description = "";
+        }
+        return description;
+    }
+
+    public void setDescription(@Nullable String description) {
+        this.description = description;
+    }
 
     public boolean isMultipleChoice() {
         return multipleChoice;
@@ -47,27 +96,6 @@ public class Dataset {
         this.textDisabled = textDisabled;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Dataset dataset = (Dataset) o;
-
-        if (multipleChoice != dataset.multipleChoice) return false;
-        if (textDisabled != dataset.textDisabled) return false;
-        // Probably incorrect - comparing Object[] arrays with Arrays.equals
-        return Arrays.equals(options, dataset.options);
-    }
-
-    @Override
-    public int hashCode() {
-        int result = (multipleChoice ? 1 : 0);
-        result = 31 * result + Arrays.hashCode(options);
-        result = 31 * result + (textDisabled ? 1 : 0);
-        return result;
-    }
-
     public List<Pair> getPairs() {
         if (pairs == null) {
             pairs = new ArrayList<>();
@@ -77,5 +105,37 @@ public class Dataset {
 
     public void setPairs(List<Pair> pairs) {
         this.pairs = pairs;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Dataset dataset = (Dataset) o;
+
+        if (multipleChoice != dataset.multipleChoice) return false;
+        if (textDisabled != dataset.textDisabled) return false;
+        if (isCheckbox != dataset.isCheckbox) return false;
+        // Probably incorrect - comparing Object[] arrays with Arrays.equals
+        if (!Arrays.equals(options, dataset.options)) return false;
+        if (pairs != null ? !pairs.equals(dataset.pairs) : dataset.pairs != null) return false;
+        if (rows != null ? !rows.equals(dataset.rows) : dataset.rows != null) return false;
+        //noinspection SimplifiableIfStatement
+        if (columns != null ? !columns.equals(dataset.columns) : dataset.columns != null) return false;
+        return description != null ? description.equals(dataset.description) : dataset.description == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (multipleChoice ? 1 : 0);
+        result = 31 * result + Arrays.hashCode(options);
+        result = 31 * result + (textDisabled ? 1 : 0);
+        result = 31 * result + (pairs != null ? pairs.hashCode() : 0);
+        result = 31 * result + (rows != null ? rows.hashCode() : 0);
+        result = 31 * result + (columns != null ? columns.hashCode() : 0);
+        result = 31 * result + (isCheckbox ? 1 : 0);
+        result = 31 * result + (description != null ? description.hashCode() : 0);
+        return result;
     }
 }

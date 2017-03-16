@@ -84,7 +84,19 @@ public class ReplyDeserializer implements JsonDeserializer<Reply> {
 
         reply.setAttachments(getStringList(object, "attachments"));
         reply.setFiles(getStringList(object, "files"));
-        reply.setChoices(getList(object, "choices", JsonElement::getAsBoolean));
+
+        JsonArray choices = object.getAsJsonArray("choices");
+        if (choices != null && choices.size() > 0) {
+            if (choices.get(0).isJsonPrimitive()) {
+                List<Boolean> list = new ArrayList<>();
+                choices.forEach(item -> list.add(item.getAsBoolean()));
+                reply.setChoices(list);
+            } else {
+                List<Choice> list = new ArrayList<>();
+                choices.forEach(item -> list.add(context.deserialize(item, Choice.class)));
+                reply.setTableChoices(list);
+            }
+        }
 
         return reply;
     }
