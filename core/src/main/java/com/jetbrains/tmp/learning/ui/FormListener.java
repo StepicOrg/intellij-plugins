@@ -17,6 +17,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.exceptions.StepikClientException;
+import org.stepik.api.objects.submissions.Choice;
+import org.stepik.api.objects.submissions.Column;
 import org.stepik.api.objects.submissions.Submission;
 import org.stepik.api.objects.submissions.Submissions;
 import org.stepik.api.queries.submissions.StepikSubmissionsPostQuery;
@@ -34,7 +36,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
@@ -184,6 +189,10 @@ class FormListener implements EventListener {
                             }
                             query.file(dataset);
                             break;
+                        case TABLE:
+                            List tableChoices = getChoices(elements);
+                            query.choices(tableChoices);
+                            break;
                         case SORTING:
                         case MATCHING:
                             List<Integer> ordering = getOrderingData(elements);
@@ -274,5 +283,36 @@ class FormListener implements EventListener {
             }
         }
         return ((HTMLTextAreaElement) elements.namedItem("text")).getValue();
+    }
+
+    @NotNull
+    private List<Choice> getChoices(@NotNull HTMLCollection elements) {
+        Map<String, List<Column>> choices = new HashMap<>();
+        List<String> rows = new ArrayList<>();
+
+        for (int i = 0; i < elements.getLength(); i++) {
+            Node item = elements.item(i);
+            if (item instanceof HTMLInputElement) {
+                HTMLInputElement element = ((HTMLInputElement) elements.item(i));
+                String type = element.getType();
+
+                if ("checkbox".equals(type) || "radio".equals(type)) {
+                    List<Column> columns = choices.computeIfAbsent(element.getName(), k -> {
+                        rows.add(k);
+                        return new ArrayList<>();
+                    });
+                    Column column = new Column(element.getValue(), element.getChecked());
+                    columns.add(column);
+                }
+                if (!"hidden".equals(type)) {
+                    element.setDisabled(true);
+                }
+            }
+        }
+
+        return choices.entrySet().stream()
+                .map(entry -> new Choice(entry.getKey(), entry.getValue()))
+                .sorted(Comparator.comparingInt(choice -> rows.indexOf(choice.getNameRow())))
+                .collect(Collectors.toList());
     }
 }

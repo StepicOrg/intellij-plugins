@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -16,8 +17,7 @@ public class Reply {
     private List<String> attachments;
     private String text;
     private List<String> files;
-    private List<Boolean> choices;
-    private List<Choice> tableChoices;
+    private List choices;
     private List<Integer> ordering;
     private String number;
     private String file;
@@ -93,10 +93,14 @@ public class Reply {
         if (choices == null) {
             choices = new ArrayList<>();
         }
+        if (choices.size() > 1 && !(choices.get(0) instanceof Boolean)) {
+            return Collections.emptyList();
+        }
+        //noinspection unchecked
         return choices;
     }
 
-    public void setChoices(@Nullable List<Boolean> choices) {
+    public void setChoices(@Nullable List choices) {
         this.choices = choices;
     }
 
@@ -130,12 +134,15 @@ public class Reply {
         this.file = file;
     }
 
-    @Nullable
+    @NotNull
     public List<Choice> getTableChoices() {
-        return tableChoices;
-    }
-
-    public void setTableChoices(@Nullable List<Choice> tableChoices) {
-        this.tableChoices = tableChoices;
+        if (choices == null) {
+            choices = new ArrayList<>();
+        }
+        if (choices.size() > 1 && !(choices.get(0) instanceof Choice)) {
+            return Collections.emptyList();
+        }
+        //noinspection unchecked
+        return choices;
     }
 }

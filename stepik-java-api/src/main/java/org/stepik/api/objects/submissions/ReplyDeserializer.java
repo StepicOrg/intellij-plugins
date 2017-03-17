@@ -94,7 +94,7 @@ public class ReplyDeserializer implements JsonDeserializer<Reply> {
             } else {
                 List<Choice> list = new ArrayList<>();
                 choices.forEach(item -> list.add(context.deserialize(item, Choice.class)));
-                reply.setTableChoices(list);
+                reply.setChoices(list);
             }
         }
 

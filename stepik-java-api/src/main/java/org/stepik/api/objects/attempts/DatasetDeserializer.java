@@ -19,6 +19,17 @@ import java.util.List;
  */
 public class DatasetDeserializer implements JsonDeserializer<Dataset> {
 
+    @NotNull
+    private static List<String> getStringList(@NotNull JsonObject object, @NotNull String memberName) {
+        JsonArray jsonArray = object.getAsJsonArray(memberName);
+        if (jsonArray != null) {
+            List<String> array = new ArrayList<>();
+            jsonArray.forEach(element -> array.add(element.getAsString()));
+            return array;
+        }
+        return Collections.emptyList();
+    }
+
     @Override
     public Dataset deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
             throws JsonParseException {
@@ -62,19 +73,10 @@ public class DatasetDeserializer implements JsonDeserializer<Dataset> {
         }
 
         JsonPrimitive description = object.getAsJsonPrimitive("description");
-        dataset.setDescription(description.getAsString());
+        if (description != null) {
+            dataset.setDescription(description.getAsString());
+        }
 
         return dataset;
-    }
-
-    @NotNull
-    private static List<String> getStringList(@NotNull JsonObject object, @NotNull String memberName) {
-        JsonArray jsonArray = object.getAsJsonArray(memberName);
-        if (jsonArray != null) {
-            List<String> array = new ArrayList<>();
-            jsonArray.forEach(element -> array.add(element.getAsString()));
-            return array;
-        }
-        return Collections.emptyList();
     }
 }
