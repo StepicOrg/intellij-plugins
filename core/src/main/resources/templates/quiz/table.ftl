@@ -15,6 +15,11 @@
     .table td:first-child {
         text-align: left;
     }
+
+    .table td,
+    .table th {
+        border-bottom: 1px solid darkgray;
+    }
 </style>
 
 <#include "base.ftl">
