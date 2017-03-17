@@ -57,6 +57,12 @@ public class StepikSubmissionsPostQuery extends StepikAbstractPostQuery<Submissi
     }
 
     @NotNull
+    public StepikSubmissionsPostQuery blanks(@Nullable List<String> blanks) {
+        submissions.getSubmission().getReply().setBlanks(blanks);
+        return this;
+    }
+
+    @NotNull
     public StepikSubmissionsPostQuery ordering(List<Integer> ordering) {
         submissions.getSubmission().getReply().setOrdering(ordering);
         return this;

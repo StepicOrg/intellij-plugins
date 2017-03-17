@@ -48,7 +48,7 @@ public class SendAction {
         indicator.setIndeterminate(false);
 
         Submission currentSubmission = null;
-        while (EVALUATION.equals(stepStatus) && timer < FIVE_MINUTES) {
+        while (timer < FIVE_MINUTES) {
             try {
                 Submissions submission = stepikApiClient.submissions()
                         .get()
@@ -59,6 +59,9 @@ public class SendAction {
                     currentSubmission = submission.getSubmissions().get(0);
                     ActionUtils.setupCheckProgress(indicator, currentSubmission, timer);
                     stepStatus = currentSubmission.getStatus();
+                    if (!EVALUATION.equals(stepStatus)) {
+                        break;
+                    }
                 }
 
                 Thread.sleep(PERIOD);

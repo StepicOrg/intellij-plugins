@@ -29,17 +29,19 @@ import org.w3c.dom.events.EventListener;
 import org.w3c.dom.html.HTMLCollection;
 import org.w3c.dom.html.HTMLFormElement;
 import org.w3c.dom.html.HTMLInputElement;
+import org.w3c.dom.html.HTMLSelectElement;
 import org.w3c.dom.html.HTMLTextAreaElement;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
@@ -57,51 +59,40 @@ class FormListener implements EventListener {
     public void handleEvent(Event event) {
         String domEventType = event.getType();
         if (EVENT_TYPE_SUBMIT.equals(domEventType)) {
-            HTMLFormElement form = (HTMLFormElement) event.getTarget();
-
             StudyNode root = StepikProjectManager.getProjectRoot(project);
             if (root == null) {
                 return;
             }
 
+            HTMLFormElement form = (HTMLFormElement) event.getTarget();
+
             StudyNode node = StudyUtils.getStudyNode(root, form.getAction());
-            if (node == null || !(node instanceof StepNode)) {
+            if (!(node instanceof StepNode)) {
                 return;
             }
 
             StepNode stepNode = (StepNode) node;
-
-            HTMLCollection elements = form.getElements();
-
-            String status = ((HTMLInputElement) elements.namedItem("status")).getValue();
-            long attemptId = Long.parseLong(((HTMLInputElement) elements
-                    .namedItem("attemptId")).getValue());
-
-            String typeStr = ((HTMLInputElement) elements
-                    .namedItem("type")).getValue();
-
-            boolean locked = Boolean.valueOf(((HTMLInputElement) elements
-                    .namedItem("locked")).getValue());
-
-            HTMLInputElement isFromFileElement = ((HTMLInputElement) elements.namedItem("isFromFile"));
-            boolean isFromFile = isFromFileElement != null && isFromFileElement.getValue().equals("true");
-
-            String data = isFromFile ? getDataFromFile(stepNode) : null;
-
-            StepType type = StepType.of(typeStr);
+            Elements elements = new Elements(form.getElements());
 
             try {
-                switch (status) {
+                switch (elements.getStatus()) {
                     case "":
                     case "correct":
                     case "wrong":
                     case "timeLeft":
+                        boolean locked = elements.isLocked();
                         if (!locked) {
                             getAttempt(stepNode);
                             StudyUtils.setStudyNode(project, node, true);
                         }
                         break;
                     case "active":
+                        String typeStr = elements.getType();
+                        StepType type = StepType.of(typeStr);
+                        boolean isFromFile = elements.isFromFile();
+                        String data = isFromFile ? getDataFromFile(stepNode) : null;
+                        long attemptId = elements.getAttemptId();
+
                         if (!isFromFile) {
                             sendStep(stepNode, elements, type, attemptId, null);
                         } else if (data != null) {
@@ -150,7 +141,7 @@ class FormListener implements EventListener {
 
     private void sendStep(
             @NotNull StepNode stepNode,
-            @NotNull HTMLCollection elements,
+            @NotNull Elements elements,
             @NotNull StepType type,
             long attemptId,
             @Nullable String data) {
@@ -183,7 +174,7 @@ class FormListener implements EventListener {
                         case DATASET:
                             String dataset;
                             if (data == null) {
-                                dataset = getDataset(elements);
+                                dataset = getStringData(elements);
                             } else {
                                 dataset = data;
                             }
@@ -193,11 +184,18 @@ class FormListener implements EventListener {
                             List tableChoices = getChoices(elements);
                             query.choices(tableChoices);
                             break;
+                        case FILL_BLANKS:
+                            List<String> blanks = getBlanks(elements);
+                            query.blanks(blanks);
+                            break;
                         case SORTING:
                         case MATCHING:
                             List<Integer> ordering = getOrderingData(elements);
                             query.ordering(ordering);
                             break;
+                        default:
+                            logger.warn("Unknown step type tried sending: " + type);
+                            return;
                     }
 
                     Submissions submissions = query.execute();
@@ -214,105 +212,177 @@ class FormListener implements EventListener {
         });
     }
 
-    @NotNull
-    private List<Boolean> getChoiceData(@NotNull HTMLCollection elements) {
-        HTMLInputElement countElement = (HTMLInputElement) elements.namedItem("count");
-        if (countElement == null) {
-            return Collections.emptyList();
-        }
-
-        int count = Integer.parseInt(countElement.getValue());
-        List<Boolean> choices = new ArrayList<>(count);
-        for (int i = 0; i < elements.getLength(); i++) {
-            HTMLInputElement option = ((HTMLInputElement) elements.item(i));
-            if (option != null) {
-                if ("option".equals(option.getName())) {
-                    choices.add(option.getChecked());
-                }
-                if (!"hidden".equals(option.getType())) {
-                    option.setDisabled(true);
-                }
+    private void forEachInputElement(@NotNull Elements elements, Consumer<HTMLInputElement> consumer) {
+        for (Node node : elements) {
+            if (node instanceof HTMLInputElement) {
+                HTMLInputElement element = (HTMLInputElement) node;
+                consumer.accept(element);
+                element.setDisabled(true);
             }
         }
+    }
+
+    private void disableAllInputs(@NotNull Elements elements) {
+        for (Node node : elements) {
+            if (node instanceof HTMLInputElement) {
+                HTMLInputElement element = (HTMLInputElement) node;
+                element.setDisabled(true);
+            } else if (node instanceof HTMLTextAreaElement) {
+                HTMLTextAreaElement element = (HTMLTextAreaElement) node;
+                element.setDisabled(true);
+            }
+        }
+    }
+
+    @NotNull
+    private List<Boolean> getChoiceData(@NotNull Elements elements) {
+        List<Boolean> choices = new ArrayList<>();
+
+        forEachInputElement(elements, element -> {
+            if ("option".equals(element.getName())) {
+                choices.add(element.getChecked());
+            }
+        });
+
         return choices;
     }
 
     @NotNull
-    private List<Integer> getOrderingData(@NotNull HTMLCollection elements) {
-        HTMLInputElement countElement = (HTMLInputElement) elements.namedItem("count");
-        if (countElement == null) {
-            return Collections.emptyList();
-        }
+    private List<Integer> getOrderingData(@NotNull Elements elements) {
+        List<Integer> ordering = new ArrayList<>();
 
-        int count = Integer.parseInt(countElement.getValue());
-        List<Integer> ordering = new ArrayList<>(count);
-        for (int i = 0; i < elements.getLength(); i++) {
-
-            HTMLInputElement option = ((HTMLInputElement) elements.item(i));
-            if (option != null) {
-                if ("index".equals(option.getName())) {
-                    String indexAttr = option.getValue();
-                    ordering.add(Integer.valueOf(indexAttr));
-                }
-                if (!"hidden".equals(option.getType())) {
-                    option.setDisabled(true);
-                }
+        forEachInputElement(elements, element -> {
+            if ("index".equals(element.getName())) {
+                String indexAttr = element.getValue();
+                ordering.add(Integer.valueOf(indexAttr));
             }
-        }
+        });
         return ordering;
     }
 
-    private String getStringData(@NotNull HTMLCollection elements) {
-        for (int i = 0; i < elements.getLength(); i++) {
-            HTMLInputElement element = ((HTMLInputElement) elements.item(i));
-            if (!"hidden".equals(element.getType())) {
-                element.setDisabled(true);
-            }
-        }
-        return ((HTMLInputElement) elements.namedItem("text")).getValue();
-    }
-
-    private String getDataset(@NotNull HTMLCollection elements) {
-        for (int i = 0; i < elements.getLength(); i++) {
-            Node item = elements.item(i);
-            if (item instanceof HTMLInputElement) {
-                HTMLInputElement element = ((HTMLInputElement) elements.item(i));
-                if (!"hidden".equals(element.getType())) {
-                    element.setDisabled(true);
-                }
-            }
-        }
-        return ((HTMLTextAreaElement) elements.namedItem("text")).getValue();
+    private String getStringData(@NotNull Elements elements) {
+        disableAllInputs(elements);
+        return elements.getInputValue("text");
     }
 
     @NotNull
-    private List<Choice> getChoices(@NotNull HTMLCollection elements) {
+    private List<Choice> getChoices(@NotNull Elements elements) {
         Map<String, List<Column>> choices = new HashMap<>();
         List<String> rows = new ArrayList<>();
 
-        for (int i = 0; i < elements.getLength(); i++) {
-            Node item = elements.item(i);
-            if (item instanceof HTMLInputElement) {
-                HTMLInputElement element = ((HTMLInputElement) elements.item(i));
-                String type = element.getType();
+        forEachInputElement(elements, element -> {
+            String type = element.getType();
 
-                if ("checkbox".equals(type) || "radio".equals(type)) {
-                    List<Column> columns = choices.computeIfAbsent(element.getName(), k -> {
-                        rows.add(k);
-                        return new ArrayList<>();
-                    });
-                    Column column = new Column(element.getValue(), element.getChecked());
-                    columns.add(column);
-                }
-                if (!"hidden".equals(type)) {
-                    element.setDisabled(true);
-                }
+            if ("checkbox".equals(type) || "radio".equals(type)) {
+                List<Column> columns = choices.computeIfAbsent(element.getName(), k -> {
+                    rows.add(k);
+                    return new ArrayList<>();
+                });
+                Column column = new Column(element.getValue(), element.getChecked());
+                columns.add(column);
             }
-        }
+        });
 
         return choices.entrySet().stream()
                 .map(entry -> new Choice(entry.getKey(), entry.getValue()))
                 .sorted(Comparator.comparingInt(choice -> rows.indexOf(choice.getNameRow())))
                 .collect(Collectors.toList());
+    }
+
+    private List<String> getBlanks(@NotNull Elements elements) {
+        List<String> blanks = new ArrayList<>();
+
+        for (Node node : elements) {
+            if (node instanceof HTMLInputElement) {
+                HTMLInputElement element = (HTMLInputElement) node;
+                String type = element.getType();
+                if ("text".equals(type)) {
+                    blanks.add(element.getValue());
+                }
+                element.setDisabled(true);
+            } else if (node instanceof HTMLSelectElement) {
+                HTMLSelectElement element = (HTMLSelectElement) node;
+                blanks.add(element.getValue());
+                element.setDisabled(true);
+            }
+        }
+
+        return blanks;
+    }
+
+    class Elements implements Iterable<Node> {
+        private final HTMLCollection elements;
+
+        Elements(@NotNull HTMLCollection elements) {
+            this.elements = elements;
+        }
+
+        @NotNull
+        String getStatus() {
+            Node item = elements.namedItem("status");
+            if (item instanceof HTMLInputElement) {
+                return ((HTMLInputElement) item).getValue();
+            }
+
+            return "";
+        }
+
+        @NotNull
+        String getType() {
+            Node item = elements.namedItem("type");
+            if (item instanceof HTMLInputElement) {
+                return ((HTMLInputElement) item).getValue();
+            }
+
+            return "";
+        }
+
+        @NotNull
+        String getInputValue(@NotNull String name) {
+            Node item = elements.namedItem(name);
+            if (item instanceof HTMLInputElement) {
+                return ((HTMLInputElement) item).getValue();
+            } else if (item instanceof HTMLTextAreaElement) {
+                return ((HTMLTextAreaElement) item).getValue();
+            }
+            return "";
+        }
+
+        boolean isFromFile() {
+            HTMLInputElement element = ((HTMLInputElement) elements.namedItem("isFromFile"));
+            return element != null && "true".equals(element.getValue());
+        }
+
+        long getAttemptId() {
+            String value = getInputValue("attemptId");
+            try {
+                return Long.parseLong(value);
+            } catch (NumberFormatException e) {
+                return 0L;
+            }
+        }
+
+        Boolean isLocked() {
+            return Boolean.valueOf(getInputValue("locked"));
+        }
+
+        @Override
+        public Iterator<Node> iterator() {
+            return new Iterator<Node>() {
+                private final int size = elements.getLength();
+                private int index;
+
+                @Override
+                public boolean hasNext() {
+                    return index < size;
+                }
+
+                @NotNull
+                @Override
+                public Node next() {
+                    return elements.item(index++);
+                }
+            };
+        }
     }
 }
