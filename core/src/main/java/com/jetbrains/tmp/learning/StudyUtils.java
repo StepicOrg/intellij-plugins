@@ -156,6 +156,12 @@ public class StudyUtils {
     }
 
     @NotNull
+    public static String getFillBlanksStepText(@NotNull StepNode stepNode) {
+        StepHelper stepNodeHelper = stepNode.asStepHelper();
+        return processTemplate(stepNodeHelper, "quiz/fill-blanks");
+    }
+
+    @NotNull
     private static String processTemplate(@NotNull StepHelper stepNodeHelper, @NotNull String templateName) {
         String text = getTextStepText(stepNodeHelper.getStepNode());
 
@@ -189,7 +195,7 @@ public class StudyUtils {
     @NotNull
     public static String getUnknownStepText(@NotNull StepNode stepNode) {
         Step data = stepNode.getData();
-        String stepType = data != null ? data.getBlock().getName() : stepNode.getType().toString();
+        String stepType = data != null ? data.getBlock().getName() : stepNode.getType().getName();
         return getStepText(stepNode, UNKNOWN_STEP_TEXT, stepType);
     }
 
@@ -269,7 +275,7 @@ public class StudyUtils {
     }
 
     @Nullable
-    public static StudyNode getSelectedNode(@NotNull Project project) {
+    static StudyNode getSelectedNode(@NotNull Project project) {
         StudyNode studyNode = getSelectedStep(project);
 
         if (studyNode == null) {

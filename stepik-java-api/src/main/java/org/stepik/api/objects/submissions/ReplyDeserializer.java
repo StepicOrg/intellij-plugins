@@ -98,6 +98,8 @@ public class ReplyDeserializer implements JsonDeserializer<Reply> {
             }
         }
 
+        reply.setBlanks(getStringList(object, "blanks"));
+
         return reply;
     }
 }

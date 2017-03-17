@@ -9,6 +9,7 @@ import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.attempts.Attempt;
 import org.stepik.api.objects.attempts.Attempts;
+import org.stepik.api.objects.attempts.Component;
 import org.stepik.api.objects.attempts.Dataset;
 import org.stepik.api.objects.submissions.Reply;
 import org.stepik.api.objects.submissions.Submission;
@@ -16,6 +17,8 @@ import org.stepik.api.objects.submissions.Submissions;
 import org.stepik.api.objects.users.User;
 import org.stepik.api.queries.Order;
 import org.stepik.api.urls.Urls;
+
+import java.util.List;
 
 /**
  * @author meanmail
@@ -31,8 +34,9 @@ public class StepHelper {
     private Attempt attempt = new Attempt();
     private int submissionsCount = -1;
     private Submission submission;
+    private boolean inited;
 
-    StepHelper(@NotNull StepNode stepNode) {
+    public StepHelper(@NotNull StepNode stepNode) {
         this.stepNode = stepNode;
     }
 
@@ -150,7 +154,7 @@ public class StepHelper {
     }
 
     boolean needInit() {
-        return true;
+        return !inited;
     }
 
     void onStartInit() {
@@ -163,9 +167,11 @@ public class StepHelper {
     }
 
     void onFinishInit() {
+        inited = true;
     }
 
     void onInitFailed() {
+        inited = false;
     }
 
     public int getSubmissionsCount() {
@@ -195,7 +201,18 @@ public class StepHelper {
         return submissionsCount;
     }
 
+    @NotNull
     public String getType() {
-        return stepNode.getType().toString().toLowerCase();
+        return stepNode.getType().getName();
+    }
+
+    @NotNull
+    public List<Component> getComponents() {
+        return getDataset().getComponents();
+    }
+
+    public List<String> getBlanks() {
+        initStepOptions();
+        return reply.getBlanks();
     }
 }

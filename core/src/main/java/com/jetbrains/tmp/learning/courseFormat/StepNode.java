@@ -9,6 +9,7 @@ import com.jetbrains.tmp.learning.courseFormat.stepHelpers.DatasetStepNodeHelper
 import com.jetbrains.tmp.learning.courseFormat.stepHelpers.MatchingStepNodeHelper;
 import com.jetbrains.tmp.learning.courseFormat.stepHelpers.NumberStepNodeHelper;
 import com.jetbrains.tmp.learning.courseFormat.stepHelpers.SortingStepNodeHelper;
+import com.jetbrains.tmp.learning.courseFormat.stepHelpers.StepHelper;
 import com.jetbrains.tmp.learning.courseFormat.stepHelpers.StringStepNodeHelper;
 import com.jetbrains.tmp.learning.courseFormat.stepHelpers.TableStepNodeHelper;
 import com.jetbrains.tmp.learning.courseFormat.stepHelpers.VideoStepNodeHelper;
@@ -356,5 +357,9 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
             }
         }
         return assignment;
+    }
+
+    public StepHelper asStepHelper() {
+        return new StepHelper(this);
     }
 }
