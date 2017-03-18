@@ -29,7 +29,7 @@ public class StudyJavaFxToolWindow extends StudyToolWindow {
 
     @Override
     public JComponent createStepInfoPanel(Project project) {
-        browserWindow = new StudyBrowserWindow(project, true, false);
+        browserWindow = new StudyBrowserWindow(project);
         browserWindow.addBackAndOpenButtons();
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
