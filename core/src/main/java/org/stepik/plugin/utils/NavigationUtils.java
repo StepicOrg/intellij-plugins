@@ -12,7 +12,7 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFileSystemItem;
 import com.intellij.psi.PsiManager;
 import com.intellij.util.ui.tree.TreeUtil;
-import com.jetbrains.tmp.learning.StudyUtils;
+import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.courseFormat.StudyNode;
 import org.jetbrains.annotations.NotNull;
@@ -68,8 +68,7 @@ public class NavigationUtils {
             updateProjectView(project, mainFile);
         }
         Metrics.navigateAction(project, targetNode, SUCCESSFUL);
-
-        StudyUtils.setStudyNode(project, targetNode);
+        StepikProjectManager.setSelected(project, targetNode);
 
         ToolWindow runToolWindow = ToolWindowManager.getInstance(project).getToolWindow(ToolWindowId.RUN);
         if (runToolWindow != null) {

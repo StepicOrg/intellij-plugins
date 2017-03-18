@@ -51,10 +51,8 @@ public class StudyProjectComponent implements ProjectComponent {
         if (!StepikProjectManager.isStepikProject(project)) {
             return;
         }
-        // Check if user has javafx lib in his JDK. Now bundled JDK doesn't have this lib inside.
-        if (StudyUtils.hasJavaFx()) {
-            Platform.setImplicitExit(false);
-        }
+
+        Platform.setImplicitExit(false);
 
         registerStudyToolWindow();
         ApplicationManager.getApplication().invokeLater(

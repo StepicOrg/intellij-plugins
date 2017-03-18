@@ -6,6 +6,7 @@ import com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
+import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.courseFormat.StudyNode;
 import org.jetbrains.annotations.NotNull;
@@ -69,7 +70,7 @@ class StepikDirectoryNode extends PsiDirectoryNode {
         StudyNode studyNode;
         if (virtualFile != null) {
             studyNode = StudyUtils.getStudyNode(myProject, virtualFile);
-            StudyUtils.setStudyNode(myProject, studyNode);
+            StepikProjectManager.setSelected(myProject, studyNode);
         }
     }
 }
