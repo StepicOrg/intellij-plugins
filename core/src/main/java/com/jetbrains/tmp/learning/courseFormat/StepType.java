@@ -21,7 +21,8 @@ public enum StepType {
     NUMBER("number"),
     DATASET("dataset"),
     TABLE("table"),
-    FILL_BLANKS("fill-blanks");
+    FILL_BLANKS("fill-blanks"),
+    MATH("math");
 
     private static Map<String, StepType> map;
     private final String name;

@@ -45,6 +45,7 @@ import static com.jetbrains.tmp.learning.StudyUtils.getCodeStepText;
 import static com.jetbrains.tmp.learning.StudyUtils.getDatasetStepText;
 import static com.jetbrains.tmp.learning.StudyUtils.getFillBlanksStepText;
 import static com.jetbrains.tmp.learning.StudyUtils.getMatchingStepText;
+import static com.jetbrains.tmp.learning.StudyUtils.getMathStepText;
 import static com.jetbrains.tmp.learning.StudyUtils.getNumberStepText;
 import static com.jetbrains.tmp.learning.StudyUtils.getSortingStepText;
 import static com.jetbrains.tmp.learning.StudyUtils.getStringStepText;
@@ -253,6 +254,9 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
                 break;
             case FILL_BLANKS:
                 text = getFillBlanksStepText(stepNode);
+                break;
+            case MATH:
+                text = getMathStepText(stepNode);
                 break;
             default:
                 text = EMPTY_STEP_TEXT;

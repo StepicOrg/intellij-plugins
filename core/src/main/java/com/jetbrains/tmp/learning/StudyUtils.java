@@ -162,6 +162,12 @@ public class StudyUtils {
     }
 
     @NotNull
+    public static String getMathStepText(@NotNull StepNode stepNode) {
+        StepHelper stepNodeHelper = stepNode.asStepHelper();
+        return processTemplate(stepNodeHelper, "quiz/math");
+    }
+
+    @NotNull
     private static String processTemplate(@NotNull StepHelper stepNodeHelper, @NotNull String templateName) {
         String text = getTextStepText(stepNodeHelper.getStepNode());
 

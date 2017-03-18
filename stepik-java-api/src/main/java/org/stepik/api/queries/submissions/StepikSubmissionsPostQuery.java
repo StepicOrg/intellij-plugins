@@ -39,6 +39,12 @@ public class StepikSubmissionsPostQuery extends StepikAbstractPostQuery<Submissi
     }
 
     @NotNull
+    public StepikSubmissionsPostQuery formula(@Nullable String formula) {
+        submissions.getSubmission().getReply().setFormula(formula);
+        return this;
+    }
+
+    @NotNull
     public StepikSubmissionsPostQuery number(@Nullable String number) {
         submissions.getSubmission().getReply().setNumber(number);
         return this;

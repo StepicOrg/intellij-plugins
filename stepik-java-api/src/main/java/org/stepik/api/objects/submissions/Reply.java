@@ -47,8 +47,11 @@ public class Reply {
         this.code = code;
     }
 
-    @Nullable
+    @NotNull
     public String getFormula() {
+        if (formula == null) {
+            formula = "";
+        }
         return formula;
     }
 
