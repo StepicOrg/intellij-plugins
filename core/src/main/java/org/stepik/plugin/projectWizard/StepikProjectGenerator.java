@@ -53,7 +53,7 @@ public class StepikProjectGenerator {
     }
 
     @NotNull
-    private static List<StudyObject> getCourses(@NotNull SupportedLanguages programmingLanguage) {
+    public static List<StudyObject> getCourses(@NotNull SupportedLanguages programmingLanguage) {
         List<StudyObject> courses = new ArrayList<>();
         List<Long> coursesIds = getHardcodedCoursesId(programmingLanguage);
 
@@ -115,25 +115,6 @@ public class StepikProjectGenerator {
         }
 
         return Collections.emptyList();
-    }
-
-    @NotNull
-    public static List<StudyObject> getCoursesUnderProgress(
-            @NotNull final Project project,
-            @NotNull SupportedLanguages programmingLanguage) {
-        try {
-            return ProgressManager.getInstance()
-                    .runProcessWithProgressSynchronously(() -> {
-                        ProgressManager.getInstance().getProgressIndicator().setIndeterminate(true);
-                        List<StudyObject> courses = getCourses(programmingLanguage);
-                        if (courses.isEmpty()) {
-                            courses.add(EMPTY_STUDY_OBJECT);
-                        }
-                        return courses;
-                    }, "Refreshing Course List", true, project);
-        } catch (RuntimeException e) {
-            return Collections.singletonList(EMPTY_STUDY_OBJECT);
-        }
     }
 
     public void createCourseNodeUnderProgress(@NotNull final Project project, @NotNull StudyObject data) {

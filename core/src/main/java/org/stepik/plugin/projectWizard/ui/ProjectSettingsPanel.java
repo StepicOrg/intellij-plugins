@@ -17,7 +17,6 @@ import java.util.List;
 
 public class ProjectSettingsPanel implements ProjectSetting, HierarchyListener {
     private static final Logger logger = Logger.getInstance(ProjectSettingsPanel.class);
-    private final Project project;
     private final List<ProjectSettingListener> listeners = new ArrayList<>();
     private JPanel mainPanel;
     private JLabel nameLabel;
@@ -33,7 +32,6 @@ public class ProjectSettingsPanel implements ProjectSetting, HierarchyListener {
     private StudyObject selectedStudyObject = StepikProjectGenerator.EMPTY_STUDY_OBJECT;
 
     public ProjectSettingsPanel(@NotNull Project project, boolean visibleLangBox) {
-        this.project = project;
         refreshListButton.setTarget(courseListComboBox, project);
         courseListComboBox.setTarget(this);
 
@@ -63,7 +61,7 @@ public class ProjectSettingsPanel implements ProjectSetting, HierarchyListener {
         logger.info("Start updating settings");
         StepikConnectorLogin.authentication();
         setUsername();
-        courseListComboBox.refresh(project, langComboBox.getSelectedItem());
+        courseListComboBox.refresh(langComboBox.getSelectedItem());
         logger.info("Updating settings is done");
     }
 
@@ -101,7 +99,7 @@ public class ProjectSettingsPanel implements ProjectSetting, HierarchyListener {
 
     @Override
     public void selectedProgrammingLanguage(@NotNull SupportedLanguages language) {
-        courseListComboBox.refresh(project, language);
+        courseListComboBox.refresh(language);
     }
 
     @NotNull

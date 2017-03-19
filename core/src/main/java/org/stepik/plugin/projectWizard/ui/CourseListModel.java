@@ -1,6 +1,5 @@
 package org.stepik.plugin.projectWizard.ui;
 
-import com.intellij.openapi.project.Project;
 import com.jetbrains.tmp.learning.SupportedLanguages;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -12,12 +11,17 @@ import javax.swing.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
+
+import static org.stepik.plugin.projectWizard.StepikProjectGenerator.EMPTY_STUDY_OBJECT;
 
 /**
  * @author meanmail
  */
 class CourseListModel extends AbstractListModel<StudyObject> implements ComboBoxModel<StudyObject>, Serializable {
+    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final List<StudyObject> courses = new ArrayList<>();
     private Object selectedItem;
 
@@ -32,33 +36,42 @@ class CourseListModel extends AbstractListModel<StudyObject> implements ComboBox
         if (index >= 0 && index < courses.size()) {
             return courses.get(index);
         } else {
-            return StepikProjectGenerator.EMPTY_STUDY_OBJECT;
+            return EMPTY_STUDY_OBJECT;
         }
     }
 
-    void update(@NotNull Project project, @NotNull SupportedLanguages programmingLanguage) {
-        List<StudyObject> newCourseList = StepikProjectGenerator.getCoursesUnderProgress(project, programmingLanguage);
-        StudyObject selectedCourse = getSelectedItem();
-        courses.clear();
+    void update(@NotNull SupportedLanguages programmingLanguage) {
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                List<StudyObject> newCourseList = StepikProjectGenerator.getCourses(programmingLanguage);
 
-        if (!newCourseList.isEmpty()) {
-            courses.addAll(newCourseList);
-            if (selectedCourse == StepikProjectGenerator.EMPTY_STUDY_OBJECT || !courses.contains(selectedCourse)) {
-                selectedCourse = courses.get(0);
+                StudyObject selectedCourse = getSelectedItem();
+                courses.clear();
+
+                if (!newCourseList.isEmpty()) {
+                    courses.addAll(newCourseList);
+                    if (selectedCourse == EMPTY_STUDY_OBJECT || !courses.contains(selectedCourse)) {
+                        selectedCourse = courses.get(0);
+                    }
+                } else {
+                    courses.add(EMPTY_STUDY_OBJECT);
+                }
+
+                StudyObject finalSelectedCourse = selectedCourse;
+                SwingUtilities.invokeLater(() -> {
+                    setSelectedItem(finalSelectedCourse);
+                    fireIntervalAdded(this, 0, getSize() - 1);
+                });
             }
-        } else {
-            courses.add(StepikProjectGenerator.EMPTY_STUDY_OBJECT);
-        }
-
-        setSelectedItem(selectedCourse);
-        fireIntervalAdded(this, 0, getSize() - 1);
+        });
     }
 
     @NotNull
     @Override
     public StudyObject getSelectedItem() {
-        if (selectedItem == null || !(selectedItem instanceof StudyObject)) {
-            return StepikProjectGenerator.EMPTY_STUDY_OBJECT;
+        if (!(selectedItem instanceof StudyObject)) {
+            return EMPTY_STUDY_OBJECT;
         }
         return (StudyObject) selectedItem;
     }

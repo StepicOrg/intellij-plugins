@@ -27,13 +27,13 @@ public class CourseListBox extends JComboBox<StudyObject> {
         setEditor(courseEditor);
     }
 
-    void refresh(@NotNull Project project, @NotNull SupportedLanguages programmingLanguage) {
+    void refresh(@NotNull SupportedLanguages programmingLanguage) {
         this.programmingLanguage = programmingLanguage;
-        courseListModel.update(project, programmingLanguage);
+        courseListModel.update(programmingLanguage);
     }
 
     void refresh(@NotNull Project project) {
-        courseListModel.update(project, programmingLanguage);
+        courseListModel.update(programmingLanguage);
     }
 
     void setTarget(@Nullable ProjectSetting target) {
