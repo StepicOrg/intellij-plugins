@@ -41,29 +41,26 @@ class CourseListModel extends AbstractListModel<StudyObject> implements ComboBox
     }
 
     void update(@NotNull SupportedLanguages programmingLanguage) {
-        executor.execute(new Runnable() {
-            @Override
-            public void run() {
-                List<StudyObject> newCourseList = StepikProjectGenerator.getCourses(programmingLanguage);
+        executor.execute(() -> {
+            List<StudyObject> newCourseList = StepikProjectGenerator.getCourses(programmingLanguage);
 
-                StudyObject selectedCourse = getSelectedItem();
-                courses.clear();
+            StudyObject selectedCourse = getSelectedItem();
+            courses.clear();
 
-                if (!newCourseList.isEmpty()) {
-                    courses.addAll(newCourseList);
-                    if (selectedCourse == EMPTY_STUDY_OBJECT || !courses.contains(selectedCourse)) {
-                        selectedCourse = courses.get(0);
-                    }
-                } else {
-                    courses.add(EMPTY_STUDY_OBJECT);
+            if (!newCourseList.isEmpty()) {
+                courses.addAll(newCourseList);
+                if (selectedCourse == EMPTY_STUDY_OBJECT || !courses.contains(selectedCourse)) {
+                    selectedCourse = courses.get(0);
                 }
-
-                StudyObject finalSelectedCourse = selectedCourse;
-                SwingUtilities.invokeLater(() -> {
-                    setSelectedItem(finalSelectedCourse);
-                    fireIntervalAdded(this, 0, getSize() - 1);
-                });
+            } else {
+                courses.add(EMPTY_STUDY_OBJECT);
             }
+
+            StudyObject finalSelectedCourse = selectedCourse;
+            SwingUtilities.invokeLater(() -> {
+                setSelectedItem(finalSelectedCourse);
+                fireIntervalAdded(this, 0, getSize() - 1);
+            });
         });
     }
 

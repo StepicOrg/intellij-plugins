@@ -1,7 +1,6 @@
 package com.jetbrains.tmp.learning.courseFormat;
 
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
@@ -27,11 +26,8 @@ public class CourseNode extends Node<Course, SectionNode, Section, LessonNode> {
     public CourseNode() {
     }
 
-    public CourseNode(
-            @NotNull Project project,
-            @NotNull Course data,
-            @Nullable ProgressIndicator indicator) {
-        super(project, data, indicator);
+    public CourseNode(@NotNull Project project, @NotNull Course data) {
+        super(project, data);
     }
 
     @Override
@@ -57,18 +53,9 @@ public class CourseNode extends Node<Course, SectionNode, Section, LessonNode> {
     }
 
     @Override
-    public void init(
-            @NotNull Project project,
-            @Nullable StudyNode parent,
-            @Nullable ProgressIndicator indicator) {
-        if (indicator != null) {
-            indicator.setText("Refresh " + getName());
-            indicator.setText2("Update sections");
-        }
-
+    public void init(@NotNull Project project, @Nullable StudyNode parent) {
         authors = null;
-
-        super.init(project, parent, indicator);
+        super.init(project, parent);
     }
 
     @Override

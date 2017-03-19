@@ -1,7 +1,6 @@
 package com.jetbrains.tmp.learning.courseFormat;
 
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
@@ -28,11 +27,8 @@ public class LessonNode extends Node<CompoundUnitLesson, StepNode, Step, StepNod
     public LessonNode() {
     }
 
-    public LessonNode(
-            @NotNull Project project,
-            @NotNull CompoundUnitLesson data,
-            @Nullable ProgressIndicator indicator) {
-        super(project, data, indicator);
+    public LessonNode(@NotNull Project project, @NotNull CompoundUnitLesson data) {
+        super(project, data);
     }
 
     @Override
@@ -58,18 +54,9 @@ public class LessonNode extends Node<CompoundUnitLesson, StepNode, Step, StepNod
     }
 
     @Override
-    public void init(
-            @NotNull Project project,
-            @Nullable StudyNode parent,
-            @Nullable ProgressIndicator indicator) {
-        if (indicator != null) {
-            indicator.setText("Refresh a lesson: " + getName());
-            indicator.setText2("Update steps");
-        }
-
+    public void init(@NotNull Project project, @Nullable StudyNode parent) {
         courseId = 0;
-
-        super.init(project, parent, indicator);
+        super.init(project, parent);
     }
 
     @Override

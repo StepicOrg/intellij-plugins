@@ -129,7 +129,7 @@ public class StepikProjectGenerator {
                     ProgressIndicator indicator = ProgressManager.getInstance().getProgressIndicator();
                     indicator.setIndeterminate(true);
 
-                    projectRoot = StudyNodeFactory.createTree(project, data, indicator);
+                    projectRoot = StudyNodeFactory.createTree(project, data);
                 }, "Creating project", true, project);
     }
 

@@ -39,6 +39,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Comparator;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static com.jetbrains.tmp.learning.StudyUtils.getChoiceStepText;
 import static com.jetbrains.tmp.learning.StudyUtils.getCodeStepText;
@@ -53,6 +55,7 @@ import static com.jetbrains.tmp.learning.StudyUtils.getTableStepText;
 import static com.jetbrains.tmp.learning.StudyUtils.getTextStepText;
 import static com.jetbrains.tmp.learning.StudyUtils.getUnknownStepText;
 import static com.jetbrains.tmp.learning.StudyUtils.getVideoStepText;
+import static com.jetbrains.tmp.learning.courseFormat.StepType.CODE;
 import static com.jetbrains.tmp.learning.courseFormat.StepType.TEXT;
 import static com.jetbrains.tmp.learning.courseFormat.StepType.VIDEO;
 import static org.stepik.core.utils.PluginUtils.PLUGIN_ID;
@@ -62,9 +65,9 @@ public class StudyToolWindow extends SimpleToolWindowPanel implements DataProvid
     private static final String STEP_INFO_ID = "stepInfo";
     private static final String EMPTY_STEP_TEXT = "Please, open any step to see step description";
     private static final String VIDEO_QUALITY_PROPERTY_NAME = PLUGIN_ID + ".VIDEO_QUALITY";
+    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final JComboBox<SupportedLanguages> languageBox;
     private final JComboBox<Integer> videoQualityBox;
-
     private final JBCardLayout cardLayout;
     private final JPanel contentPanel;
     private final OnePixelSplitter splitPane;
@@ -83,7 +86,7 @@ public class StudyToolWindow extends SimpleToolWindowPanel implements DataProvid
         languageBox = new JComboBox<>();
         languageBox.addActionListener(this);
 
-        qualityListener = e -> setText();
+        qualityListener = e -> setText(stepNode);
         videoQualityBox = new JComboBox<>();
 
         layout = new CardLayout();
@@ -197,20 +200,22 @@ public class StudyToolWindow extends SimpleToolWindowPanel implements DataProvid
 
         stepNode = (StepNode) studyNode;
 
-        setText();
+        executor.execute(() -> setText(stepNode));
     }
 
-    private void setText() {
+    private void setText(@Nullable StepNode stepNode) {
         if (stepNode == null) {
             setText(EMPTY_STEP_TEXT);
             rightPanel.setVisible(false);
             return;
         }
         String text;
-        boolean rightPanelVisible = false;
         StepType stepType = stepNode.getType();
+        if (stepType != VIDEO && stepType != CODE) {
+            SwingUtilities.invokeLater(() -> rightPanel.setVisible(false));
+        }
         boolean theory = stepType == VIDEO || stepType == TEXT;
-        postView(theory);
+        postView(stepNode, theory);
 
         switch (stepType) {
             case UNKNOWN:
@@ -218,13 +223,16 @@ public class StudyToolWindow extends SimpleToolWindowPanel implements DataProvid
                 break;
             case CODE:
                 text = getCodeStepText(stepNode);
-                languageBox.removeAllItems();
-                stepNode.getSupportedLanguages().stream()
-                        .sorted(Comparator.comparingInt(Enum::ordinal))
-                        .forEach(languageBox::addItem);
-                layout.show(rightPanel, "language");
-                rightPanelVisible = languageBox.getModel().getSize() != 0;
-                languageBox.setSelectedItem(stepNode.getCurrentLang());
+                SwingUtilities.invokeLater(() -> {
+                    languageBox.removeAllItems();
+                    stepNode.getSupportedLanguages().stream()
+                            .sorted(Comparator.comparingInt(Enum::ordinal))
+                            .forEach(languageBox::addItem);
+                    layout.show(rightPanel, "language");
+                    boolean rightPanelVisible = languageBox.getModel().getSize() != 0;
+                    rightPanel.setVisible(rightPanelVisible);
+                    languageBox.setSelectedItem(stepNode.getCurrentLang());
+                });
                 break;
             case TEXT:
                 text = getTextStepText(stepNode);
@@ -232,15 +240,18 @@ public class StudyToolWindow extends SimpleToolWindowPanel implements DataProvid
             case VIDEO:
                 VideoStepNodeHelper videoStepNode = stepNode.asVideoStep();
                 text = getVideoStepText(videoStepNode, getVideoQuality());
-                videoQualityBox.removeActionListener(qualityListener);
-                videoQualityBox.removeAllItems();
-                videoStepNode.getQualitySet().forEach(videoQualityBox::addItem);
-                int quality = videoStepNode.getQuality();
-                videoQualityBox.setSelectedItem(quality);
-                videoQualityBox.addActionListener(qualityListener);
-                layout.show(rightPanel, "quality");
-                rightPanelVisible = videoQualityBox.getModel().getSize() != 0;
-                storeVideoQuality(quality);
+                SwingUtilities.invokeLater(() -> {
+                    videoQualityBox.removeActionListener(qualityListener);
+                    videoQualityBox.removeAllItems();
+                    videoStepNode.getQualitySet().forEach(videoQualityBox::addItem);
+                    int quality = videoStepNode.getQuality();
+                    storeVideoQuality(quality);
+                    videoQualityBox.setSelectedItem(quality);
+                    videoQualityBox.addActionListener(qualityListener);
+                    layout.show(rightPanel, "quality");
+                    boolean rightPanelVisible = videoQualityBox.getModel().getSize() != 0;
+                    rightPanel.setVisible(rightPanelVisible);
+                });
                 break;
             case CHOICE:
                 text = getChoiceStepText(stepNode);
@@ -274,16 +285,13 @@ public class StudyToolWindow extends SimpleToolWindowPanel implements DataProvid
                 break;
         }
 
-        rightPanel.setVisible(rightPanelVisible);
         setText(text);
-        ProjectView.getInstance(project).refresh();
     }
 
-    private void postView(boolean needPassed) {
-        StepNode finalStepNode = stepNode;
-        new Thread(() -> {
-            Long assignment = finalStepNode.getAssignment();
-            long stepId = finalStepNode.getId();
+    private void postView(@NotNull StepNode stepNode, boolean needPassed) {
+        executor.execute(() -> {
+            Long assignment = stepNode.getAssignment();
+            long stepId = stepNode.getId();
             try {
                 if (assignment != 0) {
                     StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
@@ -298,9 +306,14 @@ public class StudyToolWindow extends SimpleToolWindowPanel implements DataProvid
             }
 
             if (needPassed) {
-                finalStepNode.passed();
+                stepNode.passed();
             }
-        }).run();
+
+            if (stepNode.getProject() == null) {
+                stepNode.setProject(project);
+            }
+            ProjectView.getInstance(project).refresh();
+        });
     }
 
     private int loadVideoQuality() {

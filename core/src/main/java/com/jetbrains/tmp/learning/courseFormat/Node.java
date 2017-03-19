@@ -2,7 +2,6 @@ package com.jetbrains.tmp.learning.courseFormat;
 
 import com.intellij.ide.projectView.ProjectView;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
@@ -32,6 +31,7 @@ public abstract class Node<
         DC extends StudyObject,
         CC extends Node> implements StudyNode<D, C> {
     private static final Logger logger = Logger.getInstance(Node.class);
+    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
     private StudyNode parent;
     private D data;
     private List<C> children;
@@ -40,14 +40,22 @@ public abstract class Node<
     private volatile StudyStatus status;
     @XStreamOmitField
     private Project project;
-    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     Node() {
     }
 
-    Node(@NotNull Project project, @NotNull D data, @Nullable ProgressIndicator indicator) {
+    Node(@NotNull Project project, @NotNull D data) {
         setData(data);
-        init(project, null, indicator);
+        init(project, null);
+    }
+
+    @Nullable
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(@NotNull Project project) {
+        this.project = project;
     }
 
     @Nullable
@@ -200,7 +208,7 @@ public abstract class Node<
     protected abstract List<DC> getChildDataList();
 
     @Override
-    public void init(@NotNull Project project, @Nullable StudyNode parent, @Nullable ProgressIndicator indicator) {
+    public void init(@NotNull Project project, @Nullable StudyNode parent) {
         this.project = project;
         Map<Long, C> mapNodes = getMapNodes();
         List<C> needInit = getChildren();
@@ -221,7 +229,7 @@ public abstract class Node<
                 }
                 item.setData(data);
                 item.setWasDeleted(wasDeleted);
-                item.init(project, this, indicator);
+                item.init(project, this);
                 if (item.canBeLeaf() || !item.isLeaf()) {
                     getChildren().add(item);
                 }
@@ -232,7 +240,7 @@ public abstract class Node<
         setParent(parent);
 
         for (StudyNode child : needInit) {
-            child.init(project, this, indicator);
+            child.init(project, this);
         }
     }
 
@@ -241,9 +249,9 @@ public abstract class Node<
     }
 
     @Override
-    public void reloadData(@NotNull Project project, @Nullable ProgressIndicator indicator) {
+    public void reloadData(@NotNull Project project) {
         loadData(data.getId());
-        init(project, indicator);
+        init(project);
     }
 
     protected abstract void loadData(long id);
