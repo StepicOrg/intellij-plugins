@@ -51,7 +51,7 @@ public class AuthDialog extends JDialog {
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
         setPanel(new JFXPanel());
-
+        Platform.setImplicitExit(false);
         Platform.runLater(() -> {
             BorderPane pane = new BorderPane();
             HBox toolPane = new HBox();

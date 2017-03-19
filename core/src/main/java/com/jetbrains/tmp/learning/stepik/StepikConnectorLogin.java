@@ -3,6 +3,7 @@ package com.jetbrains.tmp.learning.stepik;
 import com.intellij.credentialStore.CredentialAttributes;
 import com.intellij.ide.passwordSafe.PasswordSafe;
 import com.intellij.ide.util.PropertiesComponent;
+import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.diagnostic.Logger;
@@ -82,33 +83,48 @@ public class StepikConnectorLogin {
     }
 
     private static void showAuthDialog(boolean clear) {
-        ApplicationManager.getApplication().invokeAndWait(() -> {
-            logger.info("Show the authentication dialog");
-            Map<String, String> map = AuthDialog.showAuthForm(clear);
+        Application application = ApplicationManager.getApplication();
+        if (!application.isDispatchThread()) {
+            application.invokeAndWait(() -> showDialog(clear), ModalityState.defaultModalityState());
+        } else {
+            showDialog(clear);
+        }
+    }
 
-            TokenInfo tokenInfo = new TokenInfo();
-            tokenInfo.setAccessToken(map.get("access_token"));
-            tokenInfo.setExpiresIn(Integer.valueOf(map.getOrDefault("expires_in", "0")));
-            tokenInfo.setScope(map.get("scope"));
-            tokenInfo.setTokenType(map.get("token_type"));
-            tokenInfo.setRefreshToken(map.get("refresh_token"));
-            stepikApiClient.setTokenInfo(tokenInfo);
-            if (tokenInfo.getAccessToken() != null) {
-                Metrics.authenticate(SUCCESSFUL);
+    private static void showDialog(boolean clear) {
+        logger.info("Show the authentication dialog");
+        Map<String, String> map = AuthDialog.showAuthForm(clear);
+
+        TokenInfo tokenInfo = new TokenInfo();
+        tokenInfo.setAccessToken(map.get("access_token"));
+        tokenInfo.setExpiresIn(Integer.valueOf(map.getOrDefault("expires_in", "0")));
+        tokenInfo.setScope(map.get("scope"));
+        tokenInfo.setTokenType(map.get("token_type"));
+        tokenInfo.setRefreshToken(map.get("refresh_token"));
+        stepikApiClient.setTokenInfo(tokenInfo);
+        if (tokenInfo.getAccessToken() != null) {
+            Metrics.authenticate(SUCCESSFUL);
+        }
+    }
+
+    public static boolean authenticated() {
+        if (stepikApiClient.getTokenInfo().getAccessToken() != null) {
+            User user = getCurrentUser();
+
+            if (!user.isGuest()) {
+                return true;
             }
-        }, ModalityState.defaultModalityState());
+        }
+
+        return false;
     }
 
     private static boolean minorLogin(@NotNull TokenInfo tokenInfo) {
         logger.info("Check the authentication");
 
-        if (stepikApiClient.getTokenInfo().getAccessToken() != null) {
-            User user = getCurrentUser();
-
-            if (!user.isGuest()) {
-                logger.info("Authenticated");
-                return true;
-            }
+        if (authenticated()) {
+            logger.info("Authenticated");
+            return true;
         }
 
         String refreshToken = stepikApiClient.getTokenInfo().getRefreshToken();

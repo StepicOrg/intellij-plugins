@@ -1,7 +1,9 @@
 package com.jetbrains.tmp.learning.courseFormat;
 
+import com.intellij.ide.projectView.ProjectView;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.project.Project;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import org.jetbrains.annotations.NotNull;
@@ -16,6 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static com.jetbrains.tmp.learning.courseFormat.StudyStatus.SOLVED;
 
@@ -33,14 +37,17 @@ public abstract class Node<
     private List<C> children;
     private boolean wasDeleted;
     @XStreamOmitField
-    private StudyStatus status;
+    private volatile StudyStatus status;
+    @XStreamOmitField
+    private Project project;
+    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     Node() {
     }
 
-    Node(@NotNull D data, @Nullable ProgressIndicator indicator) {
+    Node(@NotNull Project project, @NotNull D data, @Nullable ProgressIndicator indicator) {
         setData(data);
-        init(null, indicator);
+        init(project, null, indicator);
     }
 
     @Nullable
@@ -193,7 +200,8 @@ public abstract class Node<
     protected abstract List<DC> getChildDataList();
 
     @Override
-    public void init(@Nullable StudyNode parent, @Nullable ProgressIndicator indicator) {
+    public void init(@NotNull Project project, @Nullable StudyNode parent, @Nullable ProgressIndicator indicator) {
+        this.project = project;
         Map<Long, C> mapNodes = getMapNodes();
         List<C> needInit = getChildren();
         setChildrenDeletedFlag();
@@ -213,7 +221,7 @@ public abstract class Node<
                 }
                 item.setData(data);
                 item.setWasDeleted(wasDeleted);
-                item.init(this, indicator);
+                item.init(project, this, indicator);
                 if (item.canBeLeaf() || !item.isLeaf()) {
                     getChildren().add(item);
                 }
@@ -224,7 +232,7 @@ public abstract class Node<
         setParent(parent);
 
         for (StudyNode child : needInit) {
-            child.init(this, indicator);
+            child.init(project, this, indicator);
         }
     }
 
@@ -233,9 +241,9 @@ public abstract class Node<
     }
 
     @Override
-    public void reloadData(@NotNull ProgressIndicator indicator) {
+    public void reloadData(@NotNull Project project, @Nullable ProgressIndicator indicator) {
         loadData(data.getId());
-        init(indicator);
+        init(project, indicator);
     }
 
     protected abstract void loadData(long id);
@@ -250,48 +258,51 @@ public abstract class Node<
     @NotNull
     @Override
     public StudyStatus getStatus() {
-        if (status == null) {
+        if (isUnknownStatus()) {
             status = StudyStatus.UNCHECKED;
 
-            try {
-                Map<String, StudyNode> progressMap = new HashMap<>();
-                getChildren().stream()
-                        .filter(StudyNode::isUnknownStatus)
-                        .forEach(child -> {
-                            DC data = child.getData();
-                            if (data != null) {
-                                progressMap.put(data.getProgress(), child);
-                            }
-                        });
-                D data = getData();
-                if (data != null) {
-                    String progressId = data.getProgress();
-                    if (progressId != null) {
-                        progressMap.put(progressId, this);
+            executor.execute(() -> {
+                try {
+                    Map<String, StudyNode> progressMap = new HashMap<>();
+                    Node.this.getChildren().stream()
+                            .filter(StudyNode::isUnknownStatus)
+                            .forEach(child -> {
+                                DC data = child.getData();
+                                if (data != null) {
+                                    progressMap.put(data.getProgress(), child);
+                                }
+                            });
+                    D data = Node.this.getData();
+                    if (data != null) {
+                        String progressId = data.getProgress();
+                        if (progressId != null) {
+                            progressMap.put(progressId, Node.this);
+                        }
+
+                        Set<String> progressIds = progressMap.keySet();
+
+                        if (progressIds.size() != 0) {
+                            StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
+
+                            Progresses progresses = stepikApiClient.progresses()
+                                    .get()
+                                    .id(progressIds.toArray(new String[progressIds.size()]))
+                                    .execute();
+
+                            progresses.getItems().forEach(progress -> {
+                                String id = progress.getId();
+                                StudyNode node = progressMap.get(id);
+                                if (progress.isPassed()) {
+                                    node.setRawStatus(SOLVED);
+                                }
+                            });
+                        }
                     }
-
-                    Set<String> progressIds = progressMap.keySet();
-
-                    if (progressIds.size() != 0) {
-                        StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
-
-                        Progresses progresses = stepikApiClient.progresses()
-                                .get()
-                                .id(progressIds.toArray(new String[progressIds.size()]))
-                                .execute();
-
-                        progresses.getItems().forEach(progress -> {
-                            String id = progress.getId();
-                            StudyNode node = progressMap.get(id);
-                            if (progress.isPassed()) {
-                                node.setRawStatus(SOLVED);
-                            }
-                        });
-                    }
+                    ProjectView.getInstance(project).refresh();
+                } catch (StepikClientException e) {
+                    logger.warn(e);
                 }
-            } catch (StepikClientException e) {
-                logger.warn(e);
-            }
+            });
         }
 
         return status;
