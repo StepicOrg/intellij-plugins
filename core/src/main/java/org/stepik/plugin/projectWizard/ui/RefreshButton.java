@@ -1,7 +1,6 @@
 package org.stepik.plugin.projectWizard.ui;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -12,15 +11,13 @@ import java.awt.event.ActionEvent;
  */
 public class RefreshButton extends JButton {
     private CourseListBox target;
-    private Project project;
 
     public RefreshButton() {
         setIcon(AllIcons.Actions.Refresh);
     }
 
-    void setTarget(@NotNull CourseListBox target, @NotNull Project project) {
+    void setTarget(@NotNull CourseListBox target) {
         this.target = target;
-        this.project = project;
     }
 
     @Override
@@ -28,7 +25,7 @@ public class RefreshButton extends JButton {
         super.fireActionPerformed(event);
 
         if (target != null) {
-            target.refresh(project);
+            target.refresh();
         }
     }
 }

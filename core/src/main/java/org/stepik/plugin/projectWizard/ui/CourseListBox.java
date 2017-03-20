@@ -1,6 +1,5 @@
 package org.stepik.plugin.projectWizard.ui;
 
-import com.intellij.openapi.project.Project;
 import com.jetbrains.tmp.learning.SupportedLanguages;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,7 +31,7 @@ public class CourseListBox extends JComboBox<StudyObject> {
         courseListModel.update(programmingLanguage);
     }
 
-    void refresh(@NotNull Project project) {
+    void refresh() {
         courseListModel.update(programmingLanguage);
     }
 

@@ -1,7 +1,6 @@
 package org.stepik.plugin.projectWizard.ui;
 
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.project.Project;
 import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
@@ -31,8 +30,8 @@ public class ProjectSettingsPanel implements ProjectSetting, HierarchyListener {
     private JButton logoutButton;
     private StudyObject selectedStudyObject = StepikProjectGenerator.EMPTY_STUDY_OBJECT;
 
-    public ProjectSettingsPanel(@NotNull Project project, boolean visibleLangBox) {
-        refreshListButton.setTarget(courseListComboBox, project);
+    public ProjectSettingsPanel(boolean visibleLangBox) {
+        refreshListButton.setTarget(courseListComboBox);
         courseListComboBox.setTarget(this);
 
         langComboBox.setTarget(this);
@@ -59,9 +58,8 @@ public class ProjectSettingsPanel implements ProjectSetting, HierarchyListener {
 
     public void updateStep() {
         logger.info("Start updating settings");
-        StepikConnectorLogin.authentication();
-        setUsername();
         courseListComboBox.refresh(langComboBox.getSelectedItem());
+        setUsername();
         logger.info("Updating settings is done");
     }
 
@@ -79,6 +77,7 @@ public class ProjectSettingsPanel implements ProjectSetting, HierarchyListener {
         // Scroll to top
         courseListDescription.setSelectionStart(0);
         courseListDescription.setSelectionEnd(0);
+        setUsername();
         logger.info("Has selected the course: " + studyObject);
         notifyListeners();
     }

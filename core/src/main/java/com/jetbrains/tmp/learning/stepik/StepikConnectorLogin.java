@@ -36,11 +36,11 @@ public class StepikConnectorLogin {
             "&scope=write" +
             "&response_type=token";
 
-    private static long getLastUser() {
+    private static synchronized long getLastUser() {
         return PropertiesComponent.getInstance().getOrInitLong(LAST_USER_PROPERTY_NAME, 0);
     }
 
-    private static void setLastUser(long userId) {
+    private static synchronized void setLastUser(long userId) {
         PropertiesComponent.getInstance().setValue(LAST_USER_PROPERTY_NAME, String.valueOf(userId));
     }
 
@@ -175,7 +175,7 @@ public class StepikConnectorLogin {
         return authInfo;
     }
 
-    private static void setAuthInfo(long userId, @NotNull final TokenInfo tokenInfo) {
+    private static void setTokenInfo(long userId, @NotNull final TokenInfo tokenInfo) {
         String serviceName = StepikProjectManager.class.getName();
         CredentialAttributes attributes = new CredentialAttributes(serviceName,
                 String.valueOf(userId),
@@ -220,7 +220,7 @@ public class StepikConnectorLogin {
     public static synchronized void logout() {
         stepikApiClient.setTokenInfo(null);
         long userId = getLastUser();
-        setAuthInfo(userId, new TokenInfo());
+        setTokenInfo(userId, new TokenInfo());
         setLastUser(0);
         logger.info("Logout successfully");
     }
