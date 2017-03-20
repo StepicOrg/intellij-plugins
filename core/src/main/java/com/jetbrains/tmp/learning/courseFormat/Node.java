@@ -210,42 +210,34 @@ public abstract class Node<
     @Override
     public void init(@NotNull Project project, @Nullable StudyNode parent) {
         this.project = project;
+        setParent(parent);
         Map<Long, C> mapNodes = getMapNodes();
-        List<C> needInit = getChildren();
-        setChildrenDeletedFlag();
+        List<C> processed = new ArrayList<>();
 
         for (DC data : getChildDataList()) {
             C child = mapNodes.get(data.getId());
-            if (child != null) {
-                child.setData(data);
-                child.setWasDeleted(wasDeleted);
-            } else {
-                C item;
+            if (child == null) {
                 try {
-                    item = getChildClass().newInstance();
+                    child = getChildClass().newInstance();
+                    getChildren().add(child);
                 } catch (InstantiationException | IllegalAccessException e) {
                     logger.warn("Can't get new instance for child", e);
                     break;
                 }
-                item.setData(data);
-                item.setWasDeleted(wasDeleted);
-                item.init(project, this);
-                if (item.canBeLeaf() || !item.isLeaf()) {
-                    getChildren().add(item);
-                }
             }
+            child.setData(data);
+            child.setWasDeleted(wasDeleted);
+            processed.add(child);
         }
 
         sortChildren();
-        setParent(parent);
+        ArrayList<C> wasDeletedList = new ArrayList<>(getChildren());
+        wasDeletedList.removeAll(processed);
+        wasDeletedList.forEach(child -> child.setWasDeleted(true));
 
-        for (StudyNode child : needInit) {
+        for (StudyNode child : getChildren()) {
             child.init(project, this);
         }
-    }
-
-    private void setChildrenDeletedFlag() {
-        getChildren().forEach(child -> child.setWasDeleted(true));
     }
 
     @Override
