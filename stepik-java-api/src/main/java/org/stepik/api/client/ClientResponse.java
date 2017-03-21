@@ -39,6 +39,11 @@ public class ClientResponse {
         return stepikApiClient.getJsonConverter().fromJson(body, clazz);
     }
 
+    @Nullable
+    public String getBody() {
+        return body;
+    }
+
     @NotNull
     public Map<String, String> getHeaders() {
         return headers;

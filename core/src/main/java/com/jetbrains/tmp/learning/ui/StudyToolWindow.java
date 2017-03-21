@@ -42,6 +42,7 @@ import java.util.Map;
 
 import static com.jetbrains.tmp.learning.StudyUtils.getChoiceStepText;
 import static com.jetbrains.tmp.learning.StudyUtils.getCodeStepText;
+import static com.jetbrains.tmp.learning.StudyUtils.getDatasetStepText;
 import static com.jetbrains.tmp.learning.StudyUtils.getMatchingStepText;
 import static com.jetbrains.tmp.learning.StudyUtils.getNumberStepText;
 import static com.jetbrains.tmp.learning.StudyUtils.getSortingStepText;
@@ -241,6 +242,9 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
                 break;
             case NUMBER:
                 text = getNumberStepText(stepNode);
+                break;
+            case DATASET:
+                text = getDatasetStepText(stepNode);
                 break;
             default:
                 text = EMPTY_STEP_TEXT;

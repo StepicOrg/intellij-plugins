@@ -23,27 +23,45 @@ ${text}<br>
 
         <#nested/>
 
-        <input type="hidden" name="status" value="${status}"/>
+        <input id="status" type="hidden" name="status" value="${status}"/>
         <input type="hidden" name="attemptId" value="${stepNode.getAttemptId()?string("#")}"/>
         <input type="hidden" name="locked" value="${locked?string("true", "false")}"/>
         <input type="hidden" name="type" value="${stepNode.getType()}"/>
         <br>
 
         <#if !locked>
-            <#if status == "">
-                <#assign submitCaption = "Solve" />
-            <#elseif status == "active">
-                <#assign submitCaption = "Submit" />
-            <#elseif status != "evaluation">
-                <#assign submitCaption = "Solve again" />
-            <#else>
-                <#assign submitCaption = "Evaluation" />
-                <#assign disabledSubmit = "disabled" />
-            </#if>
-
-            <input type="submit" value="${submitCaption}" ${disabledSubmit!""}/>
+            <input id="submit" type="submit" value="Evaluation"/>
         </#if>
     </form>
+
+    <script>
+        function updateSubmitCaption() {
+            var status = document.getElementById("status").getAttribute("value");
+
+            var submitCaption;
+            var disabled = false;
+
+            if (status == "") {
+                submitCaption = "Solve";
+            } else if (status == "active") {
+                submitCaption = "Submit";
+            } else if (status != "evaluation") {
+                submitCaption = "Solve again";
+            } else {
+                submitCaption = "Evaluation";
+                disabled = true;
+            }
+
+            document.getElementById("submit").setAttribute("value", submitCaption);
+            var submit = document.getElementById("submit");
+            if (disabled) {
+                submit.setAttribute("disabled", true);
+            } else {
+                submit.removeAttribute("disabled")
+            }
+        }
+        updateSubmitCaption();
+    </script>
 
     <#if isHasSubmissionsRestrictions>
         <p>${maxSubmissionsCount - submissionsCount} attempts left</p>

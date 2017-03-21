@@ -83,8 +83,11 @@ public class Submission extends AbstractObject {
         this.feedback = feedback;
     }
 
-    @Nullable
+    @NotNull
     public String getReplyUrl() {
+        if (replyUrl == null) {
+            replyUrl = "";
+        }
         return replyUrl;
     }
 

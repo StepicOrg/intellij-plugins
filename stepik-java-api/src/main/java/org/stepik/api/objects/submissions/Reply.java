@@ -19,6 +19,7 @@ public class Reply {
     private List<Boolean> choices;
     private List<Integer> ordering;
     private String number;
+    private String file;
 
     @NotNull
     public String getLanguage() {
@@ -117,5 +118,14 @@ public class Reply {
 
     public void setNumber(@Nullable String number) {
         this.number = number;
+    }
+
+    @Nullable
+    public String getFile() {
+        return file;
+    }
+
+    public void setFile(String file) {
+        this.file = file;
     }
 }
