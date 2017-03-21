@@ -1,3 +1,4 @@
+<#-- @ftlvariable name="disabled" type="java.lang.String" -->
 <#-- @ftlvariable name="stepNode" type="com.jetbrains.tmp.learning.courseFormat.stepHelpers.TableStepNodeHelper" -->
 <#-- @ftlvariable name="text" type="java.lang.String" -->
 

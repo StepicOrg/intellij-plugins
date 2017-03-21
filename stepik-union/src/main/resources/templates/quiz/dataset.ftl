@@ -1,3 +1,5 @@
+<#-- @ftlvariable name="status" type="java.lang.String" -->
+<#-- @ftlvariable name="disabled" type="java.lang.String" -->
 <#-- @ftlvariable name="stepNode" type="com.jetbrains.tmp.learning.courseFormat.stepHelpers.DatasetStepNodeHelper" -->
 <#-- @ftlvariable name="text" type="java.lang.String" -->
 

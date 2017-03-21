@@ -37,10 +37,6 @@ public class TableStepNodeHelper extends StepHelper {
     }
 
     @Override
-    protected void onAttemptLoaded() {
-    }
-
-    @Override
     protected void onSubmissionLoaded() {
         tableChoices = reply.getTableChoices();
     }

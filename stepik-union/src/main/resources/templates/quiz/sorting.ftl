@@ -1,3 +1,7 @@
+<#-- @ftlvariable name="ordering" type="java.util.List<com.intellij.openapi.util.Pair>" -->
+<#-- @ftlvariable name="status" type="java.lang.String" -->
+<#-- @ftlvariable name="index" type="java.lang.Integer" -->
+
 <#include "base_sorting.ftl"/>
 <@sorting_quiz>
     <#list ordering as option>

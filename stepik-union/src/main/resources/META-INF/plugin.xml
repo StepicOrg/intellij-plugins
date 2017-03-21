@@ -25,7 +25,6 @@
     <depends>com.intellij.modules.lang</depends>
     <depends optional="true" config-file="idea.xml">com.intellij.modules.java</depends>
     <depends optional="true" config-file="pycharm.xml">com.intellij.modules.python</depends>
-    <depends optional="true" config-file="clion.xml">com.intellij.modules.clion</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <applicationConfigurable instance="org.stepik.plugin.collective.ui.StepikSettingsConfigurable"/>
@@ -61,6 +60,5 @@
         <projectService serviceInterface="com.intellij.codeInsight.documentation.DocumentationManager" serviceImplementation="com.jetbrains.tmp.learning.StudyDocumentationManager" overrides="true"/>
         <toolWindow id="Step Description" anchor="right" factoryClass="com.jetbrains.tmp.learning.ui.StudyToolWindowFactory" conditionClass="com.jetbrains.tmp.learning.ui.StudyCondition"/>
         <projectService serviceInterface="com.jetbrains.tmp.learning.StepikProjectManager" serviceImplementation="com.jetbrains.tmp.learning.StepikProjectManager"/>
-        <applicationService serviceImplementation="com.jetbrains.tmp.learning.stepik.StepikUpdateSettings"/>
     </extensions>
 </idea-plugin>

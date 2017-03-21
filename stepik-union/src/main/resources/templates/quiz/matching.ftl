@@ -1,3 +1,6 @@
+<#-- @ftlvariable name="ordering" type="java.util.List<org.stepik.api.objects.attempts.Pair>" -->
+<#-- @ftlvariable name="status" type="java.lang.String" -->
+<#-- @ftlvariable name="index" type="java.lang.Integer" -->
 <#-- @ftlvariable name="option" type="org.stepik.api.objects.attempts.Pair" -->
 
 <#include "base_sorting.ftl"/>

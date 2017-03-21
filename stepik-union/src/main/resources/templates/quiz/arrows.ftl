@@ -1,3 +1,6 @@
+<#-- @ftlvariable name="index" type="java.lang.Integer" -->
+<#-- @ftlvariable name="count" type="java.lang.Integer" -->
+
 <div class="buttons">
 <#if index != 0>
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="16" viewBox="-0.51 -0.479 24 16">

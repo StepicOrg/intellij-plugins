@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.stepik.api.objects.lessons.CompoundUnitLesson;
 import org.stepik.api.objects.steps.Limit;
+import org.stepik.api.objects.steps.Step;
 import org.stepik.core.TestUtils;
 import org.xml.sax.SAXException;
 
@@ -13,6 +14,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author meanmail
@@ -35,6 +37,7 @@ public class SerializationTest {
         LessonNode lessonNode = new LessonNode();
         lessonNode.setParent(node);
         CompoundUnitLesson data = lessonNode.getData();
+        assertNotNull(data);
         data.getLesson();
         data.getUnit();
         node.getChildren().add(lessonNode);
@@ -46,6 +49,7 @@ public class SerializationTest {
             throws IOException, SAXException, ParserConfigurationException, InstantiationException, IllegalAccessException {
         LessonNode node = new LessonNode();
         CompoundUnitLesson data = node.getData();
+        assertNotNull(data);
         data.getLesson();
         data.getUnit();
         serialize("LessonNode", node);
@@ -60,7 +64,9 @@ public class SerializationTest {
         Limit limit = new Limit();
         limit.setMemory(256);
         limit.setTime(8);
-        node.getData().getBlock().getOptions().getLimits().put("Java 8", limit);
+        Step data = node.getData();
+        assertNotNull(data);
+        data.getBlock().getOptions().getLimits().put("Java 8", limit);
         serialize("StepNode", node);
     }
 
