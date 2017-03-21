@@ -193,6 +193,10 @@ class FormListener implements EventListener {
                             List<Integer> ordering = getOrderingData(elements);
                             query.ordering(ordering);
                             break;
+                        case MATH:
+                            String formula = getStringData(elements);
+                            query.formula(formula);
+                            break;
                         default:
                             logger.warn("Unknown step type tried sending: " + type);
                             return;

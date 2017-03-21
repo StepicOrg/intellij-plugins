@@ -21,6 +21,12 @@ ${text}<br>
             <p style="color: #117700">Correct</p>
         </#if>
 
+        <#if status == "wrong">
+            <div>
+            ${stepNode.getHint()}
+            </div>
+        </#if>
+
         <#nested/>
 
         <input id="status" type="hidden" name="status" value="${status}"/>

@@ -74,8 +74,11 @@ public class Submission extends AbstractObject {
         this.score = score;
     }
 
-    @Nullable
+    @NotNull
     public String getFeedback() {
+        if (feedback == null) {
+            feedback = "";
+        }
         return feedback;
     }
 

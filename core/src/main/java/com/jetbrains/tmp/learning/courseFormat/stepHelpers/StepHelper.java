@@ -215,4 +215,16 @@ public class StepHelper {
         initStepOptions();
         return reply.getBlanks();
     }
+
+    @NotNull
+    public String getFormula() {
+        initStepOptions();
+        return reply.getFormula();
+    }
+
+    @NotNull
+    public String getHint() {
+        initStepOptions();
+        return submission.getHint();
+    }
 }
