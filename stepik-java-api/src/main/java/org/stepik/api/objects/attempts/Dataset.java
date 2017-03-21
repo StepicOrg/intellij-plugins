@@ -23,6 +23,7 @@ public class Dataset {
     @SerializedName("is_checkbox")
     private boolean isCheckbox;
     private String description;
+    private List<Component> components;
 
     @NotNull
     public List<String> getRows() {
@@ -107,6 +108,18 @@ public class Dataset {
         this.pairs = pairs;
     }
 
+    @NotNull
+    public List<Component> getComponents() {
+        if (components == null) {
+            components = new ArrayList<>();
+        }
+        return components;
+    }
+
+    public void setComponents(@Nullable List<Component> components) {
+        this.components = components;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -121,9 +134,10 @@ public class Dataset {
         if (!Arrays.equals(options, dataset.options)) return false;
         if (pairs != null ? !pairs.equals(dataset.pairs) : dataset.pairs != null) return false;
         if (rows != null ? !rows.equals(dataset.rows) : dataset.rows != null) return false;
-        //noinspection SimplifiableIfStatement
         if (columns != null ? !columns.equals(dataset.columns) : dataset.columns != null) return false;
-        return description != null ? description.equals(dataset.description) : dataset.description == null;
+        //noinspection SimplifiableIfStatement
+        if (description != null ? !description.equals(dataset.description) : dataset.description != null) return false;
+        return components != null ? components.equals(dataset.components) : dataset.components == null;
     }
 
     @Override
@@ -136,6 +150,7 @@ public class Dataset {
         result = 31 * result + (columns != null ? columns.hashCode() : 0);
         result = 31 * result + (isCheckbox ? 1 : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);
+        result = 31 * result + (components != null ? components.hashCode() : 0);
         return result;
     }
 }

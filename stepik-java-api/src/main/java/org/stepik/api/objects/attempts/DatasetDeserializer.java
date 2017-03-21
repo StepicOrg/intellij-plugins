@@ -77,6 +77,13 @@ public class DatasetDeserializer implements JsonDeserializer<Dataset> {
             dataset.setDescription(description.getAsString());
         }
 
+        JsonArray components = object.getAsJsonArray("components");
+        if (components != null) {
+            List<Component> array = new ArrayList<>();
+            components.forEach(component -> array.add(context.deserialize(component, Component.class)));
+            dataset.setComponents(array);
+        }
+
         return dataset;
     }
 }

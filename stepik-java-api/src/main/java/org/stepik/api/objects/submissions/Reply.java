@@ -21,6 +21,7 @@ public class Reply {
     private List<Integer> ordering;
     private String number;
     private String file;
+    private List<String> blanks;
 
     @NotNull
     public String getLanguage() {
@@ -144,5 +145,17 @@ public class Reply {
         }
         //noinspection unchecked
         return choices;
+    }
+
+    @NotNull
+    public List<String> getBlanks() {
+        if (blanks == null) {
+            blanks = new ArrayList<>();
+        }
+        return blanks;
+    }
+
+    public void setBlanks(@Nullable List<String> blanks) {
+        this.blanks = blanks;
     }
 }
