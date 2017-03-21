@@ -18,6 +18,7 @@ import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.courseFormat.StudyNode;
 import com.jetbrains.tmp.learning.courseFormat.stepHelpers.ChoiceStepNodeHelper;
 import com.jetbrains.tmp.learning.courseFormat.stepHelpers.MatchingStepNodeHelper;
+import com.jetbrains.tmp.learning.courseFormat.stepHelpers.NumberStepNodeHelper;
 import com.jetbrains.tmp.learning.courseFormat.stepHelpers.SortingStepNodeHelper;
 import com.jetbrains.tmp.learning.courseFormat.stepHelpers.StepHelper;
 import com.jetbrains.tmp.learning.courseFormat.stepHelpers.StringStepNodeHelper;
@@ -132,6 +133,12 @@ public class StudyUtils {
     public static String getMatchingStepText(@NotNull StepNode stepNode) {
         MatchingStepNodeHelper stepNodeHelper = stepNode.asMatchingStep();
         return processTemplate(stepNodeHelper, "quiz/matching");
+    }
+
+    @NotNull
+    public static String getNumberStepText(@NotNull StepNode stepNode) {
+        NumberStepNodeHelper stepNodeHelper = stepNode.asNumberStep();
+        return processTemplate(stepNodeHelper, "quiz/number");
     }
 
     @NotNull

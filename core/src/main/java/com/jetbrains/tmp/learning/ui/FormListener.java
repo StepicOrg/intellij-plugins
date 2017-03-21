@@ -128,6 +128,10 @@ class FormListener implements EventListener {
                             String text = getStringData(elements);
                             query.text(text);
                             break;
+                        case NUMBER:
+                            String number = getStringData(elements);
+                            query.number(number);
+                            break;
                         case SORTING:
                         case MATCHING:
                             List<Integer> ordering = getOrderingData(elements);
