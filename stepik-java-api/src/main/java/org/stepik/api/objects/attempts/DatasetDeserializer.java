@@ -7,15 +7,28 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
  * @author meanmail
  */
 public class DatasetDeserializer implements JsonDeserializer<Dataset> {
+
+    @NotNull
+    private static List<String> getStringList(@NotNull JsonObject object, @NotNull String memberName) {
+        JsonArray jsonArray = object.getAsJsonArray(memberName);
+        if (jsonArray != null) {
+            List<String> array = new ArrayList<>();
+            jsonArray.forEach(element -> array.add(element.getAsString()));
+            return array;
+        }
+        return Collections.emptyList();
+    }
 
     @Override
     public Dataset deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
@@ -49,6 +62,19 @@ public class DatasetDeserializer implements JsonDeserializer<Dataset> {
             List<Pair> array = new ArrayList<>();
             pairs.forEach(pair -> array.add(context.deserialize(pair, Pair.class)));
             dataset.setPairs(array);
+        }
+
+        dataset.setRows(getStringList(object, "rows"));
+        dataset.setColumns(getStringList(object, "columns"));
+
+        JsonPrimitive isCheckbox = object.getAsJsonPrimitive("is_checkbox");
+        if (isCheckbox != null) {
+            dataset.setCheckbox(isCheckbox.getAsBoolean());
+        }
+
+        JsonPrimitive description = object.getAsJsonPrimitive("description");
+        if (description != null) {
+            dataset.setDescription(description.getAsString());
         }
 
         return dataset;
