@@ -23,6 +23,7 @@ import com.jetbrains.tmp.learning.courseFormat.stepHelpers.NumberStepNodeHelper;
 import com.jetbrains.tmp.learning.courseFormat.stepHelpers.SortingStepNodeHelper;
 import com.jetbrains.tmp.learning.courseFormat.stepHelpers.StepHelper;
 import com.jetbrains.tmp.learning.courseFormat.stepHelpers.StringStepNodeHelper;
+import com.jetbrains.tmp.learning.courseFormat.stepHelpers.TableStepNodeHelper;
 import com.jetbrains.tmp.learning.courseFormat.stepHelpers.VideoStepNodeHelper;
 import com.jetbrains.tmp.learning.ui.StudyToolWindow;
 import com.jetbrains.tmp.learning.ui.StudyToolWindowFactory;
@@ -146,6 +147,12 @@ public class StudyUtils {
     public static String getDatasetStepText(@NotNull StepNode stepNode) {
         DatasetStepNodeHelper stepNodeHelper = stepNode.asDatasetStep();
         return processTemplate(stepNodeHelper, "quiz/dataset");
+    }
+
+    @NotNull
+    public static String getTableStepText(@NotNull StepNode stepNode) {
+        TableStepNodeHelper stepNodeHelper = stepNode.asTableStep();
+        return processTemplate(stepNodeHelper, "quiz/table");
     }
 
     @NotNull

@@ -51,7 +51,7 @@ public class StepikSubmissionsPostQuery extends StepikAbstractPostQuery<Submissi
     }
 
     @NotNull
-    public StepikSubmissionsPostQuery choices(List<Boolean> choices) {
+    public StepikSubmissionsPostQuery choices(@Nullable List choices) {
         submissions.getSubmission().getReply().setChoices(choices);
         return this;
     }
