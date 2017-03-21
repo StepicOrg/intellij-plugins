@@ -20,7 +20,7 @@ import com.intellij.openapi.ui.popup.JBPopupListener;
 import com.intellij.openapi.ui.popup.LightweightWindowEvent;
 import com.intellij.openapi.ui.popup.PopupChooserBuilder;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.jetbrains.tmp.learning.StudyUtils;
+import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.courseFormat.StudyNode;
@@ -90,10 +90,12 @@ public class DownloadSubmission extends AbstractStepAction {
             return;
         }
 
-        StepNode stepNode = StudyUtils.getSelectedStep(project);
-        if (stepNode == null) {
+        StudyNode<?, ?> studyNode = StepikProjectManager.getSelected(project);
+        if (!(studyNode instanceof StepNode)) {
             return;
         }
+
+        StepNode stepNode = (StepNode) studyNode;
 
         String title = "Download submission";
 

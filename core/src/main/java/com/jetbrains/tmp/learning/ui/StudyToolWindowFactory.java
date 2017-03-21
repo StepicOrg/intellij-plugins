@@ -9,7 +9,6 @@ import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentManager;
 import com.jetbrains.tmp.learning.StepikProjectManager;
-import com.jetbrains.tmp.learning.StudyUtils;
 import icons.AllStepikIcons;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,8 +25,7 @@ public class StudyToolWindowFactory implements ToolWindowFactory, DumbAware {
             return;
         }
 
-        final StudyToolWindow studyToolWindow;
-        studyToolWindow = StudyUtils.hasJavaFx() ? new StudyJavaFxToolWindow() : new StudySwingToolWindow();
+        final StudyToolWindow studyToolWindow = new StudyToolWindow();
         studyToolWindow.init(project);
         final ContentManager contentManager = toolWindow.getContentManager();
         final Content content = contentManager.getFactory().createContent(studyToolWindow, null, false);

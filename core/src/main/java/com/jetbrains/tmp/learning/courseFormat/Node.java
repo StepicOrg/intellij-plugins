@@ -47,7 +47,7 @@ public abstract class Node<
     private StudyNode getLastNode() {
         List<C> children = getChildren();
 
-        for (int i = children.size() - 1; i > 0; i--) {
+        for (int i = children.size() - 1; i >= 0; i--) {
             C child = children.get(i);
             if (!child.getWasDeleted()) {
                 return child;

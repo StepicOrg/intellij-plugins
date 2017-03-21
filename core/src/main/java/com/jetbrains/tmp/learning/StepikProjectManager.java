@@ -27,6 +27,7 @@ import com.jetbrains.tmp.learning.serialization.SampleConverter;
 import com.jetbrains.tmp.learning.serialization.StudySerializationUtils;
 import com.jetbrains.tmp.learning.serialization.StudyUnrecognizedFormatException;
 import com.jetbrains.tmp.learning.serialization.SupportedLanguagesConverter;
+import com.jetbrains.tmp.learning.ui.StudyToolWindow;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.XStreamException;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
@@ -59,8 +60,8 @@ import java.io.OutputStreamWriter;
 import java.util.UUID;
 
 import static com.jetbrains.tmp.learning.SupportedLanguages.INVALID;
-import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
 
 @State(name = "StepikStudySettings", storages = @Storage("stepik_study_project.xml"))
 public class StepikProjectManager implements PersistentStateComponent<Element>, DumbAware {
@@ -79,6 +80,7 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
     @XStreamOmitField
     private final Project project;
     private StudyNode<?, ?> root;
+    private StudyNode<?, ?> selected;
     private boolean showHint = false;
     private long createdBy;
     private SupportedLanguages defaultLang = INVALID;
@@ -174,6 +176,59 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
             element.addContent(root);
             return element;
         }
+    }
+
+    public static void setSelected(@NotNull Project project, @Nullable StudyNode studyNode, boolean force) {
+        StepikProjectManager instance = getInstance(project);
+        if (instance != null) {
+            instance.setSelected(studyNode, force);
+        }
+    }
+
+    public static void setSelected(@NotNull Project project, @Nullable StudyNode studyNode) {
+        setSelected(project, studyNode, false);
+    }
+
+    public static void updateSelection(@NotNull Project project) {
+        StepikProjectManager instance = getInstance(project);
+        if (instance != null) {
+            instance.updateSelection();
+        }
+    }
+
+    @Nullable
+    public static StudyNode<?, ?> getSelected(@Nullable Project project) {
+        if (project == null) {
+            return null;
+        }
+        StepikProjectManager instance = getInstance(project);
+        if (instance != null) {
+            return instance.getSelected();
+        }
+
+        return null;
+    }
+
+    public StudyNode<?, ?> getSelected() {
+        return selected;
+    }
+
+    public void setSelected(StudyNode<?, ?> selected) {
+        setSelected(selected, false);
+    }
+
+    public void setSelected(StudyNode<?, ?> selected, boolean force) {
+        this.selected = selected;
+        if (project != null) {
+            StudyToolWindow toolWindow = StudyUtils.getStudyToolWindow(project);
+            if (toolWindow != null) {
+                ApplicationManager.getApplication().invokeLater(() -> toolWindow.setStepNode(selected, force));
+            }
+        }
+    }
+
+    public void updateSelection() {
+        setSelected(selected, true);
     }
 
     public void setRootNode(@Nullable StudyNode root) {

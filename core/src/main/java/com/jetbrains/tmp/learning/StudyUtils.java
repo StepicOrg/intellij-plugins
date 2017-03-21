@@ -5,8 +5,6 @@ import com.intellij.ide.projectView.ProjectViewNode;
 import com.intellij.ide.projectView.impl.AbstractProjectViewPane;
 import com.intellij.ide.ui.LafManager;
 import com.intellij.ide.ui.laf.darcula.DarculaLookAndFeelInfo;
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
@@ -59,11 +57,6 @@ public class StudyUtils {
     private StudyUtils() {
     }
 
-    public static void updateToolWindows(@NotNull final Project project) {
-        StudyNode stepNode = getSelectedNode(project);
-        setStudyNode(project, stepNode, true);
-    }
-
     static void initToolWindows(@NotNull final Project project) {
         final ToolWindowManager windowManager = ToolWindowManager.getInstance(project);
         windowManager.getToolWindow(StudyToolWindowFactory.STUDY_TOOL_WINDOW)
@@ -87,17 +80,6 @@ public class StudyUtils {
             }
         }
         return null;
-    }
-
-    public static void setStudyNode(@NotNull final Project project, @Nullable StudyNode studyNode) {
-        setStudyNode(project, studyNode, false);
-    }
-
-    public static void setStudyNode(@NotNull final Project project, @Nullable StudyNode studyNode, boolean force) {
-        StudyToolWindow toolWindow = getStudyToolWindow(project);
-        if (toolWindow != null) {
-            ApplicationManager.getApplication().invokeLater(() -> toolWindow.setStepNode(studyNode, force));
-        }
     }
 
     @NotNull
@@ -269,29 +251,6 @@ public class StudyUtils {
     }
 
     @Nullable
-    public static StepNode getSelectedStep(@NotNull Project project) {
-        VirtualFile[] files = FileEditorManager.getInstance(project).getSelectedFiles();
-        if (files.length == 0) {
-            return null;
-        }
-
-        StudyNode studyNode = getStudyNode(project, files[0]);
-
-        return studyNode instanceof StepNode ? (StepNode) studyNode : null;
-    }
-
-    @Nullable
-    static StudyNode getSelectedNode(@NotNull Project project) {
-        StudyNode studyNode = getSelectedStep(project);
-
-        if (studyNode == null) {
-            studyNode = getSelectedNodeInTree(project);
-        }
-
-        return studyNode;
-    }
-
-    @Nullable
     public static StudyNode getSelectedNodeInTree(@NotNull Project project) {
         PsiElement element = getSelectedPsiElement(project);
         if (element == null) {
@@ -337,15 +296,6 @@ public class StudyUtils {
             }
         } else {
             return null;
-        }
-    }
-
-    public static boolean hasJavaFx() {
-        try {
-            Class.forName("javafx.application.Platform");
-            return true;
-        } catch (ClassNotFoundException e) {
-            return false;
         }
     }
 

@@ -4,7 +4,6 @@ import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.extensions.ExtensionPointName;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.project.Project;
-import com.jetbrains.tmp.learning.ui.StudyToolWindow;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -28,9 +27,7 @@ public interface StudyPluginConfigurator {
     Map<String, JPanel> getAdditionalPanels(Project project);
 
     @NotNull
-    FileEditorManagerListener getFileEditorManagerListener(
-            @NotNull final Project project,
-            @NotNull final StudyToolWindow toolWindow);
+    FileEditorManagerListener getFileEditorManagerListener(@NotNull final Project project);
 
     boolean accept(@NotNull final Project project);
 }

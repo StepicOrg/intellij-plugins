@@ -1,6 +1,5 @@
 package com.jetbrains.tmp.learning.ui;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.ide.ui.LafManager;
 import com.intellij.ide.ui.LafManagerListener;
@@ -25,10 +24,8 @@ import javafx.application.Platform;
 import javafx.concurrent.Worker;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
-import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebHistory;
 import javafx.scene.web.WebView;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -48,8 +45,6 @@ import org.w3c.dom.events.EventTarget;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -65,16 +60,10 @@ class StudyBrowserWindow extends JFrame {
     private JFXPanel panel;
     private WebView webComponent;
     private StackPane pane;
-
     private WebEngine engine;
-    private ProgressBar progressBar;
-    private boolean linkInNewBrowser = true;
-    private boolean showProgress = false;
 
-    StudyBrowserWindow(@NotNull Project project, final boolean linkInNewWindow, final boolean showProgress) {
+    StudyBrowserWindow(@NotNull Project project) {
         this.project = project;
-        linkInNewBrowser = linkInNewWindow;
-        this.showProgress = showProgress;
         setSize(new Dimension(900, 800));
         setLayout(new BorderLayout());
         setPanel(new JFXPanel());
@@ -117,17 +106,8 @@ class StudyBrowserWindow extends JFrame {
             pane = new StackPane();
             webComponent = new WebView();
             engine = webComponent.getEngine();
-
-            if (showProgress) {
-                progressBar = makeProgressBarWithListener();
-                webComponent.setVisible(false);
-                pane.getChildren().addAll(webComponent, progressBar);
-            } else {
-                pane.getChildren().add(webComponent);
-            }
-            if (linkInNewBrowser) {
-                initHyperlinkListener();
-            }
+            pane.getChildren().add(webComponent);
+            initHyperlinkListener();
             Scene scene = new Scene(pane);
             panel.setScene(scene);
             panel.setVisible(true);
@@ -140,10 +120,7 @@ class StudyBrowserWindow extends JFrame {
 
     void loadContent(@NotNull final String content) {
         String withCodeHighlighting = createHtmlWithCodeHighlighting(content);
-        Platform.runLater(() -> {
-            updateLookWithProgressBarIfNeeded();
-            engine.loadContent(withCodeHighlighting);
-        });
+        Platform.runLater(() -> engine.loadContent(withCodeHighlighting));
     }
 
     @Nullable
@@ -166,13 +143,6 @@ class StudyBrowserWindow extends JFrame {
 
     private String getExternalURL(@NotNull String internalPath) {
         return getClass().getResource(internalPath).toExternalForm();
-    }
-
-    private void updateLookWithProgressBarIfNeeded() {
-        if (showProgress) {
-            progressBar.setVisible(true);
-            webComponent.setVisible(false);
-        }
     }
 
     private void initHyperlinkListener() {
@@ -330,74 +300,6 @@ class StudyBrowserWindow extends JFrame {
                 return attributes.getNamedItem("href").getNodeValue();
             }
         };
-    }
-
-    void addBackAndOpenButtons() {
-        ApplicationManager.getApplication().invokeLater(() -> {
-            final JPanel panel = new JPanel();
-            panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-
-            final JButton backButton = makeGoButton("Click to go back", AllIcons.Actions.Back, -1);
-            final JButton forwardButton = makeGoButton("Click to go forward", AllIcons.Actions.Forward, 1);
-            final JButton openInBrowser = new JButton(AllIcons.Actions.Browser_externalJavaDoc);
-            openInBrowser.addActionListener(e -> BrowserUtil.browse(engine.getLocation()));
-            openInBrowser.setToolTipText("Click to open link in browser");
-            addButtonsAvailabilityListeners(backButton, forwardButton);
-
-            panel.setMaximumSize(new Dimension(40, getPanel().getHeight()));
-            panel.add(backButton);
-            panel.add(forwardButton);
-            panel.add(openInBrowser);
-
-            add(panel, BorderLayout.PAGE_START);
-        });
-    }
-
-    private void addButtonsAvailabilityListeners(JButton backButton, JButton forwardButton) {
-        Platform.runLater(() -> engine.getLoadWorker().stateProperty().addListener((ov, oldState, newState) -> {
-            if (newState == Worker.State.SUCCEEDED) {
-                final WebHistory history = engine.getHistory();
-                boolean isGoBackAvailable = history.getCurrentIndex() > 0;
-                boolean isGoForwardAvailable = history.getCurrentIndex() < history.getEntries().size() - 1;
-                ApplicationManager.getApplication().invokeLater(() -> {
-                    backButton.setEnabled(isGoBackAvailable);
-                    forwardButton.setEnabled(isGoForwardAvailable);
-                });
-            }
-        }));
-    }
-
-    private JButton makeGoButton(@NotNull final String toolTipText, @NotNull final Icon icon, final int direction) {
-        final JButton button = new JButton(icon);
-        button.setEnabled(false);
-        button.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 1) {
-                    Platform.runLater(() -> engine.getHistory().go(direction));
-                }
-            }
-        });
-        button.setToolTipText(toolTipText);
-        return button;
-    }
-
-
-    private ProgressBar makeProgressBarWithListener() {
-        final ProgressBar progress = new ProgressBar();
-        progress.progressProperty().bind(webComponent.getEngine().getLoadWorker().progressProperty());
-
-        webComponent.getEngine().getLoadWorker().stateProperty().addListener(
-                (ov, oldState, newState) -> {
-                    if (webComponent.getEngine()
-                            .getLocation()
-                            .contains("http") && newState == Worker.State.SUCCEEDED) {
-                        progressBar.setVisible(false);
-                        webComponent.setVisible(true);
-                    }
-                });
-
-        return progress;
     }
 
     JFXPanel getPanel() {

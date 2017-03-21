@@ -60,11 +60,10 @@
     var active = false;
     </#if>
 
-    if (time_left > 0) {
-        clock.innerHTML = timeToString(time_left);
-    }
-
     if (active) {
+        if (time_left > 0) {
+            clock.innerHTML = timeToString(time_left);
+        }
         var timerId = setInterval(function () {
             time_left--;
 

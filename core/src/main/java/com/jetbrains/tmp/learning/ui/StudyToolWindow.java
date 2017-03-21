@@ -57,7 +57,7 @@ import static com.jetbrains.tmp.learning.courseFormat.StepType.TEXT;
 import static com.jetbrains.tmp.learning.courseFormat.StepType.VIDEO;
 import static org.stepik.core.utils.PluginUtils.PLUGIN_ID;
 
-public abstract class StudyToolWindow extends SimpleToolWindowPanel implements DataProvider, Disposable, ActionListener {
+public class StudyToolWindow extends SimpleToolWindowPanel implements DataProvider, Disposable, ActionListener {
     private static final Logger logger = Logger.getInstance(StudyToolWindow.class);
     private static final String STEP_INFO_ID = "stepInfo";
     private static final String EMPTY_STEP_TEXT = "Please, open any step to see step description";
@@ -73,6 +73,7 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
     private final ActionListener qualityListener;
     private Project project;
     private StepNode stepNode;
+    private StudyBrowserWindow browserWindow;
 
     StudyToolWindow() {
         super(true, true);
@@ -109,6 +110,18 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
         }
     }
 
+    private JComponent createStepInfoPanel(Project project) {
+        browserWindow = new StudyBrowserWindow(project);
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+        panel.add(browserWindow.getPanel());
+        return panel;
+    }
+
+    private void setText(@NotNull String text) {
+        browserWindow.loadContent(text);
+    }
+
     private JPanel createToolbarPanel(ActionGroup group) {
         final ActionToolbar actionToolBar = ActionManager.getInstance().createActionToolbar("Study", group, true);
         BorderLayoutPanel toolBar = JBUI.Panels.simplePanel(actionToolBar.getComponent());
@@ -135,7 +148,7 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
 
         StudyPluginConfigurator configurator = StudyUtils.getConfigurator(project);
         if (configurator != null) {
-            final FileEditorManagerListener listener = configurator.getFileEditorManagerListener(project, this);
+            final FileEditorManagerListener listener = configurator.getFileEditorManagerListener(project);
             project.getMessageBus().connect().subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, listener);
         }
 
@@ -143,7 +156,7 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
         videoQualityBox.addItem(loadVideoQuality());
         videoQualityBox.setSelectedIndex(0);
 
-        StepNode stepNode = StudyUtils.getSelectedStep(project);
+        StudyNode<?, ?> stepNode = StepikProjectManager.getSelected(project);
         setStepNode(stepNode);
     }
 
@@ -166,9 +179,7 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
         setStepNode(null);
     }
 
-    public abstract JComponent createStepInfoPanel(Project project);
-
-    public void setStepNode(@Nullable StudyNode studyNode) {
+    private void setStepNode(@Nullable StudyNode studyNode) {
         setStepNode(studyNode, false);
     }
 
@@ -300,8 +311,6 @@ public abstract class StudyToolWindow extends SimpleToolWindowPanel implements D
     private void storeVideoQuality(int quality) {
         PropertiesComponent.getInstance().setValue(VIDEO_QUALITY_PROPERTY_NAME, String.valueOf(quality));
     }
-
-    protected abstract void setText(@NotNull String text);
 
     @Override
     public void actionPerformed(ActionEvent e) {

@@ -83,7 +83,7 @@ class FormListener implements EventListener {
                         boolean locked = elements.isLocked();
                         if (!locked) {
                             getAttempt(stepNode);
-                            StudyUtils.setStudyNode(project, node, true);
+                            StepikProjectManager.updateSelection(project);
                         }
                         break;
                     case "active":
@@ -210,7 +210,7 @@ class FormListener implements EventListener {
                     }
                 } catch (StepikClientException e) {
                     logger.warn("Failed send step from browser", e);
-                    StudyUtils.updateToolWindows(project);
+                    StepikProjectManager.updateSelection(project);
                 }
             }
         });
