@@ -2,8 +2,8 @@ package org.stepik.plugin;
 
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.project.Project;
-import com.jetbrains.tmp.learning.StepikProjectManager;
-import com.jetbrains.tmp.learning.StudyBasePluginConfigurator;
+import org.stepik.core.StepikProjectManager;
+import org.stepik.core.StudyBasePluginConfigurator;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.plugin.actions.navigation.StepikNextStepAction;
 import org.stepik.plugin.actions.navigation.StepikPreviousStepAction;

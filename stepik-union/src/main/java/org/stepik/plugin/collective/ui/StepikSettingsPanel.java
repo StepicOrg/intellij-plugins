@@ -1,7 +1,7 @@
 package org.stepik.plugin.collective.ui;
 
-import com.jetbrains.tmp.learning.StepikProjectManager;
-import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
+import org.stepik.core.StepikProjectManager;
+import org.stepik.core.stepik.StepikConnectorLogin;
 import org.stepik.core.utils.Utils;
 
 import javax.swing.*;

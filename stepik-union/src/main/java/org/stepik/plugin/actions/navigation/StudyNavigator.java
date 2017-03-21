@@ -1,6 +1,6 @@
 package org.stepik.plugin.actions.navigation;
 
-import com.jetbrains.tmp.learning.courseFormat.StudyNode;
+import org.stepik.core.courseFormat.StudyNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

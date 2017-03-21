@@ -11,10 +11,10 @@ import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.jetbrains.tmp.learning.StepikProjectManager;
-import com.jetbrains.tmp.learning.SupportedLanguages;
-import com.jetbrains.tmp.learning.courseFormat.StepNode;
-import com.jetbrains.tmp.learning.courseFormat.StudyNode;
+import org.stepik.core.StepikProjectManager;
+import org.stepik.core.SupportedLanguages;
+import org.stepik.core.courseFormat.StepNode;
+import org.stepik.core.courseFormat.StudyNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.core.metrics.Metrics;
@@ -23,7 +23,7 @@ import org.stepik.plugin.utils.ReformatUtils;
 
 import javax.swing.*;
 
-import static com.jetbrains.tmp.learning.courseFormat.StepType.CODE;
+import static org.stepik.core.courseFormat.StepType.CODE;
 import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
 import static org.stepik.plugin.utils.DirectivesUtils.insertAmbientCode;

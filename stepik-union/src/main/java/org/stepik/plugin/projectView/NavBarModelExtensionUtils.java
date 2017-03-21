@@ -5,8 +5,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.jetbrains.tmp.learning.StepikProjectManager;
-import com.jetbrains.tmp.learning.courseFormat.StudyNode;
+import org.stepik.core.StepikProjectManager;
+import org.stepik.core.courseFormat.StudyNode;
 import org.jetbrains.annotations.Nullable;
 
 import static org.stepik.plugin.utils.PresentationDataUtils.isVisibleDirectory;

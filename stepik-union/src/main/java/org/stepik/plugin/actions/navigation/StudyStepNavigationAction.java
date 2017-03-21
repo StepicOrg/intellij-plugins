@@ -3,10 +3,10 @@ package org.stepik.plugin.actions.navigation;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.project.Project;
-import com.jetbrains.tmp.learning.StepikProjectManager;
-import com.jetbrains.tmp.learning.StudyUtils;
-import com.jetbrains.tmp.learning.actions.StudyActionWithShortcut;
-import com.jetbrains.tmp.learning.courseFormat.StudyNode;
+import org.stepik.core.StepikProjectManager;
+import org.stepik.core.StudyUtils;
+import org.stepik.core.actions.StudyActionWithShortcut;
+import org.stepik.core.courseFormat.StudyNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

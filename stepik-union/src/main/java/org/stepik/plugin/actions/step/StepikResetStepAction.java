@@ -12,9 +12,9 @@ import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.problems.WolfTheProblemSolver;
-import com.jetbrains.tmp.learning.StepikProjectManager;
-import com.jetbrains.tmp.learning.courseFormat.StepNode;
-import com.jetbrains.tmp.learning.courseFormat.StudyNode;
+import org.stepik.core.StepikProjectManager;
+import org.stepik.core.courseFormat.StepNode;
+import org.stepik.core.courseFormat.StudyNode;
 import icons.AllStepikIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -23,7 +23,7 @@ import org.stepik.core.metrics.MetricsStatus;
 
 import javax.swing.*;
 
-import static com.jetbrains.tmp.learning.courseFormat.StepType.CODE;
+import static org.stepik.core.courseFormat.StepType.CODE;
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
 
 public class StepikResetStepAction extends AbstractStepAction {
