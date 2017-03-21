@@ -3,6 +3,7 @@ package com.jetbrains.tmp.learning.stepik;
 import com.intellij.credentialStore.CredentialAttributes;
 import com.intellij.ide.passwordSafe.PasswordSafe;
 import com.intellij.ide.util.PropertiesComponent;
+import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.diagnostic.Logger;
@@ -16,21 +17,30 @@ import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.auth.TokenInfo;
 import org.stepik.api.objects.users.User;
 import org.stepik.core.metrics.Metrics;
+import org.stepik.plugin.auth.ui.AuthDialog;
+
+import java.util.Map;
 
 import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
 import static org.stepik.core.utils.PluginUtils.PLUGIN_ID;
 
 public class StepikConnectorLogin {
     private static final Logger logger = Logger.getInstance(StepikConnectorLogin.class);
-    private static final String CLIENT_ID = "hUCWcq3hZHCmz0DKrDtwOWITLcYutzot7p4n59vU";
+    private static final String CLIENT_ID = "vV8giW7KTPMOTriOUBwyGLvXbKV0Cc4GPBnyCJPd";
+    private static final String REDIRECT_URI = "https%3A%2F%2Fstepik.org";
     private static final String LAST_USER_PROPERTY_NAME = PLUGIN_ID + ".LAST_USER";
     private static final StepikApiClient stepikApiClient = initStepikApiClient();
+    private static final String IMPLICIT_GRANT_URL = "https://stepik.org/oauth2/authorize/" +
+            "?client_id=" + CLIENT_ID +
+            "&redirect_uri=" + REDIRECT_URI +
+            "&scope=write" +
+            "&response_type=token";
 
-    private static long getLastUser() {
+    private static synchronized long getLastUser() {
         return PropertiesComponent.getInstance().getOrInitLong(LAST_USER_PROPERTY_NAME, 0);
     }
 
-    private static void setLastUser(long userId) {
+    private static synchronized void setLastUser(long userId) {
         PropertiesComponent.getInstance().setValue(LAST_USER_PROPERTY_NAME, String.valueOf(userId));
     }
 
@@ -49,9 +59,9 @@ public class StepikConnectorLogin {
 
         long lastUserId = getLastUser();
 
-        AuthInfo authInfo = getAuthInfo(lastUserId, client);
+        TokenInfo tokenInfo = getTokenInfo(lastUserId, client);
 
-        client.setTokenInfo(authInfo.getTokenInfo());
+        client.setTokenInfo(tokenInfo);
 
         return client;
     }
@@ -65,36 +75,61 @@ public class StepikConnectorLogin {
      * <li>Show a dialog box for getting an username and a password</li>
      * </ul>
      */
-    public static void authentication() {
-        AuthInfo authInfo = getAuthInfo(getLastUser());
-        if (!minorLogin(authInfo)) {
-            showAuthDialog();
+    public static synchronized void authentication() {
+        TokenInfo tokenInfo = getTokenInfo(getLastUser());
+        if (!minorLogin(tokenInfo)) {
+            showAuthDialog(false);
         }
     }
 
-    private static void showAuthDialog() {
-        ApplicationManager.getApplication().invokeAndWait(() -> {
-            logger.info("Show the authentication dialog");
-            final LoginDialog dialog = new LoginDialog();
-            dialog.show();
-        }, ModalityState.defaultModalityState());
+    private static void showAuthDialog(boolean clear) {
+        Application application = ApplicationManager.getApplication();
+        if (!application.isDispatchThread()) {
+            application.invokeAndWait(() -> showDialog(clear), ModalityState.defaultModalityState());
+        } else {
+            showDialog(clear);
+        }
     }
 
-    private static boolean minorLogin(@NotNull AuthInfo authInfo) {
-        logger.info("Check the authentication");
+    private static void showDialog(boolean clear) {
+        logger.info("Show the authentication dialog");
+        Map<String, String> map = AuthDialog.showAuthForm(clear);
 
+        TokenInfo tokenInfo = new TokenInfo();
+        tokenInfo.setAccessToken(map.get("access_token"));
+        tokenInfo.setExpiresIn(Integer.valueOf(map.getOrDefault("expires_in", "0")));
+        tokenInfo.setScope(map.get("scope"));
+        tokenInfo.setTokenType(map.get("token_type"));
+        tokenInfo.setRefreshToken(map.get("refresh_token"));
+        stepikApiClient.setTokenInfo(tokenInfo);
+        if (tokenInfo.getAccessToken() != null) {
+            Metrics.authenticate(SUCCESSFUL);
+        }
+    }
+
+    public static boolean authenticated() {
         if (stepikApiClient.getTokenInfo().getAccessToken() != null) {
             User user = getCurrentUser();
 
             if (!user.isGuest()) {
-                logger.info("Authenticated");
                 return true;
             }
         }
 
+        return false;
+    }
+
+    private static boolean minorLogin(@NotNull TokenInfo tokenInfo) {
+        logger.info("Check the authentication");
+
+        if (authenticated()) {
+            logger.info("Authenticated");
+            return true;
+        }
+
         String refreshToken = stepikApiClient.getTokenInfo().getRefreshToken();
-        if (refreshToken == null && authInfo.getTokenInfo() != null) {
-            refreshToken = authInfo.getTokenInfo().getRefreshToken();
+        if (refreshToken == null) {
+            refreshToken = tokenInfo.getRefreshToken();
         }
 
         if (refreshToken != null) {
@@ -110,29 +145,18 @@ public class StepikConnectorLogin {
             }
         }
 
-        if (authInfo.canBeValid()) {
-            try {
-                logger.info("Try execute the Authentication with a password");
-                authenticate(authInfo.getUsername(), authInfo.getPassword());
-                logger.info("The Authentication with a password is successfully");
-                return true;
-            } catch (StepikClientException e) {
-                logger.info("The Authentication with a password failed: " + e.getMessage());
-            }
-        }
-
         return false;
     }
 
     @NotNull
-    private static AuthInfo getAuthInfo(long userId) {
-        return getAuthInfo(userId, stepikApiClient);
+    private static TokenInfo getTokenInfo(long userId) {
+        return getTokenInfo(userId, stepikApiClient);
     }
 
     @NotNull
-    private static AuthInfo getAuthInfo(long userId, StepikApiClient client) {
+    private static TokenInfo getTokenInfo(long userId, StepikApiClient client) {
         if (userId == 0) {
-            return new AuthInfo();
+            return new TokenInfo();
         }
         String serviceName = StepikProjectManager.class.getName();
         CredentialAttributes attributes = new CredentialAttributes(serviceName,
@@ -143,27 +167,21 @@ public class StepikConnectorLogin {
         synchronized (StepikConnectorLogin.class) {
             serializedAuthInfo = PasswordSafe.getInstance().getPassword(attributes);
         }
-        AuthInfo authInfo = client.getJsonConverter().fromJson(serializedAuthInfo, AuthInfo.class);
+        TokenInfo authInfo = client.getJsonConverter().fromJson(serializedAuthInfo, TokenInfo.class);
 
         if (authInfo == null) {
-            return new AuthInfo();
+            return new TokenInfo();
         }
         return authInfo;
     }
 
-    @NotNull
-    public static String getCurrentUserPassword() {
-        User currentUser = getCurrentUser();
-        return getAuthInfo(currentUser.getId()).getPassword();
-    }
-
-    private static void setAuthInfo(long userId, @NotNull final AuthInfo authInfo) {
+    private static void setTokenInfo(long userId, @NotNull final TokenInfo tokenInfo) {
         String serviceName = StepikProjectManager.class.getName();
         CredentialAttributes attributes = new CredentialAttributes(serviceName,
                 String.valueOf(userId),
                 StepikProjectManager.class,
                 false);
-        String serializedAuthInfo = stepikApiClient.getJsonConverter().toJson(authInfo);
+        String serializedAuthInfo = stepikApiClient.getJsonConverter().toJson(tokenInfo);
         synchronized (StepikConnectorLogin.class) {
             PasswordSafe.getInstance().setPassword(attributes, serializedAuthInfo);
             setLastUser(userId);
@@ -173,25 +191,6 @@ public class StepikConnectorLogin {
     @NotNull
     public static StepikApiClient getStepikApiClient() {
         return stepikApiClient;
-    }
-
-    @NotNull
-    public static User testAuthentication(@Nullable String username, @Nullable String password) {
-        TokenInfo currentTokenInfo = stepikApiClient.getTokenInfo();
-
-        User testUser;
-        try {
-            authenticate(username, password);
-            logger.info("The test authentication is successfully");
-            testUser = getCurrentUser();
-        } catch (StepikClientException e) {
-            logger.info("The test authentication failed");
-            throw e;
-        } finally {
-            stepikApiClient.setTokenInfo(currentTokenInfo);
-        }
-
-        return testUser;
     }
 
     @NotNull
@@ -207,33 +206,6 @@ public class StepikConnectorLogin {
         }
     }
 
-    public static void authenticate(@Nullable String username, @Nullable String password) {
-        try {
-            stepikApiClient.oauth2()
-                    .userAuthenticationPassword(CLIENT_ID, username, password)
-                    .execute();
-
-            AuthInfo authInfo = new AuthInfo();
-            authInfo.setTokenInfo(stepikApiClient.getTokenInfo());
-            authInfo.setUsername(username);
-            authInfo.setPassword(password);
-
-            long userId = getCurrentUser().getId();
-            setAuthInfo(userId, authInfo);
-            logger.info("Authentication is successfully");
-            Metrics.authenticate(SUCCESSFUL);
-        } catch (StepikClientException e) {
-            logger.warn("Authentication failed", e);
-            throw e;
-        }
-    }
-
-    @NotNull
-    public static String getCurrentUsername() {
-        User currentUser = getCurrentUser();
-        return getAuthInfo(currentUser.getId()).getUsername();
-    }
-
     @NotNull
     public static String getCurrentUserFullName() {
         User user = getCurrentUser();
@@ -245,13 +217,21 @@ public class StepikConnectorLogin {
         return stepikApiClient;
     }
 
-    public static void logout() {
-        synchronized (StepikConnectorLogin.class) {
-            stepikApiClient.setTokenInfo(null);
-            long userId = getLastUser();
-            setAuthInfo(userId, new AuthInfo());
-            setLastUser(0);
-            logger.info("Logout successfully");
-        }
+    public static synchronized void logout() {
+        stepikApiClient.setTokenInfo(null);
+        long userId = getLastUser();
+        setTokenInfo(userId, new TokenInfo());
+        setLastUser(0);
+        logger.info("Logout successfully");
+    }
+
+    @Nullable
+    public static String getImplicitGrantUrl() {
+        return IMPLICIT_GRANT_URL;
+    }
+
+    public static void logoutAndAuth() {
+        logout();
+        showAuthDialog(true);
     }
 }

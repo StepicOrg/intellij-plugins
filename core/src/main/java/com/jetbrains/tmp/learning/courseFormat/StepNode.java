@@ -1,7 +1,7 @@
 package com.jetbrains.tmp.learning.courseFormat;
 
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.project.Project;
 import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.stepHelpers.ChoiceStepNodeHelper;
@@ -46,21 +46,16 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
 
     public StepNode() {}
 
-    public StepNode(@NotNull Step data, @Nullable ProgressIndicator indicator) {
-        super(data, indicator);
+    public StepNode(@NotNull Project project, @NotNull Step data) {
+        super(project, data);
     }
 
     @Override
-    public void init(@Nullable StudyNode parent, @Nullable ProgressIndicator indicator) {
-        if (indicator != null) {
-            indicator.setText("Refresh a step: " + getName());
-            indicator.setText2("");
-        }
-
+    public void init(@NotNull Project project, @Nullable StudyNode parent) {
         supportedLanguages = null;
         courseId = 0;
 
-        super.init(parent, indicator);
+        super.init(project, parent);
     }
 
     @Override

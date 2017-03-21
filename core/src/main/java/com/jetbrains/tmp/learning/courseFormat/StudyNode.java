@@ -1,6 +1,6 @@
 package com.jetbrains.tmp.learning.courseFormat;
 
-import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.objects.StudyObject;
@@ -54,15 +54,15 @@ public interface StudyNode<D extends StudyObject, C extends StudyNode> {
 
     void setData(@Nullable D data);
 
-    void init(@Nullable final StudyNode parent, @Nullable ProgressIndicator indicator);
+    void init(@NotNull Project project, @Nullable final StudyNode parent);
 
-    default void init(@Nullable ProgressIndicator indicator) {
-        init(null, indicator);
+    default void init(@NotNull Project project) {
+        init(project, null);
     }
 
     boolean canBeLeaf();
 
-    void reloadData(@NotNull ProgressIndicator indicator);
+    void reloadData(@NotNull Project project);
 
     boolean getWasDeleted();
 
@@ -73,4 +73,9 @@ public interface StudyNode<D extends StudyObject, C extends StudyNode> {
     void setRawStatus(@Nullable StudyStatus status);
 
     void passed();
+
+    @Nullable
+    Project getProject();
+
+    void setProject(@NotNull Project project);
 }

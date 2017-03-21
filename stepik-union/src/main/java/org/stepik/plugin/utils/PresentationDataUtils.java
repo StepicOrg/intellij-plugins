@@ -46,14 +46,18 @@ public class PresentationDataUtils {
 
         StudyNode node = StudyUtils.getStudyNode(project, psiDirectory.getVirtualFile());
         if (node != null && path.equals(node.getPath())) {
-            setAttributes(data, node);
+            setAttributes(project, data, node);
         } else {
             data.setPresentableText(valueName);
         }
     }
 
-    private static void setAttributes(@NotNull PresentationData data, @NotNull StudyNode item) {
+    private static void setAttributes(
+            @NotNull Project project,
+            @NotNull PresentationData data,
+            @NotNull StudyNode item) {
         String text = item.getName();
+        item.setProject(project);
         StudyStatus status = item.getStatus();
         JBColor color = getColor(status);
         Icon icon = getIcon(item, status);

@@ -6,6 +6,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
 import com.jetbrains.tmp.learning.SupportedLanguages;
+import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.api.objects.StudyObject;
 import org.stepik.core.projectWizard.ProjectWizardUtils;
@@ -25,7 +26,7 @@ class JavaWizardStep extends ModuleWizardStep {
     JavaWizardStep(@NotNull final StepikProjectGenerator generator, @NotNull Project project) {
         this.generator = generator;
         this.project = project;
-        panel = new ProjectSettingsPanel(project, true);
+        panel = new ProjectSettingsPanel(true);
     }
 
     @NotNull
@@ -40,6 +41,7 @@ class JavaWizardStep extends ModuleWizardStep {
 
     @Override
     public void updateStep() {
+        StepikConnectorLogin.authentication();
         panel.updateStep();
         valid = false;
         leaving = false;

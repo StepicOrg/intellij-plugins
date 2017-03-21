@@ -13,6 +13,7 @@ import com.intellij.openapi.module.ModuleWithNameAlreadyExists;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -285,35 +286,40 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
     }
 
     private void refreshCourse() {
-        if (getProjectRoot() == null) {
+        if (getProjectRoot() == null || project == null) {
             return;
         }
 
-        ProgressManager.getInstance()
-                .runProcessWithProgressSynchronously(() -> {
-                    ProgressIndicator indicator = ProgressManager.getInstance()
-                            .getProgressIndicator();
-                    indicator.setIndeterminate(true);
-                    root.reloadData(indicator);
-                }, "Refreshing Course", true, project);
-        ApplicationManager.getApplication().invokeLater(() -> {
-            repairProjectFiles(root);
-            VirtualFileManager.getInstance().syncRefresh();
+        root.setProject(project);
 
-            VirtualFile projectDir = project != null ? project.getBaseDir() : null;
-            if (projectDir != null && projectDir.findChild(EduNames.SANDBOX_DIR) == null) {
-                ModifiableModuleModel model = ModuleManager.getInstance(project).getModifiableModel();
+        new Thread(() -> {
+            root.reloadData(project);
+            ProgressManager.getInstance().run(new Task.Backgroundable(project, "Synchronize project") {
+                @Override
+                public void run(@NotNull ProgressIndicator indicator) {
+                    repairProjectFiles(root);
 
-                ApplicationManager.getApplication().runWriteAction(() -> {
-                    try {
-                        new SandboxModuleBuilder(projectDir.getPath()).createModule(model);
-                        model.commit();
-                    } catch (IOException | ConfigurationException | JDOMException | ModuleWithNameAlreadyExists e) {
-                        logger.warn("Failed repair Sandbox", e);
+                    VirtualFile projectDir = project.getBaseDir();
+                    if (projectDir != null && projectDir.findChild(EduNames.SANDBOX_DIR) == null) {
+                        ModifiableModuleModel model = ModuleManager.getInstance(project)
+                                .getModifiableModel();
+
+                        ApplicationManager.getApplication().runWriteAction(() -> {
+                            try {
+                                new SandboxModuleBuilder(projectDir.getPath()).createModule(model);
+                                model.commit();
+                            } catch (IOException | ConfigurationException | JDOMException | ModuleWithNameAlreadyExists e) {
+                                logger.warn("Failed repair Sandbox", e);
+                            }
+                        });
                     }
-                });
-            }
-        });
+
+                    ApplicationManager.getApplication().invokeLater(() ->
+                            VirtualFileManager.getInstance().syncRefresh()
+                    );
+                }
+            });
+        }).start();
     }
 
     private void repairProjectFiles(@NotNull StudyNode<?, ?> node) {

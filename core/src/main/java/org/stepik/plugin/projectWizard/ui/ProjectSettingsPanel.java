@@ -1,7 +1,6 @@
 package org.stepik.plugin.projectWizard.ui;
 
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.project.Project;
 import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
@@ -17,7 +16,6 @@ import java.util.List;
 
 public class ProjectSettingsPanel implements ProjectSetting, HierarchyListener {
     private static final Logger logger = Logger.getInstance(ProjectSettingsPanel.class);
-    private final Project project;
     private final List<ProjectSettingListener> listeners = new ArrayList<>();
     private JPanel mainPanel;
     private JLabel nameLabel;
@@ -32,9 +30,8 @@ public class ProjectSettingsPanel implements ProjectSetting, HierarchyListener {
     private JButton logoutButton;
     private StudyObject selectedStudyObject = StepikProjectGenerator.EMPTY_STUDY_OBJECT;
 
-    public ProjectSettingsPanel(@NotNull Project project, boolean visibleLangBox) {
-        this.project = project;
-        refreshListButton.setTarget(courseListComboBox, project);
+    public ProjectSettingsPanel(boolean visibleLangBox) {
+        refreshListButton.setTarget(courseListComboBox);
         courseListComboBox.setTarget(this);
 
         langComboBox.setTarget(this);
@@ -44,8 +41,7 @@ public class ProjectSettingsPanel implements ProjectSetting, HierarchyListener {
         mainPanel.addHierarchyListener(this);
 
         logoutButton.addActionListener(e -> {
-            StepikConnectorLogin.logout();
-            StepikConnectorLogin.authentication();
+            StepikConnectorLogin.logoutAndAuth();
             setUsername();
         });
     }
@@ -62,9 +58,8 @@ public class ProjectSettingsPanel implements ProjectSetting, HierarchyListener {
 
     public void updateStep() {
         logger.info("Start updating settings");
-        StepikConnectorLogin.authentication();
+        courseListComboBox.refresh(langComboBox.getSelectedItem());
         setUsername();
-        courseListComboBox.refresh(project, langComboBox.getSelectedItem());
         logger.info("Updating settings is done");
     }
 
@@ -82,6 +77,7 @@ public class ProjectSettingsPanel implements ProjectSetting, HierarchyListener {
         // Scroll to top
         courseListDescription.setSelectionStart(0);
         courseListDescription.setSelectionEnd(0);
+        setUsername();
         logger.info("Has selected the course: " + studyObject);
         notifyListeners();
     }
@@ -102,7 +98,7 @@ public class ProjectSettingsPanel implements ProjectSetting, HierarchyListener {
 
     @Override
     public void selectedProgrammingLanguage(@NotNull SupportedLanguages language) {
-        courseListComboBox.refresh(project, language);
+        courseListComboBox.refresh(language);
     }
 
     @NotNull
