@@ -5,28 +5,39 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.tmp.learning.StepikProjectManager;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.courseFormat.StepType;
 import com.jetbrains.tmp.learning.courseFormat.StudyNode;
 import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
+import javafx.stage.FileChooser;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.submissions.Submission;
 import org.stepik.api.objects.submissions.Submissions;
 import org.stepik.api.queries.submissions.StepikSubmissionsPostQuery;
 import org.stepik.plugin.actions.SendAction;
+import org.w3c.dom.Node;
 import org.w3c.dom.events.Event;
 import org.w3c.dom.events.EventListener;
 import org.w3c.dom.html.HTMLCollection;
 import org.w3c.dom.html.HTMLFormElement;
 import org.w3c.dom.html.HTMLInputElement;
+import org.w3c.dom.html.HTMLTextAreaElement;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
 
 class FormListener implements EventListener {
     static final String EVENT_TYPE_SUBMIT = "submit";
@@ -67,6 +78,11 @@ class FormListener implements EventListener {
             boolean locked = Boolean.valueOf(((HTMLInputElement) elements
                     .namedItem("locked")).getValue());
 
+            HTMLInputElement isFromFileElement = ((HTMLInputElement) elements.namedItem("isFromFile"));
+            boolean isFromFile = isFromFileElement != null && isFromFileElement.getValue().equals("true");
+
+            String data = isFromFile ? getDataFromFile(stepNode) : null;
+
             StepType type = StepType.of(typeStr);
 
             try {
@@ -74,13 +90,18 @@ class FormListener implements EventListener {
                     case "":
                     case "correct":
                     case "wrong":
+                    case "timeLeft":
                         if (!locked) {
                             getAttempt(stepNode);
                             StudyUtils.setStudyNode(project, node, true);
                         }
                         break;
                     case "active":
-                        sendStep(stepNode, elements, type, attemptId);
+                        if (!isFromFile) {
+                            sendStep(stepNode, elements, type, attemptId, null);
+                        } else if (data != null) {
+                            sendStep(stepNode, elements, type, attemptId, data);
+                        }
                         break;
                     default:
                         return;
@@ -90,6 +111,27 @@ class FormListener implements EventListener {
             }
             event.preventDefault();
         }
+    }
+
+    @Nullable
+    private String getDataFromFile(StepNode stepNode) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open file");
+        VirtualFile srcDirectory = getOrCreateSrcDirectory(project, stepNode, true);
+        if (srcDirectory != null) {
+            File initialDir = new File(srcDirectory.getPath());
+            fileChooser.setInitialDirectory(initialDir);
+        }
+        File file = fileChooser.showOpenDialog(null);
+        if (file != null) {
+            try {
+                List<String> lines = Files.readAllLines(file.toPath());
+                return lines.stream().collect(Collectors.joining("\n"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
     }
 
     private void getAttempt(@NotNull StepNode node) {
@@ -105,7 +147,8 @@ class FormListener implements EventListener {
             @NotNull StepNode stepNode,
             @NotNull HTMLCollection elements,
             @NotNull StepType type,
-            long attemptId) {
+            long attemptId,
+            @Nullable String data) {
         String title = "Checking Step: " + stepNode.getName();
 
         ProgressManager.getInstance().run(new Task.Backgroundable(project, title) {
@@ -131,6 +174,15 @@ class FormListener implements EventListener {
                         case NUMBER:
                             String number = getStringData(elements);
                             query.number(number);
+                            break;
+                        case DATASET:
+                            String dataset;
+                            if (data == null) {
+                                dataset = getDataset(elements);
+                            } else {
+                                dataset = data;
+                            }
+                            query.file(dataset);
                             break;
                         case SORTING:
                         case MATCHING:
@@ -209,5 +261,18 @@ class FormListener implements EventListener {
             }
         }
         return ((HTMLInputElement) elements.namedItem("text")).getValue();
+    }
+
+    private String getDataset(@NotNull HTMLCollection elements) {
+        for (int i = 0; i < elements.getLength(); i++) {
+            Node item = elements.item(i);
+            if (item instanceof HTMLInputElement) {
+                HTMLInputElement element = ((HTMLInputElement) elements.item(i));
+                if (!"hidden".equals(element.getType())) {
+                    element.setDisabled(true);
+                }
+            }
+        }
+        return ((HTMLTextAreaElement) elements.namedItem("text")).getValue();
     }
 }

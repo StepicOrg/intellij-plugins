@@ -5,6 +5,7 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.jetbrains.tmp.learning.SupportedLanguages;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.courseFormat.stepHelpers.ChoiceStepNodeHelper;
+import com.jetbrains.tmp.learning.courseFormat.stepHelpers.DatasetStepNodeHelper;
 import com.jetbrains.tmp.learning.courseFormat.stepHelpers.MatchingStepNodeHelper;
 import com.jetbrains.tmp.learning.courseFormat.stepHelpers.NumberStepNodeHelper;
 import com.jetbrains.tmp.learning.courseFormat.stepHelpers.SortingStepNodeHelper;
@@ -322,6 +323,11 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
     @NotNull
     public NumberStepNodeHelper asNumberStep() {
         return new NumberStepNodeHelper(this);
+    }
+
+    @NotNull
+    public DatasetStepNodeHelper asDatasetStep() {
+        return new DatasetStepNodeHelper(this);
     }
 
     public Long getAssignment() {

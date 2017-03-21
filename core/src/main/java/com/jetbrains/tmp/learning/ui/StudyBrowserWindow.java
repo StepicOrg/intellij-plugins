@@ -5,16 +5,22 @@ import com.intellij.ide.BrowserUtil;
 import com.intellij.ide.ui.LafManager;
 import com.intellij.ide.ui.LafManagerListener;
 import com.intellij.ide.ui.laf.darcula.DarculaLookAndFeelInfo;
+import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
+import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.tmp.learning.StepikProjectManager;
+import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.courseFormat.CourseNode;
 import com.jetbrains.tmp.learning.courseFormat.LessonNode;
 import com.jetbrains.tmp.learning.courseFormat.SectionNode;
 import com.jetbrains.tmp.learning.courseFormat.StepNode;
 import com.jetbrains.tmp.learning.courseFormat.StudyNode;
+import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
 import javafx.application.Platform;
 import javafx.concurrent.Worker;
 import javafx.embed.swing.JFXPanel;
@@ -26,6 +32,8 @@ import javafx.scene.web.WebHistory;
 import javafx.scene.web.WebView;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.api.client.StepikApiClient;
+import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.urls.Urls;
 import org.stepik.core.templates.Templater;
 import org.stepik.plugin.utils.NavigationUtils;
@@ -42,12 +50,16 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
+
 class StudyBrowserWindow extends JFrame {
+    private static final Logger logger = Logger.getInstance(StudyBrowserWindow.class);
     private static final String EVENT_TYPE_CLICK = "click";
     private final Project project;
     private JFXPanel panel;
@@ -198,8 +210,14 @@ class StudyBrowserWindow extends JFrame {
                     engine.setJavaScriptEnabled(true);
                     engine.getLoadWorker().cancel();
                     ev.preventDefault();
-                    String href = getLink((Element) ev.getTarget());
+                    Element target = (Element) ev.getTarget();
+                    String href = getLink(target);
                     if (href == null) {
+                        return;
+                    }
+
+                    if (href.startsWith("inner:")) {
+                        browseInnerLink(target, href);
                         return;
                     }
 
@@ -212,6 +230,52 @@ class StudyBrowserWindow extends JFrame {
                     }
 
                     BrowserUtil.browse(href);
+                }
+            }
+
+            private void browseInnerLink(Element target, String href) {
+                href = href.substring(6);
+                StudyNode root = StepikProjectManager.getProjectRoot(project);
+                if (root == null) {
+                    return;
+                }
+
+                String stepPath = target.getAttribute("data-step-path");
+
+                StudyNode node = StudyUtils.getStudyNode(root, stepPath);
+                if (node == null || !(node instanceof StepNode)) {
+                    return;
+                }
+
+                String contentType = target.getAttribute("data-content-type");
+                String prefix = target.getAttribute("data-file-prefix");
+                String extension = target.getAttribute("data-file-ext");
+
+                try {
+                    StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
+                    String content = stepikApiClient.files().get(href, contentType);
+                    VirtualFile srcDirectory = getOrCreateSrcDirectory(project, (StepNode) node, true);
+                    if (srcDirectory == null) {
+                        return;
+                    }
+                    Application application = ApplicationManager.getApplication();
+                    application.invokeLater(() -> application.runWriteAction(() -> {
+                        try {
+                            int index = 1;
+                            String filename = prefix + "_" + node.getId();
+                            String currentFileName = filename + extension;
+                            while (srcDirectory.findChild(currentFileName) != null) {
+                                currentFileName = filename + "_" + index++ + extension;
+                            }
+                            VirtualFile file = srcDirectory.createChildData(null, currentFileName);
+                            file.setBinaryContent(content.getBytes());
+                            FileEditorManager.getInstance(project).openFile(file, false);
+                        } catch (IOException e) {
+                            logger.warn(e);
+                        }
+                    }));
+                } catch (StepikClientException e) {
+                    logger.warn(e);
                 }
             }
 

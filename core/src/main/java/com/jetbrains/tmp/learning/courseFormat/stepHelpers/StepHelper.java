@@ -15,6 +15,7 @@ import org.stepik.api.objects.submissions.Submission;
 import org.stepik.api.objects.submissions.Submissions;
 import org.stepik.api.objects.users.User;
 import org.stepik.api.queries.Order;
+import org.stepik.api.urls.Urls;
 
 /**
  * @author meanmail
@@ -29,6 +30,7 @@ public class StepHelper {
     @NotNull
     private Attempt attempt = new Attempt();
     private int submissionsCount = -1;
+    private Submission submission;
 
     StepHelper(@NotNull StepNode stepNode) {
         this.stepNode = stepNode;
@@ -64,7 +66,7 @@ public class StepHelper {
                 .execute();
 
         if (!submissions.isEmpty()) {
-            Submission submission = submissions.getSubmissions().get(0);
+            submission = submissions.getSubmissions().get(0);
             reply = submission.getReply();
             status = submission.getStatus();
             stepNode.setStatus(StudyStatus.of(status));
@@ -93,7 +95,29 @@ public class StepHelper {
 
     @NotNull
     Dataset getDataset() {
+        initStepOptions();
         return attempt.getDataset();
+    }
+
+    @NotNull
+    public String getDatasetUrl() {
+        initStepOptions();
+        return attempt.getDatasetUrl();
+    }
+
+    public int getTimeLeft() {
+        initStepOptions();
+        return attempt.getTimeLeft();
+    }
+
+    @NotNull
+    public String getReplyUrl() {
+        initStepOptions();
+        return submission != null ? submission.getReplyUrl() : "";
+    }
+
+    public String getBaseUrl() {
+        return Urls.STEPIK_URL;
     }
 
     void initStepOptions() {
