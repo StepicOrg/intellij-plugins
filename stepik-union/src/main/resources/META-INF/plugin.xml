@@ -31,7 +31,7 @@
         <moduleType id="STEPIK_MODULE_TYPE" implementationClass="org.stepik.plugin.projectWizard.idea.StepikModuleType"/>
     </extensions>
 
-    <extensions defaultExtensionNs="SCore">
+    <extensions defaultExtensionNs="org.stepik.plugin.union">
         <studyPluginConfigurator implementation="org.stepik.plugin.StepikPluginConfigurator"/>
     </extensions>
 
@@ -44,8 +44,6 @@
         <action id="STEPIK.RefreshStepAction" class="org.stepik.plugin.actions.step.StepikResetStepAction" text="Reset Step File" description="Refresh current step"/>
     </actions>
 
-    <!--______________________ CORE ________________________________________-->
-
     <project-components>
         <component>
             <implementation-class>org.stepik.core.StudyProjectComponent</implementation-class>
@@ -53,7 +51,7 @@
     </project-components>
 
     <extensionPoints>
-        <extensionPoint qualifiedName="SCore.studyPluginConfigurator" interface="org.stepik.core.StudyPluginConfigurator"/>
+        <extensionPoint qualifiedName="org.stepik.plugin.union.studyPluginConfigurator" interface="org.stepik.core.StudyPluginConfigurator"/>
     </extensionPoints>
 
     <extensions defaultExtensionNs="com.intellij">
