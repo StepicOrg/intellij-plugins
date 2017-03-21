@@ -1,6 +1,6 @@
 package org.stepik.plugin.utils;
 
-import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
+import org.stepik.core.stepik.StepikConnectorLogin;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

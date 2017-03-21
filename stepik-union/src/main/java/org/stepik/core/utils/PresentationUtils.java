@@ -1,12 +1,12 @@
 package org.stepik.core.utils;
 
 import com.intellij.ui.JBColor;
-import com.jetbrains.tmp.learning.courseFormat.CourseNode;
-import com.jetbrains.tmp.learning.courseFormat.LessonNode;
-import com.jetbrains.tmp.learning.courseFormat.SectionNode;
-import com.jetbrains.tmp.learning.courseFormat.StepNode;
-import com.jetbrains.tmp.learning.courseFormat.StudyNode;
-import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
+import org.stepik.core.courseFormat.CourseNode;
+import org.stepik.core.courseFormat.LessonNode;
+import org.stepik.core.courseFormat.SectionNode;
+import org.stepik.core.courseFormat.StepNode;
+import org.stepik.core.courseFormat.StudyNode;
+import org.stepik.core.courseFormat.StudyStatus;
 import icons.AllStepikIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

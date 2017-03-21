@@ -3,7 +3,7 @@ package org.stepik.plugin.actions.navigation;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.keymap.KeymapUtil;
-import com.jetbrains.tmp.learning.courseFormat.StudyNode;
+import org.stepik.core.courseFormat.StudyNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

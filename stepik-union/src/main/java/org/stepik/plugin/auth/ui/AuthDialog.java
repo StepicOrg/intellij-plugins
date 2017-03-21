@@ -1,7 +1,7 @@
 package org.stepik.plugin.auth.ui;
 
 import com.intellij.icons.AllIcons;
-import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
+import org.stepik.core.stepik.StepikConnectorLogin;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;

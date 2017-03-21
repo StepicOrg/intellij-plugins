@@ -2,6 +2,10 @@ package com.jetbrains.tmp.learning.courseFormat;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.stepik.core.courseFormat.CourseNode;
+import org.stepik.core.courseFormat.LessonNode;
+import org.stepik.core.courseFormat.SectionNode;
+import org.stepik.core.courseFormat.StepNode;
 
 import static org.junit.Assert.assertEquals;
 

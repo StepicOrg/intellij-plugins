@@ -1,7 +1,7 @@
 <#-- @ftlvariable name="status" type="java.lang.String" -->
 <#-- @ftlvariable name="backgroundColor" type="java.lang.String" -->
 <#-- @ftlvariable name="darcula" type="java.lang.Boolean" -->
-<#-- @ftlvariable name="stepNode" type="com.jetbrains.tmp.learning.courseFormat.stepHelpers.MatchingStepNodeHelper" -->
+<#-- @ftlvariable name="stepNode" type="org.stepik.core.courseFormat.stepHelpers.MatchingStepNodeHelper" -->
 
 <#macro sorting_quiz>
     <#if darcula>

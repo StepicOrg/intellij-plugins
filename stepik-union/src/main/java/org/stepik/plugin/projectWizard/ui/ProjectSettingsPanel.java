@@ -1,8 +1,8 @@
 package org.stepik.plugin.projectWizard.ui;
 
 import com.intellij.openapi.diagnostic.Logger;
-import com.jetbrains.tmp.learning.SupportedLanguages;
-import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
+import org.stepik.core.SupportedLanguages;
+import org.stepik.core.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.api.objects.StudyObject;
 import org.stepik.plugin.projectWizard.StepikProjectGenerator;

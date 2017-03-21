@@ -1,5 +1,5 @@
 <#-- @ftlvariable name="disabled" type="java.lang.String" -->
-<#-- @ftlvariable name="stepNode" type="com.jetbrains.tmp.learning.courseFormat.stepHelpers.StepHelper" -->
+<#-- @ftlvariable name="stepNode" type="org.stepik.core.courseFormat.stepHelpers.StepHelper" -->
 <#-- @ftlvariable name="text" type="java.lang.String" -->
 
 <style>

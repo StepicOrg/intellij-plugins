@@ -2,7 +2,7 @@ package org.stepik.plugin.projectWizard.pycharm;
 
 import com.intellij.facet.ui.ValidationResult;
 import com.intellij.openapi.project.Project;
-import com.jetbrains.tmp.learning.SupportedLanguages;
+import org.stepik.core.SupportedLanguages;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.api.objects.StudyObject;
 import org.stepik.plugin.projectWizard.ui.ProjectSettingListener;

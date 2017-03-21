@@ -2,7 +2,7 @@ package org.stepik.plugin.projectWizard.idea;
 
 import com.intellij.ide.highlighter.ModuleFileType;
 import com.intellij.openapi.util.io.FileUtil;
-import com.jetbrains.tmp.learning.core.EduNames;
+import org.stepik.core.core.EduNames;
 import org.jetbrains.annotations.NotNull;
 
 public class SandboxModuleBuilder extends ModuleBuilderWithSrc {

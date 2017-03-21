@@ -1,20 +1,21 @@
 package com.jetbrains.tmp.learning;
 
-import com.jetbrains.tmp.learning.serialization.StudySerializationUtils;
-import com.jetbrains.tmp.learning.serialization.StudyUnrecognizedFormatException;
+import org.stepik.core.serialization.StudySerializationUtils;
+import org.stepik.core.serialization.StudyUnrecognizedFormatException;
 import com.thoughtworks.xstream.XStream;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.stepik.core.StepikProjectManager;
 import org.stepik.core.TestUtils;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 
-import static com.jetbrains.tmp.learning.serialization.StudySerializationUtils.MAIN_ELEMENT;
+import static org.stepik.core.serialization.StudySerializationUtils.MAIN_ELEMENT;
 import static java.text.MessageFormat.format;
 import static org.junit.Assert.assertEquals;
 

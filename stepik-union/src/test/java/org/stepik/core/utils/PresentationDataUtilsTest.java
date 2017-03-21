@@ -1,6 +1,6 @@
 package org.stepik.core.utils;
 
-import com.jetbrains.tmp.learning.core.EduNames;
+import org.stepik.core.core.EduNames;
 import org.junit.experimental.theories.DataPoints;
 import org.junit.experimental.theories.FromDataPoints;
 import org.junit.experimental.theories.Theories;

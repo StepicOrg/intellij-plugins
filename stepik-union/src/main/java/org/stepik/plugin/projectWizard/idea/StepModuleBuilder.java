@@ -2,7 +2,7 @@ package org.stepik.plugin.projectWizard.idea;
 
 import com.intellij.ide.highlighter.ModuleFileType;
 import com.intellij.openapi.util.io.FileUtil;
-import com.jetbrains.tmp.learning.courseFormat.StepNode;
+import org.stepik.core.courseFormat.StepNode;
 import org.jetbrains.annotations.NotNull;
 
 public class StepModuleBuilder extends ModuleBuilderWithSrc {

@@ -1,6 +1,6 @@
 package org.stepik.plugin.projectWizard.ui;
 
-import com.jetbrains.tmp.learning.SupportedLanguages;
+import org.stepik.core.SupportedLanguages;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
