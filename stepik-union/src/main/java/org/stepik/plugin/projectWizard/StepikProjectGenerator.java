@@ -93,12 +93,13 @@ public class StepikProjectGenerator {
                 return Arrays.asList(187L, 150L, 217L, 1127L, 125L, 126L);
             case PYTHON3:
                 return Arrays.asList(67L, 512L, 401L, 217L, 1127L, 125L, 126L, 150L);
+            case HASKELL:
+                return Arrays.asList(75L, 217L, 1127L, 125L, 126L, 150L);
             case ASM32:
             case ASM64:
             case CLOJURE:
             case CPP:
             case CPP_11:
-            case HASKELL:
             case HASKELL_7_10:
             case JAVASCRIPT:
             case MONO_CS:
@@ -130,7 +131,7 @@ public class StepikProjectGenerator {
                     indicator.setIndeterminate(true);
 
                     projectRoot = StudyNodeFactory.createTree(project, data);
-                }, "Creating project", true, project);
+                }, "Creating Project", true, project);
     }
 
     public void generateProject(@NotNull Project project) {
