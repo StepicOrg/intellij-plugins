@@ -45,8 +45,10 @@
        data-content-type="application/txt" data-file-prefix="reply" data-file-ext=".txt">Download last submission
         dataset</a>
     </#if>
-<textarea id="text" class="row" name="value"
-          placeholder="Input your answer here" ${disabled!""}>${stepNode.getData()}</textarea>
+    <#if status != "">
+    <textarea id="text" class="row" name="value"
+              placeholder="Input your answer here" ${disabled!""}>${stepNode.getData()}</textarea>
+    </#if>
     <#if status == "active">
     <input id="filename" type="submit" name="filename" value="Send file">
     </#if>
