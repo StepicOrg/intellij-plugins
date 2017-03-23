@@ -18,17 +18,6 @@ import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
-import org.stepik.core.core.EduNames;
-import org.stepik.core.courseFormat.CourseNode;
-import org.stepik.core.courseFormat.LessonNode;
-import org.stepik.core.courseFormat.SectionNode;
-import org.stepik.core.courseFormat.StepNode;
-import org.stepik.core.courseFormat.StudyNode;
-import org.stepik.core.serialization.SampleConverter;
-import org.stepik.core.serialization.StudySerializationUtils;
-import org.stepik.core.serialization.StudyUnrecognizedFormatException;
-import org.stepik.core.serialization.SupportedLanguagesConverter;
-import org.stepik.core.ui.StudyToolWindow;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.XStreamException;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
@@ -47,6 +36,17 @@ import org.stepik.api.objects.steps.Sample;
 import org.stepik.api.objects.steps.Step;
 import org.stepik.api.objects.steps.VideoUrl;
 import org.stepik.api.objects.users.User;
+import org.stepik.core.core.EduNames;
+import org.stepik.core.courseFormat.CourseNode;
+import org.stepik.core.courseFormat.LessonNode;
+import org.stepik.core.courseFormat.SectionNode;
+import org.stepik.core.courseFormat.StepNode;
+import org.stepik.core.courseFormat.StudyNode;
+import org.stepik.core.serialization.SampleConverter;
+import org.stepik.core.serialization.StudySerializationUtils;
+import org.stepik.core.serialization.StudyUnrecognizedFormatException;
+import org.stepik.core.serialization.SupportedLanguagesConverter;
+import org.stepik.core.ui.StudyToolWindow;
 import org.stepik.plugin.projectWizard.idea.SandboxModuleBuilder;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -324,7 +324,8 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
     private void repairProjectFiles(@NotNull StudyNode<?, ?> node) {
         if (project != null) {
             if (node instanceof StepNode) {
-                getOrCreateSrcDirectory(project, (StepNode) node, false);
+                ApplicationManager.getApplication().invokeAndWait(() ->
+                        getOrCreateSrcDirectory(project, (StepNode) node, false));
             }
             node.getChildren().forEach(this::repairProjectFiles);
         }

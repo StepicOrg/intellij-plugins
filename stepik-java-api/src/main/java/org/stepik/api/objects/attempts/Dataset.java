@@ -53,7 +53,8 @@ public class Dataset {
         return isCheckbox;
     }
 
-    public void setCheckbox(boolean checkbox) {
+    public void setCheckbox(@Nullable Boolean checkbox) {
+        checkbox = checkbox == null || checkbox;
         isCheckbox = checkbox;
     }
 
@@ -73,7 +74,8 @@ public class Dataset {
         return multipleChoice;
     }
 
-    public void setMultipleChoice(boolean multipleChoice) {
+    public void setMultipleChoice(@Nullable Boolean multipleChoice) {
+        multipleChoice = multipleChoice == null || multipleChoice;
         this.multipleChoice = multipleChoice;
     }
 
@@ -93,7 +95,8 @@ public class Dataset {
         return textDisabled;
     }
 
-    public void setTextDisabled(boolean textDisabled) {
+    public void setTextDisabled(@Nullable Boolean textDisabled) {
+        textDisabled = textDisabled == null || textDisabled;
         this.textDisabled = textDisabled;
     }
 
