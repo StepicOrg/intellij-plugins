@@ -12,12 +12,12 @@ import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.problems.WolfTheProblemSolver;
-import org.stepik.core.StepikProjectManager;
-import org.stepik.core.courseFormat.StepNode;
-import org.stepik.core.courseFormat.StudyNode;
 import icons.AllStepikIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.core.StepikProjectManager;
+import org.stepik.core.courseFormat.StepNode;
+import org.stepik.core.courseFormat.StudyNode;
 import org.stepik.core.metrics.Metrics;
 import org.stepik.core.metrics.MetricsStatus;
 
@@ -62,9 +62,11 @@ public class StepikResetStepAction extends AbstractStepAction {
             Document document = documentManager.getDocument(mainFile);
             if (document != null) {
                 resetDocument(project, document, stepNode);
-                ProjectView.getInstance(project).refresh();
+                if (!project.isDisposed()) {
+                    ProjectView.getInstance(project).refresh();
+                    WolfTheProblemSolver.getInstance(project).clearProblems(mainFile);
+                }
                 StepikProjectManager.updateSelection(project);
-                WolfTheProblemSolver.getInstance(project).clearProblems(mainFile);
             }
         }
     }

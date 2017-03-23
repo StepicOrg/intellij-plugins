@@ -6,18 +6,18 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
-import org.stepik.core.StepikProjectManager;
-import org.stepik.core.courseFormat.StepNode;
-import org.stepik.core.courseFormat.StudyStatus;
-import org.stepik.core.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.submissions.Submission;
 import org.stepik.api.objects.submissions.Submissions;
+import org.stepik.core.StepikProjectManager;
+import org.stepik.core.courseFormat.StepNode;
+import org.stepik.core.courseFormat.StudyStatus;
 import org.stepik.core.metrics.Metrics;
 import org.stepik.core.metrics.MetricsStatus;
+import org.stepik.core.stepik.StepikConnectorLogin;
 import org.stepik.core.utils.Utils;
 
 import static org.stepik.core.courseFormat.StudyStatus.SOLVED;
@@ -88,7 +88,9 @@ public class SendAction {
         hint = currentSubmission.getHint();
         notify(project, stepNode, stepStatus, hint);
         ApplicationManager.getApplication().invokeLater(() -> {
-            ProjectView.getInstance(project).refresh();
+            if (!project.isDisposed()) {
+                ProjectView.getInstance(project).refresh();
+            }
             StepikProjectManager.updateSelection(project);
         });
         logger.info(String.format("Finish check a status for step: %s with status: %s", stepIdString, stepStatus));

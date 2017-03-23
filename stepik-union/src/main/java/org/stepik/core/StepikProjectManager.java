@@ -297,7 +297,9 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
                 @Override
                 public void run(@NotNull ProgressIndicator indicator) {
                     repairProjectFiles(root);
-
+                    if (project.isDisposed()) {
+                        return;
+                    }
                     VirtualFile projectDir = project.getBaseDir();
                     if (projectDir != null && projectDir.findChild(EduNames.SANDBOX_DIR) == null) {
                         ModifiableModuleModel model = ModuleManager.getInstance(project)
@@ -324,8 +326,15 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
     private void repairProjectFiles(@NotNull StudyNode<?, ?> node) {
         if (project != null) {
             if (node instanceof StepNode) {
-                ApplicationManager.getApplication().invokeAndWait(() ->
-                        getOrCreateSrcDirectory(project, (StepNode) node, false));
+                if (project.isDisposed()) {
+                    return;
+                }
+                ApplicationManager.getApplication().invokeAndWait(() -> {
+                    if (project.isDisposed()) {
+                        return;
+                    }
+                    getOrCreateSrcDirectory(project, (StepNode) node, false);
+                });
             }
             node.getChildren().forEach(this::repairProjectFiles);
         }
