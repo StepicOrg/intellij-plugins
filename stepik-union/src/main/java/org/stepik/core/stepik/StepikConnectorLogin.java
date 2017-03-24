@@ -17,8 +17,12 @@ import org.stepik.api.objects.auth.TokenInfo;
 import org.stepik.api.objects.users.User;
 import org.stepik.core.StepikProjectManager;
 import org.stepik.core.metrics.Metrics;
+import org.stepik.core.utils.PluginUtils;
+import org.stepik.core.utils.ProductGroup;
 import org.stepik.plugin.auth.ui.AuthDialog;
 
+import javax.swing.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
@@ -84,8 +88,16 @@ public class StepikConnectorLogin {
 
     private static void showAuthDialog(boolean clear) {
         Application application = ApplicationManager.getApplication();
-        if (!application.isDispatchThread()) {
-            application.invokeAndWait(() -> showDialog(clear), ModalityState.defaultModalityState());
+        if (!application.isDispatchThread() && !SwingUtilities.isEventDispatchThread()) {
+            if (PluginUtils.isCurrent(ProductGroup.PYCHARM)) {
+                try {
+                    SwingUtilities.invokeAndWait(() -> showDialog(clear));
+                } catch (InterruptedException | InvocationTargetException e) {
+                    logger.warn(e);
+                }
+            } else {
+                application.invokeAndWait(() -> showDialog(clear), ModalityState.defaultModalityState());
+            }
         } else {
             showDialog(clear);
         }
