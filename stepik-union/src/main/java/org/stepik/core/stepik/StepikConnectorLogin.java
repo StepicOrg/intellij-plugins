@@ -8,7 +8,6 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.util.net.HttpConfigurable;
-import org.stepik.core.StepikProjectManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.HttpTransportClient;
@@ -16,9 +15,14 @@ import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.auth.TokenInfo;
 import org.stepik.api.objects.users.User;
+import org.stepik.core.StepikProjectManager;
 import org.stepik.core.metrics.Metrics;
+import org.stepik.core.utils.PluginUtils;
+import org.stepik.core.utils.ProductGroup;
 import org.stepik.plugin.auth.ui.AuthDialog;
 
+import javax.swing.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
@@ -40,7 +44,7 @@ public class StepikConnectorLogin {
         return PropertiesComponent.getInstance().getOrInitLong(LAST_USER_PROPERTY_NAME, 0);
     }
 
-    private static synchronized void setLastUser(long userId) {
+    private static void setLastUser(long userId) {
         PropertiesComponent.getInstance().setValue(LAST_USER_PROPERTY_NAME, String.valueOf(userId));
     }
 
@@ -84,8 +88,16 @@ public class StepikConnectorLogin {
 
     private static void showAuthDialog(boolean clear) {
         Application application = ApplicationManager.getApplication();
-        if (!application.isDispatchThread()) {
-            application.invokeAndWait(() -> showDialog(clear), ModalityState.defaultModalityState());
+        if (!application.isDispatchThread() && !SwingUtilities.isEventDispatchThread()) {
+            if (PluginUtils.isCurrent(ProductGroup.PYCHARM)) {
+                try {
+                    SwingUtilities.invokeAndWait(() -> showDialog(clear));
+                } catch (InterruptedException | InvocationTargetException e) {
+                    logger.warn(e);
+                }
+            } else {
+                application.invokeAndWait(() -> showDialog(clear), ModalityState.defaultModalityState());
+            }
         } else {
             showDialog(clear);
         }
@@ -103,11 +115,13 @@ public class StepikConnectorLogin {
         tokenInfo.setRefreshToken(map.get("refresh_token"));
         stepikApiClient.setTokenInfo(tokenInfo);
         if (tokenInfo.getAccessToken() != null) {
+            long userId = getCurrentUser().getId();
+            setTokenInfo(userId, tokenInfo);
             Metrics.authenticate(SUCCESSFUL);
         }
     }
 
-    public static boolean authenticated() {
+    private static boolean authenticated() {
         if (stepikApiClient.getTokenInfo().getAccessToken() != null) {
             User user = getCurrentUser();
 
@@ -154,7 +168,7 @@ public class StepikConnectorLogin {
     }
 
     @NotNull
-    private static TokenInfo getTokenInfo(long userId, StepikApiClient client) {
+    private static synchronized TokenInfo getTokenInfo(long userId, StepikApiClient client) {
         if (userId == 0) {
             return new TokenInfo();
         }
@@ -164,9 +178,7 @@ public class StepikConnectorLogin {
                 StepikProjectManager.class,
                 false);
         String serializedAuthInfo;
-        synchronized (StepikConnectorLogin.class) {
-            serializedAuthInfo = PasswordSafe.getInstance().getPassword(attributes);
-        }
+        serializedAuthInfo = PasswordSafe.getInstance().getPassword(attributes);
         TokenInfo authInfo = client.getJsonConverter().fromJson(serializedAuthInfo, TokenInfo.class);
 
         if (authInfo == null) {
@@ -182,10 +194,8 @@ public class StepikConnectorLogin {
                 StepikProjectManager.class,
                 false);
         String serializedAuthInfo = stepikApiClient.getJsonConverter().toJson(tokenInfo);
-        synchronized (StepikConnectorLogin.class) {
-            PasswordSafe.getInstance().setPassword(attributes, serializedAuthInfo);
-            setLastUser(userId);
-        }
+        PasswordSafe.getInstance().setPassword(attributes, serializedAuthInfo);
+        setLastUser(userId);
     }
 
     @NotNull

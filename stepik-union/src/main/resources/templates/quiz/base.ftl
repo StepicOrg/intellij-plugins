@@ -48,11 +48,11 @@ ${text}<br>
             var disabled = false;
 
             if (status == "") {
-                submitCaption = "Solve";
+                submitCaption = "Click to solve";
             } else if (status == "active") {
                 submitCaption = "Submit";
             } else if (status != "evaluation") {
-                submitCaption = "Solve again";
+                submitCaption = "Click to solve again";
             } else {
                 submitCaption = "Evaluation";
                 disabled = true;

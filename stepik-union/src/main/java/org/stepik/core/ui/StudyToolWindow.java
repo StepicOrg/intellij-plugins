@@ -17,6 +17,10 @@ import com.intellij.ui.JBCardLayout;
 import com.intellij.ui.OnePixelSplitter;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.components.BorderLayoutPanel;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.stepik.api.client.StepikApiClient;
+import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.core.StepikProjectManager;
 import org.stepik.core.StudyBasePluginConfigurator;
 import org.stepik.core.StudyPluginConfigurator;
@@ -27,10 +31,6 @@ import org.stepik.core.courseFormat.StepType;
 import org.stepik.core.courseFormat.StudyNode;
 import org.stepik.core.courseFormat.stepHelpers.VideoStepNodeHelper;
 import org.stepik.core.stepik.StepikConnectorLogin;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.stepik.api.client.StepikApiClient;
-import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.core.utils.ProgrammingLanguageUtils;
 
 import javax.swing.*;
@@ -293,7 +293,7 @@ public class StudyToolWindow extends SimpleToolWindowPanel implements DataProvid
             Long assignment = stepNode.getAssignment();
             long stepId = stepNode.getId();
             try {
-                if (assignment != 0) {
+                if (assignment != null && assignment != 0) {
                     StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
                     stepikApiClient.views()
                             .post()
@@ -312,7 +312,9 @@ public class StudyToolWindow extends SimpleToolWindowPanel implements DataProvid
             if (stepNode.getProject() == null) {
                 stepNode.setProject(project);
             }
-            ProjectView.getInstance(project).refresh();
+            if (!project.isDisposed()) {
+                ProjectView.getInstance(project).refresh();
+            }
         });
     }
 

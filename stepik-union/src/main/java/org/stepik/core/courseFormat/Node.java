@@ -3,7 +3,6 @@ package org.stepik.core.courseFormat;
 import com.intellij.ide.projectView.ProjectView;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
-import org.stepik.core.stepik.StepikConnectorLogin;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -11,6 +10,7 @@ import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.StudyObject;
 import org.stepik.api.objects.progresses.Progresses;
+import org.stepik.core.stepik.StepikConnectorLogin;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -296,7 +296,9 @@ public abstract class Node<
                             });
                         }
                     }
-                    ProjectView.getInstance(project).refresh();
+                    if (!project.isDisposed()) {
+                        ProjectView.getInstance(project).refresh();
+                    }
                 } catch (StepikClientException e) {
                     logger.warn(e);
                 }
