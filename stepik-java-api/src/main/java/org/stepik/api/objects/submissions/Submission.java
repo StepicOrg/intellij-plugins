@@ -74,8 +74,11 @@ public class Submission extends AbstractObject {
         this.score = score;
     }
 
-    @Nullable
+    @NotNull
     public String getFeedback() {
+        if (feedback == null) {
+            feedback = "";
+        }
         return feedback;
     }
 
@@ -83,8 +86,11 @@ public class Submission extends AbstractObject {
         this.feedback = feedback;
     }
 
-    @Nullable
+    @NotNull
     public String getReplyUrl() {
+        if (replyUrl == null) {
+            replyUrl = "";
+        }
         return replyUrl;
     }
 

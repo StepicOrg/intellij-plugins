@@ -1,9 +1,8 @@
 package org.stepik.plugin.actions.navigation;
 
 import com.intellij.openapi.project.Project;
-import com.jetbrains.tmp.learning.StepikProjectManager;
-import com.jetbrains.tmp.learning.StudyUtils;
-import com.jetbrains.tmp.learning.courseFormat.StudyNode;
+import org.stepik.core.StepikProjectManager;
+import org.stepik.core.courseFormat.StudyNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.plugin.utils.NavigationUtils;
@@ -17,7 +16,7 @@ abstract class StepikStepNavigationAction extends StudyStepNavigationAction {
 
     @Override
     public void navigateStep(@NotNull final Project project) {
-        StudyNode currentNode = StudyUtils.getSelectedNodeInTree(project);
+        StudyNode currentNode = StepikProjectManager.getSelected(project);
         if (currentNode == null) {
             currentNode = StepikProjectManager.getProjectRoot(project);
         }

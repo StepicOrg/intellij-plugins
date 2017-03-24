@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -16,9 +17,11 @@ public class Reply {
     private List<String> attachments;
     private String text;
     private List<String> files;
-    private List<Boolean> choices;
+    private List choices;
     private List<Integer> ordering;
     private String number;
+    private String file;
+    private List<String> blanks;
 
     @NotNull
     public String getLanguage() {
@@ -44,8 +47,11 @@ public class Reply {
         this.code = code;
     }
 
-    @Nullable
+    @NotNull
     public String getFormula() {
+        if (formula == null) {
+            formula = "";
+        }
         return formula;
     }
 
@@ -91,10 +97,14 @@ public class Reply {
         if (choices == null) {
             choices = new ArrayList<>();
         }
+        if (choices.size() > 1 && !(choices.get(0) instanceof Boolean)) {
+            return Collections.emptyList();
+        }
+        //noinspection unchecked
         return choices;
     }
 
-    public void setChoices(@Nullable List<Boolean> choices) {
+    public void setChoices(@Nullable List choices) {
         this.choices = choices;
     }
 
@@ -117,5 +127,38 @@ public class Reply {
 
     public void setNumber(@Nullable String number) {
         this.number = number;
+    }
+
+    @Nullable
+    public String getFile() {
+        return file;
+    }
+
+    public void setFile(@Nullable String file) {
+        this.file = file;
+    }
+
+    @NotNull
+    public List<Choice> getTableChoices() {
+        if (choices == null) {
+            choices = new ArrayList<>();
+        }
+        if (choices.size() > 1 && !(choices.get(0) instanceof Choice)) {
+            return Collections.emptyList();
+        }
+        //noinspection unchecked
+        return choices;
+    }
+
+    @NotNull
+    public List<String> getBlanks() {
+        if (blanks == null) {
+            blanks = new ArrayList<>();
+        }
+        return blanks;
+    }
+
+    public void setBlanks(@Nullable List<String> blanks) {
+        this.blanks = blanks;
     }
 }

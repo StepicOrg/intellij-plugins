@@ -1,6 +1,6 @@
 package org.stepik.plugin.utils;
 
-import com.jetbrains.tmp.learning.SupportedLanguages;
+import org.stepik.core.SupportedLanguages;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Before;

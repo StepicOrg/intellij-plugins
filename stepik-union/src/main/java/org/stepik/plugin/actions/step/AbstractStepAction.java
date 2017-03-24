@@ -1,11 +1,10 @@
 package org.stepik.plugin.actions.step;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.Presentation;
-import com.intellij.openapi.project.Project;
-import com.jetbrains.tmp.learning.StudyUtils;
-import com.jetbrains.tmp.learning.actions.StudyActionWithShortcut;
-import com.jetbrains.tmp.learning.courseFormat.StepNode;
+import org.stepik.core.StepikProjectManager;
+import org.stepik.core.actions.StudyActionWithShortcut;
+import org.stepik.core.courseFormat.StepNode;
+import org.stepik.core.courseFormat.StudyNode;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -20,15 +19,7 @@ abstract class AbstractStepAction extends StudyActionWithShortcut {
 
     @Override
     public void update(AnActionEvent e) {
-        final Presentation presentation = e.getPresentation();
-        presentation.setEnabled(false);
-
-        Project project = e.getProject();
-        if (project == null) {
-            return;
-        }
-
-        StepNode targetStepNode = StudyUtils.getSelectedStep(project);
-        presentation.setEnabled(targetStepNode != null && !targetStepNode.getWasDeleted());
+        StudyNode<?, ?> targetStepNode = StepikProjectManager.getSelected(e.getProject());
+        e.getPresentation().setEnabled((targetStepNode instanceof StepNode) && !targetStepNode.getWasDeleted());
     }
 }

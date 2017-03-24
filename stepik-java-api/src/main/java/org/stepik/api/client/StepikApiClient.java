@@ -29,6 +29,7 @@ import org.stepik.api.actions.StepikEnrollmentsAction;
 import org.stepik.api.actions.StepikEventsAction;
 import org.stepik.api.actions.StepikExamSessionsAction;
 import org.stepik.api.actions.StepikFavoriteCoursesAction;
+import org.stepik.api.actions.StepikFilesAction;
 import org.stepik.api.actions.StepikGroupsAction;
 import org.stepik.api.actions.StepikInstructionsAction;
 import org.stepik.api.actions.StepikInvitesAction;
@@ -255,6 +256,11 @@ public class StepikApiClient {
     @NotNull
     public StepikFavoriteCoursesAction favoriteCourses() {
         return new StepikFavoriteCoursesAction(this);
+    }
+
+    @NotNull
+    public StepikFilesAction files() {
+        return new StepikFilesAction(this);
     }
 
     @NotNull

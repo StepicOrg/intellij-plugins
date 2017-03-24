@@ -39,8 +39,32 @@ public class StepikSubmissionsPostQuery extends StepikAbstractPostQuery<Submissi
     }
 
     @NotNull
-    public StepikSubmissionsPostQuery choices(List<Boolean> choices) {
+    public StepikSubmissionsPostQuery formula(@Nullable String formula) {
+        submissions.getSubmission().getReply().setFormula(formula);
+        return this;
+    }
+
+    @NotNull
+    public StepikSubmissionsPostQuery number(@Nullable String number) {
+        submissions.getSubmission().getReply().setNumber(number);
+        return this;
+    }
+
+    @NotNull
+    public StepikSubmissionsPostQuery file(@Nullable String file) {
+        submissions.getSubmission().getReply().setFile(file);
+        return this;
+    }
+
+    @NotNull
+    public StepikSubmissionsPostQuery choices(@Nullable List choices) {
         submissions.getSubmission().getReply().setChoices(choices);
+        return this;
+    }
+
+    @NotNull
+    public StepikSubmissionsPostQuery blanks(@Nullable List<String> blanks) {
+        submissions.getSubmission().getReply().setBlanks(blanks);
         return this;
     }
 

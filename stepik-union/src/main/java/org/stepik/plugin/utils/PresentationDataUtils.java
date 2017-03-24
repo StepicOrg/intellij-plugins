@@ -6,11 +6,11 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.SimpleTextAttributes;
-import com.jetbrains.tmp.learning.StepikProjectManager;
-import com.jetbrains.tmp.learning.StudyUtils;
-import com.jetbrains.tmp.learning.core.EduNames;
-import com.jetbrains.tmp.learning.courseFormat.StudyNode;
-import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
+import org.stepik.core.StepikProjectManager;
+import org.stepik.core.StudyUtils;
+import org.stepik.core.core.EduNames;
+import org.stepik.core.courseFormat.StudyNode;
+import org.stepik.core.courseFormat.StudyStatus;
 import icons.AllStepikIcons;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.core.utils.PresentationUtils;
@@ -46,14 +46,18 @@ public class PresentationDataUtils {
 
         StudyNode node = StudyUtils.getStudyNode(project, psiDirectory.getVirtualFile());
         if (node != null && path.equals(node.getPath())) {
-            setAttributes(data, node);
+            setAttributes(project, data, node);
         } else {
             data.setPresentableText(valueName);
         }
     }
 
-    private static void setAttributes(@NotNull PresentationData data, @NotNull StudyNode item) {
+    private static void setAttributes(
+            @NotNull Project project,
+            @NotNull PresentationData data,
+            @NotNull StudyNode item) {
         String text = item.getName();
+        item.setProject(project);
         StudyStatus status = item.getStatus();
         JBColor color = getColor(status);
         Icon icon = getIcon(item, status);

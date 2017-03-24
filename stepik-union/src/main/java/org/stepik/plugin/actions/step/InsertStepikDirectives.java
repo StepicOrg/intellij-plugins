@@ -3,6 +3,7 @@ package org.stepik.plugin.actions.step;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
+import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
@@ -10,10 +11,10 @@ import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.jetbrains.tmp.learning.StepikProjectManager;
-import com.jetbrains.tmp.learning.StudyUtils;
-import com.jetbrains.tmp.learning.SupportedLanguages;
-import com.jetbrains.tmp.learning.courseFormat.StepNode;
+import org.stepik.core.StepikProjectManager;
+import org.stepik.core.SupportedLanguages;
+import org.stepik.core.courseFormat.StepNode;
+import org.stepik.core.courseFormat.StudyNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.core.metrics.Metrics;
@@ -22,6 +23,7 @@ import org.stepik.plugin.utils.ReformatUtils;
 
 import javax.swing.*;
 
+import static org.stepik.core.courseFormat.StepType.CODE;
 import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
 import static org.stepik.plugin.utils.DirectivesUtils.insertAmbientCode;
@@ -59,10 +61,12 @@ public class InsertStepikDirectives extends AbstractStepAction {
             return;
         }
 
-        StepNode targetStepNode = StudyUtils.getSelectedStep(project);
-        if (targetStepNode == null) {
+        StudyNode selectedNode = StepikProjectManager.getSelected(project);
+        if (!(selectedNode instanceof StepNode) || ((StepNode) selectedNode).getType() != CODE) {
             return;
         }
+
+        StepNode targetStepNode = (StepNode) selectedNode;
 
         FileDocumentManager documentManager = FileDocumentManager.getInstance();
         for (VirtualFile file : FileEditorManager.getInstance(project).getOpenFiles()) {
@@ -104,5 +108,15 @@ public class InsertStepikDirectives extends AbstractStepAction {
                 ReformatUtils.reformatSelectedEditor(project, document);
             }
         }
+    }
+
+    @Override
+    public void update(AnActionEvent e) {
+        super.update(e);
+        Presentation presentation = e.getPresentation();
+        StudyNode<?, ?> selectedNode = StepikProjectManager.getSelected(e.getProject());
+        boolean enabled = presentation.isEnabled();
+        boolean canEnabled = (selectedNode instanceof StepNode) && (((StepNode) selectedNode).getType() == CODE);
+        presentation.setEnabled(enabled && canEnabled);
     }
 }

@@ -1,6 +1,5 @@
 apply plugin: 'org.stepik.gradle.plugins.pycharm'
 apply plugin: 'org.stepik.gradle.plugins.idea'
-apply plugin: 'org.stepik.gradle.plugins.clion'
 
 intellij {
     version = project.getProperties().get('ideaVersion')
@@ -14,15 +13,10 @@ pycharm {
     idePath = project.getProperties().get('pyCharmPath')
 }
 
-clion {
-    version = project.getProperties().get('cLionVersion')
-    sandboxDirectory = project.getProperties().get('cLionSandboxDir')
-    idePath = project.getProperties().get('cLionPath')
-}
-
 dependencies {
     compile project(":stepik-java-api")
-    compile project(":core")
+    compile 'org.freemarker:freemarker:2.3.23'
+
 }
 
 group 'org.stepik'

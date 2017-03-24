@@ -25,14 +25,13 @@
     <depends>com.intellij.modules.lang</depends>
     <depends optional="true" config-file="idea.xml">com.intellij.modules.java</depends>
     <depends optional="true" config-file="pycharm.xml">com.intellij.modules.python</depends>
-    <depends optional="true" config-file="clion.xml">com.intellij.modules.clion</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <applicationConfigurable instance="org.stepik.plugin.collective.ui.StepikSettingsConfigurable"/>
         <moduleType id="STEPIK_MODULE_TYPE" implementationClass="org.stepik.plugin.projectWizard.idea.StepikModuleType"/>
     </extensions>
 
-    <extensions defaultExtensionNs="SCore">
+    <extensions defaultExtensionNs="org.stepik.plugin.union">
         <studyPluginConfigurator implementation="org.stepik.plugin.StepikPluginConfigurator"/>
     </extensions>
 
@@ -45,22 +44,19 @@
         <action id="STEPIK.RefreshStepAction" class="org.stepik.plugin.actions.step.StepikResetStepAction" text="Reset Step File" description="Refresh current step"/>
     </actions>
 
-    <!--______________________ CORE ________________________________________-->
-
     <project-components>
         <component>
-            <implementation-class>com.jetbrains.tmp.learning.StudyProjectComponent</implementation-class>
+            <implementation-class>org.stepik.core.StudyProjectComponent</implementation-class>
         </component>
     </project-components>
 
     <extensionPoints>
-        <extensionPoint qualifiedName="SCore.studyPluginConfigurator" interface="com.jetbrains.tmp.learning.StudyPluginConfigurator"/>
+        <extensionPoint qualifiedName="org.stepik.plugin.union.studyPluginConfigurator" interface="org.stepik.core.StudyPluginConfigurator"/>
     </extensionPoints>
 
     <extensions defaultExtensionNs="com.intellij">
-        <projectService serviceInterface="com.intellij.codeInsight.documentation.DocumentationManager" serviceImplementation="com.jetbrains.tmp.learning.StudyDocumentationManager" overrides="true"/>
-        <toolWindow id="Step Description" anchor="right" factoryClass="com.jetbrains.tmp.learning.ui.StudyToolWindowFactory" conditionClass="com.jetbrains.tmp.learning.ui.StudyCondition"/>
-        <projectService serviceInterface="com.jetbrains.tmp.learning.StepikProjectManager" serviceImplementation="com.jetbrains.tmp.learning.StepikProjectManager"/>
-        <applicationService serviceImplementation="com.jetbrains.tmp.learning.stepik.StepikUpdateSettings"/>
+        <projectService serviceInterface="com.intellij.codeInsight.documentation.DocumentationManager" serviceImplementation="org.stepik.core.StudyDocumentationManager" overrides="true"/>
+        <toolWindow id="Step Description" anchor="right" factoryClass="org.stepik.core.ui.StudyToolWindowFactory" conditionClass="org.stepik.core.ui.StudyCondition"/>
+        <projectService serviceInterface="org.stepik.core.StepikProjectManager" serviceImplementation="org.stepik.core.StepikProjectManager"/>
     </extensions>
 </idea-plugin>

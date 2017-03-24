@@ -31,8 +31,11 @@ public class Attempt extends AbstractObject {
         this.dataset = dataset;
     }
 
-    @Nullable
+    @NotNull
     public String getDatasetUrl() {
+        if (datasetUrl == null) {
+            datasetUrl = "";
+        }
         return datasetUrl;
     }
 

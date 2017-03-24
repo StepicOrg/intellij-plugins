@@ -6,10 +6,11 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.jetbrains.tmp.learning.StudyUtils;
-import com.jetbrains.tmp.learning.SupportedLanguages;
-import com.jetbrains.tmp.learning.courseFormat.StepNode;
-import com.jetbrains.tmp.learning.stepik.StepikConnectorLogin;
+import org.stepik.core.StepikProjectManager;
+import org.stepik.core.SupportedLanguages;
+import org.stepik.core.courseFormat.StepNode;
+import org.stepik.core.courseFormat.StudyNode;
+import org.stepik.core.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
@@ -160,11 +161,13 @@ public class StepikJavaPostAction extends StudyCheckAction {
     @Override
     public void check(@NotNull Project project) {
         logger.info("Start checking step");
-        StepNode stepNode = StudyUtils.getSelectedStep(project);
-        if (stepNode == null) {
-            logger.info("Stop checking step: step is null");
+        StudyNode<?, ?> selected = StepikProjectManager.getSelected(project);
+        if (!(selected instanceof StepNode)) {
+            logger.info("Stop checking step: step is null or is not StepNode ");
             return;
         }
+
+        StepNode stepNode = (StepNode) selected;
 
         String title = "Checking Step: " + stepNode.getName();
 
