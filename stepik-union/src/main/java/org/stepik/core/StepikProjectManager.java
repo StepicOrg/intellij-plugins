@@ -284,6 +284,10 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
         }
     }
 
+    public boolean isAdaptive() {
+        return root instanceof Course && ((Course) root).isAdaptive();
+    }
+
     private void refreshCourse() {
         if (getProjectRoot() == null || project == null) {
             return;
@@ -296,7 +300,9 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
             ProgressManager.getInstance().run(new Task.Backgroundable(project, "Synchronize project") {
                 @Override
                 public void run(@NotNull ProgressIndicator indicator) {
-                    repairProjectFiles(root);
+                    if (!isAdaptive()) {
+                        repairProjectFiles(root);
+                    }
                     if (project.isDisposed()) {
                         return;
                     }
