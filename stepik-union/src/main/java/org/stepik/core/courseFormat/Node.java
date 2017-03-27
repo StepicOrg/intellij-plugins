@@ -13,6 +13,7 @@ import org.stepik.api.objects.progresses.Progresses;
 import org.stepik.core.stepik.StepikConnectorLogin;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -279,21 +280,34 @@ public abstract class Node<
 
                         Set<String> progressIds = progressMap.keySet();
 
-                        if (progressIds.size() != 0) {
-                            StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
-
-                            Progresses progresses = stepikApiClient.progresses()
-                                    .get()
-                                    .id(progressIds.toArray(new String[progressIds.size()]))
-                                    .execute();
-
-                            progresses.getItems().forEach(progress -> {
-                                String id = progress.getId();
-                                StudyNode node = progressMap.get(id);
-                                if (progress.isPassed()) {
-                                    node.setRawStatus(StudyStatus.SOLVED);
+                        if (!progressIds.isEmpty()) {
+                            int size = progressIds.size();
+                            String[] list = progressIds.toArray(new String[size]);
+                            int start = 0;
+                            int end;
+                            while (start < size) {
+                                end = start + 20;
+                                if (end > size) {
+                                    end = size;
                                 }
-                            });
+                                String[] part = Arrays.copyOfRange(list, start, end);
+                                start = end;
+
+                                StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
+
+                                Progresses progresses = stepikApiClient.progresses()
+                                        .get()
+                                        .id(part)
+                                        .execute();
+
+                                progresses.getItems().forEach(progress -> {
+                                    String id = progress.getId();
+                                    StudyNode node = progressMap.get(id);
+                                    if (progress.isPassed()) {
+                                        node.setRawStatus(StudyStatus.SOLVED);
+                                    }
+                                });
+                            }
                         }
                     }
                     if (!project.isDisposed()) {
