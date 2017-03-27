@@ -28,6 +28,7 @@ import org.jdom.input.DOMBuilder;
 import org.jdom.output.XMLOutputter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.api.objects.StudyObject;
 import org.stepik.api.objects.courses.Course;
 import org.stepik.api.objects.lessons.CompoundUnitLesson;
 import org.stepik.api.objects.sections.Section;
@@ -209,6 +210,11 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
         return null;
     }
 
+    public static boolean isAdaptive(Project project) {
+        StepikProjectManager instance = getInstance(project);
+        return instance != null && instance.isAdaptive();
+    }
+
     public StudyNode<?, ?> getSelected() {
         return selected;
     }
@@ -285,7 +291,8 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
     }
 
     public boolean isAdaptive() {
-        return root instanceof Course && ((Course) root).isAdaptive();
+        StudyObject data = root.getData();
+        return data != null && data.isAdaptive();
     }
 
     private void refreshCourse() {
@@ -300,9 +307,7 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
             ProgressManager.getInstance().run(new Task.Backgroundable(project, "Synchronize project") {
                 @Override
                 public void run(@NotNull ProgressIndicator indicator) {
-                    if (!isAdaptive()) {
-                        repairProjectFiles(root);
-                    }
+                    repairProjectFiles(root);
                     if (project.isDisposed()) {
                         return;
                     }
