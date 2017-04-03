@@ -207,10 +207,10 @@ public class StudyToolWindow extends SimpleToolWindowPanel implements DataProvid
 
         switch (stepType) {
             case UNKNOWN:
-                text = getStepContent(stepNode.asStepHelper());
+                text = getStepContent(stepNode.asStepHelper(project));
                 break;
             case CODE:
-                text = getStepContent(stepNode.asCodeHelper());
+                text = getStepContent(stepNode.asCodeHelper(project));
                 SwingUtilities.invokeLater(() -> {
                     languageBox.removeAllItems();
                     stepNode.getSupportedLanguages().stream()
@@ -223,10 +223,10 @@ public class StudyToolWindow extends SimpleToolWindowPanel implements DataProvid
                 });
                 break;
             case TEXT:
-                text = getStepContent(stepNode.asTextHelper());
+                text = getStepContent(stepNode.asTextHelper(project));
                 break;
             case VIDEO:
-                VideoStepNodeHelper videoStepNode = stepNode.asVideoStep();
+                VideoStepNodeHelper videoStepNode = stepNode.asVideoStep(project);
                 videoStepNode.setQuality(getVideoQuality());
                 text = getStepContent(videoStepNode);
                 SwingUtilities.invokeLater(() -> {
@@ -243,31 +243,31 @@ public class StudyToolWindow extends SimpleToolWindowPanel implements DataProvid
                 });
                 break;
             case CHOICE:
-                text = getStepContent(stepNode.asChoiceStep());
+                text = getStepContent(stepNode.asChoiceStep(project));
                 break;
             case STRING:
-                text = getStepContent(stepNode.asStringStep());
+                text = getStepContent(stepNode.asStringStep(project));
                 break;
             case SORTING:
-                text = getStepContent(stepNode.asSortingStep());
+                text = getStepContent(stepNode.asSortingStep(project));
                 break;
             case MATCHING:
-                text = getStepContent(stepNode.asMatchingStep());
+                text = getStepContent(stepNode.asMatchingStep(project));
                 break;
             case NUMBER:
-                text = getStepContent(stepNode.asNumberStep());
+                text = getStepContent(stepNode.asNumberStep(project));
                 break;
             case DATASET:
-                text = getStepContent(stepNode.asDatasetStep());
+                text = getStepContent(stepNode.asDatasetStep(project));
                 break;
             case TABLE:
-                text = getStepContent(stepNode.asTableStep());
+                text = getStepContent(stepNode.asTableStep(project));
                 break;
             case FILL_BLANKS:
-                text = getStepContent(stepNode.asQuizHelper());
+                text = getStepContent(stepNode.asQuizHelper(project));
                 break;
             case MATH:
-                text = getStepContent(stepNode.asQuizHelper());
+                text = getStepContent(stepNode.asQuizHelper(project));
                 break;
             default:
                 text = EMPTY_STEP_TEXT;

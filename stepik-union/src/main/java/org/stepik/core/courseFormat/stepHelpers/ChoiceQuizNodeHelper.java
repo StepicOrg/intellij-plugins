@@ -1,5 +1,6 @@
 package org.stepik.core.courseFormat.stepHelpers;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.core.courseFormat.StepNode;
@@ -16,8 +17,8 @@ public class ChoiceQuizNodeHelper extends QuizHelper {
     private String[] options;
     private List<Boolean> choices;
 
-    public ChoiceQuizNodeHelper(@NotNull StepNode stepNode) {
-        super(stepNode);
+    public ChoiceQuizNodeHelper(@NotNull Project project, @NotNull StepNode stepNode) {
+        super(project, stepNode);
     }
 
     @NotNull

@@ -1,5 +1,6 @@
 package org.stepik.core.courseFormat.stepHelpers;
 
+import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.objects.steps.Step;
@@ -21,8 +22,8 @@ public class VideoStepNodeHelper extends StepHelper {
     private int quality;
     private List<VideoUrl> urls;
 
-    public VideoStepNodeHelper(@NotNull StepNode stepNode) {
-        super(stepNode);
+    public VideoStepNodeHelper(@NotNull Project project, @NotNull StepNode stepNode) {
+        super(project, stepNode);
     }
 
     public boolean hasContent() {

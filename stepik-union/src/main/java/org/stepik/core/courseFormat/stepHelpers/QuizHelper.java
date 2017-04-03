@@ -1,6 +1,7 @@
 package org.stepik.core.courseFormat.stepHelpers;
 
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.exceptions.StepikClientException;
@@ -36,8 +37,8 @@ public class QuizHelper extends StepHelper {
     private Submission submission;
     private boolean inited;
 
-    public QuizHelper(@NotNull StepNode stepNode) {
-        super(stepNode);
+    public QuizHelper(@NotNull Project project, @NotNull StepNode stepNode) {
+        super(project, stepNode);
     }
 
     private boolean loadAttempt(@NotNull StepikApiClient stepikApiClient, long userId) {

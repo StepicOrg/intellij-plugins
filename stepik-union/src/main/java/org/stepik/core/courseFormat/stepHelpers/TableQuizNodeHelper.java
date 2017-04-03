@@ -1,5 +1,6 @@
 package org.stepik.core.courseFormat.stepHelpers;
 
+import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.api.objects.submissions.Choice;
 import org.stepik.api.objects.submissions.Column;
@@ -17,8 +18,8 @@ public class TableQuizNodeHelper extends QuizHelper {
     private List<Choice> tableChoices;
     private Map<String, Map<String, Boolean>> choices;
 
-    public TableQuizNodeHelper(@NotNull StepNode stepNode) {
-        super(stepNode);
+    public TableQuizNodeHelper(@NotNull Project project, @NotNull StepNode stepNode) {
+        super(project, stepNode);
     }
 
     public boolean getChoice(@NotNull String rowName, @NotNull String colName) {

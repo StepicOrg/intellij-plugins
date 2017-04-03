@@ -301,43 +301,43 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
     }
 
     @NotNull
-    public VideoStepNodeHelper asVideoStep() {
-        return new VideoStepNodeHelper(this);
+    public VideoStepNodeHelper asVideoStep(@NotNull Project project) {
+        return new VideoStepNodeHelper(project, this);
     }
 
     @NotNull
-    public ChoiceQuizNodeHelper asChoiceStep() {
-        return new ChoiceQuizNodeHelper(this);
+    public ChoiceQuizNodeHelper asChoiceStep(@NotNull Project project) {
+        return new ChoiceQuizNodeHelper(project, this);
     }
 
     @NotNull
-    public StringQuizNodeHelper asStringStep() {
-        return new StringQuizNodeHelper(this);
+    public StringQuizNodeHelper asStringStep(@NotNull Project project) {
+        return new StringQuizNodeHelper(project, this);
     }
 
     @NotNull
-    public SortingQuizNodeHelper asSortingStep() {
-        return new SortingQuizNodeHelper(this);
+    public SortingQuizNodeHelper asSortingStep(@NotNull Project project) {
+        return new SortingQuizNodeHelper(project, this);
     }
 
     @NotNull
-    public MatchingQuizNodeHelper asMatchingStep() {
-        return new MatchingQuizNodeHelper(this);
+    public MatchingQuizNodeHelper asMatchingStep(@NotNull Project project) {
+        return new MatchingQuizNodeHelper(project, this);
     }
 
     @NotNull
-    public NumberQuizNodeHelper asNumberStep() {
-        return new NumberQuizNodeHelper(this);
+    public NumberQuizNodeHelper asNumberStep(@NotNull Project project) {
+        return new NumberQuizNodeHelper(project, this);
     }
 
     @NotNull
-    public DatasetQuizNodeHelper asDatasetStep() {
-        return new DatasetQuizNodeHelper(this);
+    public DatasetQuizNodeHelper asDatasetStep(@NotNull Project project) {
+        return new DatasetQuizNodeHelper(project, this);
     }
 
     @NotNull
-    public TableQuizNodeHelper asTableStep() {
-        return new TableQuizNodeHelper(this);
+    public TableQuizNodeHelper asTableStep(@NotNull Project project) {
+        return new TableQuizNodeHelper(project, this);
     }
 
     public Long getAssignment() {
@@ -362,19 +362,19 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
         return assignment;
     }
 
-    public QuizHelper asQuizHelper() {
-        return new QuizHelper(this);
+    public QuizHelper asQuizHelper(@NotNull Project project) {
+        return new QuizHelper(project, this);
     }
 
-    public StepHelper asStepHelper() {
-        return new StepHelper(this);
+    public StepHelper asStepHelper(@NotNull Project project) {
+        return new StepHelper(project, this);
     }
 
-    public TextHelper asTextHelper() {
-        return new TextHelper(this);
+    public TextHelper asTextHelper(@NotNull Project project) {
+        return new TextHelper(project, this);
     }
 
-    public CodeHelper asCodeHelper() {
-        return new CodeHelper(this);
+    public CodeHelper asCodeHelper(@NotNull Project project) {
+        return new CodeHelper(project, this);
     }
 }
