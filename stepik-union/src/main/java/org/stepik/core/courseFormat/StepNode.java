@@ -17,14 +17,17 @@ import org.stepik.api.objects.steps.Steps;
 import org.stepik.api.objects.units.Units;
 import org.stepik.core.SupportedLanguages;
 import org.stepik.core.core.EduNames;
-import org.stepik.core.courseFormat.stepHelpers.ChoiceStepNodeHelper;
-import org.stepik.core.courseFormat.stepHelpers.DatasetStepNodeHelper;
-import org.stepik.core.courseFormat.stepHelpers.MatchingStepNodeHelper;
-import org.stepik.core.courseFormat.stepHelpers.NumberStepNodeHelper;
-import org.stepik.core.courseFormat.stepHelpers.SortingStepNodeHelper;
+import org.stepik.core.courseFormat.stepHelpers.ChoiceQuizNodeHelper;
+import org.stepik.core.courseFormat.stepHelpers.CodeHelper;
+import org.stepik.core.courseFormat.stepHelpers.DatasetQuizNodeHelper;
+import org.stepik.core.courseFormat.stepHelpers.MatchingQuizNodeHelper;
+import org.stepik.core.courseFormat.stepHelpers.NumberQuizNodeHelper;
+import org.stepik.core.courseFormat.stepHelpers.QuizHelper;
+import org.stepik.core.courseFormat.stepHelpers.SortingQuizNodeHelper;
 import org.stepik.core.courseFormat.stepHelpers.StepHelper;
-import org.stepik.core.courseFormat.stepHelpers.StringStepNodeHelper;
-import org.stepik.core.courseFormat.stepHelpers.TableStepNodeHelper;
+import org.stepik.core.courseFormat.stepHelpers.StringQuizNodeHelper;
+import org.stepik.core.courseFormat.stepHelpers.TableQuizNodeHelper;
+import org.stepik.core.courseFormat.stepHelpers.TextHelper;
 import org.stepik.core.courseFormat.stepHelpers.VideoStepNodeHelper;
 import org.stepik.core.stepik.StepikConnectorLogin;
 
@@ -303,38 +306,38 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
     }
 
     @NotNull
-    public ChoiceStepNodeHelper asChoiceStep() {
-        return new ChoiceStepNodeHelper(this);
+    public ChoiceQuizNodeHelper asChoiceStep() {
+        return new ChoiceQuizNodeHelper(this);
     }
 
     @NotNull
-    public StringStepNodeHelper asStringStep() {
-        return new StringStepNodeHelper(this);
+    public StringQuizNodeHelper asStringStep() {
+        return new StringQuizNodeHelper(this);
     }
 
     @NotNull
-    public SortingStepNodeHelper asSortingStep() {
-        return new SortingStepNodeHelper(this);
+    public SortingQuizNodeHelper asSortingStep() {
+        return new SortingQuizNodeHelper(this);
     }
 
     @NotNull
-    public MatchingStepNodeHelper asMatchingStep() {
-        return new MatchingStepNodeHelper(this);
+    public MatchingQuizNodeHelper asMatchingStep() {
+        return new MatchingQuizNodeHelper(this);
     }
 
     @NotNull
-    public NumberStepNodeHelper asNumberStep() {
-        return new NumberStepNodeHelper(this);
+    public NumberQuizNodeHelper asNumberStep() {
+        return new NumberQuizNodeHelper(this);
     }
 
     @NotNull
-    public DatasetStepNodeHelper asDatasetStep() {
-        return new DatasetStepNodeHelper(this);
+    public DatasetQuizNodeHelper asDatasetStep() {
+        return new DatasetQuizNodeHelper(this);
     }
 
     @NotNull
-    public TableStepNodeHelper asTableStep() {
-        return new TableStepNodeHelper(this);
+    public TableQuizNodeHelper asTableStep() {
+        return new TableQuizNodeHelper(this);
     }
 
     public Long getAssignment() {
@@ -359,7 +362,19 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
         return assignment;
     }
 
+    public QuizHelper asQuizHelper() {
+        return new QuizHelper(this);
+    }
+
     public StepHelper asStepHelper() {
         return new StepHelper(this);
+    }
+
+    public TextHelper asTextHelper() {
+        return new TextHelper(this);
+    }
+
+    public CodeHelper asCodeHelper() {
+        return new CodeHelper(this);
     }
 }

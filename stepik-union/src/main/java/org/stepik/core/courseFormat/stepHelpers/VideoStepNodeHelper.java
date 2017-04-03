@@ -1,11 +1,11 @@
 package org.stepik.core.courseFormat.stepHelpers;
 
-import org.stepik.core.courseFormat.StepNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.objects.steps.Step;
 import org.stepik.api.objects.steps.Video;
 import org.stepik.api.objects.steps.VideoUrl;
+import org.stepik.core.courseFormat.StepNode;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -17,17 +17,16 @@ import static java.util.Collections.emptyList;
 /**
  * @author meanmail
  */
-public class VideoStepNodeHelper {
-    private final StepNode stepNode;
+public class VideoStepNodeHelper extends StepHelper {
     private int quality;
     private List<VideoUrl> urls;
 
     public VideoStepNodeHelper(@NotNull StepNode stepNode) {
-        this.stepNode = stepNode;
+        super(stepNode);
     }
 
     public boolean hasContent() {
-        Step data = stepNode.getData();
+        Step data = getStepNode().getData();
 
         if (data == null) {
             return false;
@@ -61,7 +60,7 @@ public class VideoStepNodeHelper {
 
     @NotNull
     private List<VideoUrl> getVideoUrls() {
-        Step data = stepNode.getData();
+        Step data = getStepNode().getData();
 
         if (data == null) {
             return emptyList();
@@ -82,15 +81,21 @@ public class VideoStepNodeHelper {
                 .collect(Collectors.toList());
     }
 
-    public StepNode getStepNode() {
-        return stepNode;
-    }
-
     public int getQuality() {
         return quality;
     }
 
     public void setQuality(int quality) {
         this.quality = quality;
+    }
+
+    @NotNull
+    public String getType() {
+        return "video";
+    }
+
+    @NotNull
+    public String getLinkTitle() {
+        return "Play this video in a browser";
     }
 }

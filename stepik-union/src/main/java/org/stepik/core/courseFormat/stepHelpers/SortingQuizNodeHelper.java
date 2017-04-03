@@ -1,8 +1,8 @@
 package org.stepik.core.courseFormat.stepHelpers;
 
 import com.intellij.openapi.util.Pair;
-import org.stepik.core.courseFormat.StepNode;
 import org.jetbrains.annotations.NotNull;
+import org.stepik.core.courseFormat.StepNode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,12 +10,12 @@ import java.util.List;
 /**
  * @author meanmail
  */
-public class SortingStepNodeHelper extends StepHelper {
+public class SortingQuizNodeHelper extends QuizHelper {
     private String[] values;
     private List<Integer> replyOrdering;
     private List<Pair<Integer, String>> ordering;
 
-    public SortingStepNodeHelper(@NotNull StepNode stepNode) {
+    public SortingQuizNodeHelper(@NotNull StepNode stepNode) {
         super(stepNode);
     }
 

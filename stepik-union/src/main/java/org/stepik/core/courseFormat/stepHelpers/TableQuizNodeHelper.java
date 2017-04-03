@@ -1,9 +1,9 @@
 package org.stepik.core.courseFormat.stepHelpers;
 
-import org.stepik.core.courseFormat.StepNode;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.api.objects.submissions.Choice;
 import org.stepik.api.objects.submissions.Column;
+import org.stepik.core.courseFormat.StepNode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,11 +13,11 @@ import java.util.Map;
 /**
  * @author meanmail
  */
-public class TableStepNodeHelper extends StepHelper {
+public class TableQuizNodeHelper extends QuizHelper {
     private List<Choice> tableChoices;
     private Map<String, Map<String, Boolean>> choices;
 
-    public TableStepNodeHelper(@NotNull StepNode stepNode) {
+    public TableQuizNodeHelper(@NotNull StepNode stepNode) {
         super(stepNode);
     }
 

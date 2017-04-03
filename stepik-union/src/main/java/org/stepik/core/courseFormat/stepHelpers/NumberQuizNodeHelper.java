@@ -1,43 +1,43 @@
 package org.stepik.core.courseFormat.stepHelpers;
 
-import org.stepik.core.courseFormat.StepNode;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.jetbrains.annotations.NotNull;
+import org.stepik.core.courseFormat.StepNode;
 
 /**
  * @author meanmail
  */
-public class DatasetStepNodeHelper extends StepHelper {
-    private String data;
+public class NumberQuizNodeHelper extends QuizHelper {
+    private String number;
 
-    public DatasetStepNodeHelper(@NotNull StepNode stepNode) {
+    public NumberQuizNodeHelper(@NotNull StepNode stepNode) {
         super(stepNode);
     }
 
     @NotNull
-    public String getData() {
+    public String getNumber() {
         initStepOptions();
-        return StringEscapeUtils.escapeHtml(data != null ? data : "");
+        return StringEscapeUtils.escapeHtml(number != null ? number : "");
     }
 
     @Override
     protected boolean needInit() {
-        return data == null;
+        return number == null;
     }
 
     @Override
     protected void onStartInit() {
-        data = "";
+        number = "";
     }
 
     @Override
     protected void onSubmissionLoaded() {
-        data = reply.getText();
-        data = data != null ? data : "";
+        number = reply.getNumber();
+        number = number != null ? number : "";
     }
 
     @Override
     protected void onInitFailed() {
-        data = null;
+        number = null;
     }
 }

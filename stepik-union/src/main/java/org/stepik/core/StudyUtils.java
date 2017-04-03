@@ -19,21 +19,10 @@ import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.recommendations.Recommendation;
 import org.stepik.api.objects.recommendations.Recommendations;
-import org.stepik.api.objects.steps.Limit;
-import org.stepik.api.objects.steps.Sample;
 import org.stepik.api.objects.steps.Step;
 import org.stepik.api.objects.steps.Steps;
-import org.stepik.core.courseFormat.StepNode;
 import org.stepik.core.courseFormat.StudyNode;
-import org.stepik.core.courseFormat.stepHelpers.ChoiceStepNodeHelper;
-import org.stepik.core.courseFormat.stepHelpers.DatasetStepNodeHelper;
-import org.stepik.core.courseFormat.stepHelpers.MatchingStepNodeHelper;
-import org.stepik.core.courseFormat.stepHelpers.NumberStepNodeHelper;
-import org.stepik.core.courseFormat.stepHelpers.SortingStepNodeHelper;
 import org.stepik.core.courseFormat.stepHelpers.StepHelper;
-import org.stepik.core.courseFormat.stepHelpers.StringStepNodeHelper;
-import org.stepik.core.courseFormat.stepHelpers.TableStepNodeHelper;
-import org.stepik.core.courseFormat.stepHelpers.VideoStepNodeHelper;
 import org.stepik.core.stepik.StepikConnectorLogin;
 import org.stepik.core.templates.Templater;
 import org.stepik.core.ui.StudyToolWindow;
@@ -43,7 +32,6 @@ import org.stepik.core.utils.ProjectFilesUtils;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.util.HashMap;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -55,11 +43,6 @@ public class StudyUtils {
             "(?:section([0-9]+)/lesson([0-9]+))|" +
             "(?:section([0-9]+))" +
             ").*$";
-    private static final String UNKNOWN_STEP_TEXT = "This step can take place in the web version (%s)";
-    private static final String STEP_LINK_TEXT = "View step on Stepik.org";
-    private static final String VIDEO_LINK_TEXT = "Play video in the web version";
-    private static final String VIDEO_BLOCK = "<video src=\"%s\" style width=\"100%%\" preload controls autoplay></video>";
-    private static final String STEP_LINK_TEMPLATE = "<a href='https://stepik.org/lesson/%d/step/%d'>%s</a>";
     private static Pattern pathPattern;
 
     private StudyUtils() {
@@ -91,148 +74,17 @@ public class StudyUtils {
     }
 
     @NotNull
-    public static String getVideoStepText(
-            @NotNull VideoStepNodeHelper videoStepNode,
-            int quality) {
-        videoStepNode.setQuality(quality);
-        String text = getLink(videoStepNode.getStepNode(), VIDEO_LINK_TEXT);
-        if (videoStepNode.hasContent()) {
-            return text + "<br>" + String.format(VIDEO_BLOCK, videoStepNode.getUrl());
-        }
-
-        return text;
+    public static String getStepContent(@NotNull StepHelper stepHelper) {
+        return processTemplate(stepHelper, "quiz/" + stepHelper.getType());
     }
 
     @NotNull
-    public static String getChoiceStepText(@NotNull StepNode stepNode) {
-        ChoiceStepNodeHelper stepNodeHelper = stepNode.asChoiceStep();
-        return processTemplate(stepNodeHelper, "quiz/choice");
-    }
-
-    @NotNull
-    public static String getStringStepText(@NotNull StepNode stepNode) {
-        StringStepNodeHelper stepNodeHelper = stepNode.asStringStep();
-        return processTemplate(stepNodeHelper, "quiz/string");
-    }
-
-    @NotNull
-    public static String getSortingStepText(@NotNull StepNode stepNode) {
-        SortingStepNodeHelper stepNodeHelper = stepNode.asSortingStep();
-        return processTemplate(stepNodeHelper, "quiz/sorting");
-    }
-
-    @NotNull
-    public static String getMatchingStepText(@NotNull StepNode stepNode) {
-        MatchingStepNodeHelper stepNodeHelper = stepNode.asMatchingStep();
-        return processTemplate(stepNodeHelper, "quiz/matching");
-    }
-
-    @NotNull
-    public static String getNumberStepText(@NotNull StepNode stepNode) {
-        NumberStepNodeHelper stepNodeHelper = stepNode.asNumberStep();
-        return processTemplate(stepNodeHelper, "quiz/number");
-    }
-
-    @NotNull
-    public static String getDatasetStepText(@NotNull StepNode stepNode) {
-        DatasetStepNodeHelper stepNodeHelper = stepNode.asDatasetStep();
-        return processTemplate(stepNodeHelper, "quiz/dataset");
-    }
-
-    @NotNull
-    public static String getTableStepText(@NotNull StepNode stepNode) {
-        TableStepNodeHelper stepNodeHelper = stepNode.asTableStep();
-        return processTemplate(stepNodeHelper, "quiz/table");
-    }
-
-    @NotNull
-    public static String getFillBlanksStepText(@NotNull StepNode stepNode) {
-        StepHelper stepNodeHelper = stepNode.asStepHelper();
-        return processTemplate(stepNodeHelper, "quiz/fill-blanks");
-    }
-
-    @NotNull
-    public static String getMathStepText(@NotNull StepNode stepNode) {
-        StepHelper stepNodeHelper = stepNode.asStepHelper();
-        return processTemplate(stepNodeHelper, "quiz/math");
-    }
-
-    @NotNull
-    private static String processTemplate(@NotNull StepHelper stepNodeHelper, @NotNull String templateName) {
-        String text = getTextStepText(stepNodeHelper.getStepNode());
-
+    private static String processTemplate(@NotNull StepHelper stepHelper, @NotNull String templateName) {
         HashMap<String, Object> params = new HashMap<>();
-        params.put("text", text);
-        params.put("stepNode", stepNodeHelper);
+        params.put("stepNode", stepHelper);
         params.put("darcula", LafManager.getInstance().getCurrentLookAndFeel() instanceof DarculaLookAndFeelInfo);
 
         return Templater.processTemplate(templateName, params);
-    }
-
-    @NotNull
-    public static String getTextStepText(@NotNull StepNode stepNode) {
-        return getStepText(stepNode, STEP_LINK_TEXT);
-    }
-
-    @NotNull
-    private static String getStepText(@NotNull StepNode stepNode, @NotNull String linkText, Object... params) {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(getLink(stepNode, String.format(linkText, params)));
-
-        if (!stepNode.getText().startsWith("<p>") && !stepNode.getText().startsWith("<h")) {
-            stringBuilder.append("<br><br>");
-        }
-
-        stringBuilder.append(stepNode.getText());
-
-        return stringBuilder.toString();
-    }
-
-    @NotNull
-    public static String getUnknownStepText(@NotNull StepNode stepNode) {
-        Step data = stepNode.getData();
-        String stepType = data != null ? data.getBlock().getName() : stepNode.getType().getName();
-        return getStepText(stepNode, UNKNOWN_STEP_TEXT, stepType);
-    }
-
-    @NotNull
-    public static String getCodeStepText(@NotNull StepNode stepNode) {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(getTextStepText(stepNode));
-
-        List<Sample> samples = stepNode.getSamples();
-
-        for (int i = 1; i <= samples.size(); i++) {
-            Sample sample = samples.get(i - 1);
-            stringBuilder.append("<p><b>Sample Input ")
-                    .append(i)
-                    .append(":</b><br>")
-                    .append(sample.getInput().replaceAll("\\n", "<br>"))
-                    .append("<br>")
-                    .append("<b>Sample Output ")
-                    .append(i)
-                    .append(":</b><br>")
-                    .append(sample.getOutput().replaceAll("\\n", "<br>"))
-                    .append("<br>");
-        }
-
-        Limit limit = stepNode.getLimit();
-        stringBuilder.append("<p><b>Limits: </b>")
-                .append(limit.getTime())
-                .append("s; ")
-                .append(limit.getMemory())
-                .append("Mib</p>");
-
-        return stringBuilder.toString();
-    }
-
-    @NotNull
-    private static String getLink(@NotNull StepNode stepNode, @NotNull String text) {
-        StudyNode lessonNode = stepNode.getParent();
-        if (lessonNode != null) {
-            return String.format(STEP_LINK_TEMPLATE, lessonNode.getId(), stepNode.getPosition(), text);
-        }
-        return text;
     }
 
     @Nullable
