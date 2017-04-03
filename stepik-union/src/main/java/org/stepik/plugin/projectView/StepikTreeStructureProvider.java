@@ -75,7 +75,13 @@ public abstract class StepikTreeStructureProvider implements TreeStructureProvid
             }
 
             StudyNode<?, ?> selected = StepikProjectManager.getSelected(project);
-            if (selected == null || !selected.getPath().startsWith(node.getPath())) {
+            if (selected == null) {
+                return true;
+            }
+
+            String selectedPath = selected.getPath();
+            String nodePath = node.getPath();
+            if (!selectedPath.startsWith(nodePath) && selected.getParent() != node.getParent()) {
                 return true;
             }
         }
