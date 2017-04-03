@@ -174,6 +174,26 @@ public abstract class Node<
 
     @Nullable
     @Override
+    public StudyNode<?, ?> getChildByClassAndId(@NotNull Class<? extends StudyObject> clazz, long id) {
+        if (getChildDataClass() == clazz) {
+            for (C child : getChildren()) {
+                if (child.getId() == id) {
+                    return child;
+                }
+            }
+        } else {
+            for (C child : getChildren()) {
+                StudyNode<?, ?> node = child.getChildByClassAndId(clazz, id);
+                if (node != null) {
+                    return node;
+                }
+            }
+        }
+        return null;
+    }
+
+    @Nullable
+    @Override
     public C getChildByPosition(int position) {
         for (C child : getChildren()) {
             if (child.getPosition() == position) {
@@ -248,6 +268,8 @@ public abstract class Node<
     protected abstract void loadData(long id);
 
     protected abstract Class<C> getChildClass();
+
+    protected abstract Class<DC> getChildDataClass();
 
     @Override
     public boolean isUnknownStatus() {

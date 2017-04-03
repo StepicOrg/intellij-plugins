@@ -2,18 +2,6 @@ package org.stepik.core.courseFormat;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
-import org.stepik.core.SupportedLanguages;
-import org.stepik.core.core.EduNames;
-import org.stepik.core.courseFormat.stepHelpers.ChoiceStepNodeHelper;
-import org.stepik.core.courseFormat.stepHelpers.DatasetStepNodeHelper;
-import org.stepik.core.courseFormat.stepHelpers.MatchingStepNodeHelper;
-import org.stepik.core.courseFormat.stepHelpers.NumberStepNodeHelper;
-import org.stepik.core.courseFormat.stepHelpers.SortingStepNodeHelper;
-import org.stepik.core.courseFormat.stepHelpers.StepHelper;
-import org.stepik.core.courseFormat.stepHelpers.StringStepNodeHelper;
-import org.stepik.core.courseFormat.stepHelpers.TableStepNodeHelper;
-import org.stepik.core.courseFormat.stepHelpers.VideoStepNodeHelper;
-import org.stepik.core.stepik.StepikConnectorLogin;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,6 +15,18 @@ import org.stepik.api.objects.steps.Sample;
 import org.stepik.api.objects.steps.Step;
 import org.stepik.api.objects.steps.Steps;
 import org.stepik.api.objects.units.Units;
+import org.stepik.core.SupportedLanguages;
+import org.stepik.core.core.EduNames;
+import org.stepik.core.courseFormat.stepHelpers.ChoiceStepNodeHelper;
+import org.stepik.core.courseFormat.stepHelpers.DatasetStepNodeHelper;
+import org.stepik.core.courseFormat.stepHelpers.MatchingStepNodeHelper;
+import org.stepik.core.courseFormat.stepHelpers.NumberStepNodeHelper;
+import org.stepik.core.courseFormat.stepHelpers.SortingStepNodeHelper;
+import org.stepik.core.courseFormat.stepHelpers.StepHelper;
+import org.stepik.core.courseFormat.stepHelpers.StringStepNodeHelper;
+import org.stepik.core.courseFormat.stepHelpers.TableStepNodeHelper;
+import org.stepik.core.courseFormat.stepHelpers.VideoStepNodeHelper;
+import org.stepik.core.stepik.StepikConnectorLogin;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -83,6 +83,11 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
     @Override
     protected Class<StepNode> getChildClass() {
         return StepNode.class;
+    }
+
+    @Override
+    protected Class<Step> getChildDataClass() {
+        return Step.class;
     }
 
     @NotNull

@@ -1,6 +1,7 @@
 package org.stepik.core;
 
 import com.google.gson.internal.LinkedTreeMap;
+import com.intellij.ide.projectView.ProjectView;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.ServiceManager;
@@ -215,6 +216,7 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
         return instance != null && instance.isAdaptive();
     }
 
+    @Nullable
     public StudyNode<?, ?> getSelected() {
         return selected;
     }
@@ -223,12 +225,18 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
         setSelected(selected, false);
     }
 
-    public void setSelected(StudyNode<?, ?> selected, boolean force) {
+    public void setSelected(@Nullable StudyNode<?, ?> selected, boolean force) {
         this.selected = selected;
         if (project != null) {
             StudyToolWindow toolWindow = StudyUtils.getStudyToolWindow(project);
             if (toolWindow != null) {
-                ApplicationManager.getApplication().invokeLater(() -> toolWindow.setStepNode(selected, force));
+                ApplicationManager.getApplication().invokeLater(() -> {
+                    toolWindow.setStepNode(selected, force);
+                    if (selected != null && !project.isDisposed()) {
+                        VirtualFile file = project.getBaseDir().findFileByRelativePath(selected.getPath());
+                        ProjectView.getInstance(project).select(null, file, false);
+                    }
+                });
             }
         }
     }

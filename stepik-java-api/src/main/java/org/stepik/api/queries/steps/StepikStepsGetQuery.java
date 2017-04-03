@@ -21,6 +21,12 @@ public class StepikStepsGetQuery extends StepikAbstractGetQuery<StepikStepsGetQu
     }
 
     @NotNull
+    public StepikStepsGetQuery lesson(long value) {
+        addParam("lesson", value);
+        return this;
+    }
+
+    @NotNull
     @Override
     protected String getUrl() {
         return Urls.STEPS;

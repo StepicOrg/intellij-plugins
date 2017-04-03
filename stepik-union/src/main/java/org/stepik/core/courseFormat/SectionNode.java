@@ -62,6 +62,11 @@ public class SectionNode extends Node<Section, LessonNode, CompoundUnitLesson, S
     }
 
     @Override
+    protected Class<CompoundUnitLesson> getChildDataClass() {
+        return CompoundUnitLesson.class;
+    }
+
+    @Override
     public long getCourseId() {
         Section data = getData();
         return data != null ? getData().getCourse() : 0;

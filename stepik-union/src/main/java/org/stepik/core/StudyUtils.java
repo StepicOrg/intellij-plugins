@@ -5,6 +5,7 @@ import com.intellij.ide.projectView.ProjectViewNode;
 import com.intellij.ide.projectView.impl.AbstractProjectViewPane;
 import com.intellij.ide.ui.LafManager;
 import com.intellij.ide.ui.laf.darcula.DarculaLookAndFeelInfo;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
@@ -12,6 +13,16 @@ import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFileSystemItem;
 import com.intellij.ui.content.Content;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.stepik.api.client.StepikApiClient;
+import org.stepik.api.exceptions.StepikClientException;
+import org.stepik.api.objects.recommendations.Recommendation;
+import org.stepik.api.objects.recommendations.Recommendations;
+import org.stepik.api.objects.steps.Limit;
+import org.stepik.api.objects.steps.Sample;
+import org.stepik.api.objects.steps.Step;
+import org.stepik.api.objects.steps.Steps;
 import org.stepik.core.courseFormat.StepNode;
 import org.stepik.core.courseFormat.StudyNode;
 import org.stepik.core.courseFormat.stepHelpers.ChoiceStepNodeHelper;
@@ -23,14 +34,10 @@ import org.stepik.core.courseFormat.stepHelpers.StepHelper;
 import org.stepik.core.courseFormat.stepHelpers.StringStepNodeHelper;
 import org.stepik.core.courseFormat.stepHelpers.TableStepNodeHelper;
 import org.stepik.core.courseFormat.stepHelpers.VideoStepNodeHelper;
+import org.stepik.core.stepik.StepikConnectorLogin;
+import org.stepik.core.templates.Templater;
 import org.stepik.core.ui.StudyToolWindow;
 import org.stepik.core.ui.StudyToolWindowFactory;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.stepik.api.objects.steps.Limit;
-import org.stepik.api.objects.steps.Sample;
-import org.stepik.api.objects.steps.Step;
-import org.stepik.core.templates.Templater;
 import org.stepik.core.utils.ProjectFilesUtils;
 
 import javax.swing.*;
@@ -41,6 +48,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StudyUtils {
+    private static final Logger logger = Logger.getInstance(StudyUtils.class);
     private static final String PATH_PATTERN = "^(?:(?:section([0-9]+)/lesson([0-9]+)/step([0-9]+))|" +
             "(?:lesson([0-9]+)/step([0-9]+))|" +
             "(?:step([0-9]+))|" +
@@ -341,5 +349,35 @@ public class StudyUtils {
         }
 
         return root;
+    }
+
+    @Nullable
+    static StudyNode<?, ?> getRecommendation(@NotNull StudyNode root) {
+        StepikApiClient stepikClient = StepikConnectorLogin.authAndGetStepikApiClient();
+        StudyNode studyNode = null;
+        try {
+            Recommendations recommendations = stepikClient.recommendations()
+                    .get()
+                    .course(root.getId())
+                    .execute();
+            if (!recommendations.isEmpty()) {
+                Recommendation recommendation = recommendations.getItems()
+                        .get(0);
+
+                long lesson = recommendation.getLesson();
+
+                Steps steps = stepikClient.steps()
+                        .get()
+                        .lesson(lesson)
+                        .execute();
+                if (!steps.isEmpty()) {
+                    long stepId = steps.getItems().get(0).getId();
+                    studyNode = root.getChildByClassAndId(Step.class, stepId);
+                }
+            }
+        } catch (StepikClientException e) {
+            logger.warn(e);
+        }
+        return studyNode;
     }
 }
