@@ -233,8 +233,9 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
                 ApplicationManager.getApplication().invokeLater(() -> {
                     toolWindow.setStepNode(selected, force);
                     if (selected != null && !project.isDisposed()) {
+                        ProjectView.getInstance(project).refresh();
                         VirtualFile file = project.getBaseDir().findFileByRelativePath(selected.getPath());
-                        ProjectView.getInstance(project).select(null, file, false);
+                        ProjectView.getInstance(project).select(null, file, true);
                     }
                 });
             }

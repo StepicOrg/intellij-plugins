@@ -14,6 +14,7 @@ public class Urls {
     public static final String LESSONS = STEPIK_API_URL + "/lessons";
     public static final String METRICS = STEPIK_API_URL + "/metrics";
     public static final String PROGRESSES = STEPIK_API_URL + "/progresses";
+    public static final String RECOMMENDATION_REACTIONS = STEPIK_API_URL + "/recommendation-reactions";
     public static final String RECOMMENDATIONS = STEPIK_API_URL + "/recommendations";
     public static final String SECTIONS = STEPIK_API_URL + "/sections";
     public static final String STEPS = STEPIK_API_URL + "/steps";

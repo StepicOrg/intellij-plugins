@@ -56,4 +56,14 @@ public class StepHelper {
     public boolean isAdaptive() {
         return StepikProjectManager.isAdaptive(project);
     }
+
+    public long getParent() {
+        StudyNode parent = getStepNode().getParent();
+
+        if (parent == null) {
+            return 0;
+        }
+
+        return parent.getId();
+    }
 }

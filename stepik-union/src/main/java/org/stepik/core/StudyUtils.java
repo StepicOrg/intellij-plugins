@@ -204,7 +204,7 @@ public class StudyUtils {
     }
 
     @Nullable
-    static StudyNode<?, ?> getRecommendation(@NotNull StudyNode root) {
+    public static StudyNode<?, ?> getRecommendation(@NotNull StudyNode root) {
         StepikApiClient stepikClient = StepikConnectorLogin.authAndGetStepikApiClient();
         StudyNode studyNode = null;
         try {
