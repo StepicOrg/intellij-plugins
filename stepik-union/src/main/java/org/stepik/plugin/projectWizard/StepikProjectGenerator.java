@@ -92,7 +92,7 @@ public class StepikProjectGenerator {
             case JAVA8:
                 return Arrays.asList(187L, 150L, 217L, 1127L, 125L, 126L);
             case PYTHON3:
-                return Arrays.asList(67L, 512L, 401L, 217L, 1127L, 125L, 126L, 150L);
+                return Arrays.asList(67L, 512L, 401L, 217L, 1127L, 125L, 126L, 150L, 568L, 531L);
             case ASM32:
             case ASM64:
             case CLOJURE:
