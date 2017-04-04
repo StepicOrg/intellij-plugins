@@ -72,6 +72,20 @@ public class StudyProjectComponent implements ProjectComponent {
                             registerShortcuts();
                         }));
         Metrics.openProject(project, SUCCESSFUL);
+    }
+
+    public void registerStudyToolWindow() {
+        if (!StepikProjectManager.isStepikProject(project)) {
+            return;
+        }
+        final ToolWindowManager toolWindowManager = ToolWindowManager.getInstance(project);
+        registerToolWindows(toolWindowManager);
+        final ToolWindow studyToolWindow =
+                toolWindowManager.getToolWindow(StudyToolWindowFactory.STUDY_TOOL_WINDOW);
+        if (studyToolWindow != null) {
+            studyToolWindow.show(null);
+            StudyUtils.initToolWindows(project);
+        }
 
         executor.execute(() -> {
             StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
@@ -99,20 +113,6 @@ public class StudyProjectComponent implements ProjectComponent {
                 projectManager.setSelected(selected);
             }
         });
-    }
-
-    public void registerStudyToolWindow() {
-        if (!StepikProjectManager.isStepikProject(project)) {
-            return;
-        }
-        final ToolWindowManager toolWindowManager = ToolWindowManager.getInstance(project);
-        registerToolWindows(toolWindowManager);
-        final ToolWindow studyToolWindow =
-                toolWindowManager.getToolWindow(StudyToolWindowFactory.STUDY_TOOL_WINDOW);
-        if (studyToolWindow != null) {
-            studyToolWindow.show(null);
-            StudyUtils.initToolWindows(project);
-        }
     }
 
     private void registerShortcuts() {

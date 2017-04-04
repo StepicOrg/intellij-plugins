@@ -2,25 +2,21 @@ package org.stepik.plugin.projectWizard.idea;
 
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.ide.util.projectWizard.WizardContext;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.ModifiableModuleModel;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleWithNameAlreadyExists;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.DefaultProjectFactory;
-import com.intellij.openapi.project.DumbModePermission;
-import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ui.configuration.ModulesProvider;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.vfs.VirtualFileManager;
-import org.stepik.core.StepikProjectManager;
-import org.stepik.core.StudyProjectComponent;
-import org.stepik.core.courseFormat.StepNode;
-import org.stepik.core.courseFormat.StudyNode;
 import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
+import org.stepik.core.StepikProjectManager;
+import org.stepik.core.courseFormat.StepNode;
+import org.stepik.core.courseFormat.StudyNode;
 import org.stepik.plugin.projectWizard.StepikProjectGenerator;
 
 import java.io.IOException;
@@ -70,12 +66,6 @@ public class CourseModuleBuilder extends AbstractModuleBuilder {
             createSubDirectories(project, generator.getDefaultLang(), root, moduleModel);
             VirtualFileManager.getInstance().syncRefresh();
         }
-
-        ApplicationManager.getApplication().invokeLater(
-                () -> DumbService.allowStartingDumbModeInside(DumbModePermission.MAY_START_BACKGROUND,
-                        () -> ApplicationManager.getApplication().runWriteAction(
-                                () -> StudyProjectComponent.getInstance(project)
-                                        .registerStudyToolWindow())));
     }
 
     @Override
