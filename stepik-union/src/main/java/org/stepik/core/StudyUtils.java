@@ -1,8 +1,5 @@
 package org.stepik.core;
 
-import com.intellij.ide.projectView.ProjectView;
-import com.intellij.ide.projectView.ProjectViewNode;
-import com.intellij.ide.projectView.impl.AbstractProjectViewPane;
 import com.intellij.ide.ui.LafManager;
 import com.intellij.ide.ui.laf.darcula.DarculaLookAndFeelInfo;
 import com.intellij.openapi.diagnostic.Logger;
@@ -10,8 +7,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFileSystemItem;
 import com.intellij.ui.content.Content;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -30,7 +25,6 @@ import org.stepik.core.ui.StudyToolWindowFactory;
 import org.stepik.core.utils.ProjectFilesUtils;
 
 import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -108,55 +102,6 @@ public class StudyUtils {
         }
 
         return ProjectFilesUtils.getRelativePath(basePath, path);
-    }
-
-    @Nullable
-    public static StudyNode getSelectedNodeInTree(@NotNull Project project) {
-        PsiElement element = getSelectedPsiElement(project);
-        if (element == null) {
-            return null;
-        }
-
-        PsiFileSystemItem file;
-
-        if (element instanceof PsiFileSystemItem) {
-            file = (PsiFileSystemItem) element;
-        } else {
-            file = element.getContainingFile();
-        }
-
-        if (file == null) {
-            return null;
-        }
-
-        return getStudyNode(project, file.getVirtualFile());
-    }
-
-    @Nullable
-    private static PsiElement getSelectedPsiElement(@NotNull Project project) {
-        ProjectView projectView = ProjectView.getInstance(project);
-        AbstractProjectViewPane currentProjectViewPane = projectView.getCurrentProjectViewPane();
-        if (currentProjectViewPane == null) {
-            return null;
-        }
-        DefaultMutableTreeNode node = currentProjectViewPane.getSelectedNode();
-        if (node == null) {
-            return null;
-        }
-
-        Object userObject = node.getUserObject();
-        if (userObject instanceof ProjectViewNode) {
-            ProjectViewNode descriptor = (ProjectViewNode) userObject;
-            Object element = descriptor.getValue();
-            if (element instanceof PsiElement) {
-                PsiElement psiElement = (PsiElement) element;
-                return !psiElement.isValid() ? null : psiElement;
-            } else {
-                return null;
-            }
-        } else {
-            return null;
-        }
     }
 
     @Nullable
