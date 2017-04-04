@@ -2,9 +2,9 @@ package org.stepik.plugin.projectWizard.pycharm;
 
 import com.intellij.facet.ui.ValidationResult;
 import com.intellij.openapi.project.Project;
-import org.stepik.core.SupportedLanguages;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.api.objects.StudyObject;
+import org.stepik.core.SupportedLanguages;
 import org.stepik.plugin.projectWizard.ui.ProjectSettingListener;
 import org.stepik.plugin.projectWizard.ui.ProjectSettingsPanel;
 
@@ -12,8 +12,6 @@ import javax.swing.*;
 
 class PyCharmWizardStep implements ProjectSettingListener {
     private final ValidationResult invalidCourse = new ValidationResult("Please select a course");
-    private final ValidationResult adaptiveCourse = new ValidationResult(
-            "Sorry, but we don't support adaptive courses yet");
     private final StepikPyProjectGenerator generator;
     private final ProjectSettingsPanel panel;
 
@@ -37,9 +35,6 @@ class PyCharmWizardStep implements ProjectSettingListener {
     ValidationResult check() {
         StudyObject selectedStudyObject = panel.getSelectedStudyObject();
 
-        if (selectedStudyObject.isAdaptive()) {
-            return adaptiveCourse;
-        }
         if (selectedStudyObject.getId() == 0) {
             return invalidCourse;
         }
