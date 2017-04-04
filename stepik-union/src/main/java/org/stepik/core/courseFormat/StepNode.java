@@ -62,7 +62,7 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
     }
 
     @Override
-    protected void loadData(long id) {
+    protected boolean loadData(long id) {
         try {
             StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
             Steps steps = stepikApiClient.steps()
@@ -70,17 +70,22 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
                     .id(id)
                     .execute();
 
-            Step step;
+            Step data;
+
             if (!steps.isEmpty()) {
-                step = steps.getSteps().get(0);
+                data = steps.getSteps().get(0);
             } else {
-                step = new Step();
-                step.setId(id);
+                data = new Step();
+                data.setId(id);
             }
-            setData(step);
+            setData(data);
+
+            Step oldData = this.getData();
+            return oldData == null || !oldData.getUpdateDate().equals(data.getUpdateDate());
         } catch (StepikClientException logged) {
             logger.warn(String.format("Failed step lesson data id=%d", id), logged);
         }
+        return true;
     }
 
     @Override

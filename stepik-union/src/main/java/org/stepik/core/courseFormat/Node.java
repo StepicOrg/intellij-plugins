@@ -24,7 +24,7 @@ import java.util.concurrent.Executors;
 /**
  * @author meanmail
  */
-public abstract class Node<
+abstract class Node<
         D extends StudyObject,
         C extends StudyNode<DC, CC>,
         DC extends StudyObject,
@@ -54,7 +54,13 @@ public abstract class Node<
     }
 
     public void setProject(@NotNull Project project) {
+        if (this.project == project) {
+            return;
+        }
         this.project = project;
+        for (C child : getChildren()) {
+            child.setProject(project);
+        }
     }
 
     @Nullable
@@ -261,11 +267,14 @@ public abstract class Node<
 
     @Override
     public void reloadData(@NotNull Project project) {
-        loadData(data.getId());
-        init(project);
+        if (loadData(data.getId())) {
+            init(project);
+        } else {
+            setProject(project);
+        }
     }
 
-    protected abstract void loadData(long id);
+    protected abstract boolean loadData(long id);
 
     protected abstract Class<C> getChildClass();
 

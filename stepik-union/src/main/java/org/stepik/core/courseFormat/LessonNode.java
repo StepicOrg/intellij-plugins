@@ -60,11 +60,11 @@ public class LessonNode extends Node<CompoundUnitLesson, StepNode, Step, StepNod
     }
 
     @Override
-    protected void loadData(long id) {
+    protected boolean loadData(long id) {
         try {
             CompoundUnitLesson data = getData();
             if (data == null) {
-                return;
+                return true;
             }
 
             StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
@@ -82,9 +82,13 @@ public class LessonNode extends Node<CompoundUnitLesson, StepNode, Step, StepNod
                 lesson.setId(id);
             }
             data.setLesson(lesson);
+
+            CompoundUnitLesson oldData = this.getData();
+            return oldData == null || !oldData.getUpdateDate().equals(data.getUpdateDate());
         } catch (StepikClientException logged) {
             logger.warn(String.format("Failed load lesson data id=%d", id), logged);
         }
+        return true;
     }
 
 

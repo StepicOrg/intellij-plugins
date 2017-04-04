@@ -293,6 +293,7 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
 
             this.version = CURRENT_VERSION;
             refreshCourse();
+            updateSelection();
             logger.info("The StepikProjectManager state loaded");
         } catch (XStreamException | StudyUnrecognizedFormatException e) {
             logger.warn("Failed deserialization StepikProjectManager \n" + e.getMessage() + "\n" + project);

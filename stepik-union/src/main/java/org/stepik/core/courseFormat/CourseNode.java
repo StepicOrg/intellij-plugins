@@ -59,14 +59,16 @@ public class CourseNode extends Node<Course, SectionNode, Section, LessonNode> {
     }
 
     @Override
-    protected void loadData(long id) {
+    protected boolean loadData(long id) {
         try {
             StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
             Courses courses = stepikApiClient.courses()
                     .get()
                     .id(id)
                     .execute();
+
             Course data;
+
             if (!courses.isEmpty()) {
                 data = courses.getCourses().get(0);
             } else {
@@ -74,9 +76,13 @@ public class CourseNode extends Node<Course, SectionNode, Section, LessonNode> {
                 data.setId(id);
             }
             setData(data);
+
+            Course oldData = this.getData();
+            return oldData == null || !oldData.getUpdateDate().equals(data.getUpdateDate());
         } catch (StepikClientException logged) {
             logger.warn(String.format("Failed load course data id=%d", id), logged);
         }
+        return true;
     }
 
     @Override
