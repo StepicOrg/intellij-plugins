@@ -18,22 +18,27 @@ import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowAnchor;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.util.containers.hash.HashMap;
-import org.stepik.core.actions.StudyActionWithShortcut;
-import org.stepik.core.ui.StudyToolWindow;
-import org.stepik.core.ui.StudyToolWindowFactory;
 import javafx.application.Platform;
 import org.jetbrains.annotations.NotNull;
+import org.stepik.core.actions.StudyActionWithShortcut;
+import org.stepik.core.courseFormat.StudyNode;
 import org.stepik.core.metrics.Metrics;
+import org.stepik.core.ui.StudyToolWindow;
+import org.stepik.core.ui.StudyToolWindowFactory;
+import org.stepik.plugin.actions.navigation.StudyNavigator;
 
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
 
 public class StudyProjectComponent implements ProjectComponent {
     private static final Logger logger = Logger.getInstance(StudyProjectComponent.class.getName());
+    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Project project;
     private final Map<Keymap, List<Pair<String, String>>> deletedShortcuts = new HashMap<>();
 
@@ -81,6 +86,33 @@ public class StudyProjectComponent implements ProjectComponent {
             studyToolWindow.show(null);
             StudyUtils.initToolWindows(project);
         }
+
+        executor.execute(() -> {
+            StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
+            if (projectManager == null) {
+                return;
+            }
+
+            StudyNode root = projectManager.getProjectRoot();
+
+            StudyNode<?, ?> selected = projectManager.getSelected();
+            if (root != null) {
+                if (projectManager.isAdaptive()) {
+                    StudyNode<?, ?> recommendation = StudyUtils.getRecommendation(root);
+                    if (recommendation == null) {
+                        selected = null;
+                    } else if (selected == null || selected.getParent() != recommendation.getParent()) {
+                        selected = recommendation;
+                    }
+                }
+
+                if (selected == null) {
+                    selected = StudyNavigator.nextLeaf(root);
+                }
+
+                projectManager.setSelected(selected);
+            }
+        });
     }
 
     private void registerShortcuts() {

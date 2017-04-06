@@ -1,6 +1,5 @@
 package org.stepik.plugin.utils;
 
-import org.stepik.core.stepik.StepikConnectorLogin;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -15,6 +14,7 @@ import org.stepik.api.objects.sections.Section;
 import org.stepik.api.objects.sections.Sections;
 import org.stepik.api.objects.units.Unit;
 import org.stepik.api.objects.units.Units;
+import org.stepik.core.stepik.StepikConnectorLogin;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,10 +33,6 @@ public class Utils {
                     "<li>Push on a refresh button if a course list is a empty.</li>" +
                     "<li>Write a link to a course (example, https://stepik.org/187/) or a id of course.</li>" +
                     "</ul>";
-    @Language("HTML")
-    private static final String DEFAULT_MESSAGE_FOR_ADAPTIVE =
-            "<p style='font-weight: bold;'>This course is adaptive.<br>" +
-                    "Sorry, but we don't support adaptive courses yet</p>";
 
     private static final Pattern mainPattern = Pattern.compile(
             "(?:^|.*/)(course|lesson)(?=(?:(?:/[^/]*-)|/)(\\d+)(?:/|$))(.*)");
@@ -76,7 +72,7 @@ public class Utils {
         return getLessonStudyObject(id, unitId);
     }
 
-    public static long parseUnitId(String link) {
+    static long parseUnitId(String link) {
         Matcher matcher;
         matcher = unitPattern.matcher(link);
         long unitId = 0;
@@ -199,12 +195,7 @@ public class Utils {
         if (studyObject.getId() == 0) {
             return DEFAULT_DESCRIPTION;
         } else {
-            StringBuilder sb = new StringBuilder();
-            sb.append(studyObject.getDescription());
-            if (studyObject.isAdaptive()) {
-                sb.append(DEFAULT_MESSAGE_FOR_ADAPTIVE);
-            }
-            return sb.toString();
+            return studyObject.getDescription();
         }
     }
 }

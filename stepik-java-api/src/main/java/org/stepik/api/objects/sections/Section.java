@@ -412,8 +412,11 @@ public class Section extends StudyObject {
         this.createDate = createDate;
     }
 
-    @Nullable
+    @NotNull
     public String getUpdateDate() {
+        if (updateDate == null) {
+            updateDate = "";
+        }
         return updateDate;
     }
 

@@ -1,10 +1,10 @@
 package org.stepik.plugin.actions.navigation;
 
-import org.stepik.core.courseFormat.StudyNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.core.courseFormat.StudyNode;
 
-class StudyNavigator {
+public class StudyNavigator {
     private StudyNavigator() {
     }
 
@@ -61,7 +61,7 @@ class StudyNavigator {
     }
 
     @Nullable
-    static StudyNode nextLeaf(@Nullable final StudyNode node) {
+    public static StudyNode nextLeaf(@Nullable final StudyNode node) {
         return navigate(null, node, Direction.FORWARD);
     }
 

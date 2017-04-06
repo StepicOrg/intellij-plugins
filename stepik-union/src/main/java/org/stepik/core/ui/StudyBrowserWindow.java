@@ -12,14 +12,6 @@ import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import org.stepik.core.StepikProjectManager;
-import org.stepik.core.StudyUtils;
-import org.stepik.core.courseFormat.CourseNode;
-import org.stepik.core.courseFormat.LessonNode;
-import org.stepik.core.courseFormat.SectionNode;
-import org.stepik.core.courseFormat.StepNode;
-import org.stepik.core.courseFormat.StudyNode;
-import org.stepik.core.stepik.StepikConnectorLogin;
 import javafx.application.Platform;
 import javafx.concurrent.Worker;
 import javafx.embed.swing.JFXPanel;
@@ -31,7 +23,17 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.exceptions.StepikClientException;
+import org.stepik.api.objects.recommendations.ReactionValues;
+import org.stepik.api.objects.users.User;
 import org.stepik.api.urls.Urls;
+import org.stepik.core.StepikProjectManager;
+import org.stepik.core.StudyUtils;
+import org.stepik.core.courseFormat.CourseNode;
+import org.stepik.core.courseFormat.LessonNode;
+import org.stepik.core.courseFormat.SectionNode;
+import org.stepik.core.courseFormat.StepNode;
+import org.stepik.core.courseFormat.StudyNode;
+import org.stepik.core.stepik.StepikConnectorLogin;
 import org.stepik.core.templates.Templater;
 import org.stepik.plugin.utils.NavigationUtils;
 import org.w3c.dom.Document;
@@ -46,16 +48,23 @@ import org.w3c.dom.events.EventTarget;
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.stepik.api.objects.recommendations.ReactionValues.SOLVED;
+import static org.stepik.api.objects.recommendations.ReactionValues.TOO_EASY;
+import static org.stepik.api.objects.recommendations.ReactionValues.TOO_HARD;
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
 
 class StudyBrowserWindow extends JFrame {
     private static final Logger logger = Logger.getInstance(StudyBrowserWindow.class);
     private static final String EVENT_TYPE_CLICK = "click";
+    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Project project;
     private JFXPanel panel;
     private WebView webComponent;
@@ -123,7 +132,7 @@ class StudyBrowserWindow extends JFrame {
         Platform.runLater(() -> engine.loadContent(withCodeHighlighting));
     }
 
-    @Nullable
+    @NotNull
     private String createHtmlWithCodeHighlighting(@NotNull final String content) {
         final EditorColorsScheme editorColorsScheme = EditorColorsManager.getInstance().getGlobalScheme();
         int fontSize = editorColorsScheme.getEditorFontSize();
@@ -137,6 +146,7 @@ class StudyBrowserWindow extends JFrame {
             map.put("css_highlight", getExternalURL("/highlight/styles/idea.css"));
         }
         map.put("code", content);
+        map.put("charset", Charset.defaultCharset().displayName());
 
         return Templater.processTemplate("template", map);
     }
@@ -191,6 +201,11 @@ class StudyBrowserWindow extends JFrame {
                         return;
                     }
 
+                    if (href.startsWith("adaptive:")) {
+                        browseAdaptiveLink(href);
+                        return;
+                    }
+
                     if (browseProject(href)) {
                         return;
                     }
@@ -203,7 +218,7 @@ class StudyBrowserWindow extends JFrame {
                 }
             }
 
-            private void browseInnerLink(Element target, String href) {
+            private void browseInnerLink(@NotNull Element target, @NotNull String href) {
                 href = href.substring(6);
                 StudyNode root = StepikProjectManager.getProjectRoot(project);
                 if (root == null) {
@@ -247,6 +262,75 @@ class StudyBrowserWindow extends JFrame {
                 } catch (StepikClientException e) {
                     logger.warn(e);
                 }
+            }
+
+            private void browseAdaptiveLink(@NotNull String href) {
+                ReactionValues reaction;
+                if (href.startsWith("adaptive:too_easy")) {
+                    reaction = TOO_EASY;
+                } else if (href.startsWith("adaptive:too_hard")) {
+                    reaction = TOO_HARD;
+                } else if (href.startsWith("adaptive:new_recommendation")) {
+                    reaction = SOLVED;
+                } else {
+                    return;
+                }
+
+                if (reaction == TOO_EASY || reaction == TOO_HARD) {
+                    String[] items = href.split("/");
+                    if (items.length < 2) {
+                        return;
+                    }
+
+                    long lessonId;
+                    try {
+                        lessonId = Long.parseLong(items[1]);
+                    } catch (NumberFormatException e) {
+                        return;
+                    }
+
+                    try {
+                        StepikApiClient stepikClient = StepikConnectorLogin.authAndGetStepikApiClient();
+                        User user = StepikConnectorLogin.getCurrentUser();
+                        stepikClient.recommendationReactions()
+                                .post()
+                                .user(user.getId())
+                                .lesson(lessonId)
+                                .reaction(reaction)
+                                .execute();
+                    } catch (StepikClientException e) {
+                        logger.warn(e);
+                    }
+                }
+
+                getNewRecommendation();
+            }
+
+            private void getNewRecommendation() {
+                executor.execute(() -> {
+                    StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
+                    if (projectManager == null) {
+                        return;
+                    }
+
+                    StudyNode root = projectManager.getProjectRoot();
+
+                    StudyNode<?, ?> selected = projectManager.getSelected();
+                    if (root != null) {
+                        if (projectManager.isAdaptive()) {
+                            StudyNode<?, ?> recommendation = StudyUtils.getRecommendation(root);
+                            if (recommendation == null) {
+                                return;
+                            } else if (selected == null || selected.getParent() != recommendation.getParent()) {
+                                selected = recommendation;
+                            }
+                        }
+
+                        if (selected != null) {
+                            projectManager.setSelected(selected);
+                        }
+                    }
+                });
             }
 
             private boolean browseProject(@NotNull String href) {

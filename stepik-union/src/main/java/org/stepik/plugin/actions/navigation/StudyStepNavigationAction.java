@@ -3,12 +3,11 @@ package org.stepik.plugin.actions.navigation;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.project.Project;
-import org.stepik.core.StepikProjectManager;
-import org.stepik.core.StudyUtils;
-import org.stepik.core.actions.StudyActionWithShortcut;
-import org.stepik.core.courseFormat.StudyNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.core.StepikProjectManager;
+import org.stepik.core.actions.StudyActionWithShortcut;
+import org.stepik.core.courseFormat.StudyNode;
 
 import javax.swing.*;
 
@@ -41,7 +40,13 @@ abstract class StudyStepNavigationAction extends StudyActionWithShortcut {
             return;
         }
 
-        StudyNode stepNode = StudyUtils.getSelectedNodeInTree(project);
-        presentation.setEnabled(stepNode == null || getTargetStep(stepNode) != null);
+        StudyNode selected = StepikProjectManager.getSelected(project);
+        StudyNode target = getTargetStep(selected);
+        boolean enabled = selected == null || target != null;
+
+        if (StepikProjectManager.isAdaptive(project)) {
+            enabled = enabled && selected != null && target.getParent() == selected.getParent();
+        }
+        presentation.setEnabled(enabled);
     }
 }
