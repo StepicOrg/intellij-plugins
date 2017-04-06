@@ -110,6 +110,7 @@ public class StepikProjectGenerator {
                 return Arrays.asList(217L, 1127L, 125L, 126L, 150L);
             case C:
             case HASKELL_8_0:
+                return Arrays.asList(693L, 1127L, 125L, 126L, 150L);
             case RUBY:
             case SCALA:
                 return Arrays.asList(1127L, 125L, 126L, 150L);
@@ -131,7 +132,7 @@ public class StepikProjectGenerator {
                     indicator.setIndeterminate(true);
 
                     projectRoot = StudyNodeFactory.createTree(project, data);
-                }, "Creating project", true, project);
+                }, "Creating Project", true, project);
     }
 
     public void generateProject(@NotNull Project project) {
