@@ -92,7 +92,7 @@ public class StepikProjectGenerator {
             case JAVA8:
                 return Arrays.asList(187L, 150L, 217L, 1127L, 125L, 126L);
             case PYTHON3:
-                return Arrays.asList(67L, 512L, 401L, 217L, 1127L, 125L, 126L, 150L);
+                return Arrays.asList(67L, 512L, 401L, 217L, 1127L, 125L, 126L, 150L, 568L, 431L);
             case HASKELL:
                 return Arrays.asList(75L, 217L, 1127L, 125L, 126L, 150L);
             case ASM32:
@@ -131,7 +131,7 @@ public class StepikProjectGenerator {
                     indicator.setIndeterminate(true);
 
                     projectRoot = StudyNodeFactory.createTree(project, data);
-                }, "Creating Project", true, project);
+                }, "Creating project", true, project);
     }
 
     public void generateProject(@NotNull Project project) {

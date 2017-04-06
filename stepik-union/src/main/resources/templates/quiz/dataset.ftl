@@ -1,6 +1,6 @@
 <#-- @ftlvariable name="status" type="java.lang.String" -->
 <#-- @ftlvariable name="disabled" type="java.lang.String" -->
-<#-- @ftlvariable name="stepNode" type="org.stepik.core.courseFormat.stepHelpers.DatasetStepNodeHelper" -->
+<#-- @ftlvariable name="stepNode" type="org.stepik.core.courseFormat.stepHelpers.DatasetQuizNodeHelper" -->
 <#-- @ftlvariable name="text" type="java.lang.String" -->
 
 <style>
@@ -45,8 +45,10 @@
        data-content-type="application/txt" data-file-prefix="reply" data-file-ext=".txt">Download last submission
         dataset</a>
     </#if>
-<textarea id="text" class="row" name="value"
-          placeholder="Input your answer here" ${disabled!""}>${stepNode.getData()}</textarea>
+    <#if status != "">
+    <textarea id="text" class="row" name="value"
+              placeholder="Input your answer here" ${disabled!""}>${stepNode.getData()}</textarea>
+    </#if>
     <#if status == "active">
     <input id="filename" type="submit" name="filename" value="Send file">
     </#if>

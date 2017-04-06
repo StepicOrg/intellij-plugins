@@ -1,12 +1,14 @@
-<#-- @ftlvariable name="stepNode" type="org.stepik.core.courseFormat.stepHelpers.StepHelper" -->
+<#-- @ftlvariable name="stepNode" type="org.stepik.core.courseFormat.stepHelpers.QuizHelper" -->
 <#-- @ftlvariable name="text" type="java.lang.String" -->
-<#macro quiz_content>
-${text}<br>
+<#include "base_step.ftl">
 
+<@step_content>
+
+<#macro quiz_content>
 <div>
     <#assign status = stepNode.getStatus()/>
-    <#assign isHasSubmissionsRestrictions = stepNode.getStepNode().getData().isHasSubmissionsRestrictions() />
-    <#assign maxSubmissionsCount = stepNode.getStepNode().getData().getMaxSubmissionsCount() />
+    <#assign isHasSubmissionsRestrictions = stepNode.isHasSubmissionsRestrictions() />
+    <#assign maxSubmissionsCount = stepNode.getMaxSubmissionsCount() />
     <#assign submissionsCount = stepNode.getSubmissionsCount() />
     <#assign locked = isHasSubmissionsRestrictions && (submissionsCount >= maxSubmissionsCount) />
 
@@ -48,11 +50,11 @@ ${text}<br>
             var disabled = false;
 
             if (status == "") {
-                submitCaption = "Solve";
+                submitCaption = "Click to solve";
             } else if (status == "active") {
                 submitCaption = "Submit";
             } else if (status != "evaluation") {
-                submitCaption = "Solve again";
+                submitCaption = "Click to solve again";
             } else {
                 submitCaption = "Evaluation";
                 disabled = true;
@@ -75,3 +77,4 @@ ${text}<br>
 
 </div>
 </#macro>
+</@step_content>

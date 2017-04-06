@@ -20,15 +20,16 @@ import com.intellij.util.BooleanFunction;
 import com.jetbrains.python.newProject.PyNewProjectSettings;
 import com.jetbrains.python.newProject.PythonProjectGenerator;
 import com.jetbrains.python.remote.PyProjectSynchronizer;
-import org.stepik.core.StepikProjectManager;
-import org.stepik.core.StudyProjectComponent;
-import org.stepik.core.courseFormat.StepNode;
-import org.stepik.core.courseFormat.StudyNode;
 import icons.AllStepikIcons;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.objects.StudyObject;
+import org.stepik.core.StepikProjectManager;
+import org.stepik.core.StudyProjectComponent;
+import org.stepik.core.core.EduNames;
+import org.stepik.core.courseFormat.StepNode;
+import org.stepik.core.courseFormat.StudyNode;
 import org.stepik.core.projectWizard.ProjectWizardUtils;
 import org.stepik.plugin.projectWizard.StepikProjectGenerator;
 
@@ -181,7 +182,7 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
     private void createCourseFromGenerator(@NotNull Project project) {
         generator.generateProject(project);
 
-        FileUtil.createDirectory(new File(project.getBasePath(), "Sandbox"));
+        FileUtil.createDirectory(new File(project.getBasePath(), EduNames.SANDBOX_DIR));
 
         StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
         if (projectManager == null) {
@@ -208,5 +209,4 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
                                 () -> StudyProjectComponent.getInstance(project)
                                         .registerStudyToolWindow())));
     }
-
 }

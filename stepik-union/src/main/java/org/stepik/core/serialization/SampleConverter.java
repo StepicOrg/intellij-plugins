@@ -11,11 +11,8 @@ public class SampleConverter implements SingleValueConverter {
     @Language("HTML")
     private final static String TEMPLATE = "<input>%s</input><output>%s</output>";
     @Language("REGEXP")
-    private final static String PATTERN_INPUT = "<input>([^<>]*)</input>";
-    @Language("REGEXP")
-    private final static String PATTERN_OUTPUT = "<input>([^<>]*)</input>";
-    private final static Pattern pattern_input = Pattern.compile(PATTERN_INPUT);
-    private final static Pattern pattern_output = Pattern.compile(PATTERN_OUTPUT);
+    private final static String PATTERN_INPUT = "<input>([^<>]*)</input><output>([^<>]*)</output>";
+    private final static Pattern pattern = Pattern.compile(PATTERN_INPUT);
 
     @Override
     public String toString(Object o) {
@@ -28,14 +25,10 @@ public class SampleConverter implements SingleValueConverter {
     public Object fromString(String s) {
         Sample sample = new Sample();
 
-        Matcher matcher = pattern_input.matcher(s);
+        Matcher matcher = pattern.matcher(s);
         if (matcher.matches()) {
             sample.setInput(matcher.group(1));
-        }
-
-        matcher = pattern_output.matcher(s);
-        if (matcher.matches()) {
-            sample.setOutput(matcher.group(1));
+            sample.setOutput(matcher.group(2));
         }
         return sample;
     }

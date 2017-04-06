@@ -1,6 +1,7 @@
 package org.stepik.core;
 
 import com.google.gson.internal.LinkedTreeMap;
+import com.intellij.ide.projectView.ProjectView;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.ServiceManager;
@@ -18,6 +19,25 @@ import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.XStreamException;
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
+import com.thoughtworks.xstream.io.xml.DomDriver;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.input.DOMBuilder;
+import org.jdom.output.XMLOutputter;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.stepik.api.objects.StudyObject;
+import org.stepik.api.objects.courses.Course;
+import org.stepik.api.objects.lessons.CompoundUnitLesson;
+import org.stepik.api.objects.sections.Section;
+import org.stepik.api.objects.steps.Limit;
+import org.stepik.api.objects.steps.Sample;
+import org.stepik.api.objects.steps.Step;
+import org.stepik.api.objects.steps.VideoUrl;
+import org.stepik.api.objects.users.User;
 import org.stepik.core.core.EduNames;
 import org.stepik.core.courseFormat.CourseNode;
 import org.stepik.core.courseFormat.LessonNode;
@@ -29,24 +49,6 @@ import org.stepik.core.serialization.StudySerializationUtils;
 import org.stepik.core.serialization.StudyUnrecognizedFormatException;
 import org.stepik.core.serialization.SupportedLanguagesConverter;
 import org.stepik.core.ui.StudyToolWindow;
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.XStreamException;
-import com.thoughtworks.xstream.annotations.XStreamOmitField;
-import com.thoughtworks.xstream.io.xml.DomDriver;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.input.DOMBuilder;
-import org.jdom.output.XMLOutputter;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.stepik.api.objects.courses.Course;
-import org.stepik.api.objects.lessons.CompoundUnitLesson;
-import org.stepik.api.objects.sections.Section;
-import org.stepik.api.objects.steps.Limit;
-import org.stepik.api.objects.steps.Sample;
-import org.stepik.api.objects.steps.Step;
-import org.stepik.api.objects.steps.VideoUrl;
-import org.stepik.api.objects.users.User;
 import org.stepik.plugin.projectWizard.idea.SandboxModuleBuilder;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -209,6 +211,12 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
         return null;
     }
 
+    public static boolean isAdaptive(Project project) {
+        StepikProjectManager instance = getInstance(project);
+        return instance != null && instance.isAdaptive();
+    }
+
+    @Nullable
     public StudyNode<?, ?> getSelected() {
         return selected;
     }
@@ -217,12 +225,19 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
         setSelected(selected, false);
     }
 
-    public void setSelected(StudyNode<?, ?> selected, boolean force) {
+    public void setSelected(@Nullable StudyNode<?, ?> selected, boolean force) {
         this.selected = selected;
         if (project != null) {
             StudyToolWindow toolWindow = StudyUtils.getStudyToolWindow(project);
             if (toolWindow != null) {
-                ApplicationManager.getApplication().invokeLater(() -> toolWindow.setStepNode(selected, force));
+                ApplicationManager.getApplication().invokeLater(() -> {
+                    toolWindow.setStepNode(selected, force);
+                    if (selected != null && !project.isDisposed()) {
+                        ProjectView.getInstance(project).refresh();
+                        VirtualFile file = project.getBaseDir().findFileByRelativePath(selected.getPath());
+                        ProjectView.getInstance(project).select(null, file, true);
+                    }
+                });
             }
         }
     }
@@ -278,10 +293,16 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
 
             this.version = CURRENT_VERSION;
             refreshCourse();
+            updateSelection();
             logger.info("The StepikProjectManager state loaded");
         } catch (XStreamException | StudyUnrecognizedFormatException e) {
             logger.warn("Failed deserialization StepikProjectManager \n" + e.getMessage() + "\n" + project);
         }
+    }
+
+    public boolean isAdaptive() {
+        StudyObject data = root.getData();
+        return data != null && data.isAdaptive();
     }
 
     private void refreshCourse() {
@@ -297,7 +318,9 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
                 @Override
                 public void run(@NotNull ProgressIndicator indicator) {
                     repairProjectFiles(root);
-
+                    if (project.isDisposed()) {
+                        return;
+                    }
                     VirtualFile projectDir = project.getBaseDir();
                     if (projectDir != null && projectDir.findChild(EduNames.SANDBOX_DIR) == null) {
                         ModifiableModuleModel model = ModuleManager.getInstance(project)
@@ -324,7 +347,15 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
     private void repairProjectFiles(@NotNull StudyNode<?, ?> node) {
         if (project != null) {
             if (node instanceof StepNode) {
-                getOrCreateSrcDirectory(project, (StepNode) node, false);
+                if (project.isDisposed()) {
+                    return;
+                }
+                ApplicationManager.getApplication().invokeAndWait(() -> {
+                    if (project.isDisposed()) {
+                        return;
+                    }
+                    getOrCreateSrcDirectory(project, (StepNode) node, false);
+                });
             }
             node.getChildren().forEach(this::repairProjectFiles);
         }

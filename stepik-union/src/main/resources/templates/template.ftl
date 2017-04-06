@@ -5,6 +5,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="${charset}">
     <link rel="stylesheet" href="${css_highlight}">
     <script src="${highlight}"></script>
     <style media="screen" type="text/css">

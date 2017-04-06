@@ -3,7 +3,6 @@ package org.stepik.core.courseFormat;
 import com.intellij.ide.projectView.ProjectView;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
-import org.stepik.core.stepik.StepikConnectorLogin;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -11,8 +10,10 @@ import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.StudyObject;
 import org.stepik.api.objects.progresses.Progresses;
+import org.stepik.core.stepik.StepikConnectorLogin;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +24,7 @@ import java.util.concurrent.Executors;
 /**
  * @author meanmail
  */
-public abstract class Node<
+abstract class Node<
         D extends StudyObject,
         C extends StudyNode<DC, CC>,
         DC extends StudyObject,
@@ -53,7 +54,13 @@ public abstract class Node<
     }
 
     public void setProject(@NotNull Project project) {
+        if (this.project == project) {
+            return;
+        }
         this.project = project;
+        for (C child : getChildren()) {
+            child.setProject(project);
+        }
     }
 
     @Nullable
@@ -173,6 +180,26 @@ public abstract class Node<
 
     @Nullable
     @Override
+    public StudyNode<?, ?> getChildByClassAndId(@NotNull Class<? extends StudyObject> clazz, long id) {
+        if (getChildDataClass() == clazz) {
+            for (C child : getChildren()) {
+                if (child.getId() == id) {
+                    return child;
+                }
+            }
+        } else {
+            for (C child : getChildren()) {
+                StudyNode<?, ?> node = child.getChildByClassAndId(clazz, id);
+                if (node != null) {
+                    return node;
+                }
+            }
+        }
+        return null;
+    }
+
+    @Nullable
+    @Override
     public C getChildByPosition(int position) {
         for (C child : getChildren()) {
             if (child.getPosition() == position) {
@@ -240,13 +267,18 @@ public abstract class Node<
 
     @Override
     public void reloadData(@NotNull Project project) {
-        loadData(data.getId());
-        init(project);
+        if (loadData(data.getId())) {
+            init(project);
+        } else {
+            setProject(project);
+        }
     }
 
-    protected abstract void loadData(long id);
+    protected abstract boolean loadData(long id);
 
     protected abstract Class<C> getChildClass();
+
+    protected abstract Class<DC> getChildDataClass();
 
     @Override
     public boolean isUnknownStatus() {
@@ -279,24 +311,39 @@ public abstract class Node<
 
                         Set<String> progressIds = progressMap.keySet();
 
-                        if (progressIds.size() != 0) {
-                            StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
-
-                            Progresses progresses = stepikApiClient.progresses()
-                                    .get()
-                                    .id(progressIds.toArray(new String[progressIds.size()]))
-                                    .execute();
-
-                            progresses.getItems().forEach(progress -> {
-                                String id = progress.getId();
-                                StudyNode node = progressMap.get(id);
-                                if (progress.isPassed()) {
-                                    node.setRawStatus(StudyStatus.SOLVED);
+                        if (!progressIds.isEmpty()) {
+                            int size = progressIds.size();
+                            String[] list = progressIds.toArray(new String[size]);
+                            int start = 0;
+                            int end;
+                            while (start < size) {
+                                end = start + 20;
+                                if (end > size) {
+                                    end = size;
                                 }
-                            });
+                                String[] part = Arrays.copyOfRange(list, start, end);
+                                start = end;
+
+                                StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
+
+                                Progresses progresses = stepikApiClient.progresses()
+                                        .get()
+                                        .id(part)
+                                        .execute();
+
+                                progresses.getItems().forEach(progress -> {
+                                    String id = progress.getId();
+                                    StudyNode node = progressMap.get(id);
+                                    if (progress.isPassed()) {
+                                        node.setRawStatus(StudyStatus.SOLVED);
+                                    }
+                                });
+                            }
                         }
                     }
-                    ProjectView.getInstance(project).refresh();
+                    if (!project.isDisposed()) {
+                        ProjectView.getInstance(project).refresh();
+                    }
                 } catch (StepikClientException e) {
                     logger.warn(e);
                 }
