@@ -2,18 +2,6 @@ package org.stepik.core.courseFormat;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
-import org.stepik.core.SupportedLanguages;
-import org.stepik.core.core.EduNames;
-import org.stepik.core.courseFormat.stepHelpers.ChoiceStepNodeHelper;
-import org.stepik.core.courseFormat.stepHelpers.DatasetStepNodeHelper;
-import org.stepik.core.courseFormat.stepHelpers.MatchingStepNodeHelper;
-import org.stepik.core.courseFormat.stepHelpers.NumberStepNodeHelper;
-import org.stepik.core.courseFormat.stepHelpers.SortingStepNodeHelper;
-import org.stepik.core.courseFormat.stepHelpers.StepHelper;
-import org.stepik.core.courseFormat.stepHelpers.StringStepNodeHelper;
-import org.stepik.core.courseFormat.stepHelpers.TableStepNodeHelper;
-import org.stepik.core.courseFormat.stepHelpers.VideoStepNodeHelper;
-import org.stepik.core.stepik.StepikConnectorLogin;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,6 +15,21 @@ import org.stepik.api.objects.steps.Sample;
 import org.stepik.api.objects.steps.Step;
 import org.stepik.api.objects.steps.Steps;
 import org.stepik.api.objects.units.Units;
+import org.stepik.core.SupportedLanguages;
+import org.stepik.core.core.EduNames;
+import org.stepik.core.courseFormat.stepHelpers.ChoiceQuizNodeHelper;
+import org.stepik.core.courseFormat.stepHelpers.CodeHelper;
+import org.stepik.core.courseFormat.stepHelpers.DatasetQuizNodeHelper;
+import org.stepik.core.courseFormat.stepHelpers.MatchingQuizNodeHelper;
+import org.stepik.core.courseFormat.stepHelpers.NumberQuizNodeHelper;
+import org.stepik.core.courseFormat.stepHelpers.QuizHelper;
+import org.stepik.core.courseFormat.stepHelpers.SortingQuizNodeHelper;
+import org.stepik.core.courseFormat.stepHelpers.StepHelper;
+import org.stepik.core.courseFormat.stepHelpers.StringQuizNodeHelper;
+import org.stepik.core.courseFormat.stepHelpers.TableQuizNodeHelper;
+import org.stepik.core.courseFormat.stepHelpers.TextHelper;
+import org.stepik.core.courseFormat.stepHelpers.VideoStepNodeHelper;
+import org.stepik.core.stepik.StepikConnectorLogin;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -59,7 +62,7 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
     }
 
     @Override
-    protected void loadData(long id) {
+    protected boolean loadData(long id) {
         try {
             StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
             Steps steps = stepikApiClient.steps()
@@ -67,22 +70,32 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
                     .id(id)
                     .execute();
 
-            Step step;
+            Step data;
+
             if (!steps.isEmpty()) {
-                step = steps.getSteps().get(0);
+                data = steps.getSteps().get(0);
             } else {
-                step = new Step();
-                step.setId(id);
+                data = new Step();
+                data.setId(id);
             }
-            setData(step);
+            setData(data);
+
+            Step oldData = this.getData();
+            return oldData == null || !oldData.getUpdateDate().equals(data.getUpdateDate());
         } catch (StepikClientException logged) {
             logger.warn(String.format("Failed step lesson data id=%d", id), logged);
         }
+        return true;
     }
 
     @Override
     protected Class<StepNode> getChildClass() {
         return StepNode.class;
+    }
+
+    @Override
+    protected Class<Step> getChildDataClass() {
+        return Step.class;
     }
 
     @NotNull
@@ -293,43 +306,43 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
     }
 
     @NotNull
-    public VideoStepNodeHelper asVideoStep() {
-        return new VideoStepNodeHelper(this);
+    public VideoStepNodeHelper asVideoStep(@NotNull Project project) {
+        return new VideoStepNodeHelper(project, this);
     }
 
     @NotNull
-    public ChoiceStepNodeHelper asChoiceStep() {
-        return new ChoiceStepNodeHelper(this);
+    public ChoiceQuizNodeHelper asChoiceStep(@NotNull Project project) {
+        return new ChoiceQuizNodeHelper(project, this);
     }
 
     @NotNull
-    public StringStepNodeHelper asStringStep() {
-        return new StringStepNodeHelper(this);
+    public StringQuizNodeHelper asStringStep(@NotNull Project project) {
+        return new StringQuizNodeHelper(project, this);
     }
 
     @NotNull
-    public SortingStepNodeHelper asSortingStep() {
-        return new SortingStepNodeHelper(this);
+    public SortingQuizNodeHelper asSortingStep(@NotNull Project project) {
+        return new SortingQuizNodeHelper(project, this);
     }
 
     @NotNull
-    public MatchingStepNodeHelper asMatchingStep() {
-        return new MatchingStepNodeHelper(this);
+    public MatchingQuizNodeHelper asMatchingStep(@NotNull Project project) {
+        return new MatchingQuizNodeHelper(project, this);
     }
 
     @NotNull
-    public NumberStepNodeHelper asNumberStep() {
-        return new NumberStepNodeHelper(this);
+    public NumberQuizNodeHelper asNumberStep(@NotNull Project project) {
+        return new NumberQuizNodeHelper(project, this);
     }
 
     @NotNull
-    public DatasetStepNodeHelper asDatasetStep() {
-        return new DatasetStepNodeHelper(this);
+    public DatasetQuizNodeHelper asDatasetStep(@NotNull Project project) {
+        return new DatasetQuizNodeHelper(project, this);
     }
 
     @NotNull
-    public TableStepNodeHelper asTableStep() {
-        return new TableStepNodeHelper(this);
+    public TableQuizNodeHelper asTableStep(@NotNull Project project) {
+        return new TableQuizNodeHelper(project, this);
     }
 
     public Long getAssignment() {
@@ -354,7 +367,19 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
         return assignment;
     }
 
-    public StepHelper asStepHelper() {
-        return new StepHelper(this);
+    public QuizHelper asQuizHelper(@NotNull Project project) {
+        return new QuizHelper(project, this);
+    }
+
+    public StepHelper asStepHelper(@NotNull Project project) {
+        return new StepHelper(project, this);
+    }
+
+    public TextHelper asTextHelper(@NotNull Project project) {
+        return new TextHelper(project, this);
+    }
+
+    public CodeHelper asCodeHelper(@NotNull Project project) {
+        return new CodeHelper(project, this);
     }
 }

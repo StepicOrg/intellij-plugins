@@ -1,8 +1,9 @@
 package org.stepik.core.courseFormat.stepHelpers;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
-import org.stepik.core.courseFormat.StepNode;
 import org.jetbrains.annotations.NotNull;
+import org.stepik.core.courseFormat.StepNode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,14 +11,14 @@ import java.util.List;
 /**
  * @author meanmail
  */
-public class ChoiceStepNodeHelper extends StepHelper {
+public class ChoiceQuizNodeHelper extends QuizHelper {
     private boolean isMultipleChoice;
     private List<Pair<String, Boolean>> stepOptions;
     private String[] options;
     private List<Boolean> choices;
 
-    public ChoiceStepNodeHelper(@NotNull StepNode stepNode) {
-        super(stepNode);
+    public ChoiceQuizNodeHelper(@NotNull Project project, @NotNull StepNode stepNode) {
+        super(project, stepNode);
     }
 
     @NotNull

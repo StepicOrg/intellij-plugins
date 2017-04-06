@@ -12,11 +12,11 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFileSystemItem;
 import com.intellij.psi.PsiManager;
 import com.intellij.util.ui.tree.TreeUtil;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.stepik.core.StepikProjectManager;
 import org.stepik.core.courseFormat.StepNode;
 import org.stepik.core.courseFormat.StudyNode;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.stepik.core.metrics.Metrics;
 
 import javax.swing.*;
@@ -36,8 +36,7 @@ import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
  * @author meanmail
  */
 public class NavigationUtils {
-
-    public static void navigate(@NotNull Project project, StudyNode targetNode) {
+    public static void navigate(@NotNull Project project, @NotNull StudyNode targetNode) {
         for (VirtualFile file : FileEditorManager.getInstance(project).getOpenFiles()) {
             FileEditorManager.getInstance(project).closeFile(file);
         }

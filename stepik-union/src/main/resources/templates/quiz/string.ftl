@@ -1,6 +1,6 @@
 <#-- @ftlvariable name="status" type="java.lang.String" -->
 <#-- @ftlvariable name="disabled" type="java.lang.String" -->
-<#-- @ftlvariable name="stepNode" type="org.stepik.core.courseFormat.stepHelpers.StringStepNodeHelper" -->
+<#-- @ftlvariable name="stepNode" type="org.stepik.core.courseFormat.stepHelpers.StringQuizNodeHelper" -->
 <#-- @ftlvariable name="text" type="java.lang.String" -->
 
 <style>

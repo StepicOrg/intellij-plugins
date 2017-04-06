@@ -7,15 +7,19 @@ import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
-import org.stepik.core.StepikProjectManager;
+import com.intellij.psi.PsiFileSystemItem;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.core.StepikProjectManager;
+import org.stepik.core.StudyUtils;
+import org.stepik.core.courseFormat.StudyNode;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
 import static org.stepik.plugin.utils.PresentationDataUtils.isVisibleDirectory;
 import static org.stepik.plugin.utils.PresentationDataUtils.isVisibleFile;
+import static org.stepik.plugin.utils.ProjectPsiFilesUtils.getRelativePath;
 
 public abstract class StepikTreeStructureProvider implements TreeStructureProvider, DumbAware {
     @NotNull
@@ -32,6 +36,10 @@ public abstract class StepikTreeStructureProvider implements TreeStructureProvid
             final Project project = node.getProject();
             if (project != null) {
                 Object value = node.getValue();
+                if (isHidden(project, value)) {
+                    continue;
+                }
+
                 if (value instanceof PsiDirectory) {
                     final PsiDirectory nodeValue = (PsiDirectory) value;
                     if (isVisibleDirectory(nodeValue)) {
@@ -47,6 +55,37 @@ public abstract class StepikTreeStructureProvider implements TreeStructureProvid
             }
         }
         return nodes;
+    }
+
+    private boolean isHidden(@NotNull Project project, @Nullable Object value) {
+        if (StepikProjectManager.isAdaptive(project)) {
+            if (!(value instanceof PsiFileSystemItem)) {
+                return false;
+            }
+
+            String relativePath = getRelativePath((PsiFileSystemItem) value);
+            StudyNode root = StepikProjectManager.getProjectRoot(project);
+            if (root == null) {
+                return false;
+            }
+
+            StudyNode node = StudyUtils.getStudyNode(root, relativePath);
+            if (node == null) {
+                return false;
+            }
+
+            StudyNode<?, ?> selected = StepikProjectManager.getSelected(project);
+            if (selected == null) {
+                return true;
+            }
+
+            String selectedPath = selected.getPath();
+            String nodePath = node.getPath();
+            if (!selectedPath.startsWith(nodePath) && selected.getParent() != node.getParent()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     protected abstract boolean shouldAdd(@NotNull Object object);

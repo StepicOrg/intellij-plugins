@@ -13,9 +13,6 @@ public class UtilsTest {
             "<ul><li>Select a course from a list.</li>" +
             "<li>Push on a refresh button if a course list is a empty.</li>" +
             "<li>Write a link to a course (example, https://stepik.org/187/) or a id of course.</li></ul>";
-    private static final String adaptiveDescription = "Test" +
-            "<p style='font-weight: bold;'>This course is adaptive.<br>" +
-            "Sorry, but we don't support adaptive courses yet</p>";
 
     @Test
     public void parseUnitId() throws Exception {
@@ -27,15 +24,5 @@ public class UtilsTest {
     public void getCourseDescriptionIdIsZero() throws Exception {
         String description = Utils.getCourseDescription(new Course());
         assertEquals(zeroIdDescription, description);
-    }
-
-    @Test
-    public void getCourseDescriptionIsAdaptive() throws Exception {
-        Course course = new Course();
-        course.setId(1);
-        course.setDescription("Test");
-        course.setAdaptive(true);
-        String description = Utils.getCourseDescription(course);
-        assertEquals(adaptiveDescription, description);
     }
 }

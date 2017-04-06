@@ -1,18 +1,19 @@
 package org.stepik.core.courseFormat.stepHelpers;
 
-import org.stepik.core.courseFormat.StepNode;
+import com.intellij.openapi.project.Project;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.jetbrains.annotations.NotNull;
+import org.stepik.core.courseFormat.StepNode;
 
 /**
  * @author meanmail
  */
-public class StringStepNodeHelper extends StepHelper {
+public class StringQuizNodeHelper extends QuizHelper {
     private boolean isTextDisabled;
     private String text;
 
-    public StringStepNodeHelper(@NotNull StepNode stepNode) {
-        super(stepNode);
+    public StringQuizNodeHelper(@NotNull Project project, @NotNull StepNode stepNode) {
+        super(project, stepNode);
     }
 
     @NotNull

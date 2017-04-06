@@ -1,5 +1,5 @@
 <#-- @ftlvariable name="disabled" type="java.lang.String" -->
-<#-- @ftlvariable name="stepNode" type="org.stepik.core.courseFormat.stepHelpers.TableStepNodeHelper" -->
+<#-- @ftlvariable name="stepNode" type="org.stepik.core.courseFormat.stepHelpers.TableQuizNodeHelper" -->
 <#-- @ftlvariable name="text" type="java.lang.String" -->
 
 <style>

@@ -1,6 +1,7 @@
 package org.stepik.core;
 
 import com.google.gson.internal.LinkedTreeMap;
+import com.intellij.ide.projectView.ProjectView;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.ServiceManager;
@@ -28,6 +29,7 @@ import org.jdom.input.DOMBuilder;
 import org.jdom.output.XMLOutputter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.api.objects.StudyObject;
 import org.stepik.api.objects.courses.Course;
 import org.stepik.api.objects.lessons.CompoundUnitLesson;
 import org.stepik.api.objects.sections.Section;
@@ -209,6 +211,12 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
         return null;
     }
 
+    public static boolean isAdaptive(Project project) {
+        StepikProjectManager instance = getInstance(project);
+        return instance != null && instance.isAdaptive();
+    }
+
+    @Nullable
     public StudyNode<?, ?> getSelected() {
         return selected;
     }
@@ -217,12 +225,19 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
         setSelected(selected, false);
     }
 
-    public void setSelected(StudyNode<?, ?> selected, boolean force) {
+    public void setSelected(@Nullable StudyNode<?, ?> selected, boolean force) {
         this.selected = selected;
         if (project != null) {
             StudyToolWindow toolWindow = StudyUtils.getStudyToolWindow(project);
             if (toolWindow != null) {
-                ApplicationManager.getApplication().invokeLater(() -> toolWindow.setStepNode(selected, force));
+                ApplicationManager.getApplication().invokeLater(() -> {
+                    toolWindow.setStepNode(selected, force);
+                    if (selected != null && !project.isDisposed()) {
+                        ProjectView.getInstance(project).refresh();
+                        VirtualFile file = project.getBaseDir().findFileByRelativePath(selected.getPath());
+                        ProjectView.getInstance(project).select(null, file, true);
+                    }
+                });
             }
         }
     }
@@ -278,10 +293,16 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
 
             this.version = CURRENT_VERSION;
             refreshCourse();
+            updateSelection();
             logger.info("The StepikProjectManager state loaded");
         } catch (XStreamException | StudyUnrecognizedFormatException e) {
             logger.warn("Failed deserialization StepikProjectManager \n" + e.getMessage() + "\n" + project);
         }
+    }
+
+    public boolean isAdaptive() {
+        StudyObject data = root.getData();
+        return data != null && data.isAdaptive();
     }
 
     private void refreshCourse() {

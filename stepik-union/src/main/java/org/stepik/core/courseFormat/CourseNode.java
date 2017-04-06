@@ -2,7 +2,6 @@ package org.stepik.core.courseFormat;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
-import org.stepik.core.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
@@ -13,6 +12,7 @@ import org.stepik.api.objects.sections.Section;
 import org.stepik.api.objects.sections.Sections;
 import org.stepik.api.objects.users.User;
 import org.stepik.api.objects.users.Users;
+import org.stepik.core.stepik.StepikConnectorLogin;
 
 import java.util.Collections;
 import java.util.List;
@@ -59,14 +59,16 @@ public class CourseNode extends Node<Course, SectionNode, Section, LessonNode> {
     }
 
     @Override
-    protected void loadData(long id) {
+    protected boolean loadData(long id) {
         try {
             StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
             Courses courses = stepikApiClient.courses()
                     .get()
                     .id(id)
                     .execute();
+
             Course data;
+
             if (!courses.isEmpty()) {
                 data = courses.getCourses().get(0);
             } else {
@@ -74,14 +76,23 @@ public class CourseNode extends Node<Course, SectionNode, Section, LessonNode> {
                 data.setId(id);
             }
             setData(data);
+
+            Course oldData = this.getData();
+            return oldData == null || !oldData.getUpdateDate().equals(data.getUpdateDate());
         } catch (StepikClientException logged) {
             logger.warn(String.format("Failed load course data id=%d", id), logged);
         }
+        return true;
     }
 
     @Override
     protected Class<SectionNode> getChildClass() {
         return SectionNode.class;
+    }
+
+    @Override
+    protected Class<Section> getChildDataClass() {
+        return Section.class;
     }
 
     @Override

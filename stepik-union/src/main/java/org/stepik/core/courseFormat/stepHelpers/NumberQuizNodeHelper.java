@@ -1,17 +1,18 @@
 package org.stepik.core.courseFormat.stepHelpers;
 
-import org.stepik.core.courseFormat.StepNode;
+import com.intellij.openapi.project.Project;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.jetbrains.annotations.NotNull;
+import org.stepik.core.courseFormat.StepNode;
 
 /**
  * @author meanmail
  */
-public class NumberStepNodeHelper extends StepHelper {
+public class NumberQuizNodeHelper extends QuizHelper {
     private String number;
 
-    public NumberStepNodeHelper(@NotNull StepNode stepNode) {
-        super(stepNode);
+    public NumberQuizNodeHelper(@NotNull Project project, @NotNull StepNode stepNode) {
+        super(project, stepNode);
     }
 
     @NotNull
