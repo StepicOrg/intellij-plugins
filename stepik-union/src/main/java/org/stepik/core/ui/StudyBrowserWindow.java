@@ -48,6 +48,7 @@ import org.w3c.dom.events.EventTarget;
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -145,6 +146,7 @@ class StudyBrowserWindow extends JFrame {
             map.put("css_highlight", getExternalURL("/highlight/styles/idea.css"));
         }
         map.put("code", content);
+        map.put("charset", Charset.defaultCharset().displayName());
 
         return Templater.processTemplate("template", map);
     }
