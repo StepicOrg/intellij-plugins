@@ -17,6 +17,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -33,6 +34,7 @@ public class Utils {
     public static String mapToGetString(@NotNull String name, @NotNull String[] values) {
         String encodedName = encode(name);
         return Arrays.stream(values)
+                .filter(Objects::nonNull)
                 .map(value -> encodedName + "=" + encode(value))
                 .collect(Collectors.joining("&"));
     }

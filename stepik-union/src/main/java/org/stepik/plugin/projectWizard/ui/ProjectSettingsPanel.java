@@ -1,10 +1,10 @@
 package org.stepik.plugin.projectWizard.ui;
 
 import com.intellij.openapi.diagnostic.Logger;
-import org.stepik.core.SupportedLanguages;
-import org.stepik.core.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.api.objects.StudyObject;
+import org.stepik.core.SupportedLanguages;
+import org.stepik.core.stepik.StepikConnectorLogin;
 import org.stepik.plugin.projectWizard.StepikProjectGenerator;
 import org.stepik.plugin.utils.Utils;
 
@@ -64,7 +64,7 @@ public class ProjectSettingsPanel implements ProjectSetting, HierarchyListener {
     }
 
     public boolean validate() {
-        boolean valid = !selectedStudyObject.isAdaptive() && selectedStudyObject.getId() != 0;
+        boolean valid = selectedStudyObject.getId() != 0;
         logger.info("Validation is " + valid);
         return valid;
     }

@@ -42,19 +42,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static org.stepik.core.StudyUtils.getChoiceStepText;
-import static org.stepik.core.StudyUtils.getCodeStepText;
-import static org.stepik.core.StudyUtils.getDatasetStepText;
-import static org.stepik.core.StudyUtils.getFillBlanksStepText;
-import static org.stepik.core.StudyUtils.getMatchingStepText;
-import static org.stepik.core.StudyUtils.getMathStepText;
-import static org.stepik.core.StudyUtils.getNumberStepText;
-import static org.stepik.core.StudyUtils.getSortingStepText;
-import static org.stepik.core.StudyUtils.getStringStepText;
-import static org.stepik.core.StudyUtils.getTableStepText;
-import static org.stepik.core.StudyUtils.getTextStepText;
-import static org.stepik.core.StudyUtils.getUnknownStepText;
-import static org.stepik.core.StudyUtils.getVideoStepText;
+import static org.stepik.core.StudyUtils.getStepContent;
 import static org.stepik.core.courseFormat.StepType.CODE;
 import static org.stepik.core.courseFormat.StepType.TEXT;
 import static org.stepik.core.courseFormat.StepType.VIDEO;
@@ -219,10 +207,10 @@ public class StudyToolWindow extends SimpleToolWindowPanel implements DataProvid
 
         switch (stepType) {
             case UNKNOWN:
-                text = getUnknownStepText(stepNode);
+                text = getStepContent(stepNode.asStepHelper(project));
                 break;
             case CODE:
-                text = getCodeStepText(stepNode);
+                text = getStepContent(stepNode.asCodeHelper(project));
                 SwingUtilities.invokeLater(() -> {
                     languageBox.removeAllItems();
                     stepNode.getSupportedLanguages().stream()
@@ -235,11 +223,12 @@ public class StudyToolWindow extends SimpleToolWindowPanel implements DataProvid
                 });
                 break;
             case TEXT:
-                text = getTextStepText(stepNode);
+                text = getStepContent(stepNode.asTextHelper(project));
                 break;
             case VIDEO:
-                VideoStepNodeHelper videoStepNode = stepNode.asVideoStep();
-                text = getVideoStepText(videoStepNode, getVideoQuality());
+                VideoStepNodeHelper videoStepNode = stepNode.asVideoStep(project);
+                videoStepNode.setQuality(getVideoQuality());
+                text = getStepContent(videoStepNode);
                 SwingUtilities.invokeLater(() -> {
                     videoQualityBox.removeActionListener(qualityListener);
                     videoQualityBox.removeAllItems();
@@ -254,31 +243,31 @@ public class StudyToolWindow extends SimpleToolWindowPanel implements DataProvid
                 });
                 break;
             case CHOICE:
-                text = getChoiceStepText(stepNode);
+                text = getStepContent(stepNode.asChoiceStep(project));
                 break;
             case STRING:
-                text = getStringStepText(stepNode);
+                text = getStepContent(stepNode.asStringStep(project));
                 break;
             case SORTING:
-                text = getSortingStepText(stepNode);
+                text = getStepContent(stepNode.asSortingStep(project));
                 break;
             case MATCHING:
-                text = getMatchingStepText(stepNode);
+                text = getStepContent(stepNode.asMatchingStep(project));
                 break;
             case NUMBER:
-                text = getNumberStepText(stepNode);
+                text = getStepContent(stepNode.asNumberStep(project));
                 break;
             case DATASET:
-                text = getDatasetStepText(stepNode);
+                text = getStepContent(stepNode.asDatasetStep(project));
                 break;
             case TABLE:
-                text = getTableStepText(stepNode);
+                text = getStepContent(stepNode.asTableStep(project));
                 break;
             case FILL_BLANKS:
-                text = getFillBlanksStepText(stepNode);
+                text = getStepContent(stepNode.asQuizHelper(project));
                 break;
             case MATH:
-                text = getMathStepText(stepNode);
+                text = getStepContent(stepNode.asQuizHelper(project));
                 break;
             default:
                 text = EMPTY_STEP_TEXT;

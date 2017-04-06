@@ -5,9 +5,9 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import org.jetbrains.annotations.Nullable;
 import org.stepik.core.StepikProjectManager;
 import org.stepik.core.courseFormat.StudyNode;
-import org.jetbrains.annotations.Nullable;
 
 import static org.stepik.plugin.utils.PresentationDataUtils.isVisibleDirectory;
 import static org.stepik.plugin.utils.PresentationDataUtils.isVisibleFile;
@@ -46,8 +46,9 @@ public class NavBarModelExtensionUtils {
         Project project = psiElement.getProject();
 
         StudyNode root = StepikProjectManager.getProjectRoot(project);
-        if (root == null)
+        if (root == null) {
             return psiElement;
+        }
 
         if (psiElement instanceof PsiDirectory) {
             if (!isVisibleDirectory((PsiDirectory) psiElement))

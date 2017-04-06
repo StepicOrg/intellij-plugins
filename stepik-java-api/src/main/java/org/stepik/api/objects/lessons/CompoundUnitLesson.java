@@ -85,4 +85,9 @@ public class CompoundUnitLesson extends StudyObject {
     public String getProgress() {
         return getLesson().getProgress();
     }
+
+    @NotNull
+    public String getUpdateDate() {
+        return lesson.getUpdateDate();
+    }
 }

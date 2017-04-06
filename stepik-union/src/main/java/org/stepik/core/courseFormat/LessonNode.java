@@ -2,8 +2,6 @@ package org.stepik.core.courseFormat;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
-import org.stepik.core.core.EduNames;
-import org.stepik.core.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
@@ -14,6 +12,8 @@ import org.stepik.api.objects.lessons.Lessons;
 import org.stepik.api.objects.sections.Sections;
 import org.stepik.api.objects.steps.Step;
 import org.stepik.api.objects.steps.Steps;
+import org.stepik.core.core.EduNames;
+import org.stepik.core.stepik.StepikConnectorLogin;
 
 import java.util.Collections;
 import java.util.List;
@@ -60,11 +60,11 @@ public class LessonNode extends Node<CompoundUnitLesson, StepNode, Step, StepNod
     }
 
     @Override
-    protected void loadData(long id) {
+    protected boolean loadData(long id) {
         try {
             CompoundUnitLesson data = getData();
             if (data == null) {
-                return;
+                return true;
             }
 
             StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
@@ -82,15 +82,24 @@ public class LessonNode extends Node<CompoundUnitLesson, StepNode, Step, StepNod
                 lesson.setId(id);
             }
             data.setLesson(lesson);
+
+            CompoundUnitLesson oldData = this.getData();
+            return oldData == null || !oldData.getUpdateDate().equals(data.getUpdateDate());
         } catch (StepikClientException logged) {
             logger.warn(String.format("Failed load lesson data id=%d", id), logged);
         }
+        return true;
     }
 
 
     @Override
     protected Class<StepNode> getChildClass() {
         return StepNode.class;
+    }
+
+    @Override
+    protected Class<Step> getChildDataClass() {
+        return Step.class;
     }
 
     @Override

@@ -31,7 +31,14 @@ public abstract class StepikAbstractGetQuery<T extends StepikAbstractGetQuery, R
     }
 
     @NotNull
-    public T id(@NotNull long... values) {
+    public T id(@NotNull Long... values) {
+        addParam(IDS_KEY, values);
+        //noinspection unchecked
+        return (T) this;
+    }
+
+    @NotNull
+    public T id(@NotNull Integer... values) {
         addParam(IDS_KEY, values);
         //noinspection unchecked
         return (T) this;
