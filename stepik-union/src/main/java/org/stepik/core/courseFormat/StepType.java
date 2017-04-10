@@ -23,7 +23,7 @@ public enum StepType {
     TABLE("table"),
     FILL_BLANKS("fill-blanks"),
     MATH("math"),
-    FREE_ANSWER("free_answer");
+    FREE_ANSWER("free-answer");
 
     private static Map<String, StepType> map;
     private final String name;

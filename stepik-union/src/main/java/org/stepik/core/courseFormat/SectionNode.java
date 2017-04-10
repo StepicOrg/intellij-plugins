@@ -52,9 +52,9 @@ public class SectionNode extends Node<Section, LessonNode, CompoundUnitLesson, S
                 data = new Section();
                 data.setId(id);
             }
-            setData(data);
 
             Section oldData = this.getData();
+            setData(data);
             return oldData == null || !oldData.getUpdateDate().equals(data.getUpdateDate());
         } catch (StepikClientException logged) {
             logger.warn(String.format("Failed load section data id=%d", id), logged);

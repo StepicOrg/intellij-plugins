@@ -66,9 +66,9 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
                 data = new Step();
                 data.setId(id);
             }
-            setData(data);
 
             Step oldData = this.getData();
+            setData(data);
             return oldData == null || !oldData.getUpdateDate().equals(data.getUpdateDate());
         } catch (StepikClientException logged) {
             logger.warn(String.format("Failed step lesson data id=%d", id), logged);

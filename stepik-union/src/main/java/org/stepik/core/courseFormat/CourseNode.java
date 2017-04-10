@@ -75,9 +75,9 @@ public class CourseNode extends Node<Course, SectionNode, Section, LessonNode> {
                 data = new Course();
                 data.setId(id);
             }
-            setData(data);
 
             Course oldData = this.getData();
+            setData(data);
             return oldData == null || !oldData.getUpdateDate().equals(data.getUpdateDate());
         } catch (StepikClientException logged) {
             logger.warn(String.format("Failed load course data id=%d", id), logged);

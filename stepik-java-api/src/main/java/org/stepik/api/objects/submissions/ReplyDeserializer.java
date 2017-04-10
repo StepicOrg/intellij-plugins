@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.stepik.api.Utils.getJsonArray;
+import static org.stepik.api.Utils.getList;
 import static org.stepik.api.Utils.getString;
 import static org.stepik.api.Utils.getStringList;
 
@@ -52,7 +53,9 @@ public class ReplyDeserializer implements JsonDeserializer<Reply> {
             reply.setOrdering(intOrdering);
         }
 
-        reply.setAttachments(getStringList(object, "attachments"));
+        reply.setAttachments(getList(object,
+                "attachments",
+                (jsonElement) -> context.deserialize(jsonElement, Attachment.class)));
         reply.setFiles(getStringList(object, "files"));
 
         JsonArray choices = getJsonArray(object, "choices");
