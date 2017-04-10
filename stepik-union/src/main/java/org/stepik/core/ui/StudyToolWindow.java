@@ -29,7 +29,19 @@ import org.stepik.core.SupportedLanguages;
 import org.stepik.core.courseFormat.StepNode;
 import org.stepik.core.courseFormat.StepType;
 import org.stepik.core.courseFormat.StudyNode;
-import org.stepik.core.courseFormat.stepHelpers.VideoStepNodeHelper;
+import org.stepik.core.courseFormat.stepHelpers.ChoiceQuizHelper;
+import org.stepik.core.courseFormat.stepHelpers.CodeQuizHelper;
+import org.stepik.core.courseFormat.stepHelpers.DatasetQuizHelper;
+import org.stepik.core.courseFormat.stepHelpers.FreeAnswerQuizHelper;
+import org.stepik.core.courseFormat.stepHelpers.MatchingQuizHelper;
+import org.stepik.core.courseFormat.stepHelpers.NumberQuizHelper;
+import org.stepik.core.courseFormat.stepHelpers.QuizHelper;
+import org.stepik.core.courseFormat.stepHelpers.SortingQuizHelper;
+import org.stepik.core.courseFormat.stepHelpers.StepHelper;
+import org.stepik.core.courseFormat.stepHelpers.StringQuizHelper;
+import org.stepik.core.courseFormat.stepHelpers.TableQuizHelper;
+import org.stepik.core.courseFormat.stepHelpers.TextTheoryHelper;
+import org.stepik.core.courseFormat.stepHelpers.VideoTheoryHelper;
 import org.stepik.core.stepik.StepikConnectorLogin;
 import org.stepik.core.utils.ProgrammingLanguageUtils;
 
@@ -197,87 +209,98 @@ public class StudyToolWindow extends SimpleToolWindowPanel implements DataProvid
             rightPanel.setVisible(false);
             return;
         }
-        String text;
+
         StepType stepType = stepNode.getType();
         if (stepType != VIDEO && stepType != CODE) {
             SwingUtilities.invokeLater(() -> rightPanel.setVisible(false));
         }
-        boolean theory = stepType == VIDEO || stepType == TEXT;
-        postView(stepNode, theory);
+        boolean isTheory = stepType == VIDEO || stepType == TEXT;
+        postView(stepNode, isTheory);
+
+        StepHelper stepHelper = null;
 
         switch (stepType) {
             case UNKNOWN:
-                text = getStepContent(stepNode.asStepHelper(project));
+                stepHelper = new StepHelper(project, stepNode);
                 break;
             case CODE:
-                text = getStepContent(stepNode.asCodeHelper(project));
-                SwingUtilities.invokeLater(() -> {
-                    languageBox.removeAllItems();
-                    stepNode.getSupportedLanguages().stream()
-                            .sorted(Comparator.comparingInt(Enum::ordinal))
-                            .forEach(languageBox::addItem);
-                    layout.show(rightPanel, "language");
-                    boolean rightPanelVisible = languageBox.getModel().getSize() != 0;
-                    rightPanel.setVisible(rightPanelVisible);
-                    languageBox.setSelectedItem(stepNode.getCurrentLang());
-                });
+                stepHelper = new CodeQuizHelper(project, stepNode);
+                updateLanguageBox(stepNode);
                 break;
             case TEXT:
-                text = getStepContent(stepNode.asTextHelper(project));
+                stepHelper = new TextTheoryHelper(project, stepNode);
                 break;
             case VIDEO:
-                VideoStepNodeHelper videoStepNode = stepNode.asVideoStep(project);
+                VideoTheoryHelper videoStepNode = new VideoTheoryHelper(project, stepNode);
                 videoStepNode.setQuality(getVideoQuality());
-                text = getStepContent(videoStepNode);
-                SwingUtilities.invokeLater(() -> {
-                    videoQualityBox.removeActionListener(qualityListener);
-                    videoQualityBox.removeAllItems();
-                    videoStepNode.getQualitySet().forEach(videoQualityBox::addItem);
-                    int quality = videoStepNode.getQuality();
-                    storeVideoQuality(quality);
-                    videoQualityBox.setSelectedItem(quality);
-                    videoQualityBox.addActionListener(qualityListener);
-                    layout.show(rightPanel, "quality");
-                    boolean rightPanelVisible = videoQualityBox.getModel().getSize() != 0;
-                    rightPanel.setVisible(rightPanelVisible);
-                });
+                stepHelper = videoStepNode;
+                updateQualityComboBox(videoStepNode);
                 break;
             case CHOICE:
-                text = getStepContent(stepNode.asChoiceStep(project));
+                stepHelper = new ChoiceQuizHelper(project, stepNode);
                 break;
             case STRING:
-                text = getStepContent(stepNode.asStringStep(project));
+                stepHelper = new StringQuizHelper(project, stepNode);
                 break;
             case SORTING:
-                text = getStepContent(stepNode.asSortingStep(project));
+                stepHelper = new SortingQuizHelper(project, stepNode);
                 break;
             case MATCHING:
-                text = getStepContent(stepNode.asMatchingStep(project));
+                stepHelper = new MatchingQuizHelper(project, stepNode);
                 break;
             case NUMBER:
-                text = getStepContent(stepNode.asNumberStep(project));
+                stepHelper = new NumberQuizHelper(project, stepNode);
                 break;
             case DATASET:
-                text = getStepContent(stepNode.asDatasetStep(project));
+                stepHelper = new DatasetQuizHelper(project, stepNode);
                 break;
             case TABLE:
-                text = getStepContent(stepNode.asTableStep(project));
+                stepHelper = new TableQuizHelper(project, stepNode);
                 break;
             case FILL_BLANKS:
-                text = getStepContent(stepNode.asQuizHelper(project));
+                stepHelper = new QuizHelper(project, stepNode);
                 break;
             case MATH:
-                text = getStepContent(stepNode.asQuizHelper(project));
+                stepHelper = new QuizHelper(project, stepNode);
                 break;
-            default:
-                text = EMPTY_STEP_TEXT;
+            case FREE_ANSWER:
+                stepHelper = new FreeAnswerQuizHelper(project, stepNode);
                 break;
         }
 
+        String text = getStepContent(stepHelper);
         setText(text);
     }
 
-    private void postView(@NotNull StepNode stepNode, boolean needPassed) {
+    private void updateLanguageBox(@NotNull StepNode stepNode) {
+        SwingUtilities.invokeLater(() -> {
+            languageBox.removeAllItems();
+            stepNode.getSupportedLanguages().stream()
+                    .sorted(Comparator.comparingInt(Enum::ordinal))
+                    .forEach(languageBox::addItem);
+            layout.show(rightPanel, "language");
+            boolean rightPanelVisible = languageBox.getModel().getSize() != 0;
+            rightPanel.setVisible(rightPanelVisible);
+            languageBox.setSelectedItem(stepNode.getCurrentLang());
+        });
+    }
+
+    private void updateQualityComboBox(@NotNull VideoTheoryHelper videoStepNode) {
+        SwingUtilities.invokeLater(() -> {
+            videoQualityBox.removeActionListener(qualityListener);
+            videoQualityBox.removeAllItems();
+            videoStepNode.getQualitySet().forEach(videoQualityBox::addItem);
+            int quality = videoStepNode.getQuality();
+            storeVideoQuality(quality);
+            videoQualityBox.setSelectedItem(quality);
+            videoQualityBox.addActionListener(qualityListener);
+            layout.show(rightPanel, "quality");
+            boolean rightPanelVisible = videoQualityBox.getModel().getSize() != 0;
+            rightPanel.setVisible(rightPanelVisible);
+        });
+    }
+
+    private void postView(@NotNull StepNode stepNode, boolean isTheory) {
         executor.execute(() -> {
             Long assignment = stepNode.getAssignment();
             long stepId = stepNode.getId();
@@ -294,7 +317,7 @@ public class StudyToolWindow extends SimpleToolWindowPanel implements DataProvid
                 logger.warn("Failed post view: stepId=" + stepId + "; assignment=" + assignment, e);
             }
 
-            if (needPassed) {
+            if (isTheory) {
                 stepNode.passed();
             }
 

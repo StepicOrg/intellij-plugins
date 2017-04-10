@@ -7,13 +7,8 @@ import org.stepik.core.courseFormat.StepNode;
 /**
  * @author meanmail
  */
-public class TextHelper extends StepHelper {
-    public TextHelper(@NotNull Project project, @NotNull StepNode stepNode) {
+public class FreeAnswerQuizHelper extends StringQuizHelper {
+    public FreeAnswerQuizHelper(@NotNull Project project, @NotNull StepNode stepNode) {
         super(project, stepNode);
-    }
-
-    @NotNull
-    public String getLinkTitle() {
-        return "Read this step on Stepik";
     }
 }

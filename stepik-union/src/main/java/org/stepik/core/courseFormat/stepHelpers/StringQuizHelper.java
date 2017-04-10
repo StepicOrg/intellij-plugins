@@ -8,11 +8,11 @@ import org.stepik.core.courseFormat.StepNode;
 /**
  * @author meanmail
  */
-public class StringQuizNodeHelper extends QuizHelper {
+public class StringQuizHelper extends QuizHelper {
     private boolean isTextDisabled;
     private String text;
 
-    public StringQuizNodeHelper(@NotNull Project project, @NotNull StepNode stepNode) {
+    public StringQuizHelper(@NotNull Project project, @NotNull StepNode stepNode) {
         super(project, stepNode);
     }
 

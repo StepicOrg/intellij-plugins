@@ -18,11 +18,11 @@ import static java.util.Collections.emptyList;
 /**
  * @author meanmail
  */
-public class VideoStepNodeHelper extends StepHelper {
+public class VideoTheoryHelper extends StepHelper {
     private int quality;
     private List<VideoUrl> urls;
 
-    public VideoStepNodeHelper(@NotNull Project project, @NotNull StepNode stepNode) {
+    public VideoTheoryHelper(@NotNull Project project, @NotNull StepNode stepNode) {
         super(project, stepNode);
     }
 

@@ -11,17 +11,17 @@ import java.util.List;
 /**
  * @author meanmail
  */
-public class SortingQuizNodeHelper extends QuizHelper {
-    private String[] values;
+public class MatchingQuizHelper extends QuizHelper {
+    private List<org.stepik.api.objects.attempts.Pair> values;
     private List<Integer> replyOrdering;
-    private List<Pair<Integer, String>> ordering;
+    private List<Pair<String, String>> ordering;
 
-    public SortingQuizNodeHelper(@NotNull Project project, @NotNull StepNode stepNode) {
+    public MatchingQuizHelper(@NotNull Project project, @NotNull StepNode stepNode) {
         super(project, stepNode);
     }
 
     @NotNull
-    public List<Pair<Integer, String>> getOrdering() {
+    public List<Pair<String, String>> getOrdering() {
         initStepOptions();
         return ordering;
     }
@@ -38,7 +38,7 @@ public class SortingQuizNodeHelper extends QuizHelper {
 
     @Override
     protected void onAttemptLoaded() {
-        values = getDataset().getOptions();
+        values = getDataset().getPairs();
     }
 
     @Override
@@ -50,12 +50,15 @@ public class SortingQuizNodeHelper extends QuizHelper {
     protected void onFinishInit() {
         if (replyOrdering == null) {
             replyOrdering = new ArrayList<>();
-            for (int i = 0; i < values.length; i++)
+            for (int i = 0; i < values.size(); i++)
                 replyOrdering.add(i);
         }
 
-        for (int index : replyOrdering) {
-            ordering.add(Pair.create(index, index < values.length ? values[index] : ""));
+        for (int i = 0; i < replyOrdering.size() && i < values.size(); i++) {
+            int index = replyOrdering.get(i);
+            String first = values.get(i).getFirst();
+            String second = index < values.size() ? values.get(index).getSecond() : "";
+            ordering.add(Pair.create(first, second));
         }
     }
 

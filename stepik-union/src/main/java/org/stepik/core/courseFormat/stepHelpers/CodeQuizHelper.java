@@ -10,8 +10,8 @@ import java.util.List;
 /**
  * @author meanmail
  */
-public class CodeHelper extends StepHelper {
-    public CodeHelper(@NotNull Project project, @NotNull StepNode stepNode) {
+public class CodeQuizHelper extends StepHelper {
+    public CodeQuizHelper(@NotNull Project project, @NotNull StepNode stepNode) {
         super(project, stepNode);
     }
 

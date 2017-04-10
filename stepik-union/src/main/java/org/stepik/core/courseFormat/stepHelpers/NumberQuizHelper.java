@@ -8,10 +8,10 @@ import org.stepik.core.courseFormat.StepNode;
 /**
  * @author meanmail
  */
-public class NumberQuizNodeHelper extends QuizHelper {
+public class NumberQuizHelper extends QuizHelper {
     private String number;
 
-    public NumberQuizNodeHelper(@NotNull Project project, @NotNull StepNode stepNode) {
+    public NumberQuizHelper(@NotNull Project project, @NotNull StepNode stepNode) {
         super(project, stepNode);
     }
 

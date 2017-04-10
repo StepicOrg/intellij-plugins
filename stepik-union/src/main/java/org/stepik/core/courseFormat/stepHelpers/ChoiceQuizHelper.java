@@ -11,13 +11,13 @@ import java.util.List;
 /**
  * @author meanmail
  */
-public class ChoiceQuizNodeHelper extends QuizHelper {
+public class ChoiceQuizHelper extends QuizHelper {
     private boolean isMultipleChoice;
     private List<Pair<String, Boolean>> stepOptions;
     private String[] options;
     private List<Boolean> choices;
 
-    public ChoiceQuizNodeHelper(@NotNull Project project, @NotNull StepNode stepNode) {
+    public ChoiceQuizHelper(@NotNull Project project, @NotNull StepNode stepNode) {
         super(project, stepNode);
     }
 

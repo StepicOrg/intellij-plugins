@@ -14,11 +14,11 @@ import java.util.Map;
 /**
  * @author meanmail
  */
-public class TableQuizNodeHelper extends QuizHelper {
+public class TableQuizHelper extends QuizHelper {
     private List<Choice> tableChoices;
     private Map<String, Map<String, Boolean>> choices;
 
-    public TableQuizNodeHelper(@NotNull Project project, @NotNull StepNode stepNode) {
+    public TableQuizHelper(@NotNull Project project, @NotNull StepNode stepNode) {
         super(project, stepNode);
     }
 
