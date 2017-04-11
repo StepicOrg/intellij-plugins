@@ -88,6 +88,7 @@ class FormListener implements EventListener {
                         }
                         break;
                     case "active":
+                    case "active_wrong":
                         String typeStr = elements.getType();
                         StepType type = StepType.of(typeStr);
                         boolean isFromFile = elements.isFromFile();

@@ -14,6 +14,7 @@ import org.stepik.api.objects.submissions.Submission;
 import org.stepik.api.objects.submissions.Submissions;
 import org.stepik.core.StepikProjectManager;
 import org.stepik.core.courseFormat.StepNode;
+import org.stepik.core.courseFormat.StepType;
 import org.stepik.core.courseFormat.StudyStatus;
 import org.stepik.core.metrics.Metrics;
 import org.stepik.core.metrics.MetricsStatus;
@@ -86,7 +87,9 @@ public class SendAction {
         indicator.setIndeterminate(true);
         indicator.setText("");
         hint = currentSubmission.getHint();
-        notify(project, stepNode, stepStatus, hint);
+        if (stepNode.getType() == StepType.CODE) {
+            notify(project, stepNode, stepStatus, hint);
+        }
         ApplicationManager.getApplication().invokeLater(() -> {
             if (!project.isDisposed()) {
                 ProjectView.getInstance(project).refresh();

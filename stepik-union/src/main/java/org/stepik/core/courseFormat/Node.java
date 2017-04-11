@@ -1,6 +1,7 @@
 package org.stepik.core.courseFormat;
 
 import com.intellij.ide.projectView.ProjectView;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
@@ -341,9 +342,13 @@ abstract class Node<
                             }
                         }
                     }
-                    if (!project.isDisposed()) {
-                        ProjectView.getInstance(project).refresh();
-                    }
+
+                    ApplicationManager.getApplication().invokeLater(() -> {
+                        if (!project.isDisposed()) {
+                            ProjectView.getInstance(project).refresh();
+                        }
+                    });
+
                 } catch (StepikClientException e) {
                     logger.warn(e);
                 }
