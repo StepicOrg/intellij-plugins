@@ -351,12 +351,13 @@ class FormListener implements EventListener {
         @NotNull
         String getInputValue(@NotNull String name) {
             Node item = elements.namedItem(name);
+            String value = null;
             if (item instanceof HTMLInputElement) {
-                return ((HTMLInputElement) item).getValue();
+                value = ((HTMLInputElement) item).getValue();
             } else if (item instanceof HTMLTextAreaElement) {
-                return ((HTMLTextAreaElement) item).getValue();
+                value = ((HTMLTextAreaElement) item).getValue();
             }
-            return "";
+            return value != null ? value : "";
         }
 
         boolean isFromFile() {

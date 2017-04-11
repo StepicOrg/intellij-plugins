@@ -12,7 +12,7 @@
         <#assign submissionsCount = stepNode.getSubmissionsCount() />
         <#assign locked = isHasSubmissionsRestrictions && (submissionsCount >= maxSubmissionsCount) />
 
-        <form action="${stepNode.getPath()}" method="get">
+        <form id="answer_form" action="${stepNode.getPath()}" method="get">
             <#if status != "active" && status != "active_wrong">
                 <#assign disabled = "disabled" />
             </#if>
@@ -35,13 +35,18 @@
             <br>
 
             <#if !locked>
-                <input id="submit" type="submit" value="Evaluation"/>
+                <input id="submit_button" type="submit" value="Evaluation"/>
+                <#if status == "active_wrong">
+                    <input type="submit" value="Reset" onclick="solve_again()"/>
+                </#if>
             </#if>
         </form>
 
         <script>
+            var status_element = document.getElementById("status");
+
             function updateSubmitCaption() {
-                var status = document.getElementById("status").getAttribute("value");
+                var status = status_element.getAttribute("value");
 
                 var submitCaption;
                 var disabled = false;
@@ -57,8 +62,8 @@
                     disabled = true;
                 }
 
-                document.getElementById("submit").setAttribute("value", submitCaption);
-                var submit = document.getElementById("submit");
+                var submit = document.getElementById("submit_button");
+                submit.setAttribute("value", submitCaption);
                 if (disabled) {
                     submit.setAttribute("disabled", true);
                 } else {
@@ -66,6 +71,11 @@
                 }
             }
             updateSubmitCaption();
+                <#if status == "active_wrong">
+                function solve_again() {
+                    status_element.setAttribute("value", "");
+                }
+                </#if>
         </script>
 
         <#if isHasSubmissionsRestrictions>
