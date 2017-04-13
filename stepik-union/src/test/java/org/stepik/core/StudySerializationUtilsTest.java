@@ -1,4 +1,4 @@
-package com.jetbrains.tmp.learning;
+package org.stepik.core;
 
 import org.stepik.core.serialization.StudySerializationUtils;
 import org.stepik.core.serialization.StudyUnrecognizedFormatException;
@@ -8,8 +8,6 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.stepik.core.StepikProjectManager;
-import org.stepik.core.TestUtils;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;

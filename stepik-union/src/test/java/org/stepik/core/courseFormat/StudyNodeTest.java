@@ -1,4 +1,4 @@
-package com.jetbrains.tmp.learning.courseFormat;
+package org.stepik.core.courseFormat;
 
 import org.junit.Before;
 import org.junit.Test;

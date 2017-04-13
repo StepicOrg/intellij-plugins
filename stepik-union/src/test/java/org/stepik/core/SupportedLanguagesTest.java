@@ -1,4 +1,4 @@
-package com.jetbrains.tmp.learning;
+package org.stepik.core;
 
 import com.intellij.openapi.util.Pair;
 import org.junit.experimental.theories.DataPoints;

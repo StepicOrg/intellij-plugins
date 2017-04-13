@@ -1,4 +1,4 @@
-package com.jetbrains.tmp.learning.courseFormat;
+package org.stepik.core.courseFormat;
 
 import org.stepik.core.StepikProjectManager;
 import com.thoughtworks.xstream.XStream;
@@ -8,11 +8,6 @@ import org.stepik.api.objects.lessons.CompoundUnitLesson;
 import org.stepik.api.objects.steps.Limit;
 import org.stepik.api.objects.steps.Step;
 import org.stepik.core.TestUtils;
-import org.stepik.core.courseFormat.CourseNode;
-import org.stepik.core.courseFormat.LessonNode;
-import org.stepik.core.courseFormat.SectionNode;
-import org.stepik.core.courseFormat.StepNode;
-import org.stepik.core.courseFormat.StudyNode;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
