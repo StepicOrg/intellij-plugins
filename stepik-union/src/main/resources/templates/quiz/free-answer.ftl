@@ -19,4 +19,13 @@
     <textarea id="text" class="row" name="value"
               placeholder="Input your answer here" ${disabled!""}>${stepNode.getText()}</textarea>
     </#if>
+
+    <#if stepNode.withReview()>
+    ${stepNode.getStageText()}
+        <#if stepNode.hasAction()>
+        <a href="${stepNode.getLink()}">${stepNode.getActionName()}</a>
+        ${stepNode.getActionHint()}
+        </#if>
+    <br>
+    </#if>
 </@quiz_content>

@@ -212,7 +212,7 @@ class FormListener implements EventListener {
                     Submissions submissions = query.execute();
 
                     if (!submissions.isEmpty()) {
-                        Submission submission = submissions.getSubmissions().get(0);
+                        Submission submission = submissions.getFirst();
                         SendAction.checkStepStatus(project, stepNode, submission.getId(), indicator);
                     }
                 } catch (StepikClientException e) {

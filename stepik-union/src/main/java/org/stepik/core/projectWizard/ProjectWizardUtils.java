@@ -82,7 +82,7 @@ public class ProjectWizardUtils {
                         .execute();
 
                 if (!sections.isEmpty()) {
-                    long courseId = sections.getSections().get(0).getId();
+                    long courseId = sections.getFirst().getId();
 
                     if (courseId != 0) {
                         Courses courses = stepikApiClient.courses()
@@ -90,7 +90,7 @@ public class ProjectWizardUtils {
                                 .id(courseId)
                                 .execute();
                         if (!courses.isEmpty()) {
-                            enrollment(courses.getCourses().get(0));
+                            enrollment(courses.getFirst());
                         }
                     }
                 }

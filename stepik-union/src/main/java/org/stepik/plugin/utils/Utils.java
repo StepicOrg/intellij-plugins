@@ -115,7 +115,7 @@ public class Utils {
         Unit unit = null;
 
         if (unitId != 0 && !units.isEmpty()) {
-            unit = units.getItems().get(0);
+            unit = units.getFirst();
         }
 
         Lesson lesson = getLesson(lessonId, stepikApiClient);
@@ -136,7 +136,7 @@ public class Utils {
         Section section = null;
 
         if (sectionId != 0 && !sections.isEmpty()) {
-            section = sections.getItems().get(0);
+            section = sections.getFirst();
         }
         return section;
     }
@@ -155,7 +155,7 @@ public class Utils {
         Lesson lesson = null;
 
         if (lessonId != 0 && !lessons.isEmpty()) {
-            lesson = lessons.getItems().get(0);
+            lesson = lessons.getFirst();
         }
         return lesson;
     }
@@ -181,7 +181,7 @@ public class Utils {
         Course course = null;
 
         if (id != 0 && !courses.isEmpty()) {
-            course = courses.getCourses().get(0);
+            course = courses.getFirst();
         }
         return course;
     }

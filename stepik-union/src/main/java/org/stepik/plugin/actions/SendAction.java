@@ -57,7 +57,7 @@ public class SendAction {
                         .execute();
 
                 if (!submission.isEmpty()) {
-                    currentSubmission = submission.getSubmissions().get(0);
+                    currentSubmission = submission.getFirst();
                     ActionUtils.setupCheckProgress(indicator, currentSubmission, timer);
                     stepStatus = currentSubmission.getStatus();
                     if (!EVALUATION.equals(stepStatus)) {

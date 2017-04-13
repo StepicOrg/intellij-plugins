@@ -158,8 +158,7 @@ public class StudyUtils {
                     .course(root.getId())
                     .execute();
             if (!recommendations.isEmpty()) {
-                Recommendation recommendation = recommendations.getItems()
-                        .get(0);
+                Recommendation recommendation = recommendations.getFirst();
 
                 long lesson = recommendation.getLesson();
 
@@ -168,7 +167,7 @@ public class StudyUtils {
                         .lesson(lesson)
                         .execute();
                 if (!steps.isEmpty()) {
-                    long stepId = steps.getItems().get(0).getId();
+                    long stepId = steps.getFirst().getId();
                     studyNode = root.getChildByClassAndId(Step.class, stepId);
                 }
             }

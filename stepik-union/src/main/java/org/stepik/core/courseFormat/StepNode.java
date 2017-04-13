@@ -61,7 +61,7 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
             Step data;
 
             if (!steps.isEmpty()) {
-                data = steps.getSteps().get(0);
+                data = steps.getFirst();
             } else {
                 data = new Step();
                 data.setId(id);
@@ -153,7 +153,7 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
             LessonNode lessonNode = new LessonNode();
             CompoundUnitLesson lessonData = lessonNode.getData();
             if (lessonData != null) {
-                lessonData.setUnit(units.getItems().get(0));
+                lessonData.setUnit(units.getFirst());
             }
 
             courseId = lessonNode.getCourseId();

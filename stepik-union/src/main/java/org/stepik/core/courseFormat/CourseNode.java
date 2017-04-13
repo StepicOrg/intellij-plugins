@@ -70,7 +70,7 @@ public class CourseNode extends Node<Course, SectionNode, Section, LessonNode> {
             Course data;
 
             if (!courses.isEmpty()) {
-                data = courses.getCourses().get(0);
+                data = courses.getFirst();
             } else {
                 data = new Course();
                 data.setId(id);

@@ -47,7 +47,7 @@ public class SectionNode extends Node<Section, LessonNode, CompoundUnitLesson, S
             Section data;
 
             if (!sections.isEmpty()) {
-                data = sections.getSections().get(0);
+                data = sections.getFirst();
             } else {
                 data = new Section();
                 data.setId(id);

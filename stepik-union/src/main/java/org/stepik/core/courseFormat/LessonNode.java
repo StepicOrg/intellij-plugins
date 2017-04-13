@@ -77,7 +77,7 @@ public class LessonNode extends Node<CompoundUnitLesson, StepNode, Step, StepNod
 
             Lesson lesson;
             if (!lessons.isEmpty()) {
-                lesson = lessons.getLessons().get(0);
+                lesson = lessons.getFirst();
             } else {
                 lesson = new Lesson();
                 lesson.setId(id);
@@ -129,7 +129,7 @@ public class LessonNode extends Node<CompoundUnitLesson, StepNode, Step, StepNod
             if (sections.isEmpty()) {
                 return 0;
             }
-            courseId = sections.getItems().get(0).getCourse();
+            courseId = sections.getFirst().getCourse();
             return courseId;
         } catch (StepikClientException ignored) {
         }

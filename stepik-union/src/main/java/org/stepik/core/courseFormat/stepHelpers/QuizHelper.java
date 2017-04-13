@@ -56,7 +56,7 @@ public class QuizHelper extends StepHelper {
             return false;
         }
 
-        attempt = attempts.getAttempts().get(0);
+        attempt = attempts.getFirst();
         return true;
     }
 
@@ -74,7 +74,7 @@ public class QuizHelper extends StepHelper {
         Submissions submissions = query.execute();
 
         if (!submissions.isEmpty()) {
-            submission = submissions.getSubmissions().get(0);
+            submission = submissions.getFirst();
             reply = submission.getReply();
             status = submission.getStatus();
             if (ACTIVE.equals(attempt.getStatus())) {
