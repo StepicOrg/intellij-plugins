@@ -62,14 +62,13 @@ ${stepNode.getContent()}<br>
             </g>
         </svg>
 </div>
-<div>
 
-    <script>
-        var load_animation = document.getElementById("load_animation");
+<script>
+    var load_animation = document.getElementById("load_animation");
 
-        function showLoadAnimation() {
-            load_animation.style.display = "flex";
-        }
-    </script>
+    function showLoadAnimation() {
+        load_animation.style.display = "flex";
+    }
+</script>
 
 </#macro>
