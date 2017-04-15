@@ -114,6 +114,7 @@ class FormListener implements EventListener {
                 logger.warn(e);
             }
             event.preventDefault();
+            event.stopPropagation();
         }
     }
 

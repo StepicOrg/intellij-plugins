@@ -57,7 +57,6 @@ ${stepNode.getContent()}<br>
                 <animateTransform attributeName="transform" type="rotate"
                                   values="0 64 64;315 64 64;270 64 64;225 64 64;180 64 64;135 64 64;90 64 64;45 64 64"
                                   calcMode="discrete" dur="720ms" repeatCount="indefinite">
-
                 </animateTransform>
             </g>
         </svg>

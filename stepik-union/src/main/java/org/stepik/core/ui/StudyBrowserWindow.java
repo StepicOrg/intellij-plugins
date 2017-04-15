@@ -19,6 +19,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import netscape.javascript.JSObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
@@ -118,6 +119,7 @@ class StudyBrowserWindow extends JFrame {
             engine = webComponent.getEngine();
             pane.getChildren().add(webComponent);
             initHyperlinkListener();
+            initConsoleListener();
             Scene scene = new Scene(pane);
             panel.setScene(scene);
             panel.setVisible(true);
@@ -126,6 +128,22 @@ class StudyBrowserWindow extends JFrame {
 
         add(panel, BorderLayout.CENTER);
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+    }
+
+    private void initConsoleListener() {
+        engine.getLoadWorker()
+                .stateProperty()
+                .addListener((observable, oldValue, newValue) -> {
+                    JSObject window = (JSObject) engine.executeScript("window");
+                    JavaBridge bridge = new JavaBridge();
+                    window.setMember("java", bridge);
+                    engine.executeScript(
+                            "console.error = function(message){java.error(message);};" +
+                            "console.warn = function(message){java.warn(message);};" +
+                            "console.info = function(message){java.info(message);};" +
+                            "console.debug = function(message){java.debug(message);};"
+                    );
+                });
     }
 
     void loadContent(@NotNull final String content) {
@@ -399,13 +417,28 @@ class StudyBrowserWindow extends JFrame {
     }
 
     void showLoadAnimation() {
-        Platform.runLater(() -> engine.executeScript("showLoadAnimation();"));
+        Platform.runLater(() -> engine.executeScript("if (window.showLoadAnimation !== undefined) showLoadAnimation();"));
     }
 
     private class StudyLafManagerListener implements LafManagerListener {
         @Override
         public void lookAndFeelChanged(LafManager manager) {
             updateLaf(manager.getCurrentLookAndFeel() instanceof DarculaLookAndFeelInfo);
+        }
+    }
+
+    public class JavaBridge {
+        public void log(String text) {
+            logger.info("console: " + text);
+        }
+        public void error(String text) {
+            logger.error("console: " + text);
+        }
+        public void warn(String text) {
+            logger.warn("console: " + text);
+        }
+        public void debug(String text) {
+            logger.debug("console: " + text);
         }
     }
 }
