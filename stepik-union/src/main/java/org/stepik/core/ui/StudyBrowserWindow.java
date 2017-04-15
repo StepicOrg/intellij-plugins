@@ -19,7 +19,9 @@ import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import netscape.javascript.JSException;
 import netscape.javascript.JSObject;
+import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
@@ -137,12 +139,17 @@ class StudyBrowserWindow extends JFrame {
                     JSObject window = (JSObject) engine.executeScript("window");
                     JavaBridge bridge = new JavaBridge();
                     window.setMember("java", bridge);
-                    engine.executeScript(
-                            "console.error = function(message){java.error(message);};" +
+                    @Language("JavaScript")
+                    String script = "console.error = function(message){java.error(message);};" +
                             "console.warn = function(message){java.warn(message);};" +
-                            "console.info = function(message){java.info(message);};" +
-                            "console.debug = function(message){java.debug(message);};"
-                    );
+                            "console.log = function(message){java.log(message);};" +
+                            "console.debug = function(message){java.debug(message);};" +
+                            "window.addEventListener('error', function (e) {" +
+                            "       java.doError(e.filename, e.lineno, e.colno, e.message);" +
+                            "       return true;"+
+                            "   }" +
+                            ");";
+                    engine.executeScript(script);
                 });
     }
 
@@ -417,7 +424,13 @@ class StudyBrowserWindow extends JFrame {
     }
 
     void showLoadAnimation() {
-        Platform.runLater(() -> engine.executeScript("if (window.showLoadAnimation !== undefined) showLoadAnimation();"));
+        Platform.runLater(() -> {
+            try {
+                engine.executeScript("if (window.showLoadAnimation !== undefined) showLoadAnimation();");
+            } catch (JSException e) {
+                logger.error(e);
+            }
+        });
     }
 
     private class StudyLafManagerListener implements LafManagerListener {
@@ -431,14 +444,21 @@ class StudyBrowserWindow extends JFrame {
         public void log(String text) {
             logger.info("console: " + text);
         }
+
         public void error(String text) {
             logger.error("console: " + text);
         }
+
         public void warn(String text) {
             logger.warn("console: " + text);
         }
+
         public void debug(String text) {
             logger.debug("console: " + text);
+        }
+
+        public void doError(String filename, int lineno, int colno, String message) {
+            error("\nfilename: " + filename + "\nline: " + lineno + "\ncolumn: " + colno + "\nmessage: " + message);
         }
     }
 }
