@@ -398,6 +398,10 @@ class StudyBrowserWindow extends JFrame {
         this.panel = panel;
     }
 
+    void showLoadAnimation() {
+        Platform.runLater(() -> engine.executeScript("showLoadAnimation();"));
+    }
+
     private class StudyLafManagerListener implements LafManagerListener {
         @Override
         public void lookAndFeelChanged(LafManager manager) {

@@ -211,6 +211,8 @@ public class StudyToolWindow extends SimpleToolWindowPanel implements DataProvid
             return;
         }
 
+        browserWindow.showLoadAnimation();
+
         StepType stepType = stepNode.getType();
         if (stepType != VIDEO && stepType != CODE) {
             SwingUtilities.invokeLater(() -> rightPanel.setVisible(false));

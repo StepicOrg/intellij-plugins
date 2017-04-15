@@ -55,7 +55,7 @@
             <br>
 
             <#if !locked>
-                <input id="submit_button" type="submit" value="Evaluation"/>
+                <input id="submit_button" type="submit" value="Evaluation" onclick="showLoadAnimation()"/>
                 <#if status != "unchecked" && action == "submit">
                     <input type="submit" value="Reset" onclick="solve_again()"/>
                 </#if>
