@@ -1,4 +1,4 @@
-<#-- @ftlvariable name="status" type="java.lang.String" -->
+<#-- @ftlvariable name="action" type="java.lang.String" -->
 <#-- @ftlvariable name="disabled" type="java.lang.String" -->
 <#-- @ftlvariable name="stepNode" type="org.stepik.core.courseFormat.stepHelpers.DatasetQuizHelper" -->
 <#-- @ftlvariable name="text" type="java.lang.String" -->
@@ -31,7 +31,7 @@
 <#include "base.ftl">
 
 <@quiz_content>
-    <#if status != "" && status != "need_login">
+    <#if action != "get_first_attempt" && action != "need_login">
     <div id="time-left">5 minutes</div>
         <#assign dataset_url = stepNode.getDatasetUrl()/>
         <#assign reply_url = stepNode.getReplyUrl()/>
@@ -47,11 +47,9 @@
            data-content-type="application/txt" data-file-prefix="reply" data-file-ext=".txt">Download last submission
             dataset</a>
         </#if>
-        <#if status != "">
-        <textarea id="text" class="row" name="value"
-                  placeholder="Input your answer here" ${disabled!""}>${stepNode.getData()}</textarea>
-        </#if>
-        <#if status == "active" || status == "active_wrong">
+    <textarea id="text" class="row" name="value"
+              placeholder="Input your answer here" ${disabled!""}>${stepNode.getData()}</textarea>
+        <#if action == "submit">
         <input id="filename" type="submit" name="filename" value="Send file">
         </#if>
     <input id="isFromFile" type="hidden" name="isFromFile" value="false">
@@ -61,11 +59,8 @@
 <script>
     var time_left = ${stepNode.getTimeLeft()};
     var clock = document.getElementById("time-left");
-    <#if status == "active" || status == "active_wrong">
-    var active = true;
-    <#else>
-    var active = false;
-    </#if>
+    var action = ${action};
+    var active = action === "submit";
 
     if (active) {
         if (time_left > 0) {
@@ -77,9 +72,9 @@
             if (time_left <= 0) {
                 clearTimeout(timerId);
                 clock.innerHTML = "Time left (5 minutes)";
-                document.getElementById("text").setAttribute("readonly", true);
+                document.getElementById("text").setAttribute("readonly", "true");
                 document.getElementById("filename").setAttribute("type", "hidden");
-                document.getElementById("status").setAttribute("value", "timeLeft");
+                document.getElementById("action").setAttribute("value", "get_attempt");
                 updateSubmitCaption();
                 return;
             }

@@ -1,5 +1,5 @@
+<#-- @ftlvariable name="action" type="java.lang.String" -->
 <#-- @ftlvariable name="disabled" type="java.lang.String" -->
-<#-- @ftlvariable name="status" type="java.lang.String" -->
 <#-- @ftlvariable name="stepNode" type="org.stepik.core.courseFormat.stepHelpers.TableQuizHelper" -->
 <#-- @ftlvariable name="text" type="java.lang.String" -->
 
@@ -27,7 +27,7 @@
 <#include "base.ftl">
 
 <@quiz_content>
-    <#if status != "" && status != "need_login" >
+    <#if action != "get_first_attempt" && action != "need_login" >
     <table class="table">
         <tr>
             <th><b>${stepNode.getDescription()}</b></th>

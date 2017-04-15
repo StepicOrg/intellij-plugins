@@ -1,4 +1,4 @@
-<#-- @ftlvariable name="status" type="java.lang.String" -->
+<#-- @ftlvariable name="action" type="java.lang.String" -->
 <#-- @ftlvariable name="stepNode" type="org.stepik.core.courseFormat.stepHelpers.StepHelper" -->
 <#-- @ftlvariable name="text" type="java.lang.String" -->
 <style>
@@ -16,7 +16,7 @@
 
 <a href='${stepNode.getLink()}'>${stepNode.getLinkTitle()}</a><br>
 
-    <#if stepNode.isAdaptive() && status != "need_login">
+    <#if stepNode.isAdaptive() && action != "need_login">
     <div class="adaptive-buttons">
         <#assign lessonId = stepNode.getParent()?string("#")/>
         <a class="adaptive-button" href="adaptive:too_easy/${lessonId}">Lesson is too easy</a>

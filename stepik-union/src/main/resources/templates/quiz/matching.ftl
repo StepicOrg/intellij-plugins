@@ -1,18 +1,18 @@
-<#-- @ftlvariable name="ordering" type="java.util.List<org.stepik.api.objects.attempts.Pair>" -->
-<#-- @ftlvariable name="status" type="java.lang.String" -->
+<#-- @ftlvariable name="action" type="java.lang.String" -->
 <#-- @ftlvariable name="index" type="java.lang.Integer" -->
 <#-- @ftlvariable name="option" type="org.stepik.api.objects.attempts.Pair" -->
+<#-- @ftlvariable name="ordering" type="java.util.List<org.stepik.api.objects.attempts.Pair>" -->
 
 <#include "base_sorting.ftl"/>
 <@sorting_quiz>
-    <#if status != "" && status != "need_login">
+    <#if action != "get_first_attempt" && action != "need_login">
         <#list ordering as option>
         <div class="line">
             <div class="first">
                 <div>${option.getFirst()}</div>
             </div>
             <div class="second">
-                <#if status == "active" || status == "active_wrong">
+                <#if action == "submit">
                     <#include "arrows.ftl"/>
                 </#if>
                 <div class="textarea" id="option${index}">${option.getSecond()}</div>

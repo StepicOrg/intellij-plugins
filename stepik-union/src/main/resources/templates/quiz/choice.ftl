@@ -1,11 +1,11 @@
+<#-- @ftlvariable name="action" type="java.lang.String" -->
 <#-- @ftlvariable name="disabled" type="java.lang.String" -->
-<#-- @ftlvariable name="status" type="java.lang.String" -->
 <#-- @ftlvariable name="stepNode" type="org.stepik.core.courseFormat.stepHelpers.ChoiceQuizHelper" -->
 
 <#include "base.ftl">
 
 <@quiz_content>
-    <#if status != "" && status != "need_login" >
+    <#if action != "get_first_attempt" && action != "need_login" >
         <#assign index = 0 />
 
         <#assign type=stepNode.isMultipleChoice()?string("checkbox", "radio") />

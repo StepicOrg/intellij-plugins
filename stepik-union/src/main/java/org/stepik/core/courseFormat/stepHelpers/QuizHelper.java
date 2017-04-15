@@ -31,12 +31,18 @@ import static org.stepik.core.stepik.StepikConnectorLogin.getCurrentUser;
 public class QuizHelper extends StepHelper {
     private static final Logger logger = Logger.getInstance(QuizHelper.class);
     private static final String ACTIVE = "active";
-    private static final String ACTIVE_WRONG = "active_wrong";
+    private static final String GET_ATTEMPT = "get_attempt";
+    private static final String GET_FIRST_ATTEMPT = "get_first_attempt";
+    private static final String SUBMIT = "submit";
+    private static final String NEED_LOGIN = "need_login";
+    private static final String UNCHECKED = "unchecked";
     @NotNull
     Reply reply = new Reply();
     boolean useLastSubmission;
     @NotNull
-    private String status = "";
+    private String action = "get_first_attempt";
+    @NotNull
+    private String status = "unchecked";
     @NotNull
     private Attempt attempt = new Attempt();
     private int submissionsCount = -1;
@@ -55,10 +61,12 @@ public class QuizHelper extends StepHelper {
                 .execute();
         if (attempts.isEmpty()) {
             attempt = new Attempt();
+            action = GET_FIRST_ATTEMPT;
             return false;
         }
 
         attempt = attempts.getFirst();
+        action = ACTIVE.equals(attempt.getStatus()) ? SUBMIT : GET_ATTEMPT;
         return true;
     }
 
@@ -78,19 +86,16 @@ public class QuizHelper extends StepHelper {
         if (!submissions.isEmpty()) {
             submission = submissions.getFirst();
             reply = submission.getReply();
-            status = submission.getStatus();
-            if (ACTIVE.equals(attempt.getStatus())) {
-                if (submission.getAttempt() != attemptId) {
-                    status = ACTIVE;
-                } else if (status.equals("wrong")) {
-                    status = ACTIVE_WRONG;
-                }
+            if (attemptId == submission.getAttempt()) {
+                status = submission.getStatus();
+            }
+            if (ACTIVE.equals(attempt.getStatus()) && status.equals("correct")) {
+                action = GET_ATTEMPT;
             }
             getStepNode().setStatus(StudyStatus.of(status));
             return true;
         }
 
-        status = ACTIVE;
         return false;
     }
 
@@ -144,13 +149,14 @@ public class QuizHelper extends StepHelper {
         }
 
         onStartInit();
-        status = "";
+        status = UNCHECKED;
+        action = GET_FIRST_ATTEMPT;
 
         try {
             StepikApiClient stepikApiClient = authAndGetStepikApiClient();
             User user = getCurrentUser();
             if (user.isGuest()) {
-                status = "need_login";
+                action = NEED_LOGIN;
                 return;
             }
 
@@ -200,7 +206,7 @@ public class QuizHelper extends StepHelper {
                 StepikApiClient stepikApiClient = authAndGetStepikApiClient();
                 User user = getCurrentUser();
                 if (user.isGuest()) {
-                    status = "need_login";
+                    action = NEED_LOGIN;
                     return 0;
                 }
                 long userId = user.getId();
@@ -264,5 +270,11 @@ public class QuizHelper extends StepHelper {
             return 0;
         }
         return data.getMaxSubmissionsCount();
+    }
+
+    @NotNull
+    public String getAction() {
+        initStepOptions();
+        return action;
     }
 }

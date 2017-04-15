@@ -80,19 +80,15 @@ class FormListener implements EventListener {
             Elements elements = new Elements(form.getElements());
 
             try {
-                switch (elements.getStatus()) {
-                    case "":
-                    case "correct":
-                    case "wrong":
-                    case "timeLeft":
+                switch (elements.getAction()) {
+                    case "get_attempt":
                         boolean locked = elements.isLocked();
                         if (!locked) {
                             getAttempt(stepNode);
                             StepikProjectManager.updateSelection(project);
                         }
                         break;
-                    case "active":
-                    case "active_wrong":
+                    case "submit":
                         String typeStr = elements.getType();
                         StepType type = StepType.of(typeStr);
                         boolean isFromFile = elements.isFromFile();
@@ -339,8 +335,8 @@ class FormListener implements EventListener {
         }
 
         @NotNull
-        String getStatus() {
-            Node item = elements.namedItem("status");
+        String getAction() {
+            Node item = elements.namedItem("action");
             if (item instanceof HTMLInputElement) {
                 return ((HTMLInputElement) item).getValue();
             }

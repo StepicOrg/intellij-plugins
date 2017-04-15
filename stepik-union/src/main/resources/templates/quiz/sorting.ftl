@@ -1,14 +1,14 @@
 <#-- @ftlvariable name="ordering" type="java.util.List<com.intellij.openapi.util.Pair>" -->
-<#-- @ftlvariable name="status" type="java.lang.String" -->
+<#-- @ftlvariable name="action" type="java.lang.String" -->
 <#-- @ftlvariable name="index" type="java.lang.Integer" -->
 
 <#include "base_sorting.ftl"/>
 <@sorting_quiz>
-    <#if status != "" && status != "need_login" >
+    <#if action != "get_first_attempt" && action != "need_login" >
         <#list ordering as option>
         <div class="line">
             <div class="second">
-                <#if status == "active" || status == "active_wrong">
+                <#if action == "submit">
                     <#include "arrows.ftl"/>
                 </#if>
                 <div class="textarea" id="option${index}">${option.getSecond()}</div>
