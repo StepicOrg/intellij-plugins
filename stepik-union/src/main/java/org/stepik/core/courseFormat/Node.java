@@ -11,7 +11,6 @@ import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.StudyObject;
 import org.stepik.api.objects.progresses.Progresses;
-import org.stepik.core.stepik.StepikConnectorLogin;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,6 +20,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import static org.stepik.core.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
+import static org.stepik.core.stepik.StepikConnectorLogin.isAuthenticated;
 
 /**
  * @author meanmail
@@ -44,9 +46,9 @@ abstract class Node<
     Node() {
     }
 
-    Node(@NotNull Project project, @NotNull D data) {
+    Node(@NotNull Project project, @NotNull StepikApiClient stepikApiClient, @NotNull D data) {
         setData(data);
-        init(project, null);
+        init(project, stepikApiClient, null);
     }
 
     @Nullable
@@ -231,16 +233,16 @@ abstract class Node<
         return children;
     }
 
-    protected abstract List<DC> getChildDataList();
+    protected abstract List<DC> getChildDataList(@NotNull StepikApiClient stepikApiClient);
 
     @Override
-    public void init(@NotNull Project project, @Nullable StudyNode parent) {
+    public void init(@NotNull Project project, @NotNull StepikApiClient stepikApiClient, @Nullable StudyNode parent) {
         this.project = project;
         setParent(parent);
         Map<Long, C> mapNodes = getMapNodes();
         List<C> processed = new ArrayList<>();
 
-        for (DC data : getChildDataList()) {
+        for (DC data : getChildDataList(stepikApiClient)) {
             C child = mapNodes.get(data.getId());
             if (child == null) {
                 try {
@@ -262,20 +264,20 @@ abstract class Node<
         wasDeletedList.forEach(child -> child.setWasDeleted(true));
 
         for (StudyNode child : getChildren()) {
-            child.init(project, this);
+            child.init(project, stepikApiClient, this);
         }
     }
 
     @Override
-    public void reloadData(@NotNull Project project) {
-        if (loadData(data.getId())) {
-            init(project);
+    public void reloadData(@NotNull Project project, @NotNull StepikApiClient stepikApiClient) {
+        if (loadData(stepikApiClient, data.getId())) {
+            init(project, stepikApiClient);
         } else {
             setProject(project);
         }
     }
 
-    protected abstract boolean loadData(long id);
+    protected abstract boolean loadData(@NotNull StepikApiClient stepikApiClient, long id);
 
     protected abstract Class<C> getChildClass();
 
@@ -317,6 +319,12 @@ abstract class Node<
                             String[] list = progressIds.toArray(new String[size]);
                             int start = 0;
                             int end;
+
+                            StepikApiClient stepikApiClient = authAndGetStepikApiClient();
+                            if (!isAuthenticated()) {
+                                return;
+                            }
+
                             while (start < size) {
                                 end = start + 20;
                                 if (end > size) {
@@ -324,8 +332,6 @@ abstract class Node<
                                 }
                                 String[] part = Arrays.copyOfRange(list, start, end);
                                 start = end;
-
-                                StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
 
                                 Progresses progresses = stepikApiClient.progresses()
                                         .get()

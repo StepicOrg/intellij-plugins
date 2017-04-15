@@ -12,18 +12,18 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.refactoring.move.moveFilesOrDirectories.MoveFilesOrDirectoriesUtil;
-import org.stepik.core.StudyUtils;
-import org.stepik.core.SupportedLanguages;
-import org.stepik.core.core.EduNames;
-import org.stepik.core.courseFormat.StepNode;
-import org.stepik.core.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.submissions.Submission;
 import org.stepik.api.objects.submissions.Submissions;
+import org.stepik.api.objects.users.User;
 import org.stepik.api.queries.Order;
+import org.stepik.core.StudyUtils;
+import org.stepik.core.SupportedLanguages;
+import org.stepik.core.core.EduNames;
+import org.stepik.core.courseFormat.StepNode;
 import org.stepik.core.metrics.Metrics;
 
 import java.io.IOException;
@@ -31,6 +31,8 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
+import static org.stepik.core.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
+import static org.stepik.core.stepik.StepikConnectorLogin.getCurrentUser;
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreatePsiDirectory;
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcPsiDirectory;
 
@@ -164,24 +166,26 @@ public class ProgrammingLanguageUtils {
                             file[0] = parent.createChildData(null, fileName);
                             String template = null;
                             try {
-                                StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
-                                long userId = StepikConnectorLogin.getCurrentUser().getId();
-                                Submissions submissions = stepikApiClient.submissions()
-                                        .get()
-                                        .user(userId)
-                                        .order(Order.DESC)
-                                        .step(stepNode.getId())
-                                        .execute();
+                                StepikApiClient stepikApiClient = authAndGetStepikApiClient();
+                                User user = getCurrentUser();
+                                if (!user.isGuest()) {
+                                    Submissions submissions = stepikApiClient.submissions()
+                                            .get()
+                                            .user(user.getId())
+                                            .order(Order.DESC)
+                                            .step(stepNode.getId())
+                                            .execute();
 
-                                if (!submissions.isEmpty()) {
-                                    Optional<Submission> lastSubmission = submissions.getItems()
-                                            .stream()
-                                            .filter(submission -> SupportedLanguages.langOfName(submission.getReply()
-                                                    .getLanguage()) == language)
-                                            .limit(1)
-                                            .findFirst();
-                                    if (lastSubmission.isPresent()) {
-                                        template = lastSubmission.get().getReply().getCode();
+                                    if (!submissions.isEmpty()) {
+                                        Optional<Submission> lastSubmission = submissions.getItems()
+                                                .stream()
+                                                .filter(submission -> SupportedLanguages.langOfName(submission.getReply()
+                                                        .getLanguage()) == language)
+                                                .limit(1)
+                                                .findFirst();
+                                        if (lastSubmission.isPresent()) {
+                                            template = lastSubmission.get().getReply().getCode();
+                                        }
                                     }
                                 }
                             } catch (StepikClientException e) {

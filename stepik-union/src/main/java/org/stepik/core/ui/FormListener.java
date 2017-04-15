@@ -41,15 +41,19 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
+import static org.stepik.core.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
 
 class FormListener implements EventListener {
     static final String EVENT_TYPE_SUBMIT = "submit";
     private static final Logger logger = Logger.getInstance(FormListener.class);
+    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Project project;
 
     FormListener(@NotNull Project project) {
@@ -101,6 +105,12 @@ class FormListener implements EventListener {
                             sendStep(stepNode, elements, type, attemptId, data);
                         }
                         break;
+                    case "need_login":
+                        executor.execute(() -> {
+                            StepikConnectorLogin.authentication(true);
+                            StepikProjectManager.updateSelection(project);
+                        });
+                        break;
                     default:
                         return;
                 }
@@ -133,7 +143,7 @@ class FormListener implements EventListener {
     }
 
     private void getAttempt(@NotNull StepNode node) {
-        StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
+        StepikApiClient stepikApiClient = authAndGetStepikApiClient(true);
 
         stepikApiClient.attempts()
                 .post()
@@ -155,7 +165,7 @@ class FormListener implements EventListener {
                 indicator.setIndeterminate(true);
 
                 try {
-                    StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
+                    StepikApiClient stepikApiClient = authAndGetStepikApiClient(true);
 
                     StepikSubmissionsPostQuery query = stepikApiClient.submissions()
                             .post()

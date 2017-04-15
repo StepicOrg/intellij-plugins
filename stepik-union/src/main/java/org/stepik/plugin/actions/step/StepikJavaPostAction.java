@@ -17,7 +17,6 @@ import org.stepik.core.SupportedLanguages;
 import org.stepik.core.courseFormat.StepNode;
 import org.stepik.core.courseFormat.StudyNode;
 import org.stepik.core.metrics.Metrics;
-import org.stepik.core.stepik.StepikConnectorLogin;
 import org.stepik.core.utils.Utils;
 import org.stepik.plugin.actions.ActionUtils;
 import org.stepik.plugin.actions.SendAction;
@@ -27,6 +26,8 @@ import static org.stepik.core.metrics.MetricsStatus.DATA_NOT_LOADED;
 import static org.stepik.core.metrics.MetricsStatus.FAILED_POST;
 import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
 import static org.stepik.core.metrics.MetricsStatus.USER_CANCELED;
+import static org.stepik.core.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
+import static org.stepik.core.stepik.StepikConnectorLogin.isAuthenticated;
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
 
 public class StepikJavaPostAction extends StudyCheckAction {
@@ -42,7 +43,10 @@ public class StepikJavaPostAction extends StudyCheckAction {
 
         logger.info(String.format("Start sending step: id=%s", stepId));
 
-        StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
+        StepikApiClient stepikApiClient = authAndGetStepikApiClient(true);
+        if (!isAuthenticated()) {
+            return null;
+        }
 
         Long intAttemptId = getAttemptId(project, stepikApiClient, stepNode);
         if (intAttemptId == null) {

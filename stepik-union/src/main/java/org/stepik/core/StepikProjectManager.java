@@ -29,6 +29,7 @@ import org.jdom.input.DOMBuilder;
 import org.jdom.output.XMLOutputter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.objects.StudyObject;
 import org.stepik.api.objects.courses.Course;
 import org.stepik.api.objects.lessons.CompoundUnitLesson;
@@ -63,6 +64,8 @@ import java.io.OutputStreamWriter;
 import java.util.UUID;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.stepik.core.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
+import static org.stepik.core.stepik.StepikConnectorLogin.isAuthenticated;
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
 
 @State(name = "StepikStudySettings", storages = @Storage("stepik_study_project.xml"))
@@ -313,8 +316,11 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
         root.setProject(project);
 
         new Thread(() -> {
-            root.reloadData(project);
-            ProgressManager.getInstance().run(new Task.Backgroundable(project, "Synchronize project") {
+            StepikApiClient stepikApiClient = authAndGetStepikApiClient();
+            if (isAuthenticated()) {
+                root.reloadData(project, stepikApiClient);
+            }
+            ProgressManager.getInstance().run(new Task.Backgroundable(project, "Synchronize Project") {
                 @Override
                 public void run(@NotNull ProgressIndicator indicator) {
                     repairProjectFiles(root);

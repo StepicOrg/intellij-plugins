@@ -59,6 +59,7 @@ import java.util.regex.Pattern;
 import static org.stepik.api.objects.recommendations.ReactionValues.SOLVED;
 import static org.stepik.api.objects.recommendations.ReactionValues.TOO_EASY;
 import static org.stepik.api.objects.recommendations.ReactionValues.TOO_HARD;
+import static org.stepik.core.stepik.StepikConnectorLogin.getCurrentUser;
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
 
 class StudyBrowserWindow extends JFrame {
@@ -290,8 +291,11 @@ class StudyBrowserWindow extends JFrame {
                     }
 
                     try {
-                        StepikApiClient stepikClient = StepikConnectorLogin.authAndGetStepikApiClient();
-                        User user = StepikConnectorLogin.getCurrentUser();
+                        StepikApiClient stepikClient = StepikConnectorLogin.authAndGetStepikApiClient(true);
+                        User user = getCurrentUser();
+                        if (user.isGuest()) {
+                            return;
+                        }
                         stepikClient.recommendationReactions()
                                 .post()
                                 .user(user.getId())

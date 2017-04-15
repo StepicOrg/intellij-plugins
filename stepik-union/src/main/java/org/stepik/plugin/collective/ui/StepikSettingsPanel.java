@@ -27,7 +27,7 @@ class StepikSettingsPanel {
         });
 
         loginButton.addActionListener(e -> {
-            StepikConnectorLogin.authentication();
+            StepikConnectorLogin.authentication(true);
             updateUserName();
         });
     }

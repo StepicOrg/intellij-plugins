@@ -4,16 +4,15 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
-import org.stepik.core.StepikProjectManager;
-import org.stepik.core.SupportedLanguages;
-import org.stepik.core.courseFormat.StudyNode;
-import org.stepik.core.courseFormat.StudyNodeFactory;
-import org.stepik.core.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.StudyObject;
 import org.stepik.api.objects.courses.Course;
+import org.stepik.core.StepikProjectManager;
+import org.stepik.core.SupportedLanguages;
+import org.stepik.core.courseFormat.StudyNode;
+import org.stepik.core.courseFormat.StudyNodeFactory;
 import org.stepik.core.metrics.Metrics;
 
 import java.util.ArrayList;
@@ -25,6 +24,8 @@ import java.util.stream.Collectors;
 import static org.stepik.core.metrics.MetricsStatus.DATA_NOT_LOADED;
 import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
 import static org.stepik.core.metrics.MetricsStatus.TARGET_NOT_FOUND;
+import static org.stepik.core.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
+import static org.stepik.core.stepik.StepikConnectorLogin.getCurrentUser;
 
 public class StepikProjectGenerator {
     public static final StudyObject EMPTY_STUDY_OBJECT = initEmptyStudyNode();
@@ -58,7 +59,7 @@ public class StepikProjectGenerator {
         List<Long> coursesIds = getHardcodedCoursesId(programmingLanguage);
 
         if (!coursesIds.isEmpty()) {
-            StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
+            StepikApiClient stepikApiClient = authAndGetStepikApiClient(true);
             try {
                 courses = stepikApiClient.courses()
                         .get()
@@ -129,8 +130,9 @@ public class StepikProjectGenerator {
                     ProgressIndicator indicator = ProgressManager.getInstance().getProgressIndicator();
                     indicator.setIndeterminate(true);
 
-                    projectRoot = StudyNodeFactory.createTree(project, data);
-                }, "Creating project", true, project);
+                    StepikApiClient stepikApiClient = authAndGetStepikApiClient(true);
+                    projectRoot = StudyNodeFactory.createTree(project, stepikApiClient, data);
+                }, "Creating Project", true, project);
     }
 
     public void generateProject(@NotNull Project project) {
@@ -141,7 +143,7 @@ public class StepikProjectGenerator {
         }
         stepikProjectManager.setRootNode(projectRoot);
         stepikProjectManager.setDefaultLang(getDefaultLang());
-        stepikProjectManager.setCreatedBy(StepikConnectorLogin.getCurrentUser().getId());
+        stepikProjectManager.setCreatedBy(getCurrentUser().getId());
         Metrics.createProject(project, SUCCESSFUL);
     }
 

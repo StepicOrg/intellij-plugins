@@ -13,12 +13,9 @@ import org.stepik.api.objects.sections.Sections;
 import org.stepik.api.objects.steps.Step;
 import org.stepik.api.objects.steps.Steps;
 import org.stepik.core.core.EduNames;
-import org.stepik.core.stepik.StepikConnectorLogin;
 
 import java.util.Collections;
 import java.util.List;
-
-import static org.stepik.core.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
 
 public class LessonNode extends Node<CompoundUnitLesson, StepNode, Step, StepNode> {
     private static final Logger logger = Logger.getInstance(LessonNode.class);
@@ -27,16 +24,17 @@ public class LessonNode extends Node<CompoundUnitLesson, StepNode, Step, StepNod
     public LessonNode() {
     }
 
-    public LessonNode(@NotNull Project project, @NotNull CompoundUnitLesson data) {
-        super(project, data);
+    public LessonNode(
+            @NotNull Project project,
+            @NotNull StepikApiClient stepikApiClient,
+            @NotNull CompoundUnitLesson data) {
+        super(project, stepikApiClient, data);
     }
 
     @Override
-    protected List<Step> getChildDataList() {
+    protected List<Step> getChildDataList(@NotNull StepikApiClient stepikApiClient) {
         Steps steps = new Steps();
         try {
-            StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
-
             CompoundUnitLesson data = getData();
             List<Long> stepsIds = data != null ? data.getLesson().getSteps() : Collections.emptyList();
 
@@ -54,13 +52,13 @@ public class LessonNode extends Node<CompoundUnitLesson, StepNode, Step, StepNod
     }
 
     @Override
-    public void init(@NotNull Project project, @Nullable StudyNode parent) {
+    public void init(@NotNull Project project, @NotNull StepikApiClient stepikApiClient, @Nullable StudyNode parent) {
         courseId = 0;
-        super.init(project, parent);
+        super.init(project, stepikApiClient, parent);
     }
 
     @Override
-    protected boolean loadData(long id) {
+    protected boolean loadData(@NotNull StepikApiClient stepikApiClient, long id) {
         try {
             CompoundUnitLesson data = getData();
             if (data == null) {
@@ -69,7 +67,6 @@ public class LessonNode extends Node<CompoundUnitLesson, StepNode, Step, StepNod
 
             String updateDate = data.getUpdateDate();
 
-            StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
             Lessons lessons = stepikApiClient.lessons()
                     .get()
                     .id(id)
@@ -103,10 +100,10 @@ public class LessonNode extends Node<CompoundUnitLesson, StepNode, Step, StepNod
     }
 
     @Override
-    public long getCourseId() {
+    public long getCourseId(@NotNull StepikApiClient stepikApiClient) {
         StudyNode parent = getParent();
         if (parent != null) {
-            return parent.getCourseId();
+            return parent.getCourseId(stepikApiClient);
         }
 
         if (courseId != 0) {
@@ -120,8 +117,6 @@ public class LessonNode extends Node<CompoundUnitLesson, StepNode, Step, StepNod
         }
 
         try {
-            StepikApiClient stepikApiClient = authAndGetStepikApiClient();
-
             Sections sections = stepikApiClient.sections()
                     .get()
                     .id(sectionId)

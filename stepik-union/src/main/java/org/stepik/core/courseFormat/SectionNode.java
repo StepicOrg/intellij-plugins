@@ -12,7 +12,6 @@ import org.stepik.api.objects.sections.Sections;
 import org.stepik.api.objects.units.Unit;
 import org.stepik.api.objects.units.Units;
 import org.stepik.core.core.EduNames;
-import org.stepik.core.stepik.StepikConnectorLogin;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,14 +30,13 @@ public class SectionNode extends Node<Section, LessonNode, CompoundUnitLesson, S
     public SectionNode() {
     }
 
-    public SectionNode(@NotNull Project project, @NotNull Section data) {
-        super(project, data);
+    public SectionNode(@NotNull Project project, @NotNull StepikApiClient stepikApiClient, @NotNull Section data) {
+        super(project, stepikApiClient, data);
     }
 
     @Override
-    protected boolean loadData(long id) {
+    protected boolean loadData(@NotNull StepikApiClient stepikApiClient, long id) {
         try {
-            StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
             Sections sections = stepikApiClient.sections()
                     .get()
                     .id(id)
@@ -73,7 +71,7 @@ public class SectionNode extends Node<Section, LessonNode, CompoundUnitLesson, S
     }
 
     @Override
-    public long getCourseId() {
+    public long getCourseId(@NotNull StepikApiClient stepikApiClient) {
         Section data = getData();
         return data != null ? getData().getCourse() : 0;
     }
@@ -90,11 +88,9 @@ public class SectionNode extends Node<Section, LessonNode, CompoundUnitLesson, S
     }
 
     @Override
-    protected List<CompoundUnitLesson> getChildDataList() {
+    protected List<CompoundUnitLesson> getChildDataList(@NotNull StepikApiClient stepikApiClient) {
         List<CompoundUnitLesson> objects = new ArrayList<>();
         try {
-            StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
-
             List<Long> unitsIds;
             Section data = getData();
             unitsIds = data != null ? data.getUnits() : Collections.emptyList();

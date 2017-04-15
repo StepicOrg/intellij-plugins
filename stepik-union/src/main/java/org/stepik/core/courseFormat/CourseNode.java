@@ -12,12 +12,11 @@ import org.stepik.api.objects.sections.Section;
 import org.stepik.api.objects.sections.Sections;
 import org.stepik.api.objects.users.User;
 import org.stepik.api.objects.users.Users;
-import org.stepik.core.stepik.StepikConnectorLogin;
 
 import java.util.Collections;
 import java.util.List;
 
-import static org.stepik.core.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
+import static org.stepik.core.stepik.StepikConnectorLogin.isAuthenticated;
 
 public class CourseNode extends Node<Course, SectionNode, Section, LessonNode> {
     private static final Logger logger = Logger.getInstance(CourseNode.class);
@@ -26,15 +25,14 @@ public class CourseNode extends Node<Course, SectionNode, Section, LessonNode> {
     public CourseNode() {
     }
 
-    public CourseNode(@NotNull Project project, @NotNull Course data) {
-        super(project, data);
+    public CourseNode(@NotNull Project project, @NotNull StepikApiClient stepikApiClient, @NotNull Course data) {
+        super(project, stepikApiClient, data);
     }
 
     @Override
-    protected List<Section> getChildDataList() {
+    protected List<Section> getChildDataList(@NotNull StepikApiClient stepikApiClient) {
         Sections sections = new Sections();
         try {
-            StepikApiClient stepikApiClient = authAndGetStepikApiClient();
             Course data = getData();
             List<Long> sectionsIds = data != null ? getData().getSections() : Collections.emptyList();
             if (!sectionsIds.isEmpty()) {
@@ -53,15 +51,14 @@ public class CourseNode extends Node<Course, SectionNode, Section, LessonNode> {
     }
 
     @Override
-    public void init(@NotNull Project project, @Nullable StudyNode parent) {
+    public void init(@NotNull Project project, @NotNull StepikApiClient stepikApiClient, @Nullable StudyNode parent) {
         authors = null;
-        super.init(project, parent);
+        super.init(project, stepikApiClient, parent);
     }
 
     @Override
-    protected boolean loadData(long id) {
+    protected boolean loadData(@NotNull StepikApiClient stepikApiClient, long id) {
         try {
-            StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
             Courses courses = stepikApiClient.courses()
                     .get()
                     .id(id)
@@ -102,14 +99,17 @@ public class CourseNode extends Node<Course, SectionNode, Section, LessonNode> {
 
     @SuppressWarnings("unused")
     @NotNull
-    public List<User> getAuthors() {
+    public List<User> getAuthors(@NotNull StepikApiClient stepikApiClient) {
         if (authors == null) {
             List<Long> authorsIds;
             Course data = getData();
             authorsIds = data != null ? data.getAuthors() : Collections.emptyList();
             if (!authorsIds.isEmpty()) {
                 try {
-                    Users users = authAndGetStepikApiClient().users()
+                    if (!isAuthenticated()) {
+                        return Collections.emptyList();
+                    }
+                    Users users = stepikApiClient.users()
                             .get()
                             .id(authorsIds)
                             .execute();
@@ -123,7 +123,7 @@ public class CourseNode extends Node<Course, SectionNode, Section, LessonNode> {
     }
 
     @Override
-    public long getCourseId() {
+    public long getCourseId(@NotNull StepikApiClient stepikApiClient) {
         return getId();
     }
 }

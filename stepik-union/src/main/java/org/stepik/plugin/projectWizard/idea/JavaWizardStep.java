@@ -5,11 +5,11 @@ import com.intellij.ide.wizard.CommitStepException;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
-import org.stepik.core.SupportedLanguages;
-import org.stepik.core.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.api.objects.StudyObject;
+import org.stepik.core.SupportedLanguages;
 import org.stepik.core.projectWizard.ProjectWizardUtils;
+import org.stepik.core.stepik.StepikConnectorLogin;
 import org.stepik.plugin.projectWizard.StepikProjectGenerator;
 import org.stepik.plugin.projectWizard.ui.ProjectSettingsPanel;
 
@@ -41,7 +41,7 @@ class JavaWizardStep extends ModuleWizardStep {
 
     @Override
     public void updateStep() {
-        StepikConnectorLogin.authentication();
+        StepikConnectorLogin.authentication(true);
         panel.updateStep();
         valid = false;
         leaving = false;

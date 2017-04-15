@@ -1,7 +1,6 @@
 package org.stepik.plugin.auth.ui;
 
 import com.intellij.icons.AllIcons;
-import org.stepik.core.stepik.StepikConnectorLogin;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -23,6 +22,7 @@ import javafx.scene.web.WebHistory;
 import javafx.scene.web.WebView;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.api.urls.Urls;
+import org.stepik.core.stepik.StepikConnectorLogin;
 import org.stepik.core.templates.Templater;
 
 import javax.swing.*;
@@ -167,6 +167,7 @@ public class AuthDialog extends JDialog {
                                 hide();
                                 return;
                             } else if ((Urls.STEPIK_URL + "/?error=access_denied").equals(location)) {
+                                map.put("error", "access_denied");
                                 hide();
                                 return;
                             }

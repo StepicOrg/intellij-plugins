@@ -3,20 +3,22 @@ package org.stepik.core.metrics;
 import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
-import org.stepik.core.StepikProjectManager;
-import org.stepik.core.courseFormat.StepNode;
-import org.stepik.core.courseFormat.StepType;
-import org.stepik.core.courseFormat.StudyNode;
-import org.stepik.core.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.metrics.Metric;
 import org.stepik.api.queries.metrics.StepikMetricsPostQuery;
+import org.stepik.core.StepikProjectManager;
+import org.stepik.core.courseFormat.StepNode;
+import org.stepik.core.courseFormat.StepType;
+import org.stepik.core.courseFormat.StudyNode;
 import org.stepik.core.utils.PluginUtils;
 import org.stepik.core.utils.Utils;
 
 import java.util.UUID;
+
+import static org.stepik.core.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
+import static org.stepik.core.stepik.StepikConnectorLogin.isAuthenticated;
 
 /**
  * @author meanmail
@@ -32,7 +34,10 @@ public class Metrics {
         new Thread(() -> {
             StepikMetricsPostQuery query = null;
             try {
-                StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
+                StepikApiClient stepikApiClient = authAndGetStepikApiClient();
+                if (!isAuthenticated()) {
+                    return;
+                }
 
                 query = stepikApiClient.metrics()
                         .post()
@@ -60,7 +65,7 @@ public class Metrics {
                         query.tags("project_root_class", projectRootClass.getSimpleName())
                                 .data("project_root_id", projectRoot.getId());
 
-                        query.data("course_id", projectRoot.getCourseId());
+                        query.data("course_id", projectRoot.getCourseId(stepikApiClient));
                     }
                 }
 

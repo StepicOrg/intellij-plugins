@@ -20,12 +20,6 @@ import com.intellij.openapi.ui.popup.JBPopupListener;
 import com.intellij.openapi.ui.popup.LightweightWindowEvent;
 import com.intellij.openapi.ui.popup.PopupChooserBuilder;
 import com.intellij.openapi.vfs.VirtualFile;
-import org.stepik.core.StepikProjectManager;
-import org.stepik.core.SupportedLanguages;
-import org.stepik.core.courseFormat.StepNode;
-import org.stepik.core.courseFormat.StudyNode;
-import org.stepik.core.courseFormat.StudyStatus;
-import org.stepik.core.stepik.StepikConnectorLogin;
 import icons.AllStepikIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -34,6 +28,11 @@ import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.submissions.Submission;
 import org.stepik.api.objects.submissions.Submissions;
 import org.stepik.api.queries.Order;
+import org.stepik.core.StepikProjectManager;
+import org.stepik.core.SupportedLanguages;
+import org.stepik.core.courseFormat.StepNode;
+import org.stepik.core.courseFormat.StudyNode;
+import org.stepik.core.courseFormat.StudyStatus;
 import org.stepik.core.metrics.Metrics;
 import org.stepik.core.utils.Utils;
 
@@ -51,6 +50,9 @@ import static org.stepik.core.metrics.MetricsStatus.EMPTY_SOURCE;
 import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
 import static org.stepik.core.metrics.MetricsStatus.TARGET_NOT_FOUND;
 import static org.stepik.core.metrics.MetricsStatus.USER_CANCELED;
+import static org.stepik.core.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
+import static org.stepik.core.stepik.StepikConnectorLogin.getCurrentUser;
+import static org.stepik.core.stepik.StepikConnectorLogin.isAuthenticated;
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
 
 /**
@@ -99,6 +101,11 @@ public class DownloadSubmission extends AbstractStepAction {
 
         String title = "Download submission";
 
+        StepikApiClient stepikApiClient = authAndGetStepikApiClient(true);
+        if (!isAuthenticated()) {
+            return;
+        }
+
         List<Submission> submissions = ProgressManager.getInstance()
                 .run(new Task.WithResult<List<Submission>, RuntimeException>(project, title, true) {
                     @Override
@@ -109,7 +116,7 @@ public class DownloadSubmission extends AbstractStepAction {
                         String lessonName = parent != null ? parent.getName() : "";
                         progressIndicator.setText(lessonName);
                         progressIndicator.setText2(stepNode.getName());
-                        List<Submission> submissions = getSubmissions(stepNode);
+                        List<Submission> submissions = getSubmissions(stepikApiClient, stepNode);
 
                         if (Utils.isCanceled()) {
                             Metrics.downloadAction(project, stepNode, USER_CANCELED);
@@ -135,12 +142,12 @@ public class DownloadSubmission extends AbstractStepAction {
     }
 
     @Nullable
-    private List<Submission> getSubmissions(@NotNull StepNode stepNode) {
+    private List<Submission> getSubmissions(
+            @NotNull StepikApiClient stepikApiClient,
+            @NotNull StepNode stepNode) {
         try {
-            StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
-
             long stepId = stepNode.getId();
-            long userId = StepikConnectorLogin.getCurrentUser().getId();
+            long userId = getCurrentUser().getId();
 
             Submissions submissions = stepikApiClient.submissions()
                     .get()

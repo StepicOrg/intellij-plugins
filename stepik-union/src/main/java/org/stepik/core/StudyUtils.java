@@ -12,13 +12,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.exceptions.StepikClientException;
+import org.stepik.api.objects.StudyObject;
 import org.stepik.api.objects.recommendations.Recommendation;
 import org.stepik.api.objects.recommendations.Recommendations;
 import org.stepik.api.objects.steps.Step;
 import org.stepik.api.objects.steps.Steps;
 import org.stepik.core.courseFormat.StudyNode;
 import org.stepik.core.courseFormat.stepHelpers.StepHelper;
-import org.stepik.core.stepik.StepikConnectorLogin;
 import org.stepik.core.templates.Templater;
 import org.stepik.core.ui.StudyToolWindow;
 import org.stepik.core.ui.StudyToolWindowFactory;
@@ -28,6 +28,9 @@ import javax.swing.*;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static org.stepik.core.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
+import static org.stepik.core.stepik.StepikConnectorLogin.isAuthenticated;
 
 public class StudyUtils {
     private static final Logger logger = Logger.getInstance(StudyUtils.class);
@@ -150,9 +153,17 @@ public class StudyUtils {
 
     @Nullable
     public static StudyNode<?, ?> getRecommendation(@NotNull StudyNode root) {
-        StepikApiClient stepikClient = StepikConnectorLogin.authAndGetStepikApiClient();
+        StudyObject data = root.getData();
+        if (data == null || !data.isAdaptive()) {
+            return null;
+        }
+
         StudyNode studyNode = null;
         try {
+            StepikApiClient stepikClient = authAndGetStepikApiClient();
+            if (!isAuthenticated()) {
+                return null;
+            }
             Recommendations recommendations = stepikClient.recommendations()
                     .get()
                     .course(root.getId())

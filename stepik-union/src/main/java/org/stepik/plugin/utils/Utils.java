@@ -14,11 +14,11 @@ import org.stepik.api.objects.sections.Section;
 import org.stepik.api.objects.sections.Sections;
 import org.stepik.api.objects.units.Unit;
 import org.stepik.api.objects.units.Units;
-import org.stepik.core.stepik.StepikConnectorLogin;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.stepik.core.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
 import static org.stepik.plugin.projectWizard.StepikProjectGenerator.EMPTY_STUDY_OBJECT;
 
 /**
@@ -88,7 +88,7 @@ public class Utils {
         Unit unit = unitLesson.getUnit();
 
         if (unit.getId() != 0) {
-            StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
+            StepikApiClient stepikApiClient = authAndGetStepikApiClient(true);
             Section section = getSectionStudyObject(unit.getSection(), stepikApiClient);
 
             if (section != null) {
@@ -101,7 +101,7 @@ public class Utils {
 
     @NotNull
     private static CompoundUnitLesson getCompoundUnitLessonStudyObject(long lessonId, long unitId) {
-        StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
+        StepikApiClient stepikApiClient = authAndGetStepikApiClient(true);
 
         Units units = null;
 
@@ -162,7 +162,7 @@ public class Utils {
 
     @NotNull
     private static StudyObject getCourseStudyObject(long id) {
-        StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
+        StepikApiClient stepikApiClient = authAndGetStepikApiClient(true);
         Course course = getCourse(id, stepikApiClient);
         return course != null ? course : EMPTY_STUDY_OBJECT;
     }

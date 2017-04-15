@@ -18,13 +18,13 @@ import org.stepik.core.courseFormat.StepType;
 import org.stepik.core.courseFormat.StudyStatus;
 import org.stepik.core.metrics.Metrics;
 import org.stepik.core.metrics.MetricsStatus;
-import org.stepik.core.stepik.StepikConnectorLogin;
 import org.stepik.core.utils.Utils;
 
 import static org.stepik.core.courseFormat.StudyStatus.SOLVED;
 import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
 import static org.stepik.core.metrics.MetricsStatus.TIME_OVER;
 import static org.stepik.core.metrics.MetricsStatus.USER_CANCELED;
+import static org.stepik.core.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
 
 /**
  * @author meanmail
@@ -42,7 +42,7 @@ public class SendAction {
             @NotNull ProgressIndicator indicator) {
         String stepIdString = "id=" + stepNode.getId();
         logger.info("Started check a status for step: " + stepIdString);
-        StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
+        StepikApiClient stepikApiClient = authAndGetStepikApiClient(true);
         String stepStatus = EVALUATION;
         int timer = 0;
         String hint;
