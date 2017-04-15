@@ -14,9 +14,8 @@
 <#include "base.ftl">
 
 <@quiz_content>
-    <#if status != "">
+    <#if status != "" && status != "need_login" >
     <input id="text" type="text" name="value" placeholder="Input your answer here" ${disabled!""}
            value="${stepNode.getNumber()}"/>
     </#if>
-
 </@quiz_content>

@@ -31,34 +31,37 @@
 <#include "base.ftl">
 
 <@quiz_content>
-<div id="time-left">5 minutes</div>
-    <#assign dataset_url = stepNode.getDatasetUrl()/>
-    <#assign reply_url = stepNode.getReplyUrl()/>
+    <#if status != "" && status != "need_login">
+    <div id="time-left">5 minutes</div>
+        <#assign dataset_url = stepNode.getDatasetUrl()/>
+        <#assign reply_url = stepNode.getReplyUrl()/>
 
-    <#if dataset_url != "">
-    <a class="dataset-url" href="inner:${stepNode.getBaseUrl()}${dataset_url}" data-step-path="${stepNode.getPath()}"
-       data-content-type="application/txt" data-file-prefix="dataset" data-file-ext=".txt">Download dataset</a>
-    </#if>
+        <#if dataset_url != "">
+        <a class="dataset-url" href="inner:${stepNode.getBaseUrl()}${dataset_url}"
+           data-step-path="${stepNode.getPath()}"
+           data-content-type="application/txt" data-file-prefix="dataset" data-file-ext=".txt">Download dataset</a>
+        </#if>
 
-    <#if reply_url != "" >
-    <a class="dataset-url" href="inner:${stepNode.getBaseUrl()}${reply_url}" data-step-path="${stepNode.getPath()}"
-       data-content-type="application/txt" data-file-prefix="reply" data-file-ext=".txt">Download last submission
-        dataset</a>
+        <#if reply_url != "" >
+        <a class="dataset-url" href="inner:${stepNode.getBaseUrl()}${reply_url}" data-step-path="${stepNode.getPath()}"
+           data-content-type="application/txt" data-file-prefix="reply" data-file-ext=".txt">Download last submission
+            dataset</a>
+        </#if>
+        <#if status != "">
+        <textarea id="text" class="row" name="value"
+                  placeholder="Input your answer here" ${disabled!""}>${stepNode.getData()}</textarea>
+        </#if>
+        <#if status == "active" || status == "active_wrong">
+        <input id="filename" type="submit" name="filename" value="Send file">
+        </#if>
+    <input id="isFromFile" type="hidden" name="isFromFile" value="false">
     </#if>
-    <#if status != "">
-    <textarea id="text" class="row" name="value"
-              placeholder="Input your answer here" ${disabled!""}>${stepNode.getData()}</textarea>
-    </#if>
-    <#if status == "active">
-    <input id="filename" type="submit" name="filename" value="Send file">
-    </#if>
-<input id="isFromFile" type="hidden" name="isFromFile" value="false">
 </@quiz_content>
 
 <script>
     var time_left = ${stepNode.getTimeLeft()};
     var clock = document.getElementById("time-left");
-    <#if status == "active">
+    <#if status == "active" || status == "active_wrong">
     var active = true;
     <#else>
     var active = false;

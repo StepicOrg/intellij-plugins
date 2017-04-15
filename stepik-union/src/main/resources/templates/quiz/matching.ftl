@@ -5,19 +5,21 @@
 
 <#include "base_sorting.ftl"/>
 <@sorting_quiz>
-    <#list ordering as option>
-    <div class="line">
-        <div class="first">
-            <div>${option.getFirst()}</div>
+    <#if status != "" && status != "need_login">
+        <#list ordering as option>
+        <div class="line">
+            <div class="first">
+                <div>${option.getFirst()}</div>
+            </div>
+            <div class="second">
+                <#if status == "active" || status == "active_wrong">
+                    <#include "arrows.ftl"/>
+                </#if>
+                <div class="textarea" id="option${index}">${option.getSecond()}</div>
+                <input id="index${index}" type="hidden" name="index" value="${index}">
+            </div>
         </div>
-        <div class="second">
-            <#if status == "active">
-                <#include "arrows.ftl"/>
-            </#if>
-            <div class="textarea" id="option${index}">${option.getSecond()}</div>
-            <input id="index${index}" type="hidden" name="index" value="${index}">
-        </div>
-    </div>
-        <#assign index++ />
-    </#list>
+            <#assign index++ />
+        </#list>
+    </#if>
 </@sorting_quiz>

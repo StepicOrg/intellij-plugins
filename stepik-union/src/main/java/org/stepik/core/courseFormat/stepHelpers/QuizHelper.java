@@ -19,9 +19,11 @@ import org.stepik.api.queries.submissions.StepikSubmissionsGetQuery;
 import org.stepik.api.urls.Urls;
 import org.stepik.core.courseFormat.StepNode;
 import org.stepik.core.courseFormat.StudyStatus;
-import org.stepik.core.stepik.StepikConnectorLogin;
 
 import java.util.List;
+
+import static org.stepik.core.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
+import static org.stepik.core.stepik.StepikConnectorLogin.getCurrentUser;
 
 /**
  * @author meanmail
@@ -131,6 +133,7 @@ public class QuizHelper extends StepHelper {
         return submission != null ? submission.getReplyUrl() : "";
     }
 
+    @SuppressWarnings("SameReturnValue")
     public String getBaseUrl() {
         return Urls.STEPIK_URL;
     }
@@ -144,8 +147,13 @@ public class QuizHelper extends StepHelper {
         status = "";
 
         try {
-            StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
-            User user = StepikConnectorLogin.getCurrentUser();
+            StepikApiClient stepikApiClient = authAndGetStepikApiClient();
+            User user = getCurrentUser();
+            if (user.isGuest()) {
+                status = "need_login";
+                return;
+            }
+
             long userId = user.getId();
 
             if (!loadAttempt(stepikApiClient, userId)) {
@@ -189,12 +197,17 @@ public class QuizHelper extends StepHelper {
     public int getSubmissionsCount() {
         if (submissionsCount == -1) {
             try {
-                StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
-                User user = StepikConnectorLogin.getCurrentUser();
+                StepikApiClient stepikApiClient = authAndGetStepikApiClient();
+                User user = getCurrentUser();
+                if (user.isGuest()) {
+                    status = "need_login";
+                    return 0;
+                }
                 long userId = user.getId();
                 submissionsCount = 0;
                 Submissions submissions;
                 int page = 1;
+
                 do {
                     submissions = stepikApiClient.submissions()
                             .get()

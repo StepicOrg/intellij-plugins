@@ -55,6 +55,8 @@
                     submitCaption = "Click to solve";
                 } else if (status === "active" || status === "active_wrong") {
                     submitCaption = "Submit";
+                } else if (status === "need_login") {
+                    submitCaption = "Login";
                 } else if (status !== "evaluation") {
                     submitCaption = "Click to solve again";
                 } else {
@@ -78,10 +80,9 @@
                 </#if>
         </script>
 
-        <#if isHasSubmissionsRestrictions>
+        <#if isHasSubmissionsRestrictions && status != "need_login">
             <p>${maxSubmissionsCount - submissionsCount} attempts left</p>
         </#if>
-
     </div>
     </#macro>
 </@step_content>

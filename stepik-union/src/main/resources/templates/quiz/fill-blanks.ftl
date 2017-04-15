@@ -1,4 +1,5 @@
 <#-- @ftlvariable name="disabled" type="java.lang.String" -->
+<#-- @ftlvariable name="status" type="java.lang.String" -->
 <#-- @ftlvariable name="stepNode" type="org.stepik.core.courseFormat.stepHelpers.QuizHelper" -->
 <#-- @ftlvariable name="text" type="java.lang.String" -->
 
@@ -36,34 +37,36 @@
 <#include "base.ftl">
 
 <@quiz_content>
-<div id="input-buffer"></div>
-    <#assign values = stepNode.getBlanks()/>
-    <#assign index = 0 />
+    <#if status != "" && status != "need_login" >
+    <div id="input-buffer"></div>
+        <#assign values = stepNode.getBlanks()/>
+        <#assign index = 0 />
 
-    <#list stepNode.getComponents() as component>
-        <#if component.getType() == "text">
-        ${component.getText()}
-        <#else>
-            <#if (values?size > index) >
-                <#assign value = values[index]>
+        <#list stepNode.getComponents() as component>
+            <#if component.getType() == "text">
+            ${component.getText()}
             <#else>
-                <#assign value = component.getText()>
+                <#if (values?size > index) >
+                    <#assign value = values[index]>
+                <#else>
+                    <#assign value = component.getText()>
+                </#if>
+                <#assign index++ />
+                <#if component.getType() == "input">
+                <input class="field field_input" value="${value}" title="Write" ${disabled!""} oninput="resize(this);"
+                       onload="resize(this);"/>
+                <#elseif component.getType() == "select">
+                <select class="field" title="Select" ${disabled!""}>
+                    <option value="<select>">&lt;?&gt;</option>
+                    <#list component.getOptions() as option>
+                        <#assign selected = (option == value)?string("selected", "")/>
+                        <option value="${option}" ${selected}>${option}</option>
+                    </#list>
+                </select>
+                </#if>
             </#if>
-            <#assign index++ />
-            <#if component.getType() == "input">
-            <input class="field field_input" value="${value}" title="Write" ${disabled!""} oninput="resize(this);"
-                   onload="resize(this);"/>
-            <#elseif component.getType() == "select">
-            <select class="field" title="Select" ${disabled!""}>
-                <option value="<select>">&lt;?&gt;</option>
-                <#list component.getOptions() as option>
-                    <#assign selected = (option == value)?string("selected", "")/>
-                    <option value="${option}" ${selected}>${option}</option>
-                </#list>
-            </select>
-            </#if>
-        </#if>
-    </#list>
+        </#list>
+    </#if>
 </@quiz_content>
 
 <script>

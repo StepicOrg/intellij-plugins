@@ -1,4 +1,5 @@
 <#-- @ftlvariable name="disabled" type="java.lang.String" -->
+<#-- @ftlvariable name="status" type="java.lang.String" -->
 <#-- @ftlvariable name="stepNode" type="org.stepik.core.courseFormat.stepHelpers.TableQuizHelper" -->
 <#-- @ftlvariable name="text" type="java.lang.String" -->
 
@@ -26,32 +27,33 @@
 <#include "base.ftl">
 
 <@quiz_content>
-
-<table class="table">
-    <tr>
-        <th><b>${stepNode.getDescription()}</b></th>
-        <#list stepNode.getColumns() as column>
-            <th>${column}</th>
-        </#list>
-    </tr>
-
-    <#assign type=stepNode.isCheckbox()?string("checkbox", "radio") />
-    <#assign row_index = 0/>
-    <#list stepNode.getRows() as row>
+    <#if status != "" && status != "need_login" >
+    <table class="table">
         <tr>
-            <td>${row}</td>
-
-            <#assign column_index = 0/>
+            <th><b>${stepNode.getDescription()}</b></th>
             <#list stepNode.getColumns() as column>
-                <td>
-                    <input type="${type}" name="${row}"
-                           value="${column}" ${disabled!""}
-                           title="${row}:${column}" ${stepNode.getChoice(row, column)?string("checked", "")}/>
-                </td>
-                <#assign column_index += 1 />
+                <th>${column}</th>
             </#list>
-            <#assign row_index += 1 />
         </tr>
-    </#list>
-</table>
+
+        <#assign type=stepNode.isCheckbox()?string("checkbox", "radio") />
+        <#assign row_index = 0/>
+        <#list stepNode.getRows() as row>
+            <tr>
+                <td>${row}</td>
+
+                <#assign column_index = 0/>
+                <#list stepNode.getColumns() as column>
+                    <td>
+                        <input type="${type}" name="${row}"
+                               value="${column}" ${disabled!""}
+                               title="${row}:${column}" ${stepNode.getChoice(row, column)?string("checked", "")}/>
+                    </td>
+                    <#assign column_index += 1 />
+                </#list>
+                <#assign row_index += 1 />
+            </tr>
+        </#list>
+    </table>
+    </#if>
 </@quiz_content>
