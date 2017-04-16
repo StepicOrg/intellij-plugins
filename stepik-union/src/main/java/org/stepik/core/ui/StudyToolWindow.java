@@ -360,16 +360,21 @@ public class StudyToolWindow extends SimpleToolWindowPanel implements DataProvid
 
         final StepNode targetNode = stepNode;
 
-        ApplicationManager.getApplication().invokeLater(() -> {
-                    SupportedLanguages selectedLang = (SupportedLanguages) languageBox.getSelectedItem();
-                    if (selectedLang != null) {
-                        ProgrammingLanguageUtils.switchProgrammingLanguage(project, targetNode, selectedLang);
-                        if (selectedLang != targetNode.getCurrentLang()) {
-                            languageBox.setSelectedItem(targetNode.getCurrentLang());
-                        }
-                    }
+        executor.execute(() -> {
+            final SupportedLanguages[] selectedLang = new SupportedLanguages[1];
+            ApplicationManager.getApplication().invokeAndWait(() ->
+                    selectedLang[0] = (SupportedLanguages) languageBox.getSelectedItem()
+            );
+
+            if (selectedLang[0] != null) {
+                ProgrammingLanguageUtils.switchProgrammingLanguage(project, targetNode, selectedLang[0]);
+                if (selectedLang[0] != targetNode.getCurrentLang()) {
+                    ApplicationManager.getApplication().invokeLater(() ->
+                            languageBox.setSelectedItem(targetNode.getCurrentLang())
+                    );
                 }
-        );
+            }
+        });
     }
 
     private int getVideoQuality() {
