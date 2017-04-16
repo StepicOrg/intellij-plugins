@@ -1,11 +1,16 @@
 package org.stepik.plugin.actions.step;
 
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import icons.AllStepikIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
@@ -22,6 +27,8 @@ import org.stepik.plugin.actions.ActionUtils;
 import org.stepik.plugin.actions.SendAction;
 import org.stepik.plugin.utils.DirectivesUtils;
 
+import javax.swing.*;
+
 import static org.stepik.core.metrics.MetricsStatus.DATA_NOT_LOADED;
 import static org.stepik.core.metrics.MetricsStatus.FAILED_POST;
 import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
@@ -30,11 +37,14 @@ import static org.stepik.core.stepik.StepikConnectorLogin.authAndGetStepikApiCli
 import static org.stepik.core.stepik.StepikConnectorLogin.isAuthenticated;
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
 
-public class StepikJavaPostAction extends StudyCheckAction {
-    private static final Logger logger = Logger.getInstance(StepikJavaPostAction.class);
-    private static final String ACTION_ID = "STEPIC.StepikJavaPostAction";
+public class StepikSendAction extends CodeQuizAction {
+    private static final Logger logger = Logger.getInstance(StepikSendAction.class);
+    private static final String ACTION_ID = "STEPIC.StepikSendAction";
+    private static final String SHORTCUT = "ctrl alt pressed ENTER";
 
-    public StepikJavaPostAction() {
+    public StepikSendAction() {
+        super("Check Step (" + KeymapUtil.getShortcutText(new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT),
+                null)) + ")", "Check current step", AllStepikIcons.ToolWindow.checkTask);
     }
 
     @Nullable
@@ -158,7 +168,21 @@ public class StepikJavaPostAction extends StudyCheckAction {
     }
 
     @Override
-    public void check(@NotNull Project project) {
+    public void actionPerformed(@NotNull AnActionEvent e) {
+        Project project = e.getProject();
+        if (project == null) {
+            return;
+        }
+        FileDocumentManager.getInstance().saveAllDocuments();
+        check(project);
+    }
+
+    @Override
+    public String[] getShortcuts() {
+        return new String[]{SHORTCUT};
+    }
+
+    private void check(@NotNull Project project) {
         logger.info("Start checking step");
         StudyNode<?, ?> selected = StepikProjectManager.getSelected(project);
         if (!(selected instanceof StepNode)) {

@@ -59,7 +59,7 @@ import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
  * @author meanmail
  * @since 0.8
  */
-public class DownloadSubmission extends AbstractStepAction {
+public class DownloadSubmission extends CodeQuizAction {
     private static final Logger logger = Logger.getInstance(DownloadSubmission.class);
     private static final String ACTION_ID = "STEPIK.DownloadSubmission";
     private static final String SHORTCUT = "ctrl alt pressed PAGE_DOWN";
