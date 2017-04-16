@@ -177,10 +177,11 @@ public class ProjectFilesUtils {
 
     @Nullable
     private static VirtualFile getOrCreateDirectory(@NotNull VirtualFile baseDir, @NotNull String directoryPath) {
-        VirtualFile srcDir = baseDir.findFileByRelativePath(directoryPath);
-        if (srcDir == null) {
-            srcDir = ApplicationManager.getApplication()
-                    .runWriteAction((Computable<VirtualFile>) () -> {
+        final VirtualFile[] srcDir = {baseDir.findFileByRelativePath(directoryPath)};
+        if (srcDir[0] == null) {
+            Application application = ApplicationManager.getApplication();
+            application.invokeAndWait(() ->
+                    srcDir[0] = application.runWriteAction((Computable<VirtualFile>) () -> {
                         VirtualFile dir;
                         try {
                             String[] paths = directoryPath.split("/");
@@ -198,22 +199,24 @@ public class ProjectFilesUtils {
                         }
 
                         return dir;
-                    });
+                    })
+            );
         }
-        return srcDir;
+        return srcDir[0];
     }
 
     static PsiDirectory getOrCreatePsiDirectory(
             @NotNull Project project,
             @NotNull PsiDirectory baseDir,
             @NotNull String relativePath) {
+        VirtualFile directory = getOrCreateDirectory(baseDir.getVirtualFile(), relativePath);
+        if (directory == null) {
+            return null;
+        }
+
         Application application = ApplicationManager.getApplication();
-        return application.runReadAction((Computable<PsiDirectory>) () -> {
-            VirtualFile directory = getOrCreateDirectory(baseDir.getVirtualFile(), relativePath);
-            if (directory == null) {
-                return null;
-            }
-            return PsiManager.getInstance(project).findDirectory(directory);
-        });
+        return application.runReadAction((Computable<PsiDirectory>) () ->
+                PsiManager.getInstance(project).findDirectory(directory)
+        );
     }
 }
