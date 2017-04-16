@@ -16,6 +16,9 @@ import org.stepik.core.utils.PluginUtils;
 import org.stepik.core.utils.Utils;
 
 import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import static org.stepik.core.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
 import static org.stepik.core.stepik.StepikConnectorLogin.isAuthenticated;
@@ -26,12 +29,13 @@ import static org.stepik.core.stepik.StepikConnectorLogin.isAuthenticated;
 public class Metrics {
     private static final Logger logger = Logger.getInstance(Metrics.class);
     private static final String session = UUID.randomUUID().toString();
+    private static final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
 
     private static void postMetrics(
             @NotNull Project project,
             @NotNull Metric metric,
             @NotNull MetricsStatus status) {
-        new Thread(() -> {
+        executor.schedule(() -> {
             StepikMetricsPostQuery query = null;
             try {
                 StepikApiClient stepikApiClient = authAndGetStepikApiClient();
@@ -41,6 +45,7 @@ public class Metrics {
 
                 query = stepikApiClient.metrics()
                         .post()
+                        .timestamp(System.currentTimeMillis() / 1000L)
                         .tags(metric.getTags())
                         .data(metric.getData())
                         .name("ide_plugin")
@@ -74,7 +79,7 @@ public class Metrics {
                 String message = String.format("Failed post metric: %s", query != null ? query.toString() : "null");
                 logger.warn(message, e);
             }
-        }).start();
+        }, 500, TimeUnit.MILLISECONDS);
     }
 
     private static void postSimpleMetric(

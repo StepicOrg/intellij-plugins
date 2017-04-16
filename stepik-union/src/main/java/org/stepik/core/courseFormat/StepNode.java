@@ -259,11 +259,6 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
     }
 
     @Override
-    public boolean canBeLeaf() {
-        return true;
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

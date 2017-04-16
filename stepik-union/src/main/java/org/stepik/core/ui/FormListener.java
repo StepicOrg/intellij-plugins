@@ -94,18 +94,10 @@ class FormListener implements EventListener {
                         boolean isFromFile = elements.isFromFile();
                         String data = isFromFile ? getDataFromFile(stepNode) : null;
                         long attemptId = elements.getAttemptId();
-
-                        if (!isFromFile) {
-                            sendStep(stepNode, elements, type, attemptId, null);
-                        } else if (data != null) {
-                            sendStep(stepNode, elements, type, attemptId, data);
-                        }
+                        sendStep(stepNode, elements, type, attemptId, data);
                         break;
                     case "need_login":
-                        executor.execute(() -> {
-                            StepikConnectorLogin.authentication(true);
-                            StepikProjectManager.updateSelection(project);
-                        });
+                        executor.execute(() -> StepikConnectorLogin.authentication(true));
                         break;
                     default:
                         return;

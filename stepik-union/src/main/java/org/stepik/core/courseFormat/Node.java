@@ -21,6 +21,9 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static org.stepik.core.courseFormat.StudyStatus.NEED_CHECK;
+import static org.stepik.core.courseFormat.StudyStatus.SOLVED;
+import static org.stepik.core.courseFormat.StudyStatus.UNCHECKED;
 import static org.stepik.core.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
 import static org.stepik.core.stepik.StepikConnectorLogin.isAuthenticated;
 
@@ -33,7 +36,7 @@ abstract class Node<
         DC extends StudyObject,
         CC extends Node> implements StudyNode<D, C> {
     private static final Logger logger = Logger.getInstance(Node.class);
-    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private static final ExecutorService executor = Executors.newFixedThreadPool(5);
     private StudyNode parent;
     private D data;
     private List<C> children;
@@ -285,16 +288,25 @@ abstract class Node<
 
     @Override
     public boolean isUnknownStatus() {
-        return status == null;
+        return status == null || status == NEED_CHECK;
+    }
+
+    public void resetStatus() {
+        getChildren().forEach(StudyNode::resetStatus);
+        status = NEED_CHECK;
     }
 
     @NotNull
     @Override
     public StudyStatus getStatus() {
         if (isUnknownStatus()) {
-            status = StudyStatus.UNCHECKED;
+            status = UNCHECKED;
 
             executor.execute(() -> {
+                StepikApiClient stepikApiClient = authAndGetStepikApiClient();
+                if (!isAuthenticated()) {
+                    return;
+                }
                 try {
                     Map<String, StudyNode> progressMap = new HashMap<>();
                     Node.this.getChildren().stream()
@@ -320,11 +332,6 @@ abstract class Node<
                             int start = 0;
                             int end;
 
-                            StepikApiClient stepikApiClient = authAndGetStepikApiClient();
-                            if (!isAuthenticated()) {
-                                return;
-                            }
-
                             while (start < size) {
                                 end = start + 20;
                                 if (end > size) {
@@ -342,7 +349,7 @@ abstract class Node<
                                     String id = progress.getId();
                                     StudyNode node = progressMap.get(id);
                                     if (progress.isPassed()) {
-                                        node.setRawStatus(StudyStatus.SOLVED);
+                                        node.setRawStatus(SOLVED);
                                     }
                                 });
                             }
@@ -366,8 +373,8 @@ abstract class Node<
 
     @Override
     public void setStatus(@Nullable StudyStatus status) {
-        if (status == StudyStatus.SOLVED && this.status != status) {
-            this.status = StudyStatus.SOLVED;
+        if (status == SOLVED && this.status != status) {
+            this.status = SOLVED;
 
             StudyNode parent = getParent();
 
@@ -385,7 +392,7 @@ abstract class Node<
 
     @Override
     public void passed() {
-        setStatus(StudyStatus.SOLVED);
+        setStatus(SOLVED);
     }
 
     @Nullable
@@ -420,11 +427,6 @@ abstract class Node<
         if (data != null) {
             data.setId(id);
         }
-    }
-
-    @Override
-    public boolean canBeLeaf() {
-        return false;
     }
 
     @Override

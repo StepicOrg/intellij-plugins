@@ -7,6 +7,7 @@ import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.project.Project;
 import com.intellij.util.net.HttpConfigurable;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.api.client.HttpTransportClient;
@@ -15,6 +16,7 @@ import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.auth.TokenInfo;
 import org.stepik.api.objects.users.User;
 import org.stepik.core.StepikProjectManager;
+import org.stepik.core.courseFormat.StudyNode;
 import org.stepik.core.metrics.Metrics;
 import org.stepik.core.utils.PluginUtils;
 import org.stepik.core.utils.ProductGroup;
@@ -26,6 +28,7 @@ import java.util.Map;
 
 import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
 import static org.stepik.core.utils.PluginUtils.PLUGIN_ID;
+import static org.stepik.core.utils.Utils.getCurrentProject;
 
 public class StepikConnectorLogin {
     private static final Logger logger = Logger.getInstance(StepikConnectorLogin.class);
@@ -41,7 +44,7 @@ public class StepikConnectorLogin {
     private static volatile boolean authenticated = true;
     private static User user;
 
-    private static synchronized long getLastUser() {
+    private static long getLastUser() {
         return PropertiesComponent.getInstance().getOrInitLong(LAST_USER_PROPERTY_NAME, 0);
     }
 
@@ -50,7 +53,7 @@ public class StepikConnectorLogin {
     }
 
     @NotNull
-    private static StepikApiClient initStepikApiClient() {
+    private static synchronized StepikApiClient initStepikApiClient() {
         HttpConfigurable instance = HttpConfigurable.getInstance();
         StepikApiClient client;
         if (instance.USE_HTTP_PROXY) {
@@ -81,8 +84,20 @@ public class StepikConnectorLogin {
      * </ul>
      */
     public static synchronized void authentication(boolean showDialog) {
-        TokenInfo tokenInfo = getTokenInfo(getLastUser());
-        authenticated = minorLogin(tokenInfo) || (showDialog && showAuthDialog(false));
+        boolean value = minorLogin() || (showDialog && showAuthDialog(false));
+        setAuthenticated(value);
+    }
+
+    private static void stateChanged(boolean state) {
+        Project project = getCurrentProject();
+        StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
+        if (projectManager != null) {
+            StudyNode root = projectManager.getProjectRoot();
+            if (root != null) {
+                root.resetStatus();
+            }
+            projectManager.updateSelection();
+        }
     }
 
     private static boolean showAuthDialog(boolean clear) {
@@ -134,6 +149,7 @@ public class StepikConnectorLogin {
         if (!authenticated) {
             return false;
         }
+
         if (stepikApiClient.getTokenInfo().getAccessToken() != null) {
             User user = getCurrentUser(true);
             if (!user.isGuest()) {
@@ -144,13 +160,21 @@ public class StepikConnectorLogin {
         return false;
     }
 
-    private static boolean minorLogin(@NotNull TokenInfo tokenInfo) {
+    private static void setAuthenticated(boolean value) {
+        if (authenticated != value) {
+            authenticated = value;
+            stateChanged(authenticated);
+        }
+    }
+
+    private static boolean minorLogin() {
         if (isAuthenticated()) {
             return true;
         }
 
         String refreshToken = stepikApiClient.getTokenInfo().getRefreshToken();
         if (refreshToken == null) {
+            TokenInfo tokenInfo = getTokenInfo(getLastUser());
             refreshToken = tokenInfo.getRefreshToken();
         }
 
@@ -175,7 +199,7 @@ public class StepikConnectorLogin {
     }
 
     @NotNull
-    private static synchronized TokenInfo getTokenInfo(long userId, StepikApiClient client) {
+    private static TokenInfo getTokenInfo(long userId, StepikApiClient client) {
         if (userId == 0) {
             return new TokenInfo();
         }
@@ -239,18 +263,18 @@ public class StepikConnectorLogin {
         return authAndGetStepikApiClient(false);
     }
 
-    public static StepikApiClient authAndGetStepikApiClient(boolean force) {
-        StepikConnectorLogin.authentication(force);
+    public static StepikApiClient authAndGetStepikApiClient(boolean showDialog) {
+        StepikConnectorLogin.authentication(showDialog);
         return stepikApiClient;
     }
 
     public static synchronized void logout() {
         stepikApiClient.setTokenInfo(null);
-        authenticated = false;
         user = null;
         long userId = getLastUser();
         setTokenInfo(userId, new TokenInfo());
         setLastUser(0);
+        setAuthenticated(false);
         logger.info("Logout successfully");
     }
 

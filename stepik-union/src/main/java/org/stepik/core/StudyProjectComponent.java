@@ -13,6 +13,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.DumbAwareRunnable;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.startup.StartupManager;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowAnchor;
@@ -72,22 +73,8 @@ public class StudyProjectComponent implements ProjectComponent {
                             registerShortcuts();
                         }));
         Metrics.openProject(project, SUCCESSFUL);
-    }
 
-    public void registerStudyToolWindow() {
-        if (!StepikProjectManager.isStepikProject(project)) {
-            return;
-        }
-        final ToolWindowManager toolWindowManager = ToolWindowManager.getInstance(project);
-        registerToolWindows(toolWindowManager);
-        final ToolWindow studyToolWindow =
-                toolWindowManager.getToolWindow(StudyToolWindowFactory.STUDY_TOOL_WINDOW);
-        if (studyToolWindow != null) {
-            studyToolWindow.show(null);
-            StudyUtils.initToolWindows(project);
-        }
-
-        executor.execute(() -> {
+        StartupManager.getInstance(project).runWhenProjectIsInitialized(() -> executor.execute(() -> {
             StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
             if (projectManager == null) {
                 return;
@@ -112,7 +99,21 @@ public class StudyProjectComponent implements ProjectComponent {
 
                 projectManager.setSelected(selected);
             }
-        });
+        }));
+    }
+
+    public void registerStudyToolWindow() {
+        if (!StepikProjectManager.isStepikProject(project)) {
+            return;
+        }
+        final ToolWindowManager toolWindowManager = ToolWindowManager.getInstance(project);
+        registerToolWindows(toolWindowManager);
+        final ToolWindow studyToolWindow =
+                toolWindowManager.getToolWindow(StudyToolWindowFactory.STUDY_TOOL_WINDOW);
+        if (studyToolWindow != null) {
+            studyToolWindow.show(null);
+            StudyUtils.initToolWindows(project);
+        }
     }
 
     private void registerShortcuts() {

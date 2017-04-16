@@ -64,8 +64,6 @@ public interface StudyNode<D extends StudyObject, C extends StudyNode> {
         init(project, stepikApiClient, null);
     }
 
-    boolean canBeLeaf();
-
     void reloadData(@NotNull Project project, @NotNull StepikApiClient stepikApiClient);
 
     boolean getWasDeleted();
@@ -76,10 +74,9 @@ public interface StudyNode<D extends StudyObject, C extends StudyNode> {
 
     void setRawStatus(@Nullable StudyStatus status);
 
-    void passed();
+    void resetStatus();
 
-    @Nullable
-    Project getProject();
+    void passed();
 
     void setProject(@NotNull Project project);
 }

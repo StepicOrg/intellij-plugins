@@ -2,6 +2,7 @@ package org.stepik.core;
 
 import com.google.gson.internal.LinkedTreeMap;
 import com.intellij.ide.projectView.ProjectView;
+import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.ServiceManager;
@@ -62,6 +63,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.stepik.core.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
@@ -84,6 +87,8 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
     private static DOMBuilder domBuilder;
     @XStreamOmitField
     private final Project project;
+    @XStreamOmitField
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private StudyNode<?, ?> root;
     private StudyNode<?, ?> selected;
     private boolean showHint = false;
@@ -315,7 +320,7 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
 
         root.setProject(project);
 
-        new Thread(() -> {
+        executor.execute(() -> {
             StepikApiClient stepikApiClient = authAndGetStepikApiClient();
             if (isAuthenticated()) {
                 root.reloadData(project, stepikApiClient);
@@ -332,14 +337,17 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
                         ModifiableModuleModel model = ModuleManager.getInstance(project)
                                 .getModifiableModel();
 
-                        ApplicationManager.getApplication().runWriteAction(() -> {
-                            try {
-                                new SandboxModuleBuilder(projectDir.getPath()).createModule(model);
-                                model.commit();
-                            } catch (IOException | ConfigurationException | JDOMException | ModuleWithNameAlreadyExists e) {
-                                logger.warn("Failed repair Sandbox", e);
-                            }
-                        });
+                        Application application = ApplicationManager.getApplication();
+                        application.invokeLater(() ->
+                                application.runWriteAction(() -> {
+                                    try {
+                                        new SandboxModuleBuilder(projectDir.getPath()).createModule(model);
+                                        model.commit();
+                                    } catch (IOException | ConfigurationException | JDOMException | ModuleWithNameAlreadyExists e) {
+                                        logger.warn("Failed repair Sandbox", e);
+                                    }
+                                })
+                        );
                     }
 
                     ApplicationManager.getApplication().invokeLater(() ->
@@ -347,7 +355,7 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
                     );
                 }
             });
-        }).start();
+        });
     }
 
     private void repairProjectFiles(@NotNull StudyNode<?, ?> node) {
