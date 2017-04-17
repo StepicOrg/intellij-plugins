@@ -59,8 +59,11 @@ public class StudyUtils {
         if (project.isDisposed()) {
             return null;
         }
-        ToolWindow toolWindow = ToolWindowManager.getInstance(project)
-                .getToolWindow(StudyToolWindowFactory.STUDY_TOOL_WINDOW);
+        ToolWindowManager toolWindowManager = ToolWindowManager.getInstance(project);
+        if (toolWindowManager == null) {
+            return null;
+        }
+        ToolWindow toolWindow = toolWindowManager.getToolWindow(StudyToolWindowFactory.STUDY_TOOL_WINDOW);
         if (toolWindow != null) {
             Content[] contents = toolWindow.getContentManager().getContents();
             for (Content content : contents) {

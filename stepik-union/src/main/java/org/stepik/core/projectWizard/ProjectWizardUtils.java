@@ -18,10 +18,11 @@ import org.stepik.api.objects.steps.Step;
 import org.stepik.core.SupportedLanguages;
 import org.stepik.core.courseFormat.StepNode;
 import org.stepik.core.courseFormat.StudyNode;
+import org.stepik.core.stepik.StepikAuthManager;
 
 import java.io.File;
 
-import static org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient;
+import static org.stepik.core.stepik.StepikAuthManager.isAuthenticated;
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
 
 /**
@@ -63,18 +64,24 @@ public class ProjectWizardUtils {
         return projectName;
     }
 
-    public static void enrollmentCourse(StudyObject studyObject) {
-        if (studyObject instanceof Course) {
-            ProjectWizardUtils.enrollment(studyObject);
-        } else if (studyObject instanceof CompoundUnitLesson) {
-            enrollment((CompoundUnitLesson) studyObject);
+    public static boolean enrollmentCourse(StudyObject studyObject) {
+        StepikApiClient stepikApiClient = StepikAuthManager.authAndGetStepikApiClient();
+        if (!isAuthenticated()) {
+            return false;
         }
+
+        if (studyObject instanceof Course) {
+            ProjectWizardUtils.enrollment(stepikApiClient, studyObject);
+        } else if (studyObject instanceof CompoundUnitLesson) {
+            enrollment(stepikApiClient, (CompoundUnitLesson) studyObject);
+        }
+
+        return true;
     }
 
-    private static void enrollment(CompoundUnitLesson studyObject) {
+    private static void enrollment(@NotNull StepikApiClient stepikApiClient, @NotNull CompoundUnitLesson studyObject) {
         int sectionId = studyObject.getUnit().getSection();
         if (sectionId != 0) {
-            StepikApiClient stepikApiClient = authAndGetStepikApiClient(true);
             try {
                 Sections sections = stepikApiClient.sections()
                         .get()
@@ -90,7 +97,7 @@ public class ProjectWizardUtils {
                                 .id(courseId)
                                 .execute();
                         if (!courses.isEmpty()) {
-                            enrollment(courses.getFirst());
+                            enrollment(stepikApiClient, courses.getFirst());
                         }
                     }
                 }
@@ -102,9 +109,8 @@ public class ProjectWizardUtils {
         }
     }
 
-    private static void enrollment(StudyObject studyObject) {
+    private static void enrollment(@NotNull StepikApiClient stepikApiClient, @NotNull StudyObject studyObject) {
         long id = studyObject.getId();
-        StepikApiClient stepikApiClient = authAndGetStepikApiClient(true);
         try {
             stepikApiClient.enrollments()
                     .post()

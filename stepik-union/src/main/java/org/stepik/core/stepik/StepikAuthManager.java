@@ -7,6 +7,7 @@ import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.util.net.HttpConfigurable;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.api.client.HttpTransportClient;
@@ -102,20 +103,27 @@ public class StepikAuthManager {
     @NotNull
     private static StepikAuthState showAuthDialog(boolean clear) {
         Application application = ApplicationManager.getApplication();
+        boolean isDispatchThread = application.isDispatchThread() || SwingUtilities.isEventDispatchThread();
+
         final StepikAuthState[] authenticated = new StepikAuthState[]{state};
-        if (!application.isDispatchThread() && !SwingUtilities.isEventDispatchThread()) {
-            if (PluginUtils.isCurrent(ProductGroup.PYCHARM)) {
-                try {
-                    SwingUtilities.invokeAndWait(() -> authenticated[0] = showDialog(clear));
-                } catch (InterruptedException | InvocationTargetException e) {
-                    logger.warn(e);
+
+        Runnable showDialog = () -> authenticated[0] = showDialog(clear);
+
+        if (!isDispatchThread) {
+            try {
+                if (PluginUtils.isCurrent(ProductGroup.PYCHARM)) {
+                    /* TODO Check it what it's actual for supported versions today.
+                    * For some reason PyCharm run in Swing Event Dispatch Thread
+                    */
+                    SwingUtilities.invokeAndWait(showDialog);
+                } else {
+                    application.invokeAndWait(showDialog, ModalityState.defaultModalityState());
                 }
-            } else {
-                application.invokeAndWait(() -> authenticated[0] = showDialog(clear),
-                        ModalityState.defaultModalityState());
+            } catch (InterruptedException | InvocationTargetException | ProcessCanceledException e) {
+                logger.warn(e);
             }
         } else {
-            authenticated[0] = showDialog(clear);
+            showDialog.run();
         }
 
         return authenticated[0];
@@ -293,9 +301,9 @@ public class StepikAuthManager {
         return IMPLICIT_GRANT_URL;
     }
 
-    public static void logoutAndAuth() {
+    public static synchronized void logoutAndAuth() {
         logout();
-        showAuthDialog(true);
+        setState(showAuthDialog(true));
     }
 
     public static void addListener(@NotNull StepikAuthManagerListener listener) {

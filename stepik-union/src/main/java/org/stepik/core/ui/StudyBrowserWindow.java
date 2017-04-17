@@ -325,7 +325,6 @@ class StudyBrowserWindow extends JFrame {
                     }
 
                     try {
-
                         StepikApiClient stepikClient = StepikAuthManager.authAndGetStepikApiClient(true);
                         User user = getCurrentUser();
                         if (user.isGuest()) {

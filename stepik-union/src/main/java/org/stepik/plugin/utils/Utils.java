@@ -88,7 +88,7 @@ public class Utils {
         Unit unit = unitLesson.getUnit();
 
         if (unit.getId() != 0) {
-            StepikApiClient stepikApiClient = authAndGetStepikApiClient(true);
+            StepikApiClient stepikApiClient = authAndGetStepikApiClient();
             Section section = getSectionStudyObject(unit.getSection(), stepikApiClient);
 
             if (section != null) {
@@ -101,7 +101,7 @@ public class Utils {
 
     @NotNull
     private static CompoundUnitLesson getCompoundUnitLessonStudyObject(long lessonId, long unitId) {
-        StepikApiClient stepikApiClient = authAndGetStepikApiClient(true);
+        StepikApiClient stepikApiClient = authAndGetStepikApiClient();
 
         Units units = null;
 
@@ -162,7 +162,7 @@ public class Utils {
 
     @NotNull
     private static StudyObject getCourseStudyObject(long id) {
-        StepikApiClient stepikApiClient = authAndGetStepikApiClient(true);
+        StepikApiClient stepikApiClient = authAndGetStepikApiClient();
         Course course = getCourse(id, stepikApiClient);
         return course != null ? course : EMPTY_STUDY_OBJECT;
     }

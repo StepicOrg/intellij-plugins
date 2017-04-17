@@ -178,6 +178,7 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
         ApplicationManager.getApplication()
                 .runWriteAction(() -> ModuleRootModificationUtil.setModuleSdk(module, settings.getSdk()));
         createCourseFromGenerator(project);
+        wizardStep.dispose();
     }
 
     private void createCourseFromGenerator(@NotNull Project project) {

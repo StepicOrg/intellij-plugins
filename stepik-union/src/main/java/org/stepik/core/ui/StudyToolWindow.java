@@ -188,8 +188,9 @@ public class StudyToolWindow extends SimpleToolWindowPanel implements DataProvid
     }
 
     public void setStepNode(@Nullable StudyNode studyNode, boolean force) {
+        browserWindow.hideLoadAnimation();
+
         if (!force && stepNode == studyNode) {
-            browserWindow.hideLoadAnimation();
             return;
         }
 

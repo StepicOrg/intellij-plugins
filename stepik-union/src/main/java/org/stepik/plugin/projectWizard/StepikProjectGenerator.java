@@ -59,7 +59,7 @@ public class StepikProjectGenerator {
         List<Long> coursesIds = getHardcodedCoursesId(programmingLanguage);
 
         if (!coursesIds.isEmpty()) {
-            StepikApiClient stepikApiClient = authAndGetStepikApiClient(true);
+            StepikApiClient stepikApiClient = authAndGetStepikApiClient();
             try {
                 courses = stepikApiClient.courses()
                         .get()
@@ -130,7 +130,7 @@ public class StepikProjectGenerator {
                     ProgressIndicator indicator = ProgressManager.getInstance().getProgressIndicator();
                     indicator.setIndeterminate(true);
 
-                    StepikApiClient stepikApiClient = authAndGetStepikApiClient(true);
+                    StepikApiClient stepikApiClient = authAndGetStepikApiClient();
                     projectRoot = StudyNodeFactory.createTree(project, stepikApiClient, data);
                 }, "Creating Project", true, project);
     }

@@ -2,6 +2,7 @@ package org.stepik.plugin.actions.step;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.keymap.KeymapUtil;
@@ -48,15 +49,13 @@ public class StepikSendAction extends CodeQuizAction {
     }
 
     @Nullable
-    private static Long sendStep(@NotNull Project project, @NotNull StepNode stepNode) {
+    private static Long sendStep(
+            @NotNull StepikApiClient stepikApiClient,
+            @NotNull Project project,
+            @NotNull StepNode stepNode) {
         long stepId = stepNode.getId();
 
         logger.info(String.format("Start sending step: id=%s", stepId));
-
-        StepikApiClient stepikApiClient = authAndGetStepikApiClient(true);
-        if (!isAuthenticated()) {
-            return null;
-        }
 
         Long intAttemptId = getAttemptId(project, stepikApiClient, stepNode);
         if (intAttemptId == null) {
@@ -174,7 +173,9 @@ public class StepikSendAction extends CodeQuizAction {
             return;
         }
         FileDocumentManager.getInstance().saveAllDocuments();
-        check(project);
+
+        ApplicationManager.getApplication()
+                .executeOnPooledThread(() -> check(project));
     }
 
     @Override
@@ -199,7 +200,12 @@ public class StepikSendAction extends CodeQuizAction {
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
 
-                Long submissionId = sendStep(project, stepNode);
+                StepikApiClient stepikApiClient = authAndGetStepikApiClient(true);
+                if (!isAuthenticated()) {
+                    return;
+                }
+
+                Long submissionId = sendStep(stepikApiClient, project, stepNode);
 
                 if (submissionId == null) {
                     return;
@@ -207,7 +213,7 @@ public class StepikSendAction extends CodeQuizAction {
 
                 Metrics.sendAction(project, stepNode, SUCCESSFUL);
 
-                SendAction.checkStepStatus(project, stepNode, submissionId, indicator);
+                SendAction.checkStepStatus(project, stepikApiClient, stepNode, submissionId, indicator);
                 logger.info(String.format("Finish checking step: id=%s", stepNode.getId()));
             }
         });

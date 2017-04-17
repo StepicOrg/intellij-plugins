@@ -212,7 +212,7 @@ class FormListener implements EventListener {
 
                     if (!submissions.isEmpty()) {
                         Submission submission = submissions.getFirst();
-                        SendAction.checkStepStatus(project, stepNode, submission.getId(), indicator);
+                        SendAction.checkStepStatus(project, stepikApiClient, stepNode, submission.getId(), indicator);
                     }
                 } catch (StepikClientException e) {
                     logger.warn("Failed send step from browser", e);

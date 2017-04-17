@@ -84,7 +84,8 @@ public class DownloadSubmission extends CodeQuizAction {
 
     @Override
     public void actionPerformed(AnActionEvent e) {
-        downloadSubmission(e.getProject());
+        ApplicationManager.getApplication()
+                .executeOnPooledThread(() -> downloadSubmission(e.getProject()));
     }
 
     private void downloadSubmission(@Nullable Project project) {
@@ -138,7 +139,9 @@ public class DownloadSubmission extends CodeQuizAction {
             return;
         }
 
-        showPopup(project, stepNode, submissions);
+        ApplicationManager.getApplication().invokeAndWait(() ->
+                showPopup(project, stepNode, submissions)
+        );
     }
 
     @Nullable

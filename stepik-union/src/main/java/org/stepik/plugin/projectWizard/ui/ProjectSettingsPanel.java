@@ -1,10 +1,14 @@
 package org.stepik.plugin.projectWizard.ui;
 
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.diagnostic.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.api.objects.StudyObject;
 import org.stepik.core.SupportedLanguages;
 import org.stepik.core.stepik.StepikAuthManager;
+import org.stepik.core.stepik.StepikAuthManagerListener;
+import org.stepik.core.stepik.StepikAuthState;
 import org.stepik.plugin.projectWizard.StepikProjectGenerator;
 import org.stepik.plugin.utils.Utils;
 
@@ -14,7 +18,10 @@ import java.awt.event.HierarchyListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProjectSettingsPanel implements ProjectSetting, HierarchyListener {
+import static org.stepik.core.stepik.StepikAuthState.AUTH;
+import static org.stepik.core.stepik.StepikAuthState.NOT_AUTH;
+
+public class ProjectSettingsPanel implements ProjectSetting, HierarchyListener, StepikAuthManagerListener {
     private static final Logger logger = Logger.getInstance(ProjectSettingsPanel.class);
     private final List<ProjectSettingListener> listeners = new ArrayList<>();
     private JPanel mainPanel;
@@ -40,10 +47,9 @@ public class ProjectSettingsPanel implements ProjectSetting, HierarchyListener {
 
         mainPanel.addHierarchyListener(this);
 
-        logoutButton.addActionListener(e -> {
-            StepikAuthManager.logoutAndAuth();
-            setUsername();
-        });
+        logoutButton.addActionListener(e -> StepikAuthManager.logoutAndAuth());
+
+        StepikAuthManager.addListener(this);
     }
 
     private void setUsername() {
@@ -77,7 +83,6 @@ public class ProjectSettingsPanel implements ProjectSetting, HierarchyListener {
         // Scroll to top
         courseListDescription.setSelectionStart(0);
         courseListDescription.setSelectionEnd(0);
-        setUsername();
         logger.info("Has selected the course: " + studyObject);
         notifyListeners();
     }
@@ -118,5 +123,17 @@ public class ProjectSettingsPanel implements ProjectSetting, HierarchyListener {
     @Override
     public void hierarchyChanged(HierarchyEvent e) {
         notifyListeners();
+    }
+
+    @Override
+    public void stateChanged(@NotNull StepikAuthState oldState, @NotNull StepikAuthState newState) {
+        if (newState == NOT_AUTH || newState == AUTH) {
+            ApplicationManager.getApplication()
+                    .invokeLater(this::updateStep, ModalityState.stateForComponent(mainPanel));
+        }
+    }
+
+    public void dispose() {
+        StepikAuthManager.removeListener(this);
     }
 }
