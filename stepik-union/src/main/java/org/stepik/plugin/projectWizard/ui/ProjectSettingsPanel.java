@@ -18,6 +18,7 @@ import java.awt.event.HierarchyListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.stepik.core.stepik.StepikAuthManager.isAuthenticated;
 import static org.stepik.core.stepik.StepikAuthState.AUTH;
 import static org.stepik.core.stepik.StepikAuthState.NOT_AUTH;
 
@@ -66,6 +67,7 @@ public class ProjectSettingsPanel implements ProjectSetting, HierarchyListener, 
         logger.info("Start updating settings");
         courseListComboBox.refresh(langComboBox.getSelectedItem());
         setUsername();
+        logoutButton.setText(isAuthenticated() ? "Change user" : "Login");
         logger.info("Updating settings is done");
     }
 
