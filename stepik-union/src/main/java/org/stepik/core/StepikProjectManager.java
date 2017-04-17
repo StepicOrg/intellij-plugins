@@ -20,6 +20,7 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
@@ -98,6 +99,7 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
     private final Project project;
     @XStreamOmitField
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    @Nullable
     private StudyNode<?, ?> root;
     private StudyNode<?, ?> selected;
     private boolean showHint = false;
@@ -248,7 +250,7 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
     }
 
     private void updateAdaptiveSelected() {
-        if (isAdaptive()) {
+        if (isAdaptive() && root != null) {
             StudyNode<?, ?> recommendation = StudyUtils.getRecommendation(root);
             if (selected == null || (recommendation != null && selected.getParent() != recommendation.getParent())) {
                 ApplicationManager.getApplication().invokeAndWait(() -> {
@@ -346,12 +348,15 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
     }
 
     private boolean isAdaptive() {
+        if (root == null) {
+            return false;
+        }
         StudyObject data = root.getData();
         return data != null && data.isAdaptive();
     }
 
     private void refreshCourse() {
-        if (getProjectRoot() == null || project == null) {
+        if (project == null || root == null) {
             return;
         }
 
@@ -365,16 +370,30 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
             ProgressManager.getInstance().run(new Task.Backgroundable(project, "Synchronize Project") {
                 @Override
                 public void run(@NotNull ProgressIndicator indicator) {
-                    repairProjectFiles(root);
                     if (project.isDisposed()) {
                         return;
                     }
+
+                    repairProjectFiles(root);
+                    repairSandbox();
+
+                    ApplicationManager.getApplication().invokeLater(() -> {
+                                VirtualFileManager.getInstance().syncRefresh();
+                                setSelected(selected, false);
+                            }
+                    );
+                }
+
+                private void repairSandbox() {
                     VirtualFile projectDir = project.getBaseDir();
                     if (projectDir != null && projectDir.findChild(EduNames.SANDBOX_DIR) == null) {
-                        ModifiableModuleModel model = ModuleManager.getInstance(project)
-                                .getModifiableModel();
-
                         Application application = ApplicationManager.getApplication();
+
+                        ModifiableModuleModel model = application.runReadAction(
+                                (Computable<ModifiableModuleModel>) () -> ModuleManager.getInstance(project)
+                                        .getModifiableModel());
+
+
                         application.invokeLater(() ->
                                 application.runWriteAction(() -> {
                                     try {
@@ -386,10 +405,6 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
                                 })
                         );
                     }
-
-                    ApplicationManager.getApplication().invokeLater(() ->
-                            VirtualFileManager.getInstance().syncRefresh()
-                    );
                 }
             });
         });
@@ -398,9 +413,6 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
     private void repairProjectFiles(@NotNull StudyNode<?, ?> node) {
         if (project != null) {
             if (node instanceof StepNode) {
-                if (project.isDisposed()) {
-                    return;
-                }
                 ApplicationManager.getApplication().invokeAndWait(() -> {
                     if (project.isDisposed()) {
                         return;
@@ -486,9 +498,11 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
     @Override
     public void stateChanged(@NotNull StepikAuthState oldState, @NotNull StepikAuthState newState) {
         if (newState == NOT_AUTH || newState == AUTH) {
-            StudyNode root = getProjectRoot();
             if (root != null) {
                 root.resetStatus();
+                if (newState == AUTH) {
+                    refreshCourse();
+                }
             }
 
             if (oldState == SHOW_DIALOG && newState == NOT_AUTH) {
