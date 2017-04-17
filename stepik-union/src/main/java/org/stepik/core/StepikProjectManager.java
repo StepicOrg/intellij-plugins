@@ -10,6 +10,7 @@ import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.module.ModifiableModuleModel;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.module.ModuleWithNameAlreadyExists;
@@ -250,6 +251,11 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
         if (isAdaptive()) {
             StudyNode<?, ?> recommendation = StudyUtils.getRecommendation(root);
             if (selected == null || (recommendation != null && selected.getParent() != recommendation.getParent())) {
+                ApplicationManager.getApplication().invokeAndWait(() -> {
+                    for (VirtualFile file : FileEditorManager.getInstance(project).getOpenFiles()) {
+                        FileEditorManager.getInstance(project).closeFile(file);
+                    }
+                });
                 setSelected(recommendation);
             }
         }
