@@ -14,6 +14,7 @@ import org.stepik.plugin.projectWizard.ui.ProjectSettingsPanel;
 
 import javax.swing.*;
 
+import static org.stepik.core.stepik.StepikAuthManager.authentication;
 import static org.stepik.core.stepik.StepikAuthManager.isAuthenticated;
 
 class JavaWizardStep extends ModuleWizardStep {
@@ -49,7 +50,11 @@ class JavaWizardStep extends ModuleWizardStep {
 
     @Override
     public boolean validate() throws ConfigurationException {
-        valid = panel.validate() && isAuthenticated();
+        authentication(true);
+        if (!isAuthenticated()) {
+            throw new ConfigurationException("Please, you should login", "Error");
+        }
+        valid = panel.validate();
         return valid;
     }
 
