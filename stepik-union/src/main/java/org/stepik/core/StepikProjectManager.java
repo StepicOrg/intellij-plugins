@@ -236,8 +236,27 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
         return instance != null && instance.isAdaptive();
     }
 
+    public static void updateAdaptiveSelected(@Nullable Project project) {
+        if (project == null) {
+            return;
+        }
+        StepikProjectManager instance = getInstance(project);
+        if (instance != null) {
+            instance.updateAdaptiveSelected();
+        }
+    }
+
+    private void updateAdaptiveSelected() {
+        if (isAdaptive()) {
+            StudyNode<?, ?> recommendation = StudyUtils.getRecommendation(root);
+            if (selected == null || (recommendation != null && selected.getParent() != recommendation.getParent())) {
+                setSelected(recommendation);
+            }
+        }
+    }
+
     @Nullable
-    public StudyNode<?, ?> getSelected() {
+    private StudyNode<?, ?> getSelected() {
         return selected;
     }
 
@@ -320,7 +339,7 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
         }
     }
 
-    public boolean isAdaptive() {
+    private boolean isAdaptive() {
         StudyObject data = root.getData();
         return data != null && data.isAdaptive();
     }

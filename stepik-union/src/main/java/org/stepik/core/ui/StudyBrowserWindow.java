@@ -343,30 +343,7 @@ class StudyBrowserWindow extends JFrame {
             }
 
             private void getNewRecommendation() {
-                executor.execute(() -> {
-                    StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
-                    if (projectManager == null) {
-                        return;
-                    }
-
-                    StudyNode root = projectManager.getProjectRoot();
-
-                    StudyNode<?, ?> selected = projectManager.getSelected();
-                    if (root != null) {
-                        if (projectManager.isAdaptive()) {
-                            StudyNode<?, ?> recommendation = StudyUtils.getRecommendation(root);
-                            if (recommendation == null) {
-                                return;
-                            } else if (selected == null || selected.getParent() != recommendation.getParent()) {
-                                selected = recommendation;
-                            }
-                        }
-
-                        if (selected != null) {
-                            projectManager.setSelected(selected);
-                        }
-                    }
-                });
+                executor.execute(() -> StepikProjectManager.updateAdaptiveSelected(project));
             }
 
             private boolean browseProject(@NotNull String href) {
