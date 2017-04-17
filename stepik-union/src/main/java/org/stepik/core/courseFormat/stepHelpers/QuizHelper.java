@@ -34,7 +34,6 @@ public class QuizHelper extends StepHelper {
     private static final String GET_ATTEMPT = "get_attempt";
     private static final String GET_FIRST_ATTEMPT = "get_first_attempt";
     private static final String SUBMIT = "submit";
-    private static final String NEED_LOGIN = "need_login";
     private static final String UNCHECKED = "unchecked";
     @NotNull
     Reply reply = new Reply();
@@ -99,15 +98,11 @@ public class QuizHelper extends StepHelper {
         return false;
     }
 
+    @Override
     @NotNull
     public String getStatus() {
         initStepOptions();
         return status;
-    }
-
-    @NotNull
-    public String getPath() {
-        return getStepNode().getPath();
     }
 
     public long getAttemptId() {
@@ -272,6 +267,7 @@ public class QuizHelper extends StepHelper {
         return data.getMaxSubmissionsCount();
     }
 
+    @Override
     @NotNull
     public String getAction() {
         initStepOptions();

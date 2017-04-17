@@ -55,9 +55,11 @@ class FormListener implements EventListener {
     private static final Logger logger = Logger.getInstance(FormListener.class);
     private static final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Project project;
+    private final StudyBrowserWindow browser;
 
-    FormListener(@NotNull Project project) {
+    FormListener(@NotNull Project project, @NotNull StudyBrowserWindow browser) {
         this.project = project;
+        this.browser = browser;
     }
 
     @Override
@@ -97,7 +99,10 @@ class FormListener implements EventListener {
                         sendStep(stepNode, elements, type, attemptId, data);
                         break;
                     case "need_login":
-                        executor.execute(() -> StepikConnectorLogin.authentication(true));
+                        executor.execute(() -> {
+                            StepikConnectorLogin.authentication(true);
+                            browser.hideLoadAnimation();
+                        });
                         break;
                     default:
                         return;

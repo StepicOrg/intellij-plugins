@@ -88,18 +88,6 @@ public class StepikConnectorLogin {
         setAuthenticated(value);
     }
 
-    private static void stateChanged(boolean state) {
-        Project project = getCurrentProject();
-        StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
-        if (projectManager != null) {
-            StudyNode root = projectManager.getProjectRoot();
-            if (root != null) {
-                root.resetStatus();
-            }
-            projectManager.updateSelection();
-        }
-    }
-
     private static boolean showAuthDialog(boolean clear) {
         Application application = ApplicationManager.getApplication();
         final boolean[] authenticated = new boolean[1];
@@ -163,7 +151,15 @@ public class StepikConnectorLogin {
     private static void setAuthenticated(boolean value) {
         if (authenticated != value) {
             authenticated = value;
-            stateChanged(authenticated);
+            Project project = getCurrentProject();
+            StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
+            if (projectManager != null) {
+                StudyNode root = projectManager.getProjectRoot();
+                if (root != null) {
+                    root.resetStatus();
+                }
+                projectManager.updateSelection();
+            }
         }
     }
 

@@ -1,3 +1,6 @@
+<#-- @ftlvariable name="action" type="java.lang.String" -->
+<#-- @ftlvariable name="needLogin" type="boolean" -->
+<#-- @ftlvariable name="status" type="java.lang.String" -->
 <#-- @ftlvariable name="stepNode" type="org.stepik.core.courseFormat.stepHelpers.QuizHelper" -->
 <#-- @ftlvariable name="text" type="java.lang.String" -->
 <style>
@@ -5,10 +8,12 @@
         text-transform: capitalize;
     }
 
+    /*noinspection CssUnusedSymbol*/
     .wrong {
         color: #dd4444;
     }
 
+    /*noinspection CssUnusedSymbol*/
     .correct {
         color: #117700;
     }
@@ -20,9 +25,6 @@
 
     <#macro quiz_content>
     <div>
-        <#assign status = stepNode.getStatus()/>
-        <#assign action = stepNode.getAction()/>
-        <#assign needLogin = action == "need_login">
         <#assign isHasSubmissionsRestrictions = !needLogin && stepNode.isHasSubmissionsRestrictions() />
         <#if isHasSubmissionsRestrictions>
             <#assign maxSubmissionsCount = stepNode.getMaxSubmissionsCount() />

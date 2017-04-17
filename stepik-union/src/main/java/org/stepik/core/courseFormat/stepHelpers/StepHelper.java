@@ -6,16 +6,32 @@ import org.stepik.core.StepikProjectManager;
 import org.stepik.core.courseFormat.StepNode;
 import org.stepik.core.courseFormat.StudyNode;
 
+import static org.stepik.core.stepik.StepikConnectorLogin.isAuthenticated;
+
 /**
  * @author meanmail
  */
 public class StepHelper {
+    static final String NEED_LOGIN = "need_login";
     private final Project project;
     private final StepNode stepNode;
 
     public StepHelper(@NotNull Project project, @NotNull StepNode stepNode) {
         this.project = project;
         this.stepNode = stepNode;
+    }
+
+    @NotNull
+    public String getStatus() {
+        return "";
+    }
+
+    @NotNull
+    public String getAction() {
+        if (!isAuthenticated()) {
+            return NEED_LOGIN;
+        }
+        return "";
     }
 
     @NotNull
@@ -37,6 +53,11 @@ public class StepHelper {
         }
 
         return "https://stepik.org/";
+    }
+
+    @NotNull
+    public String getPath() {
+        return getStepNode().getPath();
     }
 
     @NotNull
