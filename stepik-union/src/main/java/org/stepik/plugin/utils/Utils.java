@@ -18,7 +18,7 @@ import org.stepik.api.objects.units.Units;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.stepik.core.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
+import static org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient;
 import static org.stepik.plugin.projectWizard.StepikProjectGenerator.EMPTY_STUDY_OBJECT;
 
 /**

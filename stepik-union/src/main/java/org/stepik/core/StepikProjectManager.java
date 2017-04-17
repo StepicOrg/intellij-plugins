@@ -2,6 +2,7 @@ package org.stepik.core;
 
 import com.google.gson.internal.LinkedTreeMap;
 import com.intellij.ide.projectView.ProjectView;
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
@@ -18,6 +19,7 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.thoughtworks.xstream.XStream;
@@ -50,6 +52,9 @@ import org.stepik.core.serialization.SampleConverter;
 import org.stepik.core.serialization.StudySerializationUtils;
 import org.stepik.core.serialization.StudyUnrecognizedFormatException;
 import org.stepik.core.serialization.SupportedLanguagesConverter;
+import org.stepik.core.stepik.StepikAuthManager;
+import org.stepik.core.stepik.StepikAuthManagerListener;
+import org.stepik.core.stepik.StepikAuthState;
 import org.stepik.core.ui.StudyToolWindow;
 import org.stepik.plugin.projectWizard.idea.SandboxModuleBuilder;
 import org.w3c.dom.Document;
@@ -67,12 +72,15 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.stepik.core.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
-import static org.stepik.core.stepik.StepikConnectorLogin.isAuthenticated;
+import static org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient;
+import static org.stepik.core.stepik.StepikAuthManager.isAuthenticated;
+import static org.stepik.core.stepik.StepikAuthState.AUTH;
+import static org.stepik.core.stepik.StepikAuthState.NOT_AUTH;
+import static org.stepik.core.stepik.StepikAuthState.SHOW_DIALOG;
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
 
 @State(name = "StepikStudySettings", storages = @Storage("stepik_study_project.xml"))
-public class StepikProjectManager implements PersistentStateComponent<Element>, DumbAware {
+public class StepikProjectManager implements PersistentStateComponent<Element>, DumbAware, StepikAuthManagerListener, Disposable {
     private static final int CURRENT_VERSION = 4;
     private static final Logger logger = Logger.getInstance(StepikProjectManager.class);
     @XStreamOmitField
@@ -99,6 +107,10 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
 
     public StepikProjectManager(@Nullable Project project) {
         this.project = project;
+        StepikAuthManager.addListener(this);
+        if (project != null) {
+            Disposer.register(project, this);
+        }
     }
 
     public StepikProjectManager() {
@@ -250,7 +262,7 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
         }
     }
 
-    public void updateSelection() {
+    private void updateSelection() {
         setSelected(selected, true);
     }
 
@@ -444,5 +456,27 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
         result = 31 * result + version;
         result = 31 * result + (uuid != null ? uuid.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public void stateChanged(@NotNull StepikAuthState oldState, @NotNull StepikAuthState newState) {
+        if (newState == NOT_AUTH || newState == AUTH) {
+            StudyNode root = getProjectRoot();
+            if (root != null) {
+                root.resetStatus();
+            }
+
+            if (oldState == SHOW_DIALOG && newState == NOT_AUTH) {
+                setSelected(selected, false);
+            } else {
+                updateSelection();
+            }
+        }
+    }
+
+    @Override
+    public void dispose() {
+        StepikAuthManager.removeListener(this);
+        executor.shutdown();
     }
 }

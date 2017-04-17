@@ -7,7 +7,6 @@ import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.project.Project;
 import com.intellij.util.net.HttpConfigurable;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.api.client.HttpTransportClient;
@@ -16,7 +15,6 @@ import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.auth.TokenInfo;
 import org.stepik.api.objects.users.User;
 import org.stepik.core.StepikProjectManager;
-import org.stepik.core.courseFormat.StudyNode;
 import org.stepik.core.metrics.Metrics;
 import org.stepik.core.utils.PluginUtils;
 import org.stepik.core.utils.ProductGroup;
@@ -24,14 +22,21 @@ import org.stepik.plugin.auth.ui.AuthDialog;
 
 import javax.swing.*;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
+import static org.stepik.core.stepik.StepikAuthState.AUTH;
+import static org.stepik.core.stepik.StepikAuthState.NOT_AUTH;
+import static org.stepik.core.stepik.StepikAuthState.SHOW_DIALOG;
+import static org.stepik.core.stepik.StepikAuthState.UNKNOWN;
 import static org.stepik.core.utils.PluginUtils.PLUGIN_ID;
-import static org.stepik.core.utils.Utils.getCurrentProject;
 
-public class StepikConnectorLogin {
-    private static final Logger logger = Logger.getInstance(StepikConnectorLogin.class);
+public class StepikAuthManager {
+    private static final Logger logger = Logger.getInstance(StepikAuthManager.class);
     private static final String CLIENT_ID = "vV8giW7KTPMOTriOUBwyGLvXbKV0Cc4GPBnyCJPd";
     private static final String REDIRECT_URI = "https%3A%2F%2Fstepik.org";
     private static final String LAST_USER_PROPERTY_NAME = PLUGIN_ID + ".LAST_USER";
@@ -41,7 +46,9 @@ public class StepikConnectorLogin {
             "&redirect_uri=" + REDIRECT_URI +
             "&scope=write" +
             "&response_type=token";
-    private static volatile boolean authenticated = true;
+    private static final List<StepikAuthManagerListener> listeners = new ArrayList<>();
+    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private static volatile StepikAuthState state = UNKNOWN;
     private static User user;
 
     private static long getLastUser() {
@@ -84,13 +91,18 @@ public class StepikConnectorLogin {
      * </ul>
      */
     public static synchronized void authentication(boolean showDialog) {
-        boolean value = minorLogin() || (showDialog && showAuthDialog(false));
-        setAuthenticated(value);
+        StepikAuthState value = minorLogin();
+        if (value != AUTH && showDialog) {
+            setState(SHOW_DIALOG);
+            value = showAuthDialog(false);
+        }
+        setState(value);
     }
 
-    private static boolean showAuthDialog(boolean clear) {
+    @NotNull
+    private static StepikAuthState showAuthDialog(boolean clear) {
         Application application = ApplicationManager.getApplication();
-        final boolean[] authenticated = new boolean[1];
+        final StepikAuthState[] authenticated = new StepikAuthState[]{state};
         if (!application.isDispatchThread() && !SwingUtilities.isEventDispatchThread()) {
             if (PluginUtils.isCurrent(ProductGroup.PYCHARM)) {
                 try {
@@ -109,32 +121,38 @@ public class StepikConnectorLogin {
         return authenticated[0];
     }
 
-    private static boolean showDialog(boolean clear) {
+    @NotNull
+    private static StepikAuthState showDialog(boolean clear) {
         Map<String, String> map = AuthDialog.showAuthForm(clear);
-        boolean authenticated = !map.isEmpty() && !map.containsKey("error");
-
-        logger.info("Show the authentication dialog with result: " + authenticated);
-
+        StepikAuthState newState = NOT_AUTH;
         TokenInfo tokenInfo = new TokenInfo();
-        tokenInfo.setAccessToken(map.get("access_token"));
-        tokenInfo.setExpiresIn(Integer.valueOf(map.getOrDefault("expires_in", "0")));
-        tokenInfo.setScope(map.get("scope"));
-        tokenInfo.setTokenType(map.get("token_type"));
-        tokenInfo.setRefreshToken(map.get("refresh_token"));
+        if (!map.isEmpty() && !map.containsKey("error")) {
+            newState = AUTH;
+            tokenInfo.setAccessToken(map.get("access_token"));
+            tokenInfo.setExpiresIn(Integer.valueOf(map.getOrDefault("expires_in", "0")));
+            tokenInfo.setScope(map.get("scope"));
+            tokenInfo.setTokenType(map.get("token_type"));
+            tokenInfo.setRefreshToken(map.get("refresh_token"));
+        }
+
         stepikApiClient.setTokenInfo(tokenInfo);
-        if (tokenInfo.getAccessToken() != null) {
+        if (newState == AUTH && tokenInfo.getAccessToken() != null) {
             User user = getCurrentUser(true);
             if (!user.isGuest()) {
                 setTokenInfo(user.getId(), tokenInfo);
                 Metrics.authenticate(SUCCESSFUL);
+            } else {
+                newState = NOT_AUTH;
             }
         }
 
-        return authenticated;
+        logger.info("Show the authentication dialog with result: " + newState);
+
+        return newState;
     }
 
     public static boolean isAuthenticated() {
-        if (!authenticated) {
+        if (state == NOT_AUTH) {
             return false;
         }
 
@@ -148,24 +166,20 @@ public class StepikConnectorLogin {
         return false;
     }
 
-    private static void setAuthenticated(boolean value) {
-        if (authenticated != value) {
-            authenticated = value;
-            Project project = getCurrentProject();
-            StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
-            if (projectManager != null) {
-                StudyNode root = projectManager.getProjectRoot();
-                if (root != null) {
-                    root.resetStatus();
-                }
-                projectManager.updateSelection();
-            }
+    private static void setState(@NotNull StepikAuthState value) {
+        StepikAuthState oldState = state;
+        state = value;
+
+        if (oldState != state) {
+            executor.execute(() ->
+                    listeners.forEach(listener -> listener.stateChanged(oldState, state)));
         }
     }
 
-    private static boolean minorLogin() {
+    @NotNull
+    private static StepikAuthState minorLogin() {
         if (isAuthenticated()) {
-            return true;
+            return AUTH;
         }
 
         String refreshToken = stepikApiClient.getTokenInfo().getRefreshToken();
@@ -180,13 +194,13 @@ public class StepikConnectorLogin {
                         .userAuthenticationRefresh(CLIENT_ID, refreshToken)
                         .execute();
                 logger.info("Refresh a token is successfully");
-                return true;
+                return AUTH;
             } catch (StepikClientException re) {
                 logger.info("Refresh a token failed: " + re.getMessage());
             }
         }
 
-        return false;
+        return NOT_AUTH;
     }
 
     @NotNull
@@ -260,7 +274,7 @@ public class StepikConnectorLogin {
     }
 
     public static StepikApiClient authAndGetStepikApiClient(boolean showDialog) {
-        StepikConnectorLogin.authentication(showDialog);
+        StepikAuthManager.authentication(showDialog);
         return stepikApiClient;
     }
 
@@ -270,7 +284,7 @@ public class StepikConnectorLogin {
         long userId = getLastUser();
         setTokenInfo(userId, new TokenInfo());
         setLastUser(0);
-        setAuthenticated(false);
+        setState(NOT_AUTH);
         logger.info("Logout successfully");
     }
 
@@ -282,5 +296,13 @@ public class StepikConnectorLogin {
     public static void logoutAndAuth() {
         logout();
         showAuthDialog(true);
+    }
+
+    public static void addListener(@NotNull StepikAuthManagerListener listener) {
+        listeners.add(listener);
+    }
+
+    public static void removeListener(@NotNull StepikAuthManagerListener listener) {
+        listeners.remove(listener);
     }
 }

@@ -29,8 +29,8 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.stepik.core.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
-import static org.stepik.core.stepik.StepikConnectorLogin.isAuthenticated;
+import static org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient;
+import static org.stepik.core.stepik.StepikAuthManager.isAuthenticated;
 
 public class StudyUtils {
     private static final Logger logger = Logger.getInstance(StudyUtils.class);
@@ -56,6 +56,9 @@ public class StudyUtils {
 
     @Nullable
     static StudyToolWindow getStudyToolWindow(@NotNull final Project project) {
+        if (project.isDisposed()) {
+            return null;
+        }
         ToolWindow toolWindow = ToolWindowManager.getInstance(project)
                 .getToolWindow(StudyToolWindowFactory.STUDY_TOOL_WINDOW);
         if (toolWindow != null) {

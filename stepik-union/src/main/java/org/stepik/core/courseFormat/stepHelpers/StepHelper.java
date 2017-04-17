@@ -6,7 +6,7 @@ import org.stepik.core.StepikProjectManager;
 import org.stepik.core.courseFormat.StepNode;
 import org.stepik.core.courseFormat.StudyNode;
 
-import static org.stepik.core.stepik.StepikConnectorLogin.isAuthenticated;
+import static org.stepik.core.stepik.StepikAuthManager.isAuthenticated;
 
 /**
  * @author meanmail

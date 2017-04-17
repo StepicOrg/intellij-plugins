@@ -57,8 +57,8 @@ import static org.stepik.core.StudyUtils.getStepContent;
 import static org.stepik.core.courseFormat.StepType.CODE;
 import static org.stepik.core.courseFormat.StepType.TEXT;
 import static org.stepik.core.courseFormat.StepType.VIDEO;
-import static org.stepik.core.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
-import static org.stepik.core.stepik.StepikConnectorLogin.isAuthenticated;
+import static org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient;
+import static org.stepik.core.stepik.StepikAuthManager.isAuthenticated;
 import static org.stepik.core.utils.PluginUtils.PLUGIN_ID;
 
 public class StudyToolWindow extends SimpleToolWindowPanel implements DataProvider, Disposable, ActionListener {
@@ -189,6 +189,7 @@ public class StudyToolWindow extends SimpleToolWindowPanel implements DataProvid
 
     public void setStepNode(@Nullable StudyNode studyNode, boolean force) {
         if (!force && stepNode == studyNode) {
+            browserWindow.hideLoadAnimation();
             return;
         }
 

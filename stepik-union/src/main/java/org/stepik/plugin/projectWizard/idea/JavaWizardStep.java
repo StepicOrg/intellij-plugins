@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.stepik.api.objects.StudyObject;
 import org.stepik.core.SupportedLanguages;
 import org.stepik.core.projectWizard.ProjectWizardUtils;
-import org.stepik.core.stepik.StepikConnectorLogin;
+import org.stepik.core.stepik.StepikAuthManager;
 import org.stepik.plugin.projectWizard.StepikProjectGenerator;
 import org.stepik.plugin.projectWizard.ui.ProjectSettingsPanel;
 
@@ -41,7 +41,7 @@ class JavaWizardStep extends ModuleWizardStep {
 
     @Override
     public void updateStep() {
-        StepikConnectorLogin.authentication(true);
+        StepikAuthManager.authentication(true);
         panel.updateStep();
         valid = false;
         leaving = false;

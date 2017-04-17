@@ -24,8 +24,8 @@ import java.util.stream.Collectors;
 import static org.stepik.core.metrics.MetricsStatus.DATA_NOT_LOADED;
 import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
 import static org.stepik.core.metrics.MetricsStatus.TARGET_NOT_FOUND;
-import static org.stepik.core.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
-import static org.stepik.core.stepik.StepikConnectorLogin.getCurrentUser;
+import static org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient;
+import static org.stepik.core.stepik.StepikAuthManager.getCurrentUser;
 
 public class StepikProjectGenerator {
     public static final StudyObject EMPTY_STUDY_OBJECT = initEmptyStudyNode();

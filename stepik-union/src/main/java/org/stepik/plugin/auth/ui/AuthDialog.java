@@ -22,7 +22,7 @@ import javafx.scene.web.WebHistory;
 import javafx.scene.web.WebView;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.api.urls.Urls;
-import org.stepik.core.stepik.StepikConnectorLogin;
+import org.stepik.core.stepik.StepikAuthManager;
 import org.stepik.core.templates.Templater;
 
 import javax.swing.*;
@@ -77,7 +77,7 @@ public class AuthDialog extends JDialog {
                 CookieHandler.setDefault(manager);
                 manager.getCookieStore().removeAll();
             }
-            url = StepikConnectorLogin.getImplicitGrantUrl();
+            url = StepikAuthManager.getImplicitGrantUrl();
             engine.load(url);
         });
         add(panel, BorderLayout.CENTER);

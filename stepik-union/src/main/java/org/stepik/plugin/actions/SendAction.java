@@ -24,7 +24,7 @@ import static org.stepik.core.courseFormat.StudyStatus.SOLVED;
 import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
 import static org.stepik.core.metrics.MetricsStatus.TIME_OVER;
 import static org.stepik.core.metrics.MetricsStatus.USER_CANCELED;
-import static org.stepik.core.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
+import static org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient;
 
 /**
  * @author meanmail

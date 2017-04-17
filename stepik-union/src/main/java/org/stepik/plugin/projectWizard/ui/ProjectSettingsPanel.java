@@ -4,7 +4,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.api.objects.StudyObject;
 import org.stepik.core.SupportedLanguages;
-import org.stepik.core.stepik.StepikConnectorLogin;
+import org.stepik.core.stepik.StepikAuthManager;
 import org.stepik.plugin.projectWizard.StepikProjectGenerator;
 import org.stepik.plugin.utils.Utils;
 
@@ -41,13 +41,13 @@ public class ProjectSettingsPanel implements ProjectSetting, HierarchyListener {
         mainPanel.addHierarchyListener(this);
 
         logoutButton.addActionListener(e -> {
-            StepikConnectorLogin.logoutAndAuth();
+            StepikAuthManager.logoutAndAuth();
             setUsername();
         });
     }
 
     private void setUsername() {
-        String username = StepikConnectorLogin.getCurrentUserFullName();
+        String username = StepikAuthManager.getCurrentUserFullName();
         userName.setText(username);
     }
 

@@ -36,7 +36,7 @@ import org.stepik.core.courseFormat.LessonNode;
 import org.stepik.core.courseFormat.SectionNode;
 import org.stepik.core.courseFormat.StepNode;
 import org.stepik.core.courseFormat.StudyNode;
-import org.stepik.core.stepik.StepikConnectorLogin;
+import org.stepik.core.stepik.StepikAuthManager;
 import org.stepik.core.templates.Templater;
 import org.stepik.plugin.utils.NavigationUtils;
 import org.w3c.dom.Document;
@@ -62,7 +62,7 @@ import java.util.regex.Pattern;
 import static org.stepik.api.objects.recommendations.ReactionValues.SOLVED;
 import static org.stepik.api.objects.recommendations.ReactionValues.TOO_EASY;
 import static org.stepik.api.objects.recommendations.ReactionValues.TOO_HARD;
-import static org.stepik.core.stepik.StepikConnectorLogin.getCurrentUser;
+import static org.stepik.core.stepik.StepikAuthManager.getCurrentUser;
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
 
 class StudyBrowserWindow extends JFrame {
@@ -140,15 +140,22 @@ class StudyBrowserWindow extends JFrame {
                     JavaBridge bridge = new JavaBridge();
                     window.setMember("java", bridge);
                     @Language("JavaScript")
-                    String script = "console.error = function(message){java.error(message);};" +
-                            "console.warn = function(message){java.warn(message);};" +
-                            "console.log = function(message){java.log(message);};" +
-                            "console.debug = function(message){java.debug(message);};" +
-                            "window.addEventListener('error', function (e) {" +
-                            "       java.doError(e.filename, e.lineno, e.colno, e.message);" +
-                            "       return true;" +
-                            "   }" +
-                            ");";
+                    String script = "console.error = function (message) {\n" +
+                            "    java.error(message);\n" +
+                            "};\n" +
+                            "console.warn = function (message) {\n" +
+                            "    java.warn(message);\n" +
+                            "};\n" +
+                            "console.log = function (message) {\n" +
+                            "    java.log(message);\n" +
+                            "};\n" +
+                            "console.debug = function (message) {\n" +
+                            "    java.debug(message);\n" +
+                            "};\n" +
+                            "window.addEventListener('error', function (e) {\n" +
+                            "    java.doError(e.filename, e.lineno, e.colno, e.message);\n" +
+                            "    return true;\n" +
+                            "});";
                     engine.executeScript(script);
                 });
     }
@@ -187,7 +194,7 @@ class StudyBrowserWindow extends JFrame {
                 final EventListener linkListener = makeHyperLinkListener();
                 addListenerToAllHyperlinkItems(linkListener);
 
-                final EventListener formListener = new FormListener(project, this);
+                final EventListener formListener = new FormListener(project);
                 final Document doc = engine.getDocument();
                 ((EventTarget) doc).addEventListener(FormListener.EVENT_TYPE_SUBMIT, formListener, false);
             }
@@ -263,7 +270,7 @@ class StudyBrowserWindow extends JFrame {
                 String extension = target.getAttribute("data-file-ext");
 
                 try {
-                    StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
+                    StepikApiClient stepikApiClient = StepikAuthManager.getStepikApiClient();
                     String content = stepikApiClient.files().get(href, contentType);
                     VirtualFile srcDirectory = getOrCreateSrcDirectory(project, (StepNode) node, true);
                     if (srcDirectory == null) {
@@ -316,7 +323,7 @@ class StudyBrowserWindow extends JFrame {
                     }
 
                     try {
-                        StepikApiClient stepikClient = StepikConnectorLogin.authAndGetStepikApiClient(true);
+                        StepikApiClient stepikClient = StepikAuthManager.authAndGetStepikApiClient(true);
                         User user = getCurrentUser();
                         if (user.isGuest()) {
                             return;

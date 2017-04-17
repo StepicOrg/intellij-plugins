@@ -21,7 +21,7 @@ import org.stepik.core.courseFormat.StudyNode;
 
 import java.io.File;
 
-import static org.stepik.core.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
+import static org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient;
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
 
 /**

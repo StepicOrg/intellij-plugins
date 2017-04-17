@@ -16,7 +16,7 @@ import org.stepik.api.objects.users.Users;
 import java.util.Collections;
 import java.util.List;
 
-import static org.stepik.core.stepik.StepikConnectorLogin.isAuthenticated;
+import static org.stepik.core.stepik.StepikAuthManager.isAuthenticated;
 
 public class CourseNode extends Node<Course, SectionNode, Section, LessonNode> {
     private static final Logger logger = Logger.getInstance(CourseNode.class);

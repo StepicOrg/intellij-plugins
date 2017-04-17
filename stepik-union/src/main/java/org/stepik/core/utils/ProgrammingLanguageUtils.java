@@ -33,8 +33,8 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
-import static org.stepik.core.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
-import static org.stepik.core.stepik.StepikConnectorLogin.getCurrentUser;
+import static org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient;
+import static org.stepik.core.stepik.StepikAuthManager.getCurrentUser;
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreatePsiDirectory;
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcPsiDirectory;
 

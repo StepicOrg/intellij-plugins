@@ -22,8 +22,8 @@ import org.stepik.core.courseFormat.StudyStatus;
 
 import java.util.List;
 
-import static org.stepik.core.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
-import static org.stepik.core.stepik.StepikConnectorLogin.getCurrentUser;
+import static org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient;
+import static org.stepik.core.stepik.StepikAuthManager.getCurrentUser;
 
 /**
  * @author meanmail

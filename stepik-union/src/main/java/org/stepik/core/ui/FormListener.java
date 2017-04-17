@@ -21,7 +21,7 @@ import org.stepik.core.StudyUtils;
 import org.stepik.core.courseFormat.StepNode;
 import org.stepik.core.courseFormat.StepType;
 import org.stepik.core.courseFormat.StudyNode;
-import org.stepik.core.stepik.StepikConnectorLogin;
+import org.stepik.core.stepik.StepikAuthManager;
 import org.stepik.plugin.actions.SendAction;
 import org.w3c.dom.Node;
 import org.w3c.dom.events.Event;
@@ -47,7 +47,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
-import static org.stepik.core.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
+import static org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient;
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
 
 class FormListener implements EventListener {
@@ -55,11 +55,9 @@ class FormListener implements EventListener {
     private static final Logger logger = Logger.getInstance(FormListener.class);
     private static final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Project project;
-    private final StudyBrowserWindow browser;
 
-    FormListener(@NotNull Project project, @NotNull StudyBrowserWindow browser) {
+    FormListener(@NotNull Project project) {
         this.project = project;
-        this.browser = browser;
     }
 
     @Override
@@ -99,10 +97,7 @@ class FormListener implements EventListener {
                         sendStep(stepNode, elements, type, attemptId, data);
                         break;
                     case "need_login":
-                        executor.execute(() -> {
-                            StepikConnectorLogin.authentication(true);
-                            browser.hideLoadAnimation();
-                        });
+                        executor.execute(() -> StepikAuthManager.authentication(true));
                         break;
                     default:
                         return;

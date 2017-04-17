@@ -9,8 +9,8 @@ import org.stepik.api.objects.instructions.Instructions;
 import org.stepik.api.objects.steps.Step;
 import org.stepik.core.courseFormat.StepNode;
 
-import static org.stepik.core.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
-import static org.stepik.core.stepik.StepikConnectorLogin.isAuthenticated;
+import static org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient;
+import static org.stepik.core.stepik.StepikAuthManager.isAuthenticated;
 
 /**
  * @author meanmail
@@ -129,6 +129,7 @@ public class FreeAnswerQuizHelper extends StringQuizHelper {
         return "";
     }
 
+    @SuppressWarnings("unused")
     public boolean isActionEnabled() {
         return !needReview() || !isFrozen();
     }

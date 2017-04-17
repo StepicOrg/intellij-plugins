@@ -1,7 +1,7 @@
 package org.stepik.plugin.collective.ui;
 
 import org.stepik.core.StepikProjectManager;
-import org.stepik.core.stepik.StepikConnectorLogin;
+import org.stepik.core.stepik.StepikAuthManager;
 import org.stepik.core.utils.Utils;
 
 import javax.swing.*;
@@ -22,18 +22,18 @@ class StepikSettingsPanel {
         hintCheckBox.addActionListener(e -> hintCheckBoxModified = true);
 
         logoutButton.addActionListener(e -> {
-            StepikConnectorLogin.logout();
+            StepikAuthManager.logout();
             updateUserName();
         });
 
         loginButton.addActionListener(e -> {
-            StepikConnectorLogin.authentication(true);
+            StepikAuthManager.authentication(true);
             updateUserName();
         });
     }
 
     private void updateUserName() {
-        userName.setText(StepikConnectorLogin.getCurrentUserFullName());
+        userName.setText(StepikAuthManager.getCurrentUserFullName());
     }
 
     JComponent getPanel() {

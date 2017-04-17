@@ -24,8 +24,8 @@ import java.util.concurrent.Executors;
 import static org.stepik.core.courseFormat.StudyStatus.NEED_CHECK;
 import static org.stepik.core.courseFormat.StudyStatus.SOLVED;
 import static org.stepik.core.courseFormat.StudyStatus.UNCHECKED;
-import static org.stepik.core.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
-import static org.stepik.core.stepik.StepikConnectorLogin.isAuthenticated;
+import static org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient;
+import static org.stepik.core.stepik.StepikAuthManager.isAuthenticated;
 
 /**
  * @author meanmail

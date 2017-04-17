@@ -50,9 +50,9 @@ import static org.stepik.core.metrics.MetricsStatus.EMPTY_SOURCE;
 import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
 import static org.stepik.core.metrics.MetricsStatus.TARGET_NOT_FOUND;
 import static org.stepik.core.metrics.MetricsStatus.USER_CANCELED;
-import static org.stepik.core.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
-import static org.stepik.core.stepik.StepikConnectorLogin.getCurrentUser;
-import static org.stepik.core.stepik.StepikConnectorLogin.isAuthenticated;
+import static org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient;
+import static org.stepik.core.stepik.StepikAuthManager.getCurrentUser;
+import static org.stepik.core.stepik.StepikAuthManager.isAuthenticated;
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
 
 /**
