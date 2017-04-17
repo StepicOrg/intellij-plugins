@@ -309,6 +309,8 @@ class StudyBrowserWindow extends JFrame {
                     return;
                 }
 
+                showLoadAnimation();
+
                 if (reaction == TOO_EASY || reaction == TOO_HARD) {
                     String[] items = href.split("/");
                     if (items.length < 2) {
@@ -323,6 +325,7 @@ class StudyBrowserWindow extends JFrame {
                     }
 
                     try {
+
                         StepikApiClient stepikClient = StepikAuthManager.authAndGetStepikApiClient(true);
                         User user = getCurrentUser();
                         if (user.isGuest()) {
@@ -339,11 +342,10 @@ class StudyBrowserWindow extends JFrame {
                     }
                 }
 
-                getNewRecommendation();
-            }
-
-            private void getNewRecommendation() {
-                executor.execute(() -> StepikProjectManager.updateAdaptiveSelected(project));
+                executor.execute(() -> {
+                    StepikProjectManager.updateAdaptiveSelected(project);
+                    hideLoadAnimation();
+                });
             }
 
             private boolean browseProject(@NotNull String href) {
