@@ -32,4 +32,12 @@ public abstract class ObjectsContainer<T> {
 
     @NotNull
     public abstract Class<T> getItemClass();
+
+    public T get(int index) {
+        return getItems().get(index);
+    }
+
+    public T getFirst() {
+        return getItems().get(0);
+    }
 }

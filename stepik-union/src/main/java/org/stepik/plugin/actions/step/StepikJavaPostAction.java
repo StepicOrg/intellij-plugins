@@ -6,25 +6,22 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import org.stepik.core.StepikProjectManager;
-import org.stepik.core.SupportedLanguages;
-import org.stepik.core.courseFormat.StepNode;
-import org.stepik.core.courseFormat.StudyNode;
-import org.stepik.core.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.attempts.Attempts;
-import org.stepik.api.objects.submissions.Submission;
 import org.stepik.api.objects.submissions.Submissions;
+import org.stepik.core.StepikProjectManager;
+import org.stepik.core.SupportedLanguages;
+import org.stepik.core.courseFormat.StepNode;
+import org.stepik.core.courseFormat.StudyNode;
 import org.stepik.core.metrics.Metrics;
+import org.stepik.core.stepik.StepikConnectorLogin;
 import org.stepik.core.utils.Utils;
 import org.stepik.plugin.actions.ActionUtils;
 import org.stepik.plugin.actions.SendAction;
 import org.stepik.plugin.utils.DirectivesUtils;
-
-import java.util.List;
 
 import static org.stepik.core.metrics.MetricsStatus.DATA_NOT_LOADED;
 import static org.stepik.core.metrics.MetricsStatus.FAILED_POST;
@@ -89,7 +86,7 @@ public class StepikJavaPostAction extends StudyCheckAction {
             return null;
         }
 
-        return attempts.getAttempts().get(0).getId();
+        return attempts.getFirst().getId();
     }
 
     @Nullable
@@ -123,9 +120,7 @@ public class StepikJavaPostAction extends StudyCheckAction {
             return null;
         }
 
-        List<Submission> submissionsList = submissions.getSubmissions();
-
-        return submissionsList.get(0).getId();
+        return submissions.getFirst().getId();
     }
 
     @Nullable

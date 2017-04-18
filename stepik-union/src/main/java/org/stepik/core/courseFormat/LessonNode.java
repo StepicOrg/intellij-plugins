@@ -67,6 +67,8 @@ public class LessonNode extends Node<CompoundUnitLesson, StepNode, Step, StepNod
                 return true;
             }
 
+            String updateDate = data.getUpdateDate();
+
             StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
             Lessons lessons = stepikApiClient.lessons()
                     .get()
@@ -75,16 +77,14 @@ public class LessonNode extends Node<CompoundUnitLesson, StepNode, Step, StepNod
 
             Lesson lesson;
             if (!lessons.isEmpty()) {
-                lesson = lessons.getLessons().get(0);
-                data.setLesson(lesson);
+                lesson = lessons.getFirst();
             } else {
                 lesson = new Lesson();
                 lesson.setId(id);
             }
             data.setLesson(lesson);
 
-            CompoundUnitLesson oldData = this.getData();
-            return oldData == null || !oldData.getUpdateDate().equals(data.getUpdateDate());
+            return !updateDate.equals(data.getUpdateDate());
         } catch (StepikClientException logged) {
             logger.warn(String.format("Failed load lesson data id=%d", id), logged);
         }
@@ -129,7 +129,7 @@ public class LessonNode extends Node<CompoundUnitLesson, StepNode, Step, StepNod
             if (sections.isEmpty()) {
                 return 0;
             }
-            courseId = sections.getItems().get(0).getCourse();
+            courseId = sections.getFirst().getCourse();
             return courseId;
         } catch (StepikClientException ignored) {
         }

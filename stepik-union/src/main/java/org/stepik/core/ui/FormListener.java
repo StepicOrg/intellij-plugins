@@ -6,12 +6,6 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import org.stepik.core.StepikProjectManager;
-import org.stepik.core.StudyUtils;
-import org.stepik.core.courseFormat.StepNode;
-import org.stepik.core.courseFormat.StepType;
-import org.stepik.core.courseFormat.StudyNode;
-import org.stepik.core.stepik.StepikConnectorLogin;
 import javafx.stage.FileChooser;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -22,6 +16,12 @@ import org.stepik.api.objects.submissions.Column;
 import org.stepik.api.objects.submissions.Submission;
 import org.stepik.api.objects.submissions.Submissions;
 import org.stepik.api.queries.submissions.StepikSubmissionsPostQuery;
+import org.stepik.core.StepikProjectManager;
+import org.stepik.core.StudyUtils;
+import org.stepik.core.courseFormat.StepNode;
+import org.stepik.core.courseFormat.StepType;
+import org.stepik.core.courseFormat.StudyNode;
+import org.stepik.core.stepik.StepikConnectorLogin;
 import org.stepik.plugin.actions.SendAction;
 import org.w3c.dom.Node;
 import org.w3c.dom.events.Event;
@@ -44,6 +44,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import static java.util.Collections.emptyList;
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
 
 class FormListener implements EventListener {
@@ -87,6 +88,7 @@ class FormListener implements EventListener {
                         }
                         break;
                     case "active":
+                    case "active_wrong":
                         String typeStr = elements.getType();
                         StepType type = StepType.of(typeStr);
                         boolean isFromFile = elements.isFromFile();
@@ -167,6 +169,11 @@ class FormListener implements EventListener {
                             String text = getStringData(elements);
                             query.text(text);
                             break;
+                        case FREE_ANSWER:
+                            text = getStringData(elements);
+                            query.text(text);
+                            query.attachments(emptyList());
+                            break;
                         case NUMBER:
                             String number = getStringData(elements);
                             query.number(number);
@@ -205,7 +212,7 @@ class FormListener implements EventListener {
                     Submissions submissions = query.execute();
 
                     if (!submissions.isEmpty()) {
-                        Submission submission = submissions.getSubmissions().get(0);
+                        Submission submission = submissions.getFirst();
                         SendAction.checkStepStatus(project, stepNode, submission.getId(), indicator);
                     }
                 } catch (StepikClientException e) {
@@ -344,12 +351,13 @@ class FormListener implements EventListener {
         @NotNull
         String getInputValue(@NotNull String name) {
             Node item = elements.namedItem(name);
+            String value = null;
             if (item instanceof HTMLInputElement) {
-                return ((HTMLInputElement) item).getValue();
+                value = ((HTMLInputElement) item).getValue();
             } else if (item instanceof HTMLTextAreaElement) {
-                return ((HTMLTextAreaElement) item).getValue();
+                value = ((HTMLTextAreaElement) item).getValue();
             }
-            return "";
+            return value != null ? value : "";
         }
 
         boolean isFromFile() {
@@ -370,6 +378,7 @@ class FormListener implements EventListener {
             return Boolean.valueOf(getInputValue("locked"));
         }
 
+        @NotNull
         @Override
         public Iterator<Node> iterator() {
             return new Iterator<Node>() {

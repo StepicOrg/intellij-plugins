@@ -22,8 +22,8 @@ public class Step extends StudyObject {
     private Map<String, String> actions;
     private String progress;
     private List<String> subscriptions;
-    private String instruction;
-    private String session;
+    private int instruction;
+    private int session;
     @SerializedName("instruction_type")
     private String instructionType;
     @SerializedName("viewed_by")
@@ -77,8 +77,8 @@ public class Step extends StudyObject {
         if (progress != null ? !progress.equals(step.progress) : step.progress != null) return false;
         if (subscriptions != null ? !subscriptions.equals(step.subscriptions) : step.subscriptions != null)
             return false;
-        if (instruction != null ? !instruction.equals(step.instruction) : step.instruction != null) return false;
-        if (session != null ? !session.equals(step.session) : step.session != null) return false;
+        if (instruction != step.instruction) return false;
+        if (session != step.session) return false;
         if (instructionType != null ? !instructionType.equals(step.instructionType) : step.instructionType != null)
             return false;
         if (createDate != null ? !createDate.equals(step.createDate) : step.createDate != null) return false;
@@ -102,8 +102,8 @@ public class Step extends StudyObject {
         result = 31 * result + (actions != null ? actions.hashCode() : 0);
         result = 31 * result + (progress != null ? progress.hashCode() : 0);
         result = 31 * result + (subscriptions != null ? subscriptions.hashCode() : 0);
-        result = 31 * result + (instruction != null ? instruction.hashCode() : 0);
-        result = 31 * result + (session != null ? session.hashCode() : 0);
+        result = 31 * result + instruction;
+        result = 31 * result + session;
         result = 31 * result + (instructionType != null ? instructionType.hashCode() : 0);
         result = 31 * result + viewedBy;
         result = 31 * result + passedBy;
@@ -195,21 +195,19 @@ public class Step extends StudyObject {
         this.subscriptions = subscriptions;
     }
 
-    @Nullable
-    public String getInstruction() {
+    public int getInstruction() {
         return instruction;
     }
 
-    public void setInstruction(@Nullable String instruction) {
+    public void setInstruction(int instruction) {
         this.instruction = instruction;
     }
 
-    @Nullable
-    public String getSession() {
+    public int getSession() {
         return session;
     }
 
-    public void setSession(@Nullable String session) {
+    public void setSession(int session) {
         this.session = session;
     }
 

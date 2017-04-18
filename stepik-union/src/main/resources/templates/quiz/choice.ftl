@@ -1,5 +1,5 @@
 <#-- @ftlvariable name="disabled" type="java.lang.String" -->
-<#-- @ftlvariable name="stepNode" type="org.stepik.core.courseFormat.stepHelpers.ChoiceQuizNodeHelper" -->
+<#-- @ftlvariable name="stepNode" type="org.stepik.core.courseFormat.stepHelpers.ChoiceQuizHelper" -->
 
 <#include "base.ftl">
 

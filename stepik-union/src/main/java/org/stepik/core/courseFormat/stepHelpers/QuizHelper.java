@@ -15,6 +15,7 @@ import org.stepik.api.objects.submissions.Submission;
 import org.stepik.api.objects.submissions.Submissions;
 import org.stepik.api.objects.users.User;
 import org.stepik.api.queries.Order;
+import org.stepik.api.queries.submissions.StepikSubmissionsGetQuery;
 import org.stepik.api.urls.Urls;
 import org.stepik.core.courseFormat.StepNode;
 import org.stepik.core.courseFormat.StudyStatus;
@@ -27,15 +28,18 @@ import java.util.List;
  */
 public class QuizHelper extends StepHelper {
     private static final Logger logger = Logger.getInstance(QuizHelper.class);
+    private static final String ACTIVE = "active";
+    private static final String ACTIVE_WRONG = "active_wrong";
     @NotNull
     Reply reply = new Reply();
+    boolean useLastSubmission;
     @NotNull
     private String status = "";
     @NotNull
     private Attempt attempt = new Attempt();
     private int submissionsCount = -1;
     private Submission submission;
-    private boolean inited;
+    private boolean initialized;
 
     public QuizHelper(@NotNull Project project, @NotNull StepNode stepNode) {
         super(project, stepNode);
@@ -52,27 +56,39 @@ public class QuizHelper extends StepHelper {
             return false;
         }
 
-        attempt = attempts.getAttempts().get(0);
+        attempt = attempts.getFirst();
         return true;
     }
 
     private boolean loadSubmission(StepikApiClient stepikApiClient, long userId) {
-        Submissions submissions = stepikApiClient.submissions()
+        long attemptId = attempt.getId();
+        StepikSubmissionsGetQuery query = stepikApiClient.submissions()
                 .get()
                 .order(Order.DESC)
-                .attempt(attempt.getId())
-                .user(userId)
-                .execute();
+                .user(userId);
+
+        if (!useLastSubmission) {
+            query.attempt(attemptId);
+        }
+
+        Submissions submissions = query.execute();
 
         if (!submissions.isEmpty()) {
-            submission = submissions.getSubmissions().get(0);
+            submission = submissions.getFirst();
             reply = submission.getReply();
             status = submission.getStatus();
+            if (ACTIVE.equals(attempt.getStatus())) {
+                if (submission.getAttempt() != attemptId) {
+                    status = ACTIVE;
+                } else if (status.equals("wrong")) {
+                    status = ACTIVE_WRONG;
+                }
+            }
             getStepNode().setStatus(StudyStatus.of(status));
             return true;
         }
 
-        status = "active";
+        status = ACTIVE;
         return false;
     }
 
@@ -150,7 +166,7 @@ public class QuizHelper extends StepHelper {
     }
 
     boolean needInit() {
-        return !inited;
+        return !initialized;
     }
 
     void onStartInit() {
@@ -163,11 +179,11 @@ public class QuizHelper extends StepHelper {
     }
 
     void onFinishInit() {
-        inited = true;
+        initialized = true;
     }
 
     void onInitFailed() {
-        inited = false;
+        initialized = false;
     }
 
     public int getSubmissionsCount() {
