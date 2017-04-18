@@ -241,10 +241,9 @@ public class StepikAuthManager {
 
     private static void setTokenInfo(long userId, @NotNull final TokenInfo tokenInfo) {
         String serviceName = StepikProjectManager.class.getName();
-        CredentialAttributes attributes = new CredentialAttributes(serviceName,
-                String.valueOf(userId),
-                StepikProjectManager.class,
-                false);
+        String userName = String.valueOf(userId);
+        CredentialAttributes attributes;
+        attributes = new CredentialAttributes(serviceName, userName, StepikProjectManager.class, false);
         String serializedAuthInfo = stepikApiClient.getJsonConverter().toJson(tokenInfo);
         Credentials credentials = new Credentials(attributes.getUserName(), serializedAuthInfo);
         PasswordSafe.getInstance().set(attributes, credentials);

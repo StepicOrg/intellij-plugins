@@ -72,11 +72,12 @@ public class AuthDialog extends JDialog {
             toolPane.getChildren().addAll(backButton, homeButton, progressBar);
             toolPane.setPadding(new Insets(5));
 
+            CookieManager manager = clear ? new CookieManager() : new StepikCookieManager();
+            CookieHandler.setDefault(manager);
             if (clear) {
-                CookieManager manager = new CookieManager();
-                CookieHandler.setDefault(manager);
                 manager.getCookieStore().removeAll();
             }
+
             url = StepikAuthManager.getImplicitGrantUrl();
             engine.load(url);
         });
