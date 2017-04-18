@@ -45,7 +45,8 @@ import static org.stepik.core.projectWizard.ProjectWizardUtils.createSubDirector
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
 
 
-class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettings> implements StepikAuthManagerListener {
+class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettings>
+        implements StepikAuthManagerListener {
     private static final Logger logger = Logger.getInstance(StepikPyProjectGenerator.class);
     private static final String MODULE_NAME = "Stepik";
     private final StepikProjectGenerator generator;
@@ -218,8 +219,7 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
     }
 
     @Override
-    public void stateChanged(
-            @NotNull StepikAuthState oldState, @NotNull StepikAuthState newState) {
+    public void stateChanged(@NotNull StepikAuthState oldState, @NotNull StepikAuthState newState) {
         fireStateChanged();
     }
 
