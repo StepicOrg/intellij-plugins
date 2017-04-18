@@ -1,5 +1,6 @@
 package org.stepik.core.courseFormat.stepHelpers;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.api.client.StepikApiClient;
@@ -16,6 +17,8 @@ import static org.stepik.core.stepik.StepikAuthManager.isAuthenticated;
  * @author meanmail
  */
 public class FreeAnswerQuizHelper extends StringQuizHelper {
+    private static final Logger logger = Logger.getInstance(FreeAnswerQuizHelper.class);
+
     public FreeAnswerQuizHelper(@NotNull Project project, @NotNull StepNode stepNode) {
         super(project, stepNode);
         useLastSubmission = true;
@@ -73,7 +76,8 @@ public class FreeAnswerQuizHelper extends StringQuizHelper {
                 Instruction instruction = instructions.getFirst();
                 return instruction.isFrozen();
             }
-        } catch (StepikClientException ignored) {
+        } catch (StepikClientException e) {
+            logger.warn(e);
         }
         return true;
     }

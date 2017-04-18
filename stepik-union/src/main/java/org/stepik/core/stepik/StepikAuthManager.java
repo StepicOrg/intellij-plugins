@@ -274,7 +274,7 @@ public class StepikAuthManager {
     @NotNull
     public static String getCurrentUserFullName() {
         User user = getCurrentUser();
-        return user.getFirstName() + " " + user.getLastName();
+        return (user.getFirstName() + " " + user.getLastName()).trim();
     }
 
     public static StepikApiClient authAndGetStepikApiClient() {
