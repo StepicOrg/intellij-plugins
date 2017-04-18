@@ -82,7 +82,8 @@ import static org.stepik.core.stepik.StepikAuthState.SHOW_DIALOG;
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
 
 @State(name = "StepikStudySettings", storages = @Storage("stepik_study_project.xml"))
-public class StepikProjectManager implements PersistentStateComponent<Element>, DumbAware, StepikAuthManagerListener, Disposable {
+public class StepikProjectManager
+        implements PersistentStateComponent<Element>, DumbAware, StepikAuthManagerListener, Disposable {
     private static final int CURRENT_VERSION = 4;
     private static final Logger logger = Logger.getInstance(StepikProjectManager.class);
     @XStreamOmitField
