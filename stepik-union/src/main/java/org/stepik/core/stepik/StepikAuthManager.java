@@ -1,6 +1,7 @@
 package org.stepik.core.stepik;
 
 import com.intellij.credentialStore.CredentialAttributes;
+import com.intellij.credentialStore.Credentials;
 import com.intellij.ide.passwordSafe.PasswordSafe;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.application.Application;
@@ -226,10 +227,12 @@ public class StepikAuthManager {
                 String.valueOf(userId),
                 StepikProjectManager.class,
                 false);
-        String serializedAuthInfo;
-        serializedAuthInfo = PasswordSafe.getInstance().getPassword(attributes);
-        TokenInfo authInfo = client.getJsonConverter().fromJson(serializedAuthInfo, TokenInfo.class);
-
+        Credentials credentials = PasswordSafe.getInstance().get(attributes);
+        TokenInfo authInfo = null;
+        if (credentials != null) {
+            String password = credentials.getPasswordAsString();
+            authInfo = client.getJsonConverter().fromJson(password, TokenInfo.class);
+        }
         if (authInfo == null) {
             return new TokenInfo();
         }
@@ -243,7 +246,8 @@ public class StepikAuthManager {
                 StepikProjectManager.class,
                 false);
         String serializedAuthInfo = stepikApiClient.getJsonConverter().toJson(tokenInfo);
-        PasswordSafe.getInstance().setPassword(attributes, serializedAuthInfo);
+        Credentials credentials = new Credentials(attributes.getUserName(), serializedAuthInfo);
+        PasswordSafe.getInstance().set(attributes, credentials);
         setLastUser(userId);
     }
 
