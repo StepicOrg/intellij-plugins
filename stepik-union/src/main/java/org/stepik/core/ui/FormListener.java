@@ -55,9 +55,11 @@ class FormListener implements EventListener {
     private static final Logger logger = Logger.getInstance(FormListener.class);
     private static final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Project project;
+    private final StudyBrowserWindow browser;
 
-    FormListener(@NotNull Project project) {
+    FormListener(@NotNull Project project, @NotNull StudyBrowserWindow browser) {
         this.project = project;
+        this.browser = browser;
     }
 
     @Override
@@ -81,6 +83,7 @@ class FormListener implements EventListener {
 
             try {
                 switch (elements.getAction()) {
+                    case "get_first_attempt":
                     case "get_attempt":
                         boolean locked = elements.isLocked();
                         if (!locked) {
@@ -100,6 +103,7 @@ class FormListener implements EventListener {
                         executor.execute(() -> StepikAuthManager.authentication(true));
                         break;
                     default:
+                        browser.hideLoadAnimation();
                         return;
                 }
             } catch (StepikClientException e) {

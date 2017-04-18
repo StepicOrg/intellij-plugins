@@ -194,7 +194,7 @@ class StudyBrowserWindow extends JFrame {
                 final EventListener linkListener = makeHyperLinkListener();
                 addListenerToAllHyperlinkItems(linkListener);
 
-                final EventListener formListener = new FormListener(project);
+                final EventListener formListener = new FormListener(project, this);
                 final Document doc = engine.getDocument();
                 ((EventTarget) doc).addEventListener(FormListener.EVENT_TYPE_SUBMIT, formListener, false);
             }

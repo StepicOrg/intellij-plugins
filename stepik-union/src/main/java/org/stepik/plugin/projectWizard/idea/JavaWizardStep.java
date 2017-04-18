@@ -9,13 +9,14 @@ import org.jetbrains.annotations.NotNull;
 import org.stepik.api.objects.StudyObject;
 import org.stepik.core.SupportedLanguages;
 import org.stepik.core.projectWizard.ProjectWizardUtils;
+import org.stepik.core.stepik.StepikAuthState;
 import org.stepik.plugin.projectWizard.StepikProjectGenerator;
 import org.stepik.plugin.projectWizard.ui.ProjectSettingsPanel;
 
 import javax.swing.*;
 
 import static org.stepik.core.stepik.StepikAuthManager.authentication;
-import static org.stepik.core.stepik.StepikAuthManager.isAuthenticated;
+import static org.stepik.core.stepik.StepikAuthState.AUTH;
 
 class JavaWizardStep extends ModuleWizardStep {
     private static final Logger logger = Logger.getInstance(JavaWizardStep.class);
@@ -50,8 +51,8 @@ class JavaWizardStep extends ModuleWizardStep {
 
     @Override
     public boolean validate() throws ConfigurationException {
-        authentication(true);
-        if (!isAuthenticated()) {
+        StepikAuthState authenticated = authentication(true);
+        if (authenticated != AUTH) {
             throw new ConfigurationException("Please, you should login", "Error");
         }
         valid = panel.validate();

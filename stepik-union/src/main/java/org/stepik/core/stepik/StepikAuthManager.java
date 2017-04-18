@@ -91,13 +91,14 @@ public class StepikAuthManager {
      * <li>Show a browser for authentication or registration</li>
      * </ul>
      */
-    public static synchronized void authentication(boolean showDialog) {
+    public static synchronized StepikAuthState authentication(boolean showDialog) {
         StepikAuthState value = minorLogin();
         if (value != AUTH && showDialog) {
             setState(SHOW_DIALOG);
             value = showAuthDialog(false);
         }
         setState(value);
+        return value;
     }
 
     @NotNull
@@ -274,7 +275,7 @@ public class StepikAuthManager {
     @NotNull
     public static String getCurrentUserFullName() {
         User user = getCurrentUser();
-        return user.getFirstName() + " " + user.getLastName();
+        return (user.getFirstName() + " " + user.getLastName()).trim();
     }
 
     public static StepikApiClient authAndGetStepikApiClient() {
