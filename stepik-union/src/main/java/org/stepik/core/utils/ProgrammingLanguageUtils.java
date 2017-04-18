@@ -1,29 +1,31 @@
 package org.stepik.core.utils;
 
 import com.intellij.ide.projectView.ProjectView;
+import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.refactoring.move.moveFilesOrDirectories.MoveFilesOrDirectoriesUtil;
-import org.stepik.core.StudyUtils;
-import org.stepik.core.SupportedLanguages;
-import org.stepik.core.core.EduNames;
-import org.stepik.core.courseFormat.StepNode;
-import org.stepik.core.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.submissions.Submission;
 import org.stepik.api.objects.submissions.Submissions;
+import org.stepik.api.objects.users.User;
 import org.stepik.api.queries.Order;
+import org.stepik.core.StudyUtils;
+import org.stepik.core.SupportedLanguages;
+import org.stepik.core.core.EduNames;
+import org.stepik.core.courseFormat.StepNode;
 import org.stepik.core.metrics.Metrics;
 
 import java.io.IOException;
@@ -31,6 +33,8 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
+import static org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient;
+import static org.stepik.core.stepik.StepikAuthManager.getCurrentUser;
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreatePsiDirectory;
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcPsiDirectory;
 
@@ -46,11 +50,9 @@ public class ProgrammingLanguageUtils {
         }
 
         SupportedLanguages currentLang = targetStepNode.getCurrentLang();
+        String currentMainFileName = currentLang.getMainFileName();
 
-        String mainFilePath = String.join("/",
-                targetStepNode.getPath(),
-                EduNames.SRC,
-                currentLang.getMainFileName());
+        String mainFilePath = String.join("/", targetStepNode.getPath(), EduNames.SRC, currentMainFileName);
         VirtualFile mainFile = project.getBaseDir().findFileByRelativePath(mainFilePath);
 
         boolean mainFileExists = mainFile != null;
@@ -59,7 +61,7 @@ public class ProgrammingLanguageUtils {
             return;
         }
 
-        if (currentLang.getMainFileName().equals(language.getMainFileName()) && mainFileExists) {
+        if (currentMainFileName.equals(language.getMainFileName()) && mainFileExists) {
             targetStepNode.setCurrentLang(language);
             Metrics.switchLanguage(project, targetStepNode, SUCCESSFUL);
             return;
@@ -75,7 +77,7 @@ public class ProgrammingLanguageUtils {
             return;
         }
 
-        PsiFile second = src.findFile(language.getMainFileName());
+        PsiFile second = findFile(src, language.getMainFileName());
         boolean moveSecond = second == null;
         if (moveSecond) {
             second = getOrCreateMainFile(project, hide.getVirtualFile(), language, targetStepNode);
@@ -85,24 +87,40 @@ public class ProgrammingLanguageUtils {
             }
         }
 
-        PsiFile first = hide.findFile(currentLang.getMainFileName());
+        PsiFile first = findFile(hide, currentMainFileName);
         boolean moveFirst = first == null;
 
         if (moveFirst) {
-            first = src.findFile(currentLang.getMainFileName());
+            first = findFile(src, currentMainFileName);
             moveFirst = !second.isEquivalentTo(first);
         }
 
         targetStepNode.setCurrentLang(language);
         ArrayList<VirtualFile> needClose = closeStepNodeFile(project, targetStepNode);
-        FileEditorManager.getInstance(project).openFile(second.getVirtualFile(), true);
-        FileEditorManager editorManager = FileEditorManager.getInstance(project);
-        needClose.forEach(editorManager::closeFile);
 
-        exchangeFiles(src, hide, first, second, moveFirst, moveSecond);
+        PsiFile finalSecond = second;
+        PsiFile finalFirst = first;
+        boolean finalMoveFirst = moveFirst;
+        ApplicationManager.getApplication()
+                .invokeAndWait(() -> {
+                    FileEditorManager.getInstance(project).openFile(finalSecond.getVirtualFile(), true);
+                    FileEditorManager editorManager = FileEditorManager.getInstance(project);
+                    needClose.forEach(editorManager::closeFile);
 
-        ProjectView.getInstance(project).selectPsiElement(second, false);
+                    exchangeFiles(src, hide, finalFirst, finalSecond, finalMoveFirst, moveSecond);
+
+                    ProjectView.getInstance(project).selectPsiElement(finalSecond, false);
+                });
+
         Metrics.switchLanguage(project, targetStepNode, SUCCESSFUL);
+    }
+
+    @Nullable
+    private static PsiFile findFile(@NotNull PsiDirectory parent, @NotNull String name) {
+        return ApplicationManager.getApplication()
+                .runReadAction((Computable<PsiFile>) () ->
+                        parent.findFile(name)
+                );
     }
 
     private static void exchangeFiles(
@@ -136,11 +154,16 @@ public class ProgrammingLanguageUtils {
             if (StudyUtils.getStudyNode(project, file) != targetStepNode) {
                 continue;
             }
-            Document document = documentManager.getDocument(file);
+            final Document document = ApplicationManager.getApplication()
+                    .runReadAction((Computable<Document>) () ->
+                            documentManager.getDocument(file)
+                    );
             if (document == null) {
                 continue;
             }
-            documentManager.saveDocument(document);
+            ApplicationManager.getApplication().invokeAndWait(() ->
+                    documentManager.saveDocument(document)
+            );
             needClose.add(file);
         }
 
@@ -156,32 +179,34 @@ public class ProgrammingLanguageUtils {
         String fileName = language.getMainFileName();
         final VirtualFile[] file = {parent.findChild(fileName)};
 
+        Application application = ApplicationManager.getApplication();
         if (file[0] == null) {
-            ApplicationManager
-                    .getApplication()
-                    .runWriteAction(() -> {
+            application.invokeAndWait(() ->
+                    application.runWriteAction(() -> {
                         try {
                             file[0] = parent.createChildData(null, fileName);
                             String template = null;
                             try {
-                                StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
-                                long userId = StepikConnectorLogin.getCurrentUser().getId();
-                                Submissions submissions = stepikApiClient.submissions()
-                                        .get()
-                                        .user(userId)
-                                        .order(Order.DESC)
-                                        .step(stepNode.getId())
-                                        .execute();
+                                StepikApiClient stepikApiClient = authAndGetStepikApiClient();
+                                User user = getCurrentUser();
+                                if (!user.isGuest()) {
+                                    Submissions submissions = stepikApiClient.submissions()
+                                            .get()
+                                            .user(user.getId())
+                                            .order(Order.DESC)
+                                            .step(stepNode.getId())
+                                            .execute();
 
-                                if (!submissions.isEmpty()) {
-                                    Optional<Submission> lastSubmission = submissions.getItems()
-                                            .stream()
-                                            .filter(submission -> SupportedLanguages.langOfName(submission.getReply()
-                                                    .getLanguage()) == language)
-                                            .limit(1)
-                                            .findFirst();
-                                    if (lastSubmission.isPresent()) {
-                                        template = lastSubmission.get().getReply().getCode();
+                                    if (!submissions.isEmpty()) {
+                                        Optional<Submission> lastSubmission = submissions.getItems()
+                                                .stream()
+                                                .filter(submission -> SupportedLanguages.langOfName(submission.getReply()
+                                                        .getLanguage()) == language)
+                                                .limit(1)
+                                                .findFirst();
+                                        if (lastSubmission.isPresent()) {
+                                            template = lastSubmission.get().getReply().getCode();
+                                        }
                                     }
                                 }
                             } catch (StepikClientException e) {
@@ -196,8 +221,11 @@ public class ProgrammingLanguageUtils {
                         } catch (IOException e) {
                             file[0] = null;
                         }
-                    });
+                    })
+            );
         }
-        return PsiManager.getInstance(project).findFile(file[0]);
+        return application.runReadAction((Computable<PsiFile>) () ->
+                PsiManager.getInstance(project).findFile(file[0])
+        );
     }
 }

@@ -17,19 +17,6 @@ import org.stepik.api.objects.steps.Steps;
 import org.stepik.api.objects.units.Units;
 import org.stepik.core.SupportedLanguages;
 import org.stepik.core.core.EduNames;
-import org.stepik.core.courseFormat.stepHelpers.ChoiceQuizNodeHelper;
-import org.stepik.core.courseFormat.stepHelpers.CodeHelper;
-import org.stepik.core.courseFormat.stepHelpers.DatasetQuizNodeHelper;
-import org.stepik.core.courseFormat.stepHelpers.MatchingQuizNodeHelper;
-import org.stepik.core.courseFormat.stepHelpers.NumberQuizNodeHelper;
-import org.stepik.core.courseFormat.stepHelpers.QuizHelper;
-import org.stepik.core.courseFormat.stepHelpers.SortingQuizNodeHelper;
-import org.stepik.core.courseFormat.stepHelpers.StepHelper;
-import org.stepik.core.courseFormat.stepHelpers.StringQuizNodeHelper;
-import org.stepik.core.courseFormat.stepHelpers.TableQuizNodeHelper;
-import org.stepik.core.courseFormat.stepHelpers.TextHelper;
-import org.stepik.core.courseFormat.stepHelpers.VideoStepNodeHelper;
-import org.stepik.core.stepik.StepikConnectorLogin;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.stepik.core.SupportedLanguages.INVALID;
-import static org.stepik.core.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
 
 public class StepNode extends Node<Step, StepNode, Step, StepNode> {
     private static final Logger logger = Logger.getInstance(StepNode.class);
@@ -49,22 +35,21 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
 
     public StepNode() {}
 
-    public StepNode(@NotNull Project project, @NotNull Step data) {
-        super(project, data);
+    public StepNode(@NotNull Project project, @NotNull StepikApiClient stepikApiClient, @NotNull Step data) {
+        super(project, stepikApiClient, data);
     }
 
     @Override
-    public void init(@NotNull Project project, @Nullable StudyNode parent) {
+    public void init(@NotNull Project project, @NotNull StepikApiClient stepikApiClient, @Nullable StudyNode parent) {
         supportedLanguages = null;
         courseId = 0;
 
-        super.init(project, parent);
+        super.init(project, stepikApiClient, parent);
     }
 
     @Override
-    protected boolean loadData(long id) {
+    protected boolean loadData(@NotNull StepikApiClient stepikApiClient, long id) {
         try {
-            StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
             Steps steps = stepikApiClient.steps()
                     .get()
                     .id(id)
@@ -73,14 +58,14 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
             Step data;
 
             if (!steps.isEmpty()) {
-                data = steps.getSteps().get(0);
+                data = steps.getFirst();
             } else {
                 data = new Step();
                 data.setId(id);
             }
-            setData(data);
 
             Step oldData = this.getData();
+            setData(data);
             return oldData == null || !oldData.getUpdateDate().equals(data.getUpdateDate());
         } catch (StepikClientException logged) {
             logger.warn(String.format("Failed step lesson data id=%d", id), logged);
@@ -126,15 +111,15 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
     }
 
     @Override
-    protected List<Step> getChildDataList() {
+    protected List<Step> getChildDataList(@NotNull StepikApiClient stepikApiClient) {
         return Collections.emptyList();
     }
 
     @Override
-    public long getCourseId() {
+    public long getCourseId(@NotNull StepikApiClient stepikApiClient) {
         StudyNode parent = getParent();
         if (parent != null) {
-            return parent.getCourseId();
+            return parent.getCourseId(stepikApiClient);
         }
 
         if (courseId != 0) {
@@ -152,8 +137,6 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
         }
 
         try {
-            StepikApiClient stepikApiClient = authAndGetStepikApiClient();
-
             Units units = stepikApiClient.units()
                     .get()
                     .lesson(lessonId)
@@ -165,10 +148,10 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
             LessonNode lessonNode = new LessonNode();
             CompoundUnitLesson lessonData = lessonNode.getData();
             if (lessonData != null) {
-                lessonData.setUnit(units.getItems().get(0));
+                lessonData.setUnit(units.getFirst());
             }
 
-            courseId = lessonNode.getCourseId();
+            courseId = lessonNode.getCourseId(stepikApiClient);
             return courseId;
         } catch (StepikClientException ignored) {
         }
@@ -276,11 +259,6 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
     }
 
     @Override
-    public boolean canBeLeaf() {
-        return true;
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -305,46 +283,6 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
         return result;
     }
 
-    @NotNull
-    public VideoStepNodeHelper asVideoStep(@NotNull Project project) {
-        return new VideoStepNodeHelper(project, this);
-    }
-
-    @NotNull
-    public ChoiceQuizNodeHelper asChoiceStep(@NotNull Project project) {
-        return new ChoiceQuizNodeHelper(project, this);
-    }
-
-    @NotNull
-    public StringQuizNodeHelper asStringStep(@NotNull Project project) {
-        return new StringQuizNodeHelper(project, this);
-    }
-
-    @NotNull
-    public SortingQuizNodeHelper asSortingStep(@NotNull Project project) {
-        return new SortingQuizNodeHelper(project, this);
-    }
-
-    @NotNull
-    public MatchingQuizNodeHelper asMatchingStep(@NotNull Project project) {
-        return new MatchingQuizNodeHelper(project, this);
-    }
-
-    @NotNull
-    public NumberQuizNodeHelper asNumberStep(@NotNull Project project) {
-        return new NumberQuizNodeHelper(project, this);
-    }
-
-    @NotNull
-    public DatasetQuizNodeHelper asDatasetStep(@NotNull Project project) {
-        return new DatasetQuizNodeHelper(project, this);
-    }
-
-    @NotNull
-    public TableQuizNodeHelper asTableStep(@NotNull Project project) {
-        return new TableQuizNodeHelper(project, this);
-    }
-
     public Long getAssignment() {
         if (assignment == null) {
             StudyNode parent = getParent();
@@ -365,21 +303,5 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
             }
         }
         return assignment;
-    }
-
-    public QuizHelper asQuizHelper(@NotNull Project project) {
-        return new QuizHelper(project, this);
-    }
-
-    public StepHelper asStepHelper(@NotNull Project project) {
-        return new StepHelper(project, this);
-    }
-
-    public TextHelper asTextHelper(@NotNull Project project) {
-        return new TextHelper(project, this);
-    }
-
-    public CodeHelper asCodeHelper(@NotNull Project project) {
-        return new CodeHelper(project, this);
     }
 }

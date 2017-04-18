@@ -15,27 +15,38 @@ import org.stepik.api.objects.submissions.Submission;
 import org.stepik.api.objects.submissions.Submissions;
 import org.stepik.api.objects.users.User;
 import org.stepik.api.queries.Order;
+import org.stepik.api.queries.submissions.StepikSubmissionsGetQuery;
 import org.stepik.api.urls.Urls;
 import org.stepik.core.courseFormat.StepNode;
 import org.stepik.core.courseFormat.StudyStatus;
-import org.stepik.core.stepik.StepikConnectorLogin;
 
 import java.util.List;
+
+import static org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient;
+import static org.stepik.core.stepik.StepikAuthManager.getCurrentUser;
 
 /**
  * @author meanmail
  */
 public class QuizHelper extends StepHelper {
     private static final Logger logger = Logger.getInstance(QuizHelper.class);
+    private static final String ACTIVE = "active";
+    private static final String GET_ATTEMPT = "get_attempt";
+    private static final String GET_FIRST_ATTEMPT = "get_first_attempt";
+    private static final String SUBMIT = "submit";
+    private static final String UNCHECKED = "unchecked";
     @NotNull
     Reply reply = new Reply();
+    boolean useLastSubmission;
     @NotNull
-    private String status = "";
+    private String action = "get_first_attempt";
+    @NotNull
+    private String status = "unchecked";
     @NotNull
     private Attempt attempt = new Attempt();
     private int submissionsCount = -1;
     private Submission submission;
-    private boolean inited;
+    private boolean initialized;
 
     public QuizHelper(@NotNull Project project, @NotNull StepNode stepNode) {
         super(project, stepNode);
@@ -49,42 +60,49 @@ public class QuizHelper extends StepHelper {
                 .execute();
         if (attempts.isEmpty()) {
             attempt = new Attempt();
+            action = GET_FIRST_ATTEMPT;
             return false;
         }
 
-        attempt = attempts.getAttempts().get(0);
+        attempt = attempts.getFirst();
+        action = ACTIVE.equals(attempt.getStatus()) ? SUBMIT : GET_ATTEMPT;
         return true;
     }
 
     private boolean loadSubmission(StepikApiClient stepikApiClient, long userId) {
-        Submissions submissions = stepikApiClient.submissions()
+        long attemptId = attempt.getId();
+        StepikSubmissionsGetQuery query = stepikApiClient.submissions()
                 .get()
                 .order(Order.DESC)
-                .attempt(attempt.getId())
-                .user(userId)
-                .execute();
+                .user(userId);
+
+        if (!useLastSubmission) {
+            query.attempt(attemptId);
+        }
+
+        Submissions submissions = query.execute();
 
         if (!submissions.isEmpty()) {
-            submission = submissions.getSubmissions().get(0);
+            submission = submissions.getFirst();
             reply = submission.getReply();
-            status = submission.getStatus();
+            if (attemptId == submission.getAttempt()) {
+                status = submission.getStatus();
+            }
+            if (ACTIVE.equals(attempt.getStatus()) && status.equals("correct")) {
+                action = GET_ATTEMPT;
+            }
             getStepNode().setStatus(StudyStatus.of(status));
             return true;
         }
 
-        status = "active";
         return false;
     }
 
+    @Override
     @NotNull
     public String getStatus() {
         initStepOptions();
         return status;
-    }
-
-    @NotNull
-    public String getPath() {
-        return getStepNode().getPath();
     }
 
     public long getAttemptId() {
@@ -115,6 +133,7 @@ public class QuizHelper extends StepHelper {
         return submission != null ? submission.getReplyUrl() : "";
     }
 
+    @SuppressWarnings("SameReturnValue")
     public String getBaseUrl() {
         return Urls.STEPIK_URL;
     }
@@ -125,11 +144,17 @@ public class QuizHelper extends StepHelper {
         }
 
         onStartInit();
-        status = "";
+        status = UNCHECKED;
+        action = GET_FIRST_ATTEMPT;
 
         try {
-            StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
-            User user = StepikConnectorLogin.getCurrentUser();
+            StepikApiClient stepikApiClient = authAndGetStepikApiClient();
+            User user = getCurrentUser();
+            if (user.isGuest()) {
+                action = NEED_LOGIN;
+                return;
+            }
+
             long userId = user.getId();
 
             if (!loadAttempt(stepikApiClient, userId)) {
@@ -150,7 +175,7 @@ public class QuizHelper extends StepHelper {
     }
 
     boolean needInit() {
-        return !inited;
+        return !initialized;
     }
 
     void onStartInit() {
@@ -163,22 +188,27 @@ public class QuizHelper extends StepHelper {
     }
 
     void onFinishInit() {
-        inited = true;
+        initialized = true;
     }
 
     void onInitFailed() {
-        inited = false;
+        initialized = false;
     }
 
     public int getSubmissionsCount() {
         if (submissionsCount == -1) {
             try {
-                StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
-                User user = StepikConnectorLogin.getCurrentUser();
+                StepikApiClient stepikApiClient = authAndGetStepikApiClient();
+                User user = getCurrentUser();
+                if (user.isGuest()) {
+                    action = NEED_LOGIN;
+                    return 0;
+                }
                 long userId = user.getId();
                 submissionsCount = 0;
                 Submissions submissions;
                 int page = 1;
+
                 do {
                     submissions = stepikApiClient.submissions()
                             .get()
@@ -235,5 +265,12 @@ public class QuizHelper extends StepHelper {
             return 0;
         }
         return data.getMaxSubmissionsCount();
+    }
+
+    @Override
+    @NotNull
+    public String getAction() {
+        initStepOptions();
+        return action;
     }
 }

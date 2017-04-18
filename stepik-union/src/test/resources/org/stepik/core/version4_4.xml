@@ -1,0 +1,1995 @@
+<StepikProjectManager id="1">
+  <root class="CourseNode" id="2">
+    <data id="3">
+      <id>187</id>
+    </data>
+    <children id="4">
+      <SectionNode id="5">
+        <data class="Section" id="6">
+          <id>537</id>
+          <course>0</course>
+          <position>1</position>
+          <requiredPercent>0</requiredPercent>
+          <isRequirementSatisfied>false</isRequirementSatisfied>
+          <isExam>false</isExam>
+          <examDurationMinutes>0</examDurationMinutes>
+          <title>Введение в Java</title>
+          <isActive>false</isActive>
+        </data>
+        <children id="7">
+          <LessonNode id="8">
+            <data class="CompoundUnitLesson" id="9">
+              <id>0</id>
+              <unit id="10">
+                <id>0</id>
+                <section>0</section>
+                <lesson>0</lesson>
+                <position>2</position>
+                <isActive>false</isActive>
+              </unit>
+              <lesson id="11">
+                <id>12755</id>
+                <isPrime>false</isPrime>
+                <viewedBy>0</viewedBy>
+                <passedBy>0</passedBy>
+                <timeToComplete>0</timeToComplete>
+                <isCommentsEnabled>false</isCommentsEnabled>
+                <owner>0</owner>
+                <isFeatured>false</isFeatured>
+                <isPublic>false</isPublic>
+                <title>Первый контакт — Hello World</title>
+                <discussionsCount>0</discussionsCount>
+                <epicCount>0</epicCount>
+                <abuseCount>0</abuseCount>
+              </lesson>
+            </data>
+            <children id="12">
+              <StepNode id="13">
+                <data class="Step" id="14">
+                  <id>44236</id>
+                  <lesson>0</lesson>
+                  <position>14</position>
+                  <block id="15">
+                    <name>code</name>
+                    <text>Simple text</text>
+                    <options id="16">
+                      <limits id="17">
+                        <entry>
+                          <string>java8</string>
+                          <Limit id="18">
+                            <time>5</time>
+                            <memory>256</memory>
+                          </Limit>
+                        </entry>
+                      </limits>
+                    </options>
+                  </block>
+                  <instruction>0</instruction>
+                  <session>0</session>
+                  <viewedBy>0</viewedBy>
+                  <passedBy>0</passedBy>
+                  <correctRatio>0.0</correctRatio>
+                  <worth>0</worth>
+                  <isSolutionsUnlocked>false</isSolutionsUnlocked>
+                  <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
+                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <maxSubmissionsCount>0</maxSubmissionsCount>
+                  <discussionsCount>0</discussionsCount>
+                </data>
+                <wasDeleted>false</wasDeleted>
+                <supportedLanguages id="19">
+                  <string>Java 8</string>
+                </supportedLanguages>
+                <currentLang>Java 8</currentLang>
+                <courseId>0</courseId>
+              </StepNode>
+            </children>
+            <wasDeleted>false</wasDeleted>
+            <courseId>0</courseId>
+          </LessonNode>
+        </children>
+        <wasDeleted>false</wasDeleted>
+      </SectionNode>
+      <SectionNode id="20">
+        <data class="Section" id="21">
+          <id>538</id>
+          <course>0</course>
+          <position>2</position>
+          <requiredPercent>0</requiredPercent>
+          <isRequirementSatisfied>false</isRequirementSatisfied>
+          <isExam>false</isExam>
+          <examDurationMinutes>0</examDurationMinutes>
+          <title>Базовый синтаксис Java</title>
+          <isActive>false</isActive>
+        </data>
+        <children id="22">
+          <LessonNode id="23">
+            <data class="CompoundUnitLesson" id="24">
+              <id>0</id>
+              <unit id="25">
+                <id>0</id>
+                <section>0</section>
+                <lesson>0</lesson>
+                <position>1</position>
+                <isActive>false</isActive>
+              </unit>
+              <lesson id="26">
+                <id>12759</id>
+                <isPrime>false</isPrime>
+                <viewedBy>0</viewedBy>
+                <passedBy>0</passedBy>
+                <timeToComplete>0</timeToComplete>
+                <isCommentsEnabled>false</isCommentsEnabled>
+                <owner>0</owner>
+                <isFeatured>false</isFeatured>
+                <isPublic>false</isPublic>
+                <title>Примитивные типы</title>
+                <discussionsCount>0</discussionsCount>
+                <epicCount>0</epicCount>
+                <abuseCount>0</abuseCount>
+              </lesson>
+            </data>
+            <children id="27">
+              <StepNode id="28">
+                <data class="Step" id="29">
+                  <id>47519</id>
+                  <lesson>0</lesson>
+                  <position>6</position>
+                  <block id="30">
+                    <name>code</name>
+                    <text>Simple text</text>
+                    <options id="31">
+                      <limits id="32">
+                        <entry>
+                          <string>java8</string>
+                          <Limit id="33">
+                            <time>2</time>
+                            <memory>64</memory>
+                          </Limit>
+                        </entry>
+                      </limits>
+                    </options>
+                  </block>
+                  <instruction>0</instruction>
+                  <session>0</session>
+                  <viewedBy>0</viewedBy>
+                  <passedBy>0</passedBy>
+                  <correctRatio>0.0</correctRatio>
+                  <worth>0</worth>
+                  <isSolutionsUnlocked>false</isSolutionsUnlocked>
+                  <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
+                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <maxSubmissionsCount>0</maxSubmissionsCount>
+                  <discussionsCount>0</discussionsCount>
+                </data>
+                <wasDeleted>false</wasDeleted>
+                <supportedLanguages id="34">
+                  <string>Java 8</string>
+                </supportedLanguages>
+                <currentLang>Java 8</currentLang>
+                <courseId>0</courseId>
+              </StepNode>
+              <StepNode id="35">
+                <data class="Step" id="36">
+                  <id>47533</id>
+                  <lesson>0</lesson>
+                  <position>8</position>
+                  <block id="37">
+                    <name>code</name>
+                    <text>Simple text</text>
+                    <options id="38">
+                      <limits id="39">
+                        <entry>
+                          <string>java8</string>
+                          <Limit id="40">
+                            <time>2</time>
+                            <memory>64</memory>
+                          </Limit>
+                        </entry>
+                      </limits>
+                    </options>
+                  </block>
+                  <instruction>0</instruction>
+                  <session>0</session>
+                  <viewedBy>0</viewedBy>
+                  <passedBy>0</passedBy>
+                  <correctRatio>0.0</correctRatio>
+                  <worth>0</worth>
+                  <isSolutionsUnlocked>false</isSolutionsUnlocked>
+                  <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
+                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <maxSubmissionsCount>0</maxSubmissionsCount>
+                  <discussionsCount>0</discussionsCount>
+                </data>
+                <wasDeleted>false</wasDeleted>
+                <supportedLanguages id="41">
+                  <string>Java 8</string>
+                </supportedLanguages>
+                <currentLang>Java 8</currentLang>
+                <courseId>0</courseId>
+              </StepNode>
+              <StepNode id="42">
+                <data class="Step" id="43">
+                  <id>47538</id>
+                  <lesson>0</lesson>
+                  <position>12</position>
+                  <block id="44">
+                    <name>code</name>
+                    <text>Simple text</text>
+                    <options id="45">
+                      <limits id="46">
+                        <entry>
+                          <string>java8</string>
+                          <Limit id="47">
+                            <time>2</time>
+                            <memory>64</memory>
+                          </Limit>
+                        </entry>
+                      </limits>
+                    </options>
+                  </block>
+                  <instruction>0</instruction>
+                  <session>0</session>
+                  <viewedBy>0</viewedBy>
+                  <passedBy>0</passedBy>
+                  <correctRatio>0.0</correctRatio>
+                  <worth>0</worth>
+                  <isSolutionsUnlocked>false</isSolutionsUnlocked>
+                  <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
+                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <maxSubmissionsCount>0</maxSubmissionsCount>
+                  <discussionsCount>0</discussionsCount>
+                </data>
+                <wasDeleted>false</wasDeleted>
+                <supportedLanguages id="48">
+                  <string>Java 8</string>
+                </supportedLanguages>
+                <currentLang>Java 8</currentLang>
+                <courseId>0</courseId>
+              </StepNode>
+              <StepNode id="49">
+                <data class="Step" id="50">
+                  <id>47316</id>
+                  <lesson>0</lesson>
+                  <position>15</position>
+                  <block id="51">
+                    <name>code</name>
+                    <text>Simple text</text>
+                    <options id="52">
+                      <limits id="53">
+                        <entry>
+                          <string>java8</string>
+                          <Limit id="54">
+                            <time>8</time>
+                            <memory>256</memory>
+                          </Limit>
+                        </entry>
+                      </limits>
+                    </options>
+                  </block>
+                  <instruction>0</instruction>
+                  <session>0</session>
+                  <viewedBy>0</viewedBy>
+                  <passedBy>0</passedBy>
+                  <correctRatio>0.0</correctRatio>
+                  <worth>0</worth>
+                  <isSolutionsUnlocked>false</isSolutionsUnlocked>
+                  <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
+                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <maxSubmissionsCount>0</maxSubmissionsCount>
+                  <discussionsCount>0</discussionsCount>
+                </data>
+                <wasDeleted>false</wasDeleted>
+                <supportedLanguages id="55">
+                  <string>Java 8</string>
+                </supportedLanguages>
+                <currentLang>Java 8</currentLang>
+                <courseId>0</courseId>
+              </StepNode>
+            </children>
+            <wasDeleted>false</wasDeleted>
+            <courseId>0</courseId>
+          </LessonNode>
+          <LessonNode id="56">
+            <data class="CompoundUnitLesson" id="57">
+              <id>0</id>
+              <unit id="58">
+                <id>0</id>
+                <section>0</section>
+                <lesson>0</lesson>
+                <position>2</position>
+                <isActive>false</isActive>
+              </unit>
+              <lesson id="59">
+                <id>12760</id>
+                <isPrime>false</isPrime>
+                <viewedBy>0</viewedBy>
+                <passedBy>0</passedBy>
+                <timeToComplete>0</timeToComplete>
+                <isCommentsEnabled>false</isCommentsEnabled>
+                <owner>0</owner>
+                <isFeatured>false</isFeatured>
+                <isPublic>false</isPublic>
+                <title>Преобразование типов</title>
+                <discussionsCount>0</discussionsCount>
+                <epicCount>0</epicCount>
+                <abuseCount>0</abuseCount>
+              </lesson>
+            </data>
+            <children id="60">
+              <StepNode id="61">
+                <data class="Step" id="62">
+                  <id>47682</id>
+                  <lesson>0</lesson>
+                  <position>3</position>
+                  <block id="63">
+                    <name>code</name>
+                    <text>Simple text</text>
+                    <options id="64">
+                      <limits id="65">
+                        <entry>
+                          <string>java8</string>
+                          <Limit id="66">
+                            <time>2</time>
+                            <memory>256</memory>
+                          </Limit>
+                        </entry>
+                      </limits>
+                    </options>
+                  </block>
+                  <instruction>0</instruction>
+                  <session>0</session>
+                  <viewedBy>0</viewedBy>
+                  <passedBy>0</passedBy>
+                  <correctRatio>0.0</correctRatio>
+                  <worth>0</worth>
+                  <isSolutionsUnlocked>false</isSolutionsUnlocked>
+                  <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
+                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <maxSubmissionsCount>0</maxSubmissionsCount>
+                  <discussionsCount>0</discussionsCount>
+                </data>
+                <wasDeleted>false</wasDeleted>
+                <supportedLanguages id="67">
+                  <string>Java 8</string>
+                </supportedLanguages>
+                <currentLang>Java 8</currentLang>
+                <courseId>0</courseId>
+              </StepNode>
+              <StepNode id="68">
+                <data class="Step" id="69">
+                  <id>47329</id>
+                  <lesson>0</lesson>
+                  <position>9</position>
+                  <block id="70">
+                    <name>code</name>
+                    <text>Simple text</text>
+                    <options id="71">
+                      <limits id="72">
+                        <entry>
+                          <string>java8</string>
+                          <Limit id="73">
+                            <time>8</time>
+                            <memory>256</memory>
+                          </Limit>
+                        </entry>
+                      </limits>
+                    </options>
+                  </block>
+                  <instruction>0</instruction>
+                  <session>0</session>
+                  <viewedBy>0</viewedBy>
+                  <passedBy>0</passedBy>
+                  <correctRatio>0.0</correctRatio>
+                  <worth>0</worth>
+                  <isSolutionsUnlocked>false</isSolutionsUnlocked>
+                  <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
+                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <maxSubmissionsCount>0</maxSubmissionsCount>
+                  <discussionsCount>0</discussionsCount>
+                </data>
+                <wasDeleted>false</wasDeleted>
+                <supportedLanguages id="74">
+                  <string>Java 8</string>
+                </supportedLanguages>
+                <currentLang>Java 8</currentLang>
+                <courseId>0</courseId>
+              </StepNode>
+            </children>
+            <wasDeleted>false</wasDeleted>
+            <courseId>0</courseId>
+          </LessonNode>
+          <LessonNode id="75">
+            <data class="CompoundUnitLesson" id="76">
+              <id>0</id>
+              <unit id="77">
+                <id>0</id>
+                <section>0</section>
+                <lesson>0</lesson>
+                <position>3</position>
+                <isActive>false</isActive>
+              </unit>
+              <lesson id="78">
+                <id>12761</id>
+                <isPrime>false</isPrime>
+                <viewedBy>0</viewedBy>
+                <passedBy>0</passedBy>
+                <timeToComplete>0</timeToComplete>
+                <isCommentsEnabled>false</isCommentsEnabled>
+                <owner>0</owner>
+                <isFeatured>false</isFeatured>
+                <isPublic>false</isPublic>
+                <title>Массивы и строки</title>
+                <discussionsCount>0</discussionsCount>
+                <epicCount>0</epicCount>
+                <abuseCount>0</abuseCount>
+              </lesson>
+            </data>
+            <children id="79">
+              <StepNode id="80">
+                <data class="Step" id="81">
+                  <id>47333</id>
+                  <lesson>0</lesson>
+                  <position>10</position>
+                  <block id="82">
+                    <name>code</name>
+                    <text>Simple text</text>
+                    <options id="83">
+                      <limits id="84">
+                        <entry>
+                          <string>java8</string>
+                          <Limit id="85">
+                            <time>8</time>
+                            <memory>256</memory>
+                          </Limit>
+                        </entry>
+                      </limits>
+                    </options>
+                  </block>
+                  <instruction>0</instruction>
+                  <session>0</session>
+                  <viewedBy>0</viewedBy>
+                  <passedBy>0</passedBy>
+                  <correctRatio>0.0</correctRatio>
+                  <worth>0</worth>
+                  <isSolutionsUnlocked>false</isSolutionsUnlocked>
+                  <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
+                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <maxSubmissionsCount>0</maxSubmissionsCount>
+                  <discussionsCount>0</discussionsCount>
+                </data>
+                <wasDeleted>false</wasDeleted>
+                <supportedLanguages id="86">
+                  <string>Java 8</string>
+                </supportedLanguages>
+                <currentLang>Java 8</currentLang>
+                <courseId>0</courseId>
+              </StepNode>
+            </children>
+            <wasDeleted>false</wasDeleted>
+            <courseId>0</courseId>
+          </LessonNode>
+          <LessonNode id="87">
+            <data class="CompoundUnitLesson" id="88">
+              <id>0</id>
+              <unit id="89">
+                <id>0</id>
+                <section>0</section>
+                <lesson>0</lesson>
+                <position>4</position>
+                <isActive>false</isActive>
+              </unit>
+              <lesson id="90">
+                <id>12762</id>
+                <isPrime>false</isPrime>
+                <viewedBy>0</viewedBy>
+                <passedBy>0</passedBy>
+                <timeToComplete>0</timeToComplete>
+                <isCommentsEnabled>false</isCommentsEnabled>
+                <owner>0</owner>
+                <isFeatured>false</isFeatured>
+                <isPublic>false</isPublic>
+                <title>Управляющие конструкции: условные операторы и циклы</title>
+                <discussionsCount>0</discussionsCount>
+                <epicCount>0</epicCount>
+                <abuseCount>0</abuseCount>
+              </lesson>
+            </data>
+            <children id="91">
+              <StepNode id="92">
+                <data class="Step" id="93">
+                  <id>47334</id>
+                  <lesson>0</lesson>
+                  <position>8</position>
+                  <block id="94">
+                    <name>code</name>
+                    <text>Simple text</text>
+                    <options id="95">
+                      <limits id="96">
+                        <entry>
+                          <string>java8</string>
+                          <Limit id="97">
+                            <time>8</time>
+                            <memory>256</memory>
+                          </Limit>
+                        </entry>
+                      </limits>
+                    </options>
+                  </block>
+                  <instruction>0</instruction>
+                  <session>0</session>
+                  <viewedBy>0</viewedBy>
+                  <passedBy>0</passedBy>
+                  <correctRatio>0.0</correctRatio>
+                  <worth>0</worth>
+                  <isSolutionsUnlocked>false</isSolutionsUnlocked>
+                  <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
+                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <maxSubmissionsCount>0</maxSubmissionsCount>
+                  <discussionsCount>0</discussionsCount>
+                </data>
+                <wasDeleted>false</wasDeleted>
+                <supportedLanguages id="98">
+                  <string>Java 8</string>
+                </supportedLanguages>
+                <currentLang>Java 8</currentLang>
+                <courseId>0</courseId>
+              </StepNode>
+              <StepNode id="99">
+                <data class="Step" id="100">
+                  <id>47347</id>
+                  <lesson>0</lesson>
+                  <position>9</position>
+                  <block id="101">
+                    <name>code</name>
+                    <text>Simple text</text>
+                    <options id="102">
+                      <limits id="103">
+                        <entry>
+                          <string>java8</string>
+                          <Limit id="104">
+                            <time>6</time>
+                            <memory>256</memory>
+                          </Limit>
+                        </entry>
+                      </limits>
+                    </options>
+                  </block>
+                  <instruction>0</instruction>
+                  <session>0</session>
+                  <viewedBy>0</viewedBy>
+                  <passedBy>0</passedBy>
+                  <correctRatio>0.0</correctRatio>
+                  <worth>0</worth>
+                  <isSolutionsUnlocked>false</isSolutionsUnlocked>
+                  <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
+                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <maxSubmissionsCount>0</maxSubmissionsCount>
+                  <discussionsCount>0</discussionsCount>
+                </data>
+                <wasDeleted>false</wasDeleted>
+                <supportedLanguages id="105">
+                  <string>Java 8</string>
+                </supportedLanguages>
+                <currentLang>Java 8</currentLang>
+                <courseId>0</courseId>
+              </StepNode>
+              <StepNode id="106">
+                <data class="Step" id="107">
+                  <id>47721</id>
+                  <lesson>0</lesson>
+                  <position>10</position>
+                  <block id="108">
+                    <name>code</name>
+                    <text>Simple text</text>
+                    <options id="109">
+                      <limits id="110">
+                        <entry>
+                          <string>java8</string>
+                          <Limit id="111">
+                            <time>8</time>
+                            <memory>256</memory>
+                          </Limit>
+                        </entry>
+                      </limits>
+                    </options>
+                  </block>
+                  <instruction>0</instruction>
+                  <session>0</session>
+                  <viewedBy>0</viewedBy>
+                  <passedBy>0</passedBy>
+                  <correctRatio>0.0</correctRatio>
+                  <worth>0</worth>
+                  <isSolutionsUnlocked>false</isSolutionsUnlocked>
+                  <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
+                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <maxSubmissionsCount>0</maxSubmissionsCount>
+                  <discussionsCount>0</discussionsCount>
+                </data>
+                <wasDeleted>false</wasDeleted>
+                <supportedLanguages id="112">
+                  <string>Java 8</string>
+                </supportedLanguages>
+                <currentLang>Java 8</currentLang>
+                <courseId>0</courseId>
+              </StepNode>
+            </children>
+            <wasDeleted>false</wasDeleted>
+            <courseId>0</courseId>
+          </LessonNode>
+        </children>
+        <wasDeleted>false</wasDeleted>
+      </SectionNode>
+      <SectionNode id="113">
+        <data class="Section" id="114">
+          <id>539</id>
+          <course>0</course>
+          <position>3</position>
+          <requiredPercent>0</requiredPercent>
+          <isRequirementSatisfied>false</isRequirementSatisfied>
+          <isExam>false</isExam>
+          <examDurationMinutes>0</examDurationMinutes>
+          <title>Объекты, классы и пакеты в Java</title>
+          <isActive>false</isActive>
+        </data>
+        <children id="115">
+          <LessonNode id="116">
+            <data class="CompoundUnitLesson" id="117">
+              <id>0</id>
+              <unit id="118">
+                <id>0</id>
+                <section>0</section>
+                <lesson>0</lesson>
+                <position>3</position>
+                <isActive>false</isActive>
+              </unit>
+              <lesson id="119">
+                <id>12766</id>
+                <isPrime>false</isPrime>
+                <viewedBy>0</viewedBy>
+                <passedBy>0</passedBy>
+                <timeToComplete>0</timeToComplete>
+                <isCommentsEnabled>false</isCommentsEnabled>
+                <owner>0</owner>
+                <isFeatured>false</isFeatured>
+                <isPublic>false</isPublic>
+                <title>Объявление класса</title>
+                <discussionsCount>0</discussionsCount>
+                <epicCount>0</epicCount>
+                <abuseCount>0</abuseCount>
+              </lesson>
+            </data>
+            <children id="120">
+              <StepNode id="121">
+                <data class="Step" id="122">
+                  <id>49992</id>
+                  <lesson>0</lesson>
+                  <position>12</position>
+                  <block id="123">
+                    <name>code</name>
+                    <text>Simple text</text>
+                    <options id="124">
+                      <limits id="125">
+                        <entry>
+                          <string>java8</string>
+                          <Limit id="126">
+                            <time>8</time>
+                            <memory>256</memory>
+                          </Limit>
+                        </entry>
+                      </limits>
+                    </options>
+                  </block>
+                  <instruction>0</instruction>
+                  <session>0</session>
+                  <viewedBy>0</viewedBy>
+                  <passedBy>0</passedBy>
+                  <correctRatio>0.0</correctRatio>
+                  <worth>0</worth>
+                  <isSolutionsUnlocked>false</isSolutionsUnlocked>
+                  <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
+                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <maxSubmissionsCount>0</maxSubmissionsCount>
+                  <discussionsCount>0</discussionsCount>
+                </data>
+                <wasDeleted>false</wasDeleted>
+                <supportedLanguages id="127">
+                  <string>Java 8</string>
+                </supportedLanguages>
+                <currentLang>Java 8</currentLang>
+                <courseId>0</courseId>
+              </StepNode>
+            </children>
+            <wasDeleted>false</wasDeleted>
+            <courseId>0</courseId>
+          </LessonNode>
+          <LessonNode id="128">
+            <data class="CompoundUnitLesson" id="129">
+              <id>0</id>
+              <unit id="130">
+                <id>0</id>
+                <section>0</section>
+                <lesson>0</lesson>
+                <position>4</position>
+                <isActive>false</isActive>
+              </unit>
+              <lesson id="131">
+                <id>12769</id>
+                <isPrime>false</isPrime>
+                <viewedBy>0</viewedBy>
+                <passedBy>0</passedBy>
+                <timeToComplete>0</timeToComplete>
+                <isCommentsEnabled>false</isCommentsEnabled>
+                <owner>0</owner>
+                <isFeatured>false</isFeatured>
+                <isPublic>false</isPublic>
+                <title>Наследование. Класс Object</title>
+                <discussionsCount>0</discussionsCount>
+                <epicCount>0</epicCount>
+                <abuseCount>0</abuseCount>
+              </lesson>
+            </data>
+            <children id="132">
+              <StepNode id="133">
+                <data class="Step" id="134">
+                  <id>49971</id>
+                  <lesson>0</lesson>
+                  <position>9</position>
+                  <block id="135">
+                    <name>code</name>
+                    <text>Simple text</text>
+                    <options id="136">
+                      <limits id="137">
+                        <entry>
+                          <string>java8</string>
+                          <Limit id="138">
+                            <time>8</time>
+                            <memory>256</memory>
+                          </Limit>
+                        </entry>
+                      </limits>
+                    </options>
+                  </block>
+                  <instruction>0</instruction>
+                  <session>0</session>
+                  <viewedBy>0</viewedBy>
+                  <passedBy>0</passedBy>
+                  <correctRatio>0.0</correctRatio>
+                  <worth>0</worth>
+                  <isSolutionsUnlocked>false</isSolutionsUnlocked>
+                  <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
+                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <maxSubmissionsCount>0</maxSubmissionsCount>
+                  <discussionsCount>0</discussionsCount>
+                </data>
+                <wasDeleted>false</wasDeleted>
+                <supportedLanguages id="139">
+                  <string>Java 8</string>
+                </supportedLanguages>
+                <currentLang>Java 8</currentLang>
+                <courseId>0</courseId>
+              </StepNode>
+            </children>
+            <wasDeleted>false</wasDeleted>
+            <courseId>0</courseId>
+          </LessonNode>
+          <LessonNode id="140">
+            <data class="CompoundUnitLesson" id="141">
+              <id>0</id>
+              <unit id="142">
+                <id>0</id>
+                <section>0</section>
+                <lesson>0</lesson>
+                <position>5</position>
+                <isActive>false</isActive>
+              </unit>
+              <lesson id="143">
+                <id>14513</id>
+                <isPrime>false</isPrime>
+                <viewedBy>0</viewedBy>
+                <passedBy>0</passedBy>
+                <timeToComplete>0</timeToComplete>
+                <isCommentsEnabled>false</isCommentsEnabled>
+                <owner>0</owner>
+                <isFeatured>false</isFeatured>
+                <isPublic>false</isPublic>
+                <title>Абстрактные классы и интерфейсы</title>
+                <discussionsCount>0</discussionsCount>
+                <epicCount>0</epicCount>
+                <abuseCount>0</abuseCount>
+              </lesson>
+            </data>
+            <children id="144">
+              <StepNode id="145">
+                <data class="Step" id="146">
+                  <id>49950</id>
+                  <lesson>0</lesson>
+                  <position>7</position>
+                  <block id="147">
+                    <name>code</name>
+                    <text>Simple text</text>
+                    <options id="148">
+                      <limits id="149">
+                        <entry>
+                          <string>java8</string>
+                          <Limit id="150">
+                            <time>8</time>
+                            <memory>256</memory>
+                          </Limit>
+                        </entry>
+                      </limits>
+                    </options>
+                  </block>
+                  <instruction>0</instruction>
+                  <session>0</session>
+                  <viewedBy>0</viewedBy>
+                  <passedBy>0</passedBy>
+                  <correctRatio>0.0</correctRatio>
+                  <worth>0</worth>
+                  <isSolutionsUnlocked>false</isSolutionsUnlocked>
+                  <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
+                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <maxSubmissionsCount>0</maxSubmissionsCount>
+                  <discussionsCount>0</discussionsCount>
+                </data>
+                <wasDeleted>false</wasDeleted>
+                <supportedLanguages id="151">
+                  <string>Java 8</string>
+                </supportedLanguages>
+                <currentLang>Java 8</currentLang>
+                <courseId>0</courseId>
+              </StepNode>
+              <StepNode id="152">
+                <data class="Step" id="153">
+                  <id>50005</id>
+                  <lesson>0</lesson>
+                  <position>8</position>
+                  <block id="154">
+                    <name>code</name>
+                    <text>Simple text</text>
+                    <options id="155">
+                      <limits id="156">
+                        <entry>
+                          <string>java8</string>
+                          <Limit id="157">
+                            <time>8</time>
+                            <memory>256</memory>
+                          </Limit>
+                        </entry>
+                      </limits>
+                    </options>
+                  </block>
+                  <instruction>0</instruction>
+                  <session>0</session>
+                  <viewedBy>0</viewedBy>
+                  <passedBy>0</passedBy>
+                  <correctRatio>0.0</correctRatio>
+                  <worth>0</worth>
+                  <isSolutionsUnlocked>false</isSolutionsUnlocked>
+                  <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
+                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <maxSubmissionsCount>0</maxSubmissionsCount>
+                  <discussionsCount>0</discussionsCount>
+                </data>
+                <wasDeleted>false</wasDeleted>
+                <supportedLanguages id="158">
+                  <string>Java 8</string>
+                </supportedLanguages>
+                <currentLang>Java 8</currentLang>
+                <courseId>0</courseId>
+              </StepNode>
+              <StepNode id="159">
+                <data class="Step" id="160">
+                  <id>50386</id>
+                  <lesson>0</lesson>
+                  <position>9</position>
+                  <block id="161">
+                    <name>code</name>
+                    <text>Simple text</text>
+                    <options id="162">
+                      <limits id="163">
+                        <entry>
+                          <string>java8</string>
+                          <Limit id="164">
+                            <time>8</time>
+                            <memory>256</memory>
+                          </Limit>
+                        </entry>
+                      </limits>
+                    </options>
+                  </block>
+                  <instruction>0</instruction>
+                  <session>0</session>
+                  <viewedBy>0</viewedBy>
+                  <passedBy>0</passedBy>
+                  <correctRatio>0.0</correctRatio>
+                  <worth>0</worth>
+                  <isSolutionsUnlocked>false</isSolutionsUnlocked>
+                  <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
+                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <maxSubmissionsCount>0</maxSubmissionsCount>
+                  <discussionsCount>0</discussionsCount>
+                </data>
+                <wasDeleted>false</wasDeleted>
+                <supportedLanguages id="165">
+                  <string>Java 8</string>
+                </supportedLanguages>
+                <currentLang>Java 8</currentLang>
+                <courseId>0</courseId>
+              </StepNode>
+            </children>
+            <wasDeleted>false</wasDeleted>
+            <courseId>0</courseId>
+          </LessonNode>
+        </children>
+        <wasDeleted>false</wasDeleted>
+      </SectionNode>
+      <SectionNode id="166">
+        <data class="Section" id="167">
+          <id>540</id>
+          <course>0</course>
+          <position>4</position>
+          <requiredPercent>0</requiredPercent>
+          <isRequirementSatisfied>false</isRequirementSatisfied>
+          <isExam>false</isExam>
+          <examDurationMinutes>0</examDurationMinutes>
+          <title>Обработка ошибок, исключения, отладка</title>
+          <isActive>false</isActive>
+        </data>
+        <children id="168">
+          <LessonNode id="169">
+            <data class="CompoundUnitLesson" id="170">
+              <id>0</id>
+              <unit id="171">
+                <id>0</id>
+                <section>0</section>
+                <lesson>0</lesson>
+                <position>1</position>
+                <isActive>false</isActive>
+              </unit>
+              <lesson id="172">
+                <id>12772</id>
+                <isPrime>false</isPrime>
+                <viewedBy>0</viewedBy>
+                <passedBy>0</passedBy>
+                <timeToComplete>0</timeToComplete>
+                <isCommentsEnabled>false</isCommentsEnabled>
+                <owner>0</owner>
+                <isFeatured>false</isFeatured>
+                <isPublic>false</isPublic>
+                <title>Знакомство с исключениями</title>
+                <discussionsCount>0</discussionsCount>
+                <epicCount>0</epicCount>
+                <abuseCount>0</abuseCount>
+              </lesson>
+            </data>
+            <children id="173">
+              <StepNode id="174">
+                <data class="Step" id="175">
+                  <id>53596</id>
+                  <lesson>0</lesson>
+                  <position>9</position>
+                  <block id="176">
+                    <name>code</name>
+                    <text>Simple text</text>
+                    <options id="177">
+                      <limits id="178">
+                        <entry>
+                          <string>java8</string>
+                          <Limit id="179">
+                            <time>8</time>
+                            <memory>256</memory>
+                          </Limit>
+                        </entry>
+                      </limits>
+                    </options>
+                  </block>
+                  <instruction>0</instruction>
+                  <session>0</session>
+                  <viewedBy>0</viewedBy>
+                  <passedBy>0</passedBy>
+                  <correctRatio>0.0</correctRatio>
+                  <worth>0</worth>
+                  <isSolutionsUnlocked>false</isSolutionsUnlocked>
+                  <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
+                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <maxSubmissionsCount>0</maxSubmissionsCount>
+                  <discussionsCount>0</discussionsCount>
+                </data>
+                <wasDeleted>false</wasDeleted>
+                <supportedLanguages id="180">
+                  <string>Java 8</string>
+                </supportedLanguages>
+                <currentLang>Java 8</currentLang>
+                <courseId>0</courseId>
+              </StepNode>
+              <StepNode id="181">
+                <data class="Step" id="182">
+                  <id>53676</id>
+                  <lesson>0</lesson>
+                  <position>10</position>
+                  <block id="183">
+                    <name>code</name>
+                    <text>Simple text</text>
+                    <options id="184">
+                      <limits id="185">
+                        <entry>
+                          <string>java8</string>
+                          <Limit id="186">
+                            <time>8</time>
+                            <memory>256</memory>
+                          </Limit>
+                        </entry>
+                      </limits>
+                    </options>
+                  </block>
+                  <instruction>0</instruction>
+                  <session>0</session>
+                  <viewedBy>0</viewedBy>
+                  <passedBy>0</passedBy>
+                  <correctRatio>0.0</correctRatio>
+                  <worth>0</worth>
+                  <isSolutionsUnlocked>false</isSolutionsUnlocked>
+                  <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
+                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <maxSubmissionsCount>0</maxSubmissionsCount>
+                  <discussionsCount>0</discussionsCount>
+                </data>
+                <wasDeleted>false</wasDeleted>
+                <supportedLanguages id="187">
+                  <string>Java 8</string>
+                </supportedLanguages>
+                <currentLang>Java 8</currentLang>
+                <courseId>0</courseId>
+              </StepNode>
+            </children>
+            <wasDeleted>false</wasDeleted>
+            <courseId>0</courseId>
+          </LessonNode>
+          <LessonNode id="188">
+            <data class="CompoundUnitLesson" id="189">
+              <id>0</id>
+              <unit id="190">
+                <id>0</id>
+                <section>0</section>
+                <lesson>0</lesson>
+                <position>2</position>
+                <isActive>false</isActive>
+              </unit>
+              <lesson id="191">
+                <id>12773</id>
+                <isPrime>false</isPrime>
+                <viewedBy>0</viewedBy>
+                <passedBy>0</passedBy>
+                <timeToComplete>0</timeToComplete>
+                <isCommentsEnabled>false</isCommentsEnabled>
+                <owner>0</owner>
+                <isFeatured>false</isFeatured>
+                <isPublic>false</isPublic>
+                <title>Обработка исключений. Try-catch</title>
+                <discussionsCount>0</discussionsCount>
+                <epicCount>0</epicCount>
+                <abuseCount>0</abuseCount>
+              </lesson>
+            </data>
+            <children id="192">
+              <StepNode id="193">
+                <data class="Step" id="194">
+                  <id>53606</id>
+                  <lesson>0</lesson>
+                  <position>7</position>
+                  <block id="195">
+                    <name>code</name>
+                    <text>Simple text</text>
+                    <options id="196">
+                      <limits id="197">
+                        <entry>
+                          <string>java8</string>
+                          <Limit id="198">
+                            <time>8</time>
+                            <memory>256</memory>
+                          </Limit>
+                        </entry>
+                      </limits>
+                    </options>
+                  </block>
+                  <instruction>0</instruction>
+                  <session>0</session>
+                  <viewedBy>0</viewedBy>
+                  <passedBy>0</passedBy>
+                  <correctRatio>0.0</correctRatio>
+                  <worth>0</worth>
+                  <isSolutionsUnlocked>false</isSolutionsUnlocked>
+                  <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
+                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <maxSubmissionsCount>0</maxSubmissionsCount>
+                  <discussionsCount>0</discussionsCount>
+                </data>
+                <wasDeleted>false</wasDeleted>
+                <supportedLanguages id="199">
+                  <string>Java 8</string>
+                </supportedLanguages>
+                <currentLang>Java 8</currentLang>
+                <courseId>0</courseId>
+              </StepNode>
+            </children>
+            <wasDeleted>false</wasDeleted>
+            <courseId>0</courseId>
+          </LessonNode>
+          <LessonNode id="200">
+            <data class="CompoundUnitLesson" id="201">
+              <id>0</id>
+              <unit id="202">
+                <id>0</id>
+                <section>0</section>
+                <lesson>0</lesson>
+                <position>3</position>
+                <isActive>false</isActive>
+              </unit>
+              <lesson id="203">
+                <id>12774</id>
+                <isPrime>false</isPrime>
+                <viewedBy>0</viewedBy>
+                <passedBy>0</passedBy>
+                <timeToComplete>0</timeToComplete>
+                <isCommentsEnabled>false</isCommentsEnabled>
+                <owner>0</owner>
+                <isFeatured>false</isFeatured>
+                <isPublic>false</isPublic>
+                <title>Логирование</title>
+                <discussionsCount>0</discussionsCount>
+                <epicCount>0</epicCount>
+                <abuseCount>0</abuseCount>
+              </lesson>
+            </data>
+            <children id="204">
+              <StepNode id="205">
+                <data class="Step" id="206">
+                  <id>53619</id>
+                  <lesson>0</lesson>
+                  <position>8</position>
+                  <block id="207">
+                    <name>code</name>
+                    <text>Simple text</text>
+                    <options id="208">
+                      <limits id="209">
+                        <entry>
+                          <string>java8</string>
+                          <Limit id="210">
+                            <time>8</time>
+                            <memory>256</memory>
+                          </Limit>
+                        </entry>
+                      </limits>
+                    </options>
+                  </block>
+                  <instruction>0</instruction>
+                  <session>0</session>
+                  <viewedBy>0</viewedBy>
+                  <passedBy>0</passedBy>
+                  <correctRatio>0.0</correctRatio>
+                  <worth>0</worth>
+                  <isSolutionsUnlocked>false</isSolutionsUnlocked>
+                  <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
+                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <maxSubmissionsCount>0</maxSubmissionsCount>
+                  <discussionsCount>0</discussionsCount>
+                </data>
+                <wasDeleted>false</wasDeleted>
+                <supportedLanguages id="211">
+                  <string>Java 8</string>
+                </supportedLanguages>
+                <currentLang>Java 8</currentLang>
+                <courseId>0</courseId>
+              </StepNode>
+              <StepNode id="212">
+                <data class="Step" id="213">
+                  <id>53996</id>
+                  <lesson>0</lesson>
+                  <position>9</position>
+                  <block id="214">
+                    <name>code</name>
+                    <text>Simple text</text>
+                    <options id="215">
+                      <limits id="216">
+                        <entry>
+                          <string>java8</string>
+                          <Limit id="217">
+                            <time>8</time>
+                            <memory>256</memory>
+                          </Limit>
+                        </entry>
+                      </limits>
+                    </options>
+                  </block>
+                  <instruction>0</instruction>
+                  <session>0</session>
+                  <viewedBy>0</viewedBy>
+                  <passedBy>0</passedBy>
+                  <correctRatio>0.0</correctRatio>
+                  <worth>0</worth>
+                  <isSolutionsUnlocked>false</isSolutionsUnlocked>
+                  <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
+                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <maxSubmissionsCount>0</maxSubmissionsCount>
+                  <discussionsCount>0</discussionsCount>
+                </data>
+                <wasDeleted>false</wasDeleted>
+                <supportedLanguages id="218">
+                  <string>Java 8</string>
+                </supportedLanguages>
+                <currentLang>Java 8</currentLang>
+                <courseId>0</courseId>
+              </StepNode>
+            </children>
+            <wasDeleted>false</wasDeleted>
+            <courseId>0</courseId>
+          </LessonNode>
+        </children>
+        <wasDeleted>false</wasDeleted>
+      </SectionNode>
+      <SectionNode id="219">
+        <data class="Section" id="220">
+          <id>542</id>
+          <course>0</course>
+          <position>5</position>
+          <requiredPercent>0</requiredPercent>
+          <isRequirementSatisfied>false</isRequirementSatisfied>
+          <isExam>false</isExam>
+          <examDurationMinutes>0</examDurationMinutes>
+          <title>Ввод-вывод, доступ к файловой системе</title>
+          <isActive>false</isActive>
+        </data>
+        <children id="221">
+          <LessonNode id="222">
+            <data class="CompoundUnitLesson" id="223">
+              <id>0</id>
+              <unit id="224">
+                <id>0</id>
+                <section>0</section>
+                <lesson>0</lesson>
+                <position>2</position>
+                <isActive>false</isActive>
+              </unit>
+              <lesson id="225">
+                <id>12783</id>
+                <isPrime>false</isPrime>
+                <viewedBy>0</viewedBy>
+                <passedBy>0</passedBy>
+                <timeToComplete>0</timeToComplete>
+                <isCommentsEnabled>false</isCommentsEnabled>
+                <owner>0</owner>
+                <isFeatured>false</isFeatured>
+                <isPublic>false</isPublic>
+                <title>Потоки байт</title>
+                <discussionsCount>0</discussionsCount>
+                <epicCount>0</epicCount>
+                <abuseCount>0</abuseCount>
+              </lesson>
+            </data>
+            <children id="226">
+              <StepNode id="227">
+                <data class="Step" id="228">
+                  <id>55630</id>
+                  <lesson>0</lesson>
+                  <position>8</position>
+                  <block id="229">
+                    <name>code</name>
+                    <text>Simple text</text>
+                    <options id="230">
+                      <limits id="231">
+                        <entry>
+                          <string>java8</string>
+                          <Limit id="232">
+                            <time>8</time>
+                            <memory>256</memory>
+                          </Limit>
+                        </entry>
+                      </limits>
+                    </options>
+                  </block>
+                  <instruction>0</instruction>
+                  <session>0</session>
+                  <viewedBy>0</viewedBy>
+                  <passedBy>0</passedBy>
+                  <correctRatio>0.0</correctRatio>
+                  <worth>0</worth>
+                  <isSolutionsUnlocked>false</isSolutionsUnlocked>
+                  <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
+                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <maxSubmissionsCount>0</maxSubmissionsCount>
+                  <discussionsCount>0</discussionsCount>
+                </data>
+                <wasDeleted>false</wasDeleted>
+                <supportedLanguages id="233">
+                  <string>Java 8</string>
+                </supportedLanguages>
+                <currentLang>Java 8</currentLang>
+                <courseId>0</courseId>
+              </StepNode>
+              <StepNode id="234">
+                <data class="Step" id="235">
+                  <id>55646</id>
+                  <lesson>0</lesson>
+                  <position>9</position>
+                  <block id="236">
+                    <name>code</name>
+                    <text>Simple text</text>
+                    <options id="237">
+                      <limits id="238">
+                        <entry>
+                          <string>java8</string>
+                          <Limit id="239">
+                            <time>8</time>
+                            <memory>256</memory>
+                          </Limit>
+                        </entry>
+                      </limits>
+                    </options>
+                  </block>
+                  <instruction>0</instruction>
+                  <session>0</session>
+                  <viewedBy>0</viewedBy>
+                  <passedBy>0</passedBy>
+                  <correctRatio>0.0</correctRatio>
+                  <worth>0</worth>
+                  <isSolutionsUnlocked>false</isSolutionsUnlocked>
+                  <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
+                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <maxSubmissionsCount>0</maxSubmissionsCount>
+                  <discussionsCount>0</discussionsCount>
+                </data>
+                <wasDeleted>false</wasDeleted>
+                <supportedLanguages id="240">
+                  <string>Java 8</string>
+                </supportedLanguages>
+                <currentLang>Java 8</currentLang>
+                <courseId>0</courseId>
+              </StepNode>
+            </children>
+            <wasDeleted>false</wasDeleted>
+            <courseId>0</courseId>
+          </LessonNode>
+          <LessonNode id="241">
+            <data class="CompoundUnitLesson" id="242">
+              <id>0</id>
+              <unit id="243">
+                <id>0</id>
+                <section>0</section>
+                <lesson>0</lesson>
+                <position>3</position>
+                <isActive>false</isActive>
+              </unit>
+              <lesson id="244">
+                <id>12784</id>
+                <isPrime>false</isPrime>
+                <viewedBy>0</viewedBy>
+                <passedBy>0</passedBy>
+                <timeToComplete>0</timeToComplete>
+                <isCommentsEnabled>false</isCommentsEnabled>
+                <owner>0</owner>
+                <isFeatured>false</isFeatured>
+                <isPublic>false</isPublic>
+                <title>Потоки символов</title>
+                <discussionsCount>0</discussionsCount>
+                <epicCount>0</epicCount>
+                <abuseCount>0</abuseCount>
+              </lesson>
+            </data>
+            <children id="245">
+              <StepNode id="246">
+                <data class="Step" id="247">
+                  <id>55673</id>
+                  <lesson>0</lesson>
+                  <position>12</position>
+                  <block id="248">
+                    <name>code</name>
+                    <text>Simple text</text>
+                    <options id="249">
+                      <limits id="250">
+                        <entry>
+                          <string>java8</string>
+                          <Limit id="251">
+                            <time>8</time>
+                            <memory>256</memory>
+                          </Limit>
+                        </entry>
+                      </limits>
+                    </options>
+                  </block>
+                  <instruction>0</instruction>
+                  <session>0</session>
+                  <viewedBy>0</viewedBy>
+                  <passedBy>0</passedBy>
+                  <correctRatio>0.0</correctRatio>
+                  <worth>0</worth>
+                  <isSolutionsUnlocked>false</isSolutionsUnlocked>
+                  <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
+                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <maxSubmissionsCount>0</maxSubmissionsCount>
+                  <discussionsCount>0</discussionsCount>
+                </data>
+                <wasDeleted>false</wasDeleted>
+                <supportedLanguages id="252">
+                  <string>Java 8</string>
+                </supportedLanguages>
+                <currentLang>Java 8</currentLang>
+                <courseId>0</courseId>
+              </StepNode>
+              <StepNode id="253">
+                <data class="Step" id="254">
+                  <id>55689</id>
+                  <lesson>0</lesson>
+                  <position>13</position>
+                  <block id="255">
+                    <name>code</name>
+                    <text>Simple text</text>
+                    <options id="256">
+                      <limits id="257">
+                        <entry>
+                          <string>java8</string>
+                          <Limit id="258">
+                            <time>8</time>
+                            <memory>256</memory>
+                          </Limit>
+                        </entry>
+                      </limits>
+                    </options>
+                  </block>
+                  <instruction>0</instruction>
+                  <session>0</session>
+                  <viewedBy>0</viewedBy>
+                  <passedBy>0</passedBy>
+                  <correctRatio>0.0</correctRatio>
+                  <worth>0</worth>
+                  <isSolutionsUnlocked>false</isSolutionsUnlocked>
+                  <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
+                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <maxSubmissionsCount>0</maxSubmissionsCount>
+                  <discussionsCount>0</discussionsCount>
+                </data>
+                <wasDeleted>false</wasDeleted>
+                <supportedLanguages id="259">
+                  <string>Java 8</string>
+                </supportedLanguages>
+                <currentLang>Java 8</currentLang>
+                <courseId>0</courseId>
+              </StepNode>
+            </children>
+            <wasDeleted>false</wasDeleted>
+            <courseId>0</courseId>
+          </LessonNode>
+          <LessonNode id="260">
+            <data class="CompoundUnitLesson" id="261">
+              <id>0</id>
+              <unit id="262">
+                <id>0</id>
+                <section>0</section>
+                <lesson>0</lesson>
+                <position>4</position>
+                <isActive>false</isActive>
+              </unit>
+              <lesson id="263">
+                <id>12785</id>
+                <isPrime>false</isPrime>
+                <viewedBy>0</viewedBy>
+                <passedBy>0</passedBy>
+                <timeToComplete>0</timeToComplete>
+                <isCommentsEnabled>false</isCommentsEnabled>
+                <owner>0</owner>
+                <isFeatured>false</isFeatured>
+                <isPublic>false</isPublic>
+                <title>Продвинутые возможности</title>
+                <discussionsCount>0</discussionsCount>
+                <epicCount>0</epicCount>
+                <abuseCount>0</abuseCount>
+              </lesson>
+            </data>
+            <children id="264">
+              <StepNode id="265">
+                <data class="Step" id="266">
+                  <id>55715</id>
+                  <lesson>0</lesson>
+                  <position>8</position>
+                  <block id="267">
+                    <name>code</name>
+                    <text>Simple text</text>
+                    <options id="268">
+                      <limits id="269">
+                        <entry>
+                          <string>java8</string>
+                          <Limit id="270">
+                            <time>8</time>
+                            <memory>256</memory>
+                          </Limit>
+                        </entry>
+                      </limits>
+                    </options>
+                  </block>
+                  <instruction>0</instruction>
+                  <session>0</session>
+                  <viewedBy>0</viewedBy>
+                  <passedBy>0</passedBy>
+                  <correctRatio>0.0</correctRatio>
+                  <worth>0</worth>
+                  <isSolutionsUnlocked>false</isSolutionsUnlocked>
+                  <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
+                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <maxSubmissionsCount>0</maxSubmissionsCount>
+                  <discussionsCount>0</discussionsCount>
+                </data>
+                <wasDeleted>false</wasDeleted>
+                <supportedLanguages id="271">
+                  <string>Java 8</string>
+                </supportedLanguages>
+                <currentLang>Java 8</currentLang>
+                <courseId>0</courseId>
+              </StepNode>
+            </children>
+            <wasDeleted>false</wasDeleted>
+            <courseId>0</courseId>
+          </LessonNode>
+        </children>
+        <wasDeleted>false</wasDeleted>
+      </SectionNode>
+      <SectionNode id="272">
+        <data class="Section" id="273">
+          <id>541</id>
+          <course>0</course>
+          <position>6</position>
+          <requiredPercent>0</requiredPercent>
+          <isRequirementSatisfied>false</isRequirementSatisfied>
+          <isExam>false</isExam>
+          <examDurationMinutes>0</examDurationMinutes>
+          <title>Generics. Collections. Streams</title>
+          <isActive>false</isActive>
+        </data>
+        <children id="274">
+          <LessonNode id="275">
+            <data class="CompoundUnitLesson" id="276">
+              <id>0</id>
+              <unit id="277">
+                <id>0</id>
+                <section>0</section>
+                <lesson>0</lesson>
+                <position>1</position>
+                <isActive>false</isActive>
+              </unit>
+              <lesson id="278">
+                <id>12775</id>
+                <isPrime>false</isPrime>
+                <viewedBy>0</viewedBy>
+                <passedBy>0</passedBy>
+                <timeToComplete>0</timeToComplete>
+                <isCommentsEnabled>false</isCommentsEnabled>
+                <owner>0</owner>
+                <isFeatured>false</isFeatured>
+                <isPublic>false</isPublic>
+                <title>Generics</title>
+                <discussionsCount>0</discussionsCount>
+                <epicCount>0</epicCount>
+                <abuseCount>0</abuseCount>
+              </lesson>
+            </data>
+            <children id="279">
+              <StepNode id="280">
+                <data class="Step" id="281">
+                  <id>57792</id>
+                  <lesson>0</lesson>
+                  <position>12</position>
+                  <block id="282">
+                    <name>code</name>
+                    <text>Simple text</text>
+                    <options id="283">
+                      <limits id="284">
+                        <entry>
+                          <string>java8</string>
+                          <Limit id="285">
+                            <time>8</time>
+                            <memory>256</memory>
+                          </Limit>
+                        </entry>
+                      </limits>
+                    </options>
+                  </block>
+                  <instruction>0</instruction>
+                  <session>0</session>
+                  <viewedBy>0</viewedBy>
+                  <passedBy>0</passedBy>
+                  <correctRatio>0.0</correctRatio>
+                  <worth>0</worth>
+                  <isSolutionsUnlocked>false</isSolutionsUnlocked>
+                  <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
+                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <maxSubmissionsCount>0</maxSubmissionsCount>
+                  <discussionsCount>0</discussionsCount>
+                </data>
+                <wasDeleted>false</wasDeleted>
+                <supportedLanguages id="286">
+                  <string>Java 8</string>
+                </supportedLanguages>
+                <currentLang>Java 8</currentLang>
+                <courseId>0</courseId>
+              </StepNode>
+            </children>
+            <wasDeleted>false</wasDeleted>
+            <courseId>0</courseId>
+          </LessonNode>
+          <LessonNode id="287">
+            <data class="CompoundUnitLesson" id="288">
+              <id>0</id>
+              <unit id="289">
+                <id>0</id>
+                <section>0</section>
+                <lesson>0</lesson>
+                <position>2</position>
+                <isActive>false</isActive>
+              </unit>
+              <lesson id="290">
+                <id>12776</id>
+                <isPrime>false</isPrime>
+                <viewedBy>0</viewedBy>
+                <passedBy>0</passedBy>
+                <timeToComplete>0</timeToComplete>
+                <isCommentsEnabled>false</isCommentsEnabled>
+                <owner>0</owner>
+                <isFeatured>false</isFeatured>
+                <isPublic>false</isPublic>
+                <title>Коллекции</title>
+                <discussionsCount>0</discussionsCount>
+                <epicCount>0</epicCount>
+                <abuseCount>0</abuseCount>
+              </lesson>
+            </data>
+            <children id="291">
+              <StepNode id="292">
+                <data class="Step" id="293">
+                  <id>58081</id>
+                  <lesson>0</lesson>
+                  <position>14</position>
+                  <block id="294">
+                    <name>code</name>
+                    <text>Simple text</text>
+                    <options id="295">
+                      <limits id="296">
+                        <entry>
+                          <string>java8</string>
+                          <Limit id="297">
+                            <time>8</time>
+                            <memory>256</memory>
+                          </Limit>
+                        </entry>
+                      </limits>
+                    </options>
+                  </block>
+                  <instruction>0</instruction>
+                  <session>0</session>
+                  <viewedBy>0</viewedBy>
+                  <passedBy>0</passedBy>
+                  <correctRatio>0.0</correctRatio>
+                  <worth>0</worth>
+                  <isSolutionsUnlocked>false</isSolutionsUnlocked>
+                  <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
+                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <maxSubmissionsCount>0</maxSubmissionsCount>
+                  <discussionsCount>0</discussionsCount>
+                </data>
+                <wasDeleted>false</wasDeleted>
+                <supportedLanguages id="298">
+                  <string>Java 8</string>
+                </supportedLanguages>
+                <currentLang>Java 8</currentLang>
+                <courseId>0</courseId>
+              </StepNode>
+              <StepNode id="299">
+                <data class="Step" id="300">
+                  <id>57810</id>
+                  <lesson>0</lesson>
+                  <position>15</position>
+                  <block id="301">
+                    <name>code</name>
+                    <text>Simple text</text>
+                    <options id="302">
+                      <limits id="303">
+                        <entry>
+                          <string>java8</string>
+                          <Limit id="304">
+                            <time>8</time>
+                            <memory>256</memory>
+                          </Limit>
+                        </entry>
+                      </limits>
+                    </options>
+                  </block>
+                  <instruction>0</instruction>
+                  <session>0</session>
+                  <viewedBy>0</viewedBy>
+                  <passedBy>0</passedBy>
+                  <correctRatio>0.0</correctRatio>
+                  <worth>0</worth>
+                  <isSolutionsUnlocked>false</isSolutionsUnlocked>
+                  <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
+                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <maxSubmissionsCount>0</maxSubmissionsCount>
+                  <discussionsCount>0</discussionsCount>
+                </data>
+                <wasDeleted>false</wasDeleted>
+                <supportedLanguages id="305">
+                  <string>Java 8</string>
+                </supportedLanguages>
+                <currentLang>Java 8</currentLang>
+                <courseId>0</courseId>
+              </StepNode>
+            </children>
+            <wasDeleted>false</wasDeleted>
+            <courseId>0</courseId>
+          </LessonNode>
+          <LessonNode id="306">
+            <data class="CompoundUnitLesson" id="307">
+              <id>0</id>
+              <unit id="308">
+                <id>0</id>
+                <section>0</section>
+                <lesson>0</lesson>
+                <position>3</position>
+                <isActive>false</isActive>
+              </unit>
+              <lesson id="309">
+                <id>12777</id>
+                <isPrime>false</isPrime>
+                <viewedBy>0</viewedBy>
+                <passedBy>0</passedBy>
+                <timeToComplete>0</timeToComplete>
+                <isCommentsEnabled>false</isCommentsEnabled>
+                <owner>0</owner>
+                <isFeatured>false</isFeatured>
+                <isPublic>false</isPublic>
+                <title>Функциональные интерфейсы</title>
+                <discussionsCount>0</discussionsCount>
+                <epicCount>0</epicCount>
+                <abuseCount>0</abuseCount>
+              </lesson>
+            </data>
+            <children id="310">
+              <StepNode id="311">
+                <data class="Step" id="312">
+                  <id>57838</id>
+                  <lesson>0</lesson>
+                  <position>8</position>
+                  <block id="313">
+                    <name>code</name>
+                    <text>Simple text</text>
+                    <options id="314">
+                      <limits id="315">
+                        <entry>
+                          <string>java8</string>
+                          <Limit id="316">
+                            <time>8</time>
+                            <memory>256</memory>
+                          </Limit>
+                        </entry>
+                      </limits>
+                    </options>
+                  </block>
+                  <instruction>0</instruction>
+                  <session>0</session>
+                  <viewedBy>0</viewedBy>
+                  <passedBy>0</passedBy>
+                  <correctRatio>0.0</correctRatio>
+                  <worth>0</worth>
+                  <isSolutionsUnlocked>false</isSolutionsUnlocked>
+                  <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
+                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <maxSubmissionsCount>0</maxSubmissionsCount>
+                  <discussionsCount>0</discussionsCount>
+                </data>
+                <wasDeleted>false</wasDeleted>
+                <supportedLanguages id="317">
+                  <string>Java 8</string>
+                </supportedLanguages>
+                <currentLang>Java 8</currentLang>
+                <courseId>0</courseId>
+              </StepNode>
+            </children>
+            <wasDeleted>false</wasDeleted>
+            <courseId>0</courseId>
+          </LessonNode>
+          <LessonNode id="318">
+            <data class="CompoundUnitLesson" id="319">
+              <id>0</id>
+              <unit id="320">
+                <id>0</id>
+                <section>0</section>
+                <lesson>0</lesson>
+                <position>4</position>
+                <isActive>false</isActive>
+              </unit>
+              <lesson id="321">
+                <id>12781</id>
+                <isPrime>false</isPrime>
+                <viewedBy>0</viewedBy>
+                <passedBy>0</passedBy>
+                <timeToComplete>0</timeToComplete>
+                <isCommentsEnabled>false</isCommentsEnabled>
+                <owner>0</owner>
+                <isFeatured>false</isFeatured>
+                <isPublic>false</isPublic>
+                <title>Stream API</title>
+                <discussionsCount>0</discussionsCount>
+                <epicCount>0</epicCount>
+                <abuseCount>0</abuseCount>
+              </lesson>
+            </data>
+            <children id="322">
+              <StepNode id="323">
+                <data class="Step" id="324">
+                  <id>57848</id>
+                  <lesson>0</lesson>
+                  <position>11</position>
+                  <block id="325">
+                    <name>code</name>
+                    <text>Simple text</text>
+                    <options id="326">
+                      <limits id="327">
+                        <entry>
+                          <string>java8</string>
+                          <Limit id="328">
+                            <time>8</time>
+                            <memory>256</memory>
+                          </Limit>
+                        </entry>
+                      </limits>
+                    </options>
+                  </block>
+                  <instruction>0</instruction>
+                  <session>0</session>
+                  <viewedBy>0</viewedBy>
+                  <passedBy>0</passedBy>
+                  <correctRatio>0.0</correctRatio>
+                  <worth>0</worth>
+                  <isSolutionsUnlocked>false</isSolutionsUnlocked>
+                  <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
+                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <maxSubmissionsCount>0</maxSubmissionsCount>
+                  <discussionsCount>0</discussionsCount>
+                </data>
+                <wasDeleted>false</wasDeleted>
+                <supportedLanguages id="329">
+                  <string>Java 8</string>
+                </supportedLanguages>
+                <currentLang>Java 8</currentLang>
+                <courseId>0</courseId>
+              </StepNode>
+              <StepNode id="330">
+                <data class="Step" id="331">
+                  <id>58088</id>
+                  <lesson>0</lesson>
+                  <position>12</position>
+                  <block id="332">
+                    <name>code</name>
+                    <text>Simple text</text>
+                    <options id="333">
+                      <limits id="334">
+                        <entry>
+                          <string>java8</string>
+                          <Limit id="335">
+                            <time>8</time>
+                            <memory>256</memory>
+                          </Limit>
+                        </entry>
+                      </limits>
+                    </options>
+                  </block>
+                  <instruction>0</instruction>
+                  <session>0</session>
+                  <viewedBy>0</viewedBy>
+                  <passedBy>0</passedBy>
+                  <correctRatio>0.0</correctRatio>
+                  <worth>0</worth>
+                  <isSolutionsUnlocked>false</isSolutionsUnlocked>
+                  <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
+                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <maxSubmissionsCount>0</maxSubmissionsCount>
+                  <discussionsCount>0</discussionsCount>
+                </data>
+                <wasDeleted>false</wasDeleted>
+                <supportedLanguages id="336">
+                  <string>Java 8</string>
+                </supportedLanguages>
+                <currentLang>Java 8</currentLang>
+                <courseId>0</courseId>
+              </StepNode>
+              <StepNode id="337">
+                <data class="Step" id="338">
+                  <id>57858</id>
+                  <lesson>0</lesson>
+                  <position>13</position>
+                  <block id="339">
+                    <name>code</name>
+                    <text>Simple text</text>
+                    <options id="340">
+                      <limits id="341">
+                        <entry>
+                          <string>java8</string>
+                          <Limit id="342">
+                            <time>8</time>
+                            <memory>256</memory>
+                          </Limit>
+                        </entry>
+                      </limits>
+                    </options>
+                  </block>
+                  <instruction>0</instruction>
+                  <session>0</session>
+                  <viewedBy>0</viewedBy>
+                  <passedBy>0</passedBy>
+                  <correctRatio>0.0</correctRatio>
+                  <worth>0</worth>
+                  <isSolutionsUnlocked>false</isSolutionsUnlocked>
+                  <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
+                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <maxSubmissionsCount>0</maxSubmissionsCount>
+                  <discussionsCount>0</discussionsCount>
+                </data>
+                <wasDeleted>false</wasDeleted>
+                <supportedLanguages id="343">
+                  <string>Java 8</string>
+                </supportedLanguages>
+                <currentLang>Java 8</currentLang>
+                <courseId>0</courseId>
+              </StepNode>
+              <StepNode id="344">
+                <data class="Step" id="345">
+                  <id>58108</id>
+                  <lesson>0</lesson>
+                  <position>14</position>
+                  <block id="346">
+                    <name>code</name>
+                    <text>Simple text</text>
+                    <options id="347">
+                      <limits id="348">
+                        <entry>
+                          <string>java8</string>
+                          <Limit id="349">
+                            <time>8</time>
+                            <memory>256</memory>
+                          </Limit>
+                        </entry>
+                      </limits>
+                    </options>
+                  </block>
+                  <instruction>0</instruction>
+                  <session>0</session>
+                  <viewedBy>0</viewedBy>
+                  <passedBy>0</passedBy>
+                  <correctRatio>0.0</correctRatio>
+                  <worth>0</worth>
+                  <isSolutionsUnlocked>false</isSolutionsUnlocked>
+                  <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
+                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <maxSubmissionsCount>0</maxSubmissionsCount>
+                  <discussionsCount>0</discussionsCount>
+                </data>
+                <wasDeleted>false</wasDeleted>
+                <supportedLanguages id="350">
+                  <string>Java 8</string>
+                </supportedLanguages>
+                <currentLang>Java 8</currentLang>
+                <courseId>0</courseId>
+              </StepNode>
+            </children>
+            <wasDeleted>false</wasDeleted>
+            <courseId>0</courseId>
+          </LessonNode>
+        </children>
+        <wasDeleted>false</wasDeleted>
+      </SectionNode>
+    </children>
+    <wasDeleted>false</wasDeleted>
+    <authors id="351"/>
+  </root>
+  <showHint>true</showHint>
+  <createdBy>0</createdBy>
+  <defaultLang>Java 8</defaultLang>
+  <version>1</version>
+</StepikProjectManager>

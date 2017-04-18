@@ -2,6 +2,7 @@ package org.stepik.api.actions;
 
 import org.jetbrains.annotations.NotNull;
 import org.stepik.api.client.StepikApiClient;
+import org.stepik.api.objects.users.User;
 import org.stepik.api.queries.stepiks.StepikStepiksGetQuery;
 
 /**
@@ -15,5 +16,11 @@ public class StepikStepiksAction extends StepikAbstractAction {
     @NotNull
     public StepikStepiksGetQuery get() {
         return new StepikStepiksGetQuery(this);
+    }
+
+    public User getCurrentUser() {
+        return this.get()
+                .id(1)
+                .execute().getUser();
     }
 }

@@ -9,7 +9,7 @@ import org.stepik.plugin.actions.navigation.StepikNextStepAction;
 import org.stepik.plugin.actions.navigation.StepikPreviousStepAction;
 import org.stepik.plugin.actions.step.DownloadSubmission;
 import org.stepik.plugin.actions.step.InsertStepikDirectives;
-import org.stepik.plugin.actions.step.StepikJavaPostAction;
+import org.stepik.plugin.actions.step.StepikSendAction;
 import org.stepik.plugin.actions.step.StepikResetStepAction;
 
 public class StepikPluginConfigurator extends StudyBasePluginConfigurator {
@@ -18,7 +18,7 @@ public class StepikPluginConfigurator extends StudyBasePluginConfigurator {
     public DefaultActionGroup getActionGroup(Project project) {
         final DefaultActionGroup group = new DefaultActionGroup();
 
-        group.add(new StepikJavaPostAction());
+        group.add(new StepikSendAction());
         group.add(new StepikPreviousStepAction());
         group.add(new StepikNextStepAction());
         group.add(new StepikResetStepAction());

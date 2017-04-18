@@ -3,7 +3,7 @@ package org.stepik.plugin.actions.step;
 import com.intellij.ide.projectView.ProjectView;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
-import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.editor.Document;
@@ -26,7 +26,7 @@ import javax.swing.*;
 import static org.stepik.core.courseFormat.StepType.CODE;
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
 
-public class StepikResetStepAction extends AbstractStepAction {
+public class StepikResetStepAction extends CodeQuizAction {
     private static final String ACTION_ID = "STEPIK.ResetStepAction";
     private static final String SHORTCUT = "ctrl shift pressed X";
 
@@ -37,8 +37,9 @@ public class StepikResetStepAction extends AbstractStepAction {
     }
 
     private static void reset(@NotNull final Project project) {
-        ApplicationManager.getApplication()
-                .invokeLater(() -> ApplicationManager.getApplication().runWriteAction(() -> resetFile(project)));
+        Application application = ApplicationManager.getApplication();
+        application.invokeLater(() ->
+                application.runWriteAction(() -> resetFile(project)));
     }
 
     private static void resetFile(@NotNull final Project project) {
@@ -105,15 +106,5 @@ public class StepikResetStepAction extends AbstractStepAction {
     @Override
     public String[] getShortcuts() {
         return new String[]{SHORTCUT};
-    }
-
-    @Override
-    public void update(AnActionEvent e) {
-        super.update(e);
-        Presentation presentation = e.getPresentation();
-        StudyNode<?, ?> selectedNode = StepikProjectManager.getSelected(e.getProject());
-        boolean enabled = presentation.isEnabled();
-        boolean canEnabled = (selectedNode instanceof StepNode) && (((StepNode) selectedNode).getType() == CODE);
-        presentation.setEnabled(enabled && canEnabled);
     }
 }

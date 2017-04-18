@@ -12,13 +12,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.exceptions.StepikClientException;
+import org.stepik.api.objects.StudyObject;
 import org.stepik.api.objects.recommendations.Recommendation;
 import org.stepik.api.objects.recommendations.Recommendations;
 import org.stepik.api.objects.steps.Step;
 import org.stepik.api.objects.steps.Steps;
 import org.stepik.core.courseFormat.StudyNode;
 import org.stepik.core.courseFormat.stepHelpers.StepHelper;
-import org.stepik.core.stepik.StepikConnectorLogin;
 import org.stepik.core.templates.Templater;
 import org.stepik.core.ui.StudyToolWindow;
 import org.stepik.core.ui.StudyToolWindowFactory;
@@ -28,6 +28,9 @@ import javax.swing.*;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient;
+import static org.stepik.core.stepik.StepikAuthManager.isAuthenticated;
 
 public class StudyUtils {
     private static final Logger logger = Logger.getInstance(StudyUtils.class);
@@ -53,8 +56,14 @@ public class StudyUtils {
 
     @Nullable
     static StudyToolWindow getStudyToolWindow(@NotNull final Project project) {
-        ToolWindow toolWindow = ToolWindowManager.getInstance(project)
-                .getToolWindow(StudyToolWindowFactory.STUDY_TOOL_WINDOW);
+        if (project.isDisposed()) {
+            return null;
+        }
+        ToolWindowManager toolWindowManager = ToolWindowManager.getInstance(project);
+        if (toolWindowManager == null) {
+            return null;
+        }
+        ToolWindow toolWindow = toolWindowManager.getToolWindow(StudyToolWindowFactory.STUDY_TOOL_WINDOW);
         if (toolWindow != null) {
             Content[] contents = toolWindow.getContentManager().getContents();
             for (Content content : contents) {
@@ -150,16 +159,23 @@ public class StudyUtils {
 
     @Nullable
     public static StudyNode<?, ?> getRecommendation(@NotNull StudyNode root) {
-        StepikApiClient stepikClient = StepikConnectorLogin.authAndGetStepikApiClient();
+        StudyObject data = root.getData();
+        if (data == null || !data.isAdaptive()) {
+            return null;
+        }
+
         StudyNode studyNode = null;
         try {
+            StepikApiClient stepikClient = authAndGetStepikApiClient();
+            if (!isAuthenticated()) {
+                return null;
+            }
             Recommendations recommendations = stepikClient.recommendations()
                     .get()
                     .course(root.getId())
                     .execute();
             if (!recommendations.isEmpty()) {
-                Recommendation recommendation = recommendations.getItems()
-                        .get(0);
+                Recommendation recommendation = recommendations.getFirst();
 
                 long lesson = recommendation.getLesson();
 
@@ -168,7 +184,7 @@ public class StudyUtils {
                         .lesson(lesson)
                         .execute();
                 if (!steps.isEmpty()) {
-                    long stepId = steps.getItems().get(0).getId();
+                    long stepId = steps.getFirst().getId();
                     studyNode = root.getChildByClassAndId(Step.class, stepId);
                 }
             }

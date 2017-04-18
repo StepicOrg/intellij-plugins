@@ -36,7 +36,7 @@
     </extensions>
 
     <actions>
-        <action id="STEPIK.StepikJavaPostAction" class="org.stepik.plugin.actions.step.StepikJavaPostAction"/>
+        <action id="STEPIK.StepikSendAction" class="org.stepik.plugin.actions.step.StepikSendAction"/>
         <action id="STEPIK.PreviousStepAction" class="org.stepik.plugin.actions.navigation.StepikPreviousStepAction"/>
         <action id="STEPIK.NextStepAction" class="org.stepik.plugin.actions.navigation.StepikNextStepAction"/>
         <action id="STEPIK.DownloadSubmission" class="org.stepik.plugin.actions.step.DownloadSubmission"/>

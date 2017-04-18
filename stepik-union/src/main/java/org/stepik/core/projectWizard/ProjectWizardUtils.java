@@ -4,10 +4,6 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.ModifiableModuleModel;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
-import org.stepik.core.SupportedLanguages;
-import org.stepik.core.courseFormat.StepNode;
-import org.stepik.core.courseFormat.StudyNode;
-import org.stepik.core.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
@@ -19,9 +15,14 @@ import org.stepik.api.objects.lessons.CompoundUnitLesson;
 import org.stepik.api.objects.sections.Section;
 import org.stepik.api.objects.sections.Sections;
 import org.stepik.api.objects.steps.Step;
+import org.stepik.core.SupportedLanguages;
+import org.stepik.core.courseFormat.StepNode;
+import org.stepik.core.courseFormat.StudyNode;
+import org.stepik.core.stepik.StepikAuthManager;
 
 import java.io.File;
 
+import static org.stepik.core.stepik.StepikAuthManager.isAuthenticated;
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
 
 /**
@@ -63,18 +64,24 @@ public class ProjectWizardUtils {
         return projectName;
     }
 
-    public static void enrollmentCourse(StudyObject studyObject) {
-        if (studyObject instanceof Course) {
-            ProjectWizardUtils.enrollment(studyObject);
-        } else if (studyObject instanceof CompoundUnitLesson) {
-            enrollment((CompoundUnitLesson) studyObject);
+    public static boolean enrollmentCourse(StudyObject studyObject) {
+        StepikApiClient stepikApiClient = StepikAuthManager.authAndGetStepikApiClient();
+        if (!isAuthenticated()) {
+            return false;
         }
+
+        if (studyObject instanceof Course) {
+            ProjectWizardUtils.enrollment(stepikApiClient, studyObject);
+        } else if (studyObject instanceof CompoundUnitLesson) {
+            enrollment(stepikApiClient, (CompoundUnitLesson) studyObject);
+        }
+
+        return true;
     }
 
-    private static void enrollment(CompoundUnitLesson studyObject) {
+    private static void enrollment(@NotNull StepikApiClient stepikApiClient, @NotNull CompoundUnitLesson studyObject) {
         int sectionId = studyObject.getUnit().getSection();
         if (sectionId != 0) {
-            StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
             try {
                 Sections sections = stepikApiClient.sections()
                         .get()
@@ -82,7 +89,7 @@ public class ProjectWizardUtils {
                         .execute();
 
                 if (!sections.isEmpty()) {
-                    long courseId = sections.getSections().get(0).getId();
+                    long courseId = sections.getFirst().getId();
 
                     if (courseId != 0) {
                         Courses courses = stepikApiClient.courses()
@@ -90,7 +97,7 @@ public class ProjectWizardUtils {
                                 .id(courseId)
                                 .execute();
                         if (!courses.isEmpty()) {
-                            enrollment(courses.getCourses().get(0));
+                            enrollment(stepikApiClient, courses.getFirst());
                         }
                     }
                 }
@@ -102,9 +109,8 @@ public class ProjectWizardUtils {
         }
     }
 
-    private static void enrollment(StudyObject studyObject) {
+    private static void enrollment(@NotNull StepikApiClient stepikApiClient, @NotNull StudyObject studyObject) {
         long id = studyObject.getId();
-        StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
         try {
             stepikApiClient.enrollments()
                     .post()

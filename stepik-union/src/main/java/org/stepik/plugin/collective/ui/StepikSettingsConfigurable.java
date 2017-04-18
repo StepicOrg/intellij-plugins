@@ -51,6 +51,7 @@ public class StepikSettingsConfigurable implements SearchableConfigurable, VcsCo
     }
 
     public void disposeUIResources() {
+        settingsPane.dispose();
         settingsPane = null;
     }
 

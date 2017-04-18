@@ -11,7 +11,7 @@ import java.util.Map;
  */
 public class Metric {
     private String name;
-    private Integer timestamp;
+    private Long timestamp;
     private Map<String, String> tags;
     private Map<String, Object> data;
 
@@ -57,11 +57,11 @@ public class Metric {
     }
 
     @Nullable
-    public Integer getTimestamp() {
+    public Long getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(@Nullable Integer timestamp) {
+    public void setTimestamp(@Nullable Long timestamp) {
         this.timestamp = timestamp;
     }
 }
