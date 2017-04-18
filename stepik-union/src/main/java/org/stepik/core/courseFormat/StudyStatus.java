@@ -3,11 +3,11 @@ package org.stepik.core.courseFormat;
 import org.jetbrains.annotations.Nullable;
 
 public enum StudyStatus {
-    UNCHECKED, SOLVED, FAILED;
+    UNCHECKED, SOLVED, FAILED, NEED_CHECK;
 
     public static StudyStatus of(@Nullable String status) {
         if (status == null) {
-            return UNCHECKED;
+            return NEED_CHECK;
         }
 
         status = status.toLowerCase();

@@ -13,6 +13,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.DumbAwareRunnable;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.startup.StartupManager;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowAnchor;
@@ -21,11 +22,9 @@ import com.intellij.util.containers.hash.HashMap;
 import javafx.application.Platform;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.core.actions.StudyActionWithShortcut;
-import org.stepik.core.courseFormat.StudyNode;
 import org.stepik.core.metrics.Metrics;
 import org.stepik.core.ui.StudyToolWindow;
 import org.stepik.core.ui.StudyToolWindowFactory;
-import org.stepik.plugin.actions.navigation.StudyNavigator;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -72,6 +71,10 @@ public class StudyProjectComponent implements ProjectComponent {
                             registerShortcuts();
                         }));
         Metrics.openProject(project, SUCCESSFUL);
+
+        StartupManager.getInstance(project).runWhenProjectIsInitialized(() ->
+                executor.execute(() -> StepikProjectManager.updateAdaptiveSelected(project)
+                ));
     }
 
     public void registerStudyToolWindow() {
@@ -86,33 +89,6 @@ public class StudyProjectComponent implements ProjectComponent {
             studyToolWindow.show(null);
             StudyUtils.initToolWindows(project);
         }
-
-        executor.execute(() -> {
-            StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
-            if (projectManager == null) {
-                return;
-            }
-
-            StudyNode root = projectManager.getProjectRoot();
-
-            StudyNode<?, ?> selected = projectManager.getSelected();
-            if (root != null) {
-                if (projectManager.isAdaptive()) {
-                    StudyNode<?, ?> recommendation = StudyUtils.getRecommendation(root);
-                    if (recommendation == null) {
-                        selected = null;
-                    } else if (selected == null || selected.getParent() != recommendation.getParent()) {
-                        selected = recommendation;
-                    }
-                }
-
-                if (selected == null) {
-                    selected = StudyNavigator.nextLeaf(root);
-                }
-
-                projectManager.setSelected(selected);
-            }
-        });
     }
 
     private void registerShortcuts() {

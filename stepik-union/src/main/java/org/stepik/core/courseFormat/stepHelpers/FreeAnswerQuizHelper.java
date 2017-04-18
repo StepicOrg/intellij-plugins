@@ -8,7 +8,9 @@ import org.stepik.api.objects.instructions.Instruction;
 import org.stepik.api.objects.instructions.Instructions;
 import org.stepik.api.objects.steps.Step;
 import org.stepik.core.courseFormat.StepNode;
-import org.stepik.core.stepik.StepikConnectorLogin;
+
+import static org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient;
+import static org.stepik.core.stepik.StepikAuthManager.isAuthenticated;
 
 /**
  * @author meanmail
@@ -59,7 +61,10 @@ public class FreeAnswerQuizHelper extends StringQuizHelper {
         }
 
         try {
-            StepikApiClient stepikClient = StepikConnectorLogin.authAndGetStepikApiClient();
+            StepikApiClient stepikClient = authAndGetStepikApiClient();
+            if (!isAuthenticated()) {
+                return true;
+            }
             Instructions instructions = stepikClient.instructions()
                     .get()
                     .id(instructionId)
@@ -73,11 +78,13 @@ public class FreeAnswerQuizHelper extends StringQuizHelper {
         return true;
     }
 
+    @SuppressWarnings("SameReturnValue")
     private boolean needWait() {
         // TODO not implemented
         return false;
     }
 
+    @SuppressWarnings("SameReturnValue")
     private boolean complete() {
         // TODO not implemented
         return false;
@@ -122,6 +129,7 @@ public class FreeAnswerQuizHelper extends StringQuizHelper {
         return "";
     }
 
+    @SuppressWarnings("unused")
     public boolean isActionEnabled() {
         return !needReview() || !isFrozen();
     }

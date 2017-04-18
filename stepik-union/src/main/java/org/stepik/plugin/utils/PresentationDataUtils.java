@@ -6,13 +6,13 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.SimpleTextAttributes;
+import icons.AllStepikIcons;
+import org.jetbrains.annotations.NotNull;
 import org.stepik.core.StepikProjectManager;
 import org.stepik.core.StudyUtils;
 import org.stepik.core.core.EduNames;
 import org.stepik.core.courseFormat.StudyNode;
 import org.stepik.core.courseFormat.StudyStatus;
-import icons.AllStepikIcons;
-import org.jetbrains.annotations.NotNull;
 import org.stepik.core.utils.PresentationUtils;
 
 import javax.swing.*;

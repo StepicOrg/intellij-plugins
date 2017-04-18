@@ -11,7 +11,6 @@ import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.StudyObject;
 import org.stepik.api.objects.progresses.Progresses;
-import org.stepik.core.stepik.StepikConnectorLogin;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,6 +21,12 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static org.stepik.core.courseFormat.StudyStatus.NEED_CHECK;
+import static org.stepik.core.courseFormat.StudyStatus.SOLVED;
+import static org.stepik.core.courseFormat.StudyStatus.UNCHECKED;
+import static org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient;
+import static org.stepik.core.stepik.StepikAuthManager.isAuthenticated;
+
 /**
  * @author meanmail
  */
@@ -31,7 +36,7 @@ abstract class Node<
         DC extends StudyObject,
         CC extends Node> implements StudyNode<D, C> {
     private static final Logger logger = Logger.getInstance(Node.class);
-    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private static final ExecutorService executor = Executors.newFixedThreadPool(5);
     private StudyNode parent;
     private D data;
     private List<C> children;
@@ -44,9 +49,9 @@ abstract class Node<
     Node() {
     }
 
-    Node(@NotNull Project project, @NotNull D data) {
+    Node(@NotNull Project project, @NotNull StepikApiClient stepikApiClient, @NotNull D data) {
         setData(data);
-        init(project, null);
+        init(project, stepikApiClient, null);
     }
 
     @Nullable
@@ -231,16 +236,16 @@ abstract class Node<
         return children;
     }
 
-    protected abstract List<DC> getChildDataList();
+    protected abstract List<DC> getChildDataList(@NotNull StepikApiClient stepikApiClient);
 
     @Override
-    public void init(@NotNull Project project, @Nullable StudyNode parent) {
+    public void init(@NotNull Project project, @NotNull StepikApiClient stepikApiClient, @Nullable StudyNode parent) {
         this.project = project;
         setParent(parent);
         Map<Long, C> mapNodes = getMapNodes();
         List<C> processed = new ArrayList<>();
 
-        for (DC data : getChildDataList()) {
+        for (DC data : getChildDataList(stepikApiClient)) {
             C child = mapNodes.get(data.getId());
             if (child == null) {
                 try {
@@ -262,20 +267,20 @@ abstract class Node<
         wasDeletedList.forEach(child -> child.setWasDeleted(true));
 
         for (StudyNode child : getChildren()) {
-            child.init(project, this);
+            child.init(project, stepikApiClient, this);
         }
     }
 
     @Override
-    public void reloadData(@NotNull Project project) {
-        if (loadData(data.getId())) {
-            init(project);
+    public void reloadData(@NotNull Project project, @NotNull StepikApiClient stepikApiClient) {
+        if (loadData(stepikApiClient, data.getId())) {
+            init(project, stepikApiClient);
         } else {
             setProject(project);
         }
     }
 
-    protected abstract boolean loadData(long id);
+    protected abstract boolean loadData(@NotNull StepikApiClient stepikApiClient, long id);
 
     protected abstract Class<C> getChildClass();
 
@@ -283,16 +288,25 @@ abstract class Node<
 
     @Override
     public boolean isUnknownStatus() {
-        return status == null;
+        return status == null || status == NEED_CHECK;
+    }
+
+    public void resetStatus() {
+        getChildren().forEach(StudyNode::resetStatus);
+        status = NEED_CHECK;
     }
 
     @NotNull
     @Override
     public StudyStatus getStatus() {
         if (isUnknownStatus()) {
-            status = StudyStatus.UNCHECKED;
+            status = UNCHECKED;
 
             executor.execute(() -> {
+                StepikApiClient stepikApiClient = authAndGetStepikApiClient();
+                if (!isAuthenticated()) {
+                    return;
+                }
                 try {
                     Map<String, StudyNode> progressMap = new HashMap<>();
                     Node.this.getChildren().stream()
@@ -317,6 +331,7 @@ abstract class Node<
                             String[] list = progressIds.toArray(new String[size]);
                             int start = 0;
                             int end;
+
                             while (start < size) {
                                 end = start + 20;
                                 if (end > size) {
@@ -324,8 +339,6 @@ abstract class Node<
                                 }
                                 String[] part = Arrays.copyOfRange(list, start, end);
                                 start = end;
-
-                                StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
 
                                 Progresses progresses = stepikApiClient.progresses()
                                         .get()
@@ -336,7 +349,7 @@ abstract class Node<
                                     String id = progress.getId();
                                     StudyNode node = progressMap.get(id);
                                     if (progress.isPassed()) {
-                                        node.setRawStatus(StudyStatus.SOLVED);
+                                        node.setRawStatus(SOLVED);
                                     }
                                 });
                             }
@@ -360,8 +373,8 @@ abstract class Node<
 
     @Override
     public void setStatus(@Nullable StudyStatus status) {
-        if (status == StudyStatus.SOLVED && this.status != status) {
-            this.status = StudyStatus.SOLVED;
+        if (status == SOLVED && this.status != status) {
+            this.status = SOLVED;
 
             StudyNode parent = getParent();
 
@@ -379,7 +392,7 @@ abstract class Node<
 
     @Override
     public void passed() {
-        setStatus(StudyStatus.SOLVED);
+        setStatus(SOLVED);
     }
 
     @Nullable
@@ -414,11 +427,6 @@ abstract class Node<
         if (data != null) {
             data.setId(id);
         }
-    }
-
-    @Override
-    public boolean canBeLeaf() {
-        return false;
     }
 
     @Override

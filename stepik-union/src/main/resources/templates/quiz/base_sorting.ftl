@@ -1,4 +1,3 @@
-<#-- @ftlvariable name="status" type="java.lang.String" -->
 <#-- @ftlvariable name="backgroundColor" type="java.lang.String" -->
 <#-- @ftlvariable name="darcula" type="java.lang.Boolean" -->
 <#-- @ftlvariable name="stepNode" type="org.stepik.core.courseFormat.stepHelpers.MatchingQuizHelper" -->

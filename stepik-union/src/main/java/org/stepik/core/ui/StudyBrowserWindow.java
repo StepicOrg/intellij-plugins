@@ -19,6 +19,9 @@ import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import netscape.javascript.JSException;
+import netscape.javascript.JSObject;
+import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
@@ -33,7 +36,7 @@ import org.stepik.core.courseFormat.LessonNode;
 import org.stepik.core.courseFormat.SectionNode;
 import org.stepik.core.courseFormat.StepNode;
 import org.stepik.core.courseFormat.StudyNode;
-import org.stepik.core.stepik.StepikConnectorLogin;
+import org.stepik.core.stepik.StepikAuthManager;
 import org.stepik.core.templates.Templater;
 import org.stepik.plugin.utils.NavigationUtils;
 import org.w3c.dom.Document;
@@ -59,6 +62,7 @@ import java.util.regex.Pattern;
 import static org.stepik.api.objects.recommendations.ReactionValues.SOLVED;
 import static org.stepik.api.objects.recommendations.ReactionValues.TOO_EASY;
 import static org.stepik.api.objects.recommendations.ReactionValues.TOO_HARD;
+import static org.stepik.core.stepik.StepikAuthManager.getCurrentUser;
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
 
 class StudyBrowserWindow extends JFrame {
@@ -117,6 +121,7 @@ class StudyBrowserWindow extends JFrame {
             engine = webComponent.getEngine();
             pane.getChildren().add(webComponent);
             initHyperlinkListener();
+            initConsoleListener();
             Scene scene = new Scene(pane);
             panel.setScene(scene);
             panel.setVisible(true);
@@ -125,6 +130,34 @@ class StudyBrowserWindow extends JFrame {
 
         add(panel, BorderLayout.CENTER);
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+    }
+
+    private void initConsoleListener() {
+        engine.getLoadWorker()
+                .stateProperty()
+                .addListener((observable, oldValue, newValue) -> {
+                    JSObject window = (JSObject) engine.executeScript("window");
+                    JavaBridge bridge = new JavaBridge();
+                    window.setMember("java", bridge);
+                    @Language("JavaScript")
+                    String script = "console.error = function (message) {\n" +
+                            "    java.error(message);\n" +
+                            "};\n" +
+                            "console.warn = function (message) {\n" +
+                            "    java.warn(message);\n" +
+                            "};\n" +
+                            "console.log = function (message) {\n" +
+                            "    java.log(message);\n" +
+                            "};\n" +
+                            "console.debug = function (message) {\n" +
+                            "    java.debug(message);\n" +
+                            "};\n" +
+                            "window.addEventListener('error', function (e) {\n" +
+                            "    java.doError(e.filename, e.lineno, e.colno, e.message);\n" +
+                            "    return true;\n" +
+                            "});";
+                    engine.executeScript(script);
+                });
     }
 
     void loadContent(@NotNull final String content) {
@@ -237,7 +270,7 @@ class StudyBrowserWindow extends JFrame {
                 String extension = target.getAttribute("data-file-ext");
 
                 try {
-                    StepikApiClient stepikApiClient = StepikConnectorLogin.getStepikApiClient();
+                    StepikApiClient stepikApiClient = StepikAuthManager.getStepikApiClient();
                     String content = stepikApiClient.files().get(href, contentType);
                     VirtualFile srcDirectory = getOrCreateSrcDirectory(project, (StepNode) node, true);
                     if (srcDirectory == null) {
@@ -276,6 +309,8 @@ class StudyBrowserWindow extends JFrame {
                     return;
                 }
 
+                showLoadAnimation();
+
                 if (reaction == TOO_EASY || reaction == TOO_HARD) {
                     String[] items = href.split("/");
                     if (items.length < 2) {
@@ -290,8 +325,11 @@ class StudyBrowserWindow extends JFrame {
                     }
 
                     try {
-                        StepikApiClient stepikClient = StepikConnectorLogin.authAndGetStepikApiClient();
-                        User user = StepikConnectorLogin.getCurrentUser();
+                        StepikApiClient stepikClient = StepikAuthManager.authAndGetStepikApiClient(true);
+                        User user = getCurrentUser();
+                        if (user.isGuest()) {
+                            return;
+                        }
                         stepikClient.recommendationReactions()
                                 .post()
                                 .user(user.getId())
@@ -303,33 +341,9 @@ class StudyBrowserWindow extends JFrame {
                     }
                 }
 
-                getNewRecommendation();
-            }
-
-            private void getNewRecommendation() {
                 executor.execute(() -> {
-                    StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
-                    if (projectManager == null) {
-                        return;
-                    }
-
-                    StudyNode root = projectManager.getProjectRoot();
-
-                    StudyNode<?, ?> selected = projectManager.getSelected();
-                    if (root != null) {
-                        if (projectManager.isAdaptive()) {
-                            StudyNode<?, ?> recommendation = StudyUtils.getRecommendation(root);
-                            if (recommendation == null) {
-                                return;
-                            } else if (selected == null || selected.getParent() != recommendation.getParent()) {
-                                selected = recommendation;
-                            }
-                        }
-
-                        if (selected != null) {
-                            projectManager.setSelected(selected);
-                        }
-                    }
+                    StepikProjectManager.updateAdaptiveSelected(project);
+                    hideLoadAnimation();
                 });
             }
 
@@ -394,10 +408,52 @@ class StudyBrowserWindow extends JFrame {
         this.panel = panel;
     }
 
+    void showLoadAnimation() {
+        Platform.runLater(() -> {
+            try {
+                engine.executeScript("if (window.showLoadAnimation !== undefined) showLoadAnimation();");
+            } catch (JSException e) {
+                logger.error(e);
+            }
+        });
+    }
+
+    void hideLoadAnimation() {
+        Platform.runLater(() -> {
+            try {
+                engine.executeScript("if (window.hideLoadAnimation !== undefined) hideLoadAnimation();");
+            } catch (JSException e) {
+                logger.error(e);
+            }
+        });
+    }
+
     private class StudyLafManagerListener implements LafManagerListener {
         @Override
         public void lookAndFeelChanged(LafManager manager) {
             updateLaf(manager.getCurrentLookAndFeel() instanceof DarculaLookAndFeelInfo);
+        }
+    }
+
+    public class JavaBridge {
+        public void log(String text) {
+            logger.info("console: " + text);
+        }
+
+        public void error(String text) {
+            logger.error("console: " + text);
+        }
+
+        public void warn(String text) {
+            logger.warn("console: " + text);
+        }
+
+        public void debug(String text) {
+            logger.debug("console: " + text);
+        }
+
+        public void doError(String filename, int lineno, int colno, String message) {
+            error("\nfilename: " + filename + "\nline: " + lineno + "\ncolumn: " + colno + "\nmessage: " + message);
         }
     }
 }

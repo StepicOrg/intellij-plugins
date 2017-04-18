@@ -21,7 +21,7 @@ import org.stepik.core.StudyUtils;
 import org.stepik.core.courseFormat.StepNode;
 import org.stepik.core.courseFormat.StepType;
 import org.stepik.core.courseFormat.StudyNode;
-import org.stepik.core.stepik.StepikConnectorLogin;
+import org.stepik.core.stepik.StepikAuthManager;
 import org.stepik.plugin.actions.SendAction;
 import org.w3c.dom.Node;
 import org.w3c.dom.events.Event;
@@ -41,15 +41,19 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
+import static org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient;
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
 
 class FormListener implements EventListener {
     static final String EVENT_TYPE_SUBMIT = "submit";
     private static final Logger logger = Logger.getInstance(FormListener.class);
+    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Project project;
 
     FormListener(@NotNull Project project) {
@@ -76,30 +80,24 @@ class FormListener implements EventListener {
             Elements elements = new Elements(form.getElements());
 
             try {
-                switch (elements.getStatus()) {
-                    case "":
-                    case "correct":
-                    case "wrong":
-                    case "timeLeft":
+                switch (elements.getAction()) {
+                    case "get_attempt":
                         boolean locked = elements.isLocked();
                         if (!locked) {
                             getAttempt(stepNode);
                             StepikProjectManager.updateSelection(project);
                         }
                         break;
-                    case "active":
-                    case "active_wrong":
+                    case "submit":
                         String typeStr = elements.getType();
                         StepType type = StepType.of(typeStr);
                         boolean isFromFile = elements.isFromFile();
                         String data = isFromFile ? getDataFromFile(stepNode) : null;
                         long attemptId = elements.getAttemptId();
-
-                        if (!isFromFile) {
-                            sendStep(stepNode, elements, type, attemptId, null);
-                        } else if (data != null) {
-                            sendStep(stepNode, elements, type, attemptId, data);
-                        }
+                        sendStep(stepNode, elements, type, attemptId, data);
+                        break;
+                    case "need_login":
+                        executor.execute(() -> StepikAuthManager.authentication(true));
                         break;
                     default:
                         return;
@@ -108,6 +106,7 @@ class FormListener implements EventListener {
                 logger.warn(e);
             }
             event.preventDefault();
+            event.stopPropagation();
         }
     }
 
@@ -133,7 +132,7 @@ class FormListener implements EventListener {
     }
 
     private void getAttempt(@NotNull StepNode node) {
-        StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
+        StepikApiClient stepikApiClient = authAndGetStepikApiClient(true);
 
         stepikApiClient.attempts()
                 .post()
@@ -155,7 +154,7 @@ class FormListener implements EventListener {
                 indicator.setIndeterminate(true);
 
                 try {
-                    StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
+                    StepikApiClient stepikApiClient = authAndGetStepikApiClient(true);
 
                     StepikSubmissionsPostQuery query = stepikApiClient.submissions()
                             .post()
@@ -213,7 +212,7 @@ class FormListener implements EventListener {
 
                     if (!submissions.isEmpty()) {
                         Submission submission = submissions.getFirst();
-                        SendAction.checkStepStatus(project, stepNode, submission.getId(), indicator);
+                        SendAction.checkStepStatus(project, stepikApiClient, stepNode, submission.getId(), indicator);
                     }
                 } catch (StepikClientException e) {
                     logger.warn("Failed send step from browser", e);
@@ -329,8 +328,8 @@ class FormListener implements EventListener {
         }
 
         @NotNull
-        String getStatus() {
-            Node item = elements.namedItem("status");
+        String getAction() {
+            Node item = elements.namedItem("action");
             if (item instanceof HTMLInputElement) {
                 return ((HTMLInputElement) item).getValue();
             }

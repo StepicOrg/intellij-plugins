@@ -1,6 +1,7 @@
 package org.stepik.plugin.projectWizard.pycharm;
 
 import com.intellij.facet.ui.ValidationResult;
+import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
@@ -177,6 +178,7 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
         ApplicationManager.getApplication()
                 .runWriteAction(() -> ModuleRootModificationUtil.setModuleSdk(module, settings.getSdk()));
         createCourseFromGenerator(project);
+        wizardStep.dispose();
     }
 
     private void createCourseFromGenerator(@NotNull Project project) {
@@ -203,9 +205,10 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
             VirtualFileManager.getInstance().syncRefresh();
         }
 
-        ApplicationManager.getApplication().invokeLater(
+        Application application = ApplicationManager.getApplication();
+        application.invokeLater(
                 () -> DumbService.allowStartingDumbModeInside(DumbModePermission.MAY_START_BACKGROUND,
-                        () -> ApplicationManager.getApplication().runWriteAction(
+                        () -> application.runWriteAction(
                                 () -> StudyProjectComponent.getInstance(project)
                                         .registerStudyToolWindow())));
     }

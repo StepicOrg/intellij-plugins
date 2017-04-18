@@ -17,7 +17,6 @@ import org.stepik.api.objects.steps.Steps;
 import org.stepik.api.objects.units.Units;
 import org.stepik.core.SupportedLanguages;
 import org.stepik.core.core.EduNames;
-import org.stepik.core.stepik.StepikConnectorLogin;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.stepik.core.SupportedLanguages.INVALID;
-import static org.stepik.core.stepik.StepikConnectorLogin.authAndGetStepikApiClient;
 
 public class StepNode extends Node<Step, StepNode, Step, StepNode> {
     private static final Logger logger = Logger.getInstance(StepNode.class);
@@ -37,22 +35,21 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
 
     public StepNode() {}
 
-    public StepNode(@NotNull Project project, @NotNull Step data) {
-        super(project, data);
+    public StepNode(@NotNull Project project, @NotNull StepikApiClient stepikApiClient, @NotNull Step data) {
+        super(project, stepikApiClient, data);
     }
 
     @Override
-    public void init(@NotNull Project project, @Nullable StudyNode parent) {
+    public void init(@NotNull Project project, @NotNull StepikApiClient stepikApiClient, @Nullable StudyNode parent) {
         supportedLanguages = null;
         courseId = 0;
 
-        super.init(project, parent);
+        super.init(project, stepikApiClient, parent);
     }
 
     @Override
-    protected boolean loadData(long id) {
+    protected boolean loadData(@NotNull StepikApiClient stepikApiClient, long id) {
         try {
-            StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
             Steps steps = stepikApiClient.steps()
                     .get()
                     .id(id)
@@ -114,15 +111,15 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
     }
 
     @Override
-    protected List<Step> getChildDataList() {
+    protected List<Step> getChildDataList(@NotNull StepikApiClient stepikApiClient) {
         return Collections.emptyList();
     }
 
     @Override
-    public long getCourseId() {
+    public long getCourseId(@NotNull StepikApiClient stepikApiClient) {
         StudyNode parent = getParent();
         if (parent != null) {
-            return parent.getCourseId();
+            return parent.getCourseId(stepikApiClient);
         }
 
         if (courseId != 0) {
@@ -140,8 +137,6 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
         }
 
         try {
-            StepikApiClient stepikApiClient = authAndGetStepikApiClient();
-
             Units units = stepikApiClient.units()
                     .get()
                     .lesson(lessonId)
@@ -156,7 +151,7 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
                 lessonData.setUnit(units.getFirst());
             }
 
-            courseId = lessonNode.getCourseId();
+            courseId = lessonNode.getCourseId(stepikApiClient);
             return courseId;
         } catch (StepikClientException ignored) {
         }
@@ -261,11 +256,6 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
     @Override
     String getDirectoryPrefix() {
         return EduNames.STEP;
-    }
-
-    @Override
-    public boolean canBeLeaf() {
-        return true;
     }
 
     @Override

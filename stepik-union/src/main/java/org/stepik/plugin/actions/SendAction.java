@@ -18,7 +18,6 @@ import org.stepik.core.courseFormat.StepType;
 import org.stepik.core.courseFormat.StudyStatus;
 import org.stepik.core.metrics.Metrics;
 import org.stepik.core.metrics.MetricsStatus;
-import org.stepik.core.stepik.StepikConnectorLogin;
 import org.stepik.core.utils.Utils;
 
 import static org.stepik.core.courseFormat.StudyStatus.SOLVED;
@@ -37,12 +36,12 @@ public class SendAction {
 
     public static void checkStepStatus(
             @NotNull Project project,
+            @NotNull StepikApiClient stepikApiClient,
             @NotNull StepNode stepNode,
             final long submissionId,
             @NotNull ProgressIndicator indicator) {
         String stepIdString = "id=" + stepNode.getId();
         logger.info("Started check a status for step: " + stepIdString);
-        StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
         String stepStatus = EVALUATION;
         int timer = 0;
         String hint;

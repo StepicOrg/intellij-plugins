@@ -1,12 +1,21 @@
 package org.stepik.plugin.collective.ui;
 
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
+import org.jetbrains.annotations.NotNull;
 import org.stepik.core.StepikProjectManager;
-import org.stepik.core.stepik.StepikConnectorLogin;
+import org.stepik.core.stepik.StepikAuthManager;
+import org.stepik.core.stepik.StepikAuthManagerListener;
+import org.stepik.core.stepik.StepikAuthState;
 import org.stepik.core.utils.Utils;
 
 import javax.swing.*;
 
-class StepikSettingsPanel {
+import static org.stepik.core.stepik.StepikAuthManager.isAuthenticated;
+import static org.stepik.core.stepik.StepikAuthState.AUTH;
+import static org.stepik.core.stepik.StepikAuthState.NOT_AUTH;
+
+class StepikSettingsPanel implements StepikAuthManagerListener {
     private JPanel pane;
     private JCheckBox hintCheckBox;
     private JButton logoutButton;
@@ -18,22 +27,15 @@ class StepikSettingsPanel {
 
     StepikSettingsPanel() {
         initProjectOfSettings();
-        hintCheckBox.setSelected(projectManager != null && projectManager.getShowHint());
         hintCheckBox.addActionListener(e -> hintCheckBoxModified = true);
+        logoutButton.addActionListener(e -> StepikAuthManager.logout());
+        loginButton.addActionListener(e -> StepikAuthManager.logoutAndAuth());
 
-        logoutButton.addActionListener(e -> {
-            StepikConnectorLogin.logout();
-            updateUserName();
-        });
-
-        loginButton.addActionListener(e -> {
-            StepikConnectorLogin.authentication();
-            updateUserName();
-        });
+        StepikAuthManager.addListener(this);
     }
 
     private void updateUserName() {
-        userName.setText(StepikConnectorLogin.getCurrentUserFullName());
+        userName.setText(StepikAuthManager.getCurrentUserFullName());
     }
 
     JComponent getPanel() {
@@ -42,6 +44,8 @@ class StepikSettingsPanel {
 
     private void initProjectOfSettings() {
         projectManager = StepikProjectManager.getInstance(Utils.getCurrentProject());
+        hintCheckBox.setSelected(projectManager != null && projectManager.getShowHint());
+        logoutButton.setEnabled(isAuthenticated());
     }
 
     void reset() {
@@ -63,5 +67,19 @@ class StepikSettingsPanel {
 
     private void resetModification() {
         hintCheckBoxModified = false;
+    }
+
+    @Override
+    public void stateChanged(@NotNull StepikAuthState oldState, @NotNull StepikAuthState newState) {
+        if (newState == NOT_AUTH || newState == AUTH) {
+            ApplicationManager.getApplication().invokeLater(() -> {
+                updateUserName();
+                logoutButton.setEnabled(newState == AUTH);
+            }, ModalityState.stateForComponent(pane));
+        }
+    }
+
+    void dispose() {
+        StepikAuthManager.removeListener(this);
     }
 }

@@ -42,7 +42,6 @@ import org.stepik.core.courseFormat.stepHelpers.StringQuizHelper;
 import org.stepik.core.courseFormat.stepHelpers.TableQuizHelper;
 import org.stepik.core.courseFormat.stepHelpers.TextTheoryHelper;
 import org.stepik.core.courseFormat.stepHelpers.VideoTheoryHelper;
-import org.stepik.core.stepik.StepikConnectorLogin;
 import org.stepik.core.utils.ProgrammingLanguageUtils;
 
 import javax.swing.*;
@@ -58,6 +57,8 @@ import static org.stepik.core.StudyUtils.getStepContent;
 import static org.stepik.core.courseFormat.StepType.CODE;
 import static org.stepik.core.courseFormat.StepType.TEXT;
 import static org.stepik.core.courseFormat.StepType.VIDEO;
+import static org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient;
+import static org.stepik.core.stepik.StepikAuthManager.isAuthenticated;
 import static org.stepik.core.utils.PluginUtils.PLUGIN_ID;
 
 public class StudyToolWindow extends SimpleToolWindowPanel implements DataProvider, Disposable, ActionListener {
@@ -187,6 +188,8 @@ public class StudyToolWindow extends SimpleToolWindowPanel implements DataProvid
     }
 
     public void setStepNode(@Nullable StudyNode studyNode, boolean force) {
+        browserWindow.hideLoadAnimation();
+
         if (!force && stepNode == studyNode) {
             return;
         }
@@ -209,6 +212,8 @@ public class StudyToolWindow extends SimpleToolWindowPanel implements DataProvid
             rightPanel.setVisible(false);
             return;
         }
+
+        browserWindow.showLoadAnimation();
 
         StepType stepType = stepNode.getType();
         if (stepType != VIDEO && stepType != CODE) {
@@ -306,7 +311,11 @@ public class StudyToolWindow extends SimpleToolWindowPanel implements DataProvid
             long stepId = stepNode.getId();
             try {
                 if (assignment != null && assignment != 0) {
-                    StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
+                    StepikApiClient stepikApiClient = authAndGetStepikApiClient();
+                    if (!isAuthenticated()) {
+                        return;
+                    }
+
                     stepikApiClient.views()
                             .post()
                             .assignment(assignment)
@@ -353,16 +362,21 @@ public class StudyToolWindow extends SimpleToolWindowPanel implements DataProvid
 
         final StepNode targetNode = stepNode;
 
-        ApplicationManager.getApplication().invokeLater(() -> {
-                    SupportedLanguages selectedLang = (SupportedLanguages) languageBox.getSelectedItem();
-                    if (selectedLang != null) {
-                        ProgrammingLanguageUtils.switchProgrammingLanguage(project, targetNode, selectedLang);
-                        if (selectedLang != targetNode.getCurrentLang()) {
-                            languageBox.setSelectedItem(targetNode.getCurrentLang());
-                        }
-                    }
+        executor.execute(() -> {
+            final SupportedLanguages[] selectedLang = new SupportedLanguages[1];
+            ApplicationManager.getApplication().invokeAndWait(() ->
+                    selectedLang[0] = (SupportedLanguages) languageBox.getSelectedItem()
+            );
+
+            if (selectedLang[0] != null) {
+                ProgrammingLanguageUtils.switchProgrammingLanguage(project, targetNode, selectedLang[0]);
+                if (selectedLang[0] != targetNode.getCurrentLang()) {
+                    ApplicationManager.getApplication().invokeLater(() ->
+                            languageBox.setSelectedItem(targetNode.getCurrentLang())
+                    );
                 }
-        );
+            }
+        });
     }
 
     private int getVideoQuality() {

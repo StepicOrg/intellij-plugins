@@ -77,6 +77,9 @@ public class VideoTheoryHelper extends StepHelper {
     }
 
     public Collection<? extends Integer> getQualitySet() {
+        if (urls == null) {
+            urls = getVideoUrls();
+        }
         return urls.stream()
                 .map(VideoUrl::getQuality)
                 .collect(Collectors.toList());

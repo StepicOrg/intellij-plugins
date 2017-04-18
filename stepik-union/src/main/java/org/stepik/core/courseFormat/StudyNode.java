@@ -3,6 +3,7 @@ package org.stepik.core.courseFormat;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.objects.StudyObject;
 
 import java.util.List;
@@ -39,7 +40,7 @@ public interface StudyNode<D extends StudyObject, C extends StudyNode> {
 
     boolean isLeaf();
 
-    long getCourseId();
+    long getCourseId(@NotNull StepikApiClient stepikApiClient);
 
     @Nullable
     C getChildById(long id);
@@ -57,15 +58,13 @@ public interface StudyNode<D extends StudyObject, C extends StudyNode> {
 
     void setData(@Nullable D data);
 
-    void init(@NotNull Project project, @Nullable final StudyNode parent);
+    void init(@NotNull Project project, @NotNull StepikApiClient stepikApiClient, @Nullable final StudyNode parent);
 
-    default void init(@NotNull Project project) {
-        init(project, null);
+    default void init(@NotNull Project project, @NotNull StepikApiClient stepikApiClient) {
+        init(project, stepikApiClient, null);
     }
 
-    boolean canBeLeaf();
-
-    void reloadData(@NotNull Project project);
+    void reloadData(@NotNull Project project, @NotNull StepikApiClient stepikApiClient);
 
     boolean getWasDeleted();
 
@@ -75,10 +74,9 @@ public interface StudyNode<D extends StudyObject, C extends StudyNode> {
 
     void setRawStatus(@Nullable StudyStatus status);
 
-    void passed();
+    void resetStatus();
 
-    @Nullable
-    Project getProject();
+    void passed();
 
     void setProject(@NotNull Project project);
 }

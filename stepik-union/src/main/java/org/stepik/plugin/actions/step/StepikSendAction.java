@@ -1,11 +1,17 @@
 package org.stepik.plugin.actions.step;
 
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.KeyboardShortcut;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import icons.AllStepikIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
@@ -17,32 +23,39 @@ import org.stepik.core.SupportedLanguages;
 import org.stepik.core.courseFormat.StepNode;
 import org.stepik.core.courseFormat.StudyNode;
 import org.stepik.core.metrics.Metrics;
-import org.stepik.core.stepik.StepikConnectorLogin;
 import org.stepik.core.utils.Utils;
 import org.stepik.plugin.actions.ActionUtils;
 import org.stepik.plugin.actions.SendAction;
 import org.stepik.plugin.utils.DirectivesUtils;
 
+import javax.swing.*;
+
 import static org.stepik.core.metrics.MetricsStatus.DATA_NOT_LOADED;
 import static org.stepik.core.metrics.MetricsStatus.FAILED_POST;
 import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
 import static org.stepik.core.metrics.MetricsStatus.USER_CANCELED;
+import static org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient;
+import static org.stepik.core.stepik.StepikAuthManager.isAuthenticated;
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
 
-public class StepikJavaPostAction extends StudyCheckAction {
-    private static final Logger logger = Logger.getInstance(StepikJavaPostAction.class);
-    private static final String ACTION_ID = "STEPIC.StepikJavaPostAction";
+public class StepikSendAction extends CodeQuizAction {
+    private static final Logger logger = Logger.getInstance(StepikSendAction.class);
+    private static final String ACTION_ID = "STEPIC.StepikSendAction";
+    private static final String SHORTCUT = "ctrl alt pressed ENTER";
 
-    public StepikJavaPostAction() {
+    public StepikSendAction() {
+        super("Check Step (" + KeymapUtil.getShortcutText(new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT),
+                null)) + ")", "Check current step", AllStepikIcons.ToolWindow.checkTask);
     }
 
     @Nullable
-    private static Long sendStep(@NotNull Project project, @NotNull StepNode stepNode) {
+    private static Long sendStep(
+            @NotNull StepikApiClient stepikApiClient,
+            @NotNull Project project,
+            @NotNull StepNode stepNode) {
         long stepId = stepNode.getId();
 
         logger.info(String.format("Start sending step: id=%s", stepId));
-
-        StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
 
         Long intAttemptId = getAttemptId(project, stepikApiClient, stepNode);
         if (intAttemptId == null) {
@@ -154,7 +167,23 @@ public class StepikJavaPostAction extends StudyCheckAction {
     }
 
     @Override
-    public void check(@NotNull Project project) {
+    public void actionPerformed(@NotNull AnActionEvent e) {
+        Project project = e.getProject();
+        if (project == null) {
+            return;
+        }
+        FileDocumentManager.getInstance().saveAllDocuments();
+
+        ApplicationManager.getApplication()
+                .executeOnPooledThread(() -> check(project));
+    }
+
+    @Override
+    public String[] getShortcuts() {
+        return new String[]{SHORTCUT};
+    }
+
+    private void check(@NotNull Project project) {
         logger.info("Start checking step");
         StudyNode<?, ?> selected = StepikProjectManager.getSelected(project);
         if (!(selected instanceof StepNode)) {
@@ -171,7 +200,12 @@ public class StepikJavaPostAction extends StudyCheckAction {
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
 
-                Long submissionId = sendStep(project, stepNode);
+                StepikApiClient stepikApiClient = authAndGetStepikApiClient(true);
+                if (!isAuthenticated()) {
+                    return;
+                }
+
+                Long submissionId = sendStep(stepikApiClient, project, stepNode);
 
                 if (submissionId == null) {
                     return;
@@ -179,7 +213,7 @@ public class StepikJavaPostAction extends StudyCheckAction {
 
                 Metrics.sendAction(project, stepNode, SUCCESSFUL);
 
-                SendAction.checkStepStatus(project, stepNode, submissionId, indicator);
+                SendAction.checkStepStatus(project, stepikApiClient, stepNode, submissionId, indicator);
                 logger.info(String.format("Finish checking step: id=%s", stepNode.getId()));
             }
         });

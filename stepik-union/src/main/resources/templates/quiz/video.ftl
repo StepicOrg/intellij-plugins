@@ -3,6 +3,10 @@
 
 <@step_content>
 
-<video src="${stepNode.getUrl()}" width="100%" preload controls autoplay></video>
+    <#if stepNode.hasContent()>
+    <video src="${stepNode.getUrl()}" width="100%" preload controls autoplay></video>
+    <#else>
+    <p>Not content</p>
+    </#if>
 
 </@step_content>

@@ -26,7 +26,7 @@ public class StepikMetricsPostQuery extends StepikAbstractPostQuery<VoidResult> 
     }
 
     @NotNull
-    public StepikMetricsPostQuery timestamp(int value) {
+    public StepikMetricsPostQuery timestamp(long value) {
         metrics.getMetric().setTimestamp(value);
         return this;
     }

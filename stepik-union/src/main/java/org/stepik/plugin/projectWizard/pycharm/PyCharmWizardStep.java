@@ -5,13 +5,17 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.api.objects.StudyObject;
 import org.stepik.core.SupportedLanguages;
+import org.stepik.core.stepik.StepikAuthManager;
 import org.stepik.plugin.projectWizard.ui.ProjectSettingListener;
 import org.stepik.plugin.projectWizard.ui.ProjectSettingsPanel;
 
 import javax.swing.*;
 
+import static org.stepik.core.stepik.StepikAuthManager.isAuthenticated;
+
 class PyCharmWizardStep implements ProjectSettingListener {
-    private final ValidationResult invalidCourse = new ValidationResult("Please select a course");
+    private final ValidationResult invalidCourse = new ValidationResult("Please, select a course");
+    private final ValidationResult needLogin = new ValidationResult("Please, you must login");
     private final StepikPyProjectGenerator generator;
     private final ProjectSettingsPanel panel;
 
@@ -38,6 +42,11 @@ class PyCharmWizardStep implements ProjectSettingListener {
         if (selectedStudyObject.getId() == 0) {
             return invalidCourse;
         }
+
+        StepikAuthManager.authentication(false);
+        if (!isAuthenticated()) {
+            return needLogin;
+        }
         return ValidationResult.OK;
     }
 
@@ -49,5 +58,9 @@ class PyCharmWizardStep implements ProjectSettingListener {
     void updateStep() {
         panel.setLanguage(SupportedLanguages.PYTHON3);
         panel.updateStep();
+    }
+
+    void dispose() {
+        panel.dispose();
     }
 }
