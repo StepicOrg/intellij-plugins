@@ -223,7 +223,7 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
 
     @Override
     public void stateChanged(@NotNull StepikAuthState oldState, @NotNull StepikAuthState newState) {
-        fireStateChanged();
+        ApplicationManager.getApplication().invokeLater(this::fireStateChanged);
     }
 
     private void dispose() {
