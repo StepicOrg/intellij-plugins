@@ -1,6 +1,7 @@
 package org.stepik.plugin.utils;
 
 import com.intellij.ide.projectView.ProjectView;
+import com.intellij.ide.projectView.impl.AbstractProjectViewPane;
 import com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
@@ -96,7 +97,15 @@ public class NavigationUtils {
     }
 
     private static void collapseNonSelected(@NotNull PsiFileSystemItem file) {
-        JTree tree = ProjectView.getInstance(file.getProject()).getCurrentProjectViewPane().getTree();
+        ProjectView projectView = ProjectView.getInstance(file.getProject());
+        if (projectView == null) {
+            return;
+        }
+        AbstractProjectViewPane projectViewPane = projectView.getCurrentProjectViewPane();
+        if (projectViewPane == null) {
+            return;
+        }
+        JTree tree = projectViewPane.getTree();
         Set<TreePath> paths = new HashSet<>(TreeUtil.collectExpandedPaths(tree));
         DefaultMutableTreeNode root = (DefaultMutableTreeNode) tree.getModel().getRoot();
         DefaultMutableTreeNode selectionNode = findNodeWithObject(root, file);

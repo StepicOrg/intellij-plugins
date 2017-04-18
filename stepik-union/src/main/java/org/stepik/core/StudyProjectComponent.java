@@ -13,7 +13,6 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.DumbAwareRunnable;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.startup.StartupManager;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowAnchor;
@@ -72,9 +71,7 @@ public class StudyProjectComponent implements ProjectComponent {
                         }));
         Metrics.openProject(project, SUCCESSFUL);
 
-        StartupManager.getInstance(project).runWhenProjectIsInitialized(() ->
-                executor.execute(() -> StepikProjectManager.updateAdaptiveSelected(project)
-                ));
+        executor.execute(() -> StepikProjectManager.updateAdaptiveSelected(project));
     }
 
     public void registerStudyToolWindow() {

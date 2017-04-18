@@ -334,7 +334,9 @@ public class StudyToolWindow extends SimpleToolWindowPanel implements DataProvid
                 stepNode.setProject(project);
             }
             if (!project.isDisposed()) {
-                ProjectView.getInstance(project).refresh();
+                ApplicationManager.getApplication().invokeLater(() ->
+                        ProjectView.getInstance(project).refresh()
+                );
             }
         });
     }

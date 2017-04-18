@@ -214,8 +214,11 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
         application.invokeLater(
                 () -> DumbService.allowStartingDumbModeInside(DumbModePermission.MAY_START_BACKGROUND,
                         () -> application.runWriteAction(
-                                () -> StudyProjectComponent.getInstance(project)
-                                        .registerStudyToolWindow())));
+                                () -> {
+                                    StudyProjectComponent.getInstance(project)
+                                            .registerStudyToolWindow();
+                                    StepikProjectManager.updateAdaptiveSelected(project);
+                                })));
     }
 
     @Override
