@@ -5,15 +5,18 @@ import com.intellij.ide.wizard.CommitStepException;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
-import org.stepik.core.SupportedLanguages;
-import org.stepik.core.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.api.objects.StudyObject;
+import org.stepik.core.SupportedLanguages;
 import org.stepik.core.projectWizard.ProjectWizardUtils;
+import org.stepik.core.stepik.StepikAuthState;
 import org.stepik.plugin.projectWizard.StepikProjectGenerator;
 import org.stepik.plugin.projectWizard.ui.ProjectSettingsPanel;
 
 import javax.swing.*;
+
+import static org.stepik.core.stepik.StepikAuthManager.authentication;
+import static org.stepik.core.stepik.StepikAuthState.AUTH;
 
 class JavaWizardStep extends ModuleWizardStep {
     private static final Logger logger = Logger.getInstance(JavaWizardStep.class);
@@ -41,7 +44,6 @@ class JavaWizardStep extends ModuleWizardStep {
 
     @Override
     public void updateStep() {
-        StepikConnectorLogin.authentication();
         panel.updateStep();
         valid = false;
         leaving = false;
@@ -49,6 +51,10 @@ class JavaWizardStep extends ModuleWizardStep {
 
     @Override
     public boolean validate() throws ConfigurationException {
+        StepikAuthState authenticated = authentication(true);
+        if (authenticated != AUTH) {
+            throw new ConfigurationException("Please, you should login", "Error");
+        }
         valid = panel.validate();
         return valid;
     }
@@ -56,6 +62,11 @@ class JavaWizardStep extends ModuleWizardStep {
     @Override
     public void onStepLeaving() {
         leaving = true;
+    }
+
+    @Override
+    public void disposeUIResources() {
+        panel.dispose();
     }
 
     @Override
@@ -75,7 +86,10 @@ class JavaWizardStep extends ModuleWizardStep {
             return;
         }
 
-        ProjectWizardUtils.enrollmentCourse(studyObject);
+        boolean wasEnrollment = ProjectWizardUtils.enrollmentCourse(studyObject);
+        if (wasEnrollment) {
+            logger.warn("User didn't enrollment on course: " + id);
+        }
 
         String messageTemplate = "Leaving step the project wizard with the selected study object: type=%s, id = %s, name = %s";
         logger.info(String.format(messageTemplate, studyObject.getClass().getSimpleName(), id, studyObject.getTitle()));

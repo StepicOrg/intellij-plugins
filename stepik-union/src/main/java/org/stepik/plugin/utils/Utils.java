@@ -1,9 +1,11 @@
 package org.stepik.plugin.utils;
 
+import com.intellij.openapi.diagnostic.Logger;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
+import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.StudyObject;
 import org.stepik.api.objects.courses.Course;
 import org.stepik.api.objects.courses.Courses;
@@ -14,17 +16,18 @@ import org.stepik.api.objects.sections.Section;
 import org.stepik.api.objects.sections.Sections;
 import org.stepik.api.objects.units.Unit;
 import org.stepik.api.objects.units.Units;
-import org.stepik.core.stepik.StepikConnectorLogin;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient;
 import static org.stepik.plugin.projectWizard.StepikProjectGenerator.EMPTY_STUDY_OBJECT;
 
 /**
  * @author meanmail
  */
 public class Utils {
+    private static final Logger logger = Logger.getInstance(Utils.class);
     @Language("HTML")
     private static final String DEFAULT_DESCRIPTION =
             "<b>A course does not selected.</b><br>" +
@@ -83,13 +86,13 @@ public class Utils {
     }
 
     private static StudyObject getLessonStudyObject(long lessonId, long unitId) {
-        CompoundUnitLesson unitLesson = getCompoundUnitLessonStudyObject(lessonId, unitId);
+        StepikApiClient stepikApiClient = authAndGetStepikApiClient();
+        CompoundUnitLesson unitLesson = getCompoundUnitLessonStudyObject(stepikApiClient, unitId, lessonId);
 
         Unit unit = unitLesson.getUnit();
 
         if (unit.getId() != 0) {
-            StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
-            Section section = getSectionStudyObject(unit.getSection(), stepikApiClient);
+            Section section = getSectionStudyObject(stepikApiClient, unit.getSection());
 
             if (section != null) {
                 return getCourseStudyObject(section.getCourse());
@@ -100,22 +103,28 @@ public class Utils {
     }
 
     @NotNull
-    private static CompoundUnitLesson getCompoundUnitLessonStudyObject(long lessonId, long unitId) {
-        StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
-
+    private static CompoundUnitLesson getCompoundUnitLessonStudyObject(
+            @NotNull StepikApiClient stepikApiClient,
+            long unitId,
+            long lessonId) {
         Units units = null;
 
         if (unitId != 0) {
-            units = stepikApiClient.units()
-                    .get()
-                    .id(unitId)
-                    .execute();
+            try {
+                units = stepikApiClient.units()
+                        .get()
+                        .id(unitId)
+                        .execute();
+            } catch (StepikClientException e) {
+                logger.warn(e);
+                units = new Units();
+            }
         }
 
         Unit unit = null;
 
         if (unitId != 0 && !units.isEmpty()) {
-            unit = units.getItems().get(0);
+            unit = units.getFirst();
         }
 
         Lesson lesson = getLesson(lessonId, stepikApiClient);
@@ -123,67 +132,80 @@ public class Utils {
         return lesson != null ? new CompoundUnitLesson(unit, lesson) : new CompoundUnitLesson();
     }
 
-    private static Section getSectionStudyObject(long sectionId, @NotNull StepikApiClient stepikApiClient) {
+    private static Section getSectionStudyObject(
+            @NotNull StepikApiClient stepikApiClient,
+            long sectionId) {
         Sections sections = null;
 
         if (sectionId != 0) {
-            sections = stepikApiClient.sections()
-                    .get()
-                    .id(sectionId)
-                    .execute();
+            try {
+                sections = stepikApiClient.sections()
+                        .get()
+                        .id(sectionId)
+                        .execute();
+            } catch (StepikClientException e) {
+                logger.warn(e);
+                return null;
+            }
         }
-
-        Section section = null;
 
         if (sectionId != 0 && !sections.isEmpty()) {
-            section = sections.getItems().get(0);
+            return sections.getFirst();
         }
-        return section;
+        return null;
     }
 
     @Nullable
-    private static Lesson getLesson(long lessonId, StepikApiClient stepikApiClient) {
+    private static Lesson getLesson(long lessonId, @NotNull StepikApiClient stepikApiClient) {
         Lessons lessons = null;
 
         if (lessonId != 0) {
-            lessons = stepikApiClient.lessons()
-                    .get()
-                    .id(lessonId)
-                    .execute();
+            try {
+                lessons = stepikApiClient.lessons()
+                        .get()
+                        .id(lessonId)
+                        .execute();
+            } catch (StepikClientException e) {
+                logger.warn(e);
+                return null;
+            }
         }
-
-        Lesson lesson = null;
 
         if (lessonId != 0 && !lessons.isEmpty()) {
-            lesson = lessons.getItems().get(0);
+            return lessons.getFirst();
         }
-        return lesson;
+        return null;
     }
 
     @NotNull
     private static StudyObject getCourseStudyObject(long id) {
-        StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
-        Course course = getCourse(id, stepikApiClient);
+        StepikApiClient stepikApiClient = authAndGetStepikApiClient();
+        Course course = getCourse(stepikApiClient, id);
         return course != null ? course : EMPTY_STUDY_OBJECT;
     }
 
     @Nullable
-    private static Course getCourse(long id, StepikApiClient stepikApiClient) {
+    private static Course getCourse(
+            @NotNull StepikApiClient stepikApiClient,
+            long id) {
         Courses courses = null;
 
         if (id != 0) {
-            courses = stepikApiClient.courses()
-                    .get()
-                    .id(id)
-                    .execute();
+            try {
+                courses = stepikApiClient.courses()
+                        .get()
+                        .id(id)
+                        .execute();
+            } catch (StepikClientException e) {
+                logger.warn(e);
+                return null;
+            }
         }
-
-        Course course = null;
 
         if (id != 0 && !courses.isEmpty()) {
-            course = courses.getCourses().get(0);
+            return courses.getFirst();
         }
-        return course;
+        return null;
     }
 
     private static boolean isFillOfInt(@NotNull String link) {

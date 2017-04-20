@@ -4,16 +4,15 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
-import org.stepik.core.StepikProjectManager;
-import org.stepik.core.SupportedLanguages;
-import org.stepik.core.courseFormat.StudyNode;
-import org.stepik.core.courseFormat.StudyNodeFactory;
-import org.stepik.core.stepik.StepikConnectorLogin;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.StudyObject;
 import org.stepik.api.objects.courses.Course;
+import org.stepik.core.StepikProjectManager;
+import org.stepik.core.SupportedLanguages;
+import org.stepik.core.courseFormat.StudyNode;
+import org.stepik.core.courseFormat.StudyNodeFactory;
 import org.stepik.core.metrics.Metrics;
 
 import java.util.ArrayList;
@@ -25,6 +24,8 @@ import java.util.stream.Collectors;
 import static org.stepik.core.metrics.MetricsStatus.DATA_NOT_LOADED;
 import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
 import static org.stepik.core.metrics.MetricsStatus.TARGET_NOT_FOUND;
+import static org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient;
+import static org.stepik.core.stepik.StepikAuthManager.getCurrentUser;
 
 public class StepikProjectGenerator {
     public static final StudyObject EMPTY_STUDY_OBJECT = initEmptyStudyNode();
@@ -58,7 +59,7 @@ public class StepikProjectGenerator {
         List<Long> coursesIds = getHardcodedCoursesId(programmingLanguage);
 
         if (!coursesIds.isEmpty()) {
-            StepikApiClient stepikApiClient = StepikConnectorLogin.authAndGetStepikApiClient();
+            StepikApiClient stepikApiClient = authAndGetStepikApiClient();
             try {
                 courses = stepikApiClient.courses()
                         .get()
@@ -93,12 +94,13 @@ public class StepikProjectGenerator {
                 return Arrays.asList(187L, 150L, 217L, 1127L, 125L, 126L);
             case PYTHON3:
                 return Arrays.asList(67L, 512L, 401L, 217L, 1127L, 125L, 126L, 150L, 568L, 431L);
+            case HASKELL:
+                return Arrays.asList(75L, 217L, 1127L, 125L, 126L, 150L);
             case ASM32:
             case ASM64:
             case CLOJURE:
             case CPP:
             case CPP_11:
-            case HASKELL:
             case HASKELL_7_10:
             case JAVASCRIPT:
             case MONO_CS:
@@ -109,6 +111,7 @@ public class StepikProjectGenerator {
                 return Arrays.asList(217L, 1127L, 125L, 126L, 150L);
             case C:
             case HASKELL_8_0:
+                return Arrays.asList(693L, 1127L, 125L, 126L, 150L);
             case RUBY:
             case SCALA:
                 return Arrays.asList(1127L, 125L, 126L, 150L);
@@ -129,8 +132,9 @@ public class StepikProjectGenerator {
                     ProgressIndicator indicator = ProgressManager.getInstance().getProgressIndicator();
                     indicator.setIndeterminate(true);
 
-                    projectRoot = StudyNodeFactory.createTree(project, data);
-                }, "Creating project", true, project);
+                    StepikApiClient stepikApiClient = authAndGetStepikApiClient();
+                    projectRoot = StudyNodeFactory.createTree(project, stepikApiClient, data);
+                }, "Creating Project", true, project);
     }
 
     public void generateProject(@NotNull Project project) {
@@ -141,7 +145,7 @@ public class StepikProjectGenerator {
         }
         stepikProjectManager.setRootNode(projectRoot);
         stepikProjectManager.setDefaultLang(getDefaultLang());
-        stepikProjectManager.setCreatedBy(StepikConnectorLogin.getCurrentUser().getId());
+        stepikProjectManager.setCreatedBy(getCurrentUser().getId());
         Metrics.createProject(project, SUCCESSFUL);
     }
 

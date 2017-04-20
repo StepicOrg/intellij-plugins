@@ -2,12 +2,15 @@ package org.stepik.core;
 
 import com.google.gson.internal.LinkedTreeMap;
 import com.intellij.ide.projectView.ProjectView;
+import com.intellij.openapi.Disposable;
+import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.module.ModifiableModuleModel;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.module.ModuleWithNameAlreadyExists;
@@ -17,6 +20,8 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Computable;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.thoughtworks.xstream.XStream;
@@ -29,6 +34,7 @@ import org.jdom.input.DOMBuilder;
 import org.jdom.output.XMLOutputter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.objects.StudyObject;
 import org.stepik.api.objects.courses.Course;
 import org.stepik.api.objects.lessons.CompoundUnitLesson;
@@ -48,6 +54,9 @@ import org.stepik.core.serialization.SampleConverter;
 import org.stepik.core.serialization.StudySerializationUtils;
 import org.stepik.core.serialization.StudyUnrecognizedFormatException;
 import org.stepik.core.serialization.SupportedLanguagesConverter;
+import org.stepik.core.stepik.StepikAuthManager;
+import org.stepik.core.stepik.StepikAuthManagerListener;
+import org.stepik.core.stepik.StepikAuthState;
 import org.stepik.core.ui.StudyToolWindow;
 import org.stepik.plugin.projectWizard.idea.SandboxModuleBuilder;
 import org.w3c.dom.Document;
@@ -61,12 +70,20 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient;
+import static org.stepik.core.stepik.StepikAuthManager.isAuthenticated;
+import static org.stepik.core.stepik.StepikAuthState.AUTH;
+import static org.stepik.core.stepik.StepikAuthState.NOT_AUTH;
+import static org.stepik.core.stepik.StepikAuthState.SHOW_DIALOG;
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
 
 @State(name = "StepikStudySettings", storages = @Storage("stepik_study_project.xml"))
-public class StepikProjectManager implements PersistentStateComponent<Element>, DumbAware {
+public class StepikProjectManager
+        implements PersistentStateComponent<Element>, DumbAware, StepikAuthManagerListener, Disposable {
     private static final int CURRENT_VERSION = 4;
     private static final Logger logger = Logger.getInstance(StepikProjectManager.class);
     @XStreamOmitField
@@ -81,6 +98,9 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
     private static DOMBuilder domBuilder;
     @XStreamOmitField
     private final Project project;
+    @XStreamOmitField
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    @Nullable
     private StudyNode<?, ?> root;
     private StudyNode<?, ?> selected;
     private boolean showHint = false;
@@ -91,6 +111,10 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
 
     public StepikProjectManager(@Nullable Project project) {
         this.project = project;
+        StepikAuthManager.addListener(this);
+        if (project != null) {
+            Disposer.register(project, this);
+        }
     }
 
     public StepikProjectManager() {
@@ -216,8 +240,32 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
         return instance != null && instance.isAdaptive();
     }
 
+    public static void updateAdaptiveSelected(@Nullable Project project) {
+        if (project == null) {
+            return;
+        }
+        StepikProjectManager instance = getInstance(project);
+        if (instance != null) {
+            instance.updateAdaptiveSelected();
+        }
+    }
+
+    private void updateAdaptiveSelected() {
+        if (isAdaptive() && root != null) {
+            StudyNode<?, ?> recommendation = StudyUtils.getRecommendation(root);
+            if (selected == null || (recommendation != null && selected.getParent() != recommendation.getParent())) {
+                ApplicationManager.getApplication().invokeAndWait(() -> {
+                    for (VirtualFile file : FileEditorManager.getInstance(project).getOpenFiles()) {
+                        FileEditorManager.getInstance(project).closeFile(file);
+                    }
+                });
+                setSelected(recommendation);
+            }
+        }
+    }
+
     @Nullable
-    public StudyNode<?, ?> getSelected() {
+    private StudyNode<?, ?> getSelected() {
         return selected;
     }
 
@@ -242,7 +290,7 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
         }
     }
 
-    public void updateSelection() {
+    private void updateSelection() {
         setSelected(selected, true);
     }
 
@@ -300,56 +348,72 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
         }
     }
 
-    public boolean isAdaptive() {
+    private boolean isAdaptive() {
+        if (root == null) {
+            return false;
+        }
         StudyObject data = root.getData();
         return data != null && data.isAdaptive();
     }
 
     private void refreshCourse() {
-        if (getProjectRoot() == null || project == null) {
+        if (project == null || root == null) {
             return;
         }
 
         root.setProject(project);
 
-        new Thread(() -> {
-            root.reloadData(project);
-            ProgressManager.getInstance().run(new Task.Backgroundable(project, "Synchronize project") {
+        executor.execute(() -> {
+            StepikApiClient stepikApiClient = authAndGetStepikApiClient();
+            if (isAuthenticated()) {
+                root.reloadData(project, stepikApiClient);
+            }
+            ProgressManager.getInstance().run(new Task.Backgroundable(project, "Synchronize Project") {
                 @Override
                 public void run(@NotNull ProgressIndicator indicator) {
-                    repairProjectFiles(root);
                     if (project.isDisposed()) {
                         return;
                     }
-                    VirtualFile projectDir = project.getBaseDir();
-                    if (projectDir != null && projectDir.findChild(EduNames.SANDBOX_DIR) == null) {
-                        ModifiableModuleModel model = ModuleManager.getInstance(project)
-                                .getModifiableModel();
 
-                        ApplicationManager.getApplication().runWriteAction(() -> {
-                            try {
-                                new SandboxModuleBuilder(projectDir.getPath()).createModule(model);
-                                model.commit();
-                            } catch (IOException | ConfigurationException | JDOMException | ModuleWithNameAlreadyExists e) {
-                                logger.warn("Failed repair Sandbox", e);
+                    repairProjectFiles(root);
+                    repairSandbox();
+
+                    ApplicationManager.getApplication().invokeLater(() -> {
+                                VirtualFileManager.getInstance().syncRefresh();
+                                setSelected(selected, false);
                             }
-                        });
-                    }
-
-                    ApplicationManager.getApplication().invokeLater(() ->
-                            VirtualFileManager.getInstance().syncRefresh()
                     );
                 }
+
+                private void repairSandbox() {
+                    VirtualFile projectDir = project.getBaseDir();
+                    if (projectDir != null && projectDir.findChild(EduNames.SANDBOX_DIR) == null) {
+                        Application application = ApplicationManager.getApplication();
+
+                        ModifiableModuleModel model = application.runReadAction(
+                                (Computable<ModifiableModuleModel>) () -> ModuleManager.getInstance(project)
+                                        .getModifiableModel());
+
+
+                        application.invokeLater(() ->
+                                application.runWriteAction(() -> {
+                                    try {
+                                        new SandboxModuleBuilder(projectDir.getPath()).createModule(model);
+                                        model.commit();
+                                    } catch (IOException | ConfigurationException | JDOMException | ModuleWithNameAlreadyExists e) {
+                                        logger.warn("Failed repair Sandbox", e);
+                                    }
+                                })
+                        );
+                    }
+                }
             });
-        }).start();
+        });
     }
 
     private void repairProjectFiles(@NotNull StudyNode<?, ?> node) {
         if (project != null) {
             if (node instanceof StepNode) {
-                if (project.isDisposed()) {
-                    return;
-                }
                 ApplicationManager.getApplication().invokeAndWait(() -> {
                     if (project.isDisposed()) {
                         return;
@@ -430,5 +494,29 @@ public class StepikProjectManager implements PersistentStateComponent<Element>, 
         result = 31 * result + version;
         result = 31 * result + (uuid != null ? uuid.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public void stateChanged(@NotNull StepikAuthState oldState, @NotNull StepikAuthState newState) {
+        if (newState == NOT_AUTH || newState == AUTH) {
+            if (root != null) {
+                root.resetStatus();
+                if (newState == AUTH) {
+                    refreshCourse();
+                }
+            }
+
+            if (oldState == SHOW_DIALOG && newState == NOT_AUTH) {
+                setSelected(selected, false);
+            } else {
+                updateSelection();
+            }
+        }
+    }
+
+    @Override
+    public void dispose() {
+        StepikAuthManager.removeListener(this);
+        executor.shutdown();
     }
 }

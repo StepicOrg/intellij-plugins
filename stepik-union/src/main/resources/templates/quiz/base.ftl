@@ -1,80 +1,103 @@
+<#-- @ftlvariable name="action" type="java.lang.String" -->
+<#-- @ftlvariable name="needLogin" type="boolean" -->
+<#-- @ftlvariable name="status" type="java.lang.String" -->
 <#-- @ftlvariable name="stepNode" type="org.stepik.core.courseFormat.stepHelpers.QuizHelper" -->
 <#-- @ftlvariable name="text" type="java.lang.String" -->
+<style>
+    .status {
+        text-transform: capitalize;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    .wrong {
+        color: #dd4444;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    .correct {
+        color: #117700;
+    }
+</style>
+
 <#include "base_step.ftl">
 
 <@step_content>
 
-<#macro quiz_content>
-<div>
-    <#assign status = stepNode.getStatus()/>
-    <#assign isHasSubmissionsRestrictions = stepNode.isHasSubmissionsRestrictions() />
-    <#assign maxSubmissionsCount = stepNode.getMaxSubmissionsCount() />
-    <#assign submissionsCount = stepNode.getSubmissionsCount() />
-    <#assign locked = isHasSubmissionsRestrictions && (submissionsCount >= maxSubmissionsCount) />
-
-    <form action="${stepNode.getPath()}" method="get">
-        <#if status != "active">
-            <#assign disabled = "disabled" />
+    <#macro quiz_content>
+    <div>
+        <#assign isHasSubmissionsRestrictions = !needLogin && stepNode.isHasSubmissionsRestrictions() />
+        <#if isHasSubmissionsRestrictions>
+            <#assign maxSubmissionsCount = stepNode.getMaxSubmissionsCount() />
+            <#assign submissionsCount = stepNode.getSubmissionsCount() />
+        <#else>
+            <#assign maxSubmissionsCount = 0 />
+            <#assign submissionsCount = 0 />
         </#if>
 
-        <#if status == "wrong">
-            <p style="color: #dd4444">Wrong</p>
-        <#elseif status == "correct">
-            <p style="color: #117700">Correct</p>
-        </#if>
+        <#assign locked = isHasSubmissionsRestrictions && (submissionsCount >= maxSubmissionsCount) />
 
-        <#if status == "wrong">
-            <div>
-            ${stepNode.getHint()}
-            </div>
-        </#if>
+        <form id="answer_form" action="${stepNode.getPath()}" method="get">
+            <#if action != "submit">
+                <#assign disabled = "disabled" />
+            </#if>
 
-        <#nested/>
+            <#if status != "unchecked">
+                <p class="status ${status}">${status}</p>
+                <div>
+                ${stepNode.getHint()}
+                </div>
+            </#if>
 
-        <input id="status" type="hidden" name="status" value="${status}"/>
-        <input type="hidden" name="attemptId" value="${stepNode.getAttemptId()?string("#")}"/>
-        <input type="hidden" name="locked" value="${locked?string("true", "false")}"/>
-        <input type="hidden" name="type" value="${stepNode.getType()}"/>
-        <br>
+            <#nested/>
 
-        <#if !locked>
-            <input id="submit" type="submit" value="Evaluation"/>
-        </#if>
-    </form>
+            <input id="action" type="hidden" name="action" value="${action}"/>
+            <input type="hidden" name="attemptId" value="${stepNode.getAttemptId()?string("#")}"/>
+            <input type="hidden" name="locked" value="${locked?string("true", "false")}"/>
+            <input type="hidden" name="type" value="${stepNode.getType()}"/>
+            <br>
 
-    <script>
-        function updateSubmitCaption() {
-            var status = document.getElementById("status").getAttribute("value");
+            <#if !locked>
+                <input id="submit_button" type="submit" value="Evaluation" onclick="showLoadAnimation()"/>
+                <#if status != "unchecked" && action == "submit">
+                    <input type="submit" value="Reset" onclick="solve_again()"/>
+                </#if>
+            </#if>
+        </form>
 
-            var submitCaption;
-            var disabled = false;
+        <script>
+            var captions = {
+                "get_first_attempt": "Click to solve",
+                "get_attempt": "Click to solve again",
+                "submit": "Submit",
+                "need_login": "Login"
+            };
 
-            if (status == "") {
-                submitCaption = "Click to solve";
-            } else if (status == "active") {
-                submitCaption = "Submit";
-            } else if (status != "evaluation") {
-                submitCaption = "Click to solve again";
-            } else {
-                submitCaption = "Evaluation";
-                disabled = true;
+            var action_element = document.getElementById("action");
+
+            function updateSubmitCaption() {
+                var action = action_element.getAttribute("value");
+
+                var disabled = !captions.hasOwnProperty(action);
+                var submitCaption = !disabled ? captions[action] : action;
+
+                var submit = document.getElementById("submit_button");
+                submit.setAttribute("value", submitCaption);
+                if (disabled) {
+                    submit.setAttribute("disabled", "true");
+                } else {
+                    submit.removeAttribute("disabled")
+                }
             }
+            updateSubmitCaption();
 
-            document.getElementById("submit").setAttribute("value", submitCaption);
-            var submit = document.getElementById("submit");
-            if (disabled) {
-                submit.setAttribute("disabled", true);
-            } else {
-                submit.removeAttribute("disabled")
+            function solve_again() {
+                action_element.setAttribute("value", "get_attempt");
             }
-        }
-        updateSubmitCaption();
-    </script>
+        </script>
 
-    <#if isHasSubmissionsRestrictions>
-        <p>${maxSubmissionsCount - submissionsCount} attempts left</p>
-    </#if>
-
-</div>
-</#macro>
+        <#if isHasSubmissionsRestrictions>
+            <p>${maxSubmissionsCount - submissionsCount} attempts left</p>
+        </#if>
+    </div>
+    </#macro>
 </@step_content>

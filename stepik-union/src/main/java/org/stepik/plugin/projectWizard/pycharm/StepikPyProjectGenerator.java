@@ -1,6 +1,7 @@
 package org.stepik.plugin.projectWizard.pycharm;
 
 import com.intellij.facet.ui.ValidationResult;
+import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
@@ -31,6 +32,9 @@ import org.stepik.core.core.EduNames;
 import org.stepik.core.courseFormat.StepNode;
 import org.stepik.core.courseFormat.StudyNode;
 import org.stepik.core.projectWizard.ProjectWizardUtils;
+import org.stepik.core.stepik.StepikAuthManager;
+import org.stepik.core.stepik.StepikAuthManagerListener;
+import org.stepik.core.stepik.StepikAuthState;
 import org.stepik.plugin.projectWizard.StepikProjectGenerator;
 
 import javax.swing.*;
@@ -41,7 +45,8 @@ import static org.stepik.core.projectWizard.ProjectWizardUtils.createSubDirector
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
 
 
-class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettings> {
+class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettings>
+        implements StepikAuthManagerListener {
     private static final Logger logger = Logger.getInstance(StepikPyProjectGenerator.class);
     private static final String MODULE_NAME = "Stepik";
     private final StepikProjectGenerator generator;
@@ -56,6 +61,7 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
         generator = StepikProjectGenerator.getInstance();
         this.project = DefaultProjectFactory.getInstance().getDefaultProject();
         wizardStep = new PyCharmWizardStep(this, project);
+        StepikAuthManager.addListener(this);
     }
 
     @Nullable
@@ -177,6 +183,7 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
         ApplicationManager.getApplication()
                 .runWriteAction(() -> ModuleRootModificationUtil.setModuleSdk(module, settings.getSdk()));
         createCourseFromGenerator(project);
+        dispose();
     }
 
     private void createCourseFromGenerator(@NotNull Project project) {
@@ -203,10 +210,24 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
             VirtualFileManager.getInstance().syncRefresh();
         }
 
-        ApplicationManager.getApplication().invokeLater(
+        Application application = ApplicationManager.getApplication();
+        application.invokeLater(
                 () -> DumbService.allowStartingDumbModeInside(DumbModePermission.MAY_START_BACKGROUND,
-                        () -> ApplicationManager.getApplication().runWriteAction(
-                                () -> StudyProjectComponent.getInstance(project)
-                                        .registerStudyToolWindow())));
+                        () -> application.runWriteAction(
+                                () -> {
+                                    StudyProjectComponent.getInstance(project)
+                                            .registerStudyToolWindow();
+                                    StepikProjectManager.updateAdaptiveSelected(project);
+                                })));
+    }
+
+    @Override
+    public void stateChanged(@NotNull StepikAuthState oldState, @NotNull StepikAuthState newState) {
+        ApplicationManager.getApplication().invokeLater(this::fireStateChanged);
+    }
+
+    private void dispose() {
+        wizardStep.dispose();
+        StepikAuthManager.removeListener(this);
     }
 }

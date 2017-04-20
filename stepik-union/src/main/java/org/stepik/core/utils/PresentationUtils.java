@@ -1,15 +1,15 @@
 package org.stepik.core.utils;
 
 import com.intellij.ui.JBColor;
+import icons.AllStepikIcons;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.stepik.core.courseFormat.CourseNode;
 import org.stepik.core.courseFormat.LessonNode;
 import org.stepik.core.courseFormat.SectionNode;
 import org.stepik.core.courseFormat.StepNode;
 import org.stepik.core.courseFormat.StudyNode;
 import org.stepik.core.courseFormat.StudyStatus;
-import icons.AllStepikIcons;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -108,8 +108,6 @@ public class PresentationUtils {
     @NotNull
     public static JBColor getColor(@NotNull StudyStatus status) {
         switch (status) {
-            case UNCHECKED:
-                return JBColor.BLACK;
             case SOLVED:
                 return SOLVED_COLOR;
             case FAILED:

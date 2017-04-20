@@ -69,7 +69,7 @@ public class Utils {
     }
 
     @Nullable
-    private static <T> List<T> getList(
+    public static <T> List<T> getList(
             @NotNull JsonObject object,
             @NotNull String fieldName,
             @NotNull Function<JsonElement, T> getter) {

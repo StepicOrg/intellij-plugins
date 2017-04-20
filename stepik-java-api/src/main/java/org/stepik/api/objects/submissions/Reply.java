@@ -14,7 +14,7 @@ public class Reply {
     private String language;
     private String code;
     private String formula;
-    private List<String> attachments;
+    private List<Attachment> attachments;
     private String text;
     private List<String> files;
     private List choices;
@@ -60,14 +60,14 @@ public class Reply {
     }
 
     @NotNull
-    public List<String> getAttachments() {
+    public List<Attachment> getAttachments() {
         if (attachments == null) {
             attachments = new ArrayList<>();
         }
         return attachments;
     }
 
-    public void setAttachments(@Nullable List<String> attachments) {
+    public void setAttachments(@Nullable List<Attachment> attachments) {
         this.attachments = attachments;
     }
 
