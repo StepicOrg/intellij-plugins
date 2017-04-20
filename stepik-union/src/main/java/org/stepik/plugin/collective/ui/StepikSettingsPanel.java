@@ -28,7 +28,13 @@ class StepikSettingsPanel implements StepikAuthManagerListener {
     StepikSettingsPanel() {
         initProjectOfSettings();
         hintCheckBox.addActionListener(e -> hintCheckBoxModified = true);
-        logoutButton.addActionListener(e -> StepikAuthManager.logout());
+        logoutButton.addActionListener(e -> {
+            if (isAuthenticated()) {
+                StepikAuthManager.logout();
+            } else {
+                StepikAuthManager.authentication(true);
+            }
+        });
         loginButton.addActionListener(e -> StepikAuthManager.logoutAndAuth());
 
         StepikAuthManager.addListener(this);
@@ -45,7 +51,7 @@ class StepikSettingsPanel implements StepikAuthManagerListener {
     private void initProjectOfSettings() {
         projectManager = StepikProjectManager.getInstance(Utils.getCurrentProject());
         hintCheckBox.setSelected(projectManager != null && projectManager.getShowHint());
-        logoutButton.setEnabled(isAuthenticated());
+        logoutButton.setText(isAuthenticated() ? "Logout" : "Login");
     }
 
     void reset() {
@@ -74,7 +80,7 @@ class StepikSettingsPanel implements StepikAuthManagerListener {
         if (newState == NOT_AUTH || newState == AUTH) {
             ApplicationManager.getApplication().invokeLater(() -> {
                 updateUserName();
-                logoutButton.setEnabled(newState == AUTH);
+                logoutButton.setText(newState == AUTH ? "Logout" : "Login");
             }, ModalityState.stateForComponent(pane));
         }
     }

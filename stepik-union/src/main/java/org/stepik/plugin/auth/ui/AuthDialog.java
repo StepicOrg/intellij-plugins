@@ -24,12 +24,12 @@ import org.jetbrains.annotations.NotNull;
 import org.stepik.api.urls.Urls;
 import org.stepik.core.stepik.StepikAuthManager;
 import org.stepik.core.templates.Templater;
+import org.stepik.plugin.auth.webkit.network.PublicSuffixes.CookieManager;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.net.CookieHandler;
-import java.net.CookieManager;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -39,6 +39,7 @@ import java.util.Map;
  */
 public class AuthDialog extends JDialog {
     private final Map<String, String> map = new HashMap<>();
+    private CookieManager cookieManager;
     private String url;
     private WebEngine engine;
     private Node progressBar;
@@ -72,11 +73,7 @@ public class AuthDialog extends JDialog {
             toolPane.getChildren().addAll(backButton, homeButton, progressBar);
             toolPane.setPadding(new Insets(5));
 
-            CookieManager manager = clear ? new CookieManager() : new StepikCookieManager();
-            CookieHandler.setDefault(manager);
-            if (clear) {
-                manager.getCookieStore().removeAll();
-            }
+            cookieManager = initCookieManager(clear);
 
             url = StepikAuthManager.getImplicitGrantUrl();
             engine.load(url);
@@ -85,13 +82,35 @@ public class AuthDialog extends JDialog {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     }
 
+    @NotNull
     public static Map<String, String> showAuthForm(boolean clear) {
         AuthDialog instance = new AuthDialog(clear);
         instance.setVisible(true);
+        instance.saveCookies();
         return instance.map;
     }
 
-    private void addButtonsAvailabilityListeners(Button goBackButton) {
+    @NotNull
+    private CookieManager initCookieManager(boolean clear) {
+        CookieHandler cookieManager = CookieManager.getDefault();
+        if (!(cookieManager instanceof CookieManager)) {
+            cookieManager = new CookieManager();
+
+        }
+
+        if (clear) {
+            ((CookieManager) cookieManager).clear();
+        }
+
+        CookieManager.setDefault(cookieManager);
+        return (CookieManager) cookieManager;
+    }
+
+    private void saveCookies() {
+        cookieManager.save();
+    }
+
+    private void addButtonsAvailabilityListeners(@NotNull Button goBackButton) {
         Platform.runLater(() -> engine.getLoadWorker().stateProperty().addListener((ov, oldState, newState) -> {
             if (newState == Worker.State.SUCCEEDED) {
                 WebHistory history = engine.getHistory();
@@ -101,6 +120,7 @@ public class AuthDialog extends JDialog {
         }));
     }
 
+    @NotNull
     private Button makeGoBackButton() {
         Button button = createButtonWithImage(AllIcons.Actions.Back);
         button.setDisable(true);
@@ -109,6 +129,7 @@ public class AuthDialog extends JDialog {
         return button;
     }
 
+    @NotNull
     private Button makeHomeButton() {
         Button button = createButtonWithImage(AllIcons.Actions.Refresh);
         button.setOnAction(event -> Platform.runLater(() -> engine.load(url)));
@@ -126,6 +147,7 @@ public class AuthDialog extends JDialog {
         return new Button(null, new ImageView(image));
     }
 
+    @NotNull
     private ProgressBar makeProgressBarWithListener() {
         final ProgressBar progress = new ProgressBar();
         Worker<Void> loadWorker = engine.getLoadWorker();
@@ -190,7 +212,7 @@ public class AuthDialog extends JDialog {
         return progress;
     }
 
-    private void setPanel(JFXPanel panel) {
+    private void setPanel(@NotNull JFXPanel panel) {
         this.panel = panel;
     }
 }
