@@ -1,4 +1,4 @@
-package org.stepik.plugin.auth.webkit.network.PublicSuffixes;
+package org.stepik.plugin.auth.webkit.network;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

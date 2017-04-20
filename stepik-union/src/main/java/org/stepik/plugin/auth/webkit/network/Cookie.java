@@ -1,4 +1,4 @@
-package org.stepik.plugin.auth.webkit.network.PublicSuffixes;
+package org.stepik.plugin.auth.webkit.network;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

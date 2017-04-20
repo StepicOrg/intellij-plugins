@@ -1,4 +1,4 @@
-package org.stepik.plugin.auth.webkit.network.PublicSuffixes;
+package org.stepik.plugin.auth.webkit.network;
 
 import com.intellij.openapi.diagnostic.Logger;
 import org.jetbrains.annotations.NotNull;

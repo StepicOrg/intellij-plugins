@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.stepik.api.urls.Urls;
 import org.stepik.core.stepik.StepikAuthManager;
 import org.stepik.core.templates.Templater;
-import org.stepik.plugin.auth.webkit.network.PublicSuffixes.CookieManager;
+import org.stepik.plugin.auth.webkit.network.CookieManager;
 
 import javax.swing.*;
 import java.awt.*;
