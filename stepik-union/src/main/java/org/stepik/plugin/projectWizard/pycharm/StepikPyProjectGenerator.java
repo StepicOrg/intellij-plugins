@@ -32,6 +32,9 @@ import org.stepik.core.core.EduNames;
 import org.stepik.core.courseFormat.StepNode;
 import org.stepik.core.courseFormat.StudyNode;
 import org.stepik.core.projectWizard.ProjectWizardUtils;
+import org.stepik.core.stepik.StepikAuthManager;
+import org.stepik.core.stepik.StepikAuthManagerListener;
+import org.stepik.core.stepik.StepikAuthState;
 import org.stepik.plugin.projectWizard.StepikProjectGenerator;
 
 import javax.swing.*;
@@ -42,7 +45,8 @@ import static org.stepik.core.projectWizard.ProjectWizardUtils.createSubDirector
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
 
 
-class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettings> {
+class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettings>
+        implements StepikAuthManagerListener {
     private static final Logger logger = Logger.getInstance(StepikPyProjectGenerator.class);
     private static final String MODULE_NAME = "Stepik";
     private final StepikProjectGenerator generator;
@@ -57,6 +61,7 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
         generator = StepikProjectGenerator.getInstance();
         this.project = DefaultProjectFactory.getInstance().getDefaultProject();
         wizardStep = new PyCharmWizardStep(this, project);
+        StepikAuthManager.addListener(this);
     }
 
     @Nullable
@@ -178,7 +183,7 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
         ApplicationManager.getApplication()
                 .runWriteAction(() -> ModuleRootModificationUtil.setModuleSdk(module, settings.getSdk()));
         createCourseFromGenerator(project);
-        wizardStep.dispose();
+        dispose();
     }
 
     private void createCourseFromGenerator(@NotNull Project project) {
@@ -209,7 +214,20 @@ class StepikPyProjectGenerator extends PythonProjectGenerator<PyNewProjectSettin
         application.invokeLater(
                 () -> DumbService.allowStartingDumbModeInside(DumbModePermission.MAY_START_BACKGROUND,
                         () -> application.runWriteAction(
-                                () -> StudyProjectComponent.getInstance(project)
-                                        .registerStudyToolWindow())));
+                                () -> {
+                                    StudyProjectComponent.getInstance(project)
+                                            .registerStudyToolWindow();
+                                    StepikProjectManager.updateAdaptiveSelected(project);
+                                })));
+    }
+
+    @Override
+    public void stateChanged(@NotNull StepikAuthState oldState, @NotNull StepikAuthState newState) {
+        ApplicationManager.getApplication().invokeLater(this::fireStateChanged);
+    }
+
+    private void dispose() {
+        wizardStep.dispose();
+        StepikAuthManager.removeListener(this);
     }
 }
