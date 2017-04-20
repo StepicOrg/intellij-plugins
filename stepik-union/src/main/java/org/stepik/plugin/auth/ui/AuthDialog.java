@@ -13,6 +13,7 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
@@ -24,12 +25,12 @@ import org.jetbrains.annotations.NotNull;
 import org.stepik.api.urls.Urls;
 import org.stepik.core.stepik.StepikAuthManager;
 import org.stepik.core.templates.Templater;
+import org.stepik.plugin.auth.webkit.network.CookieManager;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.net.CookieHandler;
-import java.net.CookieManager;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -39,12 +40,14 @@ import java.util.Map;
  */
 public class AuthDialog extends JDialog {
     private final Map<String, String> map = new HashMap<>();
+    private boolean clearedCookies;
+    private CookieManager cookieManager;
     private String url;
     private WebEngine engine;
     private Node progressBar;
     private JFXPanel panel;
 
-    private AuthDialog(boolean clear) {
+    private AuthDialog() {
         super((Frame) null, true);
         setTitle("Authorize");
         setSize(new Dimension(640, 480));
@@ -69,14 +72,12 @@ public class AuthDialog extends JDialog {
             Button backButton = makeGoBackButton();
             addButtonsAvailabilityListeners(backButton);
             Button homeButton = makeHomeButton();
-            toolPane.getChildren().addAll(backButton, homeButton, progressBar);
+            Button exitButton = makeExitButton();
+            toolPane.getChildren().addAll(backButton, homeButton, exitButton, progressBar);
             toolPane.setPadding(new Insets(5));
 
-            if (clear) {
-                CookieManager manager = new CookieManager();
-                CookieHandler.setDefault(manager);
-                manager.getCookieStore().removeAll();
-            }
+            cookieManager = initCookieManager(false);
+
             url = StepikAuthManager.getImplicitGrantUrl();
             engine.load(url);
         });
@@ -84,13 +85,41 @@ public class AuthDialog extends JDialog {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     }
 
-    public static Map<String, String> showAuthForm(boolean clear) {
-        AuthDialog instance = new AuthDialog(clear);
+    @NotNull
+    public static Map<String, String> showAuthForm() {
+        AuthDialog instance = new AuthDialog();
         instance.setVisible(true);
+        boolean isCanceled = instance.map.isEmpty() || instance.map.containsKey("error");
+        if (!instance.clearedCookies || !isCanceled) {
+            instance.saveCookies();
+        } else {
+            // Restore cookies from store
+            CookieManager.setDefault(new CookieManager());
+        }
         return instance.map;
     }
 
-    private void addButtonsAvailabilityListeners(Button goBackButton) {
+    @NotNull
+    private CookieManager initCookieManager(boolean clearCookies) {
+        CookieHandler cookieManager = CookieManager.getDefault();
+        if (!(cookieManager instanceof CookieManager)) {
+            cookieManager = new CookieManager();
+        }
+
+        if (clearCookies) {
+            ((CookieManager) cookieManager).clear();
+            clearedCookies = true;
+        }
+
+        CookieManager.setDefault(cookieManager);
+        return (CookieManager) cookieManager;
+    }
+
+    private void saveCookies() {
+        cookieManager.save();
+    }
+
+    private void addButtonsAvailabilityListeners(@NotNull Button goBackButton) {
         Platform.runLater(() -> engine.getLoadWorker().stateProperty().addListener((ov, oldState, newState) -> {
             if (newState == Worker.State.SUCCEEDED) {
                 WebHistory history = engine.getHistory();
@@ -100,17 +129,33 @@ public class AuthDialog extends JDialog {
         }));
     }
 
+    @NotNull
     private Button makeGoBackButton() {
         Button button = createButtonWithImage(AllIcons.Actions.Back);
+        button.setTooltip(new Tooltip("Back"));
         button.setDisable(true);
         button.setOnAction(event -> Platform.runLater(() -> engine.getHistory().go(-1)));
 
         return button;
     }
 
+    @NotNull
     private Button makeHomeButton() {
         Button button = createButtonWithImage(AllIcons.Actions.Refresh);
+        button.setTooltip(new Tooltip("To home"));
         button.setOnAction(event -> Platform.runLater(() -> engine.load(url)));
+
+        return button;
+    }
+
+    @NotNull
+    private Button makeExitButton() {
+        Button button = createButtonWithImage(AllIcons.Actions.Exit);
+        button.setTooltip(new Tooltip("Login to another account"));
+        button.setOnAction(event -> Platform.runLater(() -> {
+            initCookieManager(true);
+            engine.load(url);
+        }));
 
         return button;
     }
@@ -125,6 +170,7 @@ public class AuthDialog extends JDialog {
         return new Button(null, new ImageView(image));
     }
 
+    @NotNull
     private ProgressBar makeProgressBarWithListener() {
         final ProgressBar progress = new ProgressBar();
         Worker<Void> loadWorker = engine.getLoadWorker();
@@ -189,7 +235,7 @@ public class AuthDialog extends JDialog {
         return progress;
     }
 
-    private void setPanel(JFXPanel panel) {
+    private void setPanel(@NotNull JFXPanel panel) {
         this.panel = panel;
     }
 }

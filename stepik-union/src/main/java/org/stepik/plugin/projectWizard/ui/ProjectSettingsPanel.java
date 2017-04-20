@@ -35,7 +35,7 @@ public class ProjectSettingsPanel implements ProjectSetting, HierarchyListener, 
     private RefreshButton refreshListButton;
     private CourseDescriptionPane courseListDescription;
     private JScrollPane scrollPane;
-    private JButton logoutButton;
+    private JButton loginButton;
     private StudyObject selectedStudyObject = StepikProjectGenerator.EMPTY_STUDY_OBJECT;
 
     public ProjectSettingsPanel(boolean visibleLangBox) {
@@ -48,7 +48,7 @@ public class ProjectSettingsPanel implements ProjectSetting, HierarchyListener, 
 
         mainPanel.addHierarchyListener(this);
 
-        logoutButton.addActionListener(e -> StepikAuthManager.logoutAndAuth());
+        loginButton.addActionListener(e -> StepikAuthManager.relogin());
 
         StepikAuthManager.addListener(this);
     }
@@ -67,7 +67,7 @@ public class ProjectSettingsPanel implements ProjectSetting, HierarchyListener, 
         logger.info("Start updating settings");
         courseListComboBox.refresh(langComboBox.getSelectedItem());
         setUsername();
-        logoutButton.setText(isAuthenticated() ? "Change user" : "Login");
+        loginButton.setText(isAuthenticated() ? "Change user" : "Login");
         logger.info("Updating settings is done");
     }
 
