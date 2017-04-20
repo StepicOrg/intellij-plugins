@@ -20,7 +20,6 @@ class StepikSettingsPanel implements StepikAuthManagerListener {
     private JCheckBox hintCheckBox;
     private JButton logoutButton;
     private JLabel userName;
-    private JButton loginButton;
 
     private boolean hintCheckBoxModified;
     private StepikProjectManager projectManager;
@@ -35,7 +34,6 @@ class StepikSettingsPanel implements StepikAuthManagerListener {
                 StepikAuthManager.authentication(true);
             }
         });
-        loginButton.addActionListener(e -> StepikAuthManager.logoutAndAuth());
 
         StepikAuthManager.addListener(this);
     }
