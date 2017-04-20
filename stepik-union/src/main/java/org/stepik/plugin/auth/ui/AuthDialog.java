@@ -40,14 +40,14 @@ import java.util.Map;
  */
 public class AuthDialog extends JDialog {
     private final Map<String, String> map = new HashMap<>();
-    private boolean clear;
+    private boolean clearedCookies;
     private CookieManager cookieManager;
     private String url;
     private WebEngine engine;
     private Node progressBar;
     private JFXPanel panel;
 
-    private AuthDialog(boolean clear) {
+    private AuthDialog() {
         super((Frame) null, true);
         setTitle("Authorize");
         setSize(new Dimension(640, 480));
@@ -76,8 +76,7 @@ public class AuthDialog extends JDialog {
             toolPane.getChildren().addAll(backButton, homeButton, exitButton, progressBar);
             toolPane.setPadding(new Insets(5));
 
-            this.clear = clear;
-            cookieManager = initCookieManager(clear);
+            cookieManager = initCookieManager(false);
 
             url = StepikAuthManager.getImplicitGrantUrl();
             engine.load(url);
@@ -87,11 +86,11 @@ public class AuthDialog extends JDialog {
     }
 
     @NotNull
-    public static Map<String, String> showAuthForm(boolean clear) {
-        AuthDialog instance = new AuthDialog(clear);
+    public static Map<String, String> showAuthForm() {
+        AuthDialog instance = new AuthDialog();
         instance.setVisible(true);
         boolean isCanceled = instance.map.isEmpty() || instance.map.containsKey("error");
-        if (!instance.clear || !isCanceled) {
+        if (!instance.clearedCookies || !isCanceled) {
             instance.saveCookies();
         } else {
             // Restore cookies from store
@@ -101,14 +100,15 @@ public class AuthDialog extends JDialog {
     }
 
     @NotNull
-    private CookieManager initCookieManager(boolean clear) {
+    private CookieManager initCookieManager(boolean clearCookies) {
         CookieHandler cookieManager = CookieManager.getDefault();
         if (!(cookieManager instanceof CookieManager)) {
             cookieManager = new CookieManager();
         }
 
-        if (clear) {
+        if (clearCookies) {
             ((CookieManager) cookieManager).clear();
+            clearedCookies = true;
         }
 
         CookieManager.setDefault(cookieManager);
@@ -153,7 +153,6 @@ public class AuthDialog extends JDialog {
         Button button = createButtonWithImage(AllIcons.Actions.Exit);
         button.setTooltip(new Tooltip("Login to another account"));
         button.setOnAction(event -> Platform.runLater(() -> {
-            clear = true;
             initCookieManager(true);
             engine.load(url);
         }));

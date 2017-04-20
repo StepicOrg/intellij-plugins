@@ -96,19 +96,19 @@ public class StepikAuthManager {
         StepikAuthState value = minorLogin();
         if (value != AUTH && showDialog) {
             setState(SHOW_DIALOG);
-            value = showAuthDialog(false);
+            value = showAuthDialog();
         }
         setState(value);
     }
 
     @NotNull
-    private static StepikAuthState showAuthDialog(boolean clear) {
+    private static StepikAuthState showAuthDialog() {
         Application application = ApplicationManager.getApplication();
         boolean isDispatchThread = application.isDispatchThread() || SwingUtilities.isEventDispatchThread();
 
         final StepikAuthState[] authenticated = new StepikAuthState[]{state};
 
-        Runnable showDialog = () -> authenticated[0] = showDialog(clear);
+        Runnable showDialog = () -> authenticated[0] = showDialog();
 
         if (!isDispatchThread) {
             try {
@@ -131,8 +131,8 @@ public class StepikAuthManager {
     }
 
     @NotNull
-    private static StepikAuthState showDialog(boolean clear) {
-        Map<String, String> map = AuthDialog.showAuthForm(clear);
+    private static StepikAuthState showDialog() {
+        Map<String, String> map = AuthDialog.showAuthForm();
         StepikAuthState newState = NOT_AUTH;
         TokenInfo tokenInfo = new TokenInfo();
         if (!map.isEmpty() && !map.containsKey("error")) {
@@ -304,9 +304,9 @@ public class StepikAuthManager {
         return IMPLICIT_GRANT_URL;
     }
 
-    public static synchronized void logoutAndAuth() {
+    public static synchronized void relogin() {
         logout();
-        setState(showAuthDialog(true));
+        setState(showAuthDialog());
     }
 
     public static void addListener(@NotNull StepikAuthManagerListener listener) {
