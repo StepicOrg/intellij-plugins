@@ -1,6 +1,7 @@
 package org.stepik.core.stepik;
 
 import com.intellij.credentialStore.CredentialAttributes;
+import com.intellij.credentialStore.Credentials;
 import com.intellij.ide.passwordSafe.PasswordSafe;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.application.Application;
@@ -95,20 +96,20 @@ public class StepikAuthManager {
         StepikAuthState value = minorLogin();
         if (value != AUTH && showDialog) {
             setState(SHOW_DIALOG);
-            value = showAuthDialog(false);
+            value = showAuthDialog();
         }
         setState(value);
         return value;
     }
 
     @NotNull
-    private static StepikAuthState showAuthDialog(boolean clear) {
+    private static StepikAuthState showAuthDialog() {
         Application application = ApplicationManager.getApplication();
         boolean isDispatchThread = application.isDispatchThread() || SwingUtilities.isEventDispatchThread();
 
         final StepikAuthState[] authenticated = new StepikAuthState[]{state};
 
-        Runnable showDialog = () -> authenticated[0] = showDialog(clear);
+        Runnable showDialog = () -> authenticated[0] = showDialog();
 
         if (!isDispatchThread) {
             try {
@@ -131,8 +132,8 @@ public class StepikAuthManager {
     }
 
     @NotNull
-    private static StepikAuthState showDialog(boolean clear) {
-        Map<String, String> map = AuthDialog.showAuthForm(clear);
+    private static StepikAuthState showDialog() {
+        Map<String, String> map = AuthDialog.showAuthForm();
         StepikAuthState newState = NOT_AUTH;
         TokenInfo tokenInfo = new TokenInfo();
         if (!map.isEmpty() && !map.containsKey("error")) {
@@ -227,10 +228,12 @@ public class StepikAuthManager {
                 String.valueOf(userId),
                 StepikProjectManager.class,
                 false);
-        String serializedAuthInfo;
-        serializedAuthInfo = PasswordSafe.getInstance().getPassword(attributes);
-        TokenInfo authInfo = client.getJsonConverter().fromJson(serializedAuthInfo, TokenInfo.class);
-
+        Credentials credentials = PasswordSafe.getInstance().get(attributes);
+        TokenInfo authInfo = null;
+        if (credentials != null) {
+            String password = credentials.getPasswordAsString();
+            authInfo = client.getJsonConverter().fromJson(password, TokenInfo.class);
+        }
         if (authInfo == null) {
             return new TokenInfo();
         }
@@ -239,12 +242,12 @@ public class StepikAuthManager {
 
     private static void setTokenInfo(long userId, @NotNull final TokenInfo tokenInfo) {
         String serviceName = StepikProjectManager.class.getName();
-        CredentialAttributes attributes = new CredentialAttributes(serviceName,
-                String.valueOf(userId),
-                StepikProjectManager.class,
-                false);
+        String userName = String.valueOf(userId);
+        CredentialAttributes attributes;
+        attributes = new CredentialAttributes(serviceName, userName, StepikProjectManager.class, false);
         String serializedAuthInfo = stepikApiClient.getJsonConverter().toJson(tokenInfo);
-        PasswordSafe.getInstance().setPassword(attributes, serializedAuthInfo);
+        Credentials credentials = new Credentials(attributes.getUserName(), serializedAuthInfo);
+        PasswordSafe.getInstance().set(attributes, credentials);
         setLastUser(userId);
     }
 
@@ -302,9 +305,9 @@ public class StepikAuthManager {
         return IMPLICIT_GRANT_URL;
     }
 
-    public static synchronized void logoutAndAuth() {
+    public static synchronized void relogin() {
         logout();
-        setState(showAuthDialog(true));
+        setState(showAuthDialog());
     }
 
     public static void addListener(@NotNull StepikAuthManagerListener listener) {

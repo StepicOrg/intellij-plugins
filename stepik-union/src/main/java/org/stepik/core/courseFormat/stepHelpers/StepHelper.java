@@ -1,11 +1,17 @@
 package org.stepik.core.courseFormat.stepHelpers;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.stepik.api.client.StepikApiClient;
+import org.stepik.api.exceptions.StepikClientException;
+import org.stepik.api.objects.StudyObject;
+import org.stepik.api.objects.progresses.Progresses;
 import org.stepik.core.StepikProjectManager;
 import org.stepik.core.courseFormat.StepNode;
 import org.stepik.core.courseFormat.StudyNode;
 
+import static org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient;
 import static org.stepik.core.stepik.StepikAuthManager.isAuthenticated;
 
 /**
@@ -13,6 +19,7 @@ import static org.stepik.core.stepik.StepikAuthManager.isAuthenticated;
  */
 public class StepHelper {
     static final String NEED_LOGIN = "need_login";
+    private static final Logger logger = Logger.getInstance(StepHelper.class);
     private final Project project;
     private final StepNode stepNode;
 
@@ -86,5 +93,30 @@ public class StepHelper {
         }
 
         return parent.getId();
+    }
+
+    public boolean solvedLesson() {
+        try {
+            StudyNode lesson = stepNode.getParent();
+            if (lesson == null) {
+                return false;
+            }
+            StudyObject data = lesson.getData();
+            if (data == null) {
+                return false;
+            }
+            String progressId = data.getProgress();
+            StepikApiClient stepikApiClient = authAndGetStepikApiClient();
+            Progresses progresses = stepikApiClient.progresses()
+                    .get()
+                    .id(progressId)
+                    .execute();
+
+            return !progresses.isEmpty() && progresses.getFirst().isPassed();
+        } catch (StepikClientException e) {
+            logger.warn(e);
+        }
+
+        return false;
     }
 }

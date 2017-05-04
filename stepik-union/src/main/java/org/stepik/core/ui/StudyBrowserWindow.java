@@ -395,7 +395,11 @@ class StudyBrowserWindow extends JFrame {
                     parentNode = parentNode.getParentNode();
                     attributes = parentNode.getAttributes();
                 }
-                return attributes.getNamedItem("href").getNodeValue();
+                Node href = attributes.getNamedItem("href");
+                if (href == null) {
+                    return null;
+                }
+                return href.getNodeValue();
             }
         };
     }

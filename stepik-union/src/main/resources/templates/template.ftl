@@ -1,3 +1,5 @@
+<#-- @ftlvariable name="mathjax" type="java.lang.String" -->
+<#-- @ftlvariable name="charset" type="java.lang.String" -->
 <#-- @ftlvariable name="code" type="java.lang.String" -->
 <#-- @ftlvariable name="font_size" type="java.lang.Number" -->
 <#-- @ftlvariable name="highlight" type="java.lang.String" -->
@@ -13,7 +15,6 @@
             font-size: ${font_size}pt !important;
             padding: 10px 15px;
         }
-
     </style>
 
     <script type="text/x-mathjax-config">
@@ -22,12 +23,9 @@
       TeX: {extensions: ["mhchem.js", "color.js"]},
       messageStyle: "none",
     });
-
-
-
     </script>
     <script type="text/javascript" async
-            src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML">
+            src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_CHTML">
     </script>
 </head>
 <body>
