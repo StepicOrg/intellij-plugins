@@ -3,12 +3,21 @@
 <#-- @ftlvariable name="text" type="java.lang.String" -->
 <style>
     .adaptive-buttons {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
         margin-top: 10px;
     }
 
     .adaptive-button {
-        display: inline-block;
-        margin-right: 15px;
+        display: flex;
+        flex-grow: 1;
+        padding: 10px;
+        border: 1px solid darkgray;
+        border-radius: 5px;
+        text-decoration: none;
+        min-width: 100px;
+        margin-right: 5px;
     }
 
     #load_animation {
@@ -39,7 +48,8 @@
         <div class="adaptive-buttons">
             <#assign lessonId = stepNode.getParent()?string("#")/>
             <a class="adaptive-button" href="adaptive:too_easy/${lessonId}">Lesson is too easy</a>
-            <a class="adaptive-button" href="adaptive:new_recommendation/${lessonId}">New recommendation</a>
+            <a class="adaptive-button"
+               <#if stepNode.solvedLesson() >href="adaptive:new_recommendation/${lessonId}"</#if>>New recommendation</a>
             <a class="adaptive-button" href="adaptive:too_hard/${lessonId}">Lesson is too hard</a>
         </div>
         <#else>
