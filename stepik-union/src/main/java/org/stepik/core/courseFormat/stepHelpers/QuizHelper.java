@@ -93,6 +93,8 @@ public class QuizHelper extends StepHelper {
             }
             getStepNode().setStatus(StudyStatus.of(status));
             return true;
+        } else {
+            reply = getStepNode().getLastReply();
         }
 
         return false;

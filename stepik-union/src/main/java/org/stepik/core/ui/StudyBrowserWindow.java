@@ -136,6 +136,9 @@ class StudyBrowserWindow extends JFrame {
         engine.getLoadWorker()
                 .stateProperty()
                 .addListener((observable, oldValue, newValue) -> {
+                    if (newValue != Worker.State.SUCCEEDED) {
+                        return;
+                    }
                     JSObject window = (JSObject) engine.executeScript("window");
                     JavaBridge bridge = new JavaBridge();
                     window.setMember("java", bridge);
@@ -162,7 +165,14 @@ class StudyBrowserWindow extends JFrame {
 
     void loadContent(@NotNull final String content) {
         String withCodeHighlighting = createHtmlWithCodeHighlighting(content);
-        Platform.runLater(() -> engine.loadContent(withCodeHighlighting));
+        Platform.runLater(() -> {
+            try {
+                engine.executeScript("if (window.saveReply !== undefined) saveReply();");
+            } catch (JSException e) {
+                logger.error(e);
+            }
+            engine.loadContent(withCodeHighlighting);
+        });
     }
 
     @NotNull

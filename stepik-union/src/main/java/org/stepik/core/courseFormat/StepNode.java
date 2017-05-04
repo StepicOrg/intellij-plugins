@@ -14,6 +14,7 @@ import org.stepik.api.objects.steps.Limit;
 import org.stepik.api.objects.steps.Sample;
 import org.stepik.api.objects.steps.Step;
 import org.stepik.api.objects.steps.Steps;
+import org.stepik.api.objects.submissions.Reply;
 import org.stepik.api.objects.units.Units;
 import org.stepik.core.SupportedLanguages;
 import org.stepik.core.core.EduNames;
@@ -32,6 +33,7 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
     private long courseId;
     @XStreamOmitField
     private Long assignment;
+    private Reply lastReply;
 
     public StepNode() {}
 
@@ -303,5 +305,17 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
             }
         }
         return assignment;
+    }
+
+    @NotNull
+    public Reply getLastReply() {
+        if (lastReply == null) {
+            lastReply = new Reply();
+        }
+        return lastReply;
+    }
+
+    public void setLastReply(@Nullable Reply lastReply) {
+        this.lastReply = lastReply;
     }
 }

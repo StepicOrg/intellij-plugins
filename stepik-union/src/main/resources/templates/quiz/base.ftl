@@ -93,6 +93,12 @@
             function solve_again() {
                 action_element.setAttribute("value", "get_attempt");
             }
+
+            function saveReply() {
+                action_element.setAttribute("value", "save_reply");
+                console.log(document.getElementById("answer_form").submit);
+                document.getElementById("answer_form").submit();
+            }
         </script>
 
         <#if isHasSubmissionsRestrictions>
