@@ -104,6 +104,7 @@ class PrepareSandboxTask extends DefaultTask {
             return
         }
         disableIdeUpdate()
+        configureLogProperties()
     }
 
     private static HashSet<Path> getDependenciesJars(@NotNull Project project) {
@@ -148,6 +149,19 @@ class PrepareSandboxTask extends DefaultTask {
         Utils.createOrRepairUpdateXml(optionsDir)
         Utils.createOrRepairIdeGeneralXml(optionsDir)
         Utils.createOrRepairOptionsXml(optionsDir)
+    }
+
+    private void configureLogProperties() {
+        def logURL = this.getClass().getResource("/log.xml")
+        if (logURL == null) {
+            println "there is no log.xml"
+            return
+        }
+
+        def workingDir = project.file("${extension.idePath}/bin/")
+        def source = new File(logURL.toURI())
+        def target = new File(workingDir, "log.xml")
+        Files.copy(source.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING)
     }
 
     void setExtension(@NotNull ProductPluginExtension extension) {
