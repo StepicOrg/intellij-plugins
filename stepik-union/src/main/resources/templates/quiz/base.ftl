@@ -37,7 +37,7 @@
         <#assign locked = isHasSubmissionsRestrictions && (submissionsCount >= maxSubmissionsCount) />
 
         <form id="answer_form" action="${stepNode.getPath()}" method="get">
-            <#if action != "submit">
+            <#if action != "submit" || locked>
                 <#assign disabled = "disabled" />
             </#if>
 
