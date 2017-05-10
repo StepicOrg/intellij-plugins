@@ -15,6 +15,6 @@ public class DatasetQuizHelper extends QuizHelper {
     @NotNull
     public String getData() {
         initStepOptions();
-        return reply.getText();
+        return reply.getFile();
     }
 }
