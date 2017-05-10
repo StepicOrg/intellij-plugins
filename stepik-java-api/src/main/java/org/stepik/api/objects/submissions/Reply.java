@@ -135,8 +135,11 @@ public class Reply {
         this.number = number;
     }
 
-    @Nullable
+    @NotNull
     public String getFile() {
+        if (file == null) {
+            file = "";
+        }
         return file;
     }
 
