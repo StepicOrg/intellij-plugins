@@ -142,6 +142,7 @@ class FormListener implements EventListener {
                     boolean locked = elements.isLocked();
                     if (!locked) {
                         getAttempt(stepNode);
+                        stepNode.cleanLastReply();
                         StepikProjectManager.updateSelection(project);
                     }
                     break;
