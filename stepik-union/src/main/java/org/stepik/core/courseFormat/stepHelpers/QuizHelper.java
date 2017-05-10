@@ -74,7 +74,8 @@ public class QuizHelper extends StepHelper {
         StepikSubmissionsGetQuery query = stepikApiClient.submissions()
                 .get()
                 .order(Order.DESC)
-                .user(userId);
+                .user(userId)
+                .step(getStepNode().getId());
 
         if (!useLastSubmission) {
             query.attempt(attemptId);
@@ -84,13 +85,22 @@ public class QuizHelper extends StepHelper {
 
         if (!submissions.isEmpty()) {
             submission = submissions.getFirst();
-            reply = submission.getReply();
+            boolean lastSubmission = submission.getId() == getStepNode().getLastSubmissionId();
+            boolean outdated = getStepNode().getLastReplyTime().after(submission.getTime());
+            if (lastSubmission && outdated) {
+                reply = getStepNode().getLastReply();
+            } else {
+                reply = submission.getReply();
+                getStepNode().setLastReply(submission.getReply());
+                getStepNode().setLastSubmissionId(submission.getId());
+            }
             if (attemptId == submission.getAttempt()) {
                 status = submission.getStatus();
             }
             if (ACTIVE.equals(attempt.getStatus()) && status.equals("correct")) {
                 action = GET_ATTEMPT;
             }
+
             getStepNode().setStatus(StudyStatus.of(status));
         } else {
             reply = getStepNode().getLastReply();
@@ -152,6 +162,7 @@ public class QuizHelper extends StepHelper {
             if (user.isGuest()) {
                 action = NEED_LOGIN;
                 fail();
+                initialized = false;
                 return;
             }
 
@@ -159,12 +170,14 @@ public class QuizHelper extends StepHelper {
 
             if (!loadAttempt(stepikApiClient, userId)) {
                 fail();
+                initialized = false;
                 return;
             }
 
             loadSubmission(stepikApiClient, userId);
 
             done();
+            initialized = true;
         } catch (StepikClientException e) {
             logger.warn("Failed init test-step options", e);
             fail();
@@ -172,11 +185,9 @@ public class QuizHelper extends StepHelper {
     }
 
     void done() {
-        initialized = true;
     }
 
     void fail() {
-        initialized = false;
     }
 
     public int getSubmissionsCount() {

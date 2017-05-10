@@ -15,7 +15,7 @@ import java.util.stream.IntStream;
  * @author meanmail
  */
 public class MatchingQuizHelper extends QuizHelper {
-    private List<Pair<String, String>> ordering;
+    private List<Pair<Integer, String[]>> ordering;
 
     public MatchingQuizHelper(@NotNull Project project, @NotNull StepNode stepNode) {
         super(project, stepNode);
@@ -37,9 +37,11 @@ public class MatchingQuizHelper extends QuizHelper {
                 .boxed()
                 .map(i -> {
                     int index = finalReplyOrdering.get(i);
-                    String first = values.get(i).getFirst();
-                    String second = index < values.size() ? values.get(index).getSecond() : "";
-                    return Pair.create(first, second);
+                    String[] captions = new String[]{
+                            values.get(i).getFirst(),
+                            index < values.size() ? values.get(index).getSecond() : ""
+                    };
+                    return Pair.create(index, captions);
                 })
                 .collect(Collectors.toList());
     }
@@ -50,7 +52,7 @@ public class MatchingQuizHelper extends QuizHelper {
     }
 
     @NotNull
-    public List<Pair<String, String>> getOrdering() {
+    public List<Pair<Integer, String[]>> getOrdering() {
         initStepOptions();
         return ordering;
     }
