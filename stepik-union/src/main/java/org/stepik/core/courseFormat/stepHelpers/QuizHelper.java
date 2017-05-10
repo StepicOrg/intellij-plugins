@@ -71,11 +71,13 @@ public class QuizHelper extends StepHelper {
 
     private void loadSubmission(StepikApiClient stepikApiClient, long userId) {
         long attemptId = attempt.getId();
+        StepNode stepNode = getStepNode();
+
         StepikSubmissionsGetQuery query = stepikApiClient.submissions()
                 .get()
                 .order(Order.DESC)
                 .user(userId)
-                .step(getStepNode().getId());
+                .step(stepNode.getId());
 
         if (!useLastSubmission) {
             query.attempt(attemptId);
@@ -85,14 +87,15 @@ public class QuizHelper extends StepHelper {
 
         if (!submissions.isEmpty()) {
             submission = submissions.getFirst();
-            boolean lastSubmission = submission.getId() == getStepNode().getLastSubmissionId();
-            boolean outdated = getStepNode().getLastReplyTime().after(submission.getTime());
+
+            boolean lastSubmission = submission.getId() == stepNode.getLastSubmissionId();
+            boolean outdated = stepNode.getLastReplyTime().after(submission.getTime());
             if (lastSubmission && outdated) {
-                reply = getStepNode().getLastReply();
+                reply = stepNode.getLastReply();
             } else {
                 reply = submission.getReply();
-                getStepNode().setLastReply(submission.getReply());
-                getStepNode().setLastSubmissionId(submission.getId());
+                stepNode.setLastReply(submission.getReply());
+                stepNode.setLastSubmissionId(submission.getId());
             }
             if (attemptId == submission.getAttempt()) {
                 status = submission.getStatus();
@@ -101,9 +104,9 @@ public class QuizHelper extends StepHelper {
                 action = GET_ATTEMPT;
             }
 
-            getStepNode().setStatus(StudyStatus.of(status));
+            stepNode.setStatus(StudyStatus.of(status));
         } else {
-            reply = getStepNode().getLastReply();
+            reply = stepNode.getLastReply();
         }
     }
 
