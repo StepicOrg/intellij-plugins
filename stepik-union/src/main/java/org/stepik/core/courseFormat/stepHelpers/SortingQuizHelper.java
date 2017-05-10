@@ -7,13 +7,13 @@ import org.stepik.core.courseFormat.StepNode;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * @author meanmail
  */
 public class SortingQuizHelper extends QuizHelper {
-    private String[] values;
-    private List<Integer> replyOrdering;
     private List<Pair<Integer, String>> ordering;
 
     public SortingQuizHelper(@NotNull Project project, @NotNull StepNode stepNode) {
@@ -27,40 +27,24 @@ public class SortingQuizHelper extends QuizHelper {
     }
 
     @Override
-    protected boolean needInit() {
-        return ordering == null;
+    protected void done() {
+        List<Integer> replyOrdering = reply.getOrdering();
+        List<String> values = getDataset().getOptions();
+
+        int valuesCount = values.size();
+
+        if (replyOrdering.size() != valuesCount) {
+            replyOrdering = IntStream.range(0, valuesCount)
+                    .boxed()
+                    .collect(Collectors.toList());
+        }
+        ordering = replyOrdering.stream()
+                .map(index -> Pair.create(index, index < valuesCount ? values.get(index) : ""))
+                .collect(Collectors.toList());
     }
 
     @Override
-    protected void onStartInit() {
+    void fail() {
         ordering = new ArrayList<>();
-    }
-
-    @Override
-    protected void onAttemptLoaded() {
-        values = getDataset().getOptions();
-    }
-
-    @Override
-    protected void onSubmissionLoaded() {
-        replyOrdering = reply.getOrdering();
-    }
-
-    @Override
-    protected void onFinishInit() {
-        if (replyOrdering == null) {
-            replyOrdering = new ArrayList<>();
-            for (int i = 0; i < values.length; i++)
-                replyOrdering.add(i);
-        }
-
-        for (int index : replyOrdering) {
-            ordering.add(Pair.create(index, index < values.length ? values[index] : ""));
-        }
-    }
-
-    @Override
-    void onInitFailed() {
-        ordering = null;
     }
 }

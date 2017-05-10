@@ -69,7 +69,7 @@ public class QuizHelper extends StepHelper {
         return true;
     }
 
-    private boolean loadSubmission(StepikApiClient stepikApiClient, long userId) {
+    private void loadSubmission(StepikApiClient stepikApiClient, long userId) {
         long attemptId = attempt.getId();
         StepikSubmissionsGetQuery query = stepikApiClient.submissions()
                 .get()
@@ -92,12 +92,9 @@ public class QuizHelper extends StepHelper {
                 action = GET_ATTEMPT;
             }
             getStepNode().setStatus(StudyStatus.of(status));
-            return true;
         } else {
             reply = getStepNode().getLastReply();
         }
-
-        return false;
     }
 
     @Override
@@ -141,11 +138,11 @@ public class QuizHelper extends StepHelper {
     }
 
     void initStepOptions() {
-        if (!needInit()) {
+        if (initialized) {
             return;
         }
 
-        onStartInit();
+        initialized = true;
         status = UNCHECKED;
         action = GET_FIRST_ATTEMPT;
 
@@ -154,46 +151,31 @@ public class QuizHelper extends StepHelper {
             User user = getCurrentUser();
             if (user.isGuest()) {
                 action = NEED_LOGIN;
+                fail();
                 return;
             }
 
             long userId = user.getId();
 
             if (!loadAttempt(stepikApiClient, userId)) {
+                fail();
                 return;
             }
 
-            onAttemptLoaded();
+            loadSubmission(stepikApiClient, userId);
 
-            if (loadSubmission(stepikApiClient, userId)) {
-                onSubmissionLoaded();
-            }
-
-            onFinishInit();
+            done();
         } catch (StepikClientException e) {
             logger.warn("Failed init test-step options", e);
-            onInitFailed();
+            fail();
         }
     }
 
-    boolean needInit() {
-        return !initialized;
-    }
-
-    void onStartInit() {
-    }
-
-    void onAttemptLoaded() {
-    }
-
-    void onSubmissionLoaded() {
-    }
-
-    void onFinishInit() {
+    void done() {
         initialized = true;
     }
 
-    void onInitFailed() {
+    void fail() {
         initialized = false;
     }
 

@@ -71,8 +71,11 @@ public class Reply {
         this.attachments = attachments;
     }
 
-    @Nullable
+    @NotNull
     public String getText() {
+        if (text == null) {
+            text = "";
+        }
         return text;
     }
 
@@ -120,8 +123,11 @@ public class Reply {
         this.ordering = ordering;
     }
 
-    @Nullable
+    @NotNull
     public String getNumber() {
+        if (number == null) {
+            number = "";
+        }
         return number;
     }
 

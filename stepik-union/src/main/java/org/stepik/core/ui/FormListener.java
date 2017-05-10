@@ -118,58 +118,63 @@ class FormListener implements EventListener {
         });
     }
 
+    static void handle(
+            @NotNull Project project,
+            @NotNull StudyBrowserWindow browser,
+            @NotNull HTMLFormElement form) {
+        StudyNode root = StepikProjectManager.getProjectRoot(project);
+        if (root == null) {
+            return;
+        }
+
+        StudyNode node = StudyUtils.getStudyNode(root, form.getAction());
+        if (!(node instanceof StepNode)) {
+            return;
+        }
+
+        StepNode stepNode = (StepNode) node;
+        Elements elements = new Elements(form.getElements());
+
+        try {
+            switch (elements.getAction()) {
+                case "get_first_attempt":
+                case "get_attempt":
+                    boolean locked = elements.isLocked();
+                    if (!locked) {
+                        getAttempt(stepNode);
+                        StepikProjectManager.updateSelection(project);
+                    }
+                    break;
+                case "submit":
+                    String typeStr = elements.getType();
+                    StepType type = StepType.of(typeStr);
+                    boolean isFromFile = elements.isFromFile();
+                    String data = isFromFile ? getDataFromFile(stepNode, project) : null;
+                    long attemptId = elements.getAttemptId();
+                    sendStep(project, stepNode, elements, type, attemptId, data);
+                    break;
+                case "need_login":
+                    executor.execute(() -> StepikAuthManager.authentication(true));
+                    break;
+                case "save_reply":
+                    typeStr = elements.getType();
+                    type = StepType.of(typeStr);
+                    getReply(stepNode, type, elements, null);
+                    break;
+                default:
+                    browser.hideLoadAnimation();
+            }
+        } catch (StepikClientException e) {
+            logger.warn(e);
+        }
+    }
+
     @Override
     public void handleEvent(Event event) {
         String domEventType = event.getType();
         if (EVENT_TYPE_SUBMIT.equals(domEventType)) {
-            StudyNode root = StepikProjectManager.getProjectRoot(project);
-            if (root == null) {
-                return;
-            }
-
             HTMLFormElement form = (HTMLFormElement) event.getTarget();
-
-            StudyNode node = StudyUtils.getStudyNode(root, form.getAction());
-            if (!(node instanceof StepNode)) {
-                return;
-            }
-
-            StepNode stepNode = (StepNode) node;
-            Elements elements = new Elements(form.getElements());
-
-            try {
-                switch (elements.getAction()) {
-                    case "get_first_attempt":
-                    case "get_attempt":
-                        boolean locked = elements.isLocked();
-                        if (!locked) {
-                            getAttempt(stepNode);
-                            StepikProjectManager.updateSelection(project);
-                        }
-                        break;
-                    case "submit":
-                        String typeStr = elements.getType();
-                        StepType type = StepType.of(typeStr);
-                        boolean isFromFile = elements.isFromFile();
-                        String data = isFromFile ? getDataFromFile(stepNode, project) : null;
-                        long attemptId = elements.getAttemptId();
-                        sendStep(project, stepNode, elements, type, attemptId, data);
-                        break;
-                    case "need_login":
-                        executor.execute(() -> StepikAuthManager.authentication(true));
-                        break;
-                    case "save_reply":
-                        typeStr = elements.getType();
-                        type = StepType.of(typeStr);
-                        getReply(stepNode, type, elements, null);
-                        break;
-                    default:
-                        browser.hideLoadAnimation();
-                        return;
-                }
-            } catch (StepikClientException e) {
-                logger.warn(e);
-            }
+            handle(project, browser, form);
             event.preventDefault();
             event.stopPropagation();
         }

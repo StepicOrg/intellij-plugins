@@ -3,11 +3,11 @@ package org.stepik.api.objects.attempts;
 /**
  * @author meanmail
  */
-public class Pair {
+public class StringPair {
     private String first;
     private String second;
 
-    public Pair(String first, String second) {
+    public StringPair(String first, String second) {
         this.first = first;
         this.second = second;
     }
@@ -39,7 +39,7 @@ public class Pair {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Pair pair = (Pair) o;
+        StringPair pair = (StringPair) o;
 
         //noinspection SimplifiableIfStatement
         if (first != null ? !first.equals(pair.first) : pair.first != null) return false;

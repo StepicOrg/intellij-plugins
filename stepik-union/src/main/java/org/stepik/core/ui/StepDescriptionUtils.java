@@ -28,7 +28,8 @@ class StepDescriptionUtils {
 
     @Nullable
     static Reply getReply(
-            @NotNull StepNode stepNode, @NotNull StepType type,
+            @NotNull StepNode stepNode,
+            @NotNull StepType type,
             @NotNull Elements elements,
             @Nullable String data) {
         Reply reply = new Reply();

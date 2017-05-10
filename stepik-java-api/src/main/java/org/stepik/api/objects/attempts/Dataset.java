@@ -5,7 +5,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -14,10 +13,10 @@ import java.util.List;
 public class Dataset {
     @SerializedName("is_multiple_choice")
     private boolean multipleChoice;
-    private String[] options;
+    private List<String> options;
     @SerializedName("is_text_disabled")
     private boolean textDisabled;
-    private List<Pair> pairs;
+    private List<StringPair> pairs;
     private List<String> rows;
     private List<String> columns;
     @SerializedName("is_checkbox")
@@ -80,14 +79,14 @@ public class Dataset {
     }
 
     @NotNull
-    public String[] getOptions() {
+    public List<String> getOptions() {
         if (options == null) {
-            options = new String[0];
+            options = new ArrayList<>();
         }
         return options;
     }
 
-    public void setOptions(@Nullable String[] options) {
+    public void setOptions(@Nullable List<String> options) {
         this.options = options;
     }
 
@@ -100,14 +99,14 @@ public class Dataset {
         this.textDisabled = textDisabled;
     }
 
-    public List<Pair> getPairs() {
+    public List<StringPair> getPairs() {
         if (pairs == null) {
             pairs = new ArrayList<>();
         }
         return pairs;
     }
 
-    public void setPairs(List<Pair> pairs) {
+    public void setPairs(List<StringPair> pairs) {
         this.pairs = pairs;
     }
 
@@ -133,8 +132,7 @@ public class Dataset {
         if (multipleChoice != dataset.multipleChoice) return false;
         if (textDisabled != dataset.textDisabled) return false;
         if (isCheckbox != dataset.isCheckbox) return false;
-        // Probably incorrect - comparing Object[] arrays with Arrays.equals
-        if (!Arrays.equals(options, dataset.options)) return false;
+        if (options != null ? !options.equals(dataset.options) : dataset.options != null) return false;
         if (pairs != null ? !pairs.equals(dataset.pairs) : dataset.pairs != null) return false;
         if (rows != null ? !rows.equals(dataset.rows) : dataset.rows != null) return false;
         if (columns != null ? !columns.equals(dataset.columns) : dataset.columns != null) return false;
@@ -146,7 +144,7 @@ public class Dataset {
     @Override
     public int hashCode() {
         int result = (multipleChoice ? 1 : 0);
-        result = 31 * result + Arrays.hashCode(options);
+        result = 31 * result + (options != null ? options.hashCode() : 0);
         result = 31 * result + (textDisabled ? 1 : 0);
         result = 31 * result + (pairs != null ? pairs.hashCode() : 0);
         result = 31 * result + (rows != null ? rows.hashCode() : 0);

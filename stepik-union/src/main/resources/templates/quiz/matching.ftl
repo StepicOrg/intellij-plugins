@@ -1,7 +1,7 @@
 <#-- @ftlvariable name="action" type="java.lang.String" -->
 <#-- @ftlvariable name="index" type="java.lang.Integer" -->
-<#-- @ftlvariable name="option" type="org.stepik.api.objects.attempts.Pair" -->
-<#-- @ftlvariable name="ordering" type="java.util.List<org.stepik.api.objects.attempts.Pair>" -->
+<#-- @ftlvariable name="option" type="org.stepik.api.objects.attempts.StringPair" -->
+<#-- @ftlvariable name="ordering" type="java.util.List<org.stepik.api.objects.attempts.StringPair>" -->
 
 <#include "base_sorting.ftl"/>
 <@sorting_quiz>
