@@ -47,6 +47,7 @@ public class QuizHelper extends StepHelper {
     private int submissionsCount = -1;
     private Submission submission;
     private boolean initialized;
+    private boolean modified;
 
     public QuizHelper(@NotNull Project project, @NotNull StepNode stepNode) {
         super(project, stepNode);
@@ -84,6 +85,7 @@ public class QuizHelper extends StepHelper {
         }
 
         Submissions submissions = query.execute();
+        modified = false;
 
         if (!submissions.isEmpty()) {
             submission = submissions.getFirst();
@@ -92,6 +94,7 @@ public class QuizHelper extends StepHelper {
             boolean outdated = stepNode.getLastReplyTime().after(submission.getTime());
             if (lastSubmission && outdated) {
                 reply = stepNode.getLastReply();
+                modified = !submission.getReply().equals(reply);
             } else {
                 reply = submission.getReply();
                 stepNode.setLastReply(submission.getReply());
@@ -107,6 +110,7 @@ public class QuizHelper extends StepHelper {
             stepNode.setStatus(StudyStatus.of(status));
         } else {
             reply = stepNode.getLastReply();
+            modified = true;
         }
     }
 
@@ -270,5 +274,9 @@ public class QuizHelper extends StepHelper {
     public String getAction() {
         initStepOptions();
         return action;
+    }
+
+    public boolean isModified() {
+        return modified;
     }
 }

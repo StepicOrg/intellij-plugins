@@ -170,4 +170,41 @@ public class Reply {
     public void setBlanks(@Nullable List<String> blanks) {
         this.blanks = blanks;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Reply reply = (Reply) o;
+
+        if (!getLanguage().equals(reply.getLanguage())) return false;
+        if (!getCode().equals(reply.getCode())) return false;
+        if (!getFormula().equals(reply.getFormula())) return false;
+        if (!getAttachments().equals(reply.getAttachments())) return false;
+        if (!getText().equals(reply.getText())) return false;
+        if (!getFiles().equals(reply.getFiles())) return false;
+        if (!getChoices().equals(reply.getChoices())) return false;
+        if (!getOrdering().equals(reply.getOrdering())) return false;
+        if (!getNumber().equals(reply.getNumber())) return false;
+        //noinspection SimplifiableIfStatement
+        if (!getFile().equals(reply.getFile())) return false;
+        return getBlanks().equals(reply.getBlanks());
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getLanguage().hashCode();
+        result = 31 * result + getCode().hashCode();
+        result = 31 * result + getFormula().hashCode();
+        result = 31 * result + getAttachments().hashCode();
+        result = 31 * result + getText().hashCode();
+        result = 31 * result + getFiles().hashCode();
+        result = 31 * result + getChoices().hashCode();
+        result = 31 * result + getOrdering().hashCode();
+        result = 31 * result + getNumber().hashCode();
+        result = 31 * result + getFile().hashCode();
+        result = 31 * result + getBlanks().hashCode();
+        return result;
+    }
 }

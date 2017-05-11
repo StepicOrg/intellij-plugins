@@ -42,7 +42,7 @@
             </#if>
 
             <#if status != "unchecked">
-                <p class="status ${status}">${status}</p>
+                <p class="status ${status}">${status} ${stepNode.isModified()?string('*', '')}</p>
                 <div>
                 ${stepNode.getHint()}
                 </div>
