@@ -36,19 +36,6 @@
         #load_animation object {
             margin: auto;
         }
-
-        #close {
-            text-align: right;
-        }
-
-        #close:hover {
-            text-decoration: underline;
-            cursor: pointer;
-        }
-
-        #errors {
-            color: red;
-        }
     </style>
 
     <#nested/>
@@ -67,15 +54,22 @@ ${content}
 
 <div id="login">
     <form id="login-form" action="<#if stepNode??>${stepNode.getPath()}</#if>" method="post">
-        <div id="close" onclick="hideLogin()">Close</div>
-        <h2>Login</h2>
-        <p id="errors"></p>
-        <label for="email"> Email:</label>
-        <input id="email" type="email" name="email" value="">
-        <label for="password"> Password:</label>
-        <input id="password" type="password" name="password" value="">
-        <input type="submit" value="Login" onclick="checkValues()">
-        <input type="hidden" name="action" value="login">
+        <div id="login-form-close" onclick="hideLogin()">Close</div>
+        <h2 id="login-form-title">Login</h2>
+        <p id="login-form-errors"></p>
+        <label for="login-form-email"> Email:</label>
+        <input id="login-form-email" type="email" name="email" value="">
+        <div id="login-form-user-names">
+            <label for="login-form-first-name"> First name:</label>
+            <input id="login-form-first-name" name="first-name" value="">
+            <label for="login-form-last-name"> Last name:</label>
+            <input id="login-form-last-name" name="last-name" value="">
+        </div>
+        <label for="login-form-password"> Password:</label>
+        <input id="login-form-password" type="password" name="password" value="">
+        <input id="login-form-submit" type="submit" value="Login" onclick="checkValues()">
+        <input id="login-form-action" type="hidden" name="action" value="login">
+        <a id="login-form-toggle" href="javascript:void(0);">Register on Stepik</a>
     </form>
 </div>
 
@@ -92,6 +86,7 @@ ${content}
       TeX: {extensions: ["mhchem.js", "color.js"]},
       messageStyle: "none",
     });
+
 
 </script>
 
@@ -114,10 +109,20 @@ ${content}
 
     var login = document.getElementById("login");
 
-    //noinspection JSUnusedLocalSymbols
-    function showLogin() {
+    function showLogin(event, isLogin = true) {
         login.style.display = "flex";
-        console.warn("show login");
+        document.getElementById('login-form-user-names').style.display = isLogin ? 'none' : 'flex';
+        document.getElementById('login-form-title').innerText = isLogin ? 'Login' : 'Registration';
+        document.getElementById('login-form-toggle').innerText = (isLogin ? 'Register' : 'Login') + ' on Stepik';
+        document.getElementById('login-form-action').setAttribute('value', isLogin ? 'login' : 'register');
+        document.getElementById('login-form-toggle').onclick = isLogin ? showRegister : showLogin;
+        document.getElementById('login-form-submit').setAttribute('value', isLogin ? 'Login' : 'Register');
+        setErrorMessage("");
+        return false;
+    }
+
+    function showRegister(event) {
+        showLogin(event, false);
     }
 
     //noinspection JSUnusedLocalSymbols
@@ -139,7 +144,7 @@ ${content}
         setErrorMessage("");
     }
 
-    var errors = document.body.getElementById("errors");
+    var errors = document.getElementById("login-form-errors");
 
     function setErrorMessage(message) {
         errors.innerText = message;

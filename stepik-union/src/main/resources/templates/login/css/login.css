@@ -13,3 +13,20 @@
 #login-form input {
     margin-bottom: 10px;
 }
+
+#login-form-close {
+    text-align: right;
+}
+
+#login-form-close:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+#login-form-errors {
+    color: red;
+}
+
+#login-form-user-names {
+    flex-direction: column;
+}
