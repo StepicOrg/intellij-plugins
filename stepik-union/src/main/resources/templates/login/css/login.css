@@ -1,0 +1,14 @@
+#login-form {
+    display: flex;
+    margin: auto;
+    flex-direction: column;
+    padding: 15px;
+    border: 1px solid black;
+    border-radius: 5px;
+    background-color: white;
+    width: 300px;
+}
+
+#login-form input {
+    margin-bottom: 10px;
+}

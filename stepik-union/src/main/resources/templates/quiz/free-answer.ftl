@@ -3,6 +3,9 @@
 <#-- @ftlvariable name="stepNode" type="org.stepik.core.courseFormat.stepHelpers.FreeAnswerQuizHelper" -->
 <#-- @ftlvariable name="text" type="java.lang.String" -->
 
+<#include "base.ftl">
+
+<@styles>
 <style>
     #text {
         display: block;
@@ -11,8 +14,7 @@
         min-height: 200px;
     }
 </style>
-
-<#include "base.ftl">
+</@styles>
 
 <@quiz_content>
     <#if action != "get_first_attempt" && action != "need_login" >

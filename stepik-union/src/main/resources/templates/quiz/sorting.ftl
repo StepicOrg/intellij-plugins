@@ -3,6 +3,7 @@
 <#-- @ftlvariable name="index" type="java.lang.Integer" -->
 
 <#include "base_sorting.ftl"/>
+
 <@sorting_quiz>
     <#if action != "get_first_attempt" && action != "need_login" >
         <#list ordering as option>
