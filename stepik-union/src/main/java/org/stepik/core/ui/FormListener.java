@@ -21,10 +21,12 @@ import org.stepik.core.courseFormat.StepNode;
 import org.stepik.core.courseFormat.StepType;
 import org.stepik.core.courseFormat.StudyNode;
 import org.stepik.core.stepik.StepikAuthManager;
+import org.stepik.core.stepik.StepikAuthState;
 import org.stepik.plugin.actions.SendAction;
 import org.w3c.dom.events.Event;
 import org.w3c.dom.events.EventListener;
 import org.w3c.dom.html.HTMLFormElement;
+import org.w3c.dom.html.HTMLTextAreaElement;
 
 import java.io.File;
 import java.io.IOException;
@@ -161,6 +163,17 @@ class FormListener implements EventListener {
                     typeStr = elements.getType();
                     type = StepType.of(typeStr);
                     getReply(stepNode, type, elements, null);
+                    break;
+                case "login":
+                    String email = elements.getInputValue("email");
+                    String password = elements.getInputValue("password");
+                    StepikAuthState state = StepikAuthManager.authentication(email, password);
+                    if (state == StepikAuthState.AUTH) {
+                        StepikProjectManager.setSelected(project, stepNode, true);
+                    } else {
+                        HTMLTextAreaElement errors = ((HTMLTextAreaElement) form.getElements().namedItem("errors"));
+                        errors.setValue("Wrong the email or the password");
+                    }
                     break;
                 default:
                     browser.hideLoadAnimation();
