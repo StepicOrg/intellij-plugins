@@ -53,12 +53,14 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static org.stepik.api.objects.recommendations.ReactionValues.SOLVED;
 import static org.stepik.api.objects.recommendations.ReactionValues.TOO_EASY;
@@ -423,19 +425,21 @@ class StudyBrowserWindow extends JFrame {
     }
 
     void showLoadAnimation() {
-        Platform.runLater(() -> {
-            try {
-                engine.executeScript("if (window.showLoadAnimation !== undefined) showLoadAnimation();");
-            } catch (JSException e) {
-                logger.error(e);
-            }
-        });
+        callFunction("showLoadAnimation");
     }
 
     void hideLoadAnimation() {
+        callFunction("hideLoadAnimation");
+    }
+
+    void callFunction(@NotNull String name, @NotNull String... args) {
         Platform.runLater(() -> {
             try {
-                engine.executeScript("if (window.hideLoadAnimation !== undefined) hideLoadAnimation();");
+                String argsString = Arrays.stream(args)
+                        .map(arg -> "\"" + arg + "\"")
+                        .collect(Collectors.joining(","));
+                String script = String.format("if (window.%1$s !== undefined) %1$s(%2$s);", name, argsString);
+                engine.executeScript(script);
             } catch (JSException e) {
                 logger.error(e);
             }

@@ -1,3 +1,5 @@
+<#-- @ftlvariable name="stepNode" type="org.stepik.core.courseFormat.stepHelpers.StepHelper" -->
+<#-- @ftlvariable name="login_css" type="java.lang.String" -->
 <#-- @ftlvariable name="content" type="java.lang.String" -->
 <#-- @ftlvariable name="loader" type="java.lang.String" -->
 <#-- @ftlvariable name="mathjax" type="java.lang.String" -->
@@ -34,13 +36,26 @@
         #load_animation object {
             margin: auto;
         }
+
+        #close {
+            text-align: right;
+        }
+
+        #close:hover {
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        #errors {
+            color: red;
+        }
     </style>
 
     <#nested/>
 </#macro>
 
 <#if content?has_content>
-    ${content}
+${content}
 </#if>
 
 </head>
@@ -50,14 +65,11 @@
     <#nested/>
 </#macro>
 
-<div id="load_animation">
-    <object type="image/svg+xml" data="${loader}" class='icon'></object>
-</div>
-
 <div id="login">
-    <form id="login-form" action="${stepNode.getPath()}" method="post">
-        <h1>Login</h1>
-        <textarea id="errors" name="errors" title="Errors"></textarea>
+    <form id="login-form" action="<#if stepNode??>${stepNode.getPath()}</#if>" method="post">
+        <div id="close" onclick="hideLogin()">Close</div>
+        <h2>Login</h2>
+        <p id="errors"></p>
         <label for="email"> Email:</label>
         <input id="email" type="email" name="email" value="">
         <label for="password"> Password:</label>
@@ -65,6 +77,10 @@
         <input type="submit" value="Login" onclick="checkValues()">
         <input type="hidden" name="action" value="login">
     </form>
+</div>
+
+<div id="load_animation">
+    <object type="image/svg+xml" data="${loader}" class='icon'></object>
 </div>
 
 <#macro scripts>
@@ -76,6 +92,7 @@
       TeX: {extensions: ["mhchem.js", "color.js"]},
       messageStyle: "none",
     });
+
 </script>
 
 <script type="text/javascript" async
@@ -119,7 +136,14 @@
     hljs.initHighlighting();
 
     function checkValues() {
-        showLoadAnimation();
+
+    }
+
+    var errors = document.body.getElementById("errors");
+
+    //noinspection JSUnusedLocalSymbols
+    function setErrorMessage(message) {
+        errors.innerText = message;
     }
 </script>
     <#nested/>
