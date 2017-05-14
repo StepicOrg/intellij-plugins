@@ -136,12 +136,11 @@ ${content}
     hljs.initHighlighting();
 
     function checkValues() {
-
+        setErrorMessage("");
     }
 
     var errors = document.body.getElementById("errors");
 
-    //noinspection JSUnusedLocalSymbols
     function setErrorMessage(message) {
         errors.innerText = message;
     }
