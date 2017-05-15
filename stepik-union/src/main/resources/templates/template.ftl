@@ -55,21 +55,14 @@ ${content}
 <div id="login">
     <form id="login-form" action="<#if stepNode??>${stepNode.getPath()}</#if>" method="post">
         <div id="login-form-close" onclick="hideLogin()">Close</div>
-        <h2 id="login-form-title">Login</h2>
+        <h2>Login</h2>
         <p id="login-form-errors"></p>
         <label for="login-form-email"> Email:</label>
         <input id="login-form-email" type="email" name="email" value="">
-        <div id="login-form-user-names">
-            <label for="login-form-first-name"> First name:</label>
-            <input id="login-form-first-name" name="first-name" value="">
-            <label for="login-form-last-name"> Last name:</label>
-            <input id="login-form-last-name" name="last-name" value="">
-        </div>
         <label for="login-form-password"> Password:</label>
         <input id="login-form-password" type="password" name="password" value="">
-        <input id="login-form-submit" type="submit" value="Login" onclick="checkValues()">
-        <input id="login-form-action" type="hidden" name="action" value="login">
-        <a id="login-form-toggle" href="javascript:void(0);">Register on Stepik</a>
+        <input type="submit" value="Login" onclick="checkValues()">
+        <input type="hidden" name="action" value="login">
     </form>
 </div>
 
@@ -86,7 +79,6 @@ ${content}
       TeX: {extensions: ["mhchem.js", "color.js"]},
       messageStyle: "none",
     });
-
 
 </script>
 
@@ -109,20 +101,9 @@ ${content}
 
     var login = document.getElementById("login");
 
-    function showLogin(event, isLogin = true) {
+    function showLogin() {
         login.style.display = "flex";
-        document.getElementById('login-form-user-names').style.display = isLogin ? 'none' : 'flex';
-        document.getElementById('login-form-title').innerText = isLogin ? 'Login' : 'Registration';
-        document.getElementById('login-form-toggle').innerText = (isLogin ? 'Register' : 'Login') + ' on Stepik';
-        document.getElementById('login-form-action').setAttribute('value', isLogin ? 'login' : 'register');
-        document.getElementById('login-form-toggle').onclick = isLogin ? showRegister : showLogin;
-        document.getElementById('login-form-submit').setAttribute('value', isLogin ? 'Login' : 'Register');
         setErrorMessage("");
-        return false;
-    }
-
-    function showRegister(event) {
-        showLogin(event, false);
     }
 
     //noinspection JSUnusedLocalSymbols
