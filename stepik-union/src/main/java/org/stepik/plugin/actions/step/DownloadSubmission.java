@@ -37,12 +37,10 @@ import org.stepik.core.metrics.Metrics;
 import org.stepik.core.utils.Utils;
 
 import javax.swing.*;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 import static org.stepik.core.metrics.MetricsStatus.DATA_NOT_LOADED;
@@ -246,7 +244,6 @@ public class DownloadSubmission extends CodeQuizAction {
     }
 
     private static class SubmissionDecorator {
-        private final static SimpleDateFormat timeISOFormat = getTimeISOFormat();
         private final static SimpleDateFormat timeOutFormat = new SimpleDateFormat("dd MMM yyyy HH:mm:ss");
         private final Submission submission;
 
@@ -254,23 +251,11 @@ public class DownloadSubmission extends CodeQuizAction {
             this.submission = submission;
         }
 
-        private static SimpleDateFormat getTimeISOFormat() {
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-            TimeZone tz = TimeZone.getTimeZone("UTC");
-            format.setTimeZone(tz);
-            return format;
-        }
-
         @Override
         public String toString() {
             String localTime;
-            String time = submission.getTime();
-            try {
-                Date utcTime = timeISOFormat.parse(time);
-                localTime = timeOutFormat.format(utcTime);
-            } catch (ParseException e) {
-                localTime = time;
-            }
+            Date utcTime = submission.getTime();
+            localTime = timeOutFormat.format(utcTime);
 
             return String.format("#%d %-7s %s", submission.getId(), submission.getStatus(), localTime);
         }

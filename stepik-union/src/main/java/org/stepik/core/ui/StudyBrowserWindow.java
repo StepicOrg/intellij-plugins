@@ -47,6 +47,8 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.events.Event;
 import org.w3c.dom.events.EventListener;
 import org.w3c.dom.events.EventTarget;
+import org.w3c.dom.html.HTMLFormElement;
+import org.w3c.dom.html.HTMLInputElement;
 
 import javax.swing.*;
 import java.awt.*;
@@ -70,6 +72,7 @@ class StudyBrowserWindow extends JFrame {
     private static final String EVENT_TYPE_CLICK = "click";
     private static final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Project project;
+    private final JavaBridge bridge = new JavaBridge();
     private JFXPanel panel;
     private WebView webComponent;
     private StackPane pane;
@@ -136,8 +139,10 @@ class StudyBrowserWindow extends JFrame {
         engine.getLoadWorker()
                 .stateProperty()
                 .addListener((observable, oldValue, newValue) -> {
+                    if (newValue != Worker.State.SUCCEEDED) {
+                        return;
+                    }
                     JSObject window = (JSObject) engine.executeScript("window");
-                    JavaBridge bridge = new JavaBridge();
                     window.setMember("java", bridge);
                     @Language("JavaScript")
                     String script = "console.error = function (message) {\n" +
@@ -162,7 +167,18 @@ class StudyBrowserWindow extends JFrame {
 
     void loadContent(@NotNull final String content) {
         String withCodeHighlighting = createHtmlWithCodeHighlighting(content);
-        Platform.runLater(() -> engine.loadContent(withCodeHighlighting));
+        Platform.runLater(() -> {
+            Document document = engine.getDocument();
+            if (document != null) {
+                HTMLFormElement form = (HTMLFormElement) document.getElementById("answer_form");
+                if (form != null) {
+                    HTMLInputElement action = (HTMLInputElement) form.getElements().namedItem("action");
+                    action.setValue("save_reply");
+                    FormListener.handle(project, this, form);
+                }
+            }
+            engine.loadContent(withCodeHighlighting);
+        });
     }
 
     @NotNull

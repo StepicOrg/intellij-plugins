@@ -59,8 +59,7 @@
 <script>
     var time_left = ${stepNode.getTimeLeft()};
     var clock = document.getElementById("time-left");
-    var action = ${action};
-    var active = action === "submit";
+    var active = "${action}" === "submit";
 
     if (active) {
         if (time_left > 0) {

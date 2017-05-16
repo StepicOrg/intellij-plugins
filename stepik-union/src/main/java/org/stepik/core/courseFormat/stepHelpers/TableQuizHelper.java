@@ -6,7 +6,6 @@ import org.stepik.api.objects.submissions.Choice;
 import org.stepik.api.objects.submissions.Column;
 import org.stepik.core.courseFormat.StepNode;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,37 +14,18 @@ import java.util.Map;
  * @author meanmail
  */
 public class TableQuizHelper extends QuizHelper {
-    private List<Choice> tableChoices;
     private Map<String, Map<String, Boolean>> choices;
 
     public TableQuizHelper(@NotNull Project project, @NotNull StepNode stepNode) {
         super(project, stepNode);
     }
 
-    public boolean getChoice(@NotNull String rowName, @NotNull String colName) {
-        initStepOptions();
-        return choices.getOrDefault(rowName, new HashMap<>()).getOrDefault(colName, false);
-    }
-
     @Override
-    protected boolean needInit() {
-        return choices == null;
-    }
-
-    @Override
-    protected void onStartInit() {
+    protected void done() {
+        List<Choice> tableChoices = reply.getTableChoices();
         choices = new HashMap<>();
-    }
 
-    @Override
-    protected void onSubmissionLoaded() {
-        tableChoices = reply.getTableChoices();
-    }
-
-    @Override
-    protected void onFinishInit() {
-        if (tableChoices == null) {
-            tableChoices = new ArrayList<>();
+        if (tableChoices.isEmpty()) {
             List<String> rows = getDataset().getRows();
             List<String> cols = getDataset().getColumns();
             for (String row : rows) {
@@ -68,8 +48,13 @@ public class TableQuizHelper extends QuizHelper {
     }
 
     @Override
-    void onInitFailed() {
-        choices = null;
+    void fail() {
+        choices = new HashMap<>();
+    }
+
+    public boolean getChoice(@NotNull String rowName, @NotNull String colName) {
+        initStepOptions();
+        return choices.getOrDefault(rowName, new HashMap<>()).getOrDefault(colName, false);
     }
 
     @NotNull

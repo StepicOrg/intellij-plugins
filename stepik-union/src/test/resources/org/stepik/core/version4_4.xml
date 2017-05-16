@@ -82,6 +82,7 @@
                 </supportedLanguages>
                 <currentLang>Java 8</currentLang>
                 <courseId>0</courseId>
+                <lastSubmissionId>0</lastSubmissionId>
               </StepNode>
             </children>
             <wasDeleted>false</wasDeleted>
@@ -168,6 +169,7 @@
                 </supportedLanguages>
                 <currentLang>Java 8</currentLang>
                 <courseId>0</courseId>
+                <lastSubmissionId>0</lastSubmissionId>
               </StepNode>
               <StepNode id="35">
                 <data class="Step" id="36">
@@ -207,6 +209,7 @@
                 </supportedLanguages>
                 <currentLang>Java 8</currentLang>
                 <courseId>0</courseId>
+                <lastSubmissionId>0</lastSubmissionId>
               </StepNode>
               <StepNode id="42">
                 <data class="Step" id="43">
@@ -246,6 +249,7 @@
                 </supportedLanguages>
                 <currentLang>Java 8</currentLang>
                 <courseId>0</courseId>
+                <lastSubmissionId>0</lastSubmissionId>
               </StepNode>
               <StepNode id="49">
                 <data class="Step" id="50">
@@ -285,6 +289,7 @@
                 </supportedLanguages>
                 <currentLang>Java 8</currentLang>
                 <courseId>0</courseId>
+                <lastSubmissionId>0</lastSubmissionId>
               </StepNode>
             </children>
             <wasDeleted>false</wasDeleted>
@@ -355,6 +360,7 @@
                 </supportedLanguages>
                 <currentLang>Java 8</currentLang>
                 <courseId>0</courseId>
+                <lastSubmissionId>0</lastSubmissionId>
               </StepNode>
               <StepNode id="68">
                 <data class="Step" id="69">
@@ -394,6 +400,7 @@
                 </supportedLanguages>
                 <currentLang>Java 8</currentLang>
                 <courseId>0</courseId>
+                <lastSubmissionId>0</lastSubmissionId>
               </StepNode>
             </children>
             <wasDeleted>false</wasDeleted>
@@ -464,6 +471,7 @@
                 </supportedLanguages>
                 <currentLang>Java 8</currentLang>
                 <courseId>0</courseId>
+                <lastSubmissionId>0</lastSubmissionId>
               </StepNode>
             </children>
             <wasDeleted>false</wasDeleted>
@@ -534,6 +542,7 @@
                 </supportedLanguages>
                 <currentLang>Java 8</currentLang>
                 <courseId>0</courseId>
+                <lastSubmissionId>0</lastSubmissionId>
               </StepNode>
               <StepNode id="99">
                 <data class="Step" id="100">
@@ -573,6 +582,7 @@
                 </supportedLanguages>
                 <currentLang>Java 8</currentLang>
                 <courseId>0</courseId>
+                <lastSubmissionId>0</lastSubmissionId>
               </StepNode>
               <StepNode id="106">
                 <data class="Step" id="107">
@@ -612,6 +622,7 @@
                 </supportedLanguages>
                 <currentLang>Java 8</currentLang>
                 <courseId>0</courseId>
+                <lastSubmissionId>0</lastSubmissionId>
               </StepNode>
             </children>
             <wasDeleted>false</wasDeleted>
@@ -698,6 +709,7 @@
                 </supportedLanguages>
                 <currentLang>Java 8</currentLang>
                 <courseId>0</courseId>
+                <lastSubmissionId>0</lastSubmissionId>
               </StepNode>
             </children>
             <wasDeleted>false</wasDeleted>
@@ -768,6 +780,7 @@
                 </supportedLanguages>
                 <currentLang>Java 8</currentLang>
                 <courseId>0</courseId>
+                <lastSubmissionId>0</lastSubmissionId>
               </StepNode>
             </children>
             <wasDeleted>false</wasDeleted>
@@ -838,6 +851,7 @@
                 </supportedLanguages>
                 <currentLang>Java 8</currentLang>
                 <courseId>0</courseId>
+                <lastSubmissionId>0</lastSubmissionId>
               </StepNode>
               <StepNode id="152">
                 <data class="Step" id="153">
@@ -877,6 +891,7 @@
                 </supportedLanguages>
                 <currentLang>Java 8</currentLang>
                 <courseId>0</courseId>
+                <lastSubmissionId>0</lastSubmissionId>
               </StepNode>
               <StepNode id="159">
                 <data class="Step" id="160">
@@ -916,6 +931,7 @@
                 </supportedLanguages>
                 <currentLang>Java 8</currentLang>
                 <courseId>0</courseId>
+                <lastSubmissionId>0</lastSubmissionId>
               </StepNode>
             </children>
             <wasDeleted>false</wasDeleted>
@@ -1002,6 +1018,7 @@
                 </supportedLanguages>
                 <currentLang>Java 8</currentLang>
                 <courseId>0</courseId>
+                <lastSubmissionId>0</lastSubmissionId>
               </StepNode>
               <StepNode id="181">
                 <data class="Step" id="182">
@@ -1041,6 +1058,7 @@
                 </supportedLanguages>
                 <currentLang>Java 8</currentLang>
                 <courseId>0</courseId>
+                <lastSubmissionId>0</lastSubmissionId>
               </StepNode>
             </children>
             <wasDeleted>false</wasDeleted>
@@ -1111,6 +1129,7 @@
                 </supportedLanguages>
                 <currentLang>Java 8</currentLang>
                 <courseId>0</courseId>
+                <lastSubmissionId>0</lastSubmissionId>
               </StepNode>
             </children>
             <wasDeleted>false</wasDeleted>
@@ -1181,6 +1200,7 @@
                 </supportedLanguages>
                 <currentLang>Java 8</currentLang>
                 <courseId>0</courseId>
+                <lastSubmissionId>0</lastSubmissionId>
               </StepNode>
               <StepNode id="212">
                 <data class="Step" id="213">
@@ -1220,6 +1240,7 @@
                 </supportedLanguages>
                 <currentLang>Java 8</currentLang>
                 <courseId>0</courseId>
+                <lastSubmissionId>0</lastSubmissionId>
               </StepNode>
             </children>
             <wasDeleted>false</wasDeleted>
@@ -1306,6 +1327,7 @@
                 </supportedLanguages>
                 <currentLang>Java 8</currentLang>
                 <courseId>0</courseId>
+                <lastSubmissionId>0</lastSubmissionId>
               </StepNode>
               <StepNode id="234">
                 <data class="Step" id="235">
@@ -1345,6 +1367,7 @@
                 </supportedLanguages>
                 <currentLang>Java 8</currentLang>
                 <courseId>0</courseId>
+                <lastSubmissionId>0</lastSubmissionId>
               </StepNode>
             </children>
             <wasDeleted>false</wasDeleted>
@@ -1415,6 +1438,7 @@
                 </supportedLanguages>
                 <currentLang>Java 8</currentLang>
                 <courseId>0</courseId>
+                <lastSubmissionId>0</lastSubmissionId>
               </StepNode>
               <StepNode id="253">
                 <data class="Step" id="254">
@@ -1454,6 +1478,7 @@
                 </supportedLanguages>
                 <currentLang>Java 8</currentLang>
                 <courseId>0</courseId>
+                <lastSubmissionId>0</lastSubmissionId>
               </StepNode>
             </children>
             <wasDeleted>false</wasDeleted>
@@ -1524,6 +1549,7 @@
                 </supportedLanguages>
                 <currentLang>Java 8</currentLang>
                 <courseId>0</courseId>
+                <lastSubmissionId>0</lastSubmissionId>
               </StepNode>
             </children>
             <wasDeleted>false</wasDeleted>
@@ -1610,6 +1636,7 @@
                 </supportedLanguages>
                 <currentLang>Java 8</currentLang>
                 <courseId>0</courseId>
+                <lastSubmissionId>0</lastSubmissionId>
               </StepNode>
             </children>
             <wasDeleted>false</wasDeleted>
@@ -1680,6 +1707,7 @@
                 </supportedLanguages>
                 <currentLang>Java 8</currentLang>
                 <courseId>0</courseId>
+                <lastSubmissionId>0</lastSubmissionId>
               </StepNode>
               <StepNode id="299">
                 <data class="Step" id="300">
@@ -1719,6 +1747,7 @@
                 </supportedLanguages>
                 <currentLang>Java 8</currentLang>
                 <courseId>0</courseId>
+                <lastSubmissionId>0</lastSubmissionId>
               </StepNode>
             </children>
             <wasDeleted>false</wasDeleted>
@@ -1789,6 +1818,7 @@
                 </supportedLanguages>
                 <currentLang>Java 8</currentLang>
                 <courseId>0</courseId>
+                <lastSubmissionId>0</lastSubmissionId>
               </StepNode>
             </children>
             <wasDeleted>false</wasDeleted>
@@ -1859,6 +1889,7 @@
                 </supportedLanguages>
                 <currentLang>Java 8</currentLang>
                 <courseId>0</courseId>
+                <lastSubmissionId>0</lastSubmissionId>
               </StepNode>
               <StepNode id="330">
                 <data class="Step" id="331">
@@ -1898,6 +1929,7 @@
                 </supportedLanguages>
                 <currentLang>Java 8</currentLang>
                 <courseId>0</courseId>
+                <lastSubmissionId>0</lastSubmissionId>
               </StepNode>
               <StepNode id="337">
                 <data class="Step" id="338">
@@ -1937,6 +1969,7 @@
                 </supportedLanguages>
                 <currentLang>Java 8</currentLang>
                 <courseId>0</courseId>
+                <lastSubmissionId>0</lastSubmissionId>
               </StepNode>
               <StepNode id="344">
                 <data class="Step" id="345">
@@ -1976,6 +2009,7 @@
                 </supportedLanguages>
                 <currentLang>Java 8</currentLang>
                 <courseId>0</courseId>
+                <lastSubmissionId>0</lastSubmissionId>
               </StepNode>
             </children>
             <wasDeleted>false</wasDeleted>

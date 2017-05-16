@@ -47,6 +47,7 @@ public class QuizHelper extends StepHelper {
     private int submissionsCount = -1;
     private Submission submission;
     private boolean initialized;
+    private boolean modified;
 
     public QuizHelper(@NotNull Project project, @NotNull StepNode stepNode) {
         super(project, stepNode);
@@ -69,33 +70,48 @@ public class QuizHelper extends StepHelper {
         return true;
     }
 
-    private boolean loadSubmission(StepikApiClient stepikApiClient, long userId) {
+    private void loadSubmission(StepikApiClient stepikApiClient, long userId) {
         long attemptId = attempt.getId();
+        StepNode stepNode = getStepNode();
+
         StepikSubmissionsGetQuery query = stepikApiClient.submissions()
                 .get()
                 .order(Order.DESC)
-                .user(userId);
+                .user(userId)
+                .step(stepNode.getId());
 
         if (!useLastSubmission) {
             query.attempt(attemptId);
         }
 
         Submissions submissions = query.execute();
+        modified = false;
 
         if (!submissions.isEmpty()) {
             submission = submissions.getFirst();
-            reply = submission.getReply();
+
+            boolean lastSubmission = submission.getId() == stepNode.getLastSubmissionId();
+            boolean outdated = stepNode.getLastReplyTime().after(submission.getTime());
+            if (lastSubmission && outdated) {
+                reply = stepNode.getLastReply();
+                modified = !submission.getReply().equals(reply);
+            } else {
+                reply = submission.getReply();
+                stepNode.setLastReply(submission.getReply());
+                stepNode.setLastSubmissionId(submission.getId());
+            }
             if (attemptId == submission.getAttempt()) {
                 status = submission.getStatus();
             }
             if (ACTIVE.equals(attempt.getStatus()) && status.equals("correct")) {
                 action = GET_ATTEMPT;
             }
-            getStepNode().setStatus(StudyStatus.of(status));
-            return true;
-        }
 
-        return false;
+            stepNode.setStatus(StudyStatus.of(status));
+        } else {
+            reply = stepNode.getLastReply();
+            modified = true;
+        }
     }
 
     @Override
@@ -139,11 +155,11 @@ public class QuizHelper extends StepHelper {
     }
 
     void initStepOptions() {
-        if (!needInit()) {
+        if (initialized) {
             return;
         }
 
-        onStartInit();
+        initialized = true;
         status = UNCHECKED;
         action = GET_FIRST_ATTEMPT;
 
@@ -152,47 +168,33 @@ public class QuizHelper extends StepHelper {
             User user = getCurrentUser();
             if (user.isGuest()) {
                 action = NEED_LOGIN;
+                fail();
+                initialized = false;
                 return;
             }
 
             long userId = user.getId();
 
             if (!loadAttempt(stepikApiClient, userId)) {
+                fail();
+                initialized = false;
                 return;
             }
 
-            onAttemptLoaded();
+            loadSubmission(stepikApiClient, userId);
 
-            if (loadSubmission(stepikApiClient, userId)) {
-                onSubmissionLoaded();
-            }
-
-            onFinishInit();
+            done();
+            initialized = true;
         } catch (StepikClientException e) {
             logger.warn("Failed init test-step options", e);
-            onInitFailed();
+            fail();
         }
     }
 
-    boolean needInit() {
-        return !initialized;
+    void done() {
     }
 
-    void onStartInit() {
-    }
-
-    void onAttemptLoaded() {
-    }
-
-    void onSubmissionLoaded() {
-    }
-
-    void onFinishInit() {
-        initialized = true;
-    }
-
-    void onInitFailed() {
-        initialized = false;
+    void fail() {
     }
 
     public int getSubmissionsCount() {
@@ -272,5 +274,9 @@ public class QuizHelper extends StepHelper {
     public String getAction() {
         initStepOptions();
         return action;
+    }
+
+    public boolean isModified() {
+        return modified;
     }
 }

@@ -37,12 +37,12 @@
         <#assign locked = isHasSubmissionsRestrictions && (submissionsCount >= maxSubmissionsCount) />
 
         <form id="answer_form" action="${stepNode.getPath()}" method="get">
-            <#if action != "submit">
+            <#if action != "submit" || locked>
                 <#assign disabled = "disabled" />
             </#if>
 
             <#if status != "unchecked">
-                <p class="status ${status}">${status}</p>
+                <p class="status ${status}">${status} ${stepNode.isModified()?string('*', '')}</p>
                 <div>
                 ${stepNode.getHint()}
                 </div>

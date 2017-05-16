@@ -49,17 +49,12 @@ public class DatasetDeserializer implements JsonDeserializer<Dataset> {
         Boolean textDisabled = getBoolean(object, "is_text_disabled");
         dataset.setTextDisabled(textDisabled);
 
-        JsonArray options = getJsonArray(object, "options");
-        if (options != null) {
-            List<String> optionsArray = new ArrayList<>();
-            options.forEach(option -> optionsArray.add(option.getAsString()));
-            dataset.setOptions(optionsArray.toArray(new String[optionsArray.size()]));
-        }
+        dataset.setOptions(getStringList(object, "options"));
 
         JsonArray pairs = getJsonArray(object, "pairs");
         if (pairs != null) {
-            List<Pair> array = new ArrayList<>();
-            pairs.forEach(pair -> array.add(context.deserialize(pair, Pair.class)));
+            List<StringPair> array = new ArrayList<>();
+            pairs.forEach(pair -> array.add(context.deserialize(pair, StringPair.class)));
             dataset.setPairs(array);
         }
 

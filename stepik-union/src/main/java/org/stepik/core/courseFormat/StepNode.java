@@ -14,12 +14,15 @@ import org.stepik.api.objects.steps.Limit;
 import org.stepik.api.objects.steps.Sample;
 import org.stepik.api.objects.steps.Step;
 import org.stepik.api.objects.steps.Steps;
+import org.stepik.api.objects.submissions.Reply;
 import org.stepik.api.objects.units.Units;
 import org.stepik.core.SupportedLanguages;
 import org.stepik.core.core.EduNames;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +35,9 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
     private long courseId;
     @XStreamOmitField
     private Long assignment;
+    private Reply lastReply;
+    private Date lastReplyTime;
+    private long lastSubmissionId;
 
     public StepNode() {}
 
@@ -303,5 +309,40 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
             }
         }
         return assignment;
+    }
+
+    @NotNull
+    public Reply getLastReply() {
+        if (lastReply == null) {
+            lastReply = new Reply();
+        }
+        return lastReply;
+    }
+
+    public void setLastReply(@Nullable Reply lastReply) {
+        this.lastReply = lastReply;
+        this.lastReplyTime = new Date();
+    }
+
+    public void cleanLastReply() {
+        this.lastReply = new Reply();
+        this.lastSubmissionId = 0;
+        this.lastReplyTime = Date.from(Instant.EPOCH);
+    }
+
+    @NotNull
+    public Date getLastReplyTime() {
+        if (lastReplyTime == null) {
+            lastReplyTime = Date.from(Instant.EPOCH);
+        }
+        return lastReplyTime;
+    }
+
+    public long getLastSubmissionId() {
+        return lastSubmissionId;
+    }
+
+    public void setLastSubmissionId(long lastSubmissionId) {
+        this.lastSubmissionId = lastSubmissionId;
     }
 }

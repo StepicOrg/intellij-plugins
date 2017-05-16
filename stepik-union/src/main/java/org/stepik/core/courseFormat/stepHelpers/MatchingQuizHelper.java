@@ -3,67 +3,57 @@ package org.stepik.core.courseFormat.stepHelpers;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import org.jetbrains.annotations.NotNull;
+import org.stepik.api.objects.attempts.StringPair;
 import org.stepik.core.courseFormat.StepNode;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * @author meanmail
  */
 public class MatchingQuizHelper extends QuizHelper {
-    private List<org.stepik.api.objects.attempts.Pair> values;
-    private List<Integer> replyOrdering;
-    private List<Pair<String, String>> ordering;
+    private List<Pair<Integer, String[]>> ordering;
 
     public MatchingQuizHelper(@NotNull Project project, @NotNull StepNode stepNode) {
         super(project, stepNode);
     }
 
-    @NotNull
-    public List<Pair<String, String>> getOrdering() {
-        initStepOptions();
-        return ordering;
+    @Override
+    protected void done() {
+        List<StringPair> values = getDataset().getPairs();
+        List<Integer> replyOrdering = reply.getOrdering();
+
+        if (replyOrdering.size() != values.size()) {
+            replyOrdering = IntStream.range(0, values.size())
+                    .boxed()
+                    .collect(Collectors.toList());
+        }
+
+        List<Integer> finalReplyOrdering = replyOrdering;
+        ordering = IntStream.range(0, values.size())
+                .boxed()
+                .map(i -> {
+                    int index = finalReplyOrdering.get(i);
+                    String[] captions = new String[]{
+                            values.get(i).getFirst(),
+                            index < values.size() ? values.get(index).getSecond() : ""
+                    };
+                    return Pair.create(index, captions);
+                })
+                .collect(Collectors.toList());
     }
 
     @Override
-    protected boolean needInit() {
-        return ordering == null;
-    }
-
-    @Override
-    protected void onStartInit() {
+    void fail() {
         ordering = new ArrayList<>();
     }
 
-    @Override
-    protected void onAttemptLoaded() {
-        values = getDataset().getPairs();
-    }
-
-    @Override
-    protected void onSubmissionLoaded() {
-        replyOrdering = reply.getOrdering();
-    }
-
-    @Override
-    protected void onFinishInit() {
-        if (replyOrdering == null) {
-            replyOrdering = new ArrayList<>();
-            for (int i = 0; i < values.size(); i++)
-                replyOrdering.add(i);
-        }
-
-        for (int i = 0; i < replyOrdering.size() && i < values.size(); i++) {
-            int index = replyOrdering.get(i);
-            String first = values.get(i).getFirst();
-            String second = index < values.size() ? values.get(index).getSecond() : "";
-            ordering.add(Pair.create(first, second));
-        }
-    }
-
-    @Override
-    void onInitFailed() {
-        ordering = null;
+    @NotNull
+    public List<Pair<Integer, String[]>> getOrdering() {
+        initStepOptions();
+        return ordering;
     }
 }

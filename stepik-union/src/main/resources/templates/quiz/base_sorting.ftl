@@ -31,13 +31,13 @@
         min-width: 200px;
     }
 
-    .second {
+    .right {
         display: flex;
         flex-direction: row;
         width: 100%;
     }
 
-    .first {
+    .left {
         display: flex;
         padding: 15px;
         border: 1px solid lightgray;
@@ -55,7 +55,7 @@
         justify-content: space-around;
     }
 
-    .first div {
+    .left div {
         margin: auto 0;
     }
 
