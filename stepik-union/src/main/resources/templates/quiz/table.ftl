@@ -3,6 +3,9 @@
 <#-- @ftlvariable name="stepNode" type="org.stepik.core.courseFormat.stepHelpers.TableQuizHelper" -->
 <#-- @ftlvariable name="text" type="java.lang.String" -->
 
+<#include "base.ftl">
+
+<@styles>
 <style>
     .table {
         width: 100%;
@@ -23,8 +26,7 @@
         border-bottom: 1px solid darkgray;
     }
 </style>
-
-<#include "base.ftl">
+</@styles>
 
 <@quiz_content>
     <#if action != "get_first_attempt" && action != "need_login" >

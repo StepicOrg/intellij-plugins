@@ -3,6 +3,9 @@
 <#-- @ftlvariable name="stepNode" type="org.stepik.core.courseFormat.stepHelpers.QuizHelper" -->
 <#-- @ftlvariable name="text" type="java.lang.String" -->
 
+<#include "base.ftl">
+
+<@styles>
 <style>
     .field {
         background-color: white;
@@ -33,8 +36,7 @@
         white-space: nowrap;
     }
 </style>
-
-<#include "base.ftl">
+</@styles>
 
 <@quiz_content>
     <#if action != "get_first_attempt" && action != "need_login" >
@@ -69,6 +71,7 @@
     </#if>
 </@quiz_content>
 
+<@scripts>
 <script>
     var buffer = document.getElementById('input-buffer');
     function resize(input) {
@@ -82,3 +85,4 @@
         resize(element);
     }
 </script>
+</@scripts>

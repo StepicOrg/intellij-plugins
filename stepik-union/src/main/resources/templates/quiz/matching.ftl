@@ -4,6 +4,7 @@
 <#-- @ftlvariable name="ordering" type="java.util.List<org.stepik.api.objects.attempts.StringPair>" -->
 
 <#include "base_sorting.ftl"/>
+
 <@sorting_quiz>
     <#if action != "get_first_attempt" && action != "need_login">
         <#list ordering as option>

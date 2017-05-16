@@ -40,6 +40,7 @@ import static org.stepik.core.utils.PluginUtils.PLUGIN_ID;
 public class StepikAuthManager {
     private static final Logger logger = Logger.getInstance(StepikAuthManager.class);
     private static final String CLIENT_ID = "vV8giW7KTPMOTriOUBwyGLvXbKV0Cc4GPBnyCJPd";
+    private static final String CLIENT_ID_PASSWORD_BASED = "MVo2c17mATXWfBUdmP5oCsFrUB7RtCYqOvUmng90";
     private static final String REDIRECT_URI = "https%3A%2F%2Fstepik.org";
     private static final String LAST_USER_PROPERTY_NAME = PLUGIN_ID + ".LAST_USER";
     private static final StepikApiClient stepikApiClient = initStepikApiClient();
@@ -150,7 +151,6 @@ public class StepikAuthManager {
             User user = getCurrentUser(true);
             if (!user.isGuest()) {
                 setTokenInfo(user.getId(), tokenInfo);
-                Metrics.authenticate(SUCCESSFUL);
             } else {
                 newState = NOT_AUTH;
             }
@@ -179,6 +179,16 @@ public class StepikAuthManager {
     private static void setState(@NotNull StepikAuthState value) {
         StepikAuthState oldState = state;
         state = value;
+
+        if (state == NOT_AUTH) {
+            stepikApiClient.setTokenInfo(null);
+            user = null;
+            long userId = getLastUser();
+            setTokenInfo(userId, new TokenInfo());
+            setLastUser(0);
+        } else if (state == AUTH){
+            Metrics.authenticate(SUCCESSFUL);
+        }
 
         if (oldState != state) {
             executor.execute(() ->
@@ -291,11 +301,6 @@ public class StepikAuthManager {
     }
 
     public static synchronized void logout() {
-        stepikApiClient.setTokenInfo(null);
-        user = null;
-        long userId = getLastUser();
-        setTokenInfo(userId, new TokenInfo());
-        setLastUser(0);
         setState(NOT_AUTH);
         logger.info("Logout successfully");
     }
@@ -316,5 +321,22 @@ public class StepikAuthManager {
 
     public static void removeListener(@NotNull StepikAuthManagerListener listener) {
         listeners.remove(listener);
+    }
+
+    public static synchronized StepikAuthState authentication(@NotNull String email, @NotNull String password) {
+        try {
+            TokenInfo tokenInfo = stepikApiClient.oauth2()
+                    .userAuthenticationPassword(CLIENT_ID_PASSWORD_BASED, email, password)
+                    .execute();
+            stepikApiClient.setTokenInfo(tokenInfo);
+            User user = getCurrentUser(true);
+            setTokenInfo(user.getId(), tokenInfo);
+            setState(AUTH);
+        } catch (StepikClientException e) {
+            logger.warn(e);
+            setState(NOT_AUTH);
+        }
+
+        return state;
     }
 }

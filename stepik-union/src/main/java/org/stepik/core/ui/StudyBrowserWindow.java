@@ -23,7 +23,6 @@ import netscape.javascript.JSException;
 import netscape.javascript.JSObject;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.recommendations.ReactionValues;
@@ -54,12 +53,14 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static org.stepik.api.objects.recommendations.ReactionValues.SOLVED;
 import static org.stepik.api.objects.recommendations.ReactionValues.TOO_EASY;
@@ -165,8 +166,8 @@ class StudyBrowserWindow extends JFrame {
                 });
     }
 
-    void loadContent(@NotNull final String content) {
-        String withCodeHighlighting = createHtmlWithCodeHighlighting(content);
+    void loadContent(@NotNull String template, @NotNull Map<String, Object> params) {
+        String content = getContent(template, params);
         Platform.runLater(() -> {
             Document document = engine.getDocument();
             if (document != null) {
@@ -177,12 +178,12 @@ class StudyBrowserWindow extends JFrame {
                     FormListener.handle(project, this, form);
                 }
             }
-            engine.loadContent(withCodeHighlighting);
+            engine.loadContent(content);
         });
     }
 
     @NotNull
-    private String createHtmlWithCodeHighlighting(@NotNull final String content) {
+    private String getContent(@NotNull final String template, @NotNull Map<String, Object> params) {
         final EditorColorsScheme editorColorsScheme = EditorColorsManager.getInstance().getGlobalScheme();
         int fontSize = editorColorsScheme.getEditorFontSize();
 
@@ -194,10 +195,12 @@ class StudyBrowserWindow extends JFrame {
         } else {
             map.put("css_highlight", getExternalURL("/highlight/styles/idea.css"));
         }
-        map.put("code", content);
         map.put("charset", Charset.defaultCharset().displayName());
+        map.put("loader", getExternalURL("/templates/img/loader.svg"));
+        map.put("login_css", getExternalURL("/templates/login/css/login.css"));
+        map.putAll(params);
 
-        return Templater.processTemplate("template", map);
+        return Templater.processTemplate(template, map);
     }
 
     private String getExternalURL(@NotNull String internalPath) {
@@ -230,6 +233,7 @@ class StudyBrowserWindow extends JFrame {
     @NotNull
     private EventListener makeHyperLinkListener() {
         return new EventListener() {
+            private final Pattern protocolPattern = Pattern.compile("([a-z]+):(.*)");
             private final Pattern pattern = Pattern.compile("/lesson(?:/|/[^/]*-)(\\d+)/step/(\\d+).*");
 
             @Override
@@ -241,21 +245,19 @@ class StudyBrowserWindow extends JFrame {
                     ev.preventDefault();
                     Element target = (Element) ev.getTarget();
                     String href = getLink(target);
-                    if (href == null) {
-                        return;
-                    }
-
-                    if (href.startsWith("inner:")) {
-                        browseInnerLink(target, href);
-                        return;
-                    }
-
-                    if (href.startsWith("adaptive:")) {
-                        browseAdaptiveLink(href);
-                        return;
-                    }
-
-                    if (browseProject(href)) {
+                    Matcher matcher = protocolPattern.matcher(href);
+                    if (matcher.matches()) {
+                        String protocol = matcher.group(1);
+                        String link = matcher.group(2);
+                        switch (protocol) {
+                            case "inner":
+                                browseInnerLink(target, link);
+                                break;
+                            case "adaptive":
+                                browseAdaptiveLink(link);
+                                break;
+                        }
+                    } else if (browseProject(href)) {
                         return;
                     }
 
@@ -267,8 +269,7 @@ class StudyBrowserWindow extends JFrame {
                 }
             }
 
-            private void browseInnerLink(@NotNull Element target, @NotNull String href) {
-                href = href.substring(6);
+            private void browseInnerLink(@NotNull Element target, @NotNull String link) {
                 StudyNode root = StepikProjectManager.getProjectRoot(project);
                 if (root == null) {
                     return;
@@ -287,7 +288,7 @@ class StudyBrowserWindow extends JFrame {
 
                 try {
                     StepikApiClient stepikApiClient = StepikAuthManager.getStepikApiClient();
-                    String content = stepikApiClient.files().get(href, contentType);
+                    String content = stepikApiClient.files().get(link, contentType);
                     VirtualFile srcDirectory = getOrCreateSrcDirectory(project, (StepNode) node, true);
                     if (srcDirectory == null) {
                         return;
@@ -313,26 +314,20 @@ class StudyBrowserWindow extends JFrame {
                 }
             }
 
-            private void browseAdaptiveLink(@NotNull String href) {
-                ReactionValues reaction;
-                if (href.startsWith("adaptive:too_easy")) {
-                    reaction = TOO_EASY;
-                } else if (href.startsWith("adaptive:too_hard")) {
-                    reaction = TOO_HARD;
-                } else if (href.startsWith("adaptive:new_recommendation")) {
-                    reaction = SOLVED;
-                } else {
+            private void browseAdaptiveLink(@NotNull String link) {
+                String[] items = link.split("/");
+                if (items.length < 2) {
+                    return;
+                }
+
+                ReactionValues reaction = ReactionValues.of(items[0]);
+                if (!reaction.in(TOO_EASY, TOO_HARD, SOLVED)) {
                     return;
                 }
 
                 showLoadAnimation();
 
-                if (reaction == TOO_EASY || reaction == TOO_HARD) {
-                    String[] items = href.split("/");
-                    if (items.length < 2) {
-                        return;
-                    }
-
+                if (reaction.in(TOO_EASY, TOO_HARD)) {
                     long lessonId;
                     try {
                         lessonId = Long.parseLong(items[1]);
@@ -397,13 +392,13 @@ class StudyBrowserWindow extends JFrame {
                 return false;
             }
 
-            @Nullable
+            @NotNull
             private String getLink(@NotNull Element element) {
                 final String href = element.getAttribute("href");
                 return href == null ? getLinkFromNodeWithCodeTag(element) : href;
             }
 
-            @Nullable
+            @NotNull
             private String getLinkFromNodeWithCodeTag(@NotNull Element element) {
                 Node parentNode = element.getParentNode();
                 NamedNodeMap attributes = parentNode.getAttributes();
@@ -413,9 +408,10 @@ class StudyBrowserWindow extends JFrame {
                 }
                 Node href = attributes.getNamedItem("href");
                 if (href == null) {
-                    return null;
+                    return "";
                 }
-                return href.getNodeValue();
+                String link = href.getNodeValue();
+                return link != null ? link : "";
             }
         };
     }
@@ -429,19 +425,21 @@ class StudyBrowserWindow extends JFrame {
     }
 
     void showLoadAnimation() {
-        Platform.runLater(() -> {
-            try {
-                engine.executeScript("if (window.showLoadAnimation !== undefined) showLoadAnimation();");
-            } catch (JSException e) {
-                logger.error(e);
-            }
-        });
+        callFunction("showLoadAnimation");
     }
 
     void hideLoadAnimation() {
+        callFunction("hideLoadAnimation");
+    }
+
+    void callFunction(@NotNull String name, @NotNull String... args) {
         Platform.runLater(() -> {
             try {
-                engine.executeScript("if (window.hideLoadAnimation !== undefined) hideLoadAnimation();");
+                String argsString = Arrays.stream(args)
+                        .map(arg -> "\"" + arg + "\"")
+                        .collect(Collectors.joining(","));
+                String script = String.format("if (window.%1$s !== undefined) %1$s(%2$s);", name, argsString);
+                engine.executeScript(script);
             } catch (JSException e) {
                 logger.error(e);
             }
