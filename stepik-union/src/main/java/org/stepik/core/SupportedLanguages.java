@@ -35,6 +35,7 @@ public enum SupportedLanguages {
     JAVA8("Java 8", "java8", "Main.java", "//", new String[]{"class Main {"}, new String[]{"}"}),
     JAVA("Java", "java", "Main.java", "//", new String[]{"class Main {"}, new String[]{"}"}, JAVA8),
     JAVASCRIPT("JavaScript", "javascript", "main.js", "//", null, null),
+    KOTLIN("Kotlin", "kotlin", "Main.kt", "//", null, null),
     MONO_CS("Mono c#", "mono c#", "main.cs", "//", null, null),
     OCTAVE("Octave", "octave", "main.m", "%", null, null),
     PYTHON3("Python 3", "python3", "main.py", "#", null, null),

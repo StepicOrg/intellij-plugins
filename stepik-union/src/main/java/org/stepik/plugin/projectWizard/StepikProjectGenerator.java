@@ -115,6 +115,8 @@ public class StepikProjectGenerator {
             case RUBY:
             case SCALA:
                 return Arrays.asList(1127L, 125L, 126L, 150L);
+            case KOTLIN:
+                return Arrays.asList(2852L, 1127L, 125L, 126L, 150L);
         }
 
         return Collections.emptyList();
