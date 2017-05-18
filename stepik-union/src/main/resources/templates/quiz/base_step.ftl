@@ -44,8 +44,11 @@
             <div class="adaptive-buttons">
                 <#assign lessonId = stepNode.getParent()?string("#")/>
                 <a class="adaptive-button" href="adaptive:too_easy/${lessonId}">Lesson is too easy</a>
-                <a class="adaptive-button"
-                   <#if stepNode.solvedLesson() >href="adaptive:solved/${lessonId}"</#if>>New recommendation</a>
+                <#if stepNode.solvedLesson() >
+                    <a class="adaptive-button" href="adaptive:solved/${lessonId}">New recommendation</a>
+                <#else>
+                    <div class="adaptive-button">New recommendation</div>
+                </#if>
                 <a class="adaptive-button" href="adaptive:too_hard/${lessonId}">Lesson is too hard</a>
             </div>
             <#else>

@@ -257,6 +257,7 @@ class StudyBrowserWindow extends JFrame {
                                 browseAdaptiveLink(link);
                                 break;
                         }
+                        return;
                     } else if (browseProject(href)) {
                         return;
                     }
