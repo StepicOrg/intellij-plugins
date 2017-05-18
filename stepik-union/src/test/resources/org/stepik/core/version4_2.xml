@@ -32,6 +32,7 @@
               <StepNode id="11">
                 <wasDeleted>false</wasDeleted>
                 <courseId>0</courseId>
+                <lastSubmissionId>0</lastSubmissionId>
               </StepNode>
             </children>
             <wasDeleted>false</wasDeleted>

@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.actions.StepikAbstractAction;
 import org.stepik.api.objects.submissions.Attachment;
+import org.stepik.api.objects.submissions.Reply;
 import org.stepik.api.objects.submissions.Submissions;
 import org.stepik.api.objects.submissions.SubmissionsPost;
 import org.stepik.api.queries.StepikAbstractPostQuery;
@@ -97,5 +98,10 @@ public class StepikSubmissionsPostQuery extends StepikAbstractPostQuery<Submissi
     @Override
     protected String getBody() {
         return getJsonConverter().toJson(submissions);
+    }
+
+    public StepikSubmissionsPostQuery reply(@NotNull Reply reply) {
+        submissions.getSubmission().setReply(reply);
+        return this;
     }
 }

@@ -1,7 +1,5 @@
 package org.stepik.core;
 
-import com.intellij.ide.ui.LafManager;
-import com.intellij.ide.ui.laf.darcula.DarculaLookAndFeelInfo;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -18,14 +16,11 @@ import org.stepik.api.objects.recommendations.Recommendations;
 import org.stepik.api.objects.steps.Step;
 import org.stepik.api.objects.steps.Steps;
 import org.stepik.core.courseFormat.StudyNode;
-import org.stepik.core.courseFormat.stepHelpers.StepHelper;
-import org.stepik.core.templates.Templater;
 import org.stepik.core.ui.StudyToolWindow;
 import org.stepik.core.ui.StudyToolWindowFactory;
 import org.stepik.core.utils.ProjectFilesUtils;
 
 import javax.swing.*;
-import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -74,20 +69,6 @@ public class StudyUtils {
             }
         }
         return null;
-    }
-
-    @NotNull
-    public static String getStepContent(@NotNull StepHelper stepHelper) {
-        return processTemplate(stepHelper, "quiz/" + stepHelper.getType());
-    }
-
-    @NotNull
-    private static String processTemplate(@NotNull StepHelper stepHelper, @NotNull String templateName) {
-        HashMap<String, Object> params = new HashMap<>();
-        params.put("stepNode", stepHelper);
-        params.put("darcula", LafManager.getInstance().getCurrentLookAndFeel() instanceof DarculaLookAndFeelInfo);
-
-        return Templater.processTemplate(templateName, params);
     }
 
     @Nullable

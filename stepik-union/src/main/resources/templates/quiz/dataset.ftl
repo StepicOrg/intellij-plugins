@@ -3,6 +3,9 @@
 <#-- @ftlvariable name="stepNode" type="org.stepik.core.courseFormat.stepHelpers.DatasetQuizHelper" -->
 <#-- @ftlvariable name="text" type="java.lang.String" -->
 
+<#include "base.ftl">
+
+<@styles>
 <style>
     .row {
         display: block;
@@ -27,8 +30,7 @@
         background-color: darkkhaki;
     }
 </style>
-
-<#include "base.ftl">
+</@styles>
 
 <@quiz_content>
     <#if action != "get_first_attempt" && action != "need_login">
@@ -56,11 +58,11 @@
     </#if>
 </@quiz_content>
 
+<@sripts>
 <script>
     var time_left = ${stepNode.getTimeLeft()};
     var clock = document.getElementById("time-left");
-    var action = ${action};
-    var active = action === "submit";
+    var active = "${action}" === "submit";
 
     if (active) {
         if (time_left > 0) {
@@ -93,3 +95,4 @@
         document.getElementById("isFromFile").setAttribute("value", "true");
     }
 </script>
+</@sripts>

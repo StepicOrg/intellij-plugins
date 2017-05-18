@@ -5,10 +5,18 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.objects.AbstractObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.util.Date;
+import java.util.TimeZone;
+
 /**
  * @author meanmail
  */
 public class Submission extends AbstractObject {
+    private final static SimpleDateFormat timeISOFormat = getTimeISOFormat();
+
     private String status;
     private double score;
     private String hint;
@@ -20,6 +28,14 @@ public class Submission extends AbstractObject {
     private int attempt;
     private String session;
     private double eta;
+    private transient Date utcTime;
+
+    private static SimpleDateFormat getTimeISOFormat() {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        TimeZone tz = TimeZone.getTimeZone("UTC");
+        format.setTimeZone(tz);
+        return format;
+    }
 
     @NotNull
     public String getStatus() {
@@ -57,13 +73,21 @@ public class Submission extends AbstractObject {
         this.reply = reply;
     }
 
-    @Nullable
-    public String getTime() {
-        return time;
+    @NotNull
+    public Date getTime() {
+        if (utcTime == null) {
+            try {
+                utcTime = timeISOFormat.parse(time);
+            } catch (ParseException e) {
+                return Date.from(Instant.EPOCH);
+            }
+        }
+        return utcTime;
     }
 
-    public void setTime(@Nullable String time) {
-        this.time = time;
+    public void setTime(@Nullable Date time) {
+        this.time = timeISOFormat.format(time);
+        utcTime = time;
     }
 
     public double getScore() {

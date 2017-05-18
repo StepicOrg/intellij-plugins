@@ -1,6 +1,8 @@
 package org.stepik.core.ui;
 
 import com.intellij.ide.projectView.ProjectView;
+import com.intellij.ide.ui.LafManager;
+import com.intellij.ide.ui.laf.darcula.DarculaLookAndFeelInfo;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.ActionGroup;
@@ -49,11 +51,11 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static org.stepik.core.StudyUtils.getStepContent;
 import static org.stepik.core.courseFormat.StepType.CODE;
 import static org.stepik.core.courseFormat.StepType.TEXT;
 import static org.stepik.core.courseFormat.StepType.VIDEO;
@@ -122,8 +124,10 @@ public class StudyToolWindow extends SimpleToolWindowPanel implements DataProvid
         return panel;
     }
 
-    private void setText(@NotNull String text) {
-        browserWindow.loadContent(text);
+    private void setEmptyText() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("content", EMPTY_STEP_TEXT);
+        browserWindow.loadContent("template", map);
     }
 
     private JPanel createToolbarPanel(ActionGroup group) {
@@ -195,7 +199,7 @@ public class StudyToolWindow extends SimpleToolWindowPanel implements DataProvid
         }
 
         if (studyNode != null && !(studyNode instanceof StepNode)) {
-            setText(EMPTY_STEP_TEXT);
+            setEmptyText();
             stepNode = null;
             rightPanel.setVisible(false);
             return;
@@ -208,7 +212,7 @@ public class StudyToolWindow extends SimpleToolWindowPanel implements DataProvid
 
     private void setText(@Nullable StepNode stepNode) {
         if (stepNode == null) {
-            setText(EMPTY_STEP_TEXT);
+            setEmptyText();
             rightPanel.setVisible(false);
             return;
         }
@@ -273,8 +277,10 @@ public class StudyToolWindow extends SimpleToolWindowPanel implements DataProvid
                 break;
         }
 
-        String text = getStepContent(stepHelper);
-        setText(text);
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("stepNode", stepHelper);
+        params.put("darcula", LafManager.getInstance().getCurrentLookAndFeel() instanceof DarculaLookAndFeelInfo);
+        browserWindow.loadContent("quiz/" + stepHelper.getType(), params);
     }
 
     private void updateLanguageBox(@NotNull StepNode stepNode) {

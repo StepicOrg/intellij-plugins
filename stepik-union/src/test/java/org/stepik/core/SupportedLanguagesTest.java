@@ -6,8 +6,8 @@ import org.junit.experimental.theories.FromDataPoints;
 import org.junit.experimental.theories.Theories;
 import org.junit.experimental.theories.Theory;
 import org.junit.runner.RunWith;
-import org.stepik.core.SupportedLanguages;
 
+import static org.junit.Assert.assertEquals;
 import static org.stepik.core.SupportedLanguages.ASM32;
 import static org.stepik.core.SupportedLanguages.ASM64;
 import static org.stepik.core.SupportedLanguages.C;
@@ -20,6 +20,7 @@ import static org.stepik.core.SupportedLanguages.HASKELL_8_0;
 import static org.stepik.core.SupportedLanguages.JAVA;
 import static org.stepik.core.SupportedLanguages.JAVA8;
 import static org.stepik.core.SupportedLanguages.JAVASCRIPT;
+import static org.stepik.core.SupportedLanguages.KOTLIN;
 import static org.stepik.core.SupportedLanguages.MONO_CS;
 import static org.stepik.core.SupportedLanguages.OCTAVE;
 import static org.stepik.core.SupportedLanguages.PYTHON3;
@@ -28,7 +29,6 @@ import static org.stepik.core.SupportedLanguages.RUBY;
 import static org.stepik.core.SupportedLanguages.RUST;
 import static org.stepik.core.SupportedLanguages.SCALA;
 import static org.stepik.core.SupportedLanguages.SHELL;
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author meanmail
@@ -46,6 +46,7 @@ public class SupportedLanguagesTest {
             new Pair<>(HASKELL_8_0, "haskell 8.0"),
             new Pair<>(JAVA, "java"),
             new Pair<>(JAVA8, "java8"),
+            new Pair<>(KOTLIN, "kotlin"),
             new Pair<>(OCTAVE, "octave"),
             new Pair<>(ASM32, "asm32"),
             new Pair<>(ASM64, "asm64"),

@@ -21,4 +21,3 @@
     <input type="hidden" name="count" value="${index}"/>
     </#if>
 </@quiz_content>
-

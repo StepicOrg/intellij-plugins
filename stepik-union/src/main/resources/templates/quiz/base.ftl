@@ -3,6 +3,10 @@
 <#-- @ftlvariable name="status" type="java.lang.String" -->
 <#-- @ftlvariable name="stepNode" type="org.stepik.core.courseFormat.stepHelpers.QuizHelper" -->
 <#-- @ftlvariable name="text" type="java.lang.String" -->
+
+<#include "base_step.ftl">
+
+<@styles>
 <style>
     .status {
         text-transform: capitalize;
@@ -17,12 +21,14 @@
     .correct {
         color: #117700;
     }
-</style>
 
-<#include "base_step.ftl">
+</style>
+    <#macro styles>
+        <#nested/>
+    </#macro>
+</@styles>
 
 <@step_content>
-
     <#macro quiz_content>
     <div>
         <#assign isHasSubmissionsRestrictions = !needLogin && stepNode.isHasSubmissionsRestrictions() />
@@ -37,12 +43,12 @@
         <#assign locked = isHasSubmissionsRestrictions && (submissionsCount >= maxSubmissionsCount) />
 
         <form id="answer_form" action="${stepNode.getPath()}" method="get">
-            <#if action != "submit">
+            <#if action != "submit" || locked>
                 <#assign disabled = "disabled" />
             </#if>
 
             <#if status != "unchecked">
-                <p class="status ${status}">${status}</p>
+                <p class="status ${status}">${status} ${stepNode.isModified()?string('*', '')}</p>
                 <div>
                 ${stepNode.getHint()}
                 </div>
@@ -56,11 +62,15 @@
             <input type="hidden" name="type" value="${stepNode.getType()}"/>
             <br>
 
-            <#if !locked>
-                <input id="submit_button" type="submit" value="Evaluation" onclick="showLoadAnimation()"/>
-                <#if status != "unchecked" && action == "submit">
-                    <input type="submit" value="Reset" onclick="solve_again()"/>
+            <#if !needLogin>
+                <#if !locked>
+                    <input id="submit_button" type="submit" value="Evaluation" onclick="showLoadAnimation()"/>
+                    <#if status != "unchecked" && action == "submit">
+                        <input type="submit" value="Reset" onclick="solve_again()"/>
+                    </#if>
                 </#if>
+            <#else>
+                <button type="button" onclick="showLogin()">Login</button>
             </#if>
         </form>
 
@@ -101,3 +111,9 @@
     </div>
     </#macro>
 </@step_content>
+
+<@scripts>
+    <#macro scripts>
+        <#nested/>
+    </#macro>
+</@scripts>
