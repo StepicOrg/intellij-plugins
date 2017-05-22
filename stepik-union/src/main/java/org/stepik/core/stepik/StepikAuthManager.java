@@ -186,11 +186,12 @@ public class StepikAuthManager {
             long userId = getLastUser();
             setTokenInfo(userId, new TokenInfo());
             setLastUser(0);
-        } else if (state == AUTH){
-            Metrics.authenticate(SUCCESSFUL);
         }
 
         if (oldState != state) {
+            if (state == AUTH){
+                Metrics.authenticate(SUCCESSFUL);
+            }
             executor.execute(() ->
                     listeners.forEach(listener -> listener.stateChanged(oldState, state)));
         }
