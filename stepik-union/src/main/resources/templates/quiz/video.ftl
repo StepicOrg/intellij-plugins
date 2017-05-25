@@ -33,7 +33,11 @@
 
 <script>
     var player = videojs('video', {
-        controls: true
+        controls: true,
+
+        controlBar: {
+            fullscreenToggle: false
+        }
     });
 
     player.width(document.body.clientWidth - 20);
@@ -65,6 +69,6 @@
             player.currentTime(whereYouAt);
             player.play();
         })
-    })
+    });
 </script>
 </@scripts>
