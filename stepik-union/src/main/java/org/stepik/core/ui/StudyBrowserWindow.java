@@ -4,6 +4,7 @@ import com.intellij.ide.BrowserUtil;
 import com.intellij.ide.ui.LafManager;
 import com.intellij.ide.ui.LafManagerListener;
 import com.intellij.ide.ui.laf.darcula.DarculaLookAndFeelInfo;
+import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
@@ -35,6 +36,7 @@ import org.stepik.core.courseFormat.LessonNode;
 import org.stepik.core.courseFormat.SectionNode;
 import org.stepik.core.courseFormat.StepNode;
 import org.stepik.core.courseFormat.StudyNode;
+import org.stepik.core.courseFormat.stepHelpers.VideoTheoryHelper;
 import org.stepik.core.stepik.StepikAuthManager;
 import org.stepik.core.templates.Templater;
 import org.stepik.plugin.utils.NavigationUtils;
@@ -473,6 +475,11 @@ class StudyBrowserWindow extends JFrame {
 
         public void doError(String filename, int lineno, int colno, String message) {
             error("\nfilename: " + filename + "\nline: " + lineno + "\ncolumn: " + colno + "\nmessage: " + message);
+        }
+
+        public void setVideoQuality(Integer value) {
+            PropertiesComponent.getInstance()
+                    .setValue(VideoTheoryHelper.VIDEO_QUALITY_PROPERTY_NAME, String.valueOf(value));
         }
     }
 }

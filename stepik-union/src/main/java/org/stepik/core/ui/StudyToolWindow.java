@@ -3,7 +3,6 @@ package org.stepik.core.ui;
 import com.intellij.ide.projectView.ProjectView;
 import com.intellij.ide.ui.LafManager;
 import com.intellij.ide.ui.laf.darcula.DarculaLookAndFeelInfo;
-import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.ActionManager;
@@ -61,22 +60,18 @@ import static org.stepik.core.courseFormat.StepType.TEXT;
 import static org.stepik.core.courseFormat.StepType.VIDEO;
 import static org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient;
 import static org.stepik.core.stepik.StepikAuthManager.isAuthenticated;
-import static org.stepik.core.utils.PluginUtils.PLUGIN_ID;
 
 public class StudyToolWindow extends SimpleToolWindowPanel implements DataProvider, Disposable, ActionListener {
     private static final Logger logger = Logger.getInstance(StudyToolWindow.class);
     private static final String STEP_INFO_ID = "stepInfo";
     private static final String EMPTY_STEP_TEXT = "Please, open any step to see step description";
-    private static final String VIDEO_QUALITY_PROPERTY_NAME = PLUGIN_ID + ".VIDEO_QUALITY";
     private static final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final JComboBox<SupportedLanguages> languageBox;
-    private final JComboBox<Integer> videoQualityBox;
     private final JBCardLayout cardLayout;
     private final JPanel contentPanel;
     private final OnePixelSplitter splitPane;
     private final Panel rightPanel;
     private final CardLayout layout;
-    private final ActionListener qualityListener;
     private Project project;
     private StepNode stepNode;
     private StudyBrowserWindow browserWindow;
@@ -89,13 +84,9 @@ public class StudyToolWindow extends SimpleToolWindowPanel implements DataProvid
         languageBox = new JComboBox<>();
         languageBox.addActionListener(this);
 
-        qualityListener = e -> setText(stepNode);
-        videoQualityBox = new JComboBox<>();
-
         layout = new CardLayout();
         rightPanel = new Panel(layout);
         rightPanel.add("language", languageBox);
-        rightPanel.add("quality", videoQualityBox);
         rightPanel.setVisible(false);
     }
 
@@ -159,10 +150,6 @@ public class StudyToolWindow extends SimpleToolWindowPanel implements DataProvid
             final FileEditorManagerListener listener = configurator.getFileEditorManagerListener(project);
             project.getMessageBus().connect().subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, listener);
         }
-
-        videoQualityBox.removeAllItems();
-        videoQualityBox.addItem(loadVideoQuality());
-        videoQualityBox.setSelectedIndex(0);
 
         StudyNode<?, ?> stepNode = StepikProjectManager.getSelected(project);
         setStepNode(stepNode);
@@ -240,10 +227,7 @@ public class StudyToolWindow extends SimpleToolWindowPanel implements DataProvid
                 stepHelper = new TextTheoryHelper(project, stepNode);
                 break;
             case VIDEO:
-                VideoTheoryHelper videoStepNode = new VideoTheoryHelper(project, stepNode);
-                videoStepNode.setQuality(getVideoQuality());
-                stepHelper = videoStepNode;
-                updateQualityComboBox(videoStepNode);
+                stepHelper = new VideoTheoryHelper(project, stepNode);
                 break;
             case CHOICE:
                 stepHelper = new ChoiceQuizHelper(project, stepNode);
@@ -296,21 +280,6 @@ public class StudyToolWindow extends SimpleToolWindowPanel implements DataProvid
         });
     }
 
-    private void updateQualityComboBox(@NotNull VideoTheoryHelper videoStepNode) {
-        SwingUtilities.invokeLater(() -> {
-            videoQualityBox.removeActionListener(qualityListener);
-            videoQualityBox.removeAllItems();
-            videoStepNode.getQualitySet().forEach(videoQualityBox::addItem);
-            int quality = videoStepNode.getQuality();
-            storeVideoQuality(quality);
-            videoQualityBox.setSelectedItem(quality);
-            videoQualityBox.addActionListener(qualityListener);
-            layout.show(rightPanel, "quality");
-            boolean rightPanelVisible = videoQualityBox.getModel().getSize() != 0;
-            rightPanel.setVisible(rightPanelVisible);
-        });
-    }
-
     private void postView(@NotNull StepNode stepNode, boolean isTheory) {
         executor.execute(() -> {
             Long assignment = stepNode.getAssignment();
@@ -347,15 +316,6 @@ public class StudyToolWindow extends SimpleToolWindowPanel implements DataProvid
         });
     }
 
-    private int loadVideoQuality() {
-        return Integer.parseInt(PropertiesComponent.getInstance()
-                .getValue(VIDEO_QUALITY_PROPERTY_NAME, String.valueOf(0)));
-    }
-
-    private void storeVideoQuality(int quality) {
-        PropertiesComponent.getInstance().setValue(VIDEO_QUALITY_PROPERTY_NAME, String.valueOf(quality));
-    }
-
     @Override
     public void actionPerformed(ActionEvent e) {
         if (stepNode == null) {
@@ -385,13 +345,5 @@ public class StudyToolWindow extends SimpleToolWindowPanel implements DataProvid
                 }
             }
         });
-    }
-
-    private int getVideoQuality() {
-        Integer quality = (Integer) videoQualityBox.getSelectedItem();
-        if (quality == null) {
-            return 0;
-        }
-        return quality;
     }
 }
