@@ -69,10 +69,10 @@ public class StepikAuthManager {
     private static synchronized StepikApiClient initStepikApiClient() {
         String osName = System.getProperty("os.name");
         String jre = System.getProperty("java.version");
-        String userAgent = String.format("Stepik Union/%s/%s (%s) %s/%s JRE/%s",
+        String userAgent = String.format("Stepik Union/%s (%s) StepikApiClient/%s %s/%s JRE/%s",
                 getVersion(),
-                StepikApiClient.getVersion(),
                 osName,
+                StepikApiClient.getVersion(),
                 getCurrentProduct(),
                 getCurrentProductVersion(),
                 jre);
