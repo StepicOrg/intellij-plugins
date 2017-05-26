@@ -1,0 +1,2 @@
+replaced
+// Stepik code: end

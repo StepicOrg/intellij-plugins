@@ -18,22 +18,22 @@ public enum SupportedLanguages {
             "haskell",
             "Main.hs",
             "--",
-            new String[]{"module Main where", "main = print $ \"Hello, world!\""},
+            "module Main where\nmain = print $ \"Hello, world!\"",
             null),
     HASKELL_7_10("Haskell 7.10",
             "haskell 7.10",
             "Main.hs",
             "--",
-            new String[]{"module Main where", "main = print $ \"Hello, world!\""},
+            "module Main where\nmain = print $ \"Hello, world!\"",
             null),
     HASKELL_8_0("Haskell 8.0",
             "haskell 8.0",
             "Main.hs",
             "--",
-            new String[]{"module Main where", "main = print $ \"Hello, world!\""},
+            "module Main where\nmain = print $ \"Hello, world!\"",
             null),
-    JAVA8("Java 8", "java8", "Main.java", "//", new String[]{"class Main {"}, new String[]{"}"}),
-    JAVA("Java", "java", "Main.java", "//", new String[]{"class Main {"}, new String[]{"}"}, JAVA8),
+    JAVA8("Java 8", "java8", "Main.java", "//", "class Main {", "}"),
+    JAVA("Java", "java", "Main.java", "//", "class Main {", "}", JAVA8),
     JAVASCRIPT("JavaScript", "javascript", "main.js", "//", null, null),
     KOTLIN("Kotlin", "kotlin", "Main.kt", "//", null, null),
     MONO_CS("Mono c#", "mono c#", "main.cs", "//", null, null),
@@ -51,8 +51,8 @@ public enum SupportedLanguages {
     private final String name;
     private final String comment;
     private final String mainFileName;
-    private final String[] beforeCode;
-    private final String[] afterCode;
+    private final String beforeCode;
+    private final String afterCode;
     private final String title;
     private final SupportedLanguages nextVersion;
 
@@ -69,8 +69,8 @@ public enum SupportedLanguages {
             @NotNull String name,
             @NotNull String mainFileName,
             @NotNull String comment,
-            @Nullable String[] beforeCode,
-            @Nullable String[] afterCode) {
+            @Nullable String beforeCode,
+            @Nullable String afterCode) {
         this(title, name, mainFileName, comment, beforeCode, afterCode, null);
 
     }
@@ -80,8 +80,8 @@ public enum SupportedLanguages {
             @NotNull String name,
             @NotNull String mainFileName,
             @NotNull String comment,
-            @Nullable String[] beforeCode,
-            @Nullable String[] afterCode,
+            @Nullable String beforeCode,
+            @Nullable String afterCode,
             @Nullable SupportedLanguages nextVersion) {
         this.title = title;
         this.name = name;
@@ -128,13 +128,13 @@ public enum SupportedLanguages {
     }
 
     @NotNull
-    public String[] getBeforeCode() {
-        return beforeCode != null ? beforeCode : new String[0];
+    public String getBeforeCode() {
+        return beforeCode != null ? beforeCode : "";
     }
 
     @NotNull
-    public String[] getAfterCode() {
-        return afterCode != null ? afterCode : new String[0];
+    public String getAfterCode() {
+        return afterCode != null ? afterCode : "";
     }
 
     /**

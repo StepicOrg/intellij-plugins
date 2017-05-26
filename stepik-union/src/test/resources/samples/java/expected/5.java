@@ -9,4 +9,5 @@
 9
 10
 // Stepik code: end
-some text
+//some
+//text
