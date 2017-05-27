@@ -2,24 +2,33 @@ package org.stepik.plugin.utils
 
 import org.junit.Assert
 import org.junit.Before
-import org.junit.Test
+import org.junit.experimental.theories.DataPoints
+import org.junit.experimental.theories.FromDataPoints
+import org.junit.experimental.theories.Theories
+import org.junit.experimental.theories.Theory
+import org.junit.runner.RunWith
 import org.stepik.core.SupportedLanguages
 import java.util.*
 
+
+@RunWith(Theories::class)
 class DirectivesUtilsKtTest {
     companion object {
-        private val NOT_FOUND = "Test file not found: "
-        private val JAVA = "java"
-        private val PYTHON = "python"
         private val TESTS_COUNT = 7
+        private val SOURCE = 0
+        private val EXPECTED = 1
+        private val EXPECTED_REPLACED = 2
+
+        @DataPoints("languages")
+        @JvmField val languages = listOf(SupportedLanguages.JAVA8, SupportedLanguages.PYTHON3)
     }
 
-    private val sourcesMap = HashMap<String, String>()
-    private val expectedMap = HashMap<String, String>()
-    private val expectedReplacedMap = HashMap<String, String>()
+    private val sourcesMap = HashMap<SupportedLanguages, List<List<String>>>()
 
     private fun readTestFile(fileName: String): String {
-        val inputStream = this.javaClass.getResourceAsStream("/samples/" + fileName) ?: return ""
+        val inputStream = this::class.java.getResourceAsStream("/samples/" + fileName)
+
+        Assert.assertNotNull(inputStream)
 
         val scanner = Scanner(inputStream)
         val lines = ArrayList<String>()
@@ -33,152 +42,87 @@ class DirectivesUtilsKtTest {
 
     @Before
     fun setUp() {
-        loadResources(JAVA, ".java")
-        loadResources(PYTHON, ".py")
+        loadResources(SupportedLanguages.JAVA8, ".java")
+        loadResources(SupportedLanguages.PYTHON3, ".py")
     }
 
-    private fun loadResources(language: String, extension: String) {
-        for (i in 1..TESTS_COUNT) {
-            val fileName = language + "/sources/" + Integer.toString(i) + extension
-            sourcesMap.put(language + i, readTestFile(fileName))
+    private fun loadResources(language: SupportedLanguages, extension: String) {
+        val sources = ArrayList<List<String>>()
+
+        for (index in 1..TESTS_COUNT) {
+            val list: ArrayList<String> = ArrayList()
+
+            list.add(readTestFile("${language.getName()}/sources/$index$extension"))
+            list.add(readTestFile("${language.getName()}/expected/$index$extension"))
+            list.add(readTestFile("${language.getName()}/expected_replaced/$index$extension"))
+
+            sources.add(list)
         }
-        for (i in 1..TESTS_COUNT) {
-            val fileName = language + "/expected/" + Integer.toString(i) + extension
-            expectedMap.put(language + i, readTestFile(fileName))
-        }
-        for (i in 1..TESTS_COUNT) {
-            val fileName = language + "/expected_replaced/" + Integer.toString(i) + extension
-            expectedReplacedMap.put(language + i, readTestFile(fileName))
-        }
+
+        sourcesMap.put(language, sources)
     }
 
-    @Test
-    fun getTextUnderDirectivesJava() {
-        for (i in 1..TESTS_COUNT) {
-            val testName = JAVA + i
-            val test = sourcesMap[testName]
-            Assert.assertNotNull(NOT_FOUND + testName, test)
-            val actual = getTextUnderDirectives(test ?: "", SupportedLanguages.JAVA8)
-            Assert.assertEquals(expectedMap[JAVA + i], actual)
-        }
-    }
+    @Theory
+    fun getTextUnderDirectives(@FromDataPoints("languages") language: SupportedLanguages) {
+        val sources: List<List<String>> = sourcesMap[language]!!
 
-    @Test
-    fun getTextUnderDirectivesPy() {
-        for (i in 1..TESTS_COUNT) {
-            val testName = PYTHON + i
-            val test = sourcesMap[testName]
-            Assert.assertNotNull(NOT_FOUND + testName, test)
-            val actual = getTextUnderDirectives(test ?: "", SupportedLanguages.PYTHON3)
-            Assert.assertEquals(expectedMap[PYTHON + i], actual)
+        for ((index, value) in sources.withIndex()) {
+            val actual = getTextUnderDirectives(value[SOURCE], language)
+            val expected = value[EXPECTED]
+            Assert.assertEquals("$language: $index", expected, actual)
         }
     }
 
-    @Test
-    fun removeAmbientCodeJava() {
-        val actual = removeAmbientCode(sourcesMap[JAVA + 7] ?: "", false, SupportedLanguages.JAVA8, false)
-        Assert.assertEquals(sourcesMap[JAVA + 1], actual)
+    @Theory
+    fun removeAmbientCode(@FromDataPoints("languages") language: SupportedLanguages) {
+        val sources = sourcesMap[language]!!
+
+        val actual = removeAmbientCode(sources[6][SOURCE], false, language, false)
+        Assert.assertEquals(sources[0][SOURCE], actual)
     }
 
-    @Test
-    fun removeAmbientCodePy() {
-        val actual = removeAmbientCode(sourcesMap[PYTHON + 7] ?: "", false, SupportedLanguages.PYTHON3, false)
-        Assert.assertEquals(sourcesMap[PYTHON + 1], actual)
+    @Theory
+    fun insertAmbientCode(@FromDataPoints("languages") language: SupportedLanguages) {
+        val sources = sourcesMap[language]!!
+        val actual = insertAmbientCode(sources[0][SOURCE], language, false)
+        Assert.assertEquals(sources[6][SOURCE], actual)
     }
 
-    @Test
-    fun insertAmbientCodeJava() {
-        val actual = insertAmbientCode(sourcesMap[JAVA + 1] ?: "", SupportedLanguages.JAVA8, false)
-        Assert.assertEquals(sourcesMap[JAVA + 7], actual)
-    }
+    @Theory
+    fun replaceCode(@FromDataPoints("languages") language: SupportedLanguages) {
+        val files = sourcesMap[language]!!
 
-    @Test
-    fun insertAmbientCodePy() {
-        val actual = insertAmbientCode(sourcesMap[PYTHON + 1] ?: "", SupportedLanguages.PYTHON3, false)
-        Assert.assertEquals(sourcesMap[PYTHON + 7], actual)
-    }
-
-    @Test
-    fun replaceCodeJava() {
-        for (i in 1..TESTS_COUNT) {
-            val testName = JAVA + i
-            val test = sourcesMap[testName]
-            Assert.assertNotNull(NOT_FOUND + testName, test)
-            val actual = replaceCode(test ?: "", "replaced", SupportedLanguages.JAVA8)
-            Assert.assertEquals(expectedReplacedMap[JAVA + i], actual)
+        for ((index, value) in files.withIndex()) {
+            val actual = replaceCode(value[SOURCE], "replaced", language)
+            Assert.assertEquals("$language: $index", value[EXPECTED_REPLACED], actual)
         }
     }
 
-    @Test
-    fun replaceCodePy() {
-        for (i in 1..TESTS_COUNT) {
-            val testName = PYTHON + i
-            val test = sourcesMap[testName]
-            Assert.assertNotNull(NOT_FOUND + testName, test)
-            val actual = replaceCode(test ?: "", "replaced", SupportedLanguages.PYTHON3)
-            Assert.assertEquals(expectedReplacedMap[PYTHON + i], actual)
+    @Theory
+    fun uncommentAmbientCode(@FromDataPoints("languages") language: SupportedLanguages) {
+        val files = sourcesMap[language]!!
+
+        for ((index, value) in files.withIndex()) {
+            val actual = uncommentAmbientCode(value[EXPECTED], language)
+            Assert.assertEquals("$language: $index", value[SOURCE], actual)
         }
     }
 
-    @Test
-    fun uncommentAmbientCodeJava() {
-        for (i in 1..TESTS_COUNT) {
-            val testName = JAVA + i
-            val test = expectedMap[testName]
-            Assert.assertNotNull(NOT_FOUND + testName, test)
-            val actual = uncommentAmbientCode(test ?: "", SupportedLanguages.JAVA8)
-            Assert.assertEquals(sourcesMap[JAVA + i], actual)
+    @Theory
+    fun containsDirectivesJava(@FromDataPoints("languages") language: SupportedLanguages) {
+        val files = sourcesMap[language]!!
+
+        for (index in 1..TESTS_COUNT - 1) {
+            val actual = containsDirectives(files[index][EXPECTED], language)
+            Assert.assertTrue("$language: $index", actual)
         }
     }
 
-    @Test
-    fun uncommentAmbientCodePy() {
-        for (i in 1..TESTS_COUNT) {
-            val testName = PYTHON + i
-            val test = expectedMap[testName]
-            Assert.assertNotNull(NOT_FOUND + testName, test)
-            val actual = uncommentAmbientCode(test ?: "", SupportedLanguages.PYTHON3)
-            Assert.assertEquals(sourcesMap[PYTHON + i], actual)
-        }
-    }
+    @Theory
+    fun notContainsDirectives(@FromDataPoints("languages") language: SupportedLanguages) {
+        val files = sourcesMap[language]!!
 
-    @Test
-    fun containsDirectivesJava() {
-        for (i in 2..TESTS_COUNT) {
-            val testName = JAVA + i
-            val test = expectedMap[testName]
-            Assert.assertNotNull(NOT_FOUND + testName, test)
-            val actual = containsDirectives(test ?: "", SupportedLanguages.JAVA8)
-            Assert.assertTrue(actual)
-        }
-    }
-
-    @Test
-    fun notContainsDirectivesJava() {
-        val testName = JAVA + 1
-        val test = expectedMap[testName]
-        Assert.assertNotNull(NOT_FOUND + testName, test)
-        val actual = containsDirectives(test ?: "", SupportedLanguages.JAVA8)
-        Assert.assertFalse(actual)
-    }
-
-    @Test
-    fun containsDirectivesPy() {
-        for (i in 2..TESTS_COUNT) {
-            val testName = PYTHON + i
-            val test = expectedMap[testName]
-            Assert.assertNotNull(NOT_FOUND + testName, test)
-            val actual = containsDirectives(test ?: "", SupportedLanguages.PYTHON3)
-            Assert.assertTrue(actual)
-        }
-    }
-
-    @Test
-    fun notContainsDirectivesPy() {
-        val testName = PYTHON + 1
-        val test = expectedMap[testName]
-        Assert.assertNotNull(NOT_FOUND + testName, test)
-        val actual = containsDirectives(test ?: "", SupportedLanguages.PYTHON3)
+        val actual = containsDirectives(files[0][EXPECTED], language)
         Assert.assertFalse(actual)
     }
 }
