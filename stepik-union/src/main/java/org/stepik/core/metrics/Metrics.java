@@ -36,49 +36,55 @@ public class Metrics {
             @NotNull Metric metric,
             @NotNull MetricsStatus status) {
         executor.schedule(() -> {
-            StepikMetricsPostQuery query = null;
+            StepikApiClient stepikApiClient;
             try {
-                StepikApiClient stepikApiClient = authAndGetStepikApiClient();
+                stepikApiClient = authAndGetStepikApiClient();
                 if (!isAuthenticated()) {
                     return;
                 }
-
-                query = stepikApiClient.metrics()
-                        .post()
-                        .timestamp(System.currentTimeMillis() / 1000L)
-                        .tags(metric.getTags())
-                        .data(metric.getData())
-                        .name("ide_plugin")
-                        .tags("name", "S_Union")
-                        .tags("ide_name", ApplicationInfo.getInstance().getVersionName())
-                        .data("ide_version", ApplicationInfo.getInstance().getBuild().toString())
-                        .data("plugin_version", PluginUtils.getVersion())
-                        .data("session", session)
-                        .tags("status", status);
-
-                StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
-
-                if (projectManager != null) {
-                    query.data("project_id", projectManager.getUuid())
-                            .tags("project_programming_language", projectManager.getDefaultLang().getName())
-                            .data("project_manager_version", projectManager.getVersion());
-
-                    StudyNode projectRoot = projectManager.getProjectRoot();
-
-                    if (projectRoot != null) {
-                        Class<? extends StudyNode> projectRootClass = projectRoot.getClass();
-                        query.tags("project_root_class", projectRootClass.getSimpleName())
-                                .data("project_root_id", projectRoot.getId());
-
-                        query.data("course_id", projectRoot.getCourseId(stepikApiClient));
-                    }
-                }
-
-                query.execute();
             } catch (StepikClientException e) {
-                String message = String.format("Failed post metric: %s", query != null ? query.toString() : "null");
+                String message = "Failed post metric: not authenticated";
                 logger.warn(message, e);
+                return;
             }
+
+            final StepikMetricsPostQuery query = stepikApiClient.metrics()
+                    .post()
+                    .timestamp(System.currentTimeMillis() / 1000L)
+                    .tags(metric.getTags())
+                    .data(metric.getData())
+                    .name("ide_plugin")
+                    .tags("name", "S_Union")
+                    .tags("ide_name", ApplicationInfo.getInstance().getVersionName())
+                    .data("ide_version", ApplicationInfo.getInstance().getBuild().toString())
+                    .data("plugin_version", PluginUtils.getVersion())
+                    .data("session", session)
+                    .tags("status", status);
+
+            StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
+
+            if (projectManager != null) {
+                query.data("project_id", projectManager.getUuid())
+                        .tags("project_programming_language", projectManager.getDefaultLang().getName())
+                        .data("project_manager_version", projectManager.getVersion());
+
+                StudyNode projectRoot = projectManager.getProjectRoot();
+
+                if (projectRoot != null) {
+                    Class<? extends StudyNode> projectRootClass = projectRoot.getClass();
+                    query.tags("project_root_class", projectRootClass.getSimpleName())
+                            .data("project_root_id", projectRoot.getId());
+
+                    query.data("course_id", projectRoot.getCourseId(stepikApiClient));
+                }
+            }
+
+            query.executeAsync()
+                    .exceptionally((e) -> {
+                        String message = String.format("Failed post metric: %s", query.toString());
+                        logger.warn(message, e);
+                        return null;
+                    });
         }, 500, TimeUnit.MILLISECONDS);
     }
 
