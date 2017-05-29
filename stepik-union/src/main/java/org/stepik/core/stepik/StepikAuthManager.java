@@ -27,6 +27,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -338,20 +339,22 @@ public class StepikAuthManager {
         listeners.remove(listener);
     }
 
-    public static synchronized StepikAuthState authentication(@NotNull String email, @NotNull String password) {
-        try {
-            TokenInfo tokenInfo = stepikApiClient.oauth2()
-                    .userAuthenticationPassword(CLIENT_ID_PASSWORD_BASED, email, password)
-                    .execute();
-            stepikApiClient.setTokenInfo(tokenInfo);
-            User user = getCurrentUser(true);
-            setTokenInfo(user.getId(), tokenInfo);
-            setState(AUTH);
-        } catch (StepikClientException e) {
-            logger.warn(e);
-            setState(NOT_AUTH);
-        }
-
-        return state;
+    public static synchronized CompletableFuture<StepikAuthState> authentication(
+            @NotNull String email,
+            @NotNull String password) {
+        return stepikApiClient.oauth2()
+                .userAuthenticationPassword(CLIENT_ID_PASSWORD_BASED, email, password)
+                .executeAsync()
+                .thenApplyAsync(tokenInfo -> {
+                    stepikApiClient.setTokenInfo(tokenInfo);
+                    User user = getCurrentUser(true);
+                    setTokenInfo(user.getId(), tokenInfo);
+                    setState(AUTH);
+                    return state;
+                }).exceptionally(e -> {
+                    logger.warn(e);
+                    setState(NOT_AUTH);
+                    return state;
+                });
     }
 }
