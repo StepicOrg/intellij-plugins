@@ -5,7 +5,6 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.api.client.StepikApiClient;
-import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.metrics.Metric;
 import org.stepik.api.queries.metrics.StepikMetricsPostQuery;
 import org.stepik.core.StepikProjectManager;
@@ -37,14 +36,8 @@ public class Metrics {
             @NotNull MetricsStatus status) {
         executor.schedule(() -> {
             StepikApiClient stepikApiClient;
-            try {
-                stepikApiClient = authAndGetStepikApiClient();
-                if (!isAuthenticated()) {
-                    return;
-                }
-            } catch (StepikClientException e) {
-                String message = "Failed post metric: not authenticated";
-                logger.warn(message, e);
+            stepikApiClient = authAndGetStepikApiClient();
+            if (!isAuthenticated()) {
                 return;
             }
 
