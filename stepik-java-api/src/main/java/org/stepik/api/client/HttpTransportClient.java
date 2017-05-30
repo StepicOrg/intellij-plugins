@@ -47,7 +47,6 @@ public class HttpTransportClient implements TransportClient {
     private static final String ENCODING = "UTF-8";
     private static final String CONTENT_TYPE = "application/x-www-form-urlencoded";
     private static final String CONTENT_TYPE_HEADER = "Content-Type";
-    private static final String USER_AGENT = "Stepik Java API Client/" + StepikApiClient.getVersion();
 
     private static final int MAX_SIMULTANEOUS_CONNECTIONS = 100000;
     private static final int FULL_CONNECTION_TIMEOUT_S = 30;
@@ -57,11 +56,11 @@ public class HttpTransportClient implements TransportClient {
     private static HttpTransportClient instance;
     private final CloseableHttpClient httpClient;
 
-    private HttpTransportClient() {
-        this(null, 0);
+    private HttpTransportClient(@NotNull String userAgent) {
+        this(null, 0, userAgent);
     }
 
-    private HttpTransportClient(@Nullable String proxyHost, int proxyPort) {
+    private HttpTransportClient(@Nullable String proxyHost, int proxyPort, @NotNull String userAgent) {
         CookieStore cookieStore = new BasicCookieStore();
         RequestConfig requestConfig = RequestConfig.custom()
                 .setSocketTimeout(SOCKET_TIMEOUT_MS)
@@ -74,7 +73,7 @@ public class HttpTransportClient implements TransportClient {
                 .setDefaultRequestConfig(requestConfig)
                 .setDefaultCookieStore(cookieStore)
                 .setMaxConnPerRoute(MAX_SIMULTANEOUS_CONNECTIONS)
-                .setUserAgent(USER_AGENT)
+                .setUserAgent(userAgent)
                 .setConnectionReuseStrategy(DefaultConnectionReuseStrategy.INSTANCE);
 
         try {
@@ -99,25 +98,20 @@ public class HttpTransportClient implements TransportClient {
     }
 
     @NotNull
-    public static HttpTransportClient getInstance() {
+    public static HttpTransportClient getInstance(@NotNull String userAgent) {
         if (instance == null) {
-            instance = new HttpTransportClient();
+            instance = new HttpTransportClient(userAgent);
         }
 
         return instance;
     }
 
     @NotNull
-    public static HttpTransportClient getInstance(@Nullable String proxyHost, int proxyPort) {
+    public static HttpTransportClient getInstance(@Nullable String proxyHost, int proxyPort, @NotNull String userAgent) {
         Pair<String, Integer> proxy = new Pair<>(proxyHost, proxyPort);
 
-        if (!instances.containsKey(proxy)) {
-            HttpTransportClient instance = new HttpTransportClient(proxyHost, proxyPort);
-            instances.put(proxy, instance);
-            return instance;
-        }
-
-        return instances.get(proxy);
+        return instances.computeIfAbsent(proxy,
+                k -> new HttpTransportClient(proxyHost, proxyPort, userAgent));
     }
 
     @NotNull
@@ -147,7 +141,7 @@ public class HttpTransportClient implements TransportClient {
             headers = new HashMap<>();
         }
 
-        headers.entrySet().forEach(entry -> request.setHeader(entry.getKey(), entry.getValue()));
+        headers.forEach(request::setHeader);
 
         if (body != null) {
             ContentType contentType;
@@ -164,7 +158,7 @@ public class HttpTransportClient implements TransportClient {
             @Nullable Map<String, String> headers) {
         HttpGet request = new HttpGet(url);
         if (headers != null) {
-            headers.entrySet().forEach(entry -> request.setHeader(entry.getKey(), entry.getValue()));
+            headers.forEach(request::setHeader);
         }
         return call(stepikApiClient, request);
     }
