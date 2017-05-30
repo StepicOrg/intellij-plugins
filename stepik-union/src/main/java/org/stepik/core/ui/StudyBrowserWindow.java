@@ -332,12 +332,14 @@ class StudyBrowserWindow extends JFrame {
                     try {
                         lessonId = Long.parseLong(items[1]);
                     } catch (NumberFormatException e) {
+                        hideLoadAnimation();
                         return;
                     }
 
                     StepikApiClient stepikClient = StepikAuthManager.authAndGetStepikApiClient(true);
                     User user = getCurrentUser();
                     if (user.isGuest()) {
+                        hideLoadAnimation();
                         return;
                     }
 
@@ -354,6 +356,9 @@ class StudyBrowserWindow extends JFrame {
                                 StepikProjectManager.updateAdaptiveSelected(project);
                                 hideLoadAnimation();
                             }));
+                } else {
+                    StepikProjectManager.updateAdaptiveSelected(project);
+                    hideLoadAnimation();
                 }
             }
 
