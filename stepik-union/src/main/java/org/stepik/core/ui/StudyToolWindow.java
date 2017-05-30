@@ -284,21 +284,22 @@ public class StudyToolWindow extends SimpleToolWindowPanel implements DataProvid
         executor.execute(() -> {
             Long assignment = stepNode.getAssignment();
             long stepId = stepNode.getId();
-            try {
-                if (assignment != null && assignment != 0) {
-                    StepikApiClient stepikApiClient = authAndGetStepikApiClient();
-                    if (!isAuthenticated()) {
-                        return;
-                    }
 
+            if (assignment != null && assignment != 0) {
+                StepikApiClient stepikApiClient = authAndGetStepikApiClient();
+                if (!isAuthenticated()) {
+                    return;
+                }
+
+                try {
                     stepikApiClient.views()
                             .post()
                             .assignment(assignment)
                             .step(stepId)
                             .execute();
+                } catch (StepikClientException e) {
+                    logger.warn("Failed post view: stepId=" + stepId + "; assignment=" + assignment, e);
                 }
-            } catch (StepikClientException e) {
-                logger.warn("Failed post view: stepId=" + stepId + "; assignment=" + assignment, e);
             }
 
             if (isTheory) {

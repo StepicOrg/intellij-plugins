@@ -146,11 +146,13 @@ public class StudyUtils {
         }
 
         StudyNode studyNode = null;
+
+        StepikApiClient stepikClient = authAndGetStepikApiClient();
+        if (!isAuthenticated()) {
+            return null;
+        }
+
         try {
-            StepikApiClient stepikClient = authAndGetStepikApiClient();
-            if (!isAuthenticated()) {
-                return null;
-            }
             Recommendations recommendations = stepikClient.recommendations()
                     .get()
                     .course(root.getId())

@@ -1,19 +1,15 @@
 package org.stepik.core.ui;
 
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.openapi.progress.ProgressManager;
-import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.progress.EmptyProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import javafx.stage.FileChooser;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.client.StepikApiClient;
-import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.submissions.Reply;
 import org.stepik.api.objects.submissions.Submission;
-import org.stepik.api.objects.submissions.Submissions;
 import org.stepik.api.queries.submissions.StepikSubmissionsPostQuery;
 import org.stepik.core.StepikProjectManager;
 import org.stepik.core.StudyUtils;
@@ -31,8 +27,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import static org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient;
@@ -42,7 +36,6 @@ import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
 class FormListener implements EventListener {
     static final String EVENT_TYPE_SUBMIT = "submit";
     private static final Logger logger = Logger.getInstance(FormListener.class);
-    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Project project;
     private final StudyBrowserWindow browser;
 
@@ -72,13 +65,21 @@ class FormListener implements EventListener {
         return null;
     }
 
-    private static void getAttempt(@NotNull StepNode node) {
+    private static void getAttempt(@NotNull Project project, @NotNull StepNode node) {
         StepikApiClient stepikApiClient = authAndGetStepikApiClient(true);
 
         stepikApiClient.attempts()
                 .post()
                 .step(node.getId())
-                .execute();
+                .executeAsync()
+                .whenComplete((attempts, e) -> {
+                    if (attempts != null) {
+                        node.cleanLastReply();
+                        StepikProjectManager.updateSelection(project);
+                    } else {
+                        logger.warn(e);
+                    }
+                });
     }
 
     private static void sendStep(
@@ -88,35 +89,37 @@ class FormListener implements EventListener {
             @NotNull StepType type,
             long attemptId,
             @Nullable String data) {
-        String title = "Checking Step: " + stepNode.getName();
+        StepikApiClient stepikApiClient = authAndGetStepikApiClient(true);
 
-        ProgressManager.getInstance().run(new Task.Backgroundable(project, title) {
-            @Override
-            public void run(@NotNull ProgressIndicator indicator) {
-                indicator.setIndeterminate(true);
+        StepikSubmissionsPostQuery query = stepikApiClient.submissions()
+                .post()
+                .attempt(attemptId);
+        Reply reply = getReply(stepNode, type, elements, data);
+        if (reply == null) {
+            return;
+        }
 
-                try {
-                    StepikApiClient stepikApiClient = authAndGetStepikApiClient(true);
-
-                    StepikSubmissionsPostQuery query = stepikApiClient.submissions()
-                            .post()
-                            .attempt(attemptId);
-                    Reply reply = getReply(stepNode, type, elements, data);
-                    if (reply == null) {
+        query.reply(reply)
+                .executeAsync()
+                .whenComplete(((submissions, e) -> {
+                    if (submissions == null) {
+                        logger.warn("Failed send step from browser", e);
+                        StepikProjectManager.updateSelection(project);
                         return;
                     }
-                    Submissions submissions = query.reply(reply).execute();
 
-                    if (!submissions.isEmpty()) {
-                        Submission submission = submissions.getFirst();
-                        SendAction.checkStepStatus(project, stepikApiClient, stepNode, submission.getId(), indicator);
+                    if (submissions.isEmpty()) {
+                        logger.warn("Failed send step from browser", e);
+                        return;
                     }
-                } catch (StepikClientException e) {
-                    logger.warn("Failed send step from browser", e);
-                    StepikProjectManager.updateSelection(project);
-                }
-            }
-        });
+
+                    Submission submission = submissions.getFirst();
+                    SendAction.checkStepStatus(project,
+                            stepikApiClient,
+                            stepNode,
+                            submission.getId(),
+                            new EmptyProgressIndicator());
+                }));
     }
 
     static void handle(
@@ -136,50 +139,40 @@ class FormListener implements EventListener {
         StepNode stepNode = (StepNode) node;
         Elements elements = new Elements(form.getElements());
 
-        try {
-            switch (elements.getAction()) {
-                case "get_first_attempt":
-                case "get_attempt":
-                    boolean locked = elements.isLocked();
-                    if (!locked) {
-                        getAttempt(stepNode);
-                        stepNode.cleanLastReply();
-                        StepikProjectManager.updateSelection(project);
-                    }
-                    break;
-                case "submit":
-                    String typeStr = elements.getType();
-                    StepType type = StepType.of(typeStr);
-                    boolean isFromFile = elements.isFromFile();
-                    String data = isFromFile ? getDataFromFile(stepNode, project) : null;
-                    long attemptId = elements.getAttemptId();
-                    sendStep(project, stepNode, elements, type, attemptId, data);
-                    break;
-                case "need_login":
-                    executor.execute(() -> StepikAuthManager.authentication(true));
-                    break;
-                case "save_reply":
-                    typeStr = elements.getType();
-                    type = StepType.of(typeStr);
-                    getReply(stepNode, type, elements, null);
-                    break;
-                case "login":
-                    String email = elements.getInputValue("email");
-                    String password = elements.getInputValue("password");
-                    executor.execute(() -> {
-                        browser.showLoadAnimation();
-                        StepikAuthState state = StepikAuthManager.authentication(email, password);
-                        if (state != StepikAuthState.AUTH) {
-                            browser.callFunction("setErrorMessage", "Wrong email or password");
-                        }
-                        browser.hideLoadAnimation();
-                    });
-                    break;
-                default:
-                    browser.hideLoadAnimation();
-            }
-        } catch (StepikClientException e) {
-            logger.warn(e);
+        switch (elements.getAction()) {
+            case "get_first_attempt":
+            case "get_attempt":
+                if (!elements.isLocked()) {
+                    getAttempt(project, stepNode);
+                }
+                break;
+            case "submit":
+                String typeStr = elements.getType();
+                StepType type = StepType.of(typeStr);
+                boolean isFromFile = elements.isFromFile();
+                String data = isFromFile ? getDataFromFile(stepNode, project) : null;
+                long attemptId = elements.getAttemptId();
+                sendStep(project, stepNode, elements, type, attemptId, data);
+                break;
+            case "save_reply":
+                typeStr = elements.getType();
+                type = StepType.of(typeStr);
+                getReply(stepNode, type, elements, null);
+                break;
+            case "login":
+                String email = elements.getInputValue("email");
+                String password = elements.getInputValue("password");
+                browser.showLoadAnimation();
+                StepikAuthManager.authentication(email, password)
+                        .whenComplete((state, throwable) -> {
+                            if (state != StepikAuthState.AUTH) {
+                                browser.callFunction("setErrorMessage", "Wrong email or password");
+                            }
+                            browser.hideLoadAnimation();
+                        });
+                break;
+            default:
+                browser.hideLoadAnimation();
         }
     }
 
