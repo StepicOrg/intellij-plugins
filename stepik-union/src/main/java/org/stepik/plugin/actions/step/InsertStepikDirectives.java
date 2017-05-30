@@ -8,7 +8,6 @@ import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -17,7 +16,6 @@ import org.stepik.core.SupportedLanguages;
 import org.stepik.core.courseFormat.StepNode;
 import org.stepik.core.courseFormat.StudyNode;
 import org.stepik.core.metrics.Metrics;
-import org.stepik.plugin.utils.DirectivesUtils;
 import org.stepik.plugin.utils.ReformatUtils;
 
 import javax.swing.*;
@@ -25,9 +23,11 @@ import javax.swing.*;
 import static org.stepik.core.courseFormat.StepType.CODE;
 import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
-import static org.stepik.plugin.utils.DirectivesUtils.insertAmbientCode;
-import static org.stepik.plugin.utils.DirectivesUtils.removeAmbientCode;
-import static org.stepik.plugin.utils.DirectivesUtils.writeInToFile;
+import static org.stepik.plugin.utils.DirectivesUtilsKt.containsDirectives;
+import static org.stepik.plugin.utils.DirectivesUtilsKt.getFileText;
+import static org.stepik.plugin.utils.DirectivesUtilsKt.insertAmbientCode;
+import static org.stepik.plugin.utils.DirectivesUtilsKt.removeAmbientCode;
+import static org.stepik.plugin.utils.DirectivesUtilsKt.writeInToFile;
 
 
 public class InsertStepikDirectives extends CodeQuizAction {
@@ -86,18 +86,16 @@ public class InsertStepikDirectives extends CodeQuizAction {
             return;
         }
 
-        String[] text = DirectivesUtils.getFileText(file);
-
-        Pair<Integer, Integer> locations = DirectivesUtils.findDirectives(text, currentLang);
+        String text = getFileText(file);
 
         StepikProjectManager projectManager = StepikProjectManager.getInstance(project);
         boolean showHint = projectManager != null && projectManager.getShowHint();
-        boolean needInsert = locations.first == -1 && locations.second == text.length;
+        boolean needInsert = !containsDirectives(text, currentLang);
         if (needInsert) {
             text = insertAmbientCode(text, currentLang, showHint);
             Metrics.insertAmbientCodeAction(project, targetStepNode, SUCCESSFUL);
         } else {
-            text = removeAmbientCode(text, locations, project, showHint, currentLang);
+            text = removeAmbientCode(text, showHint, currentLang, true);
             Metrics.removeAmbientCodeAction(project, targetStepNode, SUCCESSFUL);
         }
         writeInToFile(text, file, project);

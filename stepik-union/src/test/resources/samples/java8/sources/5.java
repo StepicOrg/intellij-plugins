@@ -1,6 +1,3 @@
-some
-text
-// Stepik code: start
 1
 2
 3
