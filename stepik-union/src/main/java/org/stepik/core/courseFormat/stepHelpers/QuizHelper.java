@@ -163,18 +163,18 @@ public class QuizHelper extends StepHelper {
         status = UNCHECKED;
         action = GET_FIRST_ATTEMPT;
 
+        StepikApiClient stepikApiClient = authAndGetStepikApiClient();
+        User user = getCurrentUser();
+        if (user.isGuest()) {
+            action = NEED_LOGIN;
+            fail();
+            initialized = false;
+            return;
+        }
+
+        long userId = user.getId();
+
         try {
-            StepikApiClient stepikApiClient = authAndGetStepikApiClient();
-            User user = getCurrentUser();
-            if (user.isGuest()) {
-                action = NEED_LOGIN;
-                fail();
-                initialized = false;
-                return;
-            }
-
-            long userId = user.getId();
-
             if (!loadAttempt(stepikApiClient, userId)) {
                 fail();
                 initialized = false;
@@ -199,32 +199,32 @@ public class QuizHelper extends StepHelper {
 
     public int getSubmissionsCount() {
         if (submissionsCount == -1) {
-            try {
-                StepikApiClient stepikApiClient = authAndGetStepikApiClient();
-                User user = getCurrentUser();
-                if (user.isGuest()) {
-                    action = NEED_LOGIN;
-                    return 0;
-                }
-                long userId = user.getId();
-                submissionsCount = 0;
-                Submissions submissions;
-                int page = 1;
+            StepikApiClient stepikApiClient = authAndGetStepikApiClient();
+            User user = getCurrentUser();
+            if (user.isGuest()) {
+                action = NEED_LOGIN;
+                return 0;
+            }
+            long userId = user.getId();
+            submissionsCount = 0;
+            int page = 1;
 
-                do {
+            Submissions submissions;
+            do {
+                try {
                     submissions = stepikApiClient.submissions()
                             .get()
                             .step(getStepNode().getId())
                             .user(userId)
                             .page(page)
                             .execute();
-                    submissionsCount += submissions.getCount();
-                    page++;
-                } while (submissions.getMeta().getHasNext());
-            } catch (StepikClientException e) {
-                logger.warn("Failed get submissions count", e);
-                return 0;
-            }
+                } catch (StepikClientException e) {
+                    logger.warn("Failed get submissions count", e);
+                    return 0;
+                }
+                submissionsCount += submissions.getCount();
+                page++;
+            } while (submissions.getMeta().getHasNext());
         }
         return submissionsCount;
     }

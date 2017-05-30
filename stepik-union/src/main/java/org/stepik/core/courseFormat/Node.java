@@ -307,64 +307,66 @@ abstract class Node<
                 if (!isAuthenticated()) {
                     return;
                 }
-                try {
-                    Map<String, StudyNode> progressMap = new HashMap<>();
-                    Node.this.getChildren().stream()
-                            .filter(StudyNode::isUnknownStatus)
-                            .forEach(child -> {
-                                DC data = child.getData();
-                                if (data != null) {
-                                    progressMap.put(data.getProgress(), child);
-                                }
-                            });
-                    D data = Node.this.getData();
-                    if (data != null) {
-                        String progressId = data.getProgress();
-                        if (progressId != null) {
-                            progressMap.put(progressId, Node.this);
-                        }
 
-                        Set<String> progressIds = progressMap.keySet();
+                Map<String, StudyNode> progressMap = new HashMap<>();
+                Node.this.getChildren().stream()
+                        .filter(StudyNode::isUnknownStatus)
+                        .forEach(child -> {
+                            DC data = child.getData();
+                            if (data != null) {
+                                progressMap.put(data.getProgress(), child);
+                            }
+                        });
+                D data = Node.this.getData();
+                if (data != null) {
+                    String progressId = data.getProgress();
+                    if (progressId != null) {
+                        progressMap.put(progressId, Node.this);
+                    }
 
-                        if (!progressIds.isEmpty()) {
-                            int size = progressIds.size();
-                            String[] list = progressIds.toArray(new String[size]);
-                            int start = 0;
-                            int end;
+                    Set<String> progressIds = progressMap.keySet();
 
-                            while (start < size) {
-                                end = start + 20;
-                                if (end > size) {
-                                    end = size;
-                                }
-                                String[] part = Arrays.copyOfRange(list, start, end);
-                                start = end;
+                    if (!progressIds.isEmpty()) {
+                        int size = progressIds.size();
+                        String[] list = progressIds.toArray(new String[size]);
+                        int start = 0;
+                        int end;
 
-                                Progresses progresses = stepikApiClient.progresses()
+                        while (start < size) {
+                            end = start + 20;
+                            if (end > size) {
+                                end = size;
+                            }
+                            String[] part = Arrays.copyOfRange(list, start, end);
+                            start = end;
+
+                            Progresses progresses;
+                            try {
+                                progresses = stepikApiClient.progresses()
                                         .get()
                                         .id(part)
                                         .execute();
-
-                                progresses.getItems().forEach(progress -> {
-                                    String id = progress.getId();
-                                    StudyNode node = progressMap.get(id);
-                                    if (progress.isPassed()) {
-                                        node.setRawStatus(SOLVED);
-                                    }
-                                });
+                            } catch (StepikClientException e) {
+                                logger.warn(e);
+                                return;
                             }
+
+                            progresses.getItems().forEach(progress -> {
+                                String id = progress.getId();
+                                StudyNode node = progressMap.get(id);
+                                if (progress.isPassed()) {
+                                    node.setRawStatus(SOLVED);
+                                }
+                            });
                         }
                     }
-
-                    ApplicationManager.getApplication().invokeLater(() -> {
-                        if (!project.isDisposed()) {
-                            ProjectView.getInstance(project).refresh();
-                        }
-                    });
-
-                } catch (StepikClientException e) {
-                    logger.warn(e);
                 }
+
+                ApplicationManager.getApplication().invokeLater(() -> {
+                    if (!project.isDisposed()) {
+                        ProjectView.getInstance(project).refresh();
+                    }
+                });
             });
         }
 

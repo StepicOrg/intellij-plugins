@@ -63,11 +63,12 @@ public class FreeAnswerQuizHelper extends StringQuizHelper {
             return true;
         }
 
+        StepikApiClient stepikClient = authAndGetStepikApiClient();
+        if (!isAuthenticated()) {
+            return true;
+        }
+
         try {
-            StepikApiClient stepikClient = authAndGetStepikApiClient();
-            if (!isAuthenticated()) {
-                return true;
-            }
             Instructions instructions = stepikClient.instructions()
                     .get()
                     .id(instructionId)

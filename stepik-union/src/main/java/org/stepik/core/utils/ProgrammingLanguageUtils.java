@@ -186,10 +186,11 @@ public class ProgrammingLanguageUtils {
                         try {
                             file[0] = parent.createChildData(null, fileName);
                             String template = null;
-                            try {
-                                StepikApiClient stepikApiClient = authAndGetStepikApiClient();
-                                User user = getCurrentUser();
-                                if (!user.isGuest()) {
+
+                            StepikApiClient stepikApiClient = authAndGetStepikApiClient();
+                            User user = getCurrentUser();
+                            if (!user.isGuest()) {
+                                try {
                                     Submissions submissions = stepikApiClient.submissions()
                                             .get()
                                             .user(user.getId())
@@ -208,9 +209,9 @@ public class ProgrammingLanguageUtils {
                                             template = lastSubmission.get().getReply().getCode();
                                         }
                                     }
+                                } catch (StepikClientException e) {
+                                    logger.warn(e);
                                 }
-                            } catch (StepikClientException e) {
-                                logger.warn(e);
                             }
 
                             if (template == null) {
