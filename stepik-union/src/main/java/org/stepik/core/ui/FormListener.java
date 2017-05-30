@@ -164,10 +164,10 @@ class FormListener implements EventListener {
                     getReply(stepNode, type, elements, null);
                     break;
                 case "login":
+                    String email = elements.getInputValue("email");
+                    String password = elements.getInputValue("password");
                     executor.execute(() -> {
                         browser.showLoadAnimation();
-                        String email = elements.getInputValue("login-form-email");
-                        String password = elements.getInputValue("login-form-password");
                         StepikAuthState state = StepikAuthManager.authentication(email, password);
                         if (state != StepikAuthState.AUTH) {
                             browser.callFunction("setErrorMessage", "Wrong email or password");

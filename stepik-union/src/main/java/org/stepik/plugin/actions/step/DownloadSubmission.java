@@ -43,6 +43,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.stepik.core.SupportedLanguages.langOfName;
 import static org.stepik.core.metrics.MetricsStatus.DATA_NOT_LOADED;
 import static org.stepik.core.metrics.MetricsStatus.EMPTY_SOURCE;
 import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
@@ -52,6 +53,9 @@ import static org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient
 import static org.stepik.core.stepik.StepikAuthManager.getCurrentUser;
 import static org.stepik.core.stepik.StepikAuthManager.isAuthenticated;
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
+import static org.stepik.plugin.utils.DirectivesUtilsKt.containsDirectives;
+import static org.stepik.plugin.utils.DirectivesUtilsKt.replaceCode;
+import static org.stepik.plugin.utils.DirectivesUtilsKt.uncommentAmbientCode;
 
 /**
  * @author meanmail
@@ -171,7 +175,7 @@ public class DownloadSubmission extends CodeQuizAction {
         return submissions.stream()
                 .filter(submission -> {
                     String languageName = submission.getReply().getLanguage();
-                    return SupportedLanguages.langOfName(languageName).upgradedTo(currentLang);
+                    return langOfName(languageName).upgradedTo(currentLang);
                 })
                 .collect(Collectors.toList());
     }
@@ -231,7 +235,15 @@ public class DownloadSubmission extends CodeQuizAction {
                             Document document = documentManager.getDocument(mainFile);
 
                             if (document != null) {
-                                document.setText(finalCode);
+                                SupportedLanguages language = langOfName(submission.getReply().getLanguage());
+                                if (containsDirectives(finalCode, language)) {
+                                    String text = uncommentAmbientCode(finalCode, language);
+                                    document.setText(text);
+                                } else {
+                                    String code = replaceCode(document.getText(), finalCode, language);
+                                    document.setText(code);
+                                }
+
                                 StudyStatus status = StudyStatus.of(submission.getStatus());
                                 stepNode.setStatus(status);
                                 FileEditorManager.getInstance(project).openFile(mainFile, true);

@@ -26,7 +26,6 @@ import org.stepik.core.metrics.Metrics;
 import org.stepik.core.utils.Utils;
 import org.stepik.plugin.actions.ActionUtils;
 import org.stepik.plugin.actions.SendAction;
-import org.stepik.plugin.utils.DirectivesUtils;
 
 import javax.swing.*;
 
@@ -37,6 +36,8 @@ import static org.stepik.core.metrics.MetricsStatus.USER_CANCELED;
 import static org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient;
 import static org.stepik.core.stepik.StepikAuthManager.isAuthenticated;
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
+import static org.stepik.plugin.utils.DirectivesUtilsKt.getFileText;
+import static org.stepik.plugin.utils.DirectivesUtilsKt.getTextUnderDirectives;
 
 public class StepikSendAction extends CodeQuizAction {
     private static final Logger logger = Logger.getInstance(StepikSendAction.class);
@@ -151,8 +152,8 @@ public class StepikSendAction extends CodeQuizAction {
             return null;
         }
 
-        String[] text = DirectivesUtils.getFileText(mainFile);
-        return DirectivesUtils.getTextUnderDirectives(text, currentLang);
+        String text = getFileText(mainFile);
+        return getTextUnderDirectives(text, currentLang);
     }
 
     private static void notifyFailed(
