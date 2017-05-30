@@ -1,5 +1,6 @@
 package org.stepik.core.courseFormat.stepHelpers;
 
+import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -8,17 +9,17 @@ import org.stepik.api.objects.steps.Video;
 import org.stepik.api.objects.steps.VideoUrl;
 import org.stepik.core.courseFormat.StepNode;
 
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
+import static org.stepik.core.utils.PluginUtils.PLUGIN_ID;
 
 /**
  * @author meanmail
  */
 public class VideoTheoryHelper extends StepHelper {
+    public static final String VIDEO_QUALITY_PROPERTY_NAME = PLUGIN_ID + ".VIDEO_QUALITY";
     private int quality;
     private List<VideoUrl> urls;
 
@@ -48,19 +49,19 @@ public class VideoTheoryHelper extends StepHelper {
         }
 
         for (int i = urls.size() - 1; i > 0; i--) {
-            if (urls.get(i).getQuality() <= quality) {
-                quality = urls.get(i).getQuality();
+            if (urls.get(i).getQuality() <= getQuality()) {
+                setQuality(urls.get(i).getQuality());
                 return urls.get(i).getUrl();
             }
         }
 
         VideoUrl firstUrl = urls.get(0);
-        quality = firstUrl.getQuality();
+        setQuality(firstUrl.getQuality());
         return firstUrl.getUrl();
     }
 
     @NotNull
-    private List<VideoUrl> getVideoUrls() {
+    public List<VideoUrl> getVideoUrls() {
         Step data = getStepNode().getData();
 
         if (data == null) {
@@ -76,21 +77,18 @@ public class VideoTheoryHelper extends StepHelper {
         return urls;
     }
 
-    public Collection<? extends Integer> getQualitySet() {
-        if (urls == null) {
-            urls = getVideoUrls();
-        }
-        return urls.stream()
-                .map(VideoUrl::getQuality)
-                .collect(Collectors.toList());
-    }
-
     public int getQuality() {
+        if (quality == 0) {
+            quality = Integer.parseInt(PropertiesComponent.getInstance()
+                    .getValue(VIDEO_QUALITY_PROPERTY_NAME, String.valueOf(0)));
+        }
+
         return quality;
     }
 
-    public void setQuality(int quality) {
+    private void setQuality(int quality) {
         this.quality = quality;
+        PropertiesComponent.getInstance().setValue(VIDEO_QUALITY_PROPERTY_NAME, String.valueOf(quality));
     }
 
     @NotNull
