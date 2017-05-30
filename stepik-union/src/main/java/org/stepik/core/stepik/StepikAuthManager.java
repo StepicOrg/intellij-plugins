@@ -207,8 +207,7 @@ public class StepikAuthManager {
             if (state == AUTH) {
                 Metrics.authenticate(SUCCESSFUL);
             }
-            executor.execute(() ->
-                    listeners.forEach(listener -> listener.stateChanged(oldState, state)));
+            executor.execute(() -> listeners.forEach(listener -> listener.stateChanged(oldState, state)));
         }
     }
 
@@ -346,15 +345,19 @@ public class StepikAuthManager {
                 .userAuthenticationPassword(CLIENT_ID_PASSWORD_BASED, email, password)
                 .executeAsync()
                 .thenApplyAsync(tokenInfo -> {
-                    stepikApiClient.setTokenInfo(tokenInfo);
-                    User user = getCurrentUser(true);
-                    setTokenInfo(user.getId(), tokenInfo);
-                    setState(AUTH);
-                    return state;
+                    synchronized (StepikAuthManager.class) {
+                        stepikApiClient.setTokenInfo(tokenInfo);
+                        User user = getCurrentUser(true);
+                        setTokenInfo(user.getId(), tokenInfo);
+                        setState(AUTH);
+                        return state;
+                    }
                 }).exceptionally(e -> {
-                    logger.warn(e);
-                    setState(NOT_AUTH);
-                    return state;
+                    synchronized (StepikAuthManager.class) {
+                        logger.warn(e);
+                        setState(NOT_AUTH);
+                        return state;
+                    }
                 });
     }
 }

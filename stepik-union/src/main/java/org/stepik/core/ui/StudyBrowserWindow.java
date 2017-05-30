@@ -58,8 +58,6 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -73,7 +71,6 @@ import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
 class StudyBrowserWindow extends JFrame {
     private static final Logger logger = Logger.getInstance(StudyBrowserWindow.class);
     private static final String EVENT_TYPE_CLICK = "click";
-    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Project project;
     private final JavaBridge bridge = new JavaBridge();
     private JFXPanel panel;
@@ -338,27 +335,26 @@ class StudyBrowserWindow extends JFrame {
                         return;
                     }
 
-                    try {
-                        StepikApiClient stepikClient = StepikAuthManager.authAndGetStepikApiClient(true);
-                        User user = getCurrentUser();
-                        if (user.isGuest()) {
-                            return;
-                        }
-                        stepikClient.recommendationReactions()
-                                .post()
-                                .user(user.getId())
-                                .lesson(lessonId)
-                                .reaction(reaction)
-                                .execute();
-                    } catch (StepikClientException e) {
-                        logger.warn(e);
+                    StepikApiClient stepikClient = StepikAuthManager.authAndGetStepikApiClient(true);
+                    User user = getCurrentUser();
+                    if (user.isGuest()) {
+                        return;
                     }
-                }
 
-                executor.execute(() -> {
-                    StepikProjectManager.updateAdaptiveSelected(project);
-                    hideLoadAnimation();
-                });
+                    stepikClient.recommendationReactions()
+                            .post()
+                            .user(user.getId())
+                            .lesson(lessonId)
+                            .reaction(reaction)
+                            .executeAsync()
+                            .whenCompleteAsync(((reactions, e) -> {
+                                if (reactions == null) {
+                                    logger.warn(e);
+                                }
+                                StepikProjectManager.updateAdaptiveSelected(project);
+                                hideLoadAnimation();
+                            }));
+                }
             }
 
             private boolean browseProject(@NotNull String href) {
