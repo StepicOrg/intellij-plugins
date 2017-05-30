@@ -104,8 +104,8 @@ public class StepikApiClient {
     private Path cachePath = Paths.get(System.getProperty("user.home"), ".stepik", "stepik-api", "cache");
     private boolean cacheEnabled = true;
 
-    public StepikApiClient() {
-        this(HttpTransportClient.getInstance());
+    public StepikApiClient(@NotNull String userAgent) {
+        this(HttpTransportClient.getInstance(userAgent));
     }
 
     public StepikApiClient(@NotNull HttpTransportClient transportClient) {
