@@ -58,7 +58,7 @@
     </#if>
 </@quiz_content>
 
-<@sripts>
+<@scripts>
 <script>
     var time_left = ${stepNode.getTimeLeft()};
     var clock = document.getElementById("time-left");
@@ -95,4 +95,4 @@
         document.getElementById("isFromFile").setAttribute("value", "true");
     }
 </script>
-</@sripts>
+</@scripts>
