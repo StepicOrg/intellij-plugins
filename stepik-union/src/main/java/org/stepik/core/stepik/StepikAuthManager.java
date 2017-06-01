@@ -27,6 +27,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -36,6 +37,9 @@ import static org.stepik.core.stepik.StepikAuthState.NOT_AUTH;
 import static org.stepik.core.stepik.StepikAuthState.SHOW_DIALOG;
 import static org.stepik.core.stepik.StepikAuthState.UNKNOWN;
 import static org.stepik.core.utils.PluginUtils.PLUGIN_ID;
+import static org.stepik.core.utils.PluginUtils.getCurrentProduct;
+import static org.stepik.core.utils.PluginUtils.getCurrentProductVersion;
+import static org.stepik.core.utils.PluginUtils.getVersion;
 
 public class StepikAuthManager {
     private static final Logger logger = Logger.getInstance(StepikAuthManager.class);
@@ -64,15 +68,26 @@ public class StepikAuthManager {
 
     @NotNull
     private static synchronized StepikApiClient initStepikApiClient() {
+        String osName = System.getProperty("os.name");
+        String jre = System.getProperty("java.version");
+        String userAgent = String.format("Stepik Union/%s (%s) StepikApiClient/%s %s/%s JRE/%s",
+                getVersion(),
+                osName,
+                StepikApiClient.getVersion(),
+                getCurrentProduct(),
+                getCurrentProductVersion(),
+                jre);
+        logger.info(userAgent);
+
         HttpConfigurable instance = HttpConfigurable.getInstance();
         StepikApiClient client;
         if (instance.USE_HTTP_PROXY) {
-            logger.info("Uses proxy: Host = " + instance.PROXY_HOST + " Port = " + instance.PROXY_PORT);
+            logger.info(String.format("Uses proxy: Host = %s, Port = %s", instance.PROXY_HOST, instance.PROXY_PORT));
             HttpTransportClient transportClient;
-            transportClient = HttpTransportClient.getInstance(instance.PROXY_HOST, instance.PROXY_PORT);
+            transportClient = HttpTransportClient.getInstance(instance.PROXY_HOST, instance.PROXY_PORT, userAgent);
             client = new StepikApiClient(transportClient);
         } else {
-            client = new StepikApiClient();
+            client = new StepikApiClient(userAgent);
         }
 
         long lastUserId = getLastUser();
@@ -189,11 +204,10 @@ public class StepikAuthManager {
         }
 
         if (oldState != state) {
-            if (state == AUTH){
+            if (state == AUTH) {
                 Metrics.authenticate(SUCCESSFUL);
             }
-            executor.execute(() ->
-                    listeners.forEach(listener -> listener.stateChanged(oldState, state)));
+            executor.execute(() -> listeners.forEach(listener -> listener.stateChanged(oldState, state)));
         }
     }
 
@@ -324,20 +338,26 @@ public class StepikAuthManager {
         listeners.remove(listener);
     }
 
-    public static synchronized StepikAuthState authentication(@NotNull String email, @NotNull String password) {
-        try {
-            TokenInfo tokenInfo = stepikApiClient.oauth2()
-                    .userAuthenticationPassword(CLIENT_ID_PASSWORD_BASED, email, password)
-                    .execute();
-            stepikApiClient.setTokenInfo(tokenInfo);
-            User user = getCurrentUser(true);
-            setTokenInfo(user.getId(), tokenInfo);
-            setState(AUTH);
-        } catch (StepikClientException e) {
-            logger.warn(e);
-            setState(NOT_AUTH);
-        }
-
-        return state;
+    public static synchronized CompletableFuture<StepikAuthState> authentication(
+            @NotNull String email,
+            @NotNull String password) {
+        return stepikApiClient.oauth2()
+                .userAuthenticationPassword(CLIENT_ID_PASSWORD_BASED, email, password)
+                .executeAsync()
+                .thenApplyAsync(tokenInfo -> {
+                    synchronized (StepikAuthManager.class) {
+                        stepikApiClient.setTokenInfo(tokenInfo);
+                        User user = getCurrentUser(true);
+                        setTokenInfo(user.getId(), tokenInfo);
+                        setState(AUTH);
+                        return state;
+                    }
+                }).exceptionally(e -> {
+                    synchronized (StepikAuthManager.class) {
+                        logger.warn(e);
+                        setState(NOT_AUTH);
+                        return state;
+                    }
+                });
     }
 }

@@ -13,6 +13,7 @@ public class PluginUtils {
     public static final String PLUGIN_ID = "org.stepik.plugin.union";
     private static final String DEFAULT_PLUGIN_VERSION = "unknown";
     private static Product currentProduct;
+    private static String currentProductVersion;
     private static ProductGroup currentProductGroup;
 
     @NotNull
@@ -29,6 +30,14 @@ public class PluginUtils {
         }
 
         return currentProduct;
+    }
+
+    public static String getCurrentProductVersion() {
+        if (currentProductVersion == null) {
+            currentProductVersion = ApplicationInfo.getInstance().getBuild().toString();
+        }
+
+        return currentProductVersion;
     }
 
     public static boolean isCurrent(ProductGroup group) {
