@@ -49,6 +49,7 @@ abstract class BasePlugin implements Plugin<Project> {
             plugin = this
             instrumentCode = extensionInstrumentCode
             repositoryType = this.repositoryType
+            publish = new ProductPluginExtensionPublish()
         }
 
         configureTasks(project, extension)
@@ -62,6 +63,7 @@ abstract class BasePlugin implements Plugin<Project> {
         configurePrepareSandboxTask(project, extension)
         configureRunTask(project, extension)
         configureBuildPluginTask(project)
+        configurePublishPluginTask(project, extension)
         configureProcessResources(project)
         project.afterEvaluate(new Action<Project>() {
             @Override
@@ -148,6 +150,17 @@ abstract class BasePlugin implements Plugin<Project> {
             extension = ext
             plugin = this
             dependsOn(prepareSandboxTaskName)
+        }
+    }
+
+    private void configurePublishPluginTask(@NotNull Project project, @NotNull ProductPluginExtension ext) {
+        logger.info("Configuring publishing {} plugin task", productName)
+        project.tasks.create("publish$productName", PublishTask).with {
+            group = tasksGroupName
+            description = "Publish plugin distribution on plugins.jetbrains.com."
+            extension = ext
+            plugin = this
+            dependsOn(buildPluginTaskName)
         }
     }
 
@@ -238,6 +251,10 @@ abstract class BasePlugin implements Plugin<Project> {
 
     String getPrepareTestSandboxTaskName() {
         return prepareTestSandboxTaskName
+    }
+
+    String getBuildPluginTaskName() {
+        return buildPluginTaskName
     }
 
     String getProductType() {

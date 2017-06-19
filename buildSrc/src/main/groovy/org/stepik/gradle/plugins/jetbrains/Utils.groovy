@@ -240,7 +240,8 @@ class Utils {
     }
 
     @NotNull
-    static File getArchivePath(@NotNull Project project,
+    static File getArchivePath(
+            @NotNull Project project,
             @NotNull BasePlugin plugin,
             @NotNull ProductPluginExtension extension) {
         def defaultIdePath = getDefaultIdePath(
@@ -439,5 +440,10 @@ class Utils {
 
     static void createOrRepairOptionsXml(File file) {
         createOrRepairXml(file, OPTIONS_XML)
+    }
+
+    static String toString(input) {
+        input = input instanceof Closure ? (input as Closure).call() : input
+        return input?.toString()
     }
 }
