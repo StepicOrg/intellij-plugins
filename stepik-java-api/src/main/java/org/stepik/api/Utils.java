@@ -138,4 +138,9 @@ public class Utils {
 
         return null;
     }
+
+    @NotNull
+    public static String cleanString(@NotNull String string) {
+        return string.replaceAll("[\\u0000-\\u0008\\u000b\\u000c\\u000e-\\u001f]", "");
+    }
 }
