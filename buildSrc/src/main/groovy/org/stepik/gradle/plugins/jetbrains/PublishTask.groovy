@@ -83,8 +83,7 @@ class PublishTask extends ConventionTask {
                 def repoClient = new PluginRepositoryInstance(host, getUsername(), getPassword())
                 repoClient.uploadPlugin(pluginId, distributionFile, channel && 'default' != channel ? channel : '')
                 logger.info("Uploaded successfully")
-            }
-            catch (exception) {
+            } catch (exception) {
                 throw new TaskExecutionException(this, new RuntimeException("Failed to upload plugin", exception))
             }
         }
