@@ -14,6 +14,7 @@ public enum SupportedLanguages {
     CLOJURE("Clojure", "clojure", "main.clj", ";;", null, null),
     CPP("C++", "c++", "main.cpp", "//", null, null),
     CPP_11("C++11", "c++11", "main_11.cpp", "//", null, null),
+    GO("Go", "go", "main.go", "//", null, null),
     HASKELL("Haskell 7.8",
             "haskell",
             "Main.hs",
@@ -38,12 +39,13 @@ public enum SupportedLanguages {
     KOTLIN("Kotlin", "kotlin", "Main.kt", "//", null, null),
     MONO_CS("Mono c#", "mono c#", "main.cs", "//", null, null),
     OCTAVE("Octave", "octave", "main.m", "%", null, null),
+    PASCAL_ABC("PascalABC.NET", "pascalabc", "//", "Main.pas", null, null),
     PYTHON3("Python 3", "python3", "main.py", "#", null, null),
     R("R", "r", "main.r", "#", null, null),
     RUBY("Ruby", "ruby", "main.rb", "#", null, null),
     RUST("Rust", "rust", "main.rs", "//", null, null),
-    SHELL("Shell", "shell", "main.sh", "#", null, null),
     SCALA("Scala", "scala", "Main.scala", "//", null, null),
+    SHELL("Shell", "shell", "main.sh", "#", null, null),
     INVALID("invalid", "invalid", "", "", null, null);
 
     private static Map<String, SupportedLanguages> nameMap;
@@ -157,7 +159,7 @@ public enum SupportedLanguages {
         return title;
     }
 
-    public boolean upgradedTo(@NotNull SupportedLanguages languages) {
-        return languages == this || (this.nextVersion != null && this.nextVersion.upgradedTo(languages));
+    public boolean upgradedTo(@NotNull SupportedLanguages language) {
+        return language == this || (this.nextVersion != null && this.nextVersion.upgradedTo(language));
     }
 }
