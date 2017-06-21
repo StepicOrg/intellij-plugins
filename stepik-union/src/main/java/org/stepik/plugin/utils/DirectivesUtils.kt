@@ -120,24 +120,24 @@ fun removeAmbientCode(text: String, showHint: Boolean, language: SupportedLangua
     return splittedText.subList(start + 1, end).joinToString("\n")
 }
 
-fun insertAmbientCode(text: String, lang: SupportedLanguages, showHint: Boolean): String {
-    val sb = StringBuilder(lang.beforeCode + "\n")
-
-    if (showHint) {
-        sb.append(lang.comment + START_HINT + "\n")
-        sb.append(lang.comment + START_DIRECTIVE + "\n")
-        sb.append(text + "\n")
-        sb.append(lang.comment + END_DIRECTIVE + "\n")
-        sb.append(lang.comment + END_HINT + "\n")
+fun StringBuilder.appendlnIf(string: String, condition: Boolean): StringBuilder {
+    return if (condition) {
+        appendln(string)
     } else {
-        sb.append(lang.comment + START_DIRECTIVE + "\n")
-        sb.append(text + "\n")
-        sb.append(lang.comment + END_DIRECTIVE + "\n")
+        this
     }
+}
 
-    sb.append(lang.afterCode)
-
-    return sb.toString().trim()
+fun insertAmbientCode(text: String, lang: SupportedLanguages, showHint: Boolean): String {
+    return StringBuilder().appendln(lang.beforeCode ?: "")
+            .appendlnIf(lang.comment(START_HINT), showHint)
+            .appendln(lang.comment(START_DIRECTIVE))
+            .appendln(text)
+            .appendln(lang.comment(END_DIRECTIVE))
+            .appendlnIf(lang.comment(END_HINT), showHint)
+            .append(lang.afterCode ?: "")
+            .toString()
+            .trim()
 }
 
 fun replaceCode(text: String, code: String, language: SupportedLanguages): String {

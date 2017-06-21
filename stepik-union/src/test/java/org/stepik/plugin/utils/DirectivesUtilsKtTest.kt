@@ -47,16 +47,12 @@ class DirectivesUtilsKtTest {
     }
 
     private fun loadResources(language: SupportedLanguages, extension: String) {
-        val sources = ArrayList<List<String>>()
-
-        for (index in 1..TESTS_COUNT) {
-            val list: ArrayList<String> = ArrayList()
-
-            list.add(readTestFile("${language.getName()}/sources/$index$extension"))
-            list.add(readTestFile("${language.getName()}/expected/$index$extension"))
-            list.add(readTestFile("${language.getName()}/expected_replaced/$index$extension"))
-
-            sources.add(list)
+        val sources = (1..TESTS_COUNT).map {
+            listOf(
+                    readTestFile("${language.langName}/sources/$it$extension"),
+                    readTestFile("${language.langName}/expected/$it$extension"),
+                    readTestFile("${language.langName}/expected_replaced/$it$extension")
+            )
         }
 
         sourcesMap.put(language, sources)
