@@ -103,7 +103,7 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
             return "";
         }
         templates = getData().getBlock().getOptions().getCodeTemplates();
-        return templates.getOrDefault(language.getName(), "");
+        return templates.getOrDefault(language.getLangName(), "");
     }
 
     @NotNull
@@ -175,7 +175,7 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
 
     @NotNull
     public Limit getLimit() {
-        return getLimits().getOrDefault(getCurrentLang().getName(), new Limit());
+        return getLimits().getOrDefault(getCurrentLang().getLangName(), new Limit());
     }
 
     @NotNull
@@ -196,7 +196,7 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
 
                 Map<String, String> templates = options.getCodeTemplates();
                 templates.keySet().forEach(key -> {
-                    SupportedLanguages language = SupportedLanguages.langOfName(key);
+                    SupportedLanguages language = SupportedLanguages.Companion.langOfName(key);
 
                     if (language != INVALID && !supportedLanguages.contains(language)) {
                         supportedLanguages.add(language);

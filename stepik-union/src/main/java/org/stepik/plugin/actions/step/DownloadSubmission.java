@@ -43,7 +43,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.stepik.core.SupportedLanguages.langOfName;
+import static org.stepik.core.SupportedLanguages.Companion;
 import static org.stepik.core.metrics.MetricsStatus.DATA_NOT_LOADED;
 import static org.stepik.core.metrics.MetricsStatus.EMPTY_SOURCE;
 import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
@@ -175,7 +175,7 @@ public class DownloadSubmission extends CodeQuizAction {
         return submissions.stream()
                 .filter(submission -> {
                     String languageName = submission.getReply().getLanguage();
-                    return langOfName(languageName).upgradedTo(currentLang);
+                    return Companion.langOfName(languageName).upgradedTo(currentLang);
                 })
                 .collect(Collectors.toList());
     }
@@ -235,7 +235,7 @@ public class DownloadSubmission extends CodeQuizAction {
                             Document document = documentManager.getDocument(mainFile);
 
                             if (document != null) {
-                                SupportedLanguages language = langOfName(submission.getReply().getLanguage());
+                                SupportedLanguages language = Companion.langOfName(submission.getReply().getLanguage());
                                 if (containsDirectives(finalCode, language)) {
                                     String text = uncommentAmbientCode(finalCode, language);
                                     document.setText(text);
