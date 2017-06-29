@@ -45,13 +45,10 @@ public class StepikAuthManager {
     private static final Logger logger = Logger.getInstance(StepikAuthManager.class);
     private static final String CLIENT_ID = "vV8giW7KTPMOTriOUBwyGLvXbKV0Cc4GPBnyCJPd";
     private static final String CLIENT_ID_PASSWORD_BASED = "MVo2c17mATXWfBUdmP5oCsFrUB7RtCYqOvUmng90";
-    private static final String REDIRECT_URI = "https%3A%2F%2Fstepik.org";
     private static final String LAST_USER_PROPERTY_NAME = PLUGIN_ID + ".LAST_USER";
     private static final StepikApiClient stepikApiClient = initStepikApiClient();
     private static final String IMPLICIT_GRANT_URL = "https://stepik.org/oauth2/authorize/" +
             "?client_id=" + CLIENT_ID +
-            "&redirect_uri=" + REDIRECT_URI +
-            "&scope=write" +
             "&response_type=token";
     private static final List<StepikAuthManagerListener> listeners = new ArrayList<>();
     private static final ExecutorService executor = Executors.newSingleThreadExecutor();

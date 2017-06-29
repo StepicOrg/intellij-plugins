@@ -34,6 +34,7 @@ class ProductPluginExtension {
     private Project project
     private BasePlugin plugin
     boolean instrumentCode
+    ProductPluginExtensionPublish publish
 
     RepositoryType repositoryType
 

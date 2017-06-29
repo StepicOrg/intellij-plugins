@@ -122,7 +122,7 @@ public class StepikSendAction extends CodeQuizAction {
             submissions = stepikApiClient.submissions()
                     .post()
                     .attempt(intAttemptId)
-                    .language(currentLang.getName())
+                    .language(currentLang.getLangName())
                     .code(code)
                     .execute();
             if (submissions.isEmpty()) {

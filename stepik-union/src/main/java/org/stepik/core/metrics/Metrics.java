@@ -58,7 +58,7 @@ public class Metrics {
 
             if (projectManager != null) {
                 query.data("project_id", projectManager.getUuid())
-                        .tags("project_programming_language", projectManager.getDefaultLang().getName())
+                        .tags("project_programming_language", projectManager.getDefaultLang().getLangName())
                         .data("project_manager_version", projectManager.getVersion());
 
                 StudyNode projectRoot = projectManager.getProjectRoot();
@@ -112,7 +112,7 @@ public class Metrics {
         Metric metric = new Metric();
         metric.addTags("action", actionName);
         metric.addData("step_id", stepNode.getId());
-        metric.addTags("step_programming_language", stepNode.getCurrentLang().getName());
+        metric.addTags("step_programming_language", stepNode.getCurrentLang().getLangName());
         StepType stepType = stepNode.getType();
         metric.addTags("step_type", stepType.getName());
 

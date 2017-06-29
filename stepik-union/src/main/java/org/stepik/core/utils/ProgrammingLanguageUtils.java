@@ -201,7 +201,8 @@ public class ProgrammingLanguageUtils {
                                     if (!submissions.isEmpty()) {
                                         Optional<Submission> lastSubmission = submissions.getItems()
                                                 .stream()
-                                                .filter(submission -> SupportedLanguages.langOfName(submission.getReply()
+                                                .filter(submission -> SupportedLanguages.Companion.langOfName(submission
+                                                        .getReply()
                                                         .getLanguage()) == language)
                                                 .limit(1)
                                                 .findFirst();

@@ -104,10 +104,12 @@ public class StepikProjectGenerator {
             case CLOJURE:
             case CPP:
             case CPP_11:
+            case GO:
             case HASKELL_7_10:
             case JAVASCRIPT:
             case MONO_CS:
             case OCTAVE:
+            case PASCAL_ABC:
             case R:
             case RUST:
             case SHELL:
