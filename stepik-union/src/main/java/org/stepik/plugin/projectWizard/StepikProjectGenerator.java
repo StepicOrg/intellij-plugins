@@ -92,36 +92,40 @@ public class StepikProjectGenerator {
     @NotNull
     private static List<Long> getHardcodedCoursesId(@NotNull SupportedLanguages programmingLanguage) {
         switch (programmingLanguage) {
-            case JAVA:
-            case JAVA8:
-                return Arrays.asList(187L, 150L, 217L, 1127L, 125L, 126L);
-            case PYTHON3:
-                return Arrays.asList(67L, 512L, 401L, 217L, 1127L, 125L, 126L, 150L, 568L, 431L);
-            case HASKELL:
-                return Arrays.asList(75L, 217L, 1127L, 125L, 126L, 150L);
             case ASM32:
             case ASM64:
-            case CLOJURE:
+                return Arrays.asList(253L, 1780L, 156L, 217L, 1127L, 125L, 126L, 150L);
             case CPP:
             case CPP_11:
-            case GO:
-            case HASKELL_7_10:
+                return Arrays.asList(579L, 363L, 144L, 153L, 538L, 7L, 156L, 217L, 1127L, 125L, 126L, 150L);
+            case JAVA:
+            case JAVA8:
+                return Arrays.asList(187L, 150L, 2403L, 2600L, 1891L, 1595L, 2262L, 217L, 1127L, 125L, 126L);
             case JAVASCRIPT:
+                return Arrays.asList(2606L, 2223L, 156L, 217L, 1127L, 125L, 126L, 150L);
+            case HASKELL:
+            case HASKELL_7_10:
+            case HASKELL_8_0:
+                return Arrays.asList(75L, 693L, 156L, 217L, 1127L, 125L, 126L, 150L);
+            case KOTLIN:
+                return Arrays.asList(2852L, 156L, 217L, 1127L, 125L, 126L, 150L);
+            case PYTHON3:
+                return Arrays.asList(67L, 512L, 401L, 568L, 431L, 2057L, 156L, 217L, 1127L, 125L, 126L, 150L);
+            case R:
+                return Arrays.asList(497L, 129L, 724L, 156L, 217L, 1127L, 125L, 126L, 150L);
+            case RUBY:
+                return Arrays.asList(156L, 1127L, 125L, 126L, 150L);
+            case SCALA:
+                return Arrays.asList(2294L, 156L, 217L, 1127L, 125L, 126L, 150L);
+            case CLOJURE:
+            case GO:
+            case C:
             case MONO_CS:
             case OCTAVE:
             case PASCAL_ABC:
-            case R:
             case RUST:
             case SHELL:
-                return Arrays.asList(217L, 1127L, 125L, 126L, 150L);
-            case C:
-            case HASKELL_8_0:
-                return Arrays.asList(693L, 1127L, 125L, 126L, 150L);
-            case RUBY:
-            case SCALA:
-                return Arrays.asList(1127L, 125L, 126L, 150L);
-            case KOTLIN:
-                return Arrays.asList(2852L, 1127L, 125L, 126L, 150L);
+                return Arrays.asList(156L, 217L, 1127L, 125L, 126L, 150L);
         }
 
         return Collections.emptyList();
