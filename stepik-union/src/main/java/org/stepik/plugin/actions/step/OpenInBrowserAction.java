@@ -16,11 +16,11 @@ import org.stepik.core.courseFormat.StudyNode;
 
 import javax.swing.*;
 
-abstract class OpenInBrowserAction extends AbstractStepAction {
+public class OpenInBrowserAction extends AbstractStepAction {
     private static final String ACTION_ID = "STEPIK.OpenInBrowser";
     private static final String SHORTCUT = "ctrl shift pressed HOME";
 
-    OpenInBrowserAction() {
+    public OpenInBrowserAction() {
         super("View this step on Stepik (" + KeymapUtil.getShortcutText(
                 new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT), null)) + ")",
                 "View this step on Stepik", AllStepikIcons.stepikLogo);
