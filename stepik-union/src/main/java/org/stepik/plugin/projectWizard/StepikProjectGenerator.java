@@ -4,6 +4,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ex.ProjectEx;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.exceptions.StepikClientException;
@@ -113,6 +114,9 @@ public class StepikProjectGenerator {
         stepikProjectManager.setRootNode(projectRoot);
         stepikProjectManager.setDefaultLang(getDefaultLang());
         stepikProjectManager.setCreatedBy(getCurrentUser().getId());
+
+        ((ProjectEx) project).setProjectName(projectRoot.getName());
+
         Metrics.createProject(project, SUCCESSFUL);
     }
 
