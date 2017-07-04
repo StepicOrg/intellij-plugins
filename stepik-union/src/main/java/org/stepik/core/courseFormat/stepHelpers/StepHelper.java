@@ -7,6 +7,7 @@ import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.StudyObject;
 import org.stepik.api.objects.progresses.Progresses;
+import org.stepik.api.urls.Urls;
 import org.stepik.core.StepikProjectManager;
 import org.stepik.core.courseFormat.StepNode;
 import org.stepik.core.courseFormat.StudyNode;
@@ -55,21 +56,17 @@ public class StepHelper {
     public String getLink() {
         StepNode stepNode = getStepNode();
         StudyNode parent = stepNode.getParent();
+        String link = Urls.STEPIK_URL;
         if (parent != null) {
-            return String.format("https://stepik.org/lesson/%d/step/%d", parent.getId(), stepNode.getPosition());
+            link = String.format("%s/lesson/%d/step/%d", link, parent.getId(), stepNode.getPosition());
         }
 
-        return "https://stepik.org/";
+        return link;
     }
 
     @NotNull
     public String getPath() {
         return getStepNode().getPath();
-    }
-
-    @NotNull
-    public String getLinkTitle() {
-        return String.format("This step can take place in the web version (%s)", getType());
     }
 
     @NotNull

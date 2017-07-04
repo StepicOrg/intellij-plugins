@@ -32,9 +32,6 @@
 
 <@content>
     <#macro step_content>
-
-    <a href='${stepNode.getLink()}'>${stepNode.getLinkTitle()}</a><br>
-
         <#assign status = stepNode.getStatus()/>
         <#assign action = stepNode.getAction()/>
         <#assign needLogin = action == "need_login">
