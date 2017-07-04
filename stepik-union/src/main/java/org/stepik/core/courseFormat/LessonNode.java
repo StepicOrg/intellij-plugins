@@ -15,6 +15,7 @@ import org.stepik.api.objects.steps.Steps;
 import org.stepik.core.core.EduNames;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 public class LessonNode extends Node<CompoundUnitLesson, StepNode, Step, StepNode> {
@@ -65,7 +66,7 @@ public class LessonNode extends Node<CompoundUnitLesson, StepNode, Step, StepNod
                 return true;
             }
 
-            String updateDate = data.getUpdateDate();
+            Date updateDate = data.getUpdateDate();
 
             Lessons lessons = stepikApiClient.lessons()
                     .get()

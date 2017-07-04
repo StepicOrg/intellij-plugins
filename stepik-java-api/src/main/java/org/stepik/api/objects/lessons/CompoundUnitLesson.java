@@ -5,6 +5,8 @@ import org.jetbrains.annotations.Nullable;
 import org.stepik.api.objects.StudyObject;
 import org.stepik.api.objects.units.Unit;
 
+import java.util.Date;
+
 /**
  * @author meanmail
  */
@@ -87,7 +89,7 @@ public class CompoundUnitLesson extends StudyObject {
     }
 
     @NotNull
-    public String getUpdateDate() {
+    public Date getUpdateDate() {
         return lesson.getUpdateDate();
     }
 }

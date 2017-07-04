@@ -14,11 +14,16 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.TimeZone;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -29,6 +34,14 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  */
 public class Utils {
     private static final Logger logger = LoggerFactory.getLogger(Utils.class);
+    public final static SimpleDateFormat timeISOFormat = getTimeISOFormat();
+
+    private static SimpleDateFormat getTimeISOFormat() {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        TimeZone tz = TimeZone.getTimeZone("UTC");
+        format.setTimeZone(tz);
+        return format;
+    }
 
     @NotNull
     public static String mapToGetString(@NotNull String name, @NotNull String[] values) {
@@ -142,5 +155,14 @@ public class Utils {
     @NotNull
     public static String cleanString(@NotNull String string) {
         return string.replaceAll("[\\u0000-\\u0008\\u000b\\u000c\\u000e-\\u001f]", "");
+    }
+
+    @NotNull
+    public static Date toDate(@Nullable String date) {
+        try {
+            return timeISOFormat.parse(date);
+        } catch (ParseException e) {
+            return Date.from(Instant.EPOCH);
+        }
     }
 }
