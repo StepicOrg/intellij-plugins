@@ -11,6 +11,7 @@ import icons.AllStepikIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.urls.Urls;
+import org.stepik.core.StepikProjectManager;
 import org.stepik.core.courseFormat.StepNode;
 import org.stepik.core.courseFormat.StudyNode;
 
@@ -51,15 +52,18 @@ public class OpenInBrowserAction extends AbstractStepAction {
             return;
         }
 
-        String link = getLink(stepNode);
+        String link = getLink(project, stepNode);
         BrowserUtil.browse(link);
     }
 
-    private String getLink(@NotNull StepNode stepNode) {
+    private String getLink(@NotNull Project project, @NotNull StepNode stepNode) {
         StudyNode parent = stepNode.getParent();
         String link = Urls.STEPIK_URL;
         if (parent != null) {
             link = String.format("%s/lesson/%d/step/%d", link, parent.getId(), stepNode.getPosition());
+            if (StepikProjectManager.isAdaptive(project)) {
+                link += "?adaptive=true";
+            }
         }
         return link;
     }
@@ -68,12 +72,13 @@ public class OpenInBrowserAction extends AbstractStepAction {
     public void update(@NotNull AnActionEvent e) {
         super.update(e);
         Presentation presentation = e.getPresentation();
-        StepNode stepNode = getCurrentStep(e.getProject());
+        Project project = e.getProject();
+        StepNode stepNode = getCurrentStep(project);
         if (stepNode == null) {
             presentation.setDescription(DESCRIPTION);
             return;
         }
-        String link = getLink(stepNode);
+        String link = getLink(project, stepNode);
         presentation.setDescription(link);
     }
 }
