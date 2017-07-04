@@ -1,11 +1,9 @@
 package org.stepik.plugin.actions.step;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
-import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
@@ -25,8 +23,6 @@ import org.stepik.core.utils.Utils;
 import org.stepik.plugin.actions.ActionUtils;
 import org.stepik.plugin.actions.SendAction;
 
-import javax.swing.*;
-
 import static org.stepik.core.metrics.MetricsStatus.DATA_NOT_LOADED;
 import static org.stepik.core.metrics.MetricsStatus.FAILED_POST;
 import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
@@ -41,10 +37,12 @@ public class StepikSendAction extends CodeQuizAction {
     private static final Logger logger = Logger.getInstance(StepikSendAction.class);
     private static final String ACTION_ID = "STEPIC.StepikSendAction";
     private static final String SHORTCUT = "ctrl alt pressed ENTER";
+    private static final String SHORTCUT_TEXT = ActionUtils.getShortcutText(SHORTCUT);
+    private static final String TEXT = "Check Step (" + SHORTCUT_TEXT + ")";
+    private static final String DESCRIPTION = "Check current step";
 
     public StepikSendAction() {
-        super("Check Step (" + KeymapUtil.getShortcutText(new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT),
-                null)) + ")", "Check current step", AllStepikIcons.ToolWindow.checkTask);
+        super(TEXT, DESCRIPTION, AllStepikIcons.ToolWindow.checkTask);
     }
 
     @Nullable

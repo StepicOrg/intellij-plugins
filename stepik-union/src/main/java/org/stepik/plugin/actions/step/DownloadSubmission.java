@@ -2,14 +2,12 @@ package org.stepik.plugin.actions.step;
 
 import com.intellij.ide.projectView.ProjectView;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
@@ -34,6 +32,7 @@ import org.stepik.core.courseFormat.StudyNode;
 import org.stepik.core.courseFormat.StudyStatus;
 import org.stepik.core.metrics.Metrics;
 import org.stepik.core.utils.Utils;
+import org.stepik.plugin.actions.ActionUtils;
 
 import javax.swing.*;
 import java.text.SimpleDateFormat;
@@ -64,11 +63,12 @@ public class DownloadSubmission extends CodeQuizAction {
     private static final Logger logger = Logger.getInstance(DownloadSubmission.class);
     private static final String ACTION_ID = "STEPIK.DownloadSubmission";
     private static final String SHORTCUT = "ctrl alt pressed PAGE_DOWN";
+    private static final String SHORTCUT_TEXT = ActionUtils.getShortcutText(SHORTCUT);
+    private static final String TEXT = "Download submission from the List (" + SHORTCUT_TEXT + ")";
+    private static final String DESCRIPTION = "Download submission from the List";
 
     public DownloadSubmission() {
-        super("Download submission from the List(" + KeymapUtil.getShortcutText(
-                new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT), null)) + ")",
-                "Download submission from the List", AllStepikIcons.ToolWindow.download);
+        super(TEXT, DESCRIPTION, AllStepikIcons.ToolWindow.download);
     }
 
     @NotNull

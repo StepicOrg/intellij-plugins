@@ -2,11 +2,9 @@ package org.stepik.plugin.actions.step;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
@@ -15,9 +13,8 @@ import org.stepik.core.StepikProjectManager;
 import org.stepik.core.SupportedLanguages;
 import org.stepik.core.courseFormat.StepNode;
 import org.stepik.core.metrics.Metrics;
+import org.stepik.plugin.actions.ActionUtils;
 import org.stepik.plugin.utils.ReformatUtils;
-
-import javax.swing.*;
 
 import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
@@ -31,12 +28,12 @@ import static org.stepik.plugin.utils.DirectivesUtilsKt.writeInToFile;
 public class InsertStepikDirectives extends CodeQuizAction {
     private static final String SHORTCUT = "ctrl alt pressed R";
     private static final String ACTION_ID = "STEPIK.InsertStepikDirectives";
+    private static final String SHORTCUT_TEXT = ActionUtils.getShortcutText(SHORTCUT);
+    private static final String TEXT = "Repair standard template (" + SHORTCUT_TEXT + ")";
+    private static final String DESCRIPTION = "Insert Stepik directives. Repair ordinary template if it is possible.";
 
     public InsertStepikDirectives() {
-        super("Repair standard template(" + KeymapUtil.getShortcutText(
-                new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT), null)) + ")",
-                "Insert Stepik directives. Repair ordinary template if it is possible.",
-                AllIcons.General.ExternalToolsSmall);
+        super(TEXT, DESCRIPTION, AllIcons.General.ExternalToolsSmall);
     }
 
     @NotNull

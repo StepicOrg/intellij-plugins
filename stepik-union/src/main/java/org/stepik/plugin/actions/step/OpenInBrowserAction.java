@@ -2,10 +2,8 @@ package org.stepik.plugin.actions.step;
 
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.project.Project;
 import icons.AllStepikIcons;
 import org.jetbrains.annotations.NotNull;
@@ -14,18 +12,17 @@ import org.stepik.api.urls.Urls;
 import org.stepik.core.StepikProjectManager;
 import org.stepik.core.courseFormat.StepNode;
 import org.stepik.core.courseFormat.StudyNode;
-
-import javax.swing.*;
+import org.stepik.plugin.actions.ActionUtils;
 
 public class OpenInBrowserAction extends AbstractStepAction {
     private static final String ACTION_ID = "STEPIK.OpenInBrowser";
     private static final String SHORTCUT = "ctrl shift pressed HOME";
+    private static final String SHORTCUT_TEXT = ActionUtils.getShortcutText(SHORTCUT);
+    private static final String TEXT = "View this step on Stepik (" + SHORTCUT_TEXT + ")";
     private static final String DESCRIPTION = "View this step on Stepik";
 
     public OpenInBrowserAction() {
-        super("View this step on Stepik (" + KeymapUtil.getShortcutText(
-                new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT), null)) + ")",
-                DESCRIPTION, AllStepikIcons.stepikLogo);
+        super(TEXT, DESCRIPTION, AllStepikIcons.stepikLogo);
     }
 
     @NotNull
