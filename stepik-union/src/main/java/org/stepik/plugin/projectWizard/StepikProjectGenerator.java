@@ -16,7 +16,6 @@ import org.stepik.core.courseFormat.StudyNodeFactory;
 import org.stepik.core.metrics.Metrics;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -27,6 +26,7 @@ import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
 import static org.stepik.core.metrics.MetricsStatus.TARGET_NOT_FOUND;
 import static org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient;
 import static org.stepik.core.stepik.StepikAuthManager.getCurrentUser;
+import static org.stepik.plugin.projectWizard.CoursesList.COURSES;
 
 public class StepikProjectGenerator {
     public static final StudyObject EMPTY_STUDY_OBJECT = initEmptyStudyNode();
@@ -58,7 +58,7 @@ public class StepikProjectGenerator {
     public static CompletableFuture<List<StudyObject>> getCourses(@NotNull SupportedLanguages programmingLanguage) {
         return CompletableFuture.supplyAsync(() -> {
             List<StudyObject> courses = new ArrayList<>();
-            List<Long> coursesIds = getHardcodedCoursesId(programmingLanguage);
+            List<Long> coursesIds = COURSES.getOrDefault(programmingLanguage, Collections.emptyList());
 
             if (!coursesIds.isEmpty()) {
                 StepikApiClient stepikApiClient = authAndGetStepikApiClient();
@@ -87,48 +87,6 @@ public class StepikProjectGenerator {
 
             return courses;
         });
-    }
-
-    @NotNull
-    private static List<Long> getHardcodedCoursesId(@NotNull SupportedLanguages programmingLanguage) {
-        switch (programmingLanguage) {
-            case ASM32:
-            case ASM64:
-                return Arrays.asList(253L, 1780L, 156L, 217L, 1127L, 125L, 126L, 150L);
-            case CPP:
-            case CPP_11:
-                return Arrays.asList(579L, 363L, 144L, 153L, 538L, 7L, 156L, 217L, 1127L, 125L, 126L, 150L);
-            case JAVA:
-            case JAVA8:
-                return Arrays.asList(187L, 150L, 2403L, 2600L, 1891L, 1595L, 2262L, 217L, 1127L, 125L, 126L);
-            case JAVASCRIPT:
-                return Arrays.asList(2606L, 2223L, 156L, 217L, 1127L, 125L, 126L, 150L);
-            case HASKELL:
-            case HASKELL_7_10:
-            case HASKELL_8_0:
-                return Arrays.asList(75L, 693L, 156L, 217L, 1127L, 125L, 126L, 150L);
-            case KOTLIN:
-                return Arrays.asList(2852L, 156L, 217L, 1127L, 125L, 126L, 150L);
-            case PYTHON3:
-                return Arrays.asList(67L, 512L, 401L, 568L, 431L, 2057L, 156L, 217L, 1127L, 125L, 126L, 150L);
-            case R:
-                return Arrays.asList(497L, 129L, 724L, 156L, 217L, 1127L, 125L, 126L, 150L);
-            case RUBY:
-                return Arrays.asList(156L, 1127L, 125L, 126L, 150L);
-            case SCALA:
-                return Arrays.asList(2294L, 156L, 217L, 1127L, 125L, 126L, 150L);
-            case CLOJURE:
-            case GO:
-            case C:
-            case MONO_CS:
-            case OCTAVE:
-            case PASCAL_ABC:
-            case RUST:
-            case SHELL:
-                return Arrays.asList(156L, 217L, 1127L, 125L, 126L, 150L);
-        }
-
-        return Collections.emptyList();
     }
 
     public void createCourseNodeUnderProgress(@NotNull final Project project, @NotNull StudyObject data) {
