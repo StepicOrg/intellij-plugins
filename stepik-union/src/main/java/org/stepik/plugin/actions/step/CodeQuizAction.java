@@ -2,10 +2,11 @@ package org.stepik.plugin.actions.step;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.project.Project;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.stepik.core.StepikProjectManager;
 import org.stepik.core.courseFormat.StepNode;
-import org.stepik.core.courseFormat.StudyNode;
 
 import javax.swing.*;
 
@@ -19,13 +20,26 @@ abstract class CodeQuizAction extends AbstractStepAction {
         super(text, description, icon);
     }
 
+    @Nullable
+    @Contract("null -> null")
+    static StepNode getCurrentCodeStepNode(@Nullable Project project) {
+        StepNode stepNode = getCurrentStep(project);
+        if (stepNode == null || stepNode.getType() != CODE) {
+            return null;
+        }
+        return stepNode;
+    }
+
     @Override
-    public void update(AnActionEvent e) {
+    public void update(@NotNull AnActionEvent e) {
         super.update(e);
         Presentation presentation = e.getPresentation();
-        StudyNode<?, ?> selectedNode = StepikProjectManager.getSelected(e.getProject());
-        boolean enabled = presentation.isEnabled();
-        boolean canEnabled = (selectedNode instanceof StepNode) && (((StepNode) selectedNode).getType() == CODE);
-        presentation.setEnabled(enabled && canEnabled);
+
+        if (!presentation.isEnabled()) {
+            return;
+        }
+
+        StepNode stepNode = getCurrentStep(e.getProject());
+        presentation.setEnabled((stepNode != null) && (stepNode.getType() == CODE));
     }
 }

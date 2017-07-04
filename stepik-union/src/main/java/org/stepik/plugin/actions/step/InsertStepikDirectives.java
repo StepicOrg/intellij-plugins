@@ -14,13 +14,11 @@ import org.jetbrains.annotations.Nullable;
 import org.stepik.core.StepikProjectManager;
 import org.stepik.core.SupportedLanguages;
 import org.stepik.core.courseFormat.StepNode;
-import org.stepik.core.courseFormat.StudyNode;
 import org.stepik.core.metrics.Metrics;
 import org.stepik.plugin.utils.ReformatUtils;
 
 import javax.swing.*;
 
-import static org.stepik.core.courseFormat.StepType.CODE;
 import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
 import static org.stepik.plugin.utils.DirectivesUtilsKt.containsDirectives;
@@ -56,16 +54,10 @@ public class InsertStepikDirectives extends CodeQuizAction {
     @Override
     public void actionPerformed(AnActionEvent e) {
         Project project = e.getProject();
-        if (project == null) {
+        StepNode stepNode = getCurrentCodeStepNode(project);
+        if (stepNode == null) {
             return;
         }
-
-        StudyNode selectedNode = StepikProjectManager.getSelected(project);
-        if (!(selectedNode instanceof StepNode) || ((StepNode) selectedNode).getType() != CODE) {
-            return;
-        }
-
-        StepNode targetStepNode = (StepNode) selectedNode;
 
         FileDocumentManager documentManager = FileDocumentManager.getInstance();
         for (VirtualFile file : FileEditorManager.getInstance(project).getOpenFiles()) {
@@ -74,9 +66,9 @@ public class InsertStepikDirectives extends CodeQuizAction {
                 documentManager.saveDocument(document);
         }
 
-        SupportedLanguages currentLang = targetStepNode.getCurrentLang();
+        SupportedLanguages currentLang = stepNode.getCurrentLang();
 
-        VirtualFile src = getOrCreateSrcDirectory(project, targetStepNode, true);
+        VirtualFile src = getOrCreateSrcDirectory(project, stepNode, true);
         if (src == null) {
             return;
         }
@@ -93,10 +85,10 @@ public class InsertStepikDirectives extends CodeQuizAction {
         boolean needInsert = !containsDirectives(text, currentLang);
         if (needInsert) {
             text = insertAmbientCode(text, currentLang, showHint);
-            Metrics.insertAmbientCodeAction(project, targetStepNode, SUCCESSFUL);
+            Metrics.insertAmbientCodeAction(project, stepNode, SUCCESSFUL);
         } else {
             text = removeAmbientCode(text, showHint, currentLang, true);
-            Metrics.removeAmbientCodeAction(project, targetStepNode, SUCCESSFUL);
+            Metrics.removeAmbientCodeAction(project, stepNode, SUCCESSFUL);
         }
         writeInToFile(text, file, project);
         if (needInsert) {

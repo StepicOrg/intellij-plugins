@@ -18,10 +18,8 @@ import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.attempts.Attempts;
 import org.stepik.api.objects.submissions.Submissions;
-import org.stepik.core.StepikProjectManager;
 import org.stepik.core.SupportedLanguages;
 import org.stepik.core.courseFormat.StepNode;
-import org.stepik.core.courseFormat.StudyNode;
 import org.stepik.core.metrics.Metrics;
 import org.stepik.core.utils.Utils;
 import org.stepik.plugin.actions.ActionUtils;
@@ -186,13 +184,12 @@ public class StepikSendAction extends CodeQuizAction {
 
     private void check(@NotNull Project project) {
         logger.info("Start checking step");
-        StudyNode<?, ?> selected = StepikProjectManager.getSelected(project);
-        if (!(selected instanceof StepNode)) {
-            logger.info("Stop checking step: step is null or is not StepNode ");
+
+        StepNode stepNode = getCurrentCodeStepNode(project);
+        if (stepNode == null) {
+            logger.info("Stop checking step: step is null or it is not StepNode ");
             return;
         }
-
-        StepNode stepNode = (StepNode) selected;
 
         String title = "Checking Step: " + stepNode.getName();
 

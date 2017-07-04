@@ -17,13 +17,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.core.StepikProjectManager;
 import org.stepik.core.courseFormat.StepNode;
-import org.stepik.core.courseFormat.StudyNode;
 import org.stepik.core.metrics.Metrics;
 import org.stepik.core.metrics.MetricsStatus;
 
 import javax.swing.*;
 
-import static org.stepik.core.courseFormat.StepType.CODE;
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
 
 public class StepikResetStepAction extends CodeQuizAction {
@@ -36,19 +34,17 @@ public class StepikResetStepAction extends CodeQuizAction {
                 "Reset current step", AllStepikIcons.ToolWindow.resetTaskFile);
     }
 
-    private static void reset(@NotNull final Project project) {
+    private static void reset(@Nullable final Project project) {
         Application application = ApplicationManager.getApplication();
         application.invokeLater(() ->
                 application.runWriteAction(() -> resetFile(project)));
     }
 
-    private static void resetFile(@NotNull final Project project) {
-        StudyNode<?, ?> selected = StepikProjectManager.getSelected(project);
-        if (!(selected instanceof StepNode) || ((StepNode) selected).getType() != CODE) {
+    private static void resetFile(@Nullable final Project project) {
+        StepNode stepNode = getCurrentCodeStepNode(project);
+        if (stepNode == null) {
             return;
         }
-
-        StepNode stepNode = (StepNode) selected;
 
         VirtualFile src = getOrCreateSrcDirectory(project, stepNode, true);
         if (src == null) {
@@ -88,12 +84,7 @@ public class StepikResetStepAction extends CodeQuizAction {
     }
 
     public void actionPerformed(@NotNull AnActionEvent event) {
-        final Project project = event.getProject();
-        if (project == null) {
-            return;
-        }
-
-        reset(project);
+        reset(event.getProject());
     }
 
     @NotNull

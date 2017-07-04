@@ -28,7 +28,6 @@ import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.submissions.Submission;
 import org.stepik.api.objects.submissions.Submissions;
 import org.stepik.api.queries.Order;
-import org.stepik.core.StepikProjectManager;
 import org.stepik.core.SupportedLanguages;
 import org.stepik.core.courseFormat.StepNode;
 import org.stepik.core.courseFormat.StudyNode;
@@ -91,16 +90,10 @@ public class DownloadSubmission extends CodeQuizAction {
     }
 
     private void downloadSubmission(@Nullable Project project) {
-        if (project == null) {
+        StepNode stepNode = getCurrentCodeStepNode(project);
+        if (stepNode == null) {
             return;
         }
-
-        StudyNode<?, ?> studyNode = StepikProjectManager.getSelected(project);
-        if (!(studyNode instanceof StepNode)) {
-            return;
-        }
-
-        StepNode stepNode = (StepNode) studyNode;
 
         String title = "Download submission";
 
