@@ -15,12 +15,12 @@ import org.stepik.core.courseFormat.StudyNode;
 import org.stepik.core.courseFormat.StudyNodeFactory;
 import org.stepik.core.metrics.Metrics;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+import static java.util.Collections.*;
 import static org.stepik.core.metrics.MetricsStatus.DATA_NOT_LOADED;
 import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
 import static org.stepik.core.metrics.MetricsStatus.TARGET_NOT_FOUND;
@@ -57,35 +57,34 @@ public class StepikProjectGenerator {
     @NotNull
     public static CompletableFuture<List<StudyObject>> getCourses(@NotNull SupportedLanguages programmingLanguage) {
         return CompletableFuture.supplyAsync(() -> {
-            List<StudyObject> courses = new ArrayList<>();
-            List<Long> coursesIds = COURSES.getOrDefault(programmingLanguage, Collections.emptyList());
+            List<Long> coursesIds = COURSES.getOrDefault(programmingLanguage, emptyList());
 
-            if (!coursesIds.isEmpty()) {
-                StepikApiClient stepikApiClient = authAndGetStepikApiClient();
-                try {
-                    courses = stepikApiClient.courses()
-                            .get()
-                            .id(coursesIds)
-                            .execute()
-                            .getCourses()
-                            .stream()
-                            .map(course -> (StudyObject) course)
-                            .collect(Collectors.toList());
-                } catch (StepikClientException e) {
-                    logger.warn("Failed get courses", e);
-                }
+            if (coursesIds.isEmpty()) {
+                return emptyList();
             }
 
-            courses.sort((course1, course2) -> {
-                long id1 = course1.getId();
-                long id2 = course2.getId();
+            StepikApiClient stepikApiClient = authAndGetStepikApiClient();
+            try {
+                return stepikApiClient.courses()
+                        .get()
+                        .id(coursesIds)
+                        .execute()
+                        .getCourses()
+                        .stream()
+                        .map(course -> (StudyObject) course)
+                        .sorted((course1, course2) -> {
+                            long id1 = course1.getId();
+                            long id2 = course2.getId();
 
-                int index1 = coursesIds.indexOf(id1);
-                int index2 = coursesIds.indexOf(id2);
-                return Integer.compare(index1, index2);
-            });
-
-            return courses;
+                            int index1 = coursesIds.indexOf(id1);
+                            int index2 = coursesIds.indexOf(id2);
+                            return Integer.compare(index1, index2);
+                        })
+                        .collect(Collectors.toList());
+            } catch (StepikClientException e) {
+                logger.warn("Failed get courses", e);
+                return emptyList();
+            }
         });
     }
 
