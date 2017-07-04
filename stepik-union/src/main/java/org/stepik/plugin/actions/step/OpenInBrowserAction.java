@@ -3,6 +3,7 @@ package org.stepik.plugin.actions.step;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
+import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.project.Project;
@@ -10,7 +11,6 @@ import icons.AllStepikIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.api.urls.Urls;
-import org.stepik.core.StepikProjectManager;
 import org.stepik.core.courseFormat.StepNode;
 import org.stepik.core.courseFormat.StudyNode;
 
@@ -19,11 +19,12 @@ import javax.swing.*;
 public class OpenInBrowserAction extends AbstractStepAction {
     private static final String ACTION_ID = "STEPIK.OpenInBrowser";
     private static final String SHORTCUT = "ctrl shift pressed HOME";
+    private static final String DESCRIPTION = "View this step on Stepik";
 
     public OpenInBrowserAction() {
         super("View this step on Stepik (" + KeymapUtil.getShortcutText(
                 new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT), null)) + ")",
-                "View this step on Stepik", AllStepikIcons.stepikLogo);
+                DESCRIPTION, AllStepikIcons.stepikLogo);
     }
 
     @NotNull
@@ -45,23 +46,34 @@ public class OpenInBrowserAction extends AbstractStepAction {
     }
 
     private void openInBrowser(@Nullable Project project) {
-        if (project == null) {
+        StepNode stepNode = getCurrentStep(project);
+        if (stepNode == null) {
             return;
         }
 
-        StudyNode<?, ?> studyNode = StepikProjectManager.getSelected(project);
-        if (!(studyNode instanceof StepNode)) {
-            return;
-        }
+        String link = getLink(stepNode);
+        BrowserUtil.browse(link);
+    }
 
-        StepNode stepNode = (StepNode) studyNode;
-
+    private String getLink(@NotNull StepNode stepNode) {
         StudyNode parent = stepNode.getParent();
         String link = Urls.STEPIK_URL;
         if (parent != null) {
             link = String.format("%s/lesson/%d/step/%d", link, parent.getId(), stepNode.getPosition());
         }
+        return link;
+    }
 
-        BrowserUtil.browse(link);
+    @Override
+    public void update(@NotNull AnActionEvent e) {
+        super.update(e);
+        Presentation presentation = e.getPresentation();
+        StepNode stepNode = getCurrentStep(e.getProject());
+        if (stepNode == null) {
+            presentation.setDescription(DESCRIPTION);
+            return;
+        }
+        String link = getLink(stepNode);
+        presentation.setDescription(link);
     }
 }
