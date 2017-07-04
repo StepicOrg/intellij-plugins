@@ -41,7 +41,8 @@
         <action id="STEPIK.NextStepAction" class="org.stepik.plugin.actions.navigation.StepikNextStepAction"/>
         <action id="STEPIK.DownloadSubmission" class="org.stepik.plugin.actions.step.DownloadSubmission"/>
         <action id="STEPIK.InsertStepikDirectives" class="org.stepik.plugin.actions.step.InsertStepikDirectives"/>
-        <action id="STEPIK.RefreshStepAction" class="org.stepik.plugin.actions.step.StepikResetStepAction" text="Reset Step File" description="Refresh current step"/>
+        <action id="STEPIK.RefreshStepAction" class="org.stepik.plugin.actions.step.StepikResetStepAction"/>
+        <action id="STEPIK.OpenInBrowser" class="org.stepik.plugin.actions.step.OpenInBrowserAction"/>
     </actions>
 
     <project-components>
