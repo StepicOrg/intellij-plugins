@@ -14,6 +14,8 @@ import org.stepik.core.courseFormat.StepNode;
 import org.stepik.core.courseFormat.StudyNode;
 import org.stepik.plugin.actions.ActionUtils;
 
+import static org.stepik.core.metrics.Metrics.openInBrowserAction;
+
 public class OpenInBrowserAction extends AbstractStepAction {
     private static final String ACTION_ID = "STEPIK.OpenInBrowser";
     private static final String SHORTCUT = "ctrl shift pressed HOME";
@@ -51,6 +53,7 @@ public class OpenInBrowserAction extends AbstractStepAction {
 
         String link = getLink(project, stepNode);
         BrowserUtil.browse(link);
+        openInBrowserAction(project, stepNode);
     }
 
     private String getLink(@NotNull Project project, @NotNull StepNode stepNode) {
