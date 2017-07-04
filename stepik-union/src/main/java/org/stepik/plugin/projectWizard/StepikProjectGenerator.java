@@ -15,12 +15,11 @@ import org.stepik.core.courseFormat.StudyNode;
 import org.stepik.core.courseFormat.StudyNodeFactory;
 import org.stepik.core.metrics.Metrics;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-import static java.util.Collections.*;
+import static java.util.Collections.emptyList;
 import static org.stepik.core.metrics.MetricsStatus.DATA_NOT_LOADED;
 import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
 import static org.stepik.core.metrics.MetricsStatus.TARGET_NOT_FOUND;
