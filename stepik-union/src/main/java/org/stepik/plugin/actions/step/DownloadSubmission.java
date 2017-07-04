@@ -265,9 +265,8 @@ public class DownloadSubmission extends CodeQuizAction {
 
         @Override
         public String toString() {
-            String localTime;
             Date utcTime = submission.getTime();
-            localTime = timeOutFormat.format(utcTime);
+            String localTime = timeOutFormat.format(utcTime);
 
             return String.format("#%d %-7s %s", submission.getId(), submission.getStatus(), localTime);
         }
