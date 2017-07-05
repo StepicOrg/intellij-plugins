@@ -105,7 +105,7 @@
                 </#if>
             </#if>
 
-            <#if stepNode.needLogin()>
+            <#if needLogin>
                 <button type="button" onclick="showLogin()">Login</button>
             </#if>
 
