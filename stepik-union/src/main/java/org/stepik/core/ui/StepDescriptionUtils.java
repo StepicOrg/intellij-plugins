@@ -78,7 +78,6 @@ class StepDescriptionUtils {
                 reply.setFormula(formula);
                 break;
             default:
-                logger.warn("Unknown step type tried sending: " + type);
                 return null;
         }
         stepNode.setLastReply(reply);
