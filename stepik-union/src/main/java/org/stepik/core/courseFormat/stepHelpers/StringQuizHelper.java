@@ -22,9 +22,4 @@ public class StringQuizHelper extends QuizHelper {
         initStepOptions();
         return getDataset().isTextDisabled();
     }
-
-    @Override
-    public boolean isAutoCreateAttempt() {
-        return true;
-    }
 }

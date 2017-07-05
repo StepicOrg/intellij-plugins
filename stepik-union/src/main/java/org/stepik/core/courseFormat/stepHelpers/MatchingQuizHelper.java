@@ -56,9 +56,4 @@ public class MatchingQuizHelper extends QuizHelper {
         initStepOptions();
         return ordering;
     }
-
-    @Override
-    public boolean isAutoCreateAttempt() {
-        return true;
-    }
 }

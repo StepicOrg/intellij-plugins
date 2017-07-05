@@ -48,9 +48,4 @@ public class SortingQuizHelper extends QuizHelper {
     void fail() {
         ordering = new ArrayList<>();
     }
-
-    @Override
-    public boolean isAutoCreateAttempt() {
-        return true;
-    }
 }

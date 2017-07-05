@@ -50,9 +50,4 @@ public class ChoiceQuizHelper extends QuizHelper {
         initStepOptions();
         return getDataset().isMultipleChoice();
     }
-
-    @Override
-    public boolean isAutoCreateAttempt() {
-        return true;
-    }
 }

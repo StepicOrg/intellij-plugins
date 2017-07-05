@@ -135,6 +135,6 @@ public class StepHelper {
     }
 
     public boolean isAutoCreateAttempt() {
-        return false;
+        return hasSubmitButton();
     }
 }
