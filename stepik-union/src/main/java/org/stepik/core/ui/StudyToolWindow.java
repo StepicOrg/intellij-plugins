@@ -263,7 +263,7 @@ public class StudyToolWindow extends SimpleToolWindowPanel implements DataProvid
                 break;
         }
 
-        if (stepHelper.isAutoCreateAttempt() && GET_FIRST_ATTEMPT.contain(stepHelper.getAction())) {
+        if (stepHelper.isAutoCreateAttempt() && stepHelper.getAction() == GET_FIRST_ATTEMPT) {
             FormListener.getAttempt(project, stepNode);
         } else {
             HashMap<String, Object> params = new HashMap<>();

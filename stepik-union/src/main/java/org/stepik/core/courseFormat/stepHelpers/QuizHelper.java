@@ -22,7 +22,6 @@ import org.stepik.core.courseFormat.StudyStatus;
 
 import java.util.List;
 
-import static org.stepik.core.courseFormat.stepHelpers.Actions.ACTIVE;
 import static org.stepik.core.courseFormat.stepHelpers.Actions.GET_ATTEMPT;
 import static org.stepik.core.courseFormat.stepHelpers.Actions.GET_FIRST_ATTEMPT;
 import static org.stepik.core.courseFormat.stepHelpers.Actions.NEED_LOGIN;
@@ -35,6 +34,7 @@ import static org.stepik.core.stepik.StepikAuthManager.getCurrentUser;
  */
 public class QuizHelper extends StepHelper {
     private static final Logger logger = Logger.getInstance(QuizHelper.class);
+    private static final String ACTIVE = "active";
     private static final String UNCHECKED = "unchecked";
     @NotNull
     Reply reply = new Reply();
@@ -67,7 +67,7 @@ public class QuizHelper extends StepHelper {
         }
 
         attempt = attempts.getFirst();
-        action = ACTIVE.contain(attempt.getStatus()) ? SUBMIT : GET_ATTEMPT;
+        action = ACTIVE.equals(attempt.getStatus()) ? SUBMIT : GET_ATTEMPT;
         return true;
     }
 
@@ -104,7 +104,7 @@ public class QuizHelper extends StepHelper {
             if (attemptId == submission.getAttempt()) {
                 status = submission.getStatus();
             }
-            if (ACTIVE.contain(attempt.getStatus()) && status.equals("correct")) {
+            if (ACTIVE.equals(attempt.getStatus()) && status.equals("correct")) {
                 action = GET_ATTEMPT;
             }
 
@@ -270,9 +270,9 @@ public class QuizHelper extends StepHelper {
 
     @Override
     @NotNull
-    public String getAction() {
+    public Actions getAction() {
         initStepOptions();
-        return action.toString();
+        return action;
     }
 
     @SuppressWarnings("unused")

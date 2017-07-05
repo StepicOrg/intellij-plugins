@@ -14,6 +14,7 @@ import org.stepik.core.courseFormat.StudyNode;
 import org.stepik.plugin.actions.navigation.StudyNavigator;
 
 import static org.stepik.core.courseFormat.stepHelpers.Actions.NEED_LOGIN;
+import static org.stepik.core.courseFormat.stepHelpers.Actions.NOTHING;
 import static org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient;
 import static org.stepik.core.stepik.StepikAuthManager.isAuthenticated;
 
@@ -36,11 +37,11 @@ public class StepHelper {
     }
 
     @NotNull
-    public String getAction() {
+    public Actions getAction() {
         if (!isAuthenticated()) {
-            return NEED_LOGIN.toString();
+            return NEED_LOGIN;
         }
-        return "";
+        return NOTHING;
     }
 
     @NotNull
@@ -127,7 +128,7 @@ public class StepHelper {
     }
 
     public boolean needLogin() {
-        return "need_login".equals(getAction());
+        return getAction() == NEED_LOGIN;
     }
 
     public boolean canSubmit() {
