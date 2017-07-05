@@ -13,6 +13,7 @@ import org.stepik.core.courseFormat.StepNode;
 import org.stepik.core.courseFormat.StudyNode;
 import org.stepik.plugin.actions.navigation.StudyNavigator;
 
+import static org.stepik.core.courseFormat.stepHelpers.Actions.NEED_LOGIN;
 import static org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient;
 import static org.stepik.core.stepik.StepikAuthManager.isAuthenticated;
 
@@ -20,7 +21,6 @@ import static org.stepik.core.stepik.StepikAuthManager.isAuthenticated;
  * @author meanmail
  */
 public class StepHelper {
-    static final String NEED_LOGIN = "need_login";
     private static final Logger logger = Logger.getInstance(StepHelper.class);
     private final Project project;
     private final StepNode stepNode;
@@ -38,7 +38,7 @@ public class StepHelper {
     @NotNull
     public String getAction() {
         if (!isAuthenticated()) {
-            return NEED_LOGIN;
+            return NEED_LOGIN.toString();
         }
         return "";
     }
@@ -131,6 +131,10 @@ public class StepHelper {
     }
 
     public boolean canSubmit() {
+        return false;
+    }
+
+    public boolean isAutoCreateAttempt() {
         return false;
     }
 }

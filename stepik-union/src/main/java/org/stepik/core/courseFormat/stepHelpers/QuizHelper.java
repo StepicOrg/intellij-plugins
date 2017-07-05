@@ -22,6 +22,11 @@ import org.stepik.core.courseFormat.StudyStatus;
 
 import java.util.List;
 
+import static org.stepik.core.courseFormat.stepHelpers.Actions.ACTIVE;
+import static org.stepik.core.courseFormat.stepHelpers.Actions.GET_ATTEMPT;
+import static org.stepik.core.courseFormat.stepHelpers.Actions.GET_FIRST_ATTEMPT;
+import static org.stepik.core.courseFormat.stepHelpers.Actions.NEED_LOGIN;
+import static org.stepik.core.courseFormat.stepHelpers.Actions.SUBMIT;
 import static org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient;
 import static org.stepik.core.stepik.StepikAuthManager.getCurrentUser;
 
@@ -30,16 +35,12 @@ import static org.stepik.core.stepik.StepikAuthManager.getCurrentUser;
  */
 public class QuizHelper extends StepHelper {
     private static final Logger logger = Logger.getInstance(QuizHelper.class);
-    private static final String ACTIVE = "active";
-    private static final String GET_ATTEMPT = "get_attempt";
-    private static final String GET_FIRST_ATTEMPT = "get_first_attempt";
-    private static final String SUBMIT = "submit";
     private static final String UNCHECKED = "unchecked";
     @NotNull
     Reply reply = new Reply();
     boolean useLastSubmission;
     @NotNull
-    private String action = "get_first_attempt";
+    private Actions action = GET_FIRST_ATTEMPT;
     @NotNull
     private String status = "unchecked";
     @NotNull
@@ -66,7 +67,7 @@ public class QuizHelper extends StepHelper {
         }
 
         attempt = attempts.getFirst();
-        action = ACTIVE.equals(attempt.getStatus()) ? SUBMIT : GET_ATTEMPT;
+        action = ACTIVE.contain(attempt.getStatus()) ? SUBMIT : GET_ATTEMPT;
         return true;
     }
 
@@ -103,7 +104,7 @@ public class QuizHelper extends StepHelper {
             if (attemptId == submission.getAttempt()) {
                 status = submission.getStatus();
             }
-            if (ACTIVE.equals(attempt.getStatus()) && status.equals("correct")) {
+            if (ACTIVE.contain(attempt.getStatus()) && status.equals("correct")) {
                 action = GET_ATTEMPT;
             }
 
@@ -271,7 +272,7 @@ public class QuizHelper extends StepHelper {
     @NotNull
     public String getAction() {
         initStepOptions();
-        return action;
+        return action.toString();
     }
 
     @SuppressWarnings("unused")

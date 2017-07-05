@@ -68,7 +68,7 @@ class FormListener implements EventListener {
         return null;
     }
 
-    private static void getAttempt(@NotNull Project project, @NotNull StepNode node) {
+    static void getAttempt(@NotNull Project project, @NotNull StepNode node) {
         StepikApiClient stepikApiClient = authAndGetStepikApiClient(true);
 
         stepikApiClient.attempts()

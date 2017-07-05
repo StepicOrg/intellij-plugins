@@ -20,6 +20,7 @@ public class SortingQuizHelper extends QuizHelper {
         super(project, stepNode);
     }
 
+    @SuppressWarnings("unused")
     @NotNull
     public List<Pair<Integer, String>> getOrdering() {
         initStepOptions();
@@ -46,5 +47,10 @@ public class SortingQuizHelper extends QuizHelper {
     @Override
     void fail() {
         ordering = new ArrayList<>();
+    }
+
+    @Override
+    public boolean isAutoCreateAttempt() {
+        return true;
     }
 }

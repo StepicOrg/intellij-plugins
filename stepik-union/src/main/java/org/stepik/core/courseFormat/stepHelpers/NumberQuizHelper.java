@@ -17,4 +17,9 @@ public class NumberQuizHelper extends QuizHelper {
         initStepOptions();
         return reply.getNumber();
     }
+
+    @Override
+    public boolean isAutoCreateAttempt() {
+        return true;
+    }
 }

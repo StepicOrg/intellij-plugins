@@ -79,4 +79,9 @@ public class TableQuizHelper extends QuizHelper {
         initStepOptions();
         return getDataset().isCheckbox();
     }
+
+    @Override
+    public boolean isAutoCreateAttempt() {
+        return true;
+    }
 }

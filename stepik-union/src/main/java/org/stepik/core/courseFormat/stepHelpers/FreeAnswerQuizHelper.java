@@ -145,4 +145,9 @@ public class FreeAnswerQuizHelper extends StringQuizHelper {
         }
         return "";
     }
+
+    @Override
+    public boolean isAutoCreateAttempt() {
+        return true;
+    }
 }
