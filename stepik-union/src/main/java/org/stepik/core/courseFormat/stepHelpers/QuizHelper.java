@@ -295,4 +295,9 @@ public class QuizHelper extends StepHelper {
     public boolean canSubmit() {
         return true;
     }
+
+    @Override
+    public boolean isAutoCreateAttempt() {
+        return !isHasSubmissionsRestrictions() && hasSubmitButton();
+    }
 }
