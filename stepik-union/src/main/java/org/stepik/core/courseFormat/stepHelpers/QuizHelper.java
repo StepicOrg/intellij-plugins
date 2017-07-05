@@ -253,7 +253,8 @@ public class QuizHelper extends StepHelper {
         return submission.getHint();
     }
 
-    private boolean isHasSubmissionsRestrictions() {
+    @SuppressWarnings("WeakerAccess")
+    public boolean isHasSubmissionsRestrictions() {
         Step data = getStepNode().getData();
         return data != null && data.isHasSubmissionsRestrictions();
     }
