@@ -14,6 +14,8 @@ subprojects {
     apply plugin: "java"
     apply plugin: "kotlin"
 
+    compileJava.options.encoding = 'UTF-8'
+
     repositories {
         mavenCentral()
     }
