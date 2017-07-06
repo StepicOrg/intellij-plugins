@@ -55,7 +55,7 @@ class PrepareSandboxTask extends DefaultTask {
         return pluginName != null ? FileUtils.toSafeFileName(pluginName) : null
     }
 
-    @Input
+    @OutputDirectory
     @Nullable
     File getConfigDirectory() {
         if (extension == null) {
@@ -107,7 +107,7 @@ class PrepareSandboxTask extends DefaultTask {
     }
 
     private static HashSet<Path> getDependenciesJars(@NotNull Project project) {
-        def runtimeConfiguration = project.configurations.getByName(JavaPlugin.RUNTIME_CONFIGURATION_NAME)
+        def runtimeConfiguration = project.configurations.getByName(JavaPlugin.RUNTIME_ELEMENTS_CONFIGURATION_NAME)
 
         def libsToIgnored = [Jvm.current().toolsJar]
 
