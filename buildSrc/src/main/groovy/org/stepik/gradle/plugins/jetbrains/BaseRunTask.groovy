@@ -117,7 +117,7 @@ abstract class BaseRunTask extends JavaExec {
         this.plugin = plugin
     }
 
-    @Input
+    @Internal
     ProductPluginExtension getExtension() {
         return extension
     }
