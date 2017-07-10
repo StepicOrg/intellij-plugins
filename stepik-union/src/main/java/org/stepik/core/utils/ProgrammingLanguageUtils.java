@@ -49,6 +49,8 @@ public class ProgrammingLanguageUtils {
             return;
         }
 
+        language.getTestRunner().updateRunConfiguration(project, targetStepNode);
+
         SupportedLanguages currentLang = targetStepNode.getCurrentLang();
         String currentMainFileName = currentLang.getMainFileName();
 

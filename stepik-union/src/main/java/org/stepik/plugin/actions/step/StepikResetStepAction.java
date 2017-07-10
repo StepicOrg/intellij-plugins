@@ -76,6 +76,8 @@ public class StepikResetStepAction extends CodeQuizAction {
                         .runWriteAction(() -> {
                             document.setText(stepNode.getCurrentTemplate());
                             Metrics.resetStepAction(project, stepNode, MetricsStatus.SUCCESSFUL);
+
+                            stepNode.getCurrentLang().getTestRunner().updateRunConfiguration(project, stepNode);
                         }),
                 "Stepik reset step", "Stepik reset step"
         );

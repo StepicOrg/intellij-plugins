@@ -94,5 +94,7 @@ public class InsertStepikDirectives extends CodeQuizAction {
                 ReformatUtils.reformatSelectedEditor(project, document);
             }
         }
+
+        currentLang.getTestRunner().updateRunConfiguration(project, stepNode);
     }
 }

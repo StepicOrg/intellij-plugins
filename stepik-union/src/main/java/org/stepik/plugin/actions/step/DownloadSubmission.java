@@ -242,6 +242,8 @@ public class DownloadSubmission extends CodeQuizAction {
                                 FileEditorManager.getInstance(project).openFile(mainFile, true);
                                 ProjectView.getInstance(project).refresh();
                                 Metrics.downloadAction(project, stepNode, SUCCESSFUL);
+
+                                language.getTestRunner().updateRunConfiguration(project, stepNode);
                             }
                         }),
                 "Download submission",
