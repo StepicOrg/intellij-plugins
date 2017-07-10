@@ -27,6 +27,8 @@ class JavaTestRunner : TestRunner {
 
         val settingName = "Run step${stepNode.id} ($language)"
 
+        val type = ApplicationConfigurationType.getInstance()
+
         val runConfiguration: RunnerAndConfigurationSettings = runManager.getConfigurationSettingsList(type)
                 .filter { x -> x.name == settingName }
                 .firstOrNull()
@@ -83,6 +85,5 @@ class JavaTestRunner : TestRunner {
 
     companion object {
         private val logger = Logger.getInstance(JavaTestRunner::class.java)
-        private val type = ApplicationConfigurationType.getInstance()
     }
 }
