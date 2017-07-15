@@ -45,11 +45,17 @@ public class ProgrammingLanguageUtils {
             @NotNull Project project,
             @NotNull StepNode targetStepNode,
             @NotNull SupportedLanguages language) {
+        switchLanguage(project, targetStepNode, language);
+        targetStepNode.getCurrentLang().getTestRunner().updateRunConfiguration(project, targetStepNode);
+    }
+
+    private static void switchLanguage(
+            @NotNull Project project,
+            @NotNull StepNode targetStepNode,
+            @NotNull SupportedLanguages language) {
         if (!targetStepNode.getSupportedLanguages().contains(language)) {
             return;
         }
-
-        language.getTestRunner().updateRunConfiguration(project, targetStepNode);
 
         SupportedLanguages currentLang = targetStepNode.getCurrentLang();
         String currentMainFileName = currentLang.getMainFileName();
