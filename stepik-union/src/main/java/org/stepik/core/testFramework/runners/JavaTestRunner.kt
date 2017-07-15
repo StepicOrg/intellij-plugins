@@ -59,7 +59,7 @@ class JavaTestRunner : TestRunner {
             if (mainPsiClass is PsiJavaFile) {
                 application.invokeAndWait {
                     val mainClass = mainPsiClass.classes
-                            .filter { it.name == "Main" }
+                            .filter { it.findMethodsByName("main", false).isNotEmpty() }
                             .getOrNull(0)
                             ?: return@invokeAndWait
                     appConfiguration.mainClass = mainClass
