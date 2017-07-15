@@ -24,7 +24,7 @@ class JavaTestRunner : TestRunner {
         val runManager = RunManager.getInstance(project) as RunManagerImpl
         val language = stepNode.currentLang
 
-        val settingName = "Run ${stepNode.parent?.name ?: ""} | step ${stepNode.position} ($language)"
+        val settingName = "${stepNode.parent?.name ?: "Lesson"} | step ${stepNode.position} ($language)"
 
         val type = ApplicationConfigurationType.getInstance()
 
