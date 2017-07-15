@@ -2,28 +2,22 @@ package org.stepik.core.testFramework.runners
 
 import com.intellij.execution.RunManager
 import com.intellij.execution.RunnerAndConfigurationSettings
-import com.intellij.execution.application.ApplicationConfiguration
 import com.intellij.execution.impl.RunManagerImpl
 import com.intellij.openapi.application.Application
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.module.ModuleUtilCore
-import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.psi.PsiFile
-import com.intellij.psi.PsiJavaFile
-import com.intellij.psi.PsiManager
-import com.intellij.psi.util.PsiClassUtil
-import com.intellij.psi.util.PsiMethodUtil
+import org.jetbrains.kotlin.idea.run.JetRunConfiguration
 import org.stepik.core.core.EduNames
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.testFramework.TestRunner
 
-object JavaTestRunner : TestRunner {
+object KotlinTestRunner : TestRunner {
     private val logger = Logger.getInstance(JavaTestRunner::class.java)
-    private val typeName = "Application"
-    private val factoryName = "Application"
+    private val typeName = "JetRunConfigurationType"
+    private val factoryName = "Kotlin"
 
     override fun updateRunConfiguration(project: Project, stepNode: StepNode) {
         val application = ApplicationManager.getApplication()
@@ -38,15 +32,15 @@ object JavaTestRunner : TestRunner {
             return
         }
 
-        val appConfiguration = (runConfiguration.configuration as ApplicationConfiguration)
+        val appConfiguration = (runConfiguration.configuration as JetRunConfiguration)
 
         val workingVirtualDirectory = project.baseDir.findFileByRelativePath(stepNode.path) ?: return
         setWorkingDirectory(appConfiguration, workingVirtualDirectory)
         val mainRelativePath = listOf(EduNames.SRC, language.mainFileName).joinToString("/")
         val mainVirtualFile = workingVirtualDirectory.findFileByRelativePath(mainRelativePath)
 
-        setMainClass(application, project, appConfiguration, mainVirtualFile)
         setModule(application, project, appConfiguration, mainVirtualFile)
+        appConfiguration.MAIN_CLASS_NAME = "MainKt"
         setConfiguration(application, runManager, runConfiguration)
     }
 
@@ -69,40 +63,15 @@ object JavaTestRunner : TestRunner {
         return runConfiguration
     }
 
-    private fun setWorkingDirectory(appConfiguration: ApplicationConfiguration,
+    private fun setWorkingDirectory(appConfiguration: JetRunConfiguration,
                                     workingVirtualDirectory: VirtualFile) {
         val workingDirectory = workingVirtualDirectory.canonicalPath
         appConfiguration.workingDirectory = workingDirectory
     }
 
-    fun setMainClass(application: Application,
-                     project: Project,
-                     appConfiguration: ApplicationConfiguration,
-                     mainVirtualFile: VirtualFile?) {
-        if (mainVirtualFile != null) {
-            val mainPsiFile = Array<PsiFile?>(1, { null })
-            application.invokeAndWait {
-                val psiManager = PsiManager.getInstance(project)
-                mainPsiFile[0] = psiManager.findFile(mainVirtualFile)
-            }
-            val mainPsiClass = mainPsiFile[0]
-            if (mainPsiClass is PsiJavaFile) {
-                DumbService.getInstance(project).runReadActionInSmartMode {
-                    val mainClass = mainPsiClass.classes
-                            .filter {
-                                PsiClassUtil.isRunnableClass(it, false) && PsiMethodUtil.hasMainMethod(it)
-                            }
-                            .getOrNull(0)
-                            ?: return@runReadActionInSmartMode
-                    appConfiguration.mainClass = mainClass
-                }
-            }
-        }
-    }
-
     private fun setModule(application: Application,
                           project: Project,
-                          appConfiguration: ApplicationConfiguration,
+                          appConfiguration: JetRunConfiguration,
                           mainVirtualFile: VirtualFile?) {
         if (mainVirtualFile != null) {
             application.invokeAndWait {

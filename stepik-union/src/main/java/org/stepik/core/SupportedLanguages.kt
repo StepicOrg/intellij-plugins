@@ -2,6 +2,7 @@ package org.stepik.core
 
 import org.stepik.core.testFramework.TestRunner
 import org.stepik.core.testFramework.runners.JavaTestRunner
+import org.stepik.core.testFramework.runners.KotlinTestRunner
 import org.stepik.core.testFramework.runners.StubTestRunner
 
 enum class SupportedLanguages constructor(val title: String,
@@ -34,10 +35,10 @@ enum class SupportedLanguages constructor(val title: String,
             "Main.hs",
             "--",
             "module Main where\nmain = print $ \"Hello, world!\""),
-    JAVA8("Java 8", "java8", "Main.java", "//", "class Main {", "}", testRunner = JavaTestRunner()),
+    JAVA8("Java 8", "java8", "Main.java", "//", "class Main {", "}", testRunner = JavaTestRunner),
     JAVA("Java", "java", "Main.java", "//", "class Main {", "}", JAVA8),
     JAVASCRIPT("JavaScript", "javascript", "main.js", "//"),
-    KOTLIN("Kotlin", "kotlin", "Main.kt", "//"),
+    KOTLIN("Kotlin", "kotlin", "Main.kt", "//", testRunner = KotlinTestRunner),
     MONO_CS("Mono c#", "mono c#", "main.cs", "//"),
     OCTAVE("Octave", "octave", "main.m", "%"),
     PASCAL_ABC("PascalABC.NET", "pascalabc", "Main.pas", "//"),

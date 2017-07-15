@@ -23,6 +23,7 @@
     ]]></description>
 
     <depends>com.intellij.modules.lang</depends>
+    <depends optional="true">org.jetbrains.kotlin</depends>
     <depends optional="true" config-file="idea.xml">com.intellij.modules.java</depends>
     <depends optional="true" config-file="pycharm.xml">com.intellij.modules.python</depends>
 
