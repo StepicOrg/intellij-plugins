@@ -3,8 +3,8 @@ package org.stepik.core.testFramework.runners
 import com.intellij.execution.RunManager
 import com.intellij.execution.RunnerAndConfigurationSettings
 import com.intellij.execution.application.ApplicationConfiguration
-import com.intellij.execution.application.ApplicationConfigurationType
 import com.intellij.execution.impl.RunManagerImpl
+import com.intellij.openapi.application.Application
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.module.Module
@@ -26,13 +26,21 @@ class JavaTestRunner : TestRunner {
 
         val settingName = "${stepNode.parent?.name ?: "Lesson"} | step ${stepNode.position} ($language)"
 
-        val type = ApplicationConfigurationType.getInstance()
+        val type = runManager.getConfigurationType(typeName)
+        if (type == null) {
+            setConfiguration(application, runManager)
+            return
+        }
 
-        val runConfiguration: RunnerAndConfigurationSettings = runManager.getConfigurationSettingsList(type)
+        val runConfiguration: RunnerAndConfigurationSettings? = runManager.getConfigurationSettingsList(type)
                 .filter { x -> x.name == settingName }
                 .firstOrNull()
                 ?: createRunConfiguration(runManager, settingName)
-                ?: return
+
+        if (runConfiguration == null) {
+            setConfiguration(application, runManager)
+            return
+        }
 
         val appConfiguration = (runConfiguration.configuration as ApplicationConfiguration)
 
@@ -69,12 +77,11 @@ class JavaTestRunner : TestRunner {
             }
         }
 
-        val finalRunConfiguration = runConfiguration
-        application.invokeLater { runManager.selectedConfiguration = finalRunConfiguration }
+        setConfiguration(application, runManager, runConfiguration)
     }
 
     private fun createRunConfiguration(runManager: RunManagerImpl, settingName: String): RunnerAndConfigurationSettings? {
-        val factory = runManager.getFactory("Application", "Application") ?: return null
+        val factory = runManager.getFactory(typeName, factoryName) ?: return null
         val runConfiguration = runManager.createRunConfiguration(settingName, factory)
 
         runManager.addConfiguration(runConfiguration, true)
@@ -84,5 +91,11 @@ class JavaTestRunner : TestRunner {
 
     companion object {
         private val logger = Logger.getInstance(JavaTestRunner::class.java)
+        private val typeName = "Application"
+        private val factoryName = "Application"
+
+        fun setConfiguration(application: Application, runManager: RunManager, configuration: RunnerAndConfigurationSettings? = null) {
+            application.invokeLater { runManager.selectedConfiguration = configuration }
+        }
     }
 }
