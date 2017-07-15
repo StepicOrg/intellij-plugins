@@ -10,7 +10,6 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.util.io.FileUtil
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiJavaFile
 import com.intellij.psi.PsiManager
@@ -25,7 +24,7 @@ class JavaTestRunner : TestRunner {
         val runManager = RunManager.getInstance(project) as RunManagerImpl
         val language = stepNode.currentLang
 
-        val settingName = "Run step${stepNode.id} ($language)"
+        val settingName = "Run ${stepNode.parent?.name ?: ""} | step ${stepNode.position} ($language)"
 
         val type = ApplicationConfigurationType.getInstance()
 
@@ -40,7 +39,7 @@ class JavaTestRunner : TestRunner {
         val workingVirtualDirectory = project.baseDir.findFileByRelativePath(stepNode.path) ?: return
         val workingDirectory = workingVirtualDirectory.canonicalPath
         appConfiguration.workingDirectory = workingDirectory
-        val mainRelativePath = FileUtil.join(EduNames.SRC, language.mainFileName)
+        val mainRelativePath = listOf(EduNames.SRC, language.mainFileName).joinToString("/")
         val mainVirtualFile = workingVirtualDirectory.findFileByRelativePath(mainRelativePath)
         val psiManager = PsiManager.getInstance(project)
         if (mainVirtualFile != null) {
