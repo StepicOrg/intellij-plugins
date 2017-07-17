@@ -3,6 +3,7 @@ package org.stepik.core
 import org.stepik.core.testFramework.Runner
 import org.stepik.core.testFramework.runners.JavaRunner
 import org.stepik.core.testFramework.runners.KotlinRunner
+import org.stepik.core.testFramework.runners.PythonRunner
 import org.stepik.core.testFramework.runners.StubRunner
 
 enum class SupportedLanguages constructor(val title: String,
@@ -36,13 +37,13 @@ enum class SupportedLanguages constructor(val title: String,
             "--",
             "module Main where\nmain = print $ \"Hello, world!\""),
     JAVA8("Java 8", "java8", "Main.java", "//", "class Main {", "}", runner = JavaRunner()),
-    JAVA("Java", "java", "Main.java", "//", "class Main {", "}", JAVA8),
+    JAVA("Java", "java", "Main.java", "//", "class Main {", "}", JAVA8, runner = JavaRunner()),
     JAVASCRIPT("JavaScript", "javascript", "main.js", "//"),
     KOTLIN("Kotlin", "kotlin", "Main.kt", "//", runner = KotlinRunner()),
     MONO_CS("Mono c#", "mono c#", "main.cs", "//"),
     OCTAVE("Octave", "octave", "main.m", "%"),
     PASCAL_ABC("PascalABC.NET", "pascalabc", "Main.pas", "//"),
-    PYTHON3("Python 3", "python3", "main.py", "#"),
+    PYTHON3("Python 3", "python3", "main.py", "#", runner = PythonRunner()),
     R("R", "r", "main.r", "#"),
     RUBY("Ruby", "ruby", "main.rb", "#"),
     RUST("Rust", "rust", "main.rs", "//"),

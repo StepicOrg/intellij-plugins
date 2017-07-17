@@ -8,8 +8,9 @@ import org.stepik.core.courseFormat.StepNode
 interface Runner {
 
     fun updateRunConfiguration(project: Project, stepNode: StepNode) {
-        val runManager = RunManager.getInstance(project)
-        ApplicationManager.getApplication().invokeLater { runManager.selectedConfiguration = null }
+        ApplicationManager.getApplication().invokeLater {
+            RunManager.getInstance(project).selectedConfiguration = null
+        }
     }
 
 }
