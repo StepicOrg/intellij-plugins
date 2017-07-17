@@ -5,7 +5,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import org.stepik.core.courseFormat.StepNode
 
-interface TestRunner {
+interface Runner {
 
     fun updateRunConfiguration(project: Project, stepNode: StepNode) {
         val runManager = RunManager.getInstance(project)

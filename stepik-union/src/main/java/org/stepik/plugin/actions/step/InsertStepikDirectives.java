@@ -95,6 +95,6 @@ public class InsertStepikDirectives extends CodeQuizAction {
             }
         }
 
-        currentLang.getTestRunner().updateRunConfiguration(project, stepNode);
+        currentLang.getRunner().updateRunConfiguration(project, stepNode);
     }
 }

@@ -11,7 +11,7 @@ import com.intellij.psi.PsiManager
 import com.intellij.psi.util.PsiClassUtil
 import com.intellij.psi.util.PsiMethodUtil
 
-class JavaTestRunner : JetTestRunner() {
+class JavaRunner : JetRunner() {
     override fun getTypeName(): String = "Application"
 
     override fun getFactoryName(): String = "Application"

@@ -211,7 +211,7 @@ public class StudyToolWindow extends SimpleToolWindowPanel implements DataProvid
         StepType stepType = stepNode.getType();
         if (stepType != CODE) {
             SwingUtilities.invokeLater(() -> rightPanel.setVisible(false));
-            stepNode.getCurrentLang().getTestRunner().updateRunConfiguration(project, stepNode);
+            stepNode.getCurrentLang().getRunner().updateRunConfiguration(project, stepNode);
         }
         boolean isTheory = stepType == VIDEO || stepType == TEXT;
         postView(stepNode, isTheory);

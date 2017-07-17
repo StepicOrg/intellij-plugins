@@ -13,10 +13,10 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import org.stepik.core.core.EduNames
 import org.stepik.core.courseFormat.StepNode
-import org.stepik.core.testFramework.TestRunner
+import org.stepik.core.testFramework.Runner
 
-abstract class JetTestRunner : TestRunner {
-    private val logger = Logger.getInstance(JetTestRunner::class.java)
+abstract class JetRunner : Runner {
+    private val logger = Logger.getInstance(JetRunner::class.java)
 
     override fun updateRunConfiguration(project: Project, stepNode: StepNode) {
         val application = ApplicationManager.getApplication()

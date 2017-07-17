@@ -243,7 +243,7 @@ public class DownloadSubmission extends CodeQuizAction {
                                 ProjectView.getInstance(project).refresh();
                                 Metrics.downloadAction(project, stepNode, SUCCESSFUL);
 
-                                language.getTestRunner().updateRunConfiguration(project, stepNode);
+                                language.getRunner().updateRunConfiguration(project, stepNode);
                             }
                         }),
                 "Download submission",

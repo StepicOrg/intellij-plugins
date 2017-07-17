@@ -1,9 +1,9 @@
 package org.stepik.core
 
-import org.stepik.core.testFramework.TestRunner
-import org.stepik.core.testFramework.runners.JavaTestRunner
-import org.stepik.core.testFramework.runners.KotlinTestRunner
-import org.stepik.core.testFramework.runners.StubTestRunner
+import org.stepik.core.testFramework.Runner
+import org.stepik.core.testFramework.runners.JavaRunner
+import org.stepik.core.testFramework.runners.KotlinRunner
+import org.stepik.core.testFramework.runners.StubRunner
 
 enum class SupportedLanguages constructor(val title: String,
                                           val langName: String,
@@ -12,7 +12,7 @@ enum class SupportedLanguages constructor(val title: String,
                                           val beforeCode: String? = null,
                                           val afterCode: String? = null,
                                           private val nextVersion: SupportedLanguages? = null,
-                                          val testRunner: TestRunner = StubTestRunner.instance) {
+                                          val runner: Runner = StubRunner.instance) {
     ASM32("asm32", "asm32", "main32.asm", "#"),
     ASM64("asm64", "asm64", "main64.asm", "#"),
     C("C", "c", "main.c", "//"),
@@ -35,10 +35,10 @@ enum class SupportedLanguages constructor(val title: String,
             "Main.hs",
             "--",
             "module Main where\nmain = print $ \"Hello, world!\""),
-    JAVA8("Java 8", "java8", "Main.java", "//", "class Main {", "}", testRunner = JavaTestRunner()),
+    JAVA8("Java 8", "java8", "Main.java", "//", "class Main {", "}", runner = JavaRunner()),
     JAVA("Java", "java", "Main.java", "//", "class Main {", "}", JAVA8),
     JAVASCRIPT("JavaScript", "javascript", "main.js", "//"),
-    KOTLIN("Kotlin", "kotlin", "Main.kt", "//", testRunner = KotlinTestRunner()),
+    KOTLIN("Kotlin", "kotlin", "Main.kt", "//", runner = KotlinRunner()),
     MONO_CS("Mono c#", "mono c#", "main.cs", "//"),
     OCTAVE("Octave", "octave", "main.m", "%"),
     PASCAL_ABC("PascalABC.NET", "pascalabc", "Main.pas", "//"),

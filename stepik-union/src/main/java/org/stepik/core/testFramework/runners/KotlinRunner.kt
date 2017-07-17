@@ -6,7 +6,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import org.jetbrains.kotlin.idea.run.JetRunConfiguration
 
-class KotlinTestRunner : JetTestRunner() {
+class KotlinRunner : JetRunner() {
     override fun getTypeName(): String = "JetRunConfigurationType"
 
     override fun getFactoryName(): String = "Kotlin"
