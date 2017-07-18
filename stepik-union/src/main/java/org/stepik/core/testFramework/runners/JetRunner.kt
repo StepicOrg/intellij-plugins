@@ -38,6 +38,7 @@ abstract class JetRunner : Runner {
         val mainVirtualFile = workingVirtualDirectory.findFileByRelativePath(mainRelativePath)
         setMainClass(application, project, appConfiguration, mainVirtualFile)
         setModule(application, project, appConfiguration, mainVirtualFile)
+        setSdk(project, appConfiguration, mainVirtualFile)
         setConfiguration(application, runManager, runConfiguration)
     }
 
@@ -85,6 +86,10 @@ abstract class JetRunner : Runner {
             }
         }
     }
+
+    protected open fun setSdk(project: Project,
+                              appConfiguration: RunConfiguration,
+                              mainVirtualFile: VirtualFile?) {}
 
     private fun setConfiguration(application: Application,
                                  runManager: RunManager,
