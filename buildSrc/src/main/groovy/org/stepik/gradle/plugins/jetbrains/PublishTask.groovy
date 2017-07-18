@@ -20,7 +20,7 @@ class PublishTask extends ConventionTask {
     private ProductPluginExtension extension
 
     private BasePlugin plugin
-    private String host = "http://plugins.jetbrains.com"
+    private String host = "https://plugins.jetbrains.com"
 
     PublishTask() {
         enabled = !project.gradle.startParameter.offline
