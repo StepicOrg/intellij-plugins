@@ -13,7 +13,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import org.stepik.core.core.EduNames
 import org.stepik.core.courseFormat.StepNode
-import org.stepik.core.testFramework.Runner
 
 abstract class JetRunner : Runner {
     private val logger = Logger.getInstance(JetRunner::class.java)
@@ -89,7 +88,8 @@ abstract class JetRunner : Runner {
 
     protected open fun setSdk(project: Project,
                               appConfiguration: RunConfiguration,
-                              mainVirtualFile: VirtualFile?) {}
+                              mainVirtualFile: VirtualFile?) {
+    }
 
     private fun setConfiguration(application: Application,
                                  runManager: RunManager,

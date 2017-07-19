@@ -44,6 +44,7 @@
         <action id="STEPIK.InsertStepikDirectives" class="org.stepik.plugin.actions.step.InsertStepikDirectives"/>
         <action id="STEPIK.RefreshStepAction" class="org.stepik.plugin.actions.step.StepikResetStepAction"/>
         <action id="STEPIK.OpenInBrowser" class="org.stepik.plugin.actions.step.OpenInBrowserAction"/>
+        <action id="STEPIK.TestSamplesAction" class="org.stepik.plugin.actions.step.TestSamplesAction"/>
     </actions>
 
     <project-components>

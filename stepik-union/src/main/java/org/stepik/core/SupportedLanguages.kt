@@ -1,9 +1,9 @@
 package org.stepik.core
 
-import org.stepik.core.testFramework.Runner
 import org.stepik.core.testFramework.runners.JavaRunner
 import org.stepik.core.testFramework.runners.KotlinRunner
 import org.stepik.core.testFramework.runners.PythonRunner
+import org.stepik.core.testFramework.runners.Runner
 import org.stepik.core.testFramework.runners.StubRunner
 
 enum class SupportedLanguages constructor(val title: String,

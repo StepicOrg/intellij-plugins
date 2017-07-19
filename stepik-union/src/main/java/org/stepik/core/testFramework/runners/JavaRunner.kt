@@ -10,6 +10,9 @@ import com.intellij.psi.PsiJavaFile
 import com.intellij.psi.PsiManager
 import com.intellij.psi.util.PsiClassUtil
 import com.intellij.psi.util.PsiMethodUtil
+import org.stepik.core.courseFormat.StepNode
+import org.stepik.core.testFramework.processes.JavaProcess
+import org.stepik.core.testFramework.processes.TestProcess
 
 class JavaRunner : JetRunner() {
     override fun getTypeName(): String = "Application"
@@ -45,5 +48,9 @@ class JavaRunner : JetRunner() {
                 }
             }
         }
+    }
+
+    override fun createTestProcess(project: Project, stepNode: StepNode): TestProcess? {
+        return JavaProcess(project, stepNode)
     }
 }
