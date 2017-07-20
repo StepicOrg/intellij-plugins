@@ -60,6 +60,7 @@
     <extensions defaultExtensionNs="com.intellij">
         <projectService serviceInterface="com.intellij.codeInsight.documentation.DocumentationManager" serviceImplementation="org.stepik.core.StudyDocumentationManager" overrides="true"/>
         <toolWindow id="Step Description" anchor="right" factoryClass="org.stepik.core.ui.StudyToolWindowFactory" conditionClass="org.stepik.core.ui.StudyCondition"/>
+        <toolWindow id="Stepik Test" anchor="bottom" factoryClass="org.stepik.core.testFramework.toolWindow.StepikTestToolWindowFactory" conditionClass="org.stepik.core.testFramework.toolWindow.StudyCondition"/>
         <projectService serviceInterface="org.stepik.core.StepikProjectManager" serviceImplementation="org.stepik.core.StepikProjectManager"/>
     </extensions>
 </idea-plugin>

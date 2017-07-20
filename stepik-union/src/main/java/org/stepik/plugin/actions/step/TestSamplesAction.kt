@@ -4,6 +4,7 @@ import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.ApplicationManager
 import org.stepik.core.testFramework.runners.ExitCause
+import org.stepik.core.testFramework.toolWindow.StepikTestToolWindowUtils
 import org.stepik.plugin.actions.ActionUtils
 
 
@@ -19,12 +20,16 @@ class TestSamplesAction : CodeQuizAction(TEXT, DESCRIPTION, DefaultRunExecutor.g
         val language = stepNode.currentLang
         val runner = language.runner
 
+        val title = "${stepNode.parent?.name ?: "Lesson"} : ${stepNode.name}"
+        val resultWindow = StepikTestToolWindowUtils.showTestResultsToolWindow(project, title)
+
         ApplicationManager.getApplication().executeOnPooledThread {
             var counter = 0
-            println("Start test samples")
+            resultWindow.clear()
+            resultWindow.println("Test method: samples")
             System.out.flush()
             stepNode.samples.forEach {
-                print("Test #${counter++} ")
+                resultWindow.print("Test #${counter++} ")
                 val result = runner.test(project, stepNode, it.input, { actual -> actual == it.output })
                 val status: String
                 if (result.passed) {
@@ -36,15 +41,15 @@ class TestSamplesAction : CodeQuizAction(TEXT, DESCRIPTION, DefaultRunExecutor.g
                         else -> status = "FAIL"
                     }
                 }
-                System.out.println(status)
+                resultWindow.println(status)
                 if (!result.passed) {
-                    println("Input: ${it.input}")
-                    println("Expected: ${it.output}")
-                    println("Actual: ${result.actual}")
-                    println()
+                    resultWindow.println("Input: ${it.input}")
+                    resultWindow.println("Expected: ${it.output}")
+                    resultWindow.println("Actual: ${result.actual}")
+                    resultWindow.println()
                 }
             }
-            println("--------------------------------")
+            resultWindow.println("Done")
         }
     }
 
