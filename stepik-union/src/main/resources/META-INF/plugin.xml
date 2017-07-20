@@ -5,23 +5,6 @@
     <idea-version since-build="163.7743.44"/>
     <vendor email="plugin@stepik.org" url="https://stepik.org">Stepik</vendor>
 
-    <description><![CDATA[
-      Stepik plugin for code challenges on Python, Java, asm, C, C++, Clojure, Haskell, JavaScript, Mono C#, Octave, R, Ruby, Rust, Shell, Scala.<br>
-
-      To uses this plugin you have to have Stepik account and follow the course.<br>
-      <br>
-      Optional plugins:<br>
-      Python<br>
-      Clojure-Kit<br>
-      Haskell<br>
-      Scala<br>
-      BashSupport<br>
-      Ruby<br>
-      Rust<br>
-      R Language Support<br>
-
-    ]]></description>
-
     <depends>com.intellij.modules.lang</depends>
     <depends optional="true" config-file="idea.xml">com.intellij.modules.java</depends>
     <depends optional="true" config-file="pycharm.xml">com.intellij.modules.python</depends>
