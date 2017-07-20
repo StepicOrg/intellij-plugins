@@ -18,16 +18,15 @@ interface Runner {
         }
     }
 
-    fun createTestProcess(project: Project, stepNode: StepNode): TestProcess? {
-        return null
+    fun createTestProcess(project: Project, stepNode: StepNode): TestProcess {
+        return TestProcess(project, stepNode)
     }
 
     fun test(project: Project,
              stepNode: StepNode,
              input: String,
              assertion: (String) -> Boolean): TestResult {
-        val process = createTestProcess(project, stepNode)?.start()
-                ?: return TestResult(false, "", ExitCause.NO_CREATE_PROCESS)
+        val process = createTestProcess(project, stepNode).start() ?: return NO_PROCESS
 
         val outputStream = PrintStream(BufferedOutputStream(process.outputStream))
         outputStream.print("$input\n")
@@ -46,18 +45,17 @@ interface Runner {
 
         if (!success) {
             process.destroyForcibly()
-            return TestResult(false, "", ExitCause.TIME_LIMIT)
+            return TIME_LEFT
         }
 
         val actual = actualOutput.toString()
-        return TestResult(assertion(actual), actual, ExitCause.NOTHING)
+        val score = assertion(actual)
+        val cause: ExitCause
+        if (score) {
+            cause = ExitCause.CORRECT
+        } else {
+            cause = ExitCause.WRONG
+        }
+        return TestResult(score, actual, cause)
     }
-}
-
-data class TestResult(val passed: Boolean, val actual: String, val cause: ExitCause)
-
-enum class ExitCause {
-    NOTHING,
-    TIME_LIMIT,
-    NO_CREATE_PROCESS
 }

@@ -42,10 +42,10 @@ class TestSamplesAction : CodeQuizAction(TEXT, DESCRIPTION, DefaultRunExecutor.g
                     }
                 }
                 resultWindow.println(status)
-                if (!result.passed) {
-                    resultWindow.println("Input: ${it.input}")
-                    resultWindow.println("Expected: ${it.output}")
-                    resultWindow.println("Actual: ${result.actual}")
+                if (!result.passed && result.cause == ExitCause.WRONG) {
+                    resultWindow.println("Input:\n${it.input}")
+                    resultWindow.println("Expected:\n${it.output}")
+                    resultWindow.println("Actual:\n${result.actual}")
                     resultWindow.println()
                 }
             }

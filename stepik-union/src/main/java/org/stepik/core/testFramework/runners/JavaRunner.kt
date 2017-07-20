@@ -50,7 +50,7 @@ class JavaRunner : JetRunner() {
         }
     }
 
-    override fun createTestProcess(project: Project, stepNode: StepNode): TestProcess? {
+    override fun createTestProcess(project: Project, stepNode: StepNode): TestProcess {
         return JavaProcess(project, stepNode)
     }
 }
