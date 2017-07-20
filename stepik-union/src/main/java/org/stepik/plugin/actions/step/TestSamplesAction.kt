@@ -3,6 +3,7 @@ package org.stepik.plugin.actions.step
 import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.ApplicationManager
+import org.stepik.core.testFramework.runners.ExitCause
 import org.stepik.plugin.actions.ActionUtils
 
 
@@ -24,12 +25,16 @@ class TestSamplesAction : CodeQuizAction(TEXT, DESCRIPTION, DefaultRunExecutor.g
             System.out.flush()
             stepNode.samples.forEach {
                 print("Test #${counter++} ")
-                val result = runner.test(project, stepNode, it.input, it.output)
+                val result = runner.test(project, stepNode, it.input, { actual -> actual == it.output })
                 val status: String
                 if (result.passed) {
                     status = "PASSED"
                 } else {
-                    status = "FAIL"
+                    when (result.cause) {
+                        ExitCause.TIME_LIMIT -> status = "FAIL (time left)"
+                        ExitCause.NO_CREATE_PROCESS -> status = "FAIL (can't create the test process)"
+                        else -> status = "FAIL"
+                    }
                 }
                 System.out.println(status)
                 if (!result.passed) {

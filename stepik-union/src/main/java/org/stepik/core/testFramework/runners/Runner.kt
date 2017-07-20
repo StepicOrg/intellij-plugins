@@ -5,6 +5,8 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.testFramework.processes.TestProcess
+import java.io.BufferedInputStream
+import java.io.BufferedOutputStream
 import java.io.PrintStream
 import java.util.concurrent.TimeUnit
 
@@ -20,13 +22,17 @@ interface Runner {
         return null
     }
 
-    fun test(project: Project, stepNode: StepNode, input: String, output: String): TestResult {
-        val process = createTestProcess(project, stepNode)?.start() ?: return TestResult(false, "")
-        process.isAlive
-        val outputStream = PrintStream(process.outputStream)
-        outputStream.print(input)
+    fun test(project: Project,
+             stepNode: StepNode,
+             input: String,
+             assertion: (String) -> Boolean): TestResult {
+        val process = createTestProcess(project, stepNode)?.start()
+                ?: return TestResult(false, "", ExitCause.NO_CREATE_PROCESS)
+
+        val outputStream = PrintStream(BufferedOutputStream(process.outputStream))
+        outputStream.print("$input\n")
         outputStream.flush()
-        val inputStream = process.inputStream
+        val inputStream = BufferedInputStream(process.inputStream)
         val actualOutput = StringBuffer()
         ApplicationManager.getApplication().executeOnPooledThread {
             var b = inputStream.read()
@@ -40,12 +46,18 @@ interface Runner {
 
         if (!success) {
             process.destroyForcibly()
-            return TestResult(false, "")
+            return TestResult(false, "", ExitCause.TIME_LIMIT)
         }
 
         val actual = actualOutput.toString()
-        return TestResult(actual == output, actual)
+        return TestResult(assertion(actual), actual, ExitCause.NOTHING)
     }
 }
 
-data class TestResult(val passed: Boolean, val actual: String)
+data class TestResult(val passed: Boolean, val actual: String, val cause: ExitCause)
+
+enum class ExitCause {
+    NOTHING,
+    TIME_LIMIT,
+    NO_CREATE_PROCESS
+}
