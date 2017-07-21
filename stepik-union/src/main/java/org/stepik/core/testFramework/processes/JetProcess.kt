@@ -12,10 +12,8 @@ import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.JavaSdk
-import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.util.io.FileUtil
-import com.intellij.openapi.vfs.VirtualFile
 import org.stepik.core.core.EduNames
 import org.stepik.core.courseFormat.StepNode
 import java.io.File
@@ -55,14 +53,18 @@ abstract class JetProcess(project: Project, stepNode: StepNode) : TestProcess(pr
             }
         }
 
-        if (!compile(module, sdk, sourcePath, outDirectory, mainVirtualFile)) {
+        val mainClass = getMainClass(application, runConfiguration) ?: return null
+
+        val context = ProcessContext(runConfiguration, module, sdk, sourcePath, mainVirtualFile, mainClass, outDirectory)
+
+        if (isNeedCompile() && !compile(context)) {
             return null
         }
 
-        val mainClass = getMainClass(application, runConfiguration) ?: return null
-
-        return run(sdk, outDirectory, mainClass)
+        return run(context)
     }
+
+    open fun isNeedCompile() = true
 
     private fun getModule(runConfiguration: RunConfiguration): Module? {
         val appConfiguration = runConfiguration as ModuleBasedConfiguration<*>
@@ -73,22 +75,18 @@ abstract class JetProcess(project: Project, stepNode: StepNode) : TestProcess(pr
 
     abstract fun getMainClass(application: Application, runConfiguration: RunConfiguration): String?
 
-    abstract fun getCompilerPath(sdk: Sdk): File
+    open fun getCompilerPath(context: ProcessContext): File? = null
 
-    private fun compile(module: Module,
-                        sdk: Sdk,
-                        sourcePath: String,
-                        outDirectory: String,
-                        mainVirtualFile: VirtualFile): Boolean {
+    private fun compile(context: ProcessContext): Boolean {
         try {
-            clearDirectory(outDirectory)
+            clearDirectory(context.outDirectory)
 
-            val exePath = getCompilerPath(sdk)
-            exePath.setExecutable(true)
+            val exePath = getCompilerPath(context)
+            exePath?.setExecutable(true) ?: return false
             val commandLine = GeneralCommandLine()
-            commandLine.workDirectory = File(module.moduleFile?.parent?.canonicalPath)
+            commandLine.workDirectory = File(context.module.moduleFile?.parent?.canonicalPath)
             commandLine.exePath = exePath.absolutePath
-            if (!prepareCompileCommand(commandLine, sdk, sourcePath, outDirectory, mainVirtualFile)) {
+            if (!prepareCompileCommand(commandLine, context)) {
                 return false
             }
             commandLine.createProcess().waitFor()
@@ -98,11 +96,9 @@ abstract class JetProcess(project: Project, stepNode: StepNode) : TestProcess(pr
         }
     }
 
-    abstract fun prepareCompileCommand(commandLine: GeneralCommandLine,
-                                       sdk: Sdk,
-                                       sourcePath: String,
-                                       outDirectory: String,
-                                       mainVirtualFile: VirtualFile): Boolean
+    open fun prepareCompileCommand(commandLine: GeneralCommandLine, context: ProcessContext): Boolean {
+        return false
+    }
 
     private fun clearDirectory(directory: String) {
         val files = File(directory).listFiles()
@@ -113,17 +109,17 @@ abstract class JetProcess(project: Project, stepNode: StepNode) : TestProcess(pr
         }
     }
 
-    abstract fun getExecutorPath(sdk: Sdk): File
+    abstract fun getExecutorPath(context: ProcessContext): File
 
-    private fun run(sdk: Sdk, outDirectory: String, mainClass: String): Process? {
+    private fun run(context: ProcessContext): Process? {
         try {
-            val exePath = getExecutorPath(sdk)
+            val exePath = getExecutorPath(context)
             exePath.setExecutable(true)
 
             val commandLine = GeneralCommandLine()
-            commandLine.workDirectory = File(outDirectory)
+            commandLine.workDirectory = File(context.outDirectory)
             commandLine.exePath = exePath.absolutePath
-            if (!prepareExecuteCommand(commandLine, outDirectory, mainClass)) {
+            if (!prepareExecuteCommand(commandLine, context)) {
                 return null
             }
             return commandLine.createProcess()
@@ -132,7 +128,5 @@ abstract class JetProcess(project: Project, stepNode: StepNode) : TestProcess(pr
         }
     }
 
-    abstract fun prepareExecuteCommand(commandLine: GeneralCommandLine,
-                                       outDirectory: String,
-                                       mainClass: String): Boolean
+    abstract fun prepareExecuteCommand(commandLine: GeneralCommandLine, context: ProcessContext): Boolean
 }

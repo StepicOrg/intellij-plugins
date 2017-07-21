@@ -5,9 +5,7 @@ import com.intellij.execution.configurations.RunConfiguration
 import com.intellij.openapi.application.Application
 import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.util.Computable
-import com.intellij.openapi.vfs.VirtualFile
 import org.jetbrains.kotlin.idea.run.JetRunConfiguration
 import org.stepik.core.core.EduNames
 import org.stepik.core.courseFormat.StepNode
@@ -27,36 +25,30 @@ class KotlinProcess(project: Project, stepNode: StepNode) : JetProcess(project, 
         })
     }
 
-    override fun getCompilerPath(sdk: Sdk): File {
+    override fun getCompilerPath(context: ProcessContext): File {
         return File(PathManager.getHomePath() + "/plugins/Kotlin/kotlinc/bin/kotlinc")
     }
 
 
-    override fun prepareCompileCommand(commandLine: GeneralCommandLine,
-                                       sdk: Sdk,
-                                       sourcePath: String,
-                                       outDirectory: String,
-                                       mainVirtualFile: VirtualFile): Boolean {
-        val jdkHome = sdk.homePath ?: return false
+    override fun prepareCompileCommand(commandLine: GeneralCommandLine, context: ProcessContext): Boolean {
+        val jdkHome = context.sdk.homePath ?: return false
 
-        commandLine.addParameter(mainVirtualFile.path)
+        commandLine.addParameter(context.mainVirtualFile.path)
         commandLine.addParameter("-d")
-        commandLine.addParameter(outDirectory)
+        commandLine.addParameter(context.outDirectory)
         commandLine.addParameter("-jdk-home")
         commandLine.addParameter(jdkHome)
         return true
     }
 
-    override fun getExecutorPath(sdk: Sdk): File {
+    override fun getExecutorPath(context: ProcessContext): File {
         return File(PathManager.getHomePath() + "/plugins/Kotlin/kotlinc/bin/kotlin")
     }
 
-    override fun prepareExecuteCommand(commandLine: GeneralCommandLine,
-                                       outDirectory: String,
-                                       mainClass: String): Boolean {
+    override fun prepareExecuteCommand(commandLine: GeneralCommandLine, context: ProcessContext): Boolean {
         commandLine.addParameter("-classpath")
-        commandLine.addParameter(outDirectory)
-        commandLine.addParameter(mainClass)
+        commandLine.addParameter(context.outDirectory)
+        commandLine.addParameter(context.mainClass)
         return true
     }
 }
