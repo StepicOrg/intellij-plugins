@@ -47,7 +47,7 @@ class StepikSettingsPanel implements StepikAuthManagerListener {
     }
 
     private void initProjectOfSettings() {
-        projectManager = StepikProjectManager.getInstance(Utils.getCurrentProject());
+        projectManager = StepikProjectManager.getInstance(Utils.INSTANCE.getCurrentProject());
         hintCheckBox.setSelected(projectManager != null && projectManager.getShowHint());
         logoutButton.setText(isAuthenticated() ? "Logout" : "Login");
     }

@@ -4,7 +4,6 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
-import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
@@ -13,16 +12,17 @@ import org.stepik.core.StepikProjectManager;
 import org.stepik.core.SupportedLanguages;
 import org.stepik.core.courseFormat.StepNode;
 import org.stepik.core.metrics.Metrics;
+import org.stepik.core.utils.Utils;
 import org.stepik.plugin.actions.ActionUtils;
 import org.stepik.plugin.utils.ReformatUtils;
 
 import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
+import static org.stepik.core.utils.DirectivesUtilsKt.containsDirectives;
+import static org.stepik.core.utils.DirectivesUtilsKt.getFileText;
+import static org.stepik.core.utils.DirectivesUtilsKt.insertAmbientCode;
+import static org.stepik.core.utils.DirectivesUtilsKt.removeAmbientCode;
+import static org.stepik.core.utils.DirectivesUtilsKt.writeInToFile;
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
-import static org.stepik.plugin.utils.DirectivesUtilsKt.containsDirectives;
-import static org.stepik.plugin.utils.DirectivesUtilsKt.getFileText;
-import static org.stepik.plugin.utils.DirectivesUtilsKt.insertAmbientCode;
-import static org.stepik.plugin.utils.DirectivesUtilsKt.removeAmbientCode;
-import static org.stepik.plugin.utils.DirectivesUtilsKt.writeInToFile;
 
 
 public class InsertStepikDirectives extends CodeQuizAction {
@@ -56,12 +56,7 @@ public class InsertStepikDirectives extends CodeQuizAction {
             return;
         }
 
-        FileDocumentManager documentManager = FileDocumentManager.getInstance();
-        for (VirtualFile file : FileEditorManager.getInstance(project).getOpenFiles()) {
-            Document document = documentManager.getDocument(file);
-            if (document != null)
-                documentManager.saveDocument(document);
-        }
+        Utils.INSTANCE.saveAllDocuments(project);
 
         SupportedLanguages currentLang = stepNode.getCurrentLang();
 

@@ -1,10 +1,17 @@
 package org.stepik.core.testFramework.runners
 
 import com.intellij.execution.RunManager
+import com.intellij.openapi.application.Application
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Computable
+import com.intellij.openapi.vfs.VirtualFile
+import org.stepik.core.core.EduNames
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.testFramework.processes.TestProcess
+import org.stepik.core.utils.getTextUnderDirectives
+import org.stepik.core.utils.replaceCode
 import java.io.BufferedInputStream
 import java.io.BufferedOutputStream
 import java.io.PrintStream
@@ -18,15 +25,17 @@ interface Runner {
         }
     }
 
-    fun createTestProcess(project: Project, stepNode: StepNode): TestProcess {
-        return TestProcess(project, stepNode)
+    fun createTestProcess(project: Project, stepNode: StepNode, mainFilePath: String): TestProcess {
+        return TestProcess(project, stepNode, mainFilePath)
     }
 
-    fun test(project: Project,
-             stepNode: StepNode,
-             input: String,
-             assertion: (String) -> Boolean): TestResult {
-        val process = createTestProcess(project, stepNode).start() ?: return NO_PROCESS
+    fun testSamples(project: Project,
+                    stepNode: StepNode,
+                    input: String,
+                    assertion: (String) -> Boolean,
+                    mainFilePath: String? = null): TestResult {
+        val mainFile = mainFilePath ?: getMainFilePath(project, stepNode)?.path ?: return NO_PROCESS
+        val process = createTestProcess(project, stepNode, mainFile).start() ?: return NO_PROCESS
 
         val outputStream = PrintStream(BufferedOutputStream(process.outputStream))
         outputStream.print("$input\n")
@@ -49,7 +58,7 @@ interface Runner {
         }
 
         val actual = actualOutput.toString()
-        val score = assertion(actual)
+        val score = process.exitValue() == 0 && assertion(actual)
         val cause: ExitCause
         if (score) {
             cause = ExitCause.CORRECT
@@ -57,5 +66,94 @@ interface Runner {
             cause = ExitCause.WRONG
         }
         return TestResult(score, actual, cause)
+    }
+
+    fun getMainFilePath(project: Project, stepNode: StepNode): VirtualFile? {
+        val stepDirectory = project.baseDir.findFileByRelativePath(stepNode.path) ?: return null
+        return stepDirectory.let {
+            return@let it.findChild(EduNames.SRC)
+        }?.let {
+            return@let it.findChild(stepNode.currentLang.mainFileName)
+        } ?: return null
+    }
+
+    fun testFiles(project: Project, stepNode: StepNode): TestResult {
+        val targetTestFile = prepareMainFile(project, stepNode) ?: return NO_PROCESS
+        return testSamples(project, stepNode, "", { it.toBoolean() }, targetTestFile)
+    }
+
+    private fun prepareMainFile(project: Project, stepNode: StepNode): String? {
+        val application = ApplicationManager.getApplication()
+        val language = stepNode.currentLang
+
+        val testFileName = language.testFileName
+
+        val stepDirectory = project.baseDir.findFileByRelativePath(stepNode.path) ?: return null
+
+        val testFile = stepDirectory.let {
+            return@let it.findFileByRelativePath(listOf("tests", language.langName).joinToString("/"))
+        }?.let {
+            return@let it.findChild(testFileName)
+        }
+
+        val mainFile = getMainFilePath(project, stepNode) ?: return null
+
+        val targetFilePath = stepDirectory.let {
+            val OUT = "out"
+            return@let it.findChild(OUT) ?: createDirectory(application, it, OUT)
+        }?.let {
+            val OUT = language.langName
+            return@let it.findChild(OUT) ?: createDirectory(application, it, OUT)
+        }?.let {
+            return@let it.findChild(testFileName) ?: createFile(application, it, testFileName)
+        } ?: return null
+
+        val documentManager = FileDocumentManager.getInstance()
+        val text = application.runReadAction(Computable<String> {
+            val submissionText = documentManager.getDocument(mainFile)?.text ?: return@Computable null
+            val submission = getTextUnderDirectives(submissionText, language)
+            if (testFile != null) {
+                val testText = documentManager.getDocument(testFile)?.text ?: return@Computable null
+                return@Computable replaceCode(testText, submission, language)
+            } else {
+                return@Computable submission
+            }
+        }) ?: return null
+
+        writeText(application, documentManager, targetFilePath, text)
+
+        return targetFilePath.path
+    }
+
+    fun writeText(application: Application, documentManager: FileDocumentManager, targetFilePath: VirtualFile, text: String) {
+        application.invokeAndWait {
+            application.runWriteAction {
+                val document = documentManager.getDocument(targetFilePath) ?: return@runWriteAction
+                document.setText(text)
+                documentManager.saveDocument(document)
+            }
+        }
+    }
+
+    fun createFile(application: Application, parent: VirtualFile, testFileName: String): VirtualFile? {
+        var file: VirtualFile? = null
+        application.invokeAndWait {
+            file = application.runWriteAction(Computable<VirtualFile> {
+                parent.findOrCreateChildData(null, testFileName)
+            })
+        }
+
+        return file
+    }
+
+    fun createDirectory(application: Application, parent: VirtualFile, directoryName: String): VirtualFile? {
+        var directory: VirtualFile? = null
+        application.invokeAndWait {
+            directory = application.runWriteAction(Computable<VirtualFile> {
+                parent.createChildDirectory(null, directoryName)
+            })
+        }
+
+        return directory
     }
 }

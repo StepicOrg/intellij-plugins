@@ -11,7 +11,7 @@ import org.stepik.core.core.EduNames
 import org.stepik.core.courseFormat.StepNode
 import java.io.File
 
-class JavaProcess(project: Project, stepNode: StepNode) : JetProcess(project, stepNode) {
+class JavaProcess(project: Project, stepNode: StepNode, mainFilePath: String) : JetProcess(project, stepNode, mainFilePath) {
 
     override fun getSourcePath(runConfiguration: RunConfiguration): String {
         val appConfiguration = runConfiguration as ApplicationConfiguration
@@ -34,7 +34,7 @@ class JavaProcess(project: Project, stepNode: StepNode) : JetProcess(project, st
         commandLine.addParameter(context.sourcePath)
         commandLine.addParameter("-d")
         commandLine.addParameter(context.outDirectory)
-        commandLine.addParameter(context.mainVirtualFile.path)
+        commandLine.addParameter(context.mainFilePath)
         return true
     }
 

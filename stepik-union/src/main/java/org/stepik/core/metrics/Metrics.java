@@ -93,7 +93,7 @@ public class Metrics {
     }
 
     public static void authenticate(@NotNull MetricsStatus status) {
-        Project project = Utils.getCurrentProject();
+        Project project = Utils.INSTANCE.getCurrentProject();
         postSimpleMetric(project, "authenticate", status);
     }
 

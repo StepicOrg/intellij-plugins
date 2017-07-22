@@ -65,7 +65,7 @@ public class SendAction {
                 }
 
                 Thread.sleep(PERIOD);
-                if (Utils.isCanceled()) {
+                if (Utils.INSTANCE.isCanceled()) {
                     Metrics.getStepStatusAction(project, stepNode, USER_CANCELED);
                     return;
                 }

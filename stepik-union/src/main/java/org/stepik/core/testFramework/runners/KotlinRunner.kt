@@ -27,7 +27,7 @@ class KotlinRunner : JetRunner() {
         (appConfiguration as JetRunConfiguration).MAIN_CLASS_NAME = "MainKt"
     }
 
-    override fun createTestProcess(project: Project, stepNode: StepNode): TestProcess {
-        return KotlinProcess(project, stepNode)
+    override fun createTestProcess(project: Project, stepNode: StepNode, mainFilePath: String): TestProcess {
+        return KotlinProcess(project, stepNode, mainFilePath)
     }
 }

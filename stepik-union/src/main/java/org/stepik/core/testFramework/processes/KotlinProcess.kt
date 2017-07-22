@@ -11,7 +11,7 @@ import org.stepik.core.core.EduNames
 import org.stepik.core.courseFormat.StepNode
 import java.io.File
 
-class KotlinProcess(project: Project, stepNode: StepNode) : JetProcess(project, stepNode) {
+class KotlinProcess(project: Project, stepNode: StepNode, mainFilePath: String) : JetProcess(project, stepNode, mainFilePath) {
 
     override fun getSourcePath(runConfiguration: RunConfiguration): String {
         val appConfiguration = runConfiguration as JetRunConfiguration
@@ -29,11 +29,10 @@ class KotlinProcess(project: Project, stepNode: StepNode) : JetProcess(project, 
         return File(PathManager.getHomePath() + "/plugins/Kotlin/kotlinc/bin/kotlinc")
     }
 
-
     override fun prepareCompileCommand(commandLine: GeneralCommandLine, context: ProcessContext): Boolean {
         val jdkHome = context.sdk.homePath ?: return false
 
-        commandLine.addParameter(context.mainVirtualFile.path)
+        commandLine.addParameter(context.mainFilePath)
         commandLine.addParameter("-d")
         commandLine.addParameter(context.outDirectory)
         commandLine.addParameter("-jdk-home")

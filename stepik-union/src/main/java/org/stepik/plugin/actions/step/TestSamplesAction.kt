@@ -3,7 +3,11 @@ package org.stepik.plugin.actions.step
 import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.project.Project
+import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.testFramework.runners.ExitCause
+import org.stepik.core.testFramework.runners.Runner
+import org.stepik.core.testFramework.toolWindow.StepikTestResultToolWindow
 import org.stepik.core.testFramework.toolWindow.StepikTestToolWindowUtils
 import org.stepik.plugin.actions.ActionUtils
 
@@ -22,35 +26,68 @@ class TestSamplesAction : CodeQuizAction(TEXT, DESCRIPTION, DefaultRunExecutor.g
 
         val title = "${stepNode.parent?.name ?: "Lesson"} : ${stepNode.name}"
         val resultWindow = StepikTestToolWindowUtils.showTestResultsToolWindow(project, title)
+        val stepDirectory = project.baseDir.findFileByRelativePath(stepNode.path)
+        val haveTests = stepDirectory?.findFileByRelativePath(listOf("tests", language.langName, language.testFileName).joinToString("/")) != null
 
         ApplicationManager.getApplication().executeOnPooledThread {
-            var counter = 0
-            resultWindow.clear()
-            resultWindow.println("Test method: samples")
-            System.out.flush()
-            stepNode.samples.forEach {
-                resultWindow.print("Test #${counter++} ")
-                val result = runner.test(project, stepNode, it.input, { actual -> actual == it.output })
-                val status: String
-                if (result.passed) {
-                    status = "PASSED"
-                } else {
-                    when (result.cause) {
-                        ExitCause.TIME_LIMIT -> status = "FAIL (time left)"
-                        ExitCause.NO_CREATE_PROCESS -> status = "FAIL (can't create the test process)"
-                        else -> status = "FAIL"
-                    }
-                }
-                resultWindow.println(status)
-                if (!result.passed && result.cause == ExitCause.WRONG) {
-                    resultWindow.println("Input:\n${it.input}")
-                    resultWindow.println("Expected:\n${it.output}")
-                    resultWindow.println("Actual:\n${result.actual}")
-                    resultWindow.println()
+            if (haveTests) {
+                testWithTestFile(resultWindow, stepNode, runner, project)
+            } else {
+                testSamples(resultWindow, stepNode, runner, project)
+            }
+        }
+    }
+
+    private fun testWithTestFile(resultWindow: StepikTestResultToolWindow, stepNode: StepNode, runner: Runner, project: Project) {
+        resultWindow.clear()
+        resultWindow.println("Test method: test file")
+        System.out.flush()
+        val result = runner.testFiles(project, stepNode)
+        val status: String
+        if (result.passed) {
+            status = "PASSED"
+        } else {
+            when (result.cause) {
+                ExitCause.TIME_LIMIT -> status = "FAIL (time left)"
+                ExitCause.NO_CREATE_PROCESS -> status = "FAIL (can't create the test process)"
+                else -> status = "FAIL"
+            }
+        }
+        resultWindow.println(status)
+        if (!result.passed && result.cause == ExitCause.WRONG) {
+            resultWindow.println("Return:\n${result.actual}")
+            resultWindow.println()
+        }
+        resultWindow.println("Done")
+    }
+
+    private fun testSamples(resultWindow: StepikTestResultToolWindow, stepNode: StepNode, runner: Runner, project: Project) {
+        var counter = 0
+        resultWindow.clear()
+        resultWindow.println("Test method: samples")
+        System.out.flush()
+        stepNode.samples.forEach {
+            resultWindow.print("Test #${counter++} ")
+            val result = runner.testSamples(project, stepNode, it.input, { actual -> actual == it.output })
+            val status: String
+            if (result.passed) {
+                status = "PASSED"
+            } else {
+                when (result.cause) {
+                    ExitCause.TIME_LIMIT -> status = "FAIL (time left)"
+                    ExitCause.NO_CREATE_PROCESS -> status = "FAIL (can't create the test process)"
+                    else -> status = "FAIL"
                 }
             }
-            resultWindow.println("Done")
+            resultWindow.println(status)
+            if (!result.passed && result.cause == ExitCause.WRONG) {
+                resultWindow.println("Input:\n${it.input}")
+                resultWindow.println("Expected:\n${it.output}")
+                resultWindow.println("Actual:\n${result.actual}")
+                resultWindow.println()
+            }
         }
+        resultWindow.println("Done")
     }
 
     companion object {

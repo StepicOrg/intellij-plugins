@@ -18,6 +18,7 @@ import com.intellij.openapi.ui.popup.JBPopupListener;
 import com.intellij.openapi.ui.popup.LightweightWindowEvent;
 import com.intellij.openapi.ui.popup.PopupChooserBuilder;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.ui.components.JBList;
 import icons.AllStepikIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -50,10 +51,10 @@ import static org.stepik.core.metrics.MetricsStatus.USER_CANCELED;
 import static org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient;
 import static org.stepik.core.stepik.StepikAuthManager.getCurrentUser;
 import static org.stepik.core.stepik.StepikAuthManager.isAuthenticated;
+import static org.stepik.core.utils.DirectivesUtilsKt.containsDirectives;
+import static org.stepik.core.utils.DirectivesUtilsKt.replaceCode;
+import static org.stepik.core.utils.DirectivesUtilsKt.uncommentAmbientCode;
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
-import static org.stepik.plugin.utils.DirectivesUtilsKt.containsDirectives;
-import static org.stepik.plugin.utils.DirectivesUtilsKt.replaceCode;
-import static org.stepik.plugin.utils.DirectivesUtilsKt.uncommentAmbientCode;
 
 /**
  * @author meanmail
@@ -114,7 +115,7 @@ public class DownloadSubmission extends CodeQuizAction {
                         progressIndicator.setText2(stepNode.getName());
                         List<Submission> submissions = getSubmissions(stepikApiClient, stepNode);
 
-                        if (Utils.isCanceled()) {
+                        if (Utils.INSTANCE.isCanceled()) {
                             Metrics.downloadAction(project, stepNode, USER_CANCELED);
                             return null;
                         }
@@ -185,11 +186,11 @@ public class DownloadSubmission extends CodeQuizAction {
 
             List<SubmissionDecorator> submissionDecorators = submissions.stream()
                     .map(SubmissionDecorator::new).collect(Collectors.toList());
-            list = new JList<>(submissionDecorators.toArray(new SubmissionDecorator[submissionDecorators.size()]));
+            list = new JBList<>(submissionDecorators);
             builder = popupFactory.createListPopupBuilder(list)
                     .addListener(new Listener(list, project, stepNode));
         } else {
-            JList<String> emptyList = new JList<>(new String[]{"Empty"});
+            JList<String> emptyList = new JBList<>("Empty");
             builder = popupFactory.createListPopupBuilder(emptyList);
         }
 

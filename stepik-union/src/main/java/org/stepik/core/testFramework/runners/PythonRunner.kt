@@ -87,7 +87,7 @@ class PythonRunner : JetRunner() {
         return if (baseSdk != null) baseSdk else baseSdks.iterator().next()
     }
 
-    override fun createTestProcess(project: Project, stepNode: StepNode): TestProcess {
-        return PythonProcess(project, stepNode)
+    override fun createTestProcess(project: Project, stepNode: StepNode, mainFilePath: String): TestProcess {
+        return PythonProcess(project, stepNode, mainFilePath)
     }
 }

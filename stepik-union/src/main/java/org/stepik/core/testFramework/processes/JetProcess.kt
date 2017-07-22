@@ -7,32 +7,25 @@ import com.intellij.execution.configurations.RunConfiguration
 import com.intellij.execution.impl.RunManagerImpl
 import com.intellij.openapi.application.Application
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.fileEditor.FileDocumentManager
-import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.JavaSdk
 import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.util.io.FileUtil
-import org.stepik.core.core.EduNames
 import org.stepik.core.courseFormat.StepNode
+import org.stepik.core.utils.Utils
 import java.io.File
 import java.io.IOException
 
-abstract class JetProcess(project: Project, stepNode: StepNode) : TestProcess(project, stepNode) {
+abstract class JetProcess(project: Project, stepNode: StepNode, mainFilePath: String) : TestProcess(project, stepNode, mainFilePath) {
     private val OUTPUT_RELATIVE = "out/production"
 
     override fun start(): Process? {
         val runManager = RunManager.getInstance(project) as RunManagerImpl
-        val language = stepNode.currentLang
-        val baseDir = project.baseDir
-        val mainRelativePath = listOf(stepNode.path, EduNames.SRC, language.mainFileName).joinToString("/")
-        val mainVirtualFile = baseDir.findFileByRelativePath(mainRelativePath) ?: return null
-
         val runConfiguration = runManager.selectedConfiguration?.configuration ?: return null
-
         val sourcePath = getSourcePath(runConfiguration)
         val outDirectoryPath = "$OUTPUT_RELATIVE/step${stepNode.id}"
+        val baseDir = project.baseDir
         val outDirectory = (baseDir.findFileByRelativePath(outDirectoryPath)
                 ?: baseDir.createChildDirectory(null, outDirectoryPath)).path
         val module = getModule(runConfiguration) ?: return null
@@ -41,21 +34,14 @@ abstract class JetProcess(project: Project, stepNode: StepNode) : TestProcess(pr
             return null
         }
 
-        val documentManager = FileDocumentManager.getInstance()
-        val editorManager = FileEditorManager.getInstance(project)
-
         val application = ApplicationManager.getApplication()
         application.invokeAndWait {
-            editorManager.openFiles.forEach {
-                val document = documentManager.getDocument(it)
-                if (document != null)
-                    documentManager.saveDocument(document)
-            }
+            Utils.saveAllDocuments(project)
         }
 
         val mainClass = getMainClass(application, runConfiguration) ?: return null
 
-        val context = ProcessContext(runConfiguration, module, sdk, sourcePath, mainVirtualFile, mainClass, outDirectory)
+        val context = ProcessContext(runConfiguration, module, sdk, sourcePath, mainFilePath, mainClass, outDirectory)
 
         if (isNeedCompile() && !compile(context)) {
             return null

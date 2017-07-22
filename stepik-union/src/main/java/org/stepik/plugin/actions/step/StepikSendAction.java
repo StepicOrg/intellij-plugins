@@ -29,9 +29,9 @@ import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
 import static org.stepik.core.metrics.MetricsStatus.USER_CANCELED;
 import static org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient;
 import static org.stepik.core.stepik.StepikAuthManager.isAuthenticated;
+import static org.stepik.core.utils.DirectivesUtilsKt.getFileText;
+import static org.stepik.core.utils.DirectivesUtilsKt.getTextUnderDirectives;
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
-import static org.stepik.plugin.utils.DirectivesUtilsKt.getFileText;
-import static org.stepik.plugin.utils.DirectivesUtilsKt.getTextUnderDirectives;
 
 public class StepikSendAction extends CodeQuizAction {
     private static final Logger logger = Logger.getInstance(StepikSendAction.class);
@@ -68,7 +68,7 @@ public class StepikSendAction extends CodeQuizAction {
 
         logger.info(String.format("Finish sending step: id=%s", stepId));
 
-        if (Utils.isCanceled()) {
+        if (Utils.INSTANCE.isCanceled()) {
             Metrics.sendAction(project, stepNode, USER_CANCELED);
             return null;
         }
