@@ -2,13 +2,11 @@ package org.stepik.plugin.actions.step;
 
 import com.intellij.ide.projectView.ProjectView;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
-import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.problems.WolfTheProblemSolver;
@@ -17,38 +15,34 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.stepik.core.StepikProjectManager;
 import org.stepik.core.courseFormat.StepNode;
-import org.stepik.core.courseFormat.StudyNode;
 import org.stepik.core.metrics.Metrics;
 import org.stepik.core.metrics.MetricsStatus;
+import org.stepik.plugin.actions.ActionUtils;
 
-import javax.swing.*;
-
-import static org.stepik.core.courseFormat.StepType.CODE;
 import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
 
 public class StepikResetStepAction extends CodeQuizAction {
     private static final String ACTION_ID = "STEPIK.ResetStepAction";
     private static final String SHORTCUT = "ctrl shift pressed X";
+    private static final String SHORTCUT_TEXT = ActionUtils.getShortcutText(SHORTCUT);
+    private static final String TEXT = "Reset Step File (" + SHORTCUT_TEXT + ")";
+    private static final String DESCRIPTION = "Reset current step";
 
     public StepikResetStepAction() {
-        super("Reset Step File (" + KeymapUtil.getShortcutText(
-                new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT), null)) + ")",
-                "Reset current step", AllStepikIcons.ToolWindow.resetTaskFile);
+        super(TEXT, DESCRIPTION, AllStepikIcons.ToolWindow.resetTaskFile);
     }
 
-    private static void reset(@NotNull final Project project) {
+    private static void reset(@Nullable final Project project) {
         Application application = ApplicationManager.getApplication();
         application.invokeLater(() ->
                 application.runWriteAction(() -> resetFile(project)));
     }
 
-    private static void resetFile(@NotNull final Project project) {
-        StudyNode<?, ?> selected = StepikProjectManager.getSelected(project);
-        if (!(selected instanceof StepNode) || ((StepNode) selected).getType() != CODE) {
+    private static void resetFile(@Nullable final Project project) {
+        StepNode stepNode = getCurrentCodeStepNode(project);
+        if (stepNode == null) {
             return;
         }
-
-        StepNode stepNode = (StepNode) selected;
 
         VirtualFile src = getOrCreateSrcDirectory(project, stepNode, true);
         if (src == null) {
@@ -88,12 +82,7 @@ public class StepikResetStepAction extends CodeQuizAction {
     }
 
     public void actionPerformed(@NotNull AnActionEvent event) {
-        final Project project = event.getProject();
-        if (project == null) {
-            return;
-        }
-
-        reset(project);
+        reset(event.getProject());
     }
 
     @NotNull

@@ -95,9 +95,4 @@ public class VideoTheoryHelper extends StepHelper {
     public String getType() {
         return "video";
     }
-
-    @NotNull
-    public String getLinkTitle() {
-        return "Play this video in a browser";
-    }
 }

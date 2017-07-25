@@ -19,6 +19,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
 import static org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient;
 import static org.stepik.core.stepik.StepikAuthManager.isAuthenticated;
 
@@ -154,6 +155,15 @@ public class Metrics {
         if (studyNode instanceof StepNode) {
             StepNode stepNode = (StepNode) studyNode;
             stepAction("navigate", project, stepNode, status);
+        }
+    }
+
+    public static void openInBrowserAction(
+            @NotNull Project project,
+            @NotNull StudyNode studyNode) {
+        if (studyNode instanceof StepNode) {
+            StepNode stepNode = (StepNode) studyNode;
+            stepAction("open_in_browser", project, stepNode, SUCCESSFUL);
         }
     }
 

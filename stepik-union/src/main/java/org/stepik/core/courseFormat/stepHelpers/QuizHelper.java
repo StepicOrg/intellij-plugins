@@ -251,11 +251,6 @@ public class QuizHelper extends StepHelper {
         return submission.getHint();
     }
 
-    @NotNull
-    public String getLinkTitle() {
-        return "View this step on Stepik";
-    }
-
     public boolean isHasSubmissionsRestrictions() {
         Step data = getStepNode().getData();
         return data != null && data.isHasSubmissionsRestrictions();
