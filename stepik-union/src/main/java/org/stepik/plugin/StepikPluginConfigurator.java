@@ -21,13 +21,13 @@ public class StepikPluginConfigurator extends StudyBasePluginConfigurator {
         final DefaultActionGroup group = new DefaultActionGroup();
 
         group.add(new StepikSendAction());
+        group.add(new TestSamplesAction());
         group.add(new StepikPreviousStepAction());
         group.add(new StepikNextStepAction());
         group.add(new StepikResetStepAction());
         group.add(new DownloadSubmission());
         group.add(new InsertStepikDirectives());
         group.add(new OpenInBrowserAction());
-        group.add(new TestSamplesAction());
 
         return group;
     }
