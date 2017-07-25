@@ -17,4 +17,9 @@ public class DatasetQuizHelper extends QuizHelper {
         initStepOptions();
         return reply.getFile();
     }
+
+    @Override
+    public boolean isAutoCreateAttempt() {
+        return false;
+    }
 }

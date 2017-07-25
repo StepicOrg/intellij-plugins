@@ -90,14 +90,4 @@ public class VideoTheoryHelper extends StepHelper {
         this.quality = quality;
         PropertiesComponent.getInstance().setValue(VIDEO_QUALITY_PROPERTY_NAME, String.valueOf(quality));
     }
-
-    @NotNull
-    public String getType() {
-        return "video";
-    }
-
-    @NotNull
-    public String getLinkTitle() {
-        return "Play this video in a browser";
-    }
 }

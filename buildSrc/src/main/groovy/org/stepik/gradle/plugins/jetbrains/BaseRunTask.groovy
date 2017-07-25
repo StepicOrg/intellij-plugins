@@ -1,6 +1,7 @@
 package org.stepik.gradle.plugins.jetbrains
 
 import org.gradle.api.Project
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.JavaExec
@@ -80,7 +81,7 @@ abstract class BaseRunTask extends JavaExec {
         }
     }
 
-    @Internal
+    @Input
     protected abstract String getPlatformPrefix()
 
     private void configureSystemProperties() {
@@ -116,6 +117,7 @@ abstract class BaseRunTask extends JavaExec {
         this.plugin = plugin
     }
 
+    @Internal
     ProductPluginExtension getExtension() {
         return extension
     }

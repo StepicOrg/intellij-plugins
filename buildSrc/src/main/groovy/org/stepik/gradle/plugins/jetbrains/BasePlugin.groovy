@@ -3,11 +3,10 @@ package org.stepik.gradle.plugins.jetbrains
 import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.Task
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.bundling.Zip
-import org.gradle.api.tasks.compile.AbstractCompile
 import org.gradle.api.tasks.testing.Test
 import org.gradle.internal.jvm.Jvm
 import org.gradle.language.jvm.tasks.ProcessResources
@@ -107,7 +106,7 @@ abstract class BasePlugin implements Plugin<Project> {
 
         def toolsJar = Jvm.current().getToolsJar()
         if (toolsJar) {
-            project.getDependencies().add(JavaPlugin.RUNTIME_CONFIGURATION_NAME, project.files(toolsJar))
+            project.getDependencies().add(JavaPlugin.RUNTIME_ELEMENTS_CONFIGURATION_NAME, project.files(toolsJar))
         }
     }
 
@@ -178,18 +177,20 @@ abstract class BasePlugin implements Plugin<Project> {
 
     private void configureInstrumentation(@NotNull Project project, @NotNull ProductPluginExtension extension) {
         logger.info("Configuring IntelliJ compile tasks")
-        def abstractCompileDependencies = { String taskName ->
-            project.tasks.findByName(taskName).collect {
-                it.taskDependencies.getDependencies(it).findAll { it instanceof AbstractCompile }
-            }.flatten() as Collection<AbstractCompile>
-        }
-        abstractCompileDependencies(JavaPlugin.CLASSES_TASK_NAME).each {
-            it.inputs.property("intellijIdeaDependency", extension.dependency.toString())
-            it.doLast(new InstrumentCodeAction(false, extensionName) as Action<? super Task>)
-        }
-        abstractCompileDependencies(JavaPlugin.TEST_CLASSES_TASK_NAME).each {
-            it.inputs.property("intellijIdeaDependency", extension.dependency.toString())
-            it.doLast(new InstrumentCodeAction(true, extensionName) as Action<? super Task>)
+        def instrumentCode = { extension.instrumentCode && extension.type != 'RS' }
+        project.sourceSets.all { SourceSet sourceSet ->
+            def instrumentTask = project.tasks.create(sourceSet.getTaskName("${productName}Instrument", 'code'), InstrumentCodeTask)
+            instrumentTask.sourceSet = sourceSet
+            instrumentTask.with {
+                dependsOn sourceSet.classesTaskName
+                onlyIf instrumentCode
+
+                conventionMapping("ideaDependency", { extension.dependency })
+                conventionMapping('outputDir', { new File(sourceSet.output.classesDirs[0].getParent(), "${sourceSet.name}") })
+            }
+
+            // Ensure that our task is invoked when the source set is built
+            sourceSet.compiledBy(instrumentTask)
         }
     }
 

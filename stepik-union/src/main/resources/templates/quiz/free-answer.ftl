@@ -3,7 +3,7 @@
 <#-- @ftlvariable name="stepNode" type="org.stepik.core.courseFormat.stepHelpers.FreeAnswerQuizHelper" -->
 <#-- @ftlvariable name="text" type="java.lang.String" -->
 
-<#include "base.ftl">
+<#include "base_step.ftl">
 
 <@styles>
 <style>
@@ -16,7 +16,7 @@
 </style>
 </@styles>
 
-<@quiz_content>
+<@step_content>
     <#if action != "get_first_attempt" && action != "need_login" >
     <textarea id="text" class="row" name="value"
               placeholder="Input your answer here" ${disabled!""}>${stepNode.getText()}</textarea>
@@ -30,4 +30,4 @@
         <br>
         </#if>
     </#if>
-</@quiz_content>
+</@step_content>

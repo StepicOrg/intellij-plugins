@@ -55,7 +55,7 @@ class PrepareSandboxTask extends DefaultTask {
         return pluginName != null ? FileUtils.toSafeFileName(pluginName) : null
     }
 
-    @Input
+    @OutputDirectory
     @Nullable
     File getConfigDirectory() {
         if (extension == null) {

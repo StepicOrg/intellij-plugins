@@ -3,6 +3,7 @@ package org.stepik.plugin.utils;
 import com.intellij.ide.projectView.ProjectView;
 import com.intellij.ide.projectView.impl.AbstractProjectViewPane;
 import com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -39,7 +40,9 @@ import static org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory;
 public class NavigationUtils {
     public static void navigate(@NotNull Project project, @NotNull StudyNode targetNode) {
         for (VirtualFile file : FileEditorManager.getInstance(project).getOpenFiles()) {
-            FileEditorManager.getInstance(project).closeFile(file);
+            ApplicationManager.getApplication().invokeAndWait(() ->
+                    FileEditorManager.getInstance(project).closeFile(file)
+            );
         }
 
         VirtualFile projectDir = project.getBaseDir();
@@ -65,14 +68,19 @@ public class NavigationUtils {
         }
 
         if (mainFile != null) {
-            updateProjectView(project, mainFile);
+            VirtualFile finalMainFile = mainFile;
+            ApplicationManager.getApplication().invokeAndWait(() ->
+                    updateProjectView(project, finalMainFile)
+            );
         }
         Metrics.navigateAction(project, targetNode, SUCCESSFUL);
         StepikProjectManager.setSelected(project, targetNode);
 
         ToolWindow runToolWindow = ToolWindowManager.getInstance(project).getToolWindow(ToolWindowId.RUN);
         if (runToolWindow != null) {
-            runToolWindow.hide(null);
+            ApplicationManager.getApplication().invokeLater(() ->
+                    runToolWindow.hide(null)
+            );
         }
     }
 

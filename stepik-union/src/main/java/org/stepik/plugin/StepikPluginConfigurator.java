@@ -9,6 +9,7 @@ import org.stepik.plugin.actions.navigation.StepikNextStepAction;
 import org.stepik.plugin.actions.navigation.StepikPreviousStepAction;
 import org.stepik.plugin.actions.step.DownloadSubmission;
 import org.stepik.plugin.actions.step.InsertStepikDirectives;
+import org.stepik.plugin.actions.step.OpenInBrowserAction;
 import org.stepik.plugin.actions.step.StepikSendAction;
 import org.stepik.plugin.actions.step.StepikResetStepAction;
 
@@ -24,6 +25,7 @@ public class StepikPluginConfigurator extends StudyBasePluginConfigurator {
         group.add(new StepikResetStepAction());
         group.add(new DownloadSubmission());
         group.add(new InsertStepikDirectives());
+        group.add(new OpenInBrowserAction());
 
         return group;
     }

@@ -3,7 +3,7 @@
 <#-- @ftlvariable name="stepNode" type="org.stepik.core.courseFormat.stepHelpers.DatasetQuizHelper" -->
 <#-- @ftlvariable name="text" type="java.lang.String" -->
 
-<#include "base.ftl">
+<#include "base_step.ftl">
 
 <@styles>
 <style>
@@ -32,7 +32,7 @@
 </style>
 </@styles>
 
-<@quiz_content>
+<@step_content>
     <#if action != "get_first_attempt" && action != "need_login">
     <div id="time-left">5 minutes</div>
         <#assign dataset_url = stepNode.getDatasetUrl()/>
@@ -56,7 +56,7 @@
         </#if>
     <input id="isFromFile" type="hidden" name="isFromFile" value="false">
     </#if>
-</@quiz_content>
+</@step_content>
 
 <@scripts>
 <script>
@@ -65,7 +65,9 @@
     var active = "${action}" === "submit";
 
     if (active) {
+        //noinspection JSUnusedAssignment
         if (time_left > 0) {
+            //noinspection JSUnusedAssignment
             clock.innerHTML = timeToString(time_left);
         }
         var timerId = setInterval(function () {

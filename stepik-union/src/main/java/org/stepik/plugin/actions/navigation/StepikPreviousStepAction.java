@@ -1,21 +1,20 @@
 package org.stepik.plugin.actions.navigation;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.openapi.actionSystem.KeyboardShortcut;
-import com.intellij.openapi.keymap.KeymapUtil;
-import org.stepik.core.courseFormat.StudyNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import javax.swing.*;
+import org.stepik.core.courseFormat.StudyNode;
+import org.stepik.plugin.actions.ActionUtils;
 
 public class StepikPreviousStepAction extends StepikStepNavigationAction {
     private static final String ACTION_ID = "STEPIK.PreviousStepAction";
     private static final String SHORTCUT = "ctrl pressed COMMA";
+    private static final String SHORTCUT_TEXT = ActionUtils.getShortcutText(SHORTCUT);
+    private static final String TEXT = "Previous Step (" + SHORTCUT_TEXT + ")";
+    private static final String DESCRIPTION = "Navigate to the previous step";
 
     public StepikPreviousStepAction() {
-        super("Previous Step (" + KeymapUtil.getShortcutText(new KeyboardShortcut(KeyStroke.getKeyStroke(SHORTCUT),
-                null)) + ")", "Navigate to the previous step", AllIcons.Actions.Back);
+        super(TEXT, DESCRIPTION, AllIcons.Actions.Back);
     }
 
     @Override

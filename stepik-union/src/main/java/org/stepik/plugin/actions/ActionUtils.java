@@ -2,10 +2,14 @@ package org.stepik.plugin.actions;
 
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
+import com.intellij.openapi.actionSystem.KeyboardShortcut;
+import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.api.objects.submissions.Submission;
+
+import javax.swing.*;
 
 public class ActionUtils {
     static final int MILLISECONDS_IN_MINUTES = 60 * 1000;
@@ -77,5 +81,11 @@ public class ActionUtils {
 
         indicator.setFraction(1 - eta / total);
         indicator.setText2("Ends in " + etaAsString((long) eta));
+    }
+
+    @NotNull
+    public static String getShortcutText(@NotNull String shortcut) {
+        KeyboardShortcut keyboardShortcut = new KeyboardShortcut(KeyStroke.getKeyStroke(shortcut), null);
+        return KeymapUtil.getShortcutText(keyboardShortcut);
     }
 }
