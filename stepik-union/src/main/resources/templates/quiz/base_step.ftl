@@ -70,7 +70,7 @@
 
     ${stepNode.getContent()}<br>
     <div>
-        <form id="answer_form" action="${stepNode.getPath()}" method="get">
+        <form id="answer_form" action="${stepNode.getPath()}">
             <#if action != "submit" || !stepNode.hasSubmitButton()>
                 <#assign disabled = "disabled" />
             </#if>
@@ -138,6 +138,7 @@
                     submit.removeAttribute("disabled")
                 }
             }
+
             updateSubmitCaption();
 
             function solve_again() {

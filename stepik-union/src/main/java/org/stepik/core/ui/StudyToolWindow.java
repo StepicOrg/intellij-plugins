@@ -13,6 +13,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.ui.JBCardLayout;
 import com.intellij.ui.OnePixelSplitter;
@@ -83,7 +84,7 @@ public class StudyToolWindow extends SimpleToolWindowPanel implements DataProvid
         cardLayout = new JBCardLayout();
         contentPanel = new JPanel(cardLayout);
         splitPane = new OnePixelSplitter(myVertical = true);
-        languageBox = new JComboBox<>();
+        languageBox = new ComboBox<>();
         languageBox.addActionListener(this);
 
         layout = new CardLayout();

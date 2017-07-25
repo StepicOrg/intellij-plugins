@@ -17,7 +17,7 @@
 
 <@step_content>
     <#if action != "get_first_attempt" && action != "need_login" >
-    <input id="text" type="text" name="value" placeholder="Input your answer here" ${disabled!""}
+    <input id="text" name="value" placeholder="Input your answer here" ${disabled!""}
            value="${stepNode.getText()}"/>
     </#if>
 </@step_content>
