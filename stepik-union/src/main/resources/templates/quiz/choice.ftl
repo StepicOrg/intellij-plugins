@@ -2,9 +2,9 @@
 <#-- @ftlvariable name="disabled" type="java.lang.String" -->
 <#-- @ftlvariable name="stepNode" type="org.stepik.core.courseFormat.stepHelpers.ChoiceQuizHelper" -->
 
-<#include "base.ftl">
+<#include "base_step.ftl">
 
-<@quiz_content>
+<@step_content>
     <#if action != "get_first_attempt" && action != "need_login" >
         <#assign index = 0 />
 
@@ -20,4 +20,4 @@
 
     <input type="hidden" name="count" value="${index}"/>
     </#if>
-</@quiz_content>
+</@step_content>

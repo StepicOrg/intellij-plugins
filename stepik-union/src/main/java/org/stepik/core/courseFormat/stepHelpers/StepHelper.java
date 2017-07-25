@@ -11,6 +11,7 @@ import org.stepik.api.urls.Urls;
 import org.stepik.core.StepikProjectManager;
 import org.stepik.core.courseFormat.StepNode;
 import org.stepik.core.courseFormat.StudyNode;
+import org.stepik.plugin.actions.navigation.StudyNavigator;
 
 import static org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient;
 import static org.stepik.core.stepik.StepikAuthManager.isAuthenticated;
@@ -114,6 +115,22 @@ public class StepHelper {
             logger.warn(e);
         }
 
+        return false;
+    }
+
+    public boolean hasNextStep() {
+        return StudyNavigator.nextLeaf(stepNode) != null;
+    }
+
+    public boolean hasSubmitButton() {
+        return false;
+    }
+
+    public boolean needLogin() {
+        return "need_login".equals(getAction());
+    }
+
+    public boolean canSubmit() {
         return false;
     }
 }

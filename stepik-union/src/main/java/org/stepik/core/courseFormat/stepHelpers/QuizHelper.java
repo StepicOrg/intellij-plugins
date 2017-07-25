@@ -121,6 +121,7 @@ public class QuizHelper extends StepHelper {
         return status;
     }
 
+    @SuppressWarnings("unused")
     public long getAttemptId() {
         initStepOptions();
         return attempt.getId();
@@ -197,7 +198,7 @@ public class QuizHelper extends StepHelper {
     void fail() {
     }
 
-    public int getSubmissionsCount() {
+    private int getSubmissionsCount() {
         if (submissionsCount == -1) {
             StepikApiClient stepikApiClient = authAndGetStepikApiClient();
             User user = getCurrentUser();
@@ -245,18 +246,20 @@ public class QuizHelper extends StepHelper {
         return reply.getFormula();
     }
 
+    @SuppressWarnings("unused")
     @NotNull
     public String getHint() {
         initStepOptions();
         return submission.getHint();
     }
 
+    @SuppressWarnings("WeakerAccess")
     public boolean isHasSubmissionsRestrictions() {
         Step data = getStepNode().getData();
         return data != null && data.isHasSubmissionsRestrictions();
     }
 
-    public int getMaxSubmissionsCount() {
+    private int getMaxSubmissionsCount() {
         Step data = getStepNode().getData();
         if (data == null) {
             return 0;
@@ -271,7 +274,24 @@ public class QuizHelper extends StepHelper {
         return action;
     }
 
+    @SuppressWarnings("unused")
     public boolean isModified() {
         return modified;
+    }
+
+    @SuppressWarnings("unused")
+    public int submissionsLeft() {
+        return getMaxSubmissionsCount() - getSubmissionsCount();
+    }
+
+    @Override
+    public boolean hasSubmitButton() {
+        boolean locked = isHasSubmissionsRestrictions() && (getSubmissionsCount() >= getMaxSubmissionsCount());
+        return !needLogin() && !locked;
+    }
+
+    @Override
+    public boolean canSubmit() {
+        return true;
     }
 }

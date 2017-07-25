@@ -4,6 +4,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.EmptyProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import javafx.application.Platform;
 import javafx.stage.FileChooser;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,6 +20,8 @@ import org.stepik.core.courseFormat.StudyNode;
 import org.stepik.core.stepik.StepikAuthManager;
 import org.stepik.core.stepik.StepikAuthState;
 import org.stepik.plugin.actions.SendAction;
+import org.stepik.plugin.actions.navigation.StudyNavigator;
+import org.stepik.plugin.utils.NavigationUtils;
 import org.w3c.dom.events.Event;
 import org.w3c.dom.events.EventListener;
 import org.w3c.dom.html.HTMLFormElement;
@@ -170,6 +173,15 @@ class FormListener implements EventListener {
                             }
                             browser.hideLoadAnimation();
                         });
+                break;
+            case "next_step":
+                StudyNode targetNode = StudyNavigator.nextLeaf(stepNode);
+
+                if (targetNode == null) {
+                    return;
+                }
+
+                Platform.runLater(() -> NavigationUtils.navigate(project, targetNode));
                 break;
             default:
                 browser.hideLoadAnimation();
