@@ -5,18 +5,21 @@ intellij {
     version = project.getProperties().get('ideaVersion')
     sandboxDirectory = project.getProperties().get('ideaSandboxDir')
     idePath = project.getProperties().get('ideaPath')
+    pluginDescription = new File("description.html")
+    changeNotes = new File("change-notes.html")
 }
 
 pycharm {
     version = project.getProperties().get('pyCharmVersion')
     sandboxDirectory = project.getProperties().get('pyCharmSandboxDir')
     idePath = project.getProperties().get('pyCharmPath')
+    pluginDescription = new File("description.html")
+    changeNotes = new File("change-notes.html")
 }
 
 dependencies {
     compile project(":stepik-java-api")
     compile 'org.freemarker:freemarker:2.3.23'
-
 }
 
 group 'org.stepik'

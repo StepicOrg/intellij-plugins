@@ -3,8 +3,11 @@ package org.stepik.gradle.plugins.jetbrains
 import org.gradle.api.file.FileCollection
 import org.gradle.api.internal.ConventionTask
 import org.gradle.api.tasks.*
+import org.jdom2.CDATA
+import org.jdom2.Content
 import org.jdom2.Document
 import org.jdom2.Element
+import org.jdom2.Text
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.Nullable
 
@@ -82,8 +85,8 @@ class PatchPluginXmlTask extends ConventionTask {
                 }
 
                 patchSinceUntilBuild(pluginXml, sinceBuild, untilBuild)
-                patchElement(pluginXml, "description", pluginDescription)
-                patchElement(pluginXml, "change-notes", changeNotes)
+                patchElement(pluginXml, "description", new CDATA(pluginDescription))
+                patchElement(pluginXml, "change-notes", new CDATA(changeNotes))
                 patchElement(pluginXml, "version", version)
 
                 def destinationFile = new File(destinationDir, it.name)
@@ -111,6 +114,10 @@ class PatchPluginXmlTask extends ConventionTask {
     }
 
     static void patchElement(@NotNull Document pluginXml, @NotNull String name, @Nullable String value) {
+        patchElement(pluginXml, name, new Text(value))
+    }
+
+    static void patchElement(@NotNull Document pluginXml, @NotNull String name, @Nullable Content value) {
         if (value != null) {
             def result = pluginXml.getRootElement().getChild(name)
 
@@ -119,7 +126,7 @@ class PatchPluginXmlTask extends ConventionTask {
                 pluginXml.getRootElement().addContent(result)
             }
 
-            result.text = value
+            result.setContent(value)
         }
     }
 
