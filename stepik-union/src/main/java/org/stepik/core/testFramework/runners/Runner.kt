@@ -37,18 +37,7 @@ interface Runner {
         val mainFile = mainFilePath ?: getMainFilePath(project, stepNode)?.path ?: return NO_PROCESS
         val process = createTestProcess(project, stepNode, mainFile).start() ?: return NO_PROCESS
 
-        val outputStream = PrintStream(BufferedOutputStream(process.outputStream))
-        outputStream.print("$input\n")
-        outputStream.flush()
-        val inputStream = BufferedInputStream(process.inputStream)
-        val actualOutput = StringBuffer()
-        ApplicationManager.getApplication().executeOnPooledThread {
-            var b = inputStream.read()
-            while (b != -1) {
-                actualOutput.append(b.toChar())
-                b = inputStream.read()
-            }
-        }
+        writeToProcessInput(process, input)
 
         val success = process.waitFor(stepNode.limit.time.toLong(), TimeUnit.SECONDS)
 
@@ -56,6 +45,8 @@ interface Runner {
             process.destroyForcibly()
             return TIME_LEFT
         }
+
+        val actualOutput = readProcessOutput(process)
 
         val actual = actualOutput.toString()
         val score = process.exitValue() == 0 && assertion(actual)
@@ -66,6 +57,23 @@ interface Runner {
             cause = ExitCause.WRONG
         }
         return TestResult(score, actual, cause)
+    }
+
+    fun writeToProcessInput(process: Process, input: String) {
+        val outputStream = PrintStream(BufferedOutputStream(process.outputStream))
+        outputStream.print("$input\n")
+        outputStream.flush()
+    }
+
+    fun readProcessOutput(process: Process): StringBuffer {
+        val inputStream = BufferedInputStream(process.inputStream)
+        val actualOutput = StringBuffer()
+        var b = inputStream.read()
+        while (b != -1) {
+            actualOutput.append(b.toChar())
+            b = inputStream.read()
+        }
+        return actualOutput
     }
 
     fun getMainFilePath(project: Project, stepNode: StepNode): VirtualFile? {
