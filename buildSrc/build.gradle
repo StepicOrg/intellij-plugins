@@ -10,8 +10,8 @@ repositories {
 dependencies {
     compile gradleApi()
     compile 'org.jetbrains:annotations:13.0'
-    compile 'org.jetbrains.intellij:plugin-repository-rest-client:0.3.21'
-    compile 'org.jetbrains.intellij.plugins:intellij-plugin-structure:2.2'
+    compile 'org.jetbrains.intellij:plugin-repository-rest-client:0.4.26'
+    compile 'org.jetbrains.intellij.plugins:intellij-plugin-structure:2.3'
     compile 'org.jdom:jdom2:2.0.6'
     compile group: 'org.rauschig', name: 'jarchivelib', version: '0.7.1'
 

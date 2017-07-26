@@ -246,6 +246,10 @@ class ProductPluginExtension {
         this.plugin = plugin
     }
 
+    BasePlugin getPlugin() {
+        return plugin
+    }
+
     @Input
     @NotNull
     RepositoryType getRepositoryType() {

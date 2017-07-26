@@ -1,3 +1,5 @@
+import org.stepik.gradle.plugins.jetbrains.PublishTask
+
 apply plugin: 'org.stepik.gradle.plugins.pycharm'
 apply plugin: 'org.stepik.gradle.plugins.idea'
 
@@ -5,6 +7,9 @@ intellij {
     version = project.getProperties().get('ideaVersion')
     sandboxDirectory = project.getProperties().get('ideaSandboxDir')
     idePath = project.getProperties().get('ideaPath')
+    publish.username = project.getProperties().get('username')
+    publish.password = project.getProperties().get('password')
+    publish.channels = [project.getProperties().get('channel') ?: ["EAP"]]
     pluginDescription = new File("description.html")
     changeNotes = new File("change-notes.html")
 }
@@ -13,6 +18,9 @@ pycharm {
     version = project.getProperties().get('pyCharmVersion')
     sandboxDirectory = project.getProperties().get('pyCharmSandboxDir')
     idePath = project.getProperties().get('pyCharmPath')
+    publish.username = project.getProperties().get('username')
+    publish.password = project.getProperties().get('password')
+    publish.channels = [project.getProperties().get('channel') ?: ["EAP"]]
     pluginDescription = new File("description.html")
     changeNotes = new File("change-notes.html")
 }
@@ -26,3 +34,13 @@ group 'org.stepik'
 version project.getProperties().get('pluginVersion') ?: 'SNAPSHOT'
 
 defaultTasks "runIdea"
+
+task("publishBranch", type: PublishTask) {
+    extension = intellij
+    plugin = intellij.plugin
+    def buildNumber = project.getProperties().get('buildNumber') ?: "SNAPSHOT"
+    def branch = project.getProperties().get('branch') ?: "UNKNOWN"
+    project.version = "${project.version}-${branch}-${buildNumber}"
+}
+
+publishBranch.dependsOn(buildIdeaPlugin)

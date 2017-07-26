@@ -1,5 +1,6 @@
 package org.stepik.gradle.plugins.jetbrains
 
+import com.intellij.structure.plugin.PluginCreationFail
 import com.intellij.structure.plugin.PluginManager
 import org.gradle.api.internal.ConventionTask
 import org.gradle.api.tasks.Input
@@ -17,8 +18,9 @@ class PublishTask extends ConventionTask {
     private static final Logger logger = LoggerFactory.getLogger(BasePlugin)
 
     private ProductPluginExtension extension
+
     private BasePlugin plugin
-    private String host = "http://plugins.jetbrains.com"
+    private String host = "https://plugins.jetbrains.com"
 
     PublishTask() {
         enabled = !project.gradle.startParameter.offline
@@ -28,8 +30,16 @@ class PublishTask extends ConventionTask {
         this.extension = extension
     }
 
+    ProductPluginExtension getExtension() {
+        return extension
+    }
+
     void setPlugin(BasePlugin plugin) {
         this.plugin = plugin
+    }
+
+    BasePlugin getPlugin() {
+        return plugin
     }
 
     @Input
@@ -76,7 +86,14 @@ class PublishTask extends ConventionTask {
 
         def host = getHost()
         def distributionFile = getDistributionFile()
-        String pluginId = PluginManager.instance.createPlugin(distributionFile).plugin.pluginId
+        def pluginCreationResult = PluginManager.instance.createPlugin(distributionFile)
+        if (pluginCreationResult instanceof PluginCreationFail) {
+            logger.warn("Don't create plugin: " + pluginCreationResult.toString())
+            return
+        }
+
+        def plugin = pluginCreationResult.plugin
+        String pluginId = plugin.pluginId
         for (String channel : channels) {
             logger.info("Uploading plugin ${pluginId} from $distributionFile.absolutePath to $host, channel: $channel")
             try {
