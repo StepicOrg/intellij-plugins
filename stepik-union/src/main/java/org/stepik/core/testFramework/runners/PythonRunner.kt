@@ -14,6 +14,9 @@ import com.jetbrains.python.run.PythonRunConfiguration
 import com.jetbrains.python.sdk.PyDetectedSdk
 import com.jetbrains.python.sdk.PythonSdkType
 import com.jetbrains.python.sdk.flavors.PythonSdkFlavor
+import org.stepik.core.courseFormat.StepNode
+import org.stepik.core.testFramework.processes.PythonProcess
+import org.stepik.core.testFramework.processes.TestProcess
 import org.stepik.core.utils.ProjectFilesUtils
 
 class PythonRunner : JetRunner() {
@@ -82,5 +85,9 @@ class PythonRunner : JetRunner() {
             }
         }
         return if (baseSdk != null) baseSdk else baseSdks.iterator().next()
+    }
+
+    override fun createTestProcess(project: Project, stepNode: StepNode, mainFilePath: String): TestProcess {
+        return PythonProcess(project, stepNode, mainFilePath)
     }
 }

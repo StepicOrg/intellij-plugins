@@ -5,6 +5,9 @@ import com.intellij.openapi.application.Application
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import org.jetbrains.kotlin.idea.run.JetRunConfiguration
+import org.stepik.core.courseFormat.StepNode
+import org.stepik.core.testFramework.processes.KotlinProcess
+import org.stepik.core.testFramework.processes.TestProcess
 
 class KotlinRunner : JetRunner() {
     override fun getTypeName(): String = "JetRunConfigurationType"
@@ -22,5 +25,9 @@ class KotlinRunner : JetRunner() {
                               appConfiguration: RunConfiguration,
                               mainVirtualFile: VirtualFile?) {
         (appConfiguration as JetRunConfiguration).MAIN_CLASS_NAME = "MainKt"
+    }
+
+    override fun createTestProcess(project: Project, stepNode: StepNode, mainFilePath: String): TestProcess {
+        return KotlinProcess(project, stepNode, mainFilePath)
     }
 }

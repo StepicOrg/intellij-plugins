@@ -93,7 +93,7 @@ public class Metrics {
     }
 
     public static void authenticate(@NotNull MetricsStatus status) {
-        Project project = Utils.getCurrentProject();
+        Project project = Utils.INSTANCE.getCurrentProject();
         postSimpleMetric(project, "authenticate", status);
     }
 
@@ -186,5 +186,12 @@ public class Metrics {
             @NotNull StepNode stepNode,
             @NotNull MetricsStatus status) {
         stepAction("switch_language", project, stepNode, status);
+    }
+
+    public static void testCodeAction(
+            @NotNull Project project,
+            @NotNull StepNode stepNode,
+            @NotNull MetricsStatus status) {
+        stepAction("test_code", project, stepNode, status);
     }
 }

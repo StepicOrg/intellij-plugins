@@ -8,6 +8,12 @@ import org.junit.experimental.theories.Theories
 import org.junit.experimental.theories.Theory
 import org.junit.runner.RunWith
 import org.stepik.core.SupportedLanguages
+import org.stepik.core.utils.containsDirectives
+import org.stepik.core.utils.getTextUnderDirectives
+import org.stepik.core.utils.insertAmbientCode
+import org.stepik.core.utils.removeAmbientCode
+import org.stepik.core.utils.replaceCode
+import org.stepik.core.utils.uncommentAmbientCode
 import java.util.*
 
 
