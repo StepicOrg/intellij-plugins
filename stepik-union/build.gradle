@@ -3,6 +3,9 @@ import org.stepik.gradle.plugins.jetbrains.PublishTask
 apply plugin: 'org.stepik.gradle.plugins.pycharm'
 apply plugin: 'org.stepik.gradle.plugins.idea'
 
+def descriptionFile = file("description.html")
+def changeNotesFile = file("change-notes.html")
+
 intellij {
     version = project.getProperties().get('ideaVersion')
     sandboxDirectory = project.getProperties().get('ideaSandboxDir')
@@ -10,8 +13,8 @@ intellij {
     publish.username = project.getProperties().get('username')
     publish.password = project.getProperties().get('password')
     publish.channels = [project.getProperties().get('channel') ?: ["EAP"]]
-    pluginDescription = new File("description.html")
-    changeNotes = new File("change-notes.html")
+    pluginDescription = descriptionFile
+    changeNotes = changeNotesFile
 }
 
 pycharm {
@@ -21,8 +24,8 @@ pycharm {
     publish.username = project.getProperties().get('username')
     publish.password = project.getProperties().get('password')
     publish.channels = [project.getProperties().get('channel') ?: ["EAP"]]
-    pluginDescription = new File("description.html")
-    changeNotes = new File("change-notes.html")
+    pluginDescription = descriptionFile
+    changeNotes = changeNotesFile
 }
 
 dependencies {
