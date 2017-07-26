@@ -12,7 +12,7 @@ import javax.swing.*;
 
 import static org.stepik.core.courseFormat.StepType.CODE;
 
-abstract class CodeQuizAction extends AbstractStepAction {
+public abstract class CodeQuizAction extends AbstractStepAction {
     CodeQuizAction(
             @Nullable String text,
             @Nullable String description,

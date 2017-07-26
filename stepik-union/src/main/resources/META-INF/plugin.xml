@@ -6,6 +6,7 @@
     <vendor email="plugin@stepik.org" url="https://stepik.org">Stepik</vendor>
 
     <depends>com.intellij.modules.lang</depends>
+    <depends optional="true">org.jetbrains.kotlin</depends>
     <depends optional="true" config-file="idea.xml">com.intellij.modules.java</depends>
     <depends optional="true" config-file="pycharm.xml">com.intellij.modules.python</depends>
 
@@ -26,6 +27,7 @@
         <action id="STEPIK.InsertStepikDirectives" class="org.stepik.plugin.actions.step.InsertStepikDirectives"/>
         <action id="STEPIK.RefreshStepAction" class="org.stepik.plugin.actions.step.StepikResetStepAction"/>
         <action id="STEPIK.OpenInBrowser" class="org.stepik.plugin.actions.step.OpenInBrowserAction"/>
+        <action id="STEPIK.TestSamplesAction" class="org.stepik.plugin.actions.step.TestSamplesAction"/>
     </actions>
 
     <project-components>
@@ -41,6 +43,7 @@
     <extensions defaultExtensionNs="com.intellij">
         <projectService serviceInterface="com.intellij.codeInsight.documentation.DocumentationManager" serviceImplementation="org.stepik.core.StudyDocumentationManager" overrides="true"/>
         <toolWindow id="Step Description" anchor="right" factoryClass="org.stepik.core.ui.StudyToolWindowFactory" conditionClass="org.stepik.core.ui.StudyCondition"/>
+        <toolWindow id="Stepik Test" anchor="bottom" factoryClass="org.stepik.core.testFramework.toolWindow.StepikTestToolWindowFactory" conditionClass="org.stepik.core.testFramework.toolWindow.StudyCondition"/>
         <projectService serviceInterface="org.stepik.core.StepikProjectManager" serviceImplementation="org.stepik.core.StepikProjectManager"/>
     </extensions>
 </idea-plugin>

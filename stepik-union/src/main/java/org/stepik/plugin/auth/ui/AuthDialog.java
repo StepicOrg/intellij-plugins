@@ -1,6 +1,7 @@
 package org.stepik.plugin.auth.ui;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.util.ui.UIUtil;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -162,7 +163,7 @@ public class AuthDialog extends JDialog {
 
     @NotNull
     private Button createButtonWithImage(@NotNull Icon icon) {
-        BufferedImage bImg = new BufferedImage(icon.getIconWidth(), icon.getIconWidth(), BufferedImage.TYPE_INT_ARGB);
+        BufferedImage bImg = UIUtil.createImage(icon.getIconWidth(), icon.getIconWidth(), BufferedImage.TYPE_INT_ARGB);
         Graphics2D graphics = bImg.createGraphics();
         icon.paintIcon(null, graphics, 0, 0);
         graphics.dispose();
