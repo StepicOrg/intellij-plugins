@@ -21,7 +21,7 @@ class JavaRunner : JetRunner() {
 
     override fun setWorkingDirectory(appConfiguration: RunConfiguration,
                                      workingVirtualDirectory: VirtualFile) {
-        val workingDirectory = workingVirtualDirectory.canonicalPath
+        val workingDirectory = workingVirtualDirectory.path
         (appConfiguration as ApplicationConfiguration).workingDirectory = workingDirectory
     }
 

@@ -70,7 +70,7 @@ abstract class JetProcess(project: Project, stepNode: StepNode, mainFilePath: St
             val exePath = getCompilerPath(context)
             exePath?.setExecutable(true) ?: return false
             val commandLine = GeneralCommandLine()
-            commandLine.workDirectory = File(context.module.moduleFile?.parent?.canonicalPath)
+            commandLine.workDirectory = File(context.module.moduleFile?.parent?.path)
             commandLine.exePath = exePath.absolutePath
             if (!prepareCompileCommand(commandLine, context)) {
                 return false
