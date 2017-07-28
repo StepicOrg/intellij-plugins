@@ -120,21 +120,25 @@ fun removeAmbientCode(text: String, showHint: Boolean, language: SupportedLangua
     return splittedText.subList(start + 1, end).joinToString("\n")
 }
 
-fun StringBuilder.appendlnIf(string: String, condition: Boolean): StringBuilder {
+fun StringBuilder.appendLn(string: String): StringBuilder {
+    return append(string).append("\n")
+}
+
+fun StringBuilder.appendLnIf(string: String, condition: Boolean): StringBuilder {
     return if (condition) {
-        appendln(string)
+        appendLn(string)
     } else {
         this
     }
 }
 
 fun insertAmbientCode(text: String, lang: SupportedLanguages, showHint: Boolean): String {
-    return StringBuilder().appendln(lang.beforeCode ?: "")
-            .appendlnIf(lang.comment(START_HINT), showHint)
-            .appendln(lang.comment(START_DIRECTIVE))
-            .appendln(text)
-            .appendln(lang.comment(END_DIRECTIVE))
-            .appendlnIf(lang.comment(END_HINT), showHint)
+    return StringBuilder().appendLn(lang.beforeCode ?: "")
+            .appendLnIf(lang.comment(START_HINT), showHint)
+            .appendLn(lang.comment(START_DIRECTIVE))
+            .appendLn(text)
+            .appendLn(lang.comment(END_DIRECTIVE))
+            .appendLnIf(lang.comment(END_HINT), showHint)
             .append(lang.afterCode ?: "")
             .toString()
             .trim()
