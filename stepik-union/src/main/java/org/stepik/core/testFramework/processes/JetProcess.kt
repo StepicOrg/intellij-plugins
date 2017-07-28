@@ -9,7 +9,6 @@ import com.intellij.openapi.application.Application
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.projectRoots.JavaSdk
 import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.util.io.FileUtil
 import org.stepik.core.courseFormat.StepNode
@@ -30,11 +29,7 @@ abstract class JetProcess(project: Project, stepNode: StepNode, mainFilePath: St
         val outDirectory = (baseDir.findFileByRelativePath(outDirectoryPath)
                 ?: createDirectories(application, baseDir, outDirectoryPath))?.path ?: return null
         val module = getModule(runConfiguration) ?: return null
-        val sdk = ModuleRootManager.getInstance(module).sdk
-        if (sdk == null || sdk.sdkType !is JavaSdk) {
-            return null
-        }
-
+        val sdk = ModuleRootManager.getInstance(module).sdk ?: return null
 
         application.invokeAndWait {
             Utils.saveAllDocuments(project)
