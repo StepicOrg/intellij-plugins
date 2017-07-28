@@ -24,7 +24,7 @@ abstract class JetProcess(project: Project, stepNode: StepNode, mainFilePath: St
         val runManager = RunManager.getInstance(project) as RunManagerImpl
         val runConfiguration = runManager.selectedConfiguration?.configuration ?: return null
         val sourcePath = getSourcePath(runConfiguration)
-        val outDirectoryPath = listOf("out", "production", "step${stepNode.id}").joinToString(File.separator)
+        val outDirectoryPath = "out/production/step${stepNode.id}"
         val baseDir = project.baseDir
         val application = ApplicationManager.getApplication()
         val outDirectory = (baseDir.findFileByRelativePath(outDirectoryPath)
@@ -96,11 +96,11 @@ abstract class JetProcess(project: Project, stepNode: StepNode, mainFilePath: St
         }
     }
 
-    abstract fun getExecutorPath(context: ProcessContext): File
+    abstract fun getExecutorPath(context: ProcessContext): File?
 
     private fun run(context: ProcessContext): Process? {
         try {
-            val exePath = getExecutorPath(context)
+            val exePath = getExecutorPath(context) ?: return null
             exePath.setExecutable(true)
 
             val commandLine = GeneralCommandLine()

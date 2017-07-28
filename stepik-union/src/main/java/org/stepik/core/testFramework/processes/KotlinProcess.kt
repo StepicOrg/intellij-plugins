@@ -41,7 +41,7 @@ class KotlinProcess(project: Project, stepNode: StepNode, mainFilePath: String) 
         return true
     }
 
-    override fun getExecutorPath(context: ProcessContext): File {
+    override fun getExecutorPath(context: ProcessContext): File? {
         val relativeRunnerPath = listOf("plugins", "Kotlin", "kotlinc", "bin", "kotlin").joinToString(File.separator)
         return File(PathManager.getHomePath(), relativeRunnerPath)
     }

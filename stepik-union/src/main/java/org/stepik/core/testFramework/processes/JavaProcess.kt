@@ -38,8 +38,9 @@ class JavaProcess(project: Project, stepNode: StepNode, mainFilePath: String) : 
         return true
     }
 
-    override fun getExecutorPath(context: ProcessContext): File {
-        return File(SimpleJavaSdkType().getVMExecutablePath(context.sdk))
+    override fun getExecutorPath(context: ProcessContext): File? {
+        val executable = SimpleJavaSdkType().getVMExecutablePath(context.sdk) ?: return null
+        return File(executable)
     }
 
     override fun prepareExecuteCommand(commandLine: GeneralCommandLine, context: ProcessContext): Boolean {
