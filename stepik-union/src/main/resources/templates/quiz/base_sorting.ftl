@@ -9,7 +9,7 @@
         <#assign backgroundColor = "white"/>
     </#if>
 
-    <#include "base.ftl">
+    <#include "base_step.ftl">
 
     <@styles>
     <style>
@@ -78,7 +78,7 @@
     </style>
     </@styles>
 
-    <@quiz_content>
+    <@step_content>
         <#assign index = 0 />
         <#assign ordering = stepNode.getOrdering() />
         <#assign count = ordering?size />
@@ -87,7 +87,7 @@
         <#nested/>
 
     <input type="hidden" name="count" value="${count}"/>
-    </@quiz_content>
+    </@step_content>
 
     <@scripts>
     <script>

@@ -3,6 +3,9 @@ package org.stepik.api.objects;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.time.Instant;
+import java.util.Date;
+
 /**
  * @author meanmail
  */
@@ -34,5 +37,10 @@ public class StudyObject extends AbstractObject {
     @Nullable
     public String getProgress() {
         return null;
+    }
+
+    @NotNull
+    public Date getUpdateDate() {
+        return Date.from(Instant.EPOCH);
     }
 }

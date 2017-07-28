@@ -45,6 +45,14 @@ public class ProgrammingLanguageUtils {
             @NotNull Project project,
             @NotNull StepNode targetStepNode,
             @NotNull SupportedLanguages language) {
+        switchLanguage(project, targetStepNode, language);
+        targetStepNode.getCurrentLang().getRunner().updateRunConfiguration(project, targetStepNode);
+    }
+
+    private static void switchLanguage(
+            @NotNull Project project,
+            @NotNull StepNode targetStepNode,
+            @NotNull SupportedLanguages language) {
         if (!targetStepNode.getSupportedLanguages().contains(language)) {
             return;
         }

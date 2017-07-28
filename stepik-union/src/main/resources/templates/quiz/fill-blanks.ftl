@@ -3,7 +3,7 @@
 <#-- @ftlvariable name="stepNode" type="org.stepik.core.courseFormat.stepHelpers.QuizHelper" -->
 <#-- @ftlvariable name="text" type="java.lang.String" -->
 
-<#include "base.ftl">
+<#include "base_step.ftl">
 
 <@styles>
 <style>
@@ -38,7 +38,7 @@
 </style>
 </@styles>
 
-<@quiz_content>
+<@step_content>
     <#if action != "get_first_attempt" && action != "need_login" >
     <div id="input-buffer"></div>
         <#assign values = stepNode.getBlanks()/>
@@ -69,7 +69,7 @@
             </#if>
         </#list>
     </#if>
-</@quiz_content>
+</@step_content>
 
 <@scripts>
 <script>

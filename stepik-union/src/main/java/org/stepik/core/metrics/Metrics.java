@@ -19,6 +19,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import static org.stepik.core.metrics.MetricsStatus.SUCCESSFUL;
 import static org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient;
 import static org.stepik.core.stepik.StepikAuthManager.isAuthenticated;
 
@@ -92,7 +93,7 @@ public class Metrics {
     }
 
     public static void authenticate(@NotNull MetricsStatus status) {
-        Project project = Utils.getCurrentProject();
+        Project project = Utils.INSTANCE.getCurrentProject();
         postSimpleMetric(project, "authenticate", status);
     }
 
@@ -157,6 +158,15 @@ public class Metrics {
         }
     }
 
+    public static void openInBrowserAction(
+            @NotNull Project project,
+            @NotNull StudyNode studyNode) {
+        if (studyNode instanceof StepNode) {
+            StepNode stepNode = (StepNode) studyNode;
+            stepAction("open_in_browser", project, stepNode, SUCCESSFUL);
+        }
+    }
+
     public static void resetStepAction(
             @NotNull Project project,
             @NotNull StepNode stepNode,
@@ -176,5 +186,12 @@ public class Metrics {
             @NotNull StepNode stepNode,
             @NotNull MetricsStatus status) {
         stepAction("switch_language", project, stepNode, status);
+    }
+
+    public static void testCodeAction(
+            @NotNull Project project,
+            @NotNull StepNode stepNode,
+            @NotNull MetricsStatus status) {
+        stepAction("test_code", project, stepNode, status);
     }
 }

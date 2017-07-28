@@ -6,17 +6,15 @@ import org.jetbrains.annotations.Nullable;
 import org.stepik.api.objects.AbstractObject;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Date;
-import java.util.TimeZone;
+
+import static org.stepik.api.Utils.timeISOFormat;
 
 /**
  * @author meanmail
  */
 public class Submission extends AbstractObject {
-    private final static SimpleDateFormat timeISOFormat = getTimeISOFormat();
-
     private String status;
     private double score;
     private String hint;
@@ -29,13 +27,6 @@ public class Submission extends AbstractObject {
     private String session;
     private double eta;
     private transient Date utcTime;
-
-    private static SimpleDateFormat getTimeISOFormat() {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-        TimeZone tz = TimeZone.getTimeZone("UTC");
-        format.setTimeZone(tz);
-        return format;
-    }
 
     @NotNull
     public String getStatus() {

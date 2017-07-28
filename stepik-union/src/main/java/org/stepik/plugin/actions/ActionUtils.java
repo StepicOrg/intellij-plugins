@@ -1,11 +1,13 @@
 package org.stepik.plugin.actions;
 
-import com.intellij.notification.Notification;
-import com.intellij.notification.NotificationType;
-import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.openapi.project.Project;
+import com.intellij.execution.ui.ConsoleViewContentType;
+import com.intellij.openapi.actionSystem.KeyboardShortcut;
+import com.intellij.openapi.keymap.KeymapUtil;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.api.objects.submissions.Submission;
+import org.stepik.core.testFramework.toolWindow.StepikTestResultToolWindow;
+
+import javax.swing.*;
 
 public class ActionUtils {
     static final int MILLISECONDS_IN_MINUTES = 60 * 1000;
@@ -45,37 +47,20 @@ public class ActionUtils {
                 .append(" ");
     }
 
-    static void notify(
-            @NotNull Project project,
-            @NotNull String title,
-            @NotNull String content,
-            @NotNull NotificationType type) {
-        if (content.isEmpty()) {
-            content = "<empty>";
-        }
-        Notification notification = new Notification(
-                "Step.sending",
-                title,
-                content,
-                type);
-        notification.notify(project);
-    }
-
-    public static void notifyError(
-            @NotNull Project project,
-            @NotNull String title,
-            @NotNull String content) {
-        notify(project, title, content, NotificationType.ERROR);
-    }
-
     static void setupCheckProgress(
-            @NotNull ProgressIndicator indicator,
+            @NotNull StepikTestResultToolWindow resultWindow,
             @NotNull Submission submission,
-            int timer) {
+            long timer) {
         double eta = submission.getEta() * 1000; //to ms
         double total = eta + timer;
 
-        indicator.setFraction(1 - eta / total);
-        indicator.setText2("Ends in " + etaAsString((long) eta));
+        resultWindow.print("[" + Math.round((1 - eta / total) * 100) + "%] ", ConsoleViewContentType.NORMAL_OUTPUT);
+        resultWindow.print("Ends in " + etaAsString((long) eta), ConsoleViewContentType.NORMAL_OUTPUT);
+    }
+
+    @NotNull
+    public static String getShortcutText(@NotNull String shortcut) {
+        KeyboardShortcut keyboardShortcut = new KeyboardShortcut(KeyStroke.getKeyStroke(shortcut), null);
+        return KeymapUtil.getShortcutText(keyboardShortcut);
     }
 }

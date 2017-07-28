@@ -13,6 +13,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.ui.JBCardLayout;
 import com.intellij.ui.OnePixelSplitter;
@@ -33,10 +34,11 @@ import org.stepik.core.courseFormat.StudyNode;
 import org.stepik.core.courseFormat.stepHelpers.ChoiceQuizHelper;
 import org.stepik.core.courseFormat.stepHelpers.CodeQuizHelper;
 import org.stepik.core.courseFormat.stepHelpers.DatasetQuizHelper;
+import org.stepik.core.courseFormat.stepHelpers.FillBlanksQuizHelper;
 import org.stepik.core.courseFormat.stepHelpers.FreeAnswerQuizHelper;
 import org.stepik.core.courseFormat.stepHelpers.MatchingQuizHelper;
+import org.stepik.core.courseFormat.stepHelpers.MathQuizHelper;
 import org.stepik.core.courseFormat.stepHelpers.NumberQuizHelper;
-import org.stepik.core.courseFormat.stepHelpers.QuizHelper;
 import org.stepik.core.courseFormat.stepHelpers.SortingQuizHelper;
 import org.stepik.core.courseFormat.stepHelpers.StepHelper;
 import org.stepik.core.courseFormat.stepHelpers.StringQuizHelper;
@@ -58,6 +60,7 @@ import java.util.concurrent.Executors;
 import static org.stepik.core.courseFormat.StepType.CODE;
 import static org.stepik.core.courseFormat.StepType.TEXT;
 import static org.stepik.core.courseFormat.StepType.VIDEO;
+import static org.stepik.core.courseFormat.stepHelpers.Actions.GET_FIRST_ATTEMPT;
 import static org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient;
 import static org.stepik.core.stepik.StepikAuthManager.isAuthenticated;
 
@@ -81,7 +84,7 @@ public class StudyToolWindow extends SimpleToolWindowPanel implements DataProvid
         cardLayout = new JBCardLayout();
         contentPanel = new JPanel(cardLayout);
         splitPane = new OnePixelSplitter(myVertical = true);
-        languageBox = new JComboBox<>();
+        languageBox = new ComboBox<>();
         languageBox.addActionListener(this);
 
         layout = new CardLayout();
@@ -207,8 +210,9 @@ public class StudyToolWindow extends SimpleToolWindowPanel implements DataProvid
         browserWindow.showLoadAnimation();
 
         StepType stepType = stepNode.getType();
-        if (stepType != VIDEO && stepType != CODE) {
+        if (stepType != CODE) {
             SwingUtilities.invokeLater(() -> rightPanel.setVisible(false));
+            stepNode.getCurrentLang().getRunner().updateRunConfiguration(project, stepNode);
         }
         boolean isTheory = stepType == VIDEO || stepType == TEXT;
         postView(stepNode, isTheory);
@@ -251,20 +255,24 @@ public class StudyToolWindow extends SimpleToolWindowPanel implements DataProvid
                 stepHelper = new TableQuizHelper(project, stepNode);
                 break;
             case FILL_BLANKS:
-                stepHelper = new QuizHelper(project, stepNode);
+                stepHelper = new FillBlanksQuizHelper(project, stepNode);
                 break;
             case MATH:
-                stepHelper = new QuizHelper(project, stepNode);
+                stepHelper = new MathQuizHelper(project, stepNode);
                 break;
             case FREE_ANSWER:
                 stepHelper = new FreeAnswerQuizHelper(project, stepNode);
                 break;
         }
 
-        HashMap<String, Object> params = new HashMap<>();
-        params.put("stepNode", stepHelper);
-        params.put("darcula", LafManager.getInstance().getCurrentLookAndFeel() instanceof DarculaLookAndFeelInfo);
-        browserWindow.loadContent("quiz/" + stepHelper.getType(), params);
+        if (stepHelper.isAutoCreateAttempt() && stepHelper.getAction() == GET_FIRST_ATTEMPT) {
+            FormListener.getAttempt(project, stepNode);
+        } else {
+            HashMap<String, Object> params = new HashMap<>();
+            params.put("stepNode", stepHelper);
+            params.put("darcula", LafManager.getInstance().getCurrentLookAndFeel() instanceof DarculaLookAndFeelInfo);
+            browserWindow.loadContent("quiz/" + stepHelper.getType(), params);
+        }
     }
 
     private void updateLanguageBox(@NotNull StepNode stepNode) {

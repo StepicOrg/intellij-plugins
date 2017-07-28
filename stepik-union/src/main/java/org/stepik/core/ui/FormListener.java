@@ -1,9 +1,11 @@
 package org.stepik.core.ui;
 
+import com.intellij.execution.ui.ConsoleViewContentType;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.progress.EmptyProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import javafx.application.Platform;
 import javafx.stage.FileChooser;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -18,7 +20,11 @@ import org.stepik.core.courseFormat.StepType;
 import org.stepik.core.courseFormat.StudyNode;
 import org.stepik.core.stepik.StepikAuthManager;
 import org.stepik.core.stepik.StepikAuthState;
+import org.stepik.core.testFramework.toolWindow.StepikTestResultToolWindow;
+import org.stepik.core.testFramework.toolWindow.StepikTestToolWindowUtils;
 import org.stepik.plugin.actions.SendAction;
+import org.stepik.plugin.actions.navigation.StudyNavigator;
+import org.stepik.plugin.utils.NavigationUtils;
 import org.w3c.dom.events.Event;
 import org.w3c.dom.events.EventListener;
 import org.w3c.dom.html.HTMLFormElement;
@@ -65,7 +71,7 @@ class FormListener implements EventListener {
         return null;
     }
 
-    private static void getAttempt(@NotNull Project project, @NotNull StepNode node) {
+    static void getAttempt(@NotNull Project project, @NotNull StepNode node) {
         StepikApiClient stepikApiClient = authAndGetStepikApiClient(true);
 
         stepikApiClient.attempts()
@@ -102,24 +108,48 @@ class FormListener implements EventListener {
         query.reply(reply)
                 .executeAsync()
                 .whenComplete(((submissions, e) -> {
+                    String lessonName;
+                    StudyNode lesson = stepNode.getParent();
+                    if (lesson != null) {
+                        lessonName = lesson.getName();
+                    } else {
+                        lessonName = "";
+                    }
+
+                    final StepikTestResultToolWindow[] resultWindow = new StepikTestResultToolWindow[1];
+
+                    String title = lessonName + " : " + stepNode.getName();
+                    ApplicationManager.getApplication().invokeAndWait(() ->
+                            resultWindow[0] = StepikTestToolWindowUtils.Companion
+                                    .showTestResultsToolWindow(project, title));
+
+                    resultWindow[0].clear();
+                    resultWindow[0].println("Test method: send to Stepik", ConsoleViewContentType.NORMAL_OUTPUT);
+
                     if (submissions == null) {
-                        logger.warn("Failed send step from browser", e);
+                        printError(e, resultWindow[0]);
                         StepikProjectManager.updateSelection(project);
                         return;
                     }
 
                     if (submissions.isEmpty()) {
-                        logger.warn("Failed send step from browser", e);
+                        printError(e, resultWindow[0]);
                         return;
                     }
 
                     Submission submission = submissions.getFirst();
-                    SendAction.checkStepStatus(project,
+                    SendAction.INSTANCE.checkStepStatus(project,
                             stepikApiClient,
                             stepNode,
                             submission.getId(),
-                            new EmptyProgressIndicator());
+                            resultWindow[0]);
                 }));
+    }
+
+    private static void printError(Throwable e, StepikTestResultToolWindow resultWindow) {
+        resultWindow.println("Failed send step from browser", ConsoleViewContentType.ERROR_OUTPUT);
+        resultWindow.println(e.getMessage(), ConsoleViewContentType.ERROR_OUTPUT);
+        logger.warn("Failed send step from browser", e);
     }
 
     static void handle(
@@ -170,6 +200,15 @@ class FormListener implements EventListener {
                             }
                             browser.hideLoadAnimation();
                         });
+                break;
+            case "next_step":
+                StudyNode targetNode = StudyNavigator.nextLeaf(stepNode);
+
+                if (targetNode == null) {
+                    return;
+                }
+
+                Platform.runLater(() -> NavigationUtils.navigate(project, targetNode));
                 break;
             default:
                 browser.hideLoadAnimation();

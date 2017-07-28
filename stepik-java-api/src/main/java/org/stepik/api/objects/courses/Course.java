@@ -9,8 +9,12 @@ import org.stepik.api.objects.steps.Video;
 import org.stepik.api.urls.Urls;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import static org.stepik.api.Utils.timeISOFormat;
+import static org.stepik.api.Utils.toDate;
 
 /**
  * @author meanmail
@@ -124,6 +128,7 @@ public class Course extends StudyObject {
     private String createDate;
     @SerializedName("update_date")
     private String updateDate;
+    private transient Date utcUpdateDate;
     @SerializedName("learners_group")
     private String learnersGroup;
     @SerializedName("testers_group")
@@ -722,15 +727,16 @@ public class Course extends StudyObject {
     }
 
     @NotNull
-    public String getUpdateDate() {
-        if (updateDate == null) {
-            updateDate = "";
+    public Date getUpdateDate() {
+        if (utcUpdateDate == null) {
+            utcUpdateDate = toDate(updateDate);
         }
-        return updateDate;
+        return utcUpdateDate;
     }
 
-    public void setUpdateDate(@Nullable String updateDate) {
-        this.updateDate = updateDate;
+    public void setUpdateDate(@Nullable Date updateDate) {
+        this.updateDate = timeISOFormat.format(updateDate);
+        utcUpdateDate = updateDate;
     }
 
     @Nullable

@@ -6,8 +6,12 @@ import org.jetbrains.annotations.Nullable;
 import org.stepik.api.objects.StudyObject;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import static org.stepik.api.Utils.timeISOFormat;
+import static org.stepik.api.Utils.toDate;
 
 /**
  * @author meanmail
@@ -63,6 +67,7 @@ public class Section extends StudyObject {
     private String createDate;
     @SerializedName("update_date")
     private String updateDate;
+    private transient Date utcUpdateDate;
 
     @Override
     public boolean equals(Object o) {
@@ -413,15 +418,16 @@ public class Section extends StudyObject {
     }
 
     @NotNull
-    public String getUpdateDate() {
-        if (updateDate == null) {
-            updateDate = "";
+    public Date getUpdateDate() {
+        if (utcUpdateDate == null) {
+            utcUpdateDate = toDate(updateDate);
         }
-        return updateDate;
+        return utcUpdateDate;
     }
 
-    public void setUpdateDate(@Nullable String updateDate) {
-        this.updateDate = updateDate;
+    public void setUpdateDate(@Nullable Date updateDate) {
+        this.updateDate = timeISOFormat.format(updateDate);
+        utcUpdateDate = updateDate;
     }
 
     @Override

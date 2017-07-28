@@ -20,6 +20,7 @@ public class SortingQuizHelper extends QuizHelper {
         super(project, stepNode);
     }
 
+    @SuppressWarnings("unused")
     @NotNull
     public List<Pair<Integer, String>> getOrdering() {
         initStepOptions();

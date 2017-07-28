@@ -16,7 +16,12 @@ import org.stepik.api.objects.sections.Section;
 import org.stepik.api.objects.sections.Sections;
 import org.stepik.api.objects.units.Unit;
 import org.stepik.api.objects.units.Units;
+import org.stepik.core.templates.Templater;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -40,6 +45,7 @@ public class Utils {
     private static final Pattern mainPattern = Pattern.compile(
             "(?:^|.*/)(course|lesson)(?=(?:(?:/[^/]*-)|/)(\\d+)(?:/|$))(.*)");
     private static final Pattern unitPattern = Pattern.compile("(?:.*)[?|&]unit=(\\d+)(?:$|&)");
+    private final static SimpleDateFormat timeOutFormat = new SimpleDateFormat("dd MMM yyyy HH:mm:ss");
 
     public static StudyObject getStudyObjectFromLink(@NotNull String link) {
         // https://stepik.org/course/Основы-программирования-для-Linux-548
@@ -217,7 +223,20 @@ public class Utils {
         if (studyObject.getId() == 0) {
             return DEFAULT_DESCRIPTION;
         } else {
-            return studyObject.getDescription();
+            Map<String, Object> map = new HashMap<>();
+            map.put("studyObject", studyObject);
+
+            Date utcUpdateDate = studyObject.getUpdateDate();
+            String localUpdateDate = timeOutFormat.format(utcUpdateDate);
+
+            map.put("updateDate", localUpdateDate);
+
+            if (studyObject instanceof Course) {
+                Course course = ((Course) studyObject);
+                map.put("summary", course.getSummary());
+            }
+
+            return Templater.processTemplate("catalog/description", map);
         }
     }
 }

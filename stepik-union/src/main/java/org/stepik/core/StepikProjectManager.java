@@ -128,6 +128,9 @@ public class StepikProjectManager
 
     @Nullable
     public static StudyNode getProjectRoot(@NotNull final Project project) {
+        if (project.isDisposed()) {
+            return null;
+        }
         StepikProjectManager instance = getInstance(project);
 
         if (instance == null) {

@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlin_version = '1.1.2-2'
+    ext.kotlin_version = '1.1.3-2'
 
     repositories {
         mavenCentral()
@@ -14,6 +14,24 @@ subprojects {
     apply plugin: "java"
     apply plugin: "kotlin"
 
+    def javaVersion = project.getProperties().get('javaVersion') ?: JavaVersion.current()
+
+    compileKotlin {
+        kotlinOptions{
+            jvmTarget = javaVersion
+            languageVersion = "1.1"
+            apiVersion = "1.1"
+        }
+    }
+
+    compileTestKotlin {
+        kotlinOptions {
+            jvmTarget = javaVersion
+            languageVersion = "1.1"
+            apiVersion = "1.1"
+        }
+    }
+
     repositories {
         mavenCentral()
     }
@@ -24,17 +42,18 @@ subprojects {
         testCompile(group: 'junit', name: 'junit', version: '4+') {
             exclude group: 'org.hamcrest'
         }
+
+        testCompile "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
     }
 
     apply plugin: 'idea'
 
     tasks.withType(JavaCompile) {
-        def javaVersion = project.getProperties().get('javaVersion') ?: JavaVersion.current()
         sourceCompatibility = javaVersion
         targetCompatibility = javaVersion
     }
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = project.getProperties().get('gradleVersion') ?: gradle.gradleVersion
+    gradleVersion = (project.getProperties().get('gradleVersion') ?: gradle.gradleVersion) as String
 }

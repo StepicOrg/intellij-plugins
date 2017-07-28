@@ -5,24 +5,8 @@
     <idea-version since-build="163.7743.44"/>
     <vendor email="plugin@stepik.org" url="https://stepik.org">Stepik</vendor>
 
-    <description><![CDATA[
-      Stepik plugin for code challenges on Python, Java, asm, C, C++, Clojure, Haskell, JavaScript, Mono C#, Octave, R, Ruby, Rust, Shell, Scala.<br>
-
-      To uses this plugin you have to have Stepik account and follow the course.<br>
-      <br>
-      Optional plugins:<br>
-      Python<br>
-      Clojure-Kit<br>
-      Haskell<br>
-      Scala<br>
-      BashSupport<br>
-      Ruby<br>
-      Rust<br>
-      R Language Support<br>
-
-    ]]></description>
-
     <depends>com.intellij.modules.lang</depends>
+    <depends optional="true">org.jetbrains.kotlin</depends>
     <depends optional="true" config-file="idea.xml">com.intellij.modules.java</depends>
     <depends optional="true" config-file="pycharm.xml">com.intellij.modules.python</depends>
 
@@ -41,7 +25,9 @@
         <action id="STEPIK.NextStepAction" class="org.stepik.plugin.actions.navigation.StepikNextStepAction"/>
         <action id="STEPIK.DownloadSubmission" class="org.stepik.plugin.actions.step.DownloadSubmission"/>
         <action id="STEPIK.InsertStepikDirectives" class="org.stepik.plugin.actions.step.InsertStepikDirectives"/>
-        <action id="STEPIK.RefreshStepAction" class="org.stepik.plugin.actions.step.StepikResetStepAction" text="Reset Step File" description="Refresh current step"/>
+        <action id="STEPIK.RefreshStepAction" class="org.stepik.plugin.actions.step.StepikResetStepAction"/>
+        <action id="STEPIK.OpenInBrowser" class="org.stepik.plugin.actions.step.OpenInBrowserAction"/>
+        <action id="STEPIK.TestSamplesAction" class="org.stepik.plugin.actions.step.TestSamplesAction"/>
     </actions>
 
     <project-components>
@@ -57,6 +43,7 @@
     <extensions defaultExtensionNs="com.intellij">
         <projectService serviceInterface="com.intellij.codeInsight.documentation.DocumentationManager" serviceImplementation="org.stepik.core.StudyDocumentationManager" overrides="true"/>
         <toolWindow id="Step Description" anchor="right" factoryClass="org.stepik.core.ui.StudyToolWindowFactory" conditionClass="org.stepik.core.ui.StudyCondition"/>
+        <toolWindow id="Stepik Test" anchor="bottom" factoryClass="org.stepik.core.testFramework.toolWindow.StepikTestToolWindowFactory" conditionClass="org.stepik.core.testFramework.toolWindow.StudyCondition"/>
         <projectService serviceInterface="org.stepik.core.StepikProjectManager" serviceImplementation="org.stepik.core.StepikProjectManager"/>
     </extensions>
 </idea-plugin>

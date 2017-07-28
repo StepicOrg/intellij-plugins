@@ -1,8 +1,8 @@
 package org.stepik.plugin.projectWizard.ui;
 
-import org.stepik.core.SupportedLanguages;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.core.SupportedLanguages;
 
 import javax.swing.*;
 import java.awt.event.ItemEvent;
@@ -28,7 +28,11 @@ public class LanguageComboBox extends JComboBox<SupportedLanguages> {
     @NotNull
     @Override
     public SupportedLanguages getSelectedItem() {
-        return (SupportedLanguages) super.getSelectedItem();
+        SupportedLanguages language = (SupportedLanguages) super.getSelectedItem();
+        if (language == null) {
+            language = SupportedLanguages.INVALID;
+        }
+        return language;
     }
 
     @Override

@@ -7,10 +7,14 @@ import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.StudyObject;
 import org.stepik.api.objects.progresses.Progresses;
+import org.stepik.api.urls.Urls;
 import org.stepik.core.StepikProjectManager;
 import org.stepik.core.courseFormat.StepNode;
 import org.stepik.core.courseFormat.StudyNode;
+import org.stepik.plugin.actions.navigation.StudyNavigator;
 
+import static org.stepik.core.courseFormat.stepHelpers.Actions.NEED_LOGIN;
+import static org.stepik.core.courseFormat.stepHelpers.Actions.NOTHING;
 import static org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient;
 import static org.stepik.core.stepik.StepikAuthManager.isAuthenticated;
 
@@ -18,7 +22,6 @@ import static org.stepik.core.stepik.StepikAuthManager.isAuthenticated;
  * @author meanmail
  */
 public class StepHelper {
-    static final String NEED_LOGIN = "need_login";
     private static final Logger logger = Logger.getInstance(StepHelper.class);
     private final Project project;
     private final StepNode stepNode;
@@ -34,11 +37,11 @@ public class StepHelper {
     }
 
     @NotNull
-    public String getAction() {
+    public Actions getAction() {
         if (!isAuthenticated()) {
             return NEED_LOGIN;
         }
-        return "";
+        return NOTHING;
     }
 
     @NotNull
@@ -55,21 +58,17 @@ public class StepHelper {
     public String getLink() {
         StepNode stepNode = getStepNode();
         StudyNode parent = stepNode.getParent();
+        String link = Urls.STEPIK_URL;
         if (parent != null) {
-            return String.format("https://stepik.org/lesson/%d/step/%d", parent.getId(), stepNode.getPosition());
+            link = String.format("%s/lesson/%d/step/%d", link, parent.getId(), stepNode.getPosition());
         }
 
-        return "https://stepik.org/";
+        return link;
     }
 
     @NotNull
     public String getPath() {
         return getStepNode().getPath();
-    }
-
-    @NotNull
-    public String getLinkTitle() {
-        return String.format("This step can take place in the web version (%s)", getType());
     }
 
     @NotNull
@@ -118,5 +117,25 @@ public class StepHelper {
         }
 
         return false;
+    }
+
+    public boolean hasNextStep() {
+        return StudyNavigator.nextLeaf(stepNode) != null;
+    }
+
+    public boolean hasSubmitButton() {
+        return false;
+    }
+
+    public boolean needLogin() {
+        return getAction() == NEED_LOGIN;
+    }
+
+    public boolean canSubmit() {
+        return false;
+    }
+
+    public boolean isAutoCreateAttempt() {
+        return hasSubmitButton();
     }
 }

@@ -15,11 +15,6 @@ public class CodeQuizHelper extends StepHelper {
         super(project, stepNode);
     }
 
-    @NotNull
-    public String getLinkTitle() {
-        return "View this step on Stepik";
-    }
-
     public int getTimeLimit() {
         return getStepNode().getLimit().getTime();
     }
