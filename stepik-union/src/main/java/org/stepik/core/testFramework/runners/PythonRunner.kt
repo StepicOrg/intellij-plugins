@@ -35,13 +35,12 @@ class PythonRunner : JetRunner() {
                               project: Project,
                               appConfiguration: RunConfiguration,
                               mainVirtualFile: VirtualFile?) {
-        val module = (appConfiguration as PythonRunConfiguration).module
-        val modulePath = module?.moduleFile?.parent?.path
+        val workingDirectory = (appConfiguration as PythonRunConfiguration).workingDirectory
         val scriptPath = mainVirtualFile?.path
         val scriptRelativePath: String
 
-        if (modulePath != null && scriptPath != null) {
-            scriptRelativePath = ProjectFilesUtils.getRelativePath(modulePath, scriptPath)
+        if (workingDirectory != null && scriptPath != null) {
+            scriptRelativePath = ProjectFilesUtils.getRelativePath(workingDirectory, scriptPath)
         } else {
             scriptRelativePath = ""
         }
