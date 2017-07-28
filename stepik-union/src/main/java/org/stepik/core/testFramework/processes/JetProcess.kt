@@ -13,28 +13,29 @@ import com.intellij.openapi.projectRoots.JavaSdk
 import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.util.io.FileUtil
 import org.stepik.core.courseFormat.StepNode
+import org.stepik.core.testFramework.createDirectories
 import org.stepik.core.utils.Utils
 import java.io.File
 import java.io.IOException
 
 abstract class JetProcess(project: Project, stepNode: StepNode, mainFilePath: String) : TestProcess(project, stepNode, mainFilePath) {
-    private val OUTPUT_RELATIVE = "out/production"
 
     override fun start(): Process? {
         val runManager = RunManager.getInstance(project) as RunManagerImpl
         val runConfiguration = runManager.selectedConfiguration?.configuration ?: return null
         val sourcePath = getSourcePath(runConfiguration)
-        val outDirectoryPath = "$OUTPUT_RELATIVE/step${stepNode.id}"
+        val outDirectoryPath = listOf("out", "production", "step${stepNode.id}").joinToString(File.separator)
         val baseDir = project.baseDir
+        val application = ApplicationManager.getApplication()
         val outDirectory = (baseDir.findFileByRelativePath(outDirectoryPath)
-                ?: baseDir.createChildDirectory(null, outDirectoryPath)).path
+                ?: createDirectories(application, baseDir, outDirectoryPath))?.path ?: return null
         val module = getModule(runConfiguration) ?: return null
         val sdk = ModuleRootManager.getInstance(module).sdk
         if (sdk == null || sdk.sdkType !is JavaSdk) {
             return null
         }
 
-        val application = ApplicationManager.getApplication()
+
         application.invokeAndWait {
             Utils.saveAllDocuments(project)
         }
