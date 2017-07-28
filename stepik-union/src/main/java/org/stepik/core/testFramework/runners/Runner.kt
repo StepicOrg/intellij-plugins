@@ -9,6 +9,7 @@ import com.intellij.openapi.util.Computable
 import com.intellij.openapi.vfs.VirtualFile
 import org.stepik.core.core.EduNames
 import org.stepik.core.courseFormat.StepNode
+import org.stepik.core.testFramework.createDirectory
 import org.stepik.core.testFramework.processes.TestProcess
 import org.stepik.core.utils.getTextUnderDirectives
 import org.stepik.core.utils.replaceCode
@@ -152,16 +153,5 @@ interface Runner {
         }
 
         return file
-    }
-
-    fun createDirectory(application: Application, parent: VirtualFile, directoryName: String): VirtualFile? {
-        var directory: VirtualFile? = null
-        application.invokeAndWait {
-            directory = application.runWriteAction(Computable<VirtualFile> {
-                parent.createChildDirectory(null, directoryName)
-            })
-        }
-
-        return directory
     }
 }

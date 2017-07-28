@@ -18,6 +18,7 @@ import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.testFramework.processes.PythonProcess
 import org.stepik.core.testFramework.processes.TestProcess
 import org.stepik.core.utils.ProjectFilesUtils
+import java.io.File
 
 class PythonRunner : JetRunner() {
     override fun getTypeName(): String = "PythonConfigurationType"
@@ -26,7 +27,7 @@ class PythonRunner : JetRunner() {
 
     override fun setWorkingDirectory(appConfiguration: RunConfiguration,
                                      workingVirtualDirectory: VirtualFile) {
-        val workingDirectory = workingVirtualDirectory.canonicalPath
+        val workingDirectory = workingVirtualDirectory.path
         (appConfiguration as PythonRunConfiguration).workingDirectory = workingDirectory
     }
 
@@ -34,13 +35,12 @@ class PythonRunner : JetRunner() {
                               project: Project,
                               appConfiguration: RunConfiguration,
                               mainVirtualFile: VirtualFile?) {
-        val module = (appConfiguration as PythonRunConfiguration).module
-        val modulePath = module?.moduleFile?.parent?.canonicalPath
-        val scriptPath = mainVirtualFile?.canonicalPath
+        val workingDirectory = (appConfiguration as PythonRunConfiguration).workingDirectory
+        val scriptPath = mainVirtualFile?.path
         val scriptRelativePath: String
 
-        if (modulePath != null && scriptPath != null) {
-            scriptRelativePath = ProjectFilesUtils.getRelativePath(modulePath, scriptPath)
+        if (workingDirectory != null && scriptPath != null) {
+            scriptRelativePath = ProjectFilesUtils.getRelativePath(workingDirectory, scriptPath)
         } else {
             scriptRelativePath = ""
         }
@@ -52,8 +52,8 @@ class PythonRunner : JetRunner() {
                         appConfiguration: RunConfiguration,
                         mainVirtualFile: VirtualFile?) {
         mainVirtualFile ?: return
-        val virtualEnvPath = project.basePath + "/.idea/virtualenvs"
-        val sdkPath = virtualEnvPath + "/bin/python"
+        val virtualEnvPath = listOf(project.basePath, ".idea", "virtualenvs").joinToString(File.separator)
+        val sdkPath = listOf(virtualEnvPath, "bin", "python").joinToString(File.separator)
         val baseSdk = getBaseSdk()
         val packageManager = PyPackageManager.getInstance(PyDetectedSdk(baseSdk))
         val path = packageManager.createVirtualEnv(virtualEnvPath, false)

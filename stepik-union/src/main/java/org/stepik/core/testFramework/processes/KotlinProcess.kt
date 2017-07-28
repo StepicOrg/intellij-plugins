@@ -26,7 +26,8 @@ class KotlinProcess(project: Project, stepNode: StepNode, mainFilePath: String) 
     }
 
     override fun getCompilerPath(context: ProcessContext): File {
-        return File(PathManager.getHomePath() + "/plugins/Kotlin/kotlinc/bin/kotlinc")
+        val relativeCompilerPath = listOf("plugins", "Kotlin", "kotlinc", "bin", "kotlinc").joinToString(File.separator)
+        return File(PathManager.getHomePath(), relativeCompilerPath)
     }
 
     override fun prepareCompileCommand(commandLine: GeneralCommandLine, context: ProcessContext): Boolean {
@@ -40,8 +41,9 @@ class KotlinProcess(project: Project, stepNode: StepNode, mainFilePath: String) 
         return true
     }
 
-    override fun getExecutorPath(context: ProcessContext): File {
-        return File(PathManager.getHomePath() + "/plugins/Kotlin/kotlinc/bin/kotlin")
+    override fun getExecutorPath(context: ProcessContext): File? {
+        val relativeRunnerPath = listOf("plugins", "Kotlin", "kotlinc", "bin", "kotlin").joinToString(File.separator)
+        return File(PathManager.getHomePath(), relativeRunnerPath)
     }
 
     override fun prepareExecuteCommand(commandLine: GeneralCommandLine, context: ProcessContext): Boolean {

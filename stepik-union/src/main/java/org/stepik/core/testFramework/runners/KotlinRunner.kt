@@ -16,7 +16,7 @@ class KotlinRunner : JetRunner() {
 
     override fun setWorkingDirectory(appConfiguration: RunConfiguration,
                                      workingVirtualDirectory: VirtualFile) {
-        val workingDirectory = workingVirtualDirectory.canonicalPath
+        val workingDirectory = workingVirtualDirectory.path
         (appConfiguration as JetRunConfiguration).workingDirectory = workingDirectory
     }
 

@@ -27,9 +27,9 @@ class PythonProcess(project: Project, stepNode: StepNode, mainFilePath: String) 
 
     override fun isNeedCompile() = false
 
-    override fun getExecutorPath(context: ProcessContext): File {
+    override fun getExecutorPath(context: ProcessContext): File? {
         val sdkHome = (context.runConfiguration as PythonRunConfiguration).sdkHome ?: ""
-        val executable = PythonSdkType.getPythonExecutable(sdkHome)
+        val executable = PythonSdkType.getPythonExecutable(sdkHome) ?: return null
         return File(executable)
     }
 
