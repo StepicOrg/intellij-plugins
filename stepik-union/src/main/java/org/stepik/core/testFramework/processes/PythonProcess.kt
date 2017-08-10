@@ -13,11 +13,6 @@ import java.io.File
 
 class PythonProcess(project: Project, stepNode: StepNode, mainFilePath: String) : JetProcess(project, stepNode, mainFilePath) {
 
-    override fun getSourcePath(runConfiguration: RunConfiguration): String {
-        val appConfiguration = runConfiguration as PythonRunConfiguration
-        return appConfiguration.workingDirectory + File.separator + EduNames.SRC
-    }
-
     override fun getMainClass(application: Application, runConfiguration: RunConfiguration): String? {
         val appConfiguration = runConfiguration as PythonRunConfiguration
         return application.runReadAction(Computable {

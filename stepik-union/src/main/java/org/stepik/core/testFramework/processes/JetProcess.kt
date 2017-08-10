@@ -11,6 +11,7 @@ import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.util.io.FileUtil
+import org.stepik.core.core.EduNames
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.testFramework.createDirectories
 import org.stepik.core.utils.Utils
@@ -22,7 +23,7 @@ abstract class JetProcess(project: Project, stepNode: StepNode, mainFilePath: St
     override fun start(): Process? {
         val runManager = RunManager.getInstance(project) as RunManagerImpl
         val runConfiguration = runManager.selectedConfiguration?.configuration ?: return null
-        val sourcePath = getSourcePath(runConfiguration)
+        val sourcePath = getSourcePath(project, stepNode)
         val outDirectoryPath = "out/production/step${stepNode.id}"
         val baseDir = project.baseDir
         val application = ApplicationManager.getApplication()
@@ -53,7 +54,9 @@ abstract class JetProcess(project: Project, stepNode: StepNode, mainFilePath: St
         return appConfiguration.configurationModule.module
     }
 
-    abstract fun getSourcePath(runConfiguration: RunConfiguration): String
+    fun getSourcePath(project: Project, stepNode: StepNode) : String {
+        return listOf(project.baseDir.path, stepNode.path, EduNames.SRC).joinToString(File.separator)
+    }
 
     abstract fun getMainClass(application: Application, runConfiguration: RunConfiguration): String?
 
