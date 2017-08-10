@@ -22,7 +22,7 @@ fun createDirectories(application: Application, parent: VirtualFile, directoryRe
             val directories = directoryRelativePath.split('/')
             var newDirectory = parent
             directories.forEach {
-                newDirectory = newDirectory.createChildDirectory(null, it)
+                newDirectory = newDirectory.findChild(it) ?: newDirectory.createChildDirectory(null, it)
             }
 
             return@Computable newDirectory
