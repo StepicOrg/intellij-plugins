@@ -1,24 +1,12 @@
 package org.stepik.core.testFramework.processes
 
 import com.intellij.execution.configurations.GeneralCommandLine
-import com.intellij.execution.configurations.RunConfiguration
-import com.intellij.openapi.application.Application
 import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.util.Computable
-import org.jetbrains.kotlin.idea.run.JetRunConfiguration
-import org.stepik.core.core.EduNames
 import org.stepik.core.courseFormat.StepNode
 import java.io.File
 
 class KotlinProcess(project: Project, stepNode: StepNode, mainFilePath: String) : JetProcess(project, stepNode, mainFilePath) {
-
-    override fun getMainClass(application: Application, runConfiguration: RunConfiguration): String? {
-        val appConfiguration = runConfiguration as JetRunConfiguration
-        return application.runReadAction(Computable {
-            return@Computable appConfiguration.MAIN_CLASS_NAME
-        })
-    }
 
     override fun getCompilerPath(context: ProcessContext): File {
         val relativeCompilerPath = listOf("plugins", "Kotlin", "kotlinc", "bin", "kotlinc").joinToString(File.separator)
@@ -47,4 +35,6 @@ class KotlinProcess(project: Project, stepNode: StepNode, mainFilePath: String) 
         commandLine.addParameter(context.mainClass)
         return true
     }
+
+    override fun getTestClass(): String? = "TestKt"
 }
