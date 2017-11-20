@@ -15,6 +15,7 @@ import org.stepik.core.utils.getTextUnderDirectives
 import org.stepik.core.utils.replaceCode
 import java.io.BufferedInputStream
 import java.io.BufferedOutputStream
+import java.io.InputStream
 import java.io.PrintStream
 import java.util.concurrent.TimeUnit
 
@@ -26,17 +27,17 @@ interface Runner {
         }
     }
 
-    fun createTestProcess(project: Project, stepNode: StepNode, mainFilePath: String): TestProcess {
-        return TestProcess(project, stepNode, mainFilePath)
-    }
+    fun createTestProcess(project: Project, stepNode: StepNode, mainFilePath: String): TestProcess =
+            TestProcess(project, stepNode, mainFilePath)
 
     fun testSamples(project: Project,
                     stepNode: StepNode,
                     input: String,
                     assertion: (String) -> Boolean,
-                    mainFilePath: String? = null): TestResult {
+                    mainFilePath: String? = null,
+                    testClass: Boolean = false): TestResult {
         val mainFile = mainFilePath ?: getMainFilePath(project, stepNode)?.path ?: return NO_PROCESS
-        val process = createTestProcess(project, stepNode, mainFile).start() ?: return NO_PROCESS
+        val process = createTestProcess(project, stepNode, mainFile).start(testClass) ?: return NO_PROCESS
 
         writeToProcessInput(process, input)
 
@@ -48,16 +49,18 @@ interface Runner {
         }
 
         val actualOutput = readProcessOutput(process)
+        val errorOutput = readProcessErrorOutput(process)
 
         val actual = actualOutput.toString()
+        val errorString = errorOutput.toString()
         val score = process.exitValue() == 0 && assertion(actual)
         val cause: ExitCause
-        if (score) {
-            cause = ExitCause.CORRECT
+        cause = if (score) {
+            ExitCause.CORRECT
         } else {
-            cause = ExitCause.WRONG
+            ExitCause.WRONG
         }
-        return TestResult(score, actual, cause)
+        return TestResult(score, actual, cause, errorString)
     }
 
     fun writeToProcessInput(process: Process, input: String) {
@@ -66,8 +69,8 @@ interface Runner {
         outputStream.flush()
     }
 
-    fun readProcessOutput(process: Process): StringBuffer {
-        val inputStream = BufferedInputStream(process.inputStream)
+    fun readProcessOutput(stream: InputStream): StringBuffer {
+        val inputStream = BufferedInputStream(stream)
         val actualOutput = StringBuffer()
         var b = inputStream.read()
         while (b != -1) {
@@ -76,6 +79,10 @@ interface Runner {
         }
         return actualOutput
     }
+
+    fun readProcessOutput(process: Process): StringBuffer = readProcessOutput(process.inputStream)
+
+    fun readProcessErrorOutput(process: Process): StringBuffer = readProcessOutput(process.errorStream)
 
     fun getMainFilePath(project: Project, stepNode: StepNode): VirtualFile? {
         val stepDirectory = project.baseDir.findFileByRelativePath(stepNode.path) ?: return null
@@ -88,7 +95,7 @@ interface Runner {
 
     fun testFiles(project: Project, stepNode: StepNode): TestResult {
         val targetTestFile = prepareMainFile(project, stepNode) ?: return NO_PROCESS
-        return testSamples(project, stepNode, "", { it.toBoolean() }, targetTestFile)
+        return testSamples(project, stepNode, "", { it.toBoolean() }, targetTestFile, true)
     }
 
     private fun prepareMainFile(project: Project, stepNode: StepNode): String? {

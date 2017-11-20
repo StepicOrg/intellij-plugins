@@ -45,8 +45,7 @@ abstract class JetRunner : Runner {
                                     settingName: String): RunnerAndConfigurationSettings? {
         val type = runManager.getConfigurationType(getTypeName()) ?: return null
         return runManager.getConfigurationSettingsList(type)
-                .filter { x -> x.name == settingName }
-                .firstOrNull()
+                .firstOrNull { x -> x.name == settingName }
                 ?: createRunConfiguration(runManager, settingName)
     }
 
