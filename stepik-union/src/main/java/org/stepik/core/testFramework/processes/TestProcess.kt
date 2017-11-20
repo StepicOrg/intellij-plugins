@@ -5,5 +5,5 @@ import org.stepik.core.courseFormat.StepNode
 
 open class TestProcess(val project: Project, val stepNode: StepNode, val mainFilePath: String) {
 
-    open fun start(): Process? = null
+    open fun start(testClass: Boolean = false): Process? = null
 }

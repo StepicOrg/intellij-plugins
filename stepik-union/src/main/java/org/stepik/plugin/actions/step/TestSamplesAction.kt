@@ -56,19 +56,24 @@ class TestSamplesAction : CodeQuizAction(TEXT, DESCRIPTION, AllIcons.Actions.Res
         resultWindow.println(status)
         if (!result.passed && result.cause == ExitCause.WRONG) {
             resultWindow.println("Return:\n${result.actual}")
+            resultWindow.println("Error:\n${result.errorString}")
             resultWindow.println()
         }
         resultWindow.println("Done")
     }
 
-    private fun testSamples(resultWindow: StepikTestResultToolWindow, stepNode: StepNode, runner: Runner, project: Project) {
+    private fun testSamples(resultWindow: StepikTestResultToolWindow,
+                            stepNode: StepNode,
+                            runner: Runner,
+                            project: Project,
+                            testClass: Boolean = false) {
         var counter = 0
         resultWindow.clear()
         resultWindow.println("Test method: samples")
 
         stepNode.samples.forEach {
             resultWindow.print("Test #${counter++} ")
-            val result = runner.testSamples(project, stepNode, it.input, { actual -> actual == it.output })
+            val result = runner.testSamples(project, stepNode, it.input, { actual -> actual == it.output }, testClass = testClass)
             val status = getStatusString(result)
 
             resultWindow.println(status)
@@ -76,6 +81,7 @@ class TestSamplesAction : CodeQuizAction(TEXT, DESCRIPTION, AllIcons.Actions.Res
                 resultWindow.println("Input:\n${it.input}")
                 resultWindow.println("Expected:\n${it.output}")
                 resultWindow.println("Actual:\n${result.actual}")
+                resultWindow.println("Error:\n${result.errorString}")
                 resultWindow.println()
             }
         }
@@ -83,10 +89,10 @@ class TestSamplesAction : CodeQuizAction(TEXT, DESCRIPTION, AllIcons.Actions.Res
     }
 
     private fun getStatusString(result: TestResult): String {
-        if (result.passed) {
-            return "PASSED"
+        return if (result.passed) {
+            "PASSED"
         } else {
-            return when (result.cause) {
+            when (result.cause) {
                 ExitCause.TIME_LIMIT -> "FAIL (time left)"
                 ExitCause.NO_CREATE_PROCESS -> "FAIL (can't create the test process)"
                 else -> "FAIL"

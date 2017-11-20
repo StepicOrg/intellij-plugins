@@ -1,5 +1,6 @@
 package org.stepik.core.testFramework.processes
 
+import com.intellij.execution.CommonJavaRunConfigurationParameters
 import com.intellij.execution.RunManager
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.configurations.ModuleBasedConfiguration
@@ -10,6 +11,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ModuleRootManager
+import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.io.FileUtil
 import org.stepik.core.core.EduNames
 import org.stepik.core.courseFormat.StepNode
@@ -20,7 +22,19 @@ import java.io.IOException
 
 abstract class JetProcess(project: Project, stepNode: StepNode, mainFilePath: String) : TestProcess(project, stepNode, mainFilePath) {
 
-    override fun start(): Process? {
+    open fun getMainClass(application: Application, runConfiguration: RunConfiguration, testClass: Boolean = false): String? {
+        if (testClass) {
+            return getTestClass()
+        }
+        val appConfiguration = runConfiguration as CommonJavaRunConfigurationParameters
+        return application.runReadAction(Computable {
+            return@Computable appConfiguration.runClass
+        })
+    }
+
+    open fun getTestClass(): String? = null
+
+    override fun start(testClass: Boolean): Process? {
         val runManager = RunManager.getInstance(project) as RunManagerImpl
         val runConfiguration = runManager.selectedConfiguration?.configuration ?: return null
         val sourcePath = getSourcePath(project, stepNode)
@@ -36,7 +50,7 @@ abstract class JetProcess(project: Project, stepNode: StepNode, mainFilePath: St
             Utils.saveAllDocuments(project)
         }
 
-        val mainClass = getMainClass(application, runConfiguration) ?: return null
+        val mainClass = getMainClass(application, runConfiguration, testClass) ?: return null
 
         val context = ProcessContext(runConfiguration, module, sdk, sourcePath, mainFilePath, mainClass, outDirectory)
 
@@ -54,11 +68,8 @@ abstract class JetProcess(project: Project, stepNode: StepNode, mainFilePath: St
         return appConfiguration.configurationModule.module
     }
 
-    fun getSourcePath(project: Project, stepNode: StepNode) : String {
-        return listOf(project.baseDir.path, stepNode.path, EduNames.SRC).joinToString(File.separator)
-    }
-
-    abstract fun getMainClass(application: Application, runConfiguration: RunConfiguration): String?
+    private fun getSourcePath(project: Project, stepNode: StepNode): String =
+            listOf(project.baseDir.path, stepNode.path, EduNames.SRC).joinToString(File.separator)
 
     open fun getCompilerPath(context: ProcessContext): File? = null
 
@@ -81,9 +92,7 @@ abstract class JetProcess(project: Project, stepNode: StepNode, mainFilePath: St
         }
     }
 
-    open fun prepareCompileCommand(commandLine: GeneralCommandLine, context: ProcessContext): Boolean {
-        return false
-    }
+    open fun prepareCompileCommand(commandLine: GeneralCommandLine, context: ProcessContext): Boolean = false
 
     private fun clearDirectory(directory: String) {
         val files = File(directory).listFiles()
@@ -97,7 +106,7 @@ abstract class JetProcess(project: Project, stepNode: StepNode, mainFilePath: St
     abstract fun getExecutorPath(context: ProcessContext): File?
 
     private fun run(context: ProcessContext): Process? {
-        try {
+        return try {
             val exePath = getExecutorPath(context) ?: return null
             exePath.setExecutable(true)
 
@@ -107,9 +116,9 @@ abstract class JetProcess(project: Project, stepNode: StepNode, mainFilePath: St
             if (!prepareExecuteCommand(commandLine, context)) {
                 return null
             }
-            return commandLine.createProcess()
+            commandLine.createProcess()
         } catch (e: IOException) {
-            return null
+            null
         }
     }
 
