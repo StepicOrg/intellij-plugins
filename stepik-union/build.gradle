@@ -41,9 +41,12 @@ defaultTasks "runIdea"
 task("publishBranch", type: PublishTask) {
     extension = intellij
     plugin = intellij.plugin
-    def buildNumber = project.getProperties().get('buildNumber') ?: "SNAPSHOT"
-    def branch = project.getProperties().get('branch') ?: "UNKNOWN"
-    project.version = "${project.version}-${branch}-${buildNumber}"
+    def buildNumber = project.getProperties().get('buildNumber')
+    def branch = project.getProperties().get('branch')
+
+    if (buildNumber && branch) {
+        project.version = "${project.version}-${branch}-${buildNumber}"
+    }
 }
 
 publishBranch.dependsOn(buildIdeaPlugin)
