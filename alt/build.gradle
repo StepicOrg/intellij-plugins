@@ -35,7 +35,7 @@ dependencies {
 }
 
 group 'org.stepik'
-version project.getProperties().get('stepikUnionVersion') ?: 'SNAPSHOT'
+version project.getProperties().get('ALTVersion') ?: 'SNAPSHOT'
 
 defaultTasks "runIdea"
 
