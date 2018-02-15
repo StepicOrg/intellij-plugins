@@ -326,7 +326,6 @@ class Utils {
         }
 
         result += "-Xbootclasspath/a:${idePath.absolutePath}/lib/boot.jar"
-        if (!hasPermSizeArg) result += "-XX:MaxPermSize=250m"
         return result
     }
 
