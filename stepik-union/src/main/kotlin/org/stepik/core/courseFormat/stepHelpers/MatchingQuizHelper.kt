@@ -14,10 +14,10 @@ class MatchingQuizHelper(project: Project, stepNode: StepNode) : QuizHelper(proj
         var replyOrdering = reply.ordering
 
         if (replyOrdering.size != values.size) {
-            replyOrdering = (0..values.size).toList()
+            replyOrdering = (0 until values.size).toList()
         }
 
-        ordering = (0..values.size)
+        ordering = (0 until values.size)
                 .map { i ->
                     val index = replyOrdering[i]
                     val captions = arrayOf(values[i].first, if (index < values.size) values[index].second else "")

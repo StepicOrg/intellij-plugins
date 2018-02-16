@@ -27,11 +27,11 @@ class ChoiceQuizHelper(project: Project, stepNode: StepNode) : QuizHelper(projec
         if (choices.size != options.size) {
             choices = Collections.nCopies(options.size, false)
         }
-        stepOptions = (0..options.size)
+        stepOptions = (0 until options.size)
                 .map { i -> Pair.create(options[i], choices[i]) }
     }
 
-    internal override fun fail() {
+    override fun fail() {
         stepOptions = ArrayList()
     }
 }

@@ -3,7 +3,6 @@ package org.stepik.core.actions.step
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.project.Project
 import org.jetbrains.annotations.Contract
-import org.stepik.core.actions.step.AbstractStepAction
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.StepType.CODE
 import javax.swing.Icon

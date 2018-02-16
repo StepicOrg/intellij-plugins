@@ -20,7 +20,7 @@ class SortingQuizHelper(project: Project, stepNode: StepNode) : QuizHelper(proje
         val valuesCount = values.size
 
         if (replyOrdering.size != valuesCount) {
-            replyOrdering = (0..valuesCount).toList()
+            replyOrdering = (0 until valuesCount).toList()
         }
         ordering = replyOrdering.map { index -> Pair.create(index, if (index < valuesCount) values[index] else "") }
     }

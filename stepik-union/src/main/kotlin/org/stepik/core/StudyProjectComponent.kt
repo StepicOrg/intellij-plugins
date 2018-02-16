@@ -8,7 +8,6 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.keymap.Keymap
 import com.intellij.openapi.keymap.ex.KeymapManagerEx
 import com.intellij.openapi.module.ModuleManager
-import com.intellij.openapi.project.DumbAwareRunnable
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Pair
 import com.intellij.openapi.wm.ToolWindowAnchor
@@ -42,8 +41,8 @@ class StudyProjectComponent private constructor(private val project: Project) : 
                                 uiSettings.fireUISettingsChanged()
                                 logger.info("register Shortcuts")
                                 registerShortcuts()
-                            } as DumbAwareRunnable)
-                } as DumbAwareRunnable)
+                            })
+                })
         Metrics.openProject(project, SUCCESSFUL)
 
         executor.execute { StepikProjectManager.updateAdaptiveSelected(project) }
