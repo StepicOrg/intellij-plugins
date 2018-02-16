@@ -5,6 +5,7 @@ import com.intellij.openapi.project.Project
 import org.stepik.core.StepikProjectManager
 import org.stepik.core.actions.StudyActionWithShortcut
 import org.stepik.core.courseFormat.StudyNode
+import org.stepik.core.utils.NavigationUtils
 import javax.swing.Icon
 
 
@@ -13,11 +14,26 @@ abstract class StudyStepNavigationAction(text: String?,
                                          icon: Icon?) :
         StudyActionWithShortcut(text, description, icon) {
 
-    protected abstract fun navigateStep(project: Project)
-
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
         navigateStep(project)
+    }
+
+    private fun navigateStep(project: Project) {
+        var currentNode = StepikProjectManager.getSelected(project)
+        if (currentNode == null) {
+            currentNode = StepikProjectManager.getProjectRoot(project)
+        }
+
+        val targetNode: StudyNode<*, *>?
+
+        targetNode = getTargetStep(currentNode)
+
+        if (targetNode == null) {
+            return
+        }
+
+        NavigationUtils.navigate(project, targetNode)
     }
 
     protected abstract fun getTargetStep(sourceStepNode: StudyNode<*, *>?): StudyNode<*, *>?

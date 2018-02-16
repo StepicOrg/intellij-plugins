@@ -3,9 +3,10 @@ package org.stepik.plugin.actions.navigation
 import com.intellij.icons.AllIcons
 import org.stepik.core.actions.getShortcutText
 import org.stepik.core.actions.navigation.StepikStepNavigationAction
+import org.stepik.core.actions.navigation.StudyStepNavigationAction
 import org.stepik.core.courseFormat.StudyNode
 
-class StepikNextStepAction : StepikStepNavigationAction(TEXT, DESCRIPTION, AllIcons.Actions.Forward) {
+class StepikNextStepAction : StudyStepNavigationAction(TEXT, DESCRIPTION, AllIcons.Actions.Forward) {
 
     override fun getTargetStep(sourceStepNode: StudyNode<*, *>?): StudyNode<*, *>? {
         return StudyNavigator.nextLeaf(sourceStepNode)
