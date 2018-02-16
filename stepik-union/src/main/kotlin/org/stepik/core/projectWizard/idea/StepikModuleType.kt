@@ -10,8 +10,8 @@ import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.psi.CommonClassNames
 import com.intellij.psi.JavaPsiFacade
-import icons.AllStepikIcons
 import org.jetbrains.jps.model.java.JavaModuleSourceRootTypes
+import org.stepik.core.icons.AllStepikIcons
 import org.stepik.core.projectWizard.ProjectWizardUtils
 import javax.swing.Icon
 

@@ -18,12 +18,12 @@ import com.intellij.util.BooleanFunction
 import com.jetbrains.python.newProject.PyNewProjectSettings
 import com.jetbrains.python.newProject.PythonProjectGenerator
 import com.jetbrains.python.remote.PyProjectSynchronizer
-import icons.AllStepikIcons
 import org.jetbrains.annotations.Nls
 import org.stepik.core.StepikProjectManager
 import org.stepik.core.StudyProjectComponent
 import org.stepik.core.core.EduNames
 import org.stepik.core.courseFormat.StepNode
+import org.stepik.core.icons.AllStepikIcons
 import org.stepik.core.projectWizard.ProjectWizardUtils
 import org.stepik.core.projectWizard.ProjectWizardUtils.createSubDirectories
 import org.stepik.core.projectWizard.StepikProjectGenerator

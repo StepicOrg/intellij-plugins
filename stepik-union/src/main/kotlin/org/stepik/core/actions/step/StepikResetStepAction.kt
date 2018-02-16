@@ -8,10 +8,10 @@ import com.intellij.openapi.editor.Document
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
 import com.intellij.problems.WolfTheProblemSolver
-import icons.AllStepikIcons
 import org.stepik.core.StepikProjectManager
 import org.stepik.core.actions.getShortcutText
 import org.stepik.core.courseFormat.StepNode
+import org.stepik.core.icons.AllStepikIcons
 import org.stepik.core.metrics.Metrics
 import org.stepik.core.metrics.MetricsStatus
 import org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory

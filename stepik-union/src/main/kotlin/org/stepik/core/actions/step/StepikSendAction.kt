@@ -5,7 +5,6 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
-import icons.AllStepikIcons
 import org.stepik.api.client.StepikApiClient
 import org.stepik.api.exceptions.StepikClientException
 import org.stepik.api.objects.attempts.Attempts
@@ -14,6 +13,7 @@ import org.stepik.core.SupportedLanguages
 import org.stepik.core.actions.SendAction
 import org.stepik.core.actions.getShortcutText
 import org.stepik.core.courseFormat.StepNode
+import org.stepik.core.icons.AllStepikIcons
 import org.stepik.core.metrics.Metrics
 import org.stepik.core.metrics.MetricsStatus.DATA_NOT_LOADED
 import org.stepik.core.metrics.MetricsStatus.FAILED_POST

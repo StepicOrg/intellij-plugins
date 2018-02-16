@@ -12,26 +12,22 @@ abstract class CodeQuizAction protected constructor(
         description: String?,
         icon: Icon?) : AbstractStepAction(text, description, icon) {
 
-    override fun update(e: AnActionEvent) {
+    override fun update(e: AnActionEvent?) {
         super.update(e)
-        val presentation = e.presentation
+        val presentation = e?.presentation
 
-        if (!presentation.isEnabled) {
+        if (presentation?.isEnabled != true) {
             return
         }
 
-        val stepNode = AbstractStepAction.Companion.getCurrentStep(e.project)
-        presentation.isEnabled = stepNode != null && stepNode.type == CODE
+        presentation.isEnabled = getCurrentStep(e.project)?.type == CODE
     }
 
     companion object {
-
         @Contract("null -> null")
         fun getCurrentCodeStepNode(project: Project?): StepNode? {
-            val stepNode = AbstractStepAction.Companion.getCurrentStep(project)
-            return if (stepNode == null || stepNode.type != CODE) {
-                null
-            } else stepNode
+            val stepNode = getCurrentStep(project)
+            return if (stepNode?.type == CODE) stepNode else null
         }
     }
 }

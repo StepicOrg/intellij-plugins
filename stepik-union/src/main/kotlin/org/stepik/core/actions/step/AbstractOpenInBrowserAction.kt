@@ -4,9 +4,9 @@ import com.intellij.ide.BrowserUtil
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.ApplicationManager.getApplication
 import com.intellij.openapi.project.Project
-import icons.AllStepikIcons
 import org.stepik.core.actions.getShortcutText
 import org.stepik.core.courseFormat.StepNode
+import org.stepik.core.icons.AllStepikIcons
 import org.stepik.core.metrics.Metrics
 
 abstract class AbstractOpenInBrowserAction : AbstractStepAction(TEXT, DESCRIPTION, AllStepikIcons.stepikLogo) {
@@ -27,9 +27,9 @@ abstract class AbstractOpenInBrowserAction : AbstractStepAction(TEXT, DESCRIPTIO
 
     abstract fun getLink(project: Project, stepNode: StepNode): String
 
-    override fun update(e: AnActionEvent) {
+    override fun update(e: AnActionEvent?) {
         super.update(e)
-        val presentation = e.presentation
+        val presentation = e?.presentation ?: return
         val project = e.project
         val stepNode = getCurrentStep(project)
         if (stepNode == null) {

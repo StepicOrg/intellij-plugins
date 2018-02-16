@@ -1,4 +1,4 @@
-package icons
+package org.stepik.core.icons
 
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.util.IconLoader

@@ -16,7 +16,6 @@ import com.intellij.openapi.ui.popup.JBPopupListener
 import com.intellij.openapi.ui.popup.LightweightWindowEvent
 import com.intellij.openapi.ui.popup.PopupChooserBuilder
 import com.intellij.ui.components.JBList
-import icons.AllStepikIcons
 import org.stepik.api.client.StepikApiClient
 import org.stepik.api.exceptions.StepikClientException
 import org.stepik.api.objects.submissions.Submission
@@ -25,6 +24,7 @@ import org.stepik.core.SupportedLanguages
 import org.stepik.core.actions.getShortcutText
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.StudyStatus
+import org.stepik.core.icons.AllStepikIcons
 import org.stepik.core.metrics.Metrics
 import org.stepik.core.metrics.MetricsStatus.DATA_NOT_LOADED
 import org.stepik.core.metrics.MetricsStatus.EMPTY_SOURCE

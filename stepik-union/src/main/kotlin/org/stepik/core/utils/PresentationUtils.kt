@@ -1,7 +1,6 @@
 package org.stepik.core.utils
 
 import com.intellij.ui.JBColor
-import icons.AllStepikIcons
 import org.stepik.core.courseFormat.CourseNode
 import org.stepik.core.courseFormat.LessonNode
 import org.stepik.core.courseFormat.SectionNode
@@ -9,6 +8,7 @@ import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.StepType
 import org.stepik.core.courseFormat.StudyNode
 import org.stepik.core.courseFormat.StudyStatus
+import org.stepik.core.icons.AllStepikIcons
 import org.stepik.core.utils.ProjectFilesUtils.getParent
 import org.stepik.core.utils.ProjectFilesUtils.isHideDir
 import org.stepik.core.utils.ProjectFilesUtils.isSandbox
