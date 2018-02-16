@@ -2,12 +2,12 @@ package org.stepik.core.actions.step
 
 import com.intellij.ide.BrowserUtil
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.ApplicationManager.getApplication
 import com.intellij.openapi.project.Project
 import icons.AllStepikIcons
 import org.stepik.core.actions.getShortcutText
 import org.stepik.core.courseFormat.StepNode
-import org.stepik.core.metrics.Metrics.openInBrowserAction
+import org.stepik.core.metrics.Metrics
 
 abstract class AbstractOpenInBrowserAction : AbstractStepAction(TEXT, DESCRIPTION, AllStepikIcons.stepikLogo) {
 
@@ -17,15 +17,12 @@ abstract class AbstractOpenInBrowserAction : AbstractStepAction(TEXT, DESCRIPTIO
 
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
-        ApplicationManager.getApplication()
-                .executeOnPooledThread { openInBrowser(project) }
-    }
-
-    private fun openInBrowser(project: Project) {
-        val stepNode = getCurrentStep(project) ?: return
-        val link = getLink(project, stepNode)
-        BrowserUtil.browse(link)
-        openInBrowserAction(project, stepNode)
+        getApplication().executeOnPooledThread {
+            val stepNode = getCurrentStep(project) ?: return@executeOnPooledThread
+            val link = getLink(project, stepNode)
+            BrowserUtil.browse(link)
+            Metrics.openInBrowserAction(project, stepNode)
+        }
     }
 
     abstract fun getLink(project: Project, stepNode: StepNode): String
