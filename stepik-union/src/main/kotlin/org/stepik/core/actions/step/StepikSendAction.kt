@@ -1,7 +1,7 @@
 package org.stepik.core.actions.step
 
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.ApplicationManager.getApplication
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
@@ -10,7 +10,7 @@ import org.stepik.api.exceptions.StepikClientException
 import org.stepik.api.objects.attempts.Attempts
 import org.stepik.api.objects.submissions.Submissions
 import org.stepik.core.SupportedLanguages
-import org.stepik.core.actions.SendAction
+import org.stepik.core.actions.SendAction.checkStepStatus
 import org.stepik.core.actions.getShortcutText
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.icons.AllStepikIcons
@@ -21,7 +21,7 @@ import org.stepik.core.metrics.MetricsStatus.SUCCESSFUL
 import org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient
 import org.stepik.core.stepik.StepikAuthManager.isAuthenticated
 import org.stepik.core.testFramework.toolWindow.StepikTestResultToolWindow
-import org.stepik.core.testFramework.toolWindow.StepikTestToolWindowUtils
+import org.stepik.core.testFramework.toolWindow.StepikTestToolWindowUtils.Companion.showTestResultsToolWindow
 import org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory
 import org.stepik.core.utils.getFileText
 import org.stepik.core.utils.getTextUnderDirectives
@@ -34,31 +34,31 @@ class StepikSendAction : CodeQuizAction(TEXT, DESCRIPTION, AllStepikIcons.ToolWi
 
         logger.info("Start checking step")
 
-        val stepNode = CodeQuizAction.getCurrentCodeStepNode(project)
+        val stepNode = getCurrentCodeStepNode(project)
         if (stepNode == null) {
             logger.info("Stop checking step: step is null or it is not StepNode ")
             return
         }
         val title = "${stepNode.parent?.name ?: "Lesson"} : ${stepNode.name}"
-        val resultWindow = StepikTestToolWindowUtils.showTestResultsToolWindow(project, title)
-        resultWindow.clear()
-        resultWindow.println("Test method: send to Stepik")
+        val resultWindow = showTestResultsToolWindow(project, title)
+        resultWindow.apply {
+            clear()
+            println("Test method: send to Stepik")
+        }
+        getApplication().executeOnPooledThread {
+            val stepikApiClient = authAndGetStepikApiClient(true)
+            if (!isAuthenticated) {
+                return@executeOnPooledThread
+            }
 
-        ApplicationManager.getApplication()
-                .executeOnPooledThread {
-                    val stepikApiClient = authAndGetStepikApiClient(true)
-                    if (!isAuthenticated) {
-                        return@executeOnPooledThread
-                    }
+            val submissionId = sendStep(stepikApiClient, project, stepNode, resultWindow)
+                    ?: return@executeOnPooledThread
 
-                    val submissionId = sendStep(stepikApiClient, project, stepNode, resultWindow)
-                            ?: return@executeOnPooledThread
+            Metrics.sendAction(project, stepNode, SUCCESSFUL)
 
-                    Metrics.sendAction(project, stepNode, SUCCESSFUL)
-
-                    SendAction.checkStepStatus(project, stepikApiClient, stepNode, submissionId, resultWindow)
-                    logger.info("Finish checking step: id=${stepNode.id}")
-                }
+            checkStepStatus(project, stepikApiClient, stepNode, submissionId, resultWindow)
+            logger.info("Finish checking step: id=${stepNode.id}")
+        }
     }
 
     override fun getShortcuts() = arrayOf(SHORTCUT)
@@ -114,8 +114,10 @@ class StepikSendAction : CodeQuizAction(TEXT, DESCRIPTION, AllStepikIcons.ToolWi
                     return null
                 }
             } catch (e: StepikClientException) {
-                resultWindow.println("Error: can't get attempt")
-                resultWindow.println(e.message ?: "Unknown error")
+                resultWindow.apply {
+                    println("Error: can't get attempt")
+                    println(e.message ?: "Unknown error")
+                }
                 return null
             }
 
@@ -149,8 +151,10 @@ class StepikSendAction : CodeQuizAction(TEXT, DESCRIPTION, AllStepikIcons.ToolWi
                     return null
                 }
             } catch (e: StepikClientException) {
-                resultWindow.println("Error: can't send the submission")
-                resultWindow.println(e.message ?: "Unknown error")
+                resultWindow.apply {
+                    println("Error: can't send the submission")
+                    println(e.message ?: "Unknown error")
+                }
                 return null
             }
 
