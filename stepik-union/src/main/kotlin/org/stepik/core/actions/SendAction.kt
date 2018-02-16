@@ -2,12 +2,13 @@ package org.stepik.core.actions
 
 import com.intellij.execution.ui.ConsoleViewContentType.ERROR_OUTPUT
 import com.intellij.ide.projectView.ProjectView
-import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.ApplicationManager.getApplication
+import com.intellij.openapi.components.ServiceManager.getService
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import org.stepik.api.client.StepikApiClient
 import org.stepik.api.objects.submissions.Submission
-import org.stepik.core.StepikProjectManager
+import org.stepik.core.ProjectManager
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.StudyStatus
 import org.stepik.core.courseFormat.StudyStatus.SOLVED
@@ -51,7 +52,7 @@ object SendAction {
                     }
                     setupCheckProgress(resultWindow, currentSubmission!!, timer)
                     stepStatus = currentSubmission.status
-                    if (EVALUATION != stepStatus) {
+                    if (stepStatus != EVALUATION) {
                         if (showedTimer) {
                             resultWindow.clearLastLine()
                         }
@@ -65,8 +66,10 @@ object SendAction {
                 if (showedTimer) {
                     resultWindow.clearLastLine()
                 }
-                resultWindow.println("Error: can't get submission status", ERROR_OUTPUT)
-                resultWindow.println(e.message ?: "Unknown error", ERROR_OUTPUT)
+                resultWindow.apply {
+                    println("Error: can't get submission status", ERROR_OUTPUT)
+                    println(e.message ?: "Unknown error", ERROR_OUTPUT)
+                }
                 logger.info("Stop check a status for step: $stepIdString", e)
                 return
             }
@@ -76,20 +79,22 @@ object SendAction {
             logger.info("Stop check a status for step: $stepIdString without result")
             return
         }
-        val actionStatus = if (EVALUATION == stepStatus) TIME_OVER else SUCCESSFUL
+        val actionStatus = if (stepStatus == EVALUATION) TIME_OVER else SUCCESSFUL
         Metrics.getStepStatusAction(project, stepNode, actionStatus)
 
         if (StudyStatus.of(stepStatus) == SOLVED) {
             stepNode.passed()
         }
-        resultWindow.println(stepStatus)
-        resultWindow.println(currentSubmission.hint)
-
-        ApplicationManager.getApplication().invokeLater {
+        resultWindow.apply {
+            println(stepStatus)
+            println(currentSubmission!!.hint)
+        }
+        getApplication().invokeLater {
             if (!project.isDisposed) {
                 ProjectView.getInstance(project).refresh()
             }
-            StepikProjectManager.updateSelection(project)
+            val projectManager = getService(project, ProjectManager::class.java)
+            projectManager?.updateSelection()
         }
         logger.info("Finish check a status for step: $stepIdString with status: $stepStatus")
     }

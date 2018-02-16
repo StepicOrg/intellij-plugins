@@ -2,7 +2,7 @@ package org.stepik.core.actions.step
 
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.components.ServiceManager.getService
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import org.stepik.core.ProjectManager
 import org.stepik.core.actions.getShortcutText
@@ -39,7 +39,7 @@ class InsertStepikDirectives : CodeQuizAction(TEXT, DESCRIPTION, AllIcons.Genera
 
         var text = getFileText(file)
 
-        val projectManager = ServiceManager.getService(project, ProjectManager::class.java)
+        val projectManager = getService(project, ProjectManager::class.java)
         val showHint = projectManager?.showHint == true
         val needInsert = !containsDirectives(text, currentLang)
         if (needInsert) {

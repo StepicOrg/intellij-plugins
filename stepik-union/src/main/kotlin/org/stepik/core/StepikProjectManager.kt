@@ -5,7 +5,7 @@ import com.intellij.ide.projectView.ProjectView
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.PersistentStateComponent
-import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.components.ServiceManager.getService
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.diagnostic.Logger
@@ -378,7 +378,7 @@ class StepikProjectManager @JvmOverloads constructor(@field:XStreamOmitField
         private var domBuilder: DOMBuilder? = null
 
         fun getInstance(project: Project): StepikProjectManager? {
-            return ServiceManager.getService(project, StepikProjectManager::class.java)
+            return getService(project, StepikProjectManager::class.java)
         }
 
         fun getProjectRoot(project: Project): StudyNode<*, *>? {

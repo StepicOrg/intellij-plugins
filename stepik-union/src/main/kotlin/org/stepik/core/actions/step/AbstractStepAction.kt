@@ -1,7 +1,7 @@
 package org.stepik.core.actions.step
 
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.components.ServiceManager.getService
 import com.intellij.openapi.project.Project
 import org.jetbrains.annotations.Contract
 import org.stepik.core.ProjectManager
@@ -25,8 +25,8 @@ abstract class AbstractStepAction protected constructor(text: String?, descripti
             if (project == null) {
                 return null
             }
-            val projectManager = ServiceManager.getService(project, ProjectManager::class.java)
-            return projectManager.getSelected(project)
+            val projectManager = getService(project, ProjectManager::class.java)
+            return projectManager?.getSelected(project)
         }
     }
 }
