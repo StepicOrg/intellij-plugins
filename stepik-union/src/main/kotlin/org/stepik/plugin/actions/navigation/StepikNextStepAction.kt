@@ -2,23 +2,17 @@ package org.stepik.plugin.actions.navigation
 
 import com.intellij.icons.AllIcons
 import org.stepik.core.actions.getShortcutText
-import org.stepik.core.actions.navigation.StepikStepNavigationAction
-import org.stepik.core.actions.navigation.StudyStepNavigationAction
 import org.stepik.core.courseFormat.StudyNode
 
-class StepikNextStepAction : StudyStepNavigationAction(TEXT, DESCRIPTION, AllIcons.Actions.Forward) {
+class StepikNextStepAction : StepikNavigationAction(TEXT, DESCRIPTION, AllIcons.Actions.Forward) {
 
-    override fun getTargetStep(sourceStepNode: StudyNode<*, *>?): StudyNode<*, *>? {
-        return StudyNavigator.nextLeaf(sourceStepNode)
+    override fun getTargetStep(currentStepNode: StudyNode<*, *>?): StudyNode<*, *>? {
+        return StudyNavigator.nextLeaf(currentStepNode)
     }
 
-    override fun getActionId(): String {
-        return ACTION_ID
-    }
+    override fun getActionId() = ACTION_ID
 
-    override fun getShortcuts(): Array<String>? {
-        return arrayOf(SHORTCUT)
-    }
+    override fun getShortcuts() = arrayOf(SHORTCUT)
 
     companion object {
         private const val ACTION_ID = "STEPIK.NextStepAction"

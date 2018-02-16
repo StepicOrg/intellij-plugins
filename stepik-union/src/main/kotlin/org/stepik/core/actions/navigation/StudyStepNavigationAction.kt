@@ -1,8 +1,9 @@
 package org.stepik.core.actions.navigation
 
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
-import org.stepik.core.StepikProjectManager
+import org.stepik.core.ProjectManager
 import org.stepik.core.actions.StudyActionWithShortcut
 import org.stepik.core.courseFormat.StudyNode
 import org.stepik.core.utils.NavigationUtils
@@ -16,44 +17,31 @@ abstract class StudyStepNavigationAction(text: String?,
 
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
-        navigateStep(project)
-    }
-
-    private fun navigateStep(project: Project) {
-        var currentNode = StepikProjectManager.getSelected(project)
-        if (currentNode == null) {
-            currentNode = StepikProjectManager.getProjectRoot(project)
-        }
-
-        val targetNode: StudyNode<*, *>?
-
-        targetNode = getTargetStep(currentNode)
-
-        if (targetNode == null) {
-            return
-        }
-
+        val projectManager = ServiceManager.getService(project, ProjectManager::class.java)
+        val currentNode = projectManager.getSelected() ?: projectManager.getProjectRoot()
+        val targetNode = getTargetStep(currentNode) ?: return
         NavigationUtils.navigate(project, targetNode)
     }
 
-    protected abstract fun getTargetStep(sourceStepNode: StudyNode<*, *>?): StudyNode<*, *>?
+    protected abstract fun getTargetStep(currentStepNode: StudyNode<*, *>?): StudyNode<*, *>?
 
     override fun update(e: AnActionEvent?) {
-        val presentation = e!!.presentation
+        val presentation = e?.presentation ?: return
+        val project = e.project ?: return
         presentation.isEnabled = false
 
-        val project = e.project!!
-        if (!StepikProjectManager.isStepikProject(project)) {
+        val projectManager = ServiceManager.getService(project, ProjectManager::class.java)
+
+        if (!projectManager.isStepikProject(project)) {
             return
         }
 
-        val selected = StepikProjectManager.getSelected(project)
+        val selected = projectManager.getSelected(project)
         val target = getTargetStep(selected)
-        var enabled = selected == null || target != null
-
-        if (StepikProjectManager.isAdaptive(project)) {
-            enabled = enabled && selected != null && target!!.parent === selected.parent
-        }
-        presentation.isEnabled = enabled
+        val enabled = selected == null || target != null
+        presentation.isEnabled = isEnabled(project, enabled, selected, target)
     }
+
+    open fun isEnabled(project: Project, enabled: Boolean,
+                       selected: StudyNode<*, *>?, target: StudyNode<*, *>?): Boolean = enabled
 }
