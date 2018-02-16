@@ -7,7 +7,10 @@ import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import javafx.scene.web.WebEngine
 import org.stepik.api.exceptions.StepikClientException
-import org.stepik.api.objects.recommendations.ReactionValues.*
+import org.stepik.api.objects.recommendations.ReactionValues.SOLVED
+import org.stepik.api.objects.recommendations.ReactionValues.TOO_EASY
+import org.stepik.api.objects.recommendations.ReactionValues.TOO_HARD
+import org.stepik.api.objects.recommendations.ReactionValues.of
 import org.stepik.api.urls.Urls
 import org.stepik.core.StepikProjectManager
 import org.stepik.core.StudyUtils
@@ -15,9 +18,9 @@ import org.stepik.core.courseFormat.CourseNode
 import org.stepik.core.courseFormat.LessonNode
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.stepik.StepikAuthManager
-import org.stepik.core.stepik.StepikAuthManager.getCurrentUser
+import org.stepik.core.stepik.StepikAuthManager.currentUser
+import org.stepik.core.utils.NavigationUtils
 import org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory
-import org.stepik.plugin.utils.NavigationUtils
 import org.w3c.dom.Element
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.EventListener
@@ -72,7 +75,7 @@ class LinkListener(val project: Project, val browser: StudyBrowserWindow, val en
         val prefix = target.getAttribute("data-file-prefix")
         val extension = target.getAttribute("data-file-ext")
 
-        val stepikApiClient = StepikAuthManager.getStepikApiClient()
+        val stepikApiClient = StepikAuthManager.stepikApiClient
         val content: String
         try {
             content = stepikApiClient.files().get(link, contentType)
@@ -126,7 +129,7 @@ class LinkListener(val project: Project, val browser: StudyBrowserWindow, val en
             }
 
             val stepikClient = StepikAuthManager.authAndGetStepikApiClient(true)
-            val user = getCurrentUser()
+            val user = currentUser
             if (user.isGuest) {
                 browser.hideLoadAnimation()
                 return

@@ -251,7 +251,7 @@ public class StepNode extends Node<Step, StepNode, Step, StepNode> {
         if (data == null) {
             return StepType.UNKNOWN;
         }
-        return StepType.of(data.getBlock().getName());
+        return StepType.Companion.of(data.getBlock().getName());
     }
 
     public boolean isStepFile(@NotNull String fileName) {

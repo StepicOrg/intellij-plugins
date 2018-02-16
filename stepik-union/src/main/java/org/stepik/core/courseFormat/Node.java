@@ -11,6 +11,7 @@ import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.objects.StudyObject;
 import org.stepik.api.objects.progresses.Progresses;
+import org.stepik.core.stepik.StepikAuthManager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,12 +25,8 @@ import java.util.concurrent.Executors;
 import static org.stepik.core.courseFormat.StudyStatus.NEED_CHECK;
 import static org.stepik.core.courseFormat.StudyStatus.SOLVED;
 import static org.stepik.core.courseFormat.StudyStatus.UNCHECKED;
-import static org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient;
-import static org.stepik.core.stepik.StepikAuthManager.isAuthenticated;
 
-/**
- * @author meanmail
- */
+
 abstract class Node<
         D extends StudyObject,
         C extends StudyNode<DC, CC>,
@@ -224,7 +221,7 @@ abstract class Node<
     }
 
     private void sortChildren() {
-        getChildren().sort(StudyNodeComparator.getInstance());
+        getChildren().sort(StudyNodeComparator.Companion.getInstance());
     }
 
     @Override
@@ -303,8 +300,8 @@ abstract class Node<
             status = UNCHECKED;
 
             executor.execute(() -> {
-                StepikApiClient stepikApiClient = authAndGetStepikApiClient();
-                if (!isAuthenticated()) {
+                StepikApiClient stepikApiClient = StepikAuthManager.INSTANCE.authAndGetStepikApiClient();
+                if (!StepikAuthManager.INSTANCE.isAuthenticated()) {
                     return;
                 }
 

@@ -10,7 +10,7 @@ import org.stepik.core.SupportedLanguages.JAVA8
 import org.stepik.core.SupportedLanguages.PYTHON3
 
 class SupportedLanguagesConverterTest {
-    val converter = SupportedLanguagesConverter()
+    private val converter = SupportedLanguagesConverter()
 
     @Test
     fun testToString() {

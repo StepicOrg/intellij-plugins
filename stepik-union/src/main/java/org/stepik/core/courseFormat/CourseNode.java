@@ -12,11 +12,10 @@ import org.stepik.api.objects.sections.Section;
 import org.stepik.api.objects.sections.Sections;
 import org.stepik.api.objects.users.User;
 import org.stepik.api.objects.users.Users;
+import org.stepik.core.stepik.StepikAuthManager;
 
 import java.util.Collections;
 import java.util.List;
-
-import static org.stepik.core.stepik.StepikAuthManager.isAuthenticated;
 
 public class CourseNode extends Node<Course, SectionNode, Section, LessonNode> {
     private static final Logger logger = Logger.getInstance(CourseNode.class);
@@ -106,7 +105,7 @@ public class CourseNode extends Node<Course, SectionNode, Section, LessonNode> {
             authorsIds = data != null ? data.getAuthors() : Collections.emptyList();
             if (!authorsIds.isEmpty()) {
                 try {
-                    if (!isAuthenticated()) {
+                    if (!StepikAuthManager.INSTANCE.isAuthenticated()) {
                         return Collections.emptyList();
                     }
                     Users users = stepikApiClient.users()
