@@ -2,13 +2,14 @@ package org.stepik.core.actions.step
 
 import com.intellij.ide.projectView.ProjectView
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.ApplicationManager.getApplication
 import com.intellij.openapi.command.CommandProcessor
+import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
 import com.intellij.problems.WolfTheProblemSolver
-import org.stepik.core.StepikProjectManager
+import org.stepik.core.ProjectManager
 import org.stepik.core.actions.getShortcutText
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.icons.AllStepikIcons
@@ -18,8 +19,8 @@ import org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory
 
 class StepikResetStepAction : CodeQuizAction(TEXT, DESCRIPTION, AllStepikIcons.ToolWindow.resetTaskFile) {
 
-    override fun actionPerformed(event: AnActionEvent) {
-        val project = event.project ?: return
+    override fun actionPerformed(e: AnActionEvent) {
+        val project = e.project ?: return
         reset(project)
     }
 
@@ -35,12 +36,14 @@ class StepikResetStepAction : CodeQuizAction(TEXT, DESCRIPTION, AllStepikIcons.T
         private const val DESCRIPTION = "Reset current step"
 
         private fun reset(project: Project) {
-            val application = ApplicationManager.getApplication()
-            application.invokeLater { application.runWriteAction { resetFile(project) } }
+            val application = getApplication()
+            application.invokeLater {
+                application.runWriteAction { resetFile(project) }
+            }
         }
 
         private fun resetFile(project: Project) {
-            val stepNode = CodeQuizAction.Companion.getCurrentCodeStepNode(project) ?: return
+            val stepNode = getCurrentCodeStepNode(project) ?: return
 
             val src = getOrCreateSrcDirectory(project, stepNode, true) ?: return
 
@@ -56,24 +59,20 @@ class StepikResetStepAction : CodeQuizAction(TEXT, DESCRIPTION, AllStepikIcons.T
                         ProjectView.getInstance(project).refresh()
                         WolfTheProblemSolver.getInstance(project).clearProblems(mainFile)
                     }
-                    StepikProjectManager.updateSelection(project)
+                    val projectManager = ServiceManager.getService(project, ProjectManager::class.java)
+                    projectManager?.updateSelection()
                 }
             }
         }
 
-        private fun resetDocument(
-                project: Project,
-                document: Document,
-                stepNode: StepNode) {
+        private fun resetDocument(project: Project, document: Document, stepNode: StepNode) {
             CommandProcessor.getInstance().executeCommand(project,
                     {
-                        ApplicationManager
-                                .getApplication()
-                                .runWriteAction {
-                                    document.setText(stepNode.currentTemplate)
-                                    Metrics.resetStepAction(project, stepNode, MetricsStatus.SUCCESSFUL)
-                                    stepNode.currentLang.runner.updateRunConfiguration(project, stepNode)
-                                }
+                        getApplication().runWriteAction {
+                            document.setText(stepNode.currentTemplate)
+                            Metrics.resetStepAction(project, stepNode, MetricsStatus.SUCCESSFUL)
+                            stepNode.currentLang.runner.updateRunConfiguration(project, stepNode)
+                        }
                     },
                     "Stepik reset step", "Stepik reset step"
             )
