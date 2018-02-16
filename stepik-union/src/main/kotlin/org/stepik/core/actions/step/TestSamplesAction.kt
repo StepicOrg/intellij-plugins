@@ -24,18 +24,21 @@ class TestSamplesAction : CodeQuizAction(TEXT, DESCRIPTION, AllIcons.Actions.Res
 
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
-        val stepNode = CodeQuizAction.getCurrentCodeStepNode(project) ?: return
+        val stepNode = getCurrentCodeStepNode(project) ?: return
         val language = stepNode.currentLang
         val runner = language.runner
         val title = "${stepNode.parent?.name ?: "Lesson"} : ${stepNode.name}"
         val resultWindow = StepikTestToolWindowUtils.showTestResultsToolWindow(project, title)
         val stepDirectory = project.baseDir.findFileByRelativePath(stepNode.path)
-        ApplicationManager.getApplication().runWriteAction {
+        val application = ApplicationManager.getApplication()
+        application.runWriteAction {
             VirtualFileManager.getInstance().syncRefresh()
         }
-        val haveTests = stepDirectory?.findFileByRelativePath(listOf("tests", language.langName, language.testFileName).joinToString("/")) != null
+        val haveTests = stepDirectory?.findFileByRelativePath(
+                listOf("tests", language.langName, language.testFileName).joinToString("/")
+        ) != null
 
-        ApplicationManager.getApplication().executeOnPooledThread {
+        application.executeOnPooledThread {
             if (haveTests) {
                 testWithTestFile(resultWindow, stepNode, runner, project)
             } else {
@@ -47,16 +50,18 @@ class TestSamplesAction : CodeQuizAction(TEXT, DESCRIPTION, AllIcons.Actions.Res
     }
 
     private fun testWithTestFile(resultWindow: StepikTestResultToolWindow, stepNode: StepNode, runner: Runner, project: Project) {
-        resultWindow.clear()
-        resultWindow.println("Test method: test file")
-
+        resultWindow.apply {
+            clear()
+            println("Test method: test file")
+        }
         val result = runner.testFiles(project, stepNode)
         val status = getStatusString(result)
         resultWindow.println(status)
         if (!result.passed && result.cause == ExitCause.WRONG) {
-            resultWindow.println("Return:\n${result.actual}")
-            resultWindow.println("Error:\n${result.errorString}")
-            resultWindow.println()
+            resultWindow.apply {
+                println("Return:\n${result.actual}")
+                println("Error:\n${result.errorString}\n")
+            }
         }
         resultWindow.println("Done")
     }
@@ -67,31 +72,32 @@ class TestSamplesAction : CodeQuizAction(TEXT, DESCRIPTION, AllIcons.Actions.Res
                             project: Project,
                             testClass: Boolean = false) {
         var counter = 0
-        resultWindow.clear()
-        resultWindow.println("Test method: samples")
-
-        stepNode.samples.forEach {
+        resultWindow.apply {
+            clear()
+            println("Test method: samples")
+        }
+        stepNode.samples.forEach { sample ->
             resultWindow.print("Test #${counter++} ")
-            val result = runner.testSamples(project, stepNode, it.input, { actual -> actual == it.output }, testClass = testClass)
+            val result = runner.testSamples(project, stepNode, sample.input, { it == sample.output }, testClass = testClass)
             val status = getStatusString(result)
 
             resultWindow.println(status)
             if (!result.passed && result.cause == ExitCause.WRONG) {
-                resultWindow.println("Input:\n${it.input}")
-                resultWindow.println("Expected:\n${it.output}")
-                resultWindow.println("Actual:\n${result.actual}")
-                resultWindow.println("Error:\n${result.errorString}")
-                resultWindow.println()
+                resultWindow.apply {
+                    println("Input:\n${sample.input}")
+                    println("Expected:\n${sample.output}")
+                    println("Actual:\n${result.actual}")
+                    println("Error:\n${result.errorString}\n")
+                }
             }
         }
         resultWindow.println("Done")
     }
 
     private fun getStatusString(result: TestResult): String {
-        return if (result.passed) {
-            "PASSED"
-        } else {
-            when (result.cause) {
+        return when {
+            result.passed -> "PASSED"
+            else -> when (result.cause) {
                 ExitCause.TIME_LIMIT -> "FAIL (time left)"
                 ExitCause.NO_CREATE_PROCESS -> "FAIL (can't create the test process)"
                 else -> "FAIL"
@@ -103,7 +109,7 @@ class TestSamplesAction : CodeQuizAction(TEXT, DESCRIPTION, AllIcons.Actions.Res
         private const val SHORTCUT = "ctrl shift pressed F10"
         private const val ACTION_ID = "STEPIK.TestSamplesAction"
         private val SHORTCUT_TEXT = getShortcutText(SHORTCUT)
-        private val TEXT = "Test a code (${SHORTCUT_TEXT})"
+        private val TEXT = "Test a code ($SHORTCUT_TEXT)"
         private const val DESCRIPTION = "Test a code"
     }
 }
