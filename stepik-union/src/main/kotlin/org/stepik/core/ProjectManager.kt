@@ -8,4 +8,5 @@ interface ProjectManager {
     fun getSelected(project: Project): StepNode?
     fun getProjectRoot(): StepNode?
     fun isStepikProject(project: Project): Boolean
+    val showHint: Boolean
 }
