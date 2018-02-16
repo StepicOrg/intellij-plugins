@@ -3,6 +3,7 @@ package org.stepik.core.actions.step
 import com.intellij.ide.projectView.ProjectView
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.ApplicationManager.getApplication
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.fileEditor.FileDocumentManager
@@ -14,7 +15,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.ui.popup.JBPopupListener
 import com.intellij.openapi.ui.popup.LightweightWindowEvent
-import com.intellij.openapi.ui.popup.PopupChooserBuilder
 import com.intellij.ui.components.JBList
 import org.stepik.api.client.StepikApiClient
 import org.stepik.api.exceptions.StepikClientException
@@ -50,11 +50,13 @@ class DownloadSubmission : CodeQuizAction(TEXT, DESCRIPTION, AllStepikIcons.Tool
     override fun getShortcuts() = arrayOf(SHORTCUT)
 
     override fun actionPerformed(e: AnActionEvent) {
-        ApplicationManager.getApplication()
-                .executeOnPooledThread { downloadSubmission(e.project) }
+        val project = e.project ?: return
+        getApplication().executeOnPooledThread {
+            downloadSubmission(project)
+        }
     }
 
-    private fun downloadSubmission(project: Project?) {
+    private fun downloadSubmission(project: Project) {
         val stepNode = getCurrentCodeStepNode(project) ?: return
 
         val stepikApiClient = authAndGetStepikApiClient(true)
@@ -74,12 +76,12 @@ class DownloadSubmission : CodeQuizAction(TEXT, DESCRIPTION, AllStepikIcons.Tool
                         val submissions = getSubmissions(stepikApiClient, stepNode)
 
                         if (Utils.isCanceled) {
-                            Metrics.downloadAction(project!!, stepNode, USER_CANCELED)
+                            Metrics.downloadAction(project, stepNode, USER_CANCELED)
                             return null
                         }
 
                         if (submissions == null) {
-                            Metrics.downloadAction(project!!, stepNode, DATA_NOT_LOADED)
+                            Metrics.downloadAction(project, stepNode, DATA_NOT_LOADED)
                             return emptyList()
                         }
 
@@ -89,36 +91,31 @@ class DownloadSubmission : CodeQuizAction(TEXT, DESCRIPTION, AllStepikIcons.Tool
                     }
                 }) ?: return
 
-        ApplicationManager.getApplication().invokeAndWait { showPopup(project!!, stepNode, submissions) }
+        getApplication().invokeAndWait { showPopup(project, stepNode, submissions) }
     }
 
     private fun getSubmissions(
             stepikApiClient: StepikApiClient,
             stepNode: StepNode): List<Submission>? {
-        try {
-            val stepId = stepNode.id
-            val userId = currentUser.id
-
-            val submissions = stepikApiClient.submissions()
+        return try {
+            stepikApiClient.submissions()
                     .get()
-                    .step(stepId)
-                    .user(userId)
+                    .step(stepNode.id)
+                    .user(currentUser.id)
                     .order(Order.DESC)
                     .execute()
-
-            return submissions.submissions
+                    .submissions
         } catch (e: StepikClientException) {
             logger.warn("Failed get submissions", e)
-            return null
+            null
         }
-
     }
 
     private fun filterSubmissions(
             submissions: List<Submission>,
             currentLang: SupportedLanguages): List<Submission> {
-        return submissions.filter { submission ->
-            SupportedLanguages.langOfName(submission.reply.language).upgradedTo(currentLang)
+        return submissions.filter {
+            SupportedLanguages.langOfName(it.reply.language).upgradedTo(currentLang)
         }
     }
 
@@ -128,21 +125,15 @@ class DownloadSubmission : CodeQuizAction(TEXT, DESCRIPTION, AllStepikIcons.Tool
             submissions: List<Submission>) {
         val popupFactory = JBPopupFactory.getInstance()
 
-        var builder: PopupChooserBuilder
-        if (!submissions.isEmpty()) {
-            val list: JList<SubmissionDecorator>
-
-            val submissionDecorators = submissions.map { SubmissionDecorator(it) }
-            list = JBList(submissionDecorators)
-            builder = popupFactory.createListPopupBuilder(list)
+        val builder = if (!submissions.isEmpty()) {
+            val list = JBList(submissions.map { SubmissionDecorator(it) })
+            popupFactory.createListPopupBuilder(list)
                     .addListener(Listener(list, project, stepNode))
         } else {
-            val emptyList = JBList<String>("Empty")
-            builder = popupFactory.createListPopupBuilder(emptyList)
+            popupFactory.createListPopupBuilder(JBList<String>("No submissions"))
         }
 
-        builder = builder.setTitle("Choose submission")
-        val popup = builder.createPopup()
+        val popup = builder.setTitle("Choose submission").createPopup()
         popup.showCenteredInCurrentWindow(project)
     }
 
@@ -165,7 +156,7 @@ class DownloadSubmission : CodeQuizAction(TEXT, DESCRIPTION, AllStepikIcons.Tool
             return
         }
 
-        val finalCode = submission.reply.code
+        val code = submission.reply.code
 
         CommandProcessor.getInstance().executeCommand(project,
                 {
@@ -175,13 +166,12 @@ class DownloadSubmission : CodeQuizAction(TEXT, DESCRIPTION, AllStepikIcons.Tool
 
                         if (document != null) {
                             val language = SupportedLanguages.langOfName(submission.reply.language)
-                            if (containsDirectives(finalCode, language)) {
-                                val text = uncommentAmbientCode(finalCode, language)
-                                document.setText(text)
+                            val text = if (containsDirectives(code, language)) {
+                                uncommentAmbientCode(code, language)
                             } else {
-                                val code = replaceCode(document.text, finalCode, language)
-                                document.setText(code)
+                                replaceCode(document.text, code, language)
                             }
+                            document.setText(text)
 
                             val status = StudyStatus.of(submission.status)
                             stepNode.setStatus(status)
@@ -200,9 +190,7 @@ class DownloadSubmission : CodeQuizAction(TEXT, DESCRIPTION, AllStepikIcons.Tool
     private class SubmissionDecorator internal constructor(internal val submission: Submission) {
 
         override fun toString(): String {
-            val utcTime = submission.time
-            val localTime = timeOutFormat.format(utcTime)
-
+            val localTime = timeOutFormat.format(submission.time)
             return String.format("#%d %-7s %s", submission.id, submission.status, localTime)
         }
 
@@ -219,22 +207,25 @@ class DownloadSubmission : CodeQuizAction(TEXT, DESCRIPTION, AllStepikIcons.Tool
         override fun beforeShown(event: LightweightWindowEvent) {}
 
         override fun onClosed(event: LightweightWindowEvent) {
-            if (!event.isOk) {
-                Metrics.downloadAction(project, stepNode, USER_CANCELED)
-                return
-            } else if (list.isSelectionEmpty) {
-                Metrics.downloadAction(project, stepNode, EMPTY_SOURCE)
-                return
+            when {
+                !event.isOk -> {
+                    Metrics.downloadAction(project, stepNode, USER_CANCELED)
+                }
+                list.isSelectionEmpty -> {
+                    Metrics.downloadAction(project, stepNode, EMPTY_SOURCE)
+                }
+                else -> {
+                    val submission = list.selectedValue?.submission
+
+                    if (submission == null) {
+                        Metrics.downloadAction(project, stepNode, EMPTY_SOURCE)
+                        return
+                    }
+
+                    loadSubmission(project, stepNode, submission)
+                }
             }
 
-            val submission = list.selectedValue?.submission
-
-            if (submission == null) {
-                Metrics.downloadAction(project, stepNode, EMPTY_SOURCE)
-                return
-            }
-
-            loadSubmission(project, stepNode, submission)
         }
     }
 

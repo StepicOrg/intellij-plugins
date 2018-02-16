@@ -10,9 +10,7 @@ import org.stepik.core.courseFormat.StepNode
 import javax.swing.Icon
 
 
-abstract class AbstractStepAction protected constructor(text: String?,
-                                                        description: String?,
-                                                        icon: Icon?) :
+abstract class AbstractStepAction protected constructor(text: String?, description: String?, icon: Icon?) :
         StudyActionWithShortcut(text, description, icon) {
 
     override fun update(e: AnActionEvent?) {
