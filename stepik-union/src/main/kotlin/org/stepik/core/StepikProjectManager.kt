@@ -8,7 +8,6 @@ import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.ServiceManager.getService
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.module.ModuleWithNameAlreadyExists
@@ -37,6 +36,7 @@ import org.stepik.api.objects.steps.Sample
 import org.stepik.api.objects.steps.Step
 import org.stepik.api.objects.steps.VideoUrl
 import org.stepik.api.objects.users.User
+import org.stepik.core.common.Loggable
 import org.stepik.core.core.EduNames
 import org.stepik.core.courseFormat.CourseNode
 import org.stepik.core.courseFormat.LessonNode
@@ -72,7 +72,7 @@ import javax.xml.parsers.ParserConfigurationException
 @State(name = "StepikStudySettings", storages = arrayOf(Storage("stepik_study_project.xml")))
 class StepikProjectManager @JvmOverloads constructor(@field:XStreamOmitField
                                                      val project: Project? = null) :
-        PersistentStateComponent<Element>, DumbAware, StepikAuthManagerListener, Disposable {
+        PersistentStateComponent<Element>, DumbAware, StepikAuthManagerListener, Disposable, Loggable {
     @XStreamOmitField
     private val executor = Executors.newSingleThreadExecutor()
     private var root: StudyNode<*, *>? = null
@@ -82,7 +82,7 @@ class StepikProjectManager @JvmOverloads constructor(@field:XStreamOmitField
     var defaultLang: SupportedLanguages? = SupportedLanguages.INVALID
     var version = CURRENT_VERSION
         private set
-    internal var uuid: String? = null
+    private var uuid: String? = null
 
     private val isAdaptive: Boolean
         get() {
@@ -341,7 +341,6 @@ class StepikProjectManager @JvmOverloads constructor(@field:XStreamOmitField
 
     companion object {
         private const val CURRENT_VERSION = 4
-        private val logger = Logger.getInstance(StepikProjectManager::class.java)
         @XStreamOmitField
         val xStream: XStream = {
             XStream(DomDriver()).apply {

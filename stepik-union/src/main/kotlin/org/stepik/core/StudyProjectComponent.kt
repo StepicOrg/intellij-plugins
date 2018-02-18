@@ -4,7 +4,6 @@ import com.intellij.ide.ui.UISettings
 import com.intellij.openapi.actionSystem.KeyboardShortcut
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.ProjectComponent
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.keymap.Keymap
 import com.intellij.openapi.keymap.ex.KeymapManagerEx
 import com.intellij.openapi.module.ModuleManager
@@ -15,13 +14,14 @@ import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.util.containers.hash.HashMap
 import javafx.application.Platform
 import org.stepik.core.actions.StudyActionWithShortcut
+import org.stepik.core.common.Loggable
 import org.stepik.core.metrics.Metrics
 import org.stepik.core.metrics.MetricsStatus.SUCCESSFUL
 import org.stepik.core.ui.StudyToolWindowFactory
 import java.util.concurrent.Executors
 import javax.swing.KeyStroke
 
-class StudyProjectComponent private constructor(private val project: Project) : ProjectComponent {
+class StudyProjectComponent private constructor(private val project: Project) : ProjectComponent, Loggable {
     private val deletedShortcuts = HashMap<Keymap, MutableList<Pair<String, String>>>()
 
     override fun projectOpened() {
@@ -134,7 +134,6 @@ class StudyProjectComponent private constructor(private val project: Project) : 
     }
 
     companion object {
-        private val logger = Logger.getInstance(StudyProjectComponent::class.java.name)
         private val executor = Executors.newSingleThreadExecutor()
 
         fun getInstance(project: Project): StudyProjectComponent {

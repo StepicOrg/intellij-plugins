@@ -4,7 +4,6 @@ import com.intellij.ide.ui.LafManager
 import com.intellij.ide.ui.LafManagerListener
 import com.intellij.ide.ui.laf.darcula.DarculaLookAndFeelInfo
 import com.intellij.ide.util.PropertiesComponent
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.project.Project
 import javafx.application.Platform
@@ -17,6 +16,7 @@ import javafx.scene.web.WebView
 import netscape.javascript.JSException
 import netscape.javascript.JSObject
 import org.intellij.lang.annotations.Language
+import org.stepik.core.common.Loggable
 import org.stepik.core.courseFormat.stepHelpers.VideoTheoryHelper
 import org.stepik.core.templates.Templater
 import org.w3c.dom.events.EventListener
@@ -30,7 +30,7 @@ import java.util.*
 import javax.swing.JFrame
 import javax.swing.WindowConstants
 
-class StudyBrowserWindow internal constructor(private val project: Project) : JFrame() {
+class StudyBrowserWindow internal constructor(private val project: Project) : JFrame(), Loggable {
     private val bridge = JavaBridge()
     val panel: JFXPanel = JFXPanel()
     private var webComponent: WebView? = null
@@ -246,7 +246,6 @@ class StudyBrowserWindow internal constructor(private val project: Project) : JF
     }
 
     companion object {
-        private val logger = Logger.getInstance(StudyBrowserWindow::class.java)
         private const val EVENT_TYPE_CLICK = "click"
     }
 }

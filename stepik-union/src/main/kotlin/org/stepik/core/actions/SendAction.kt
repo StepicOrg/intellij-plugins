@@ -4,11 +4,11 @@ import com.intellij.execution.ui.ConsoleViewContentType.ERROR_OUTPUT
 import com.intellij.ide.projectView.ProjectView
 import com.intellij.openapi.application.ApplicationManager.getApplication
 import com.intellij.openapi.components.ServiceManager.getService
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import org.stepik.api.client.StepikApiClient
 import org.stepik.api.objects.submissions.Submission
 import org.stepik.core.ProjectManager
+import org.stepik.core.common.Loggable
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.StudyStatus
 import org.stepik.core.courseFormat.StudyStatus.SOLVED
@@ -17,8 +17,7 @@ import org.stepik.core.metrics.MetricsStatus.SUCCESSFUL
 import org.stepik.core.metrics.MetricsStatus.TIME_OVER
 import org.stepik.core.testFramework.toolWindow.StepikTestResultToolWindow
 
-object SendAction {
-    private val logger = Logger.getInstance(SendAction::class.java)
+object SendAction : Loggable {
     private const val EVALUATION = "evaluation"
     private const val PERIOD = 2 * 1000L //ms
     private const val FIVE_MINUTES = 5 * MILLISECONDS_IN_MINUTES //ms

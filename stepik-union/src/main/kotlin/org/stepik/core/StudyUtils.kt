@@ -1,11 +1,11 @@
 package org.stepik.core
 
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.wm.ToolWindowManager
 import org.stepik.api.exceptions.StepikClientException
 import org.stepik.api.objects.steps.Step
+import org.stepik.core.common.Loggable
 import org.stepik.core.courseFormat.StudyNode
 import org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient
 import org.stepik.core.stepik.StepikAuthManager.isAuthenticated
@@ -14,8 +14,7 @@ import org.stepik.core.ui.StudyToolWindowFactory
 import org.stepik.core.utils.ProjectFilesUtils
 import java.util.regex.Pattern
 
-object StudyUtils {
-    private val logger = Logger.getInstance(StudyUtils::class.java)
+object StudyUtils : Loggable {
     private const val PATH_PATTERN = "^(?:(?:section([0-9]+)/lesson([0-9]+)/step([0-9]+))|" +
             "(?:lesson([0-9]+)/step([0-9]+))|" +
             "(?:step([0-9]+))|" +
@@ -53,12 +52,7 @@ object StudyUtils {
 
     fun getConfigurator(project: Project): StudyPluginConfigurator? {
         val extensions = StudyPluginConfigurator.EP_NAME.extensions
-        for (extension in extensions) {
-            if (extension.accept(project)) {
-                return extension
-            }
-        }
-        return null
+        return extensions.firstOrNull { it.accept(project) }
     }
 
     private fun getRelativePath(project: Project, item: VirtualFile): String {

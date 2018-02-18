@@ -2,7 +2,6 @@ package org.stepik.core.ui
 
 import com.intellij.ide.BrowserUtil
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import javafx.scene.web.WebEngine
@@ -14,6 +13,7 @@ import org.stepik.api.objects.recommendations.ReactionValues.of
 import org.stepik.api.urls.Urls
 import org.stepik.core.StepikProjectManager
 import org.stepik.core.StudyUtils
+import org.stepik.core.common.Loggable
 import org.stepik.core.courseFormat.CourseNode
 import org.stepik.core.courseFormat.LessonNode
 import org.stepik.core.courseFormat.StepNode
@@ -27,8 +27,9 @@ import org.w3c.dom.events.EventListener
 import java.io.IOException
 import java.util.regex.Pattern
 
-class LinkListener(val project: Project, val browser: StudyBrowserWindow, val engine: WebEngine) : EventListener {
-    private val logger = Logger.getInstance(LinkListener::class.java)
+class LinkListener(val project: Project,
+                   private val browser: StudyBrowserWindow,
+                   val engine: WebEngine) : EventListener, Loggable {
     private val protocolPattern = Pattern.compile("([a-z]+):(.*)")
     private val pattern = Pattern.compile("/lesson(?:/|/[^/]*-)(\\d+)/step/(\\d+).*")
 

@@ -7,7 +7,6 @@ import com.intellij.execution.configurations.RunConfiguration
 import com.intellij.execution.impl.RunManagerImpl
 import com.intellij.openapi.application.Application
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
@@ -15,7 +14,6 @@ import org.stepik.core.core.EduNames
 import org.stepik.core.courseFormat.StepNode
 
 abstract class JetRunner : Runner {
-    private val logger = Logger.getInstance(JetRunner::class.java)
 
     override fun updateRunConfiguration(project: Project, stepNode: StepNode) {
         val application = ApplicationManager.getApplication()

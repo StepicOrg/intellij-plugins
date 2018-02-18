@@ -2,7 +2,6 @@ package org.stepik.core.projectWizard.idea
 
 import com.intellij.ide.util.projectWizard.ModuleWizardStep
 import com.intellij.ide.util.projectWizard.WizardContext
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.module.ModifiableModuleModel
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleWithNameAlreadyExists
@@ -81,9 +80,5 @@ class CourseModuleBuilder : AbstractModuleBuilder() {
         wizardSteps[0] = wizardStep
 
         return wizardSteps
-    }
-
-    companion object {
-        private val logger = Logger.getInstance(CourseModuleBuilder::class.java)
     }
 }

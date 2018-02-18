@@ -2,9 +2,9 @@ package org.stepik.core.projectWizard.ui
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
-import com.intellij.openapi.diagnostic.Logger
 import org.stepik.api.objects.StudyObject
 import org.stepik.core.SupportedLanguages
+import org.stepik.core.common.Loggable
 import org.stepik.core.projectWizard.EMPTY_STUDY_OBJECT
 import org.stepik.core.stepik.StepikAuthManager
 import org.stepik.core.stepik.StepikAuthManager.isAuthenticated
@@ -21,7 +21,7 @@ import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JScrollPane
 
-class ProjectSettingsPanel(visibleLangBox: Boolean) : ProjectSetting, HierarchyListener, StepikAuthManagerListener {
+class ProjectSettingsPanel(visibleLangBox: Boolean) : ProjectSetting, HierarchyListener, StepikAuthManagerListener, Loggable {
     private val listeners = ArrayList<ProjectSettingListener>()
     private var mainPanel: JPanel? = null
     private var nameLabel: JLabel? = null
@@ -115,9 +115,5 @@ class ProjectSettingsPanel(visibleLangBox: Boolean) : ProjectSetting, HierarchyL
 
     fun dispose() {
         StepikAuthManager.removeListener(this)
-    }
-
-    companion object {
-        private val logger = Logger.getInstance(ProjectSettingsPanel::class.java)
     }
 }

@@ -4,9 +4,10 @@ import com.intellij.ide.util.projectWizard.ModuleBuilder
 import com.intellij.openapi.options.ConfigurationException
 import com.intellij.openapi.roots.CompilerModuleExtension
 import com.intellij.openapi.roots.ModifiableRootModel
+import org.stepik.core.common.Loggable
 
 
-abstract class AbstractModuleBuilder : ModuleBuilder() {
+abstract class AbstractModuleBuilder : ModuleBuilder(), Loggable {
     override fun getModuleType() = StepikModuleType.STEPIK_MODULE_TYPE
 
     @Throws(ConfigurationException::class)

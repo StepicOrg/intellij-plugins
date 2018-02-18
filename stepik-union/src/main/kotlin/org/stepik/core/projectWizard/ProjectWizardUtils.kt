@@ -1,6 +1,5 @@
 package org.stepik.core.projectWizard
 
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.module.ModifiableModuleModel
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.io.FileUtil
@@ -12,6 +11,7 @@ import org.stepik.api.objects.lessons.CompoundUnitLesson
 import org.stepik.api.objects.sections.Section
 import org.stepik.api.objects.steps.Step
 import org.stepik.core.SupportedLanguages
+import org.stepik.core.common.Loggable
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.StudyNode
 import org.stepik.core.stepik.StepikAuthManager
@@ -20,8 +20,7 @@ import org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory
 import java.io.File
 
 
-object ProjectWizardUtils {
-    private val logger = Logger.getInstance(ProjectWizardUtils::class.java)
+object ProjectWizardUtils : Loggable {
 
     private fun findNonExistingFileName(searchDirectory: String, preferredName: String): String {
         var fileName = preferredName

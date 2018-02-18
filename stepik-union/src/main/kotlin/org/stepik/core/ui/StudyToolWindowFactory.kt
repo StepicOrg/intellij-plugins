@@ -1,15 +1,15 @@
 package org.stepik.core.ui
 
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
 import org.stepik.core.StepikProjectManager
+import org.stepik.core.common.Loggable
 import org.stepik.core.icons.AllStepikIcons
 
-class StudyToolWindowFactory : ToolWindowFactory, DumbAware {
+class StudyToolWindowFactory : ToolWindowFactory, DumbAware, Loggable {
 
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
         toolWindow.icon = AllStepikIcons.stepikLogoSmall
@@ -30,6 +30,5 @@ class StudyToolWindowFactory : ToolWindowFactory, DumbAware {
 
     companion object {
         const val STUDY_TOOL_WINDOW = "Step Description"
-        private val logger = Logger.getInstance(StudyToolWindowFactory::class.java.name)
     }
 }

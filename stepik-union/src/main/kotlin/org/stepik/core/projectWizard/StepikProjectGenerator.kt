@@ -1,6 +1,5 @@
 package org.stepik.core.projectWizard
 
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ex.ProjectEx
@@ -9,6 +8,7 @@ import org.stepik.api.objects.StudyObject
 import org.stepik.api.objects.courses.Course
 import org.stepik.core.StepikProjectManager
 import org.stepik.core.SupportedLanguages
+import org.stepik.core.common.Loggable
 import org.stepik.core.courseFormat.StudyNode
 import org.stepik.core.courseFormat.StudyNodeFactory
 import org.stepik.core.metrics.Metrics
@@ -21,7 +21,7 @@ import org.stepik.core.stepik.StepikAuthManager.currentUser
 import java.util.Collections.emptyList
 import java.util.concurrent.CompletableFuture
 
-object StepikProjectGenerator {
+object StepikProjectGenerator : Loggable {
     var defaultLang = SupportedLanguages.INVALID
 
     fun createCourseNodeUnderProgress(project: Project, data: StudyObject) {
@@ -57,7 +57,6 @@ object StepikProjectGenerator {
     }
 
 
-    private val logger = Logger.getInstance(StepikProjectGenerator::class.java)
     private var projectRoot: StudyNode<*, *>? = null
 
 

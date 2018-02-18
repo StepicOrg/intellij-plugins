@@ -1,10 +1,10 @@
 package org.stepik.core.courseFormat.stepHelpers
 
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import org.stepik.api.exceptions.StepikClientException
 import org.stepik.api.urls.Urls
 import org.stepik.core.StepikProjectManager
+import org.stepik.core.common.Loggable
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.stepHelpers.Actions.NEED_LOGIN
 import org.stepik.core.courseFormat.stepHelpers.Actions.NOTHING
@@ -13,7 +13,7 @@ import org.stepik.core.stepik.StepikAuthManager.isAuthenticated
 import org.stepik.plugin.actions.navigation.StudyNavigator
 
 
-open class StepHelper(private val project: Project, internal val stepNode: StepNode) {
+open class StepHelper(private val project: Project, internal val stepNode: StepNode) : Loggable {
 
     open fun getStatus(): String = ""
 
@@ -91,8 +91,4 @@ open class StepHelper(private val project: Project, internal val stepNode: StepN
     fun needLogin() = getAction() === NEED_LOGIN
 
     open fun canSubmit() = false
-
-    companion object {
-        private val logger = Logger.getInstance(StepHelper::class.java)
-    }
 }

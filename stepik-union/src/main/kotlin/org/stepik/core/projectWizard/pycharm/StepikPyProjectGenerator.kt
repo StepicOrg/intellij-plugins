@@ -2,7 +2,6 @@ package org.stepik.core.projectWizard.pycharm
 
 import com.intellij.facet.ui.ValidationResult
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.project.DefaultProjectFactory
@@ -21,6 +20,7 @@ import com.jetbrains.python.remote.PyProjectSynchronizer
 import org.jetbrains.annotations.Nls
 import org.stepik.core.StepikProjectManager
 import org.stepik.core.StudyProjectComponent
+import org.stepik.core.common.Loggable
 import org.stepik.core.core.EduNames
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.icons.AllStepikIcons
@@ -39,7 +39,7 @@ import javax.swing.JPanel
 
 internal class StepikPyProjectGenerator private constructor() :
         PythonProjectGenerator<PyNewProjectSettings>(true),
-        StepikAuthManagerListener {
+        StepikAuthManagerListener, Loggable {
     private val generator: StepikProjectGenerator = StepikProjectGenerator
     private val wizardStep: PyCharmWizardStep = PyCharmWizardStep(this)
     private val project: Project = DefaultProjectFactory.getInstance().defaultProject
@@ -192,7 +192,6 @@ internal class StepikPyProjectGenerator private constructor() :
     }
 
     companion object {
-        private val logger = Logger.getInstance(StepikPyProjectGenerator::class.java)
         private const val MODULE_NAME = "Stepik"
     }
 }

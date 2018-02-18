@@ -9,7 +9,6 @@ import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.DataProvider
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.fileEditor.FileEditorManagerListener
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ComboBox
@@ -22,6 +21,7 @@ import org.stepik.core.StepikProjectManager
 import org.stepik.core.StudyBasePluginConfigurator
 import org.stepik.core.StudyUtils
 import org.stepik.core.SupportedLanguages
+import org.stepik.core.common.Loggable
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.StepType
 import org.stepik.core.courseFormat.StudyNode
@@ -279,8 +279,7 @@ class StudyToolWindow internal constructor() :
         }
     }
 
-    companion object {
-        private val logger = Logger.getInstance(StudyToolWindow::class.java)
+    companion object : Loggable {
         private const val STEP_INFO_ID = "stepInfo"
         private const val EMPTY_STEP_TEXT = "Please, open any step to see step description"
         private val executor = Executors.newSingleThreadExecutor()
@@ -288,7 +287,7 @@ class StudyToolWindow internal constructor() :
         private fun getActionGroup(project: Project): DefaultActionGroup {
             val group = DefaultActionGroup()
             if (!StepikProjectManager.isStepikProject(project)) {
-                logger.warn(project.name + " is not Stepik-project")
+                logger.warn("${project.name} is not Stepik-project")
                 return group
             }
             val configurator = StudyUtils.getConfigurator(project)

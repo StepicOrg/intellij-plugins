@@ -1,18 +1,17 @@
 package org.stepik.core.utils
 
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.module.ModifiableModuleModel
 import com.intellij.openapi.module.ModuleWithNameAlreadyExists
 import com.intellij.openapi.options.ConfigurationException
 import com.intellij.openapi.project.Project
 import org.jdom.JDOMException
+import org.stepik.core.common.Loggable
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.projectWizard.idea.StepModuleBuilder
 import java.io.IOException
 
 
-internal object ModuleUtils {
-    private val logger = Logger.getInstance(ModuleUtils::class.java)
+internal object ModuleUtils : Loggable {
 
     fun createStepModule(
             project: Project,

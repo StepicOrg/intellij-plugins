@@ -2,7 +2,6 @@ package org.stepik.core.actions.step
 
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.ApplicationManager.getApplication
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
 import org.stepik.api.client.StepikApiClient
@@ -12,6 +11,7 @@ import org.stepik.api.objects.submissions.Submissions
 import org.stepik.core.SupportedLanguages
 import org.stepik.core.actions.SendAction.checkStepStatus
 import org.stepik.core.actions.getShortcutText
+import org.stepik.core.common.Loggable
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.icons.AllStepikIcons
 import org.stepik.core.metrics.Metrics
@@ -65,8 +65,7 @@ class StepikSendAction : CodeQuizAction(TEXT, DESCRIPTION, AllStepikIcons.ToolWi
 
     override fun getActionId() = ACTION_ID
 
-    companion object {
-        private val logger = Logger.getInstance(StepikSendAction::class.java)
+    companion object : Loggable {
         private const val ACTION_ID = "STEPIC.StepikSendAction"
         private const val SHORTCUT = "ctrl alt pressed ENTER"
         private val SHORTCUT_TEXT = getShortcutText(SHORTCUT)

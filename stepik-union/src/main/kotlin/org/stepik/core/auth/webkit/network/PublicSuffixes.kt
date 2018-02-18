@@ -1,6 +1,6 @@
 package org.stepik.core.auth.webkit.network
 
-import com.intellij.openapi.diagnostic.Logger
+import org.stepik.core.common.Loggable
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
@@ -29,8 +29,7 @@ private constructor() {
         EXCEPTION_RULE
     }
 
-    companion object {
-        private val logger = Logger.getInstance(PublicSuffixes::class.java)
+    companion object : Loggable {
         /**
          * The mapping from domain names to public suffix list rules.
          */

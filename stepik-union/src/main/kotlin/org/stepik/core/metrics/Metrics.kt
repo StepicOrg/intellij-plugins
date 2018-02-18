@@ -1,12 +1,12 @@
 package org.stepik.core.metrics
 
 import com.intellij.openapi.application.ApplicationInfo
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import org.stepik.api.client.StepikApiClient
 import org.stepik.api.objects.metrics.Metric
 import org.stepik.core.StepikProjectManager
 import org.stepik.core.SupportedLanguages
+import org.stepik.core.common.Loggable
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.StudyNode
 import org.stepik.core.metrics.MetricsStatus.SUCCESSFUL
@@ -19,8 +19,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 
-object Metrics {
-    private val logger = Logger.getInstance(Metrics::class.java)
+object Metrics : Loggable {
     private val session = UUID.randomUUID().toString()
     private val executor = Executors.newScheduledThreadPool(1)
 

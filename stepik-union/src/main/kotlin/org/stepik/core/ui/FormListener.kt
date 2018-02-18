@@ -2,7 +2,6 @@ package org.stepik.core.ui
 
 import com.intellij.execution.ui.ConsoleViewContentType
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import javafx.application.Platform
 import javafx.stage.FileChooser
@@ -10,6 +9,7 @@ import org.stepik.api.objects.ObjectsContainer
 import org.stepik.core.StepikProjectManager
 import org.stepik.core.StudyUtils
 import org.stepik.core.actions.SendAction
+import org.stepik.core.common.Loggable
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.StepType
 import org.stepik.core.stepik.StepikAuthManager
@@ -40,9 +40,8 @@ internal class FormListener(private val project: Project, private val browser: S
         }
     }
 
-    companion object {
+    companion object : Loggable {
         const val EVENT_TYPE_SUBMIT = "submit"
-        private val logger = Logger.getInstance(FormListener::class.java)
 
         private fun getDataFromFile(stepNode: StepNode, project: Project): String? {
             val fileChooser = FileChooser()

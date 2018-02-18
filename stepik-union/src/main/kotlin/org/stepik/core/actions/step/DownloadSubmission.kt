@@ -5,7 +5,6 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ApplicationManager.getApplication
 import com.intellij.openapi.command.CommandProcessor
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.progress.ProgressIndicator
@@ -230,7 +229,6 @@ class DownloadSubmission : CodeQuizAction(TEXT, DESCRIPTION, AllStepikIcons.Tool
     }
 
     companion object {
-        private val logger = Logger.getInstance(DownloadSubmission::class.java)
         private const val ACTION_ID = "STEPIK.DownloadSubmission"
         private const val SHORTCUT = "ctrl alt pressed PAGE_DOWN"
         private val SHORTCUT_TEXT = getShortcutText(SHORTCUT)

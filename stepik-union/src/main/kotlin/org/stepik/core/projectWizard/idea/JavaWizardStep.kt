@@ -2,17 +2,18 @@ package org.stepik.core.projectWizard.idea
 
 import com.intellij.ide.util.projectWizard.ModuleWizardStep
 import com.intellij.ide.wizard.CommitStepException
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.options.ConfigurationException
 import com.intellij.openapi.project.Project
 import org.stepik.api.objects.StudyObject
+import org.stepik.core.common.Loggable
 import org.stepik.core.projectWizard.ProjectWizardUtils
 import org.stepik.core.projectWizard.StepikProjectGenerator
 import org.stepik.core.projectWizard.ui.ProjectSettingsPanel
 import org.stepik.core.stepik.StepikAuthManager.authentication
 import org.stepik.core.stepik.StepikAuthState.AUTH
 
-internal class JavaWizardStep(private val generator: StepikProjectGenerator, private val project: Project) : ModuleWizardStep() {
+internal class JavaWizardStep(private val generator: StepikProjectGenerator,
+                              private val project: Project) : ModuleWizardStep(), Loggable {
     private val panel: ProjectSettingsPanel = ProjectSettingsPanel(true)
     private var valid: Boolean = false
     private var leaving: Boolean = false
@@ -72,9 +73,5 @@ internal class JavaWizardStep(private val generator: StepikProjectGenerator, pri
 
         val messageTemplate = "Leaving step the project wizard with the selected study object: type=%s, id = %s, name = %s"
         logger.info(String.format(messageTemplate, studyObject.javaClass.simpleName, id, studyObject.title))
-    }
-
-    companion object {
-        private val logger = Logger.getInstance(JavaWizardStep::class.java)
     }
 }

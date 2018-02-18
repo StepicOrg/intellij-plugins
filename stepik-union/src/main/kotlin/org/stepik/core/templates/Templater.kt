@@ -1,15 +1,14 @@
 package org.stepik.core.templates
 
-import com.intellij.openapi.diagnostic.Logger
 import freemarker.template.Configuration
 import freemarker.template.TemplateException
+import org.stepik.core.common.Loggable
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.io.PrintWriter
 
 
-object Templater {
-    private val logger = Logger.getInstance(Templater::class.java)
+object Templater : Loggable {
     private var config: Configuration? = null
 
     fun processTemplate(templateName: String, map: Map<String, Any?>): String {

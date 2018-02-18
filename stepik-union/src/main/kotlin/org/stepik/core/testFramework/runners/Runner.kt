@@ -7,6 +7,7 @@ import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Computable
 import com.intellij.openapi.vfs.VirtualFile
+import org.stepik.core.common.Loggable
 import org.stepik.core.core.EduNames
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.testFramework.createDirectory
@@ -19,7 +20,7 @@ import java.io.InputStream
 import java.io.PrintStream
 import java.util.concurrent.TimeUnit
 
-interface Runner {
+interface Runner : Loggable {
 
     fun updateRunConfiguration(project: Project, stepNode: StepNode) {
         ApplicationManager.getApplication().invokeLater {
@@ -89,8 +90,8 @@ interface Runner {
         return stepDirectory.let {
             return@let it.findChild(EduNames.SRC)
         }?.let {
-            return@let it.findChild(stepNode.currentLang.mainFileName)
-        } ?: return null
+                    return@let it.findChild(stepNode.currentLang.mainFileName)
+                } ?: return null
     }
 
     fun testFiles(project: Project, stepNode: StepNode): TestResult {
@@ -109,20 +110,20 @@ interface Runner {
         val testFile = stepDirectory.let {
             return@let it.findFileByRelativePath(listOf("tests", language.langName).joinToString("/"))
         }?.let {
-            return@let it.findChild(testFileName)
-        }
+                    return@let it.findChild(testFileName)
+                }
 
         val mainFile = getMainFilePath(project, stepNode) ?: return null
 
         val targetFilePath = stepDirectory.let {
-            val OUT = "out"
-            return@let it.findChild(OUT) ?: createDirectory(application, it, OUT)
+            val out = "out"
+            return@let it.findChild(out) ?: createDirectory(application, it, out)
         }?.let {
-            val OUT = language.langName
-            return@let it.findChild(OUT) ?: createDirectory(application, it, OUT)
-        }?.let {
-            return@let it.findChild(testFileName) ?: createFile(application, it, testFileName)
-        } ?: return null
+                    val out = language.langName
+                    return@let it.findChild(out) ?: createDirectory(application, it, out)
+                }?.let {
+                    return@let it.findChild(testFileName) ?: createFile(application, it, testFileName)
+                } ?: return null
 
         val documentManager = FileDocumentManager.getInstance()
         val text = application.runReadAction(Computable<String> {

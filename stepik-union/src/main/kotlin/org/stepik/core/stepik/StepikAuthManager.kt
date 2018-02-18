@@ -6,7 +6,6 @@ import com.intellij.ide.passwordSafe.PasswordSafe
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.util.net.HttpConfigurable
 import org.stepik.api.client.HttpTransportClient
@@ -16,6 +15,7 @@ import org.stepik.api.objects.auth.TokenInfo
 import org.stepik.api.objects.users.User
 import org.stepik.core.StepikProjectManager
 import org.stepik.core.auth.ui.AuthDialog
+import org.stepik.core.common.Loggable
 import org.stepik.core.metrics.Metrics
 import org.stepik.core.metrics.MetricsStatus.SUCCESSFUL
 import org.stepik.core.stepik.StepikAuthState.AUTH
@@ -30,8 +30,7 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executors
 import javax.swing.SwingUtilities
 
-object StepikAuthManager {
-    private val logger = Logger.getInstance(StepikAuthManager::class.java)
+object StepikAuthManager : Loggable {
     private const val CLIENT_ID = "vV8giW7KTPMOTriOUBwyGLvXbKV0Cc4GPBnyCJPd"
     private const val CLIENT_ID_PASSWORD_BASED = "MVo2c17mATXWfBUdmP5oCsFrUB7RtCYqOvUmng90"
     private const val LAST_USER_PROPERTY_NAME = PluginUtils.PLUGIN_ID + ".LAST_USER"

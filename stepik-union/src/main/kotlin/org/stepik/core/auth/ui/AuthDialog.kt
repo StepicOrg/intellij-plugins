@@ -41,29 +41,33 @@ class AuthDialog private constructor() : JDialog(null as Frame?, true) {
     private var url: String? = null
     private var engine: WebEngine? = null
     private var progressBar: Node? = null
-    private var panel: JFXPanel? = null
+    private val panel: JFXPanel
 
     init {
         title = "Authorize"
         size = Dimension(640, 480)
         setLocationRelativeTo(null)
         layout = BorderLayout()
-        setPanel(JFXPanel())
+        panel = JFXPanel()
         Platform.setImplicitExit(false)
         Platform.runLater {
             val pane = BorderPane()
             val toolPane = HBox()
-            toolPane.spacing = 5.0
-            toolPane.alignment = Pos.CENTER_LEFT
+            toolPane.apply {
+                spacing = 5.0
+                alignment = Pos.CENTER_LEFT
+            }
             val webComponent = WebView()
             engine = webComponent.engine
             progressBar = makeProgressBarWithListener()
-            pane.top = toolPane
-            pane.center = webComponent
-            val scene = Scene(pane)
-            panel!!.scene = scene
-            panel!!.isVisible = true
-
+            pane.apply {
+                top = toolPane
+                center = webComponent
+            }
+            panel.apply {
+                scene = Scene(pane)
+                isVisible = true
+            }
             val backButton = makeGoBackButton()
             addButtonsAvailabilityListeners(backButton)
             val homeButton = makeHomeButton()
@@ -76,7 +80,7 @@ class AuthDialog private constructor() : JDialog(null as Frame?, true) {
             url = StepikAuthManager.implicitGrantUrl
             engine!!.load(url)
         }
-        add(panel!!, BorderLayout.CENTER)
+        add(panel, BorderLayout.CENTER)
         defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
     }
 
@@ -211,10 +215,6 @@ class AuthDialog private constructor() : JDialog(null as Frame?, true) {
                 })
 
         return progress
-    }
-
-    private fun setPanel(panel: JFXPanel) {
-        this.panel = panel
     }
 
     companion object {

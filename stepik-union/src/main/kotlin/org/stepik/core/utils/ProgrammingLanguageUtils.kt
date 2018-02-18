@@ -2,7 +2,6 @@ package org.stepik.core.utils
 
 import com.intellij.ide.projectView.ProjectView
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
@@ -16,6 +15,7 @@ import org.stepik.api.exceptions.StepikClientException
 import org.stepik.api.queries.Order
 import org.stepik.core.StudyUtils
 import org.stepik.core.SupportedLanguages
+import org.stepik.core.common.Loggable
 import org.stepik.core.core.EduNames
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.metrics.Metrics
@@ -27,8 +27,7 @@ import org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcPsiDirectory
 import java.io.IOException
 import java.util.*
 
-object ProgrammingLanguageUtils {
-    private val logger = Logger.getInstance(ProgrammingLanguageUtils::class.java)
+object ProgrammingLanguageUtils : Loggable {
 
     fun switchProgrammingLanguage(
             project: Project,

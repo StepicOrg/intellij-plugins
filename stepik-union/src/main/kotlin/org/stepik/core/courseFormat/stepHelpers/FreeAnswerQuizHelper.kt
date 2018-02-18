@@ -1,6 +1,5 @@
 package org.stepik.core.courseFormat.stepHelpers
 
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import org.stepik.api.exceptions.StepikClientException
 import org.stepik.core.courseFormat.StepNode
@@ -127,9 +126,5 @@ class FreeAnswerQuizHelper(project: Project, stepNode: StepNode) : StringQuizHel
 
     fun hasAction(): Boolean {
         return needReview() || needSendSubmission()
-    }
-
-    companion object {
-        private val logger = Logger.getInstance(FreeAnswerQuizHelper::class.java)
     }
 }

@@ -1,6 +1,5 @@
 package org.stepik.core.courseFormat.stepHelpers
 
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import org.stepik.api.client.StepikApiClient
 import org.stepik.api.exceptions.StepikClientException
@@ -263,7 +262,6 @@ open class QuizHelper(project: Project, stepNode: StepNode) : StepHelper(project
     }
 
     companion object {
-        private val logger = Logger.getInstance(QuizHelper::class.java)
         private const val ACTIVE = "active"
         private const val UNCHECKED = "unchecked"
     }

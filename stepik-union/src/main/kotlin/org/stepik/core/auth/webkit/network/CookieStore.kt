@@ -6,13 +6,13 @@ import com.google.gson.reflect.TypeToken
 import com.intellij.credentialStore.CredentialAttributes
 import com.intellij.credentialStore.Credentials
 import com.intellij.ide.passwordSafe.PasswordSafe
-import com.intellij.openapi.diagnostic.Logger
+import org.stepik.core.common.Loggable
 import java.util.*
 
 /**
  * A cookie store.
  */
-internal class CookieStore {
+internal class CookieStore : Loggable {
 
     private val bucketsType = object : TypeToken<Map<String, Set<Cookie>>>() {
 
@@ -271,7 +271,6 @@ internal class CookieStore {
     }
 
     companion object {
-        private val logger = Logger.getInstance(CookieStore::class.java)
         private const val MAX_BUCKET_SIZE = 50
         private const val TOTAL_COUNT_LOWER_THRESHOLD = 3000
         private const val TOTAL_COUNT_UPPER_THRESHOLD = 4000

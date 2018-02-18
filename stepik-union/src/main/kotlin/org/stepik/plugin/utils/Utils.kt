@@ -1,6 +1,5 @@
 package org.stepik.plugin.utils
 
-import com.intellij.openapi.diagnostic.Logger
 import org.intellij.lang.annotations.Language
 import org.stepik.api.client.StepikApiClient
 import org.stepik.api.exceptions.StepikClientException
@@ -14,6 +13,7 @@ import org.stepik.api.objects.sections.Section
 import org.stepik.api.objects.sections.Sections
 import org.stepik.api.objects.units.Unit
 import org.stepik.api.objects.units.Units
+import org.stepik.core.common.Loggable
 import org.stepik.core.projectWizard.EMPTY_STUDY_OBJECT
 import org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient
 import org.stepik.core.templates.Templater
@@ -23,8 +23,8 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 
-object Utils {
-    private val logger = Logger.getInstance(Utils::class.java)
+object Utils : Loggable {
+
     @Language("HTML")
     private val DEFAULT_DESCRIPTION = "<b>A course does not selected.</b><br>" +
             "<ul>" +

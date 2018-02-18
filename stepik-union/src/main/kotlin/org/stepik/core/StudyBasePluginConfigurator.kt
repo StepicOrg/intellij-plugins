@@ -1,7 +1,6 @@
 package org.stepik.core
 
 import com.intellij.openapi.actionSystem.DefaultActionGroup
-import com.intellij.openapi.fileEditor.FileEditorManagerAdapter
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent
 import com.intellij.openapi.fileEditor.FileEditorManagerListener
 import com.intellij.openapi.project.Project
@@ -18,7 +17,7 @@ abstract class StudyBasePluginConfigurator : StudyPluginConfigurator {
     }
 
     override fun getFileEditorManagerListener(project: Project): FileEditorManagerListener {
-        return object : FileEditorManagerAdapter() {
+        return object : FileEditorManagerListener {
             override fun selectionChanged(event: FileEditorManagerEvent) {
                 val file = event.newFile ?: return
 
