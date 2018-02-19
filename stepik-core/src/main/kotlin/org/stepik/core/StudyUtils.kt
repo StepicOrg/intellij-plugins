@@ -15,6 +15,7 @@ import org.stepik.core.ui.StudyToolWindowFactory
 import org.stepik.core.utils.ProjectFilesUtils
 import java.util.regex.Pattern
 
+
 object StudyUtils : Loggable {
     private const val PATH_PATTERN = "^(?:(?:section([0-9]+)/lesson([0-9]+)/step([0-9]+))|" +
             "(?:lesson([0-9]+)/step([0-9]+))|" +

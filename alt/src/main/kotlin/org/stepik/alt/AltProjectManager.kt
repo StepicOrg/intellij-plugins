@@ -9,6 +9,11 @@ import org.stepik.core.serialization.StudySerializationUtils
 
 @State(name = "AltSettings", storages = arrayOf(Storage("alt_project.xml")))
 class AltProjectManager @JvmOverloads constructor(project: Project? = null) : BaseProjectManager(project) {
+
+    init {
+        version = getCurrentVersion()
+    }
+
     override fun getVersion(state: Element): Int {
         return StudySerializationUtils.getVersion(state, getMainElement())
     }

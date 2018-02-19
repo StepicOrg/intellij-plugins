@@ -11,6 +11,11 @@ import org.stepik.plugin.serialization.SerializationUtils.MAIN_ELEMENT
 
 @State(name = "StepikStudySettings", storages = arrayOf(Storage("stepik_study_project.xml")))
 class StepikProjectManager @JvmOverloads constructor(project: Project? = null) : BaseProjectManager(project) {
+
+    init {
+        version = getCurrentVersion()
+    }
+
     override fun getVersion(state: Element): Int {
         return StudySerializationUtils.getVersion(state, MAIN_ELEMENT)
     }
