@@ -68,8 +68,11 @@ abstract class BaseProjectManager constructor(@field:XStreamOmitField val projec
             return data != null && data.isAdaptive
         }
 
-    override var projectRoot: StudyNode<*, *>? = null
+    override var projectRoot: StudyNode<*, *>?
         get() = root
+        set(value) {
+            root = value
+        }
 
     init {
         StepikAuthManager.addListener(this)
@@ -145,7 +148,7 @@ abstract class BaseProjectManager constructor(@field:XStreamOmitField val projec
 
             myState = migrate(version, myState)
 
-            val xml = elementToXml(myState, getMainElement())
+            val xml = elementToXml(myState, javaClass.simpleName)
             xStream.fromXML(xml, this)
 
             this.version = getCurrentVersion()
@@ -156,8 +159,6 @@ abstract class BaseProjectManager constructor(@field:XStreamOmitField val projec
             logger.warn("Failed deserialization StepikProjectManager \n${e.message}\n$project")
         }
     }
-
-    abstract fun getMainElement(): String
 
     private fun refreshCourse() {
         if (project == null || root == null) {

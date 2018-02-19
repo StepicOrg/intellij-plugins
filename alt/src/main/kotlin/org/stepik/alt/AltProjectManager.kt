@@ -15,10 +15,8 @@ class AltProjectManager @JvmOverloads constructor(project: Project? = null) : Ba
     }
 
     override fun getVersion(state: Element): Int {
-        return StudySerializationUtils.getVersion(state, getMainElement())
+        return StudySerializationUtils.getVersion(state, javaClass.simpleName)
     }
-
-    override fun getMainElement() = "AltStepikProject"
 
     override fun getCurrentVersion() = 1
 }
