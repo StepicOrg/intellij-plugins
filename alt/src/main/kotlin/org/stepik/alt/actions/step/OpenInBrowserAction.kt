@@ -9,4 +9,10 @@ class OpenInBrowserAction : AbstractOpenInBrowserAction() {
     override fun getLink(project: Project, stepNode: StudyNode<*, *>): String {
         return Urls.ALT_URL
     }
+
+    override fun getActionId() = ACTION_ID
+
+    companion object {
+        private const val ACTION_ID = "Alt.OpenInBrowser"
+    }
 }
