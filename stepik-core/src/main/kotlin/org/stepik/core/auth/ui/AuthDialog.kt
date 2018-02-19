@@ -51,6 +51,9 @@ class AuthDialog private constructor() : JDialog(null as Frame?, true) {
         panel = JFXPanel()
         Platform.setImplicitExit(false)
         Platform.runLater {
+            val webComponent = WebView()
+            engine = webComponent.engine
+
             val backButton = makeGoBackButton()
             addButtonsAvailabilityListeners(backButton)
             progressBar = makeProgressBarWithListener()
@@ -62,8 +65,6 @@ class AuthDialog private constructor() : JDialog(null as Frame?, true) {
                 padding = Insets(5.0)
             }
 
-            val webComponent = WebView()
-
             val pane = BorderPane().apply {
                 top = toolPane
                 center = webComponent
@@ -74,7 +75,6 @@ class AuthDialog private constructor() : JDialog(null as Frame?, true) {
                 isVisible = true
             }
 
-            engine = webComponent.engine
             engine!!.userAgent = StepikAuthManager.userAgent
             url = StepikAuthManager.implicitGrantUrl
             engine!!.load(url)
