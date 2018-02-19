@@ -32,6 +32,8 @@ dependencies {
     compile project(":stepik-java-api")
     compile project(":stepik-core")
     compile 'org.freemarker:freemarker:2.3.23'
+
+    testCompile project(':stepik-core').sourceSets.test.output
 }
 
 group 'org.stepik'

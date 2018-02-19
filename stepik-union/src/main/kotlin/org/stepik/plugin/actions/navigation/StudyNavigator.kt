@@ -9,9 +9,7 @@ object StudyNavigator {
             currentNode: StudyNode<*, *>?,
             direction: Direction): StudyNode<*, *>? {
 
-        if (currentNode == null) {
-            return null
-        }
+        currentNode ?: return null
 
         val parent = currentNode.parent
 

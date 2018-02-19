@@ -1,4 +1,4 @@
-<idea-plugin version="2">
+<idea-plugin>
     <id>org.stepik.plugin.union</id>
     <name>Stepik Union</name>
     <version>SNAPSHOT</version>
@@ -12,7 +12,7 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <applicationConfigurable instance="org.stepik.core.ui.StepikSettingsConfigurable"/>
-        <moduleType id="STEPIK_MODULE_TYPE" implementationClass="org.stepik.core.projectWizard.idea.StepikModuleType"/>
+        <moduleType id="STEPIK_MODULE_TYPE" implementationClass="org.stepik.plugin.projectWizard.idea.StepikModuleType"/>
     </extensions>
 
     <extensions defaultExtensionNs="org.stepik.plugin.union">
@@ -49,7 +49,7 @@
         <toolWindow id="Stepik Test" anchor="bottom"
                     factoryClass="org.stepik.core.testFramework.toolWindow.StepikTestToolWindowFactory"
                     conditionClass="org.stepik.core.testFramework.toolWindow.StudyCondition"/>
-        <projectService serviceInterface="org.stepik.core.StepikProjectManager"
-                        serviceImplementation="org.stepik.core.StepikProjectManager"/>
+        <projectService serviceInterface="org.stepik.core.ProjectManager"
+                        serviceImplementation="org.stepik.plugin.StepikProjectManager"/>
     </extensions>
 </idea-plugin>

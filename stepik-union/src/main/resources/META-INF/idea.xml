@@ -1,14 +1,14 @@
-<idea-plugin version="2">
+<idea-plugin>
     <extensions defaultExtensionNs="com.intellij">
         <treeStructureProvider implementation="org.stepik.core.projectView.idea.IdeaTreeStructureProvider"/>
         <navbar implementation="org.stepik.core.projectView.idea.IdeaNavBarModelExtension"/>
-        <refactoring.moveHandler implementation="org.stepik.plugin.refactoring.impl.idea.move.MoveHandlerDelegate"
+        <refactoring.moveHandler implementation="org.stepik.core.refactoring.impl.idea.move.MoveHandlerDelegate"
                                  order="first"/>
         <renamePsiElementProcessor
-                implementation="org.stepik.plugin.refactoring.impl.idea.rename.RenamePsiElementProcessor"
+                implementation="org.stepik.core.refactoring.impl.idea.rename.RenamePsiElementProcessor"
                 order="first"/>
         <refactoring.safeDeleteProcessor
-                implementation="org.stepik.plugin.refactoring.impl.idea.safeDelete.SafeDeleteProcessorDelegate"
+                implementation="org.stepik.core.refactoring.impl.idea.safeDelete.SafeDeleteProcessorDelegate"
                 order="first"/>
     </extensions>
 </idea-plugin>
