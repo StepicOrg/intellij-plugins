@@ -66,7 +66,7 @@ object StudyUtils : Loggable {
     fun getStudyNode(project: Project, nodeVF: VirtualFile): StudyNode<*, *>? {
         val path = getRelativePath(project, nodeVF)
         val projectManager = getService(project, ProjectManager::class.java)
-        val root = projectManager.projectRoot ?: return null
+        val root = projectManager?.projectRoot ?: return null
 
         return getStudyNode(root, path)
     }
@@ -142,6 +142,7 @@ object StudyUtils : Loggable {
         if (project == null) {
             return false
         }
-        return getService(project, ProjectManager::class.java) != null
+        val projectManager = getService(project, ProjectManager::class.java)
+        return projectManager?.projectRoot != null
     }
 }

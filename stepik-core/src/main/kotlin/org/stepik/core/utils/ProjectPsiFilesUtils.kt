@@ -51,7 +51,7 @@ object ProjectPsiFilesUtils {
         val project = element.project
 
         val projectManager = getService(project, ProjectManager::class.java)
-        val root = projectManager.projectRoot ?: return false
+        val root = projectManager?.projectRoot ?: return false
 
         if (notAccept(element, acceptableClasses)) {
             return false

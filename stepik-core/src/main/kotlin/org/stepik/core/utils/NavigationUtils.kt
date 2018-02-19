@@ -51,7 +51,9 @@ object NavigationUtils {
         }
         Metrics.navigateAction(project, targetNode)
         val projectManager = getService(project, ProjectManager::class.java)
-        projectManager.selected = targetNode
+        if (projectManager != null) {
+            projectManager.selected = targetNode
+        }
 
         val runToolWindow = ToolWindowManager.getInstance(project).getToolWindow(ToolWindowId.RUN)
         if (runToolWindow != null) {

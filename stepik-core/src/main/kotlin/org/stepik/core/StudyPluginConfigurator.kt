@@ -29,7 +29,7 @@ interface StudyPluginConfigurator {
 
     fun nextAction(node: StepNode): StudyNode<*, *>?
 
-    fun getProjectGenerator(): ProjectGenerator
+    fun getProjectGenerator(): ProjectGenerator?
 
     companion object {
         val EP_NAME = ExtensionPointName.create<StudyPluginConfigurator>(
@@ -37,7 +37,7 @@ interface StudyPluginConfigurator {
 
     }
 
-    fun getStepModuleBuilder(moduleDir: String, step: StepNode): BaseModuleBuilder
-    fun getSandboxModuleBuilder(path: String): BaseModuleBuilder
+    fun getStepModuleBuilder(moduleDir: String, step: StepNode): BaseModuleBuilder?
+    fun getSandboxModuleBuilder(path: String): BaseModuleBuilder?
 }
 

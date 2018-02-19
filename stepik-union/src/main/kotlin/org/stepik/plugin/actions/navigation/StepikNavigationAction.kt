@@ -1,6 +1,7 @@
 package org.stepik.plugin.actions.navigation
 
 import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.components.ServiceManager.getService
 import com.intellij.openapi.project.Project
 import org.stepik.core.actions.navigation.StudyStepNavigationAction
 import org.stepik.core.courseFormat.StudyNode
@@ -11,7 +12,7 @@ abstract class StepikNavigationAction(text: String?, description: String?, icon:
         StudyStepNavigationAction(text, description, icon) {
 
     override fun isEnabled(project: Project, enabled: Boolean, selected: StudyNode<*, *>?, target: StudyNode<*, *>?): Boolean {
-        val projectManager = ServiceManager.getService(project, StepikProjectManager::class.java)
+        val projectManager = getService(project, StepikProjectManager::class.java)
         if (projectManager?.isAdaptive == true) {
             return enabled && selected != null && target?.parent === selected.parent
         }

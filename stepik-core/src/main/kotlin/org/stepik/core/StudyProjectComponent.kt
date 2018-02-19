@@ -5,6 +5,7 @@ import com.intellij.openapi.actionSystem.KeyboardShortcut
 import com.intellij.openapi.application.ApplicationManager.getApplication
 import com.intellij.openapi.components.ProjectComponent
 import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.components.ServiceManager.getService
 import com.intellij.openapi.keymap.Keymap
 import com.intellij.openapi.keymap.ex.KeymapManagerEx
 import com.intellij.openapi.module.ModuleManager
@@ -26,7 +27,7 @@ class StudyProjectComponent private constructor(private val project: Project) : 
     private val deletedShortcuts = HashMap<Keymap, MutableList<Pair<String, String>>>()
 
     override fun projectOpened() {
-        val projectManager = ServiceManager.getService(project, ProjectManager::class.java) ?: return
+        val projectManager = getService(project, ProjectManager::class.java) ?: return
 
         Platform.setImplicitExit(false)
 

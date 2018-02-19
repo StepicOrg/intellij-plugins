@@ -1,7 +1,9 @@
-package org.stepik.plugin
+package org.stepik.alt
 
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.project.Project
+import org.stepik.alt.actions.navigation.StepikNextStepAction
+import org.stepik.alt.actions.step.OpenInBrowserAction
 import org.stepik.core.ProjectGenerator
 import org.stepik.core.StudyBasePluginConfigurator
 import org.stepik.core.StudyUtils.isStepikProject
@@ -13,29 +15,22 @@ import org.stepik.core.actions.step.TestSamplesAction
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.StudyNode
 import org.stepik.core.projectWizard.idea.BaseModuleBuilder
-import org.stepik.plugin.actions.navigation.StepikNextStepAction
-import org.stepik.plugin.actions.navigation.StepikPreviousStepAction
-import org.stepik.plugin.actions.navigation.StudyNavigator
-import org.stepik.plugin.actions.step.OpenInBrowserAction
-import org.stepik.plugin.projectWizard.StepikProjectGenerator
-import org.stepik.plugin.projectWizard.idea.SandboxModuleBuilder
-import org.stepik.plugin.projectWizard.idea.StepModuleBuilder
 
 class StepikPluginConfigurator : StudyBasePluginConfigurator() {
     override fun getSandboxModuleBuilder(path: String): BaseModuleBuilder? {
-        return SandboxModuleBuilder(path)
+        return null
     }
 
     override fun getStepModuleBuilder(moduleDir: String, step: StepNode): BaseModuleBuilder? {
-        return StepModuleBuilder(moduleDir, step)
+        return null
     }
 
     override fun getProjectGenerator(): ProjectGenerator? {
-        return StepikProjectGenerator
+        return null
     }
 
     override fun nextAction(node: StepNode): StudyNode<*, *>? {
-        return StudyNavigator.nextLeaf(node)
+        return StepikNextStepAction.getNextStep()
     }
 
     override fun getActionGroup(project: Project): DefaultActionGroup {
@@ -43,7 +38,6 @@ class StepikPluginConfigurator : StudyBasePluginConfigurator() {
         group.addAll(
                 StepikSendAction(),
                 TestSamplesAction(),
-                StepikPreviousStepAction(),
                 StepikNextStepAction(),
                 StepikResetStepAction(),
                 DownloadSubmission(),

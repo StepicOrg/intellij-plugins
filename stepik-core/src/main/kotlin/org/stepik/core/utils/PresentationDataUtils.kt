@@ -9,6 +9,7 @@ import com.intellij.ui.JBColor
 import com.intellij.ui.SimpleTextAttributes
 import org.stepik.core.ProjectManager
 import org.stepik.core.StudyUtils.getStudyNode
+import org.stepik.core.StudyUtils.isStepikProject
 import org.stepik.core.core.EduNames
 import org.stepik.core.courseFormat.StudyNode
 import org.stepik.core.icons.AllStepikIcons
@@ -24,8 +25,9 @@ object PresentationDataUtils {
     fun updatePresentationData(data: PresentationData, psiDirectory: PsiDirectory) {
         val project = psiDirectory.project
 
-        val projectManager = getService(project, ProjectManager::class.java)
-        projectManager.projectRoot ?: return
+        if (!isStepikProject(project)) {
+            return
+        }
 
         var path = getRelativePath(psiDirectory)
         if (isSandbox(path)) {

@@ -2,6 +2,7 @@ package org.stepik.core
 
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.components.ServiceManager.getService
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent
 import com.intellij.openapi.fileEditor.FileEditorManagerListener
 import com.intellij.openapi.project.Project
@@ -25,7 +26,7 @@ abstract class StudyBasePluginConfigurator : StudyPluginConfigurator {
                 val stepNode = StudyUtils.getStudyNode(project, file)
 
                 if (stepNode != null) {
-                    val projectManager = ServiceManager.getService(project, ProjectManager::class.java)
+                    val projectManager = getService(project, ProjectManager::class.java) ?: return
                     projectManager.selected = stepNode
                 }
             }

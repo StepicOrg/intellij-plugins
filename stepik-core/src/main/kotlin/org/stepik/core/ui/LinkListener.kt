@@ -3,6 +3,7 @@ package org.stepik.core.ui
 import com.intellij.ide.BrowserUtil
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.components.ServiceManager.getService
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import javafx.scene.web.WebEngine
@@ -33,7 +34,7 @@ class LinkListener(val project: Project,
                    val engine: WebEngine) : EventListener, Loggable {
     private val protocolPattern = Pattern.compile("([a-z]+):(.*)")
     private val pattern = Pattern.compile("/lesson(?:/|/[^/]*-)(\\d+)/step/(\\d+).*")
-    private val projectManager = ServiceManager.getService(project, ProjectManager::class.java)
+    private val projectManager = getService(project, ProjectManager::class.java)
 
     override fun handleEvent(ev: Event) {
         if (ev.type == "click") {
@@ -71,7 +72,7 @@ class LinkListener(val project: Project,
     }
 
     private fun browseInnerLink(target: Element, link: String) {
-        val root = projectManager.projectRoot ?: return
+        val root = projectManager?.projectRoot ?: return
         val stepPath = target.getAttribute("data-step-path")
         val node = StudyUtils.getStudyNode(root, stepPath) as? StepNode ?: return
         val contentType = target.getAttribute("data-content-type")
@@ -148,11 +149,11 @@ class LinkListener(val project: Project,
                         if (reactions == null) {
                             logger.warn(e)
                         }
-                        projectManager.updateAdaptiveSelected()
+                        projectManager?.updateAdaptiveSelected()
                         browser.hideLoadAnimation()
                     }
         } else {
-            projectManager.updateAdaptiveSelected()
+            projectManager?.updateAdaptiveSelected()
             browser.hideLoadAnimation()
         }
     }
@@ -165,7 +166,7 @@ class LinkListener(val project: Project,
 
             val step: StepNode?
 
-            val root = projectManager.projectRoot
+            val root = projectManager?.projectRoot
             if (root != null) {
                 var lessonNode: LessonNode? = null
                 if (root is CourseNode) {

@@ -75,7 +75,7 @@ internal class FormListener(private val project: Project, private val browser: S
                         if (attempts != null) {
                             node.cleanLastReply()
                             val projectManager = getService(project, ProjectManager::class.java)
-                            projectManager.updateSelection()
+                            projectManager?.updateSelection()
                         } else {
                             logger.warn(e)
                         }
@@ -117,7 +117,7 @@ internal class FormListener(private val project: Project, private val browser: S
                         if (submissions == null) {
                             printError(e, resultWindow)
                             val projectManager = getService(project, ProjectManager::class.java)
-                            projectManager.updateSelection()
+                            projectManager?.updateSelection()
                             return@whenComplete
                         }
 
@@ -146,7 +146,7 @@ internal class FormListener(private val project: Project, private val browser: S
                 browser: StudyBrowserWindow,
                 form: HTMLFormElement) {
             val projectManager = getService(project, ProjectManager::class.java)
-            val root = projectManager.projectRoot ?: return
+            val root = projectManager?.projectRoot ?: return
 
             val node = StudyUtils.getStudyNode(root, form.action) as? StepNode ?: return
 

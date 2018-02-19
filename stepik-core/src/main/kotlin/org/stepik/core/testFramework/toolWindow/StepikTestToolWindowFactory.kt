@@ -2,6 +2,7 @@ package org.stepik.core.testFramework.toolWindow
 
 import com.intellij.execution.impl.ConsoleViewImpl
 import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.components.ServiceManager.getService
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent
@@ -15,8 +16,8 @@ import org.stepik.core.ProjectManager
 class StepikTestToolWindowFactory : ToolWindowFactory {
 
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
-        val projectManager = ServiceManager.getService(project, ProjectManager::class.java)
-        val currentTask = projectManager.selected
+        val projectManager = getService(project, ProjectManager::class.java)
+        val currentTask = projectManager?.selected
         if (currentTask != null) {
             val consoleView = ConsoleViewImpl(project, true)
             toolWindow.isToHideOnEmptyContent = true

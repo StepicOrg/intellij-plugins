@@ -24,4 +24,6 @@ public class Urls {
     public static final String UNITS = STEPIK_API_URL + "/units";
     public static final String USERS = STEPIK_API_URL + "/users";
     public static final String VIEWS = STEPIK_API_URL + "/views";
+
+    public static final String ALT_URL = "https://alt.stepik.org";
 }

@@ -37,7 +37,7 @@ class CourseModuleBuilder : AbstractModuleBuilder() {
         SandboxModuleBuilder(moduleDir).createModule(moduleModel)
 
         val projectManager = getService(project, ProjectManager::class.java)
-        val root = projectManager.projectRoot
+        val root = projectManager?.projectRoot
         if (root == null) {
             logger.info("Failed to generate builders: project root is null")
             return

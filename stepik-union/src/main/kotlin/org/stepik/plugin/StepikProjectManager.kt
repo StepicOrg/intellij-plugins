@@ -5,13 +5,14 @@ import com.intellij.openapi.components.Storage
 import com.intellij.openapi.project.Project
 import org.jdom.Element
 import org.stepik.core.BaseProjectManager
-import org.stepik.plugin.serialization.StudySerializationUtils
-import org.stepik.plugin.serialization.StudySerializationUtils.MAIN_ELEMENT
+import org.stepik.core.serialization.StudySerializationUtils
+import org.stepik.plugin.serialization.SerializationUtils
+import org.stepik.plugin.serialization.SerializationUtils.MAIN_ELEMENT
 
 @State(name = "StepikStudySettings", storages = arrayOf(Storage("stepik_study_project.xml")))
 class StepikProjectManager @JvmOverloads constructor(project: Project? = null) : BaseProjectManager(project) {
     override fun getVersion(state: Element): Int {
-        return StudySerializationUtils.getVersion(state)
+        return StudySerializationUtils.getVersion(state, MAIN_ELEMENT)
     }
 
     override fun getMainElement() = MAIN_ELEMENT
@@ -20,15 +21,15 @@ class StepikProjectManager @JvmOverloads constructor(project: Project? = null) :
         var myState = state
         when (version) {
             1 -> {
-                myState = StudySerializationUtils.convertToSecondVersion(myState)
-                myState = StudySerializationUtils.convertToThirdVersion(myState)
-                myState = StudySerializationUtils.convertToFourthVersion(myState)
+                myState = SerializationUtils.convertToSecondVersion(myState)
+                myState = SerializationUtils.convertToThirdVersion(myState)
+                myState = SerializationUtils.convertToFourthVersion(myState)
             }
             2 -> {
-                myState = StudySerializationUtils.convertToThirdVersion(myState)
-                myState = StudySerializationUtils.convertToFourthVersion(myState)
+                myState = SerializationUtils.convertToThirdVersion(myState)
+                myState = SerializationUtils.convertToFourthVersion(myState)
             }
-            3 -> myState = StudySerializationUtils.convertToFourthVersion(myState)
+            3 -> myState = SerializationUtils.convertToFourthVersion(myState)
         }//uncomment for future versions
         //case 4:
         //myState = StudySerializationUtils.convertToFifthVersion(myState);

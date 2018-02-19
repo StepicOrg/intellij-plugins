@@ -115,7 +115,7 @@ class StudyToolWindow internal constructor() :
             project.messageBus.connect().subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, listener)
         }
         val projectManager = getService(project, ProjectManager::class.java)
-        val stepNode = projectManager.selected
+        val stepNode = projectManager?.selected
         setStepNode(stepNode)
     }
 
