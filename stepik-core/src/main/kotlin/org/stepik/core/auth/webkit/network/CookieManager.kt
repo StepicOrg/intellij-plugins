@@ -49,7 +49,7 @@ class CookieManager : CookieHandler() {
             cookieList = store[canonicalize(host), uri.path, secureProtocol, httpApi]
         }
 
-        val cookies = cookieList!!.map { "${it.name}=${it.value}" }.joinToString { "; " }
+        val cookies = cookieList!!.joinToString("; ") { "${it.name}=${it.value}" }
 
         return if (cookies.isNotEmpty()) cookies else null
     }

@@ -134,7 +134,7 @@ internal class CookieStore : Loggable {
 
     fun save() {
         val attributes = CredentialAttributes(javaClass.name, "cookies", javaClass, false)
-        val cookies = buckets.map { it.key to it.value.values.toSet() }.toMap()
+        val cookies = buckets.mapValues { it.value.values.toSet() }
         val serialized = gson.toJson(cookies, bucketsType)
         val credentials = Credentials(attributes.userName, serialized)
         PasswordSafe.getInstance().set(attributes, credentials)

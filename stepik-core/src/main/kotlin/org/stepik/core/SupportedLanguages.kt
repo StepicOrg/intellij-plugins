@@ -22,23 +22,11 @@ enum class SupportedLanguages constructor(val title: String,
     CPP("C++", "c++", "main.cpp", "test.cpp", "//"),
     CPP_11("C++11", "c++11", "main_11.cpp", "test_11.cpp", "//"),
     GO("Go", "go", "main.go", "test.go", "//"),
-    HASKELL("Haskell 7.8",
-            "haskell",
-            "Main.hs",
-            "Test_7_8.hs",
-            "--",
+    HASKELL("Haskell 7.8", "haskell", "Main.hs", "Test_7_8.hs", "--",
             "module Main where\nmain = print $ \"Hello, world!\""),
-    HASKELL_7_10("Haskell 7.10",
-            "haskell 7.10",
-            "Main.hs",
-            "Test_7_10.hs",
-            "--",
+    HASKELL_7_10("Haskell 7.10", "haskell 7.10", "Main.hs", "Test_7_10.hs", "--",
             "module Main where\nmain = print $ \"Hello, world!\""),
-    HASKELL_8_0("Haskell 8.0",
-            "haskell 8.0",
-            "Main.hs",
-            "Test_8_0.hs",
-            "--",
+    HASKELL_8_0("Haskell 8.0", "haskell 8.0", "Main.hs", "Test_8_0.hs", "--",
             "module Main where\nmain = print $ \"Hello, world!\""),
     JAVA8("Java 8", "java8", "Main.java", "Test.java", "//", "class Main {", "}", runner = JavaRunner()),
     JAVA("Java", "java", "Main.java", "Test.java", "//", "class Main {", "}", JAVA8, runner = JavaRunner()),
@@ -55,34 +43,28 @@ enum class SupportedLanguages constructor(val title: String,
     SHELL("Shell", "shell", "main.sh", "test.sh", "#"),
     INVALID("invalid", "invalid", "", "", "");
 
-    /**
-     * Checks whether the comment string
-
-     * @param line String to check
-     * *
-     * @return true if line is commented, false otherwise
-     */
-    fun isCommentedLine(line: String) = line.trimStart { it <= ' ' }.startsWith(comment)
+    fun isCommentedLine(line: String) = line.trimStart { it.isWhitespace() }.startsWith(comment)
 
     override fun toString() = title
 
-    fun upgradedTo(language: SupportedLanguages): Boolean {
-        return language == this || this.nextVersion?.upgradedTo(language) ?: false
+    fun canUpgradedTo(language: SupportedLanguages): Boolean {
+        return language == this || nextVersion?.canUpgradedTo(language) ?: false
     }
 
-    fun comment(string: String) = comment + string
+    fun comment(string: String) = "$comment$string"
 
     companion object {
-        private val nameMap: Map<String, SupportedLanguages> by lazy {
-            values().map { it.langName to it }.toMap()
+
+        private val nameMap by lazy {
+            values().associateBy { it.langName }
         }
 
-        private val titleMap: Map<String, SupportedLanguages> by lazy {
-            values().map { it.title to it }.toMap()
+        private val titleMap by lazy {
+            values().associateBy { it.title }
         }
 
-        fun langOfName(lang: String) = nameMap.getOrElse(lang, { INVALID })
+        fun langOfName(lang: String) = nameMap.getOrDefault(lang, INVALID)
 
-        fun langOfTitle(lang: String) = titleMap.getOrElse(lang, { INVALID })
+        fun langOfTitle(lang: String) = titleMap.getOrDefault(lang, INVALID)
     }
 }

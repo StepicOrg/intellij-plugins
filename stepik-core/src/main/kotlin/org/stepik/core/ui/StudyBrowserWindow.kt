@@ -201,9 +201,7 @@ class StudyBrowserWindow internal constructor(private val project: Project) : JF
     internal fun callFunction(name: String, vararg args: String) {
         Platform.runLater {
             try {
-                val argsString = args
-                        .map { "\"$it\"" }
-                        .joinToString { "," }
+                val argsString = args.joinToString(",") { "\"$it\"" }
                 val script = "if (window.$name !== undefined) $name($argsString);"
                 engine!!.executeScript(script)
             } catch (e: JSException) {

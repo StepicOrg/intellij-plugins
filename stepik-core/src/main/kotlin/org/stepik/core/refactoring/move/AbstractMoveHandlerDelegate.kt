@@ -52,6 +52,6 @@ abstract class AbstractMoveHandlerDelegate : MoveHandlerDelegate() {
 
         sources.mapNotNullTo(message) { it.virtualFile?.path }
 
-        MessagesEx.error(project, message.joinToString { "\n" }, "Move").showNow()
+        MessagesEx.error(project, message.joinToString("\n"), "Move").showNow()
     }
 }

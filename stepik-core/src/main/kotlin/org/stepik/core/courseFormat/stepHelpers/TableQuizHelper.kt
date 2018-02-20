@@ -35,18 +35,14 @@ class TableQuizHelper(project: Project, stepNode: StepNode) : QuizHelper(project
         val tableChoices = reply.tableChoices
 
         choices = if (tableChoices.isEmpty()) {
-            dataset.rows.map { row ->
-                row to dataset.columns.map {
-                    it to false
-                }.toMap()
+            dataset.rows.associate { row ->
+                row to dataset.columns.associate { it to false }
             }
         } else {
-            tableChoices.map { choice ->
-                choice.nameRow to choice.columns.map { column ->
-                    column.name to column.answer
-                }.toMap()
+            tableChoices.associate {
+                it.nameRow to it.columns.associate { it.name to it.answer }
             }
-        }.toMap()
+        }
     }
 
     override fun fail() {

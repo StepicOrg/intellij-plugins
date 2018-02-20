@@ -59,13 +59,13 @@ class SupportedLanguagesTest {
 
     @Test
     fun upgradedTo() {
-        assertTrue(JAVA.upgradedTo(JAVA))
-        assertTrue(JAVA.upgradedTo(JAVA8))
+        assertTrue(JAVA.canUpgradedTo(JAVA))
+        assertTrue(JAVA.canUpgradedTo(JAVA8))
     }
 
     @Test
     fun notUpgradedTo() {
-        assertFalse(PYTHON3.upgradedTo(GO))
+        assertFalse(PYTHON3.canUpgradedTo(GO))
     }
 
     companion object {

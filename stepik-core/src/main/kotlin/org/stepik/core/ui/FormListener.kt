@@ -56,7 +56,7 @@ internal class FormListener(private val project: Project, private val browser: S
             if (file != null) {
                 try {
                     val lines = Files.readAllLines(file.toPath())
-                    return lines.joinToString { "\n" }
+                    return lines.joinToString("\n")
                 } catch (e: IOException) {
                     logger.warn(e)
                 }

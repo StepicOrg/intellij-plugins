@@ -23,12 +23,10 @@ enum class StepType(val typeName: String) {
 
     companion object {
 
-        private val map: Map<String, StepType> by lazy {
-            values().map { it.typeName to it }.toMap()
+        private val map by lazy {
+            values().associateBy { it.typeName }
         }
 
-        fun of(typeName: String): StepType {
-            return map[typeName] ?: UNKNOWN
-        }
+        fun of(typeName: String) = map.getOrDefault(typeName, UNKNOWN)
     }
 }

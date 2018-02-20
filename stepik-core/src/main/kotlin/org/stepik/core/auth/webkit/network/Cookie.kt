@@ -74,22 +74,23 @@ internal class Cookie private constructor(
         fun parse(setCookieString: String, currentTime: ExtendedTime): Cookie? {
             val items = setCookieString.split(";")
 
-            val nameValuePair = items[0].split("=".toRegex(), 2)
+            val nameValuePair = items.first().split("=", limit = 2)
             if (nameValuePair.size != 2) {
                 return null
             }
-            val name = nameValuePair[0].trim { it <= ' ' }
-            val value = nameValuePair[1].trim { it <= ' ' }
+            val name = nameValuePair[0].trim()
+            val value = nameValuePair[1].trim()
             if (name.isEmpty()) {
                 return null
             }
 
-            val values = items.map {
-                val terms = it.split("=".toRegex(), 2)
-                val attrName = terms[0].trim { it <= ' ' }.toLowerCase()
-                val attrValue = terms.getOrNull(1)?.trim { it <= ' ' } ?: ""
+            val values = items.associate {
+                val terms = it.split("=", limit = 2)
+                        .map { it.trim() }
+                val attrName = terms.first().toLowerCase()
+                val attrValue = terms.getOrElse(1) { "" }
                 attrName to attrValue
-            }.toMap()
+            }
 
             val expires: Long? = parseExpires(values["expires"])
             val maxAge: Long? = parseMaxAge(values["max-age"], currentTime.baseTime())

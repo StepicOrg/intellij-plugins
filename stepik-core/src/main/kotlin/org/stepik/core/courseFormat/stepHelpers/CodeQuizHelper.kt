@@ -17,6 +17,6 @@ class CodeQuizHelper(project: Project, stepNode: StepNode) : StepHelper(project,
             return stepNode.samples.mapIndexed { index, sample ->
                 "<p><b>Sample Input $index:</b><br>${sample.input}<br>" +
                         "<b>Sample Output $index:</b><br>${sample.output}"
-            }.joinToString { "<br>" }.replace("\\n".toRegex(), "<br>")
+            }.joinToString("<br>").replace("\\n".toRegex(), "<br>")
         }
 }
