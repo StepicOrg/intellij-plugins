@@ -1,19 +1,57 @@
 package org.stepik.alt.actions.navigation
 
 import com.intellij.icons.AllIcons
+import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.ex.MessagesEx
+import org.stepik.core.ProjectManager
 import org.stepik.core.actions.getShortcutText
+import org.stepik.core.actions.navigation.StudyNavigator
 import org.stepik.core.actions.navigation.StudyStepNavigationAction
+import org.stepik.core.courseFormat.LessonNode
+import org.stepik.core.courseFormat.Node
 import org.stepik.core.courseFormat.StudyNode
+import org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient
 
 class StepikNextStepAction : StudyStepNavigationAction(TEXT, DESCRIPTION, AllIcons.Actions.Forward) {
 
-    override fun getTargetStep(currentStepNode: StudyNode?): StudyNode? {
-        return getNextStep()
+    override fun getTargetStep(project: Project, currentStepNode: StudyNode?): StudyNode? {
+        var lesson: LessonNode? = null
+        val input = MessagesEx.showInputDialog("Example, https://alt.stepik.org/topics/lesson/50509",
+                "Input link to lesson", null)
+        if (input != null) {
+            val template = ".*/lesson/(\\d+)".toRegex()
+            val matcher = template.matchEntire(input)
+            if (matcher != null) {
+                val lessonId = matcher.groups[1]!!.value
+                val projectManager = ServiceManager.getService(project, ProjectManager::class.java)
+                val stepikApiClient = authAndGetStepikApiClient()
+                val root = projectManager.projectRoot
+                lesson = LessonNode(project, stepikApiClient)
+                lesson.id = lessonId.toLong()
+                lesson.parent = root
+                val children = root?.children?.toMutableList()
+                if (children != null) {
+                    children.add(lesson)
+                    lesson.reloadData(project, stepikApiClient)
+                    (root as Node).setChildren(children)
+                    projectManager.refreshProjectFiles()
+                }
+            }
+        }
+
+        return StudyNavigator.nextLeaf(lesson)
     }
 
     override fun getActionId() = ACTION_ID
 
     override fun getShortcuts() = arrayOf(SHORTCUT)
+
+    override fun update(e: AnActionEvent?) {
+        val presentation = e?.presentation ?: return
+        presentation.isEnabled = true
+    }
 
     companion object {
         private const val ACTION_ID = "Alt.NextStepAction"
@@ -23,7 +61,7 @@ class StepikNextStepAction : StudyStepNavigationAction(TEXT, DESCRIPTION, AllIco
         private const val DESCRIPTION = "Navigate to the next step"
 
         fun getNextStep(): StudyNode? {
-            return null
+            return StudyNavigator.nextLeaf(null)
         }
     }
 }

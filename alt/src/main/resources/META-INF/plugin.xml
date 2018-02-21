@@ -2,7 +2,7 @@
   <id>org.stepik.alt</id>
   <name>Stepik ALT</name>
   <version>SNAPSHOT</version>
-  <idea-version since-build="163.7743.44"/>
+  <idea-version since-build="163.7743.44" />
   <vendor email="alt@stepik.org" url="https://alt.stepik.org">Stepik</vendor>
 
   <depends>com.intellij.modules.lang</depends>
@@ -11,25 +11,26 @@
   <depends optional="true" config-file="pycharm.xml">com.intellij.modules.python</depends>
 
   <extensions defaultExtensionNs="com.intellij">
-    <applicationConfigurable instance="org.stepik.core.ui.StepikSettingsConfigurable"/>
+    <applicationConfigurable instance="org.stepik.core.ui.StepikSettingsConfigurable" />
+    <moduleType id="STEPIK_MODULE_TYPE" implementationClass="org.stepik.alt.projectWizard.idea.StepikModuleType" />
   </extensions>
 
   <extensions defaultExtensionNs="org.stepik.plugin.union">
-    <studyPluginConfigurator implementation="org.stepik.alt.StepikPluginConfigurator"/>
+    <studyPluginConfigurator implementation="org.stepik.alt.StepikPluginConfigurator" />
   </extensions>
 
   <actions>
-    <action id="STEPIK.StepikSendAction" class="org.stepik.core.actions.step.StepikSendAction"/>
-    <action id="Alt.NextStepAction" class="org.stepik.alt.actions.navigation.StepikNextStepAction"/>
-    <action id="STEPIK.DownloadSubmission" class="org.stepik.core.actions.step.DownloadSubmission"/>
-    <action id="STEPIK.InsertStepikDirectives" class="org.stepik.core.actions.step.InsertStepikDirectives"/>
-    <action id="STEPIK.RefreshStepAction" class="org.stepik.core.actions.step.StepikResetStepAction"/>
-    <action id="Alt.OpenInBrowser" class="org.stepik.alt.actions.step.OpenInBrowserAction"/>
-    <action id="STEPIK.TestSamplesAction" class="org.stepik.core.actions.step.TestSamplesAction"/>
+    <action id="STEPIK.StepikSendAction" class="org.stepik.core.actions.step.StepikSendAction" />
+    <action id="Alt.NextStepAction" class="org.stepik.alt.actions.navigation.StepikNextStepAction" />
+    <action id="STEPIK.DownloadSubmission" class="org.stepik.core.actions.step.DownloadSubmission" />
+    <action id="STEPIK.InsertStepikDirectives" class="org.stepik.core.actions.step.InsertStepikDirectives" />
+    <action id="STEPIK.RefreshStepAction" class="org.stepik.core.actions.step.StepikResetStepAction" />
+    <action id="Alt.OpenInBrowser" class="org.stepik.alt.actions.step.OpenInBrowserAction" />
+    <action id="STEPIK.TestSamplesAction" class="org.stepik.core.actions.step.TestSamplesAction" />
 
     <action id="Alt.StartAltAction" class="org.stepik.alt.actions.StartAltAction">
-      <add-to-group group-id="WelcomeScreen.QuickStart" anchor="first"/>
-      <add-to-group group-id="FileMenu" anchor="first"/>
+      <add-to-group group-id="WelcomeScreen.QuickStart" anchor="first" />
+      <add-to-group group-id="FileMenu" anchor="first" />
     </action>
   </actions>
 
@@ -41,18 +42,18 @@
 
   <extensionPoints>
     <extensionPoint qualifiedName="org.stepik.plugin.union.studyPluginConfigurator"
-                    interface="org.stepik.core.StudyPluginConfigurator"/>
+                    interface="org.stepik.core.StudyPluginConfigurator" />
   </extensionPoints>
 
   <extensions defaultExtensionNs="com.intellij">
     <projectService serviceInterface="com.intellij.codeInsight.documentation.DocumentationManager"
-                    serviceImplementation="org.stepik.core.StudyDocumentationManager" overrides="true"/>
+                    serviceImplementation="org.stepik.core.StudyDocumentationManager" overrides="true" />
     <toolWindow id="Step Description" anchor="right" factoryClass="org.stepik.core.ui.StudyToolWindowFactory"
-                conditionClass="org.stepik.core.ui.StudyCondition"/>
+                conditionClass="org.stepik.core.ui.StudyCondition" />
     <toolWindow id="Stepik Test" anchor="bottom"
                 factoryClass="org.stepik.core.testFramework.toolWindow.StepikTestToolWindowFactory"
-                conditionClass="org.stepik.core.testFramework.toolWindow.StudyCondition"/>
+                conditionClass="org.stepik.core.testFramework.toolWindow.StudyCondition" />
     <projectService serviceInterface="org.stepik.core.ProjectManager"
-                    serviceImplementation="org.stepik.alt.AltProjectManager"/>
+                    serviceImplementation="org.stepik.alt.AltProjectManager" />
   </extensions>
 </idea-plugin>

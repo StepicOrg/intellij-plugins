@@ -72,17 +72,20 @@ class StudyToolWindow internal constructor() :
     private var browserWindow: StudyBrowserWindow? = null
 
     private fun createStepInfoPanel(project: Project): JComponent {
-        browserWindow = StudyBrowserWindow(project)
+        val browserWindow = StudyBrowserWindow(project)
         val panel = JPanel()
         panel.layout = BoxLayout(panel, BoxLayout.PAGE_AXIS)
-        panel.add(browserWindow!!.panel)
+        panel.add(browserWindow.panel)
+        this.browserWindow = browserWindow
         return panel
     }
 
     private fun setEmptyText() {
-        val map = HashMap<String, Any>()
-        map["content"] = EMPTY_STEP_TEXT
-        browserWindow!!.loadContent("template", map)
+        val context = mapOf("content" to EMPTY_STEP_TEXT)
+        browserWindow?.loadContent("template", context)
+        if (!isAuthenticated) {
+            browserWindow?.callFunction("showLogin")
+        }
     }
 
     private fun createToolbarPanel(group: ActionGroup): JPanel {
@@ -138,14 +141,17 @@ class StudyToolWindow internal constructor() :
         setStepNode(null)
     }
 
-    internal fun setStepNode(studyNode: StudyNode?) {
+    private fun setStepNode(studyNode: StudyNode?) {
         setStepNode(studyNode, false)
     }
 
     fun setStepNode(studyNode: StudyNode?, force: Boolean) {
-        browserWindow!!.hideLoadAnimation()
+        browserWindow?.hideLoadAnimation()
 
         if (!force && stepNode === studyNode) {
+            if (stepNode == null) {
+                setEmptyText()
+            }
             return
         }
 
@@ -168,7 +174,7 @@ class StudyToolWindow internal constructor() :
             return
         }
 
-        browserWindow!!.showLoadAnimation()
+        browserWindow?.showLoadAnimation()
 
         val stepType = stepNode.type
         if (stepType != StepType.CODE) {
@@ -204,7 +210,7 @@ class StudyToolWindow internal constructor() :
             val context = HashMap<String, Any>()
             context["stepNode"] = stepHelper
             context["darcula"] = LafManager.getInstance().currentLookAndFeel is DarculaLookAndFeelInfo
-            browserWindow!!.loadContent("quiz/" + stepHelper.type, context)
+            browserWindow?.loadContent("quiz/${stepHelper.type}", context)
         }
     }
 

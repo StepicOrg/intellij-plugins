@@ -1,13 +1,14 @@
 package org.stepik.plugin.actions.navigation
 
 import com.intellij.icons.AllIcons
+import com.intellij.openapi.project.Project
 import org.stepik.core.actions.getShortcutText
+import org.stepik.core.actions.navigation.StudyNavigator.previousLeaf
 import org.stepik.core.courseFormat.StudyNode
-import org.stepik.plugin.actions.navigation.StudyNavigator.previousLeaf
 
 class StepikPreviousStepAction : StepikNavigationAction(TEXT, DESCRIPTION, AllIcons.Actions.Back) {
 
-    override fun getTargetStep(currentStepNode: StudyNode?): StudyNode? {
+    override fun getTargetStep(project: Project, currentStepNode: StudyNode?): StudyNode? {
         return previousLeaf(currentStepNode)
     }
 

@@ -1,7 +1,6 @@
 package org.stepik.core.courseFormat
 
 import com.intellij.openapi.project.Project
-import com.thoughtworks.xstream.annotations.XStreamOmitField
 import org.stepik.api.client.StepikApiClient
 import org.stepik.api.exceptions.StepikClientException
 import org.stepik.api.objects.StudyObject
@@ -23,8 +22,8 @@ open class LessonNode(project: Project? = null, stepikApiClient: StepikApiClient
     override val dataClass: Class<CompoundUnitLesson>
         get() = CompoundUnitLesson::class.java
 
-    @XStreamOmitField
-    override val directoryPrefix = EduNames.LESSON
+    override val directoryPrefix
+        get() = EduNames.LESSON
 
     override fun getChildDataList(stepikApiClient: StepikApiClient): List<StudyObject> {
         try {

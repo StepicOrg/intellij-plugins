@@ -2,13 +2,13 @@ package org.stepik.alt.courseFormat
 
 import com.intellij.openapi.project.Project
 import org.stepik.api.client.StepikApiClient
+import org.stepik.api.exceptions.StepikClientException
 import org.stepik.api.objects.StudyObject
 import org.stepik.api.objects.lessons.CompoundUnitLesson
-import org.stepik.api.objects.lessons.Lesson
 import org.stepik.core.courseFormat.LessonNode
 import org.stepik.core.courseFormat.Node
 
-class AltTree(project: Project? = null, stepikApiClient: StepikApiClient? = null, data: StudyObject? = null) :
+class AltTree(project: Project? = null, stepikApiClient: StepikApiClient? = null, data: StudyObject? = StudyObject()) :
         Node(project, stepikApiClient, data) {
     override val childClass: Class<out Node>
         get() = LessonNode::class.java
@@ -28,9 +28,24 @@ class AltTree(project: Project? = null, stepikApiClient: StepikApiClient? = null
     }
 
     override fun getChildDataList(stepikApiClient: StepikApiClient): List<StudyObject> {
-        val lesson = Lesson()
-        lesson.id = 62367
-        lesson.setTitle("Test lesson")
-        return listOf(CompoundUnitLesson(null, lesson))
+        val objects = mutableListOf<CompoundUnitLesson>()
+        try {
+            val lessonsIds = children.map { it.id }
+            if (lessonsIds.isNotEmpty()) {
+                val lessons = stepikApiClient.lessons()
+                        .get()
+                        .id(lessonsIds)
+                        .execute()
+
+                lessons.lessons
+                        .forEach { lesson ->
+                            objects.add(CompoundUnitLesson(null, lesson))
+                        }
+            }
+        } catch (logged: StepikClientException) {
+            logger.warn("A AltL initialization don't is fully", logged)
+        }
+
+        return objects
     }
 }

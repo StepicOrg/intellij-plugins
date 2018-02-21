@@ -33,7 +33,11 @@ class LinkListener(val project: Project,
                    val engine: WebEngine) : EventListener, Loggable {
     private val protocolPattern = Pattern.compile("([a-z]+):(.*)")
     private val pattern = Pattern.compile("/lesson(?:/|/[^/]*-)(\\d+)/step/(\\d+).*")
-    private val projectManager = getService(project, ProjectManager::class.java)
+    private val projectManager: ProjectManager? = if (!project.isDisposed) {
+        getService(project, ProjectManager::class.java)
+    } else {
+        null
+    }
 
     override fun handleEvent(ev: Event) {
         if (ev.type == "click") {

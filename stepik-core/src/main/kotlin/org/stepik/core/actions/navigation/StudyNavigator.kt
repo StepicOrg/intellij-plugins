@@ -1,4 +1,4 @@
-package org.stepik.plugin.actions.navigation
+package org.stepik.core.actions.navigation
 
 import org.stepik.core.courseFormat.StudyNode
 
@@ -24,8 +24,8 @@ object StudyNavigator {
             } ?: navigate(parent, parent.parent, direction)
         } else {
             val targetNode: StudyNode? = when (direction) {
-                StudyNavigator.Direction.BACK -> currentNode.getPrevChild(prevNode)
-                StudyNavigator.Direction.FORWARD -> currentNode.getNextChild(prevNode)
+                Direction.BACK -> currentNode.getPrevChild(prevNode)
+                Direction.FORWARD -> currentNode.getNextChild(prevNode)
             }
 
             if (targetNode != null) {
@@ -43,7 +43,7 @@ object StudyNavigator {
         return navigate(null, node, Direction.FORWARD)
     }
 
-    internal fun previousLeaf(node: StudyNode?): StudyNode? {
+    fun previousLeaf(node: StudyNode?): StudyNode? {
         return navigate(null, node, Direction.BACK)
     }
 

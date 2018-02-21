@@ -7,7 +7,8 @@ import org.stepik.core.courseFormat.StudyNode
 
 class OpenInBrowserAction : AbstractOpenInBrowserAction() {
     override fun getLink(project: Project, stepNode: StudyNode): String {
-        return Urls.ALT_URL
+        val lessonId = stepNode.parent?.id ?: return Urls.ALT_URL
+        return "${Urls.ALT_URL}/topics/lesson/$lessonId"
     }
 
     override fun getActionId() = ACTION_ID

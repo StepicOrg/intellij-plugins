@@ -54,11 +54,11 @@ class CookieManager : CookieHandler() {
         return if (cookies.isNotEmpty()) cookies else null
     }
 
-    override fun put(uri: URI?, responseHeaders: Map<String, List<String>>?) {
+    override fun put(uri: URI?, responseHeaders: Map<String?, List<String>>?) {
         uri ?: throw IllegalArgumentException("uri is null")
         responseHeaders ?: throw IllegalArgumentException("responseHeaders is null")
 
-        val cookies = responseHeaders.filter { it.key.toLowerCase() == "set-cookie" }
+        val cookies = responseHeaders.filter { it.key?.toLowerCase() == "set-cookie" }
                 .map { it.value }
 
         for (values in cookies) {

@@ -13,4 +13,5 @@ interface ProjectManager {
     var projectRoot: StudyNode?
     fun updateAdaptiveSelected() // FIXME
     var createdBy: Long
+    fun refreshProjectFiles()
 }

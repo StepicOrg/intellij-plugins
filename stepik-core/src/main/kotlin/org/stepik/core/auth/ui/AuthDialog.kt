@@ -2,6 +2,7 @@ package org.stepik.core.auth.ui
 
 import com.intellij.icons.AllIcons
 import com.intellij.util.ui.UIUtil
+import com.sun.javafx.application.PlatformImpl
 import javafx.application.Platform
 import javafx.beans.value.ChangeListener
 import javafx.beans.value.ObservableValue
@@ -50,32 +51,27 @@ class AuthDialog private constructor() : JDialog(null as Frame?, true) {
         layout = BorderLayout()
         panel = JFXPanel()
         Platform.setImplicitExit(false)
-        Platform.runLater {
+        PlatformImpl.startup {
+            val pane = BorderPane()
+            val toolPane = HBox()
+            toolPane.spacing = 5.0
+            toolPane.alignment = Pos.CENTER_LEFT
             val webComponent = WebView()
             engine = webComponent.engine
+            progressBar = makeProgressBarWithListener()
+            pane.top = toolPane
+            pane.center = webComponent
+            val scene = Scene(pane)
+            panel.scene = scene
+            panel.isVisible = true
 
             val backButton = makeGoBackButton()
             addButtonsAvailabilityListeners(backButton)
-            progressBar = makeProgressBarWithListener()
+            val homeButton = makeHomeButton()
+            val exitButton = makeExitButton()
+            toolPane.children.addAll(backButton, homeButton, exitButton, progressBar)
+            toolPane.padding = Insets(5.0)
 
-            val toolPane = HBox().apply {
-                spacing = 5.0
-                alignment = Pos.CENTER_LEFT
-                children.addAll(backButton, makeHomeButton(), makeExitButton(), progressBar)
-                padding = Insets(5.0)
-            }
-
-            val pane = BorderPane().apply {
-                top = toolPane
-                center = webComponent
-            }
-
-            panel.apply {
-                scene = Scene(pane)
-                isVisible = true
-            }
-
-            engine!!.userAgent = StepikAuthManager.userAgent
             url = StepikAuthManager.implicitGrantUrl
             engine!!.load(url)
         }
@@ -115,7 +111,11 @@ class AuthDialog private constructor() : JDialog(null as Frame?, true) {
         return createButtonWithImage(AllIcons.Actions.Back).apply {
             tooltip = Tooltip("Back")
             isDisable = true
-            setOnAction { Platform.runLater { engine!!.history.go(-1) } }
+            setOnAction {
+                Platform.runLater {
+                    engine!!.history.go(-1)
+                }
+            }
         }
     }
 
@@ -158,47 +158,44 @@ class AuthDialog private constructor() : JDialog(null as Frame?, true) {
                             ov: ObservableValue<out Worker.State>,
                             oldState: Worker.State,
                             newState: Worker.State) {
-                        if (newState === Worker.State.CANCELLED) {
-                            return
-                        }
+                        val engine = engine!!
+                        when (newState) {
+                            Worker.State.CANCELLED -> return
+                            Worker.State.FAILED -> {
+                                val map = mapOf("url" to engine.location)
+                                val content = Templater.processTemplate("error", map)
+                                engine.loadContent(content)
+                                return
+                            }
+                            else -> {
+                                val location = engine.location
 
-                        if (newState === Worker.State.FAILED) {
-                            val map = HashMap<String, Any>()
-                            map["url"] = engine!!.location
-                            val content = Templater.processTemplate("error", map)
-                            engine!!.loadContent(content)
-                            return
-                        }
-
-                        val location = engine!!.location
-
-                        if (location != null) {
-                            if (location.startsWith("${Urls.STEPIK_URL}/#")) {
-                                val paramString = location.split("#").dropLastWhile { it.isEmpty() }[1]
-                                val params = paramString.split("&").dropLastWhile { it.isEmpty() }
-                                map.clear()
-                                params.forEach { param ->
-                                    val entry = param.split("=").dropLastWhile { it.isEmpty() }
-                                    var value = ""
-                                    if (entry.size > 1) {
-                                        value = entry[1]
+                                if (location != null) {
+                                    if (location.startsWith("${Urls.STEPIK_URL}/#")) {
+                                        val paramString = location.split("#", limit = 2)[1]
+                                        val params = paramString.split("&")
+                                        map.clear()
+                                        params.forEach {
+                                            val entry = it.split("=", limit = 2)
+                                            map[entry.first()] = entry.getOrNull(1) ?: ""
+                                        }
+                                        hide()
+                                        return
+                                    } else if ("${Urls.STEPIK_URL}/?error=access_denied" == location) {
+                                        map["error"] = "access_denied"
+                                        hide()
+                                        return
                                     }
-                                    map[entry[0]] = value
                                 }
-                                hide()
-                                return
-                            } else if ("${Urls.STEPIK_URL}/?error=access_denied" == location) {
-                                map["error"] = "access_denied"
-                                hide()
-                                return
+
+                                progressBar?.isVisible = newState == Worker.State.RUNNING
+
+                                if (newState == Worker.State.SUCCEEDED) {
+                                    this@AuthDialog.title = engine.title
+                                }
                             }
                         }
 
-                        progressBar!!.isVisible = newState == Worker.State.RUNNING
-
-                        if (newState == Worker.State.SUCCEEDED) {
-                            this@AuthDialog.title = engine!!.title
-                        }
                     }
 
                     private fun hide() {

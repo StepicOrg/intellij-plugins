@@ -160,7 +160,7 @@ abstract class BaseProjectManager constructor(@field:XStreamOmitField val projec
         }
     }
 
-    private fun refreshProjectFiles() {
+    override fun refreshProjectFiles() {
         if (project == null || root == null) {
             return
         }

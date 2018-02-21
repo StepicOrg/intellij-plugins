@@ -148,24 +148,28 @@ internal class FormListener(private val project: Project, private val browser: S
             val projectManager = getService(project, ProjectManager::class.java)
             val root = projectManager?.projectRoot ?: return
 
-            val node = StudyUtils.getStudyNode(root, form.action) as? StepNode ?: return
-
             val elements = Elements(form.elements)
+
+            val node = StudyUtils.getStudyNode(root, form.action) as? StepNode
+
+            if (node == null && elements.action !in listOf("login", "next_step")) {
+                return
+            }
 
             when (elements.action) {
                 "get_first_attempt", "get_attempt" -> if (!elements.isLocked) {
-                    getAttempt(project, node)
+                    getAttempt(project, node!!)
                 }
                 "submit" -> {
                     val type = StepType.of(elements.type)
                     val isFromFile = elements.isFromFile
-                    val data = if (isFromFile) getDataFromFile(node, project) else null
+                    val data = if (isFromFile) getDataFromFile(node!!, project) else null
                     val attemptId = elements.attemptId
-                    sendStep(project, node, elements, type, attemptId, data)
+                    sendStep(project, node!!, elements, type, attemptId, data)
                 }
                 "save_reply" -> {
                     val type = StepType.of(elements.type)
-                    getReply(node, type, elements, null)
+                    getReply(node!!, type, elements, null)
                 }
                 "login" -> {
                     val email = elements.getInputValue("email")

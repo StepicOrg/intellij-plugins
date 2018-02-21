@@ -4,6 +4,9 @@ import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.project.Project
 import org.stepik.alt.actions.navigation.StepikNextStepAction
 import org.stepik.alt.actions.step.OpenInBrowserAction
+import org.stepik.alt.projectWizard.StepikProjectGenerator
+import org.stepik.alt.projectWizard.idea.SandboxModuleBuilder
+import org.stepik.alt.projectWizard.idea.StepModuleBuilder
 import org.stepik.core.ProjectGenerator
 import org.stepik.core.StudyBasePluginConfigurator
 import org.stepik.core.StudyUtils.isStepikProject
@@ -18,18 +21,18 @@ import org.stepik.core.projectWizard.idea.BaseModuleBuilder
 
 class StepikPluginConfigurator : StudyBasePluginConfigurator() {
     override fun getSandboxModuleBuilder(path: String): BaseModuleBuilder? {
-        return null
+        return SandboxModuleBuilder(path)
     }
 
     override fun getStepModuleBuilder(moduleDir: String, step: StepNode): BaseModuleBuilder? {
-        return null
+        return StepModuleBuilder(moduleDir, step)
     }
 
     override fun getProjectGenerator(): ProjectGenerator? {
-        return null
+        return StepikProjectGenerator
     }
 
-    override fun nextAction(node: StepNode): StudyNode? {
+    override fun nextAction(node: StepNode?): StudyNode? {
         return StepikNextStepAction.getNextStep()
     }
 

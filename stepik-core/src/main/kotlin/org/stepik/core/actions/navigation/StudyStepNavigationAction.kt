@@ -19,11 +19,11 @@ abstract class StudyStepNavigationAction(text: String?,
         val project = e.project ?: return
         val projectManager = getService(project, ProjectManager::class.java)
         val currentNode = projectManager?.selected ?: projectManager?.projectRoot
-        val targetNode = getTargetStep(currentNode) ?: return
+        val targetNode = getTargetStep(project, currentNode) ?: return
         NavigationUtils.navigate(project, targetNode)
     }
 
-    protected abstract fun getTargetStep(currentStepNode: StudyNode?): StudyNode?
+    protected abstract fun getTargetStep(project: Project, currentStepNode: StudyNode?): StudyNode?
 
     override fun update(e: AnActionEvent?) {
         val presentation = e?.presentation ?: return
@@ -32,7 +32,7 @@ abstract class StudyStepNavigationAction(text: String?,
 
         val projectManager = getService(project, ProjectManager::class.java) ?: return
         val selected = projectManager.selected
-        val target = getTargetStep(selected)
+        val target = getTargetStep(project, selected)
         val enabled = selected == null || target != null
         presentation.isEnabled = isEnabled(project, enabled, selected, target)
     }

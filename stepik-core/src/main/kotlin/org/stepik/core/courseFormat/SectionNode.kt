@@ -1,7 +1,6 @@
 package org.stepik.core.courseFormat
 
 import com.intellij.openapi.project.Project
-import com.thoughtworks.xstream.annotations.XStreamOmitField
 import org.stepik.api.client.StepikApiClient
 import org.stepik.api.exceptions.StepikClientException
 import org.stepik.api.objects.StudyObject
@@ -24,8 +23,8 @@ class SectionNode(project: Project? = null, stepikApiClient: StepikApiClient? = 
     override val dataClass: Class<Section>
         get() = Section::class.java
 
-    @XStreamOmitField
-    override val directoryPrefix = EduNames.SECTION
+    override val directoryPrefix
+        get() = EduNames.SECTION
 
     override fun loadData(stepikApiClient: StepikApiClient, id: Long): Boolean {
         try {

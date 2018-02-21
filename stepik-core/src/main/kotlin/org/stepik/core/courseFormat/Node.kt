@@ -152,8 +152,8 @@ abstract class Node(project: Project? = null,
             return "$directoryPrefix$id"
         }
 
-    @XStreamOmitField
-    open val directoryPrefix = ""
+    open val directoryPrefix
+        get() = ""
 
     private val mapNodes: Map<Long, StudyNode>
         get() = children.associateBy { it.id }

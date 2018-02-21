@@ -14,7 +14,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -33,8 +32,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * @author meanmail
  */
 public class Utils {
-    private static final Logger logger = LoggerFactory.getLogger(Utils.class);
     public final static SimpleDateFormat timeISOFormat = getTimeISOFormat();
+    private static final Logger logger = LoggerFactory.getLogger(Utils.class);
 
     private static SimpleDateFormat getTimeISOFormat() {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
@@ -161,7 +160,7 @@ public class Utils {
     public static Date toDate(@Nullable String date) {
         try {
             return timeISOFormat.parse(date);
-        } catch (ParseException e) {
+        } catch (Exception e) {
             return Date.from(Instant.EPOCH);
         }
     }

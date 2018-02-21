@@ -33,6 +33,8 @@ class StepNode(project: Project? = null, stepikApiClient: StepikApiClient? = nul
                             .options.codeTemplates.map {
                         langOfName(it.key)
                     }.filter { it !== INVALID }
+                } else {
+                    return emptyList()
                 }
             }
 
@@ -133,8 +135,8 @@ class StepNode(project: Project? = null, stepikApiClient: StepikApiClient? = nul
     val type: StepType
         get() = StepType.of((data as Step).block.name)
 
-    @XStreamOmitField
-    override val directoryPrefix = EduNames.STEP
+    override val directoryPrefix
+        get() = EduNames.STEP
 
     override fun beforeInit() {
         _supportedLanguages = null
