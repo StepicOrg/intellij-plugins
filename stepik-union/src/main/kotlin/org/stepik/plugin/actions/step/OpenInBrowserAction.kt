@@ -8,7 +8,7 @@ import org.stepik.core.courseFormat.StudyNode
 import org.stepik.plugin.StepikProjectManager
 
 class OpenInBrowserAction : AbstractOpenInBrowserAction() {
-    override fun getLink(project: Project, stepNode: StudyNode<*, *>): String {
+    override fun getLink(project: Project, stepNode: StudyNode): String {
         val parent = stepNode.parent ?: return Urls.STEPIK_URL
         val link = "${Urls.STEPIK_URL}/lesson/${parent.id}/step/${stepNode.position}"
         val projectManager = getService(project, StepikProjectManager::class.java)

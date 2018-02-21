@@ -5,8 +5,8 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.wm.ToolWindowManager
 import org.stepik.api.exceptions.StepikClientException
-import org.stepik.api.objects.steps.Step
 import org.stepik.core.common.Loggable
+import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.StudyNode
 import org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient
 import org.stepik.core.stepik.StepikAuthManager.isAuthenticated
@@ -64,7 +64,7 @@ object StudyUtils : Loggable {
         return ProjectFilesUtils.getRelativePath(basePath, path)
     }
 
-    fun getStudyNode(project: Project, nodeVF: VirtualFile): StudyNode<*, *>? {
+    fun getStudyNode(project: Project, nodeVF: VirtualFile): StudyNode? {
         val path = getRelativePath(project, nodeVF)
         val projectManager = getService(project, ProjectManager::class.java)
         val root = projectManager?.projectRoot ?: return null
@@ -72,8 +72,8 @@ object StudyUtils : Loggable {
         return getStudyNode(root, path)
     }
 
-    fun getStudyNode(root: StudyNode<*, *>, relativePath: String): StudyNode<*, *>? {
-        var myRoot: StudyNode<*, *>? = root
+    fun getStudyNode(root: StudyNode, relativePath: String): StudyNode? {
+        var myRoot: StudyNode? = root
         if (relativePath == ".") {
             return myRoot
         }
@@ -100,13 +100,13 @@ object StudyUtils : Loggable {
         return myRoot
     }
 
-    fun getRecommendation(root: StudyNode<*, *>): StudyNode<*, *>? {
+    fun getRecommendation(root: StudyNode): StudyNode? {
         val data = root.data
-        if (data == null || !data.isAdaptive) {
+        if (!data.isAdaptive) {
             return null
         }
 
-        var studyNode: StudyNode<*, *>? = null
+        var studyNode: StudyNode? = null
 
         val stepikClient = authAndGetStepikApiClient()
         if (!isAuthenticated) {
@@ -129,7 +129,7 @@ object StudyUtils : Loggable {
                         .execute()
                 if (!steps.isEmpty) {
                     val stepId = steps.first.id
-                    studyNode = root.getChildByClassAndId(Step::class.java, stepId)
+                    studyNode = root.getChildByClassAndId(StepNode::class.java, stepId)
                 }
             }
         } catch (e: StepikClientException) {

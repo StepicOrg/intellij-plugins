@@ -57,7 +57,7 @@ object ProgrammingLanguageUtils : Loggable {
         }
 
         if (currentMainFileName == language.mainFileName && mainFileExists) {
-            targetStepNode.setCurrentLang(language)
+            targetStepNode.currentLang = language
             Metrics.switchLanguage(project, targetStepNode)
             return
         }
@@ -84,7 +84,7 @@ object ProgrammingLanguageUtils : Loggable {
             moveFirst = !second!!.isEquivalentTo(first)
         }
 
-        targetStepNode.setCurrentLang(language)
+        targetStepNode.currentLang = language
         val needClose = closeStepNodeFile(project, targetStepNode)
 
         val finalSecond = second

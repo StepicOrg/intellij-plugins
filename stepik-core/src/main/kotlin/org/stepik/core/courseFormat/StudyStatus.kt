@@ -1,7 +1,9 @@
 package org.stepik.core.courseFormat
 
 enum class StudyStatus {
-    UNCHECKED, SOLVED, FAILED, NEED_CHECK;
+    UNCHECKED,
+    FAILED,
+    SOLVED;
 
 
     companion object {
@@ -10,7 +12,6 @@ enum class StudyStatus {
             return when (status?.toLowerCase()) {
                 "correct", "solved" -> SOLVED
                 "wrong", "failed" -> FAILED
-                null -> NEED_CHECK
                 else -> UNCHECKED
             }
         }

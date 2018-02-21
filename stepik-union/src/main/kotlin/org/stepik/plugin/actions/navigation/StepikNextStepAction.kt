@@ -7,7 +7,7 @@ import org.stepik.plugin.actions.navigation.StudyNavigator.nextLeaf
 
 class StepikNextStepAction : StepikNavigationAction(TEXT, DESCRIPTION, AllIcons.Actions.Forward) {
 
-    override fun getTargetStep(currentStepNode: StudyNode<*, *>?): StudyNode<*, *>? {
+    override fun getTargetStep(currentStepNode: StudyNode?): StudyNode? {
         return nextLeaf(currentStepNode)
     }
 

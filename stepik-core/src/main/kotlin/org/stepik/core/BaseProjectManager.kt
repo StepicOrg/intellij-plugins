@@ -44,8 +44,8 @@ abstract class BaseProjectManager constructor(@field:XStreamOmitField val projec
         PersistentStateComponent<Element>, DumbAware, StepikAuthManagerListener, Disposable, Loggable, ProjectManager {
     @XStreamOmitField
     private val executor = Executors.newSingleThreadExecutor()
-    private var root: StudyNode<*, *>? = null
-    override var selected: StudyNode<*, *>? = null
+    private var root: StudyNode? = null
+    override var selected: StudyNode? = null
         set(value) {
             field = value
             updateToolWindow()
@@ -65,10 +65,10 @@ abstract class BaseProjectManager constructor(@field:XStreamOmitField val projec
                 return false
             }
             val data = root!!.data
-            return data != null && data.isAdaptive
+            return data.isAdaptive
         }
 
-    override var projectRoot: StudyNode<*, *>?
+    override var projectRoot: StudyNode?
         get() = root
         set(value) {
             root = value
@@ -123,12 +123,12 @@ abstract class BaseProjectManager constructor(@field:XStreamOmitField val projec
             ByteArrayOutputStream().use { out ->
                 xStream.toXML(this, OutputStreamWriter(out, UTF_8))
                 val el = toElement(out)
-                logger.info("Getting the StepikProjectManager state")
+                logger.info("Getting the ${javaClass.simpleName} state")
 
                 return el
             }
         } catch (e: Exception) {
-            logger.warn("Failed getting the StepikProjectManager state", e)
+            logger.warn("Failed getting the ${javaClass.simpleName} state", e)
         }
 
         return null
@@ -143,7 +143,7 @@ abstract class BaseProjectManager constructor(@field:XStreamOmitField val projec
     override fun loadState(state: Element) {
         var myState = state
         try {
-            logger.info("Start load the StepikProjectManager state")
+            logger.info("Start load the ${javaClass.simpleName} state")
             val version = getVersion(myState)
 
             myState = migrate(version, myState)
@@ -152,20 +152,20 @@ abstract class BaseProjectManager constructor(@field:XStreamOmitField val projec
             xStream.fromXML(xml, this)
 
             this.version = getCurrentVersion()
-            refreshCourse()
+            refreshProjectFiles()
             updateSelection()
-            logger.info("The StepikProjectManager state loaded")
+            logger.info("The ${javaClass.simpleName} state loaded")
         } catch (e: Exception) {
-            logger.warn("Failed deserialization StepikProjectManager \n${e.message}\n$project")
+            logger.warn("Failed deserialization ${javaClass.simpleName} \n${e.message}\n$project")
         }
     }
 
-    private fun refreshCourse() {
+    private fun refreshProjectFiles() {
         if (project == null || root == null) {
             return
         }
 
-        root!!.setProject(project)
+        root!!.project = project
 
         executor.execute {
             val stepikApiClient = authAndGetStepikApiClient()
@@ -219,7 +219,7 @@ abstract class BaseProjectManager constructor(@field:XStreamOmitField val projec
         }
     }
 
-    private fun repairProjectFiles(node: StudyNode<*, *>) {
+    private fun repairProjectFiles(node: StudyNode) {
         if (project != null) {
             if (node is StepNode) {
                 ApplicationManager.getApplication().invokeAndWait {
@@ -272,7 +272,7 @@ abstract class BaseProjectManager constructor(@field:XStreamOmitField val projec
             if (root != null) {
                 root!!.resetStatus()
                 if (newState === AUTH) {
-                    refreshCourse()
+                    refreshProjectFiles()
                 }
             }
 

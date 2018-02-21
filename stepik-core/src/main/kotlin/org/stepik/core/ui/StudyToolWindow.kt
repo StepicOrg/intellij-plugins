@@ -138,11 +138,11 @@ class StudyToolWindow internal constructor() :
         setStepNode(null)
     }
 
-    internal fun setStepNode(studyNode: StudyNode<*, *>?) {
+    internal fun setStepNode(studyNode: StudyNode?) {
         setStepNode(studyNode, false)
     }
 
-    fun setStepNode(studyNode: StudyNode<*, *>?, force: Boolean) {
+    fun setStepNode(studyNode: StudyNode?, force: Boolean) {
         browserWindow!!.hideLoadAnimation()
 
         if (!force && stepNode === studyNode) {
@@ -249,7 +249,7 @@ class StudyToolWindow internal constructor() :
             }
 
             if (stepNode.project == null) {
-                stepNode.setProject(project!!)
+                stepNode.project = project
             }
             if (!project!!.isDisposed) {
                 ApplicationManager.getApplication().invokeLater { ProjectView.getInstance(project!!).refresh() }

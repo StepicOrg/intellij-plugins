@@ -1,5 +1,7 @@
 package org.stepik.core.utils
 
+import com.intellij.ide.projectView.ProjectView
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.progress.ProcessCanceledException
@@ -46,4 +48,29 @@ private fun initEmptyStudyNode(): StudyObject {
     course.setTitle("Empty")
     course.setDescription("Please, press refresh button")
     return course
+}
+
+fun <T> Set<T>.batch(n: Int): Sequence<List<T>> {
+    return BatchingSequence(this.asSequence(), n)
+}
+
+private class BatchingSequence<out T>(val source: Sequence<T>, val batchSize: Int) : Sequence<List<T>> {
+    override fun iterator(): Iterator<List<T>> = object : AbstractIterator<List<T>>() {
+        val iterate = if (batchSize > 0) source.iterator() else emptyList<T>().iterator()
+        override fun computeNext() {
+            if (iterate.hasNext()) {
+                setNext(iterate.asSequence().take(batchSize).toList())
+            } else {
+                done()
+            }
+        }
+    }
+}
+
+fun refreshProjectView(project: Project?) {
+    ApplicationManager.getApplication().invokeLater {
+        if (project?.isDisposed == false) {
+            ProjectView.getInstance(project).refresh()
+        }
+    }
 }

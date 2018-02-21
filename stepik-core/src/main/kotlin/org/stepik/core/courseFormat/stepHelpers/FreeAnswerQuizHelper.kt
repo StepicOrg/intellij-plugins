@@ -19,7 +19,7 @@ class FreeAnswerQuizHelper(project: Project, stepNode: StepNode) : StringQuizHel
                 return true
             }
 
-            val instructionId = stepNode.data?.instruction ?: 0
+            val instructionId = data.instruction
             if (instructionId == 0) {
                 return true
             }
@@ -73,7 +73,7 @@ class FreeAnswerQuizHelper(project: Project, stepNode: StepNode) : StringQuizHel
 
     fun withReview(): Boolean {
         initStepOptions()
-        return stepNode.data?.instruction ?: 0 != 0
+        return data.instruction != 0
     }
 
     private fun needSolve(): Boolean {
@@ -82,14 +82,14 @@ class FreeAnswerQuizHelper(project: Project, stepNode: StepNode) : StringQuizHel
 
     private fun needSendSubmission(): Boolean {
         initStepOptions()
-        return stepNode.data?.session ?: 0 == 0
+        return data.session == 0
     }
 
     private fun needReview(): Boolean {
         if (needSendSubmission()) {
             return false
         }
-        return stepNode.data?.actions?.containsKey("do_review") ?: true
+        return data.actions.containsKey("do_review")
     }
 
     private fun needWait(): Boolean {

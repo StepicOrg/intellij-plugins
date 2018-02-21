@@ -26,7 +26,7 @@ object PresentationUtils {
     private val WRONG_COLOR = JBColor(Color(175, 65, 45), Color(175, 75, 60))
     private var icons: Array<Array<Icon>>? = null
 
-    fun getIcon(studyNode: StudyNode<*, *>, status: StudyStatus?): Icon? {
+    fun getIcon(studyNode: StudyNode, status: StudyStatus?): Icon? {
         if (icons == null) {
             icons = getIcons()
         }

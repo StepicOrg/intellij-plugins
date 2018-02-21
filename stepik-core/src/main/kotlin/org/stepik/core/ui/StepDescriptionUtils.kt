@@ -61,7 +61,7 @@ internal object StepDescriptionUtils {
             }
             else -> return null
         }
-        stepNode.setLastReply(reply)
+        stepNode.lastReply = reply
         return reply
     }
 

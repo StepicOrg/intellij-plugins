@@ -142,7 +142,7 @@ object Metrics : Loggable {
 
     fun navigateAction(
             project: Project,
-            studyNode: StudyNode<*, *>,
+            studyNode: StudyNode,
             status: MetricsStatus = SUCCESSFUL) {
         if (studyNode is StepNode) {
             stepAction("navigate", project, studyNode, status)
@@ -151,7 +151,7 @@ object Metrics : Loggable {
 
     fun openInBrowserAction(
             project: Project,
-            studyNode: StudyNode<*, *>) {
+            studyNode: StudyNode) {
         if (studyNode is StepNode) {
             stepAction("open_in_browser", project, studyNode, SUCCESSFUL)
         }

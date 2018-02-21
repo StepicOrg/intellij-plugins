@@ -36,7 +36,7 @@ object ProjectFilesUtils {
         } else !(isWithinSrc(targetPath) || isWithinSandbox(targetPath) || isSandbox(targetPath) || isSrc(targetPath))
     }
 
-    private fun isStepFile(root: StudyNode<*, *>, path: String): Boolean {
+    private fun isStepFile(root: StudyNode, path: String): Boolean {
         val studyNode = StudyUtils.getStudyNode(root, path)
 
         if (studyNode is StepNode) {
@@ -46,7 +46,7 @@ object ProjectFilesUtils {
         return false
     }
 
-    fun isNotMovableOrRenameElement(node: StudyNode<*, *>, path: String): Boolean {
+    fun isNotMovableOrRenameElement(node: StudyNode, path: String): Boolean {
         return if (isWithinSrc(path)) {
             isHideDir(path) || isWithinHideDir(path) || isStepFile(node, path)
         } else !isWithinSandbox(path)
@@ -116,7 +116,7 @@ object ProjectFilesUtils {
             model: ModifiableModuleModel? = null): VirtualFile? {
         var myModel = model
         val baseDir = project.baseDir
-        val srcPath = stepNode.path + "/" + EduNames.SRC
+        val srcPath = "${stepNode.path}/${EduNames.SRC}"
         var srcDirectory = baseDir.findFileByRelativePath(srcPath)
         if (srcDirectory == null && !stepNode.wasDeleted) {
             srcDirectory = getOrCreateDirectory(baseDir, srcPath)
@@ -158,7 +158,7 @@ object ProjectFilesUtils {
                 srcDir = application.runWriteAction(Computable {
                     var dir: VirtualFile
                     try {
-                        val paths = directoryPath.split("/".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+                        val paths = directoryPath.split("/").dropLastWhile { it.isEmpty() }
                         dir = baseDir
                         for (path in paths) {
                             val child = dir.findChild(path)

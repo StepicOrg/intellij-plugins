@@ -25,7 +25,7 @@ abstract class AbstractOpenInBrowserAction : AbstractStepAction(TEXT, DESCRIPTIO
         }
     }
 
-    abstract fun getLink(project: Project, stepNode: StudyNode<*, *>): String
+    abstract fun getLink(project: Project, stepNode: StudyNode): String
 
     override fun update(e: AnActionEvent?) {
         super.update(e)

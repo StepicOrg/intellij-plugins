@@ -2,7 +2,6 @@ package org.stepik.core.ui
 
 import com.intellij.ide.BrowserUtil
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.ServiceManager.getService
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
@@ -16,9 +15,9 @@ import org.stepik.api.urls.Urls
 import org.stepik.core.ProjectManager
 import org.stepik.core.StudyUtils
 import org.stepik.core.common.Loggable
-import org.stepik.core.courseFormat.CourseNode
 import org.stepik.core.courseFormat.LessonNode
 import org.stepik.core.courseFormat.StepNode
+import org.stepik.core.courseFormat.StudyNode
 import org.stepik.core.stepik.StepikAuthManager
 import org.stepik.core.stepik.StepikAuthManager.currentUser
 import org.stepik.core.utils.NavigationUtils
@@ -164,21 +163,15 @@ class LinkListener(val project: Project,
             val lessonId = matcher.group(1).toLong()
             val stepPosition = matcher.group(2).toInt()
 
-            val step: StepNode?
+            val step: StudyNode?
 
             val root = projectManager?.projectRoot
             if (root != null) {
-                var lessonNode: LessonNode? = null
-                if (root is CourseNode) {
-                    lessonNode = root.children.flatMap { it.children.filter { it.id == lessonId } }.firstOrNull()
-                } else if (root is LessonNode && root.id == lessonId) {
-                    lessonNode = root
-                }
+                val lessonNode = root.getChildByClassAndId(LessonNode::class.java, lessonId)
 
-                step = lessonNode?.getChildByPosition(stepPosition)
+                step = lessonNode?.getChildByPosition(stepPosition) ?: return false
 
-                val finalStep = step ?: return false
-                ApplicationManager.getApplication().invokeLater { NavigationUtils.navigate(project, finalStep) }
+                ApplicationManager.getApplication().invokeLater { NavigationUtils.navigate(project, step) }
                 return true
             }
         }

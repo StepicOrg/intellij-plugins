@@ -57,7 +57,7 @@ object StepikProjectGenerator : ProjectGenerator, Loggable {
     }
 
 
-    private var projectRoot: StudyNode<*, *>? = null
+    private var projectRoot: StudyNode? = null
 
 
     fun getCourses(programmingLanguage: SupportedLanguages): CompletableFuture<List<StudyObject>> {

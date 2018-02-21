@@ -1,6 +1,5 @@
 package org.stepik.plugin.serialization;
 
-import com.intellij.openapi.diagnostic.Logger;
 import org.jdom.Attribute;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
@@ -11,14 +10,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
 
-import static org.stepik.api.urls.Urls.COURSE;
-import static org.stepik.api.urls.Urls.LESSONS;
-import static org.stepik.api.urls.Urls.SECTIONS;
 import static org.stepik.core.serialization.StudySerializationUtils.*;
 
 public class SerializationUtils {
     public final static String MAIN_ELEMENT = "StepikProjectManager";
-    private static final Logger logger = Logger.getInstance(SerializationUtils.class);
 
     @NotNull
     public static Element convertToSecondVersion(@NotNull Element state) throws StudyUnrecognizedFormatException {

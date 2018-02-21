@@ -89,10 +89,10 @@ open class QuizHelper(project: Project, stepNode: StepNode) : StepHelper(project
         }
 
     val isHasSubmissionsRestrictions: Boolean
-        get() = stepNode.data?.isHasSubmissionsRestrictions ?: false
+        get() = data.isHasSubmissionsRestrictions
 
     private val maxSubmissionsCount: Int
-        get() = stepNode.data?.maxSubmissionsCount ?: 0
+        get() = data.maxSubmissionsCount
 
     override val isAutoCreateAttempt: Boolean
         get() = !isHasSubmissionsRestrictions && hasSubmitButton()
@@ -141,7 +141,7 @@ open class QuizHelper(project: Project, stepNode: StepNode) : StepHelper(project
                 isModified = lastSubmission.reply != reply
             } else {
                 reply = lastSubmission.reply
-                stepNode.setLastReply(reply)
+                stepNode.lastReply = reply
                 stepNode.lastSubmissionId = lastSubmission.id
             }
             if (attemptId == lastSubmission.attempt.toLong()) {
@@ -151,7 +151,7 @@ open class QuizHelper(project: Project, stepNode: StepNode) : StepHelper(project
                 action = GET_ATTEMPT
             }
 
-            stepNode.setStatus(StudyStatus.of(status))
+            stepNode.status = StudyStatus.of(status)
         } else {
             reply = stepNode.lastReply
             isModified = true

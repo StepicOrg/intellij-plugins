@@ -3,6 +3,7 @@ package org.stepik.core.courseFormat.stepHelpers
 import com.intellij.openapi.components.ServiceManager.getService
 import com.intellij.openapi.project.Project
 import org.stepik.api.exceptions.StepikClientException
+import org.stepik.api.objects.steps.Step
 import org.stepik.api.urls.Urls
 import org.stepik.core.ProjectManager
 import org.stepik.core.StudyUtils.getConfigurator
@@ -15,6 +16,8 @@ import org.stepik.core.stepik.StepikAuthManager.isAuthenticated
 
 
 open class StepHelper(val project: Project, internal val stepNode: StepNode) : Loggable {
+    val data
+        get() = stepNode.data as Step
 
     private val projectManager = getService(project, ProjectManager::class.java)
 

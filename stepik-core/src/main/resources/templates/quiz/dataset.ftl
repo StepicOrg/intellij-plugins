@@ -50,7 +50,7 @@
             dataset</a>
         </#if>
     <textarea id="text" class="row" name="value"
-              placeholder="Input your answer here" ${disabled!""}>${stepNode.getData()}</textarea>
+              placeholder="Input your answer here" ${disabled!""}>${stepNode.getFile()}</textarea>
         <#if action == "submit">
         <input id="filename" type="submit" name="filename" value="Send file">
         </#if>

@@ -10,8 +10,7 @@ import org.stepik.core.TestUtils.readTextFile
 import org.stepik.core.TestUtils.readXmlFile
 import org.stepik.core.serialization.SerializationUtils.xStream
 import org.stepik.core.serialization.StudyUnrecognizedFormatException
-import org.stepik.plugin.serialization.StudySerializationUtils
-import org.stepik.plugin.serialization.StudySerializationUtils.MAIN_ELEMENT
+import org.stepik.plugin.serialization.SerializationUtils
 import java.text.MessageFormat.format
 
 
@@ -20,9 +19,9 @@ class StudySerializationUtilsTest {
     @Test
     fun convertToSecondVersion() {
         val stateVersion1 = readSourceXmlFile(1, 4)
-        val stateVersion2 = StudySerializationUtils.convertToSecondVersion(stateVersion1)
+        val stateVersion2 = SerializationUtils.convertToSecondVersion(stateVersion1)
 
-        val actual = outputter!!.outputString(stateVersion2)
+        val actual = outputter.outputString(stateVersion2)
         val expected = readSourceTextFile(2, 4)
 
         assertEquals("#4", expected, actual)
@@ -32,9 +31,9 @@ class StudySerializationUtilsTest {
     fun convertToThirdVersion() {
         for (i in 1..SOURCES_COUNT) {
             val stateVersion2 = readSourceXmlFile(2, i)
-            val stateVersion3 = StudySerializationUtils.convertToThirdVersion(stateVersion2)
+            val stateVersion3 = SerializationUtils.convertToThirdVersion(stateVersion2)
 
-            val actual = outputter!!.outputString(stateVersion3)
+            val actual = outputter.outputString(stateVersion3)
             val expected = readSourceTextFile(3, i)
 
             assertEquals("#" + i, expected, actual)
@@ -44,19 +43,19 @@ class StudySerializationUtilsTest {
     @Test(expected = StudyUnrecognizedFormatException::class)
     fun convertToThirdVersionWithException() {
         val stateVersion2 = readXmlFile(StudySerializationUtilsTest::class.java, "version2_0.xml")
-        StudySerializationUtils.convertToThirdVersion(stateVersion2)
+        SerializationUtils.convertToThirdVersion(stateVersion2)
     }
 
     @Test
     fun convertToFourthVersion() {
         for (i in 1..SOURCES_COUNT) {
             val stateVersion3 = readSourceXmlFile(3, i)
-            val stateVersion4 = StudySerializationUtils.convertToFourthVersion(stateVersion3)
+            val stateVersion4 = SerializationUtils.convertToFourthVersion(stateVersion3)
 
             val xs = xStream
             xs.alias("StepikProjectManager", StepikProjectManager::class.java)
 
-            val obj = xs.fromXML(outputter!!.outputString(stateVersion4.getChild(MAIN_ELEMENT)))
+            val obj = xs.fromXML(outputter.outputString(stateVersion4.getChild(SerializationUtils.MAIN_ELEMENT)))
 
             val actual = xs.toXML(obj)
             val expected = readSourceTextFile(4, i)
@@ -67,14 +66,14 @@ class StudySerializationUtilsTest {
 
     companion object {
         private const val SOURCES_COUNT = 4
-        private var outputter: XMLOutputter? = null
+        private lateinit var outputter: XMLOutputter
 
         @BeforeClass
         @JvmStatic
         fun before() {
             outputter = XMLOutputter()
             val format = Format.getPrettyFormat().setLineSeparator("\n")
-            outputter!!.format = format
+            outputter.format = format
         }
 
         private fun readSourceXmlFile(version: Int, index: Int): Element {

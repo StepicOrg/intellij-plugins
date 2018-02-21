@@ -6,7 +6,7 @@ import org.stepik.core.courseFormat.StepNode
 
 class DatasetQuizHelper(project: Project, stepNode: StepNode) : QuizHelper(project, stepNode) {
 
-    val data: String
+    val file: String
         get() {
             initStepOptions()
             return reply.file

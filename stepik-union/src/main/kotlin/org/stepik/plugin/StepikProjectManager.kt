@@ -20,8 +20,6 @@ class StepikProjectManager @JvmOverloads constructor(project: Project? = null) :
         return StudySerializationUtils.getVersion(state, MAIN_ELEMENT)
     }
 
-    override fun getMainElement() = MAIN_ELEMENT
-
     override fun migrate(version: Int, state: Element): Element {
         var myState = state
         when (version) {

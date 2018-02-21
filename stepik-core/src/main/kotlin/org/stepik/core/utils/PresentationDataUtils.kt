@@ -1,13 +1,11 @@
 package org.stepik.core.utils
 
 import com.intellij.ide.projectView.PresentationData
-import com.intellij.openapi.components.ServiceManager.getService
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiDirectory
 import com.intellij.psi.PsiFile
 import com.intellij.ui.JBColor
 import com.intellij.ui.SimpleTextAttributes
-import org.stepik.core.ProjectManager
 import org.stepik.core.StudyUtils.getStudyNode
 import org.stepik.core.StudyUtils.isStepikProject
 import org.stepik.core.core.EduNames
@@ -48,8 +46,8 @@ object PresentationDataUtils {
     private fun setAttributes(
             project: Project,
             data: PresentationData,
-            item: StudyNode<*, *>) {
-        item.setProject(project)
+            item: StudyNode) {
+        item.project = project
         val status = item.status
         val color = getColor(status)
         val icon = getIcon(item, status)

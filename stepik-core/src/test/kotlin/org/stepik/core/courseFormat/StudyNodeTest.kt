@@ -7,120 +7,120 @@ import org.junit.Test
 
 class StudyNodeTest {
 
-    private var courseNode: CourseNode? = null
-    private var sectionNode: SectionNode? = null
-    private var lessonNode: LessonNode? = null
-    private var stepNode: StepNode? = null
+    private lateinit var courseNode: CourseNode
+    private lateinit var sectionNode: SectionNode
+    private lateinit var lessonNode: LessonNode
+    private lateinit var stepNode: StepNode
 
     @Before
     fun setUp() {
         courseNode = CourseNode()
 
         sectionNode = SectionNode()
-        sectionNode!!.id = 1
-        sectionNode!!.parent = courseNode
+        sectionNode.id = 1
+        sectionNode.parent = courseNode
 
 
         lessonNode = LessonNode()
-        lessonNode!!.id = 1
-        lessonNode!!.parent = sectionNode
+        lessonNode.id = 1
+        lessonNode.parent = sectionNode
 
         stepNode = StepNode()
-        stepNode!!.id = 1
-        stepNode!!.parent = lessonNode
+        stepNode.id = 1
+        stepNode.parent = lessonNode
 
-        courseNode!!.children.add(sectionNode)
-        sectionNode!!.children.add(lessonNode)
-        lessonNode!!.children.add(stepNode)
+        courseNode.setChildren(listOf(sectionNode))
+        sectionNode.setChildren(listOf(lessonNode))
+        lessonNode.setChildren(listOf(stepNode))
     }
 
     @Test
     fun getCourseDirectory() {
-        assertEquals("", courseNode!!.directory)
+        assertEquals("", courseNode.directory)
     }
 
     @Test
     fun getCoursePath() {
-        assertEquals("", courseNode!!.path)
+        assertEquals("", courseNode.path)
     }
 
     @Test
     fun getSectionDirectory() {
-        assertEquals("section1", sectionNode!!.directory)
+        assertEquals("section1", sectionNode.directory)
     }
 
     @Test
     fun getSectionPath() {
-        assertEquals("section1", sectionNode!!.path)
+        assertEquals("section1", sectionNode.path)
     }
 
     @Test
     fun getLessonDirectory() {
-        assertEquals("lesson1", lessonNode!!.directory)
+        assertEquals("lesson1", lessonNode.directory)
     }
 
     @Test
     fun getLessonPath() {
-        assertEquals("section1/lesson1", lessonNode!!.path)
+        assertEquals("section1/lesson1", lessonNode.path)
     }
 
     @Test
     fun getStepDirectory() {
-        assertEquals("step1", stepNode!!.directory)
+        assertEquals("step1", stepNode.directory)
     }
 
     @Test
     fun getStepPath() {
-        assertEquals("section1/lesson1/step1", stepNode!!.path)
+        assertEquals("section1/lesson1/step1", stepNode.path)
     }
 
     @Test
     fun getSectionDirectoryAfterChangeId() {
-        sectionNode!!.id = 2
-        assertEquals("section2", sectionNode!!.directory)
+        sectionNode.id = 2
+        assertEquals("section2", sectionNode.directory)
     }
 
     @Test
     fun getSectionPathAfterChangeId() {
-        sectionNode!!.id = 2
-        assertEquals("section2", sectionNode!!.path)
+        sectionNode.id = 2
+        assertEquals("section2", sectionNode.path)
     }
 
     @Test
     fun getLessonDirectoryAfterChangeId() {
-        lessonNode!!.id = 2
-        assertEquals("lesson2", lessonNode!!.directory)
+        lessonNode.id = 2
+        assertEquals("lesson2", lessonNode.directory)
     }
 
     @Test
     fun getLessonPathAfterChangeId() {
-        lessonNode!!.id = 2
-        assertEquals("section1/lesson2", lessonNode!!.path)
+        lessonNode.id = 2
+        assertEquals("section1/lesson2", lessonNode.path)
     }
 
     @Test
     fun getStepDirectoryAfterChangeId() {
-        stepNode!!.id = 2
-        assertEquals("step2", stepNode!!.directory)
+        stepNode.id = 2
+        assertEquals("step2", stepNode.directory)
     }
 
     @Test
     fun getStepPathAfterChangeId() {
-        stepNode!!.id = 2
-        assertEquals("section1/lesson1/step2", stepNode!!.path)
+        stepNode.id = 2
+        assertEquals("section1/lesson1/step2", stepNode.path)
     }
 
     @Test
     fun getLessonPathAfterChangeSectionId() {
-        assertEquals("section1/lesson1", lessonNode!!.path)
-        sectionNode!!.id = 2
-        assertEquals("section2/lesson1", lessonNode!!.path)
+        assertEquals("section1/lesson1", lessonNode.path)
+        sectionNode.id = 2
+        assertEquals("section2/lesson1", lessonNode.path)
     }
 
     @Test
     fun getStepPathAfterChangeLessonId() {
-        assertEquals("section1/lesson1/step1", stepNode!!.path)
-        lessonNode!!.id = 2
-        assertEquals("section1/lesson2/step1", stepNode!!.path)
+        assertEquals("section1/lesson1/step1", stepNode.path)
+        lessonNode.id = 2
+        assertEquals("section1/lesson2/step1", stepNode.path)
     }
 }

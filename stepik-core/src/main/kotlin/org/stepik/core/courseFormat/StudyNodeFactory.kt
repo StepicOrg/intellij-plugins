@@ -14,7 +14,7 @@ object StudyNodeFactory {
     fun createTree(
             project: Project,
             stepikApiClient: StepikApiClient,
-            data: StudyObject): StudyNode<*, *>? {
+            data: StudyObject): StudyNode? {
         return when (data) {
             is Course -> CourseNode(project, stepikApiClient, data)
             is Section -> SectionNode(project, stepikApiClient, data)

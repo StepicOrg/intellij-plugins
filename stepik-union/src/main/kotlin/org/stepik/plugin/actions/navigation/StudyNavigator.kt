@@ -5,9 +5,9 @@ import org.stepik.core.courseFormat.StudyNode
 object StudyNavigator {
 
     private fun navigate(
-            prevNode: StudyNode<*, *>?,
-            currentNode: StudyNode<*, *>?,
-            direction: Direction): StudyNode<*, *>? {
+            prevNode: StudyNode?,
+            currentNode: StudyNode?,
+            direction: Direction): StudyNode? {
 
         currentNode ?: return null
 
@@ -23,7 +23,7 @@ object StudyNavigator {
                 Direction.FORWARD -> parent.getNextChild(currentNode)
             } ?: navigate(parent, parent.parent, direction)
         } else {
-            val targetNode: StudyNode<*, *>? = when (direction) {
+            val targetNode: StudyNode? = when (direction) {
                 StudyNavigator.Direction.BACK -> currentNode.getPrevChild(prevNode)
                 StudyNavigator.Direction.FORWARD -> currentNode.getNextChild(prevNode)
             }
@@ -39,11 +39,11 @@ object StudyNavigator {
         return null
     }
 
-    fun nextLeaf(node: StudyNode<*, *>?): StudyNode<*, *>? {
+    fun nextLeaf(node: StudyNode?): StudyNode? {
         return navigate(null, node, Direction.FORWARD)
     }
 
-    internal fun previousLeaf(node: StudyNode<*, *>?): StudyNode<*, *>? {
+    internal fun previousLeaf(node: StudyNode?): StudyNode? {
         return navigate(null, node, Direction.BACK)
     }
 

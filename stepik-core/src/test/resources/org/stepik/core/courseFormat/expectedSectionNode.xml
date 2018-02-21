@@ -9,7 +9,7 @@
     <examDurationMinutes>0</examDurationMinutes>
     <isActive>false</isActive>
   </data>
-  <children id="3">
+  <children class="singleton-list" id="3">
     <LessonNode id="4">
       <parent class="SectionNode" reference="1"/>
       <data class="CompoundUnitLesson" id="5">

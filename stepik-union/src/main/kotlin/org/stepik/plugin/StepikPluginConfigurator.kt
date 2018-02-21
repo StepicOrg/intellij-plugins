@@ -34,7 +34,7 @@ class StepikPluginConfigurator : StudyBasePluginConfigurator() {
         return StepikProjectGenerator
     }
 
-    override fun nextAction(node: StepNode): StudyNode<*, *>? {
+    override fun nextAction(node: StepNode): StudyNode? {
         return StudyNavigator.nextLeaf(node)
     }
 

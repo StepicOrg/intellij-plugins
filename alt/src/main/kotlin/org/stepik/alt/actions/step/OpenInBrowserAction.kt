@@ -6,7 +6,7 @@ import org.stepik.core.actions.step.AbstractOpenInBrowserAction
 import org.stepik.core.courseFormat.StudyNode
 
 class OpenInBrowserAction : AbstractOpenInBrowserAction() {
-    override fun getLink(project: Project, stepNode: StudyNode<*, *>): String {
+    override fun getLink(project: Project, stepNode: StudyNode): String {
         return Urls.ALT_URL
     }
 

@@ -27,7 +27,7 @@ interface StudyPluginConfigurator {
 
     fun accept(project: Project): Boolean
 
-    fun nextAction(node: StepNode): StudyNode<*, *>?
+    fun nextAction(node: StepNode): StudyNode?
 
     fun getProjectGenerator(): ProjectGenerator?
 

@@ -7,7 +7,7 @@ import org.stepik.core.courseFormat.StudyNode
 
 class StepikNextStepAction : StudyStepNavigationAction(TEXT, DESCRIPTION, AllIcons.Actions.Forward) {
 
-    override fun getTargetStep(currentStepNode: StudyNode<*, *>?): StudyNode<*, *>? {
+    override fun getTargetStep(currentStepNode: StudyNode?): StudyNode? {
         return getNextStep()
     }
 
@@ -22,7 +22,7 @@ class StepikNextStepAction : StudyStepNavigationAction(TEXT, DESCRIPTION, AllIco
         private val TEXT = "Next Step ($SHORTCUT_TEXT)"
         private const val DESCRIPTION = "Navigate to the next step"
 
-        fun getNextStep() : StudyNode<*, *>? {
+        fun getNextStep(): StudyNode? {
             return null
         }
     }

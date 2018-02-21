@@ -106,13 +106,13 @@ object ProjectWizardUtils : Loggable {
     fun createSubDirectories(
             project: Project,
             defaultLanguage: SupportedLanguages,
-            root: StudyNode<*, *>,
+            root: StudyNode,
             model: ModifiableModuleModel?) {
         root.children
                 .forEach { child ->
                     FileUtil.createDirectory(File(project.basePath, child.path))
                     if (child is StepNode) {
-                        child.setCurrentLang(defaultLanguage)
+                        child.currentLang = defaultLanguage
                         getOrCreateSrcDirectory(project, child, false, model)
                     } else {
                         createSubDirectories(project, defaultLanguage, child, model)

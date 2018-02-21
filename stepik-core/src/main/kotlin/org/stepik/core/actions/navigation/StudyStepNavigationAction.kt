@@ -23,7 +23,7 @@ abstract class StudyStepNavigationAction(text: String?,
         NavigationUtils.navigate(project, targetNode)
     }
 
-    protected abstract fun getTargetStep(currentStepNode: StudyNode<*, *>?): StudyNode<*, *>?
+    protected abstract fun getTargetStep(currentStepNode: StudyNode?): StudyNode?
 
     override fun update(e: AnActionEvent?) {
         val presentation = e?.presentation ?: return
@@ -38,5 +38,5 @@ abstract class StudyStepNavigationAction(text: String?,
     }
 
     open fun isEnabled(project: Project, enabled: Boolean,
-                       selected: StudyNode<*, *>?, target: StudyNode<*, *>?): Boolean = enabled
+                       selected: StudyNode?, target: StudyNode?): Boolean = enabled
 }

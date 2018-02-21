@@ -2,7 +2,6 @@ package org.stepik.alt
 
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.project.Project
-import org.stepik.alt.actions.StartAltAction
 import org.stepik.alt.actions.navigation.StepikNextStepAction
 import org.stepik.alt.actions.step.OpenInBrowserAction
 import org.stepik.core.ProjectGenerator
@@ -30,7 +29,7 @@ class StepikPluginConfigurator : StudyBasePluginConfigurator() {
         return null
     }
 
-    override fun nextAction(node: StepNode): StudyNode<*, *>? {
+    override fun nextAction(node: StepNode): StudyNode? {
         return StepikNextStepAction.getNextStep()
     }
 

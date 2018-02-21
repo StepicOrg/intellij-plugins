@@ -5,7 +5,6 @@ import com.intellij.openapi.project.Project
 import org.stepik.api.objects.steps.VideoUrl
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.utils.PluginUtils
-import java.util.Collections.emptyList
 
 
 class VideoTheoryHelper(project: Project, stepNode: StepNode) : StepHelper(project, stepNode) {
@@ -34,12 +33,10 @@ class VideoTheoryHelper(project: Project, stepNode: StepNode) : StepHelper(proje
 
     val videoUrls: List<VideoUrl>
         get() {
-            val data = stepNode.data ?: return emptyList()
             return data.block.video.urls.sortedBy { it.quality }
         }
 
     fun hasContent(): Boolean {
-        val data = stepNode.data ?: return false
         return data.block.video.urls.isNotEmpty()
     }
 

@@ -113,7 +113,7 @@ class DownloadSubmission : CodeQuizAction(TEXT, DESCRIPTION, AllStepikIcons.Tool
             submissions: List<Submission>,
             currentLang: SupportedLanguages): List<Submission> {
         return submissions.filter {
-            SupportedLanguages.langOfName(it.reply.language).upgradedTo(currentLang)
+            SupportedLanguages.langOfName(it.reply.language).canUpgradedTo(currentLang)
         }
     }
 
@@ -172,7 +172,7 @@ class DownloadSubmission : CodeQuizAction(TEXT, DESCRIPTION, AllStepikIcons.Tool
                             document.setText(text)
 
                             val status = StudyStatus.of(submission.status)
-                            stepNode.setStatus(status)
+                            stepNode.status = status
                             FileEditorManager.getInstance(project).openFile(mainFile, true)
                             ProjectView.getInstance(project).refresh()
                             Metrics.downloadAction(project, stepNode)

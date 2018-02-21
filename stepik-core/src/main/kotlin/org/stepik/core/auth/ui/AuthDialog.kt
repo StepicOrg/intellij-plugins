@@ -158,11 +158,11 @@ class AuthDialog private constructor() : JDialog(null as Frame?, true) {
                             ov: ObservableValue<out Worker.State>,
                             oldState: Worker.State,
                             newState: Worker.State) {
-                        if (newState == Worker.State.CANCELLED) {
+                        if (newState === Worker.State.CANCELLED) {
                             return
                         }
 
-                        if (newState == Worker.State.FAILED) {
+                        if (newState === Worker.State.FAILED) {
                             val map = HashMap<String, Any>()
                             map["url"] = engine!!.location
                             val content = Templater.processTemplate("error", map)

@@ -3,7 +3,9 @@ package org.stepik.core.courseFormat
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Test
+import org.stepik.api.objects.lessons.CompoundUnitLesson
 import org.stepik.api.objects.steps.Limit
+import org.stepik.api.objects.steps.Step
 import org.stepik.core.TestUtils.readTextFile
 import org.stepik.core.serialization.SerializationUtils.xStream
 
@@ -23,20 +25,20 @@ class SerializationTest {
         node.data
         val lessonNode = LessonNode()
         lessonNode.parent = node
-        val data = lessonNode.data
+        val data = lessonNode.data as CompoundUnitLesson
         assertNotNull(data)
-        data!!.lesson
+        data.lesson
         data.unit
-        node.children.add(lessonNode)
+        node.setChildren(listOf(lessonNode))
         serialize("SectionNode", node)
     }
 
     @Test
     fun serializeLessonNode() {
         val node = LessonNode()
-        val data = node.data
+        val data = node.data as CompoundUnitLesson
         assertNotNull(data)
-        data!!.lesson
+        data.lesson
         data.unit
         serialize("LessonNode", node)
     }
@@ -49,13 +51,13 @@ class SerializationTest {
         val limit = Limit()
         limit.memory = 256
         limit.time = 8
-        val data = node.data
+        val data = node.data as Step
         assertNotNull(data)
-        data!!.block.options.limits["Java 8"] = limit
+        data.block.options.limits["Java 8"] = limit
         serialize("StepNode", node)
     }
 
-    private fun serialize(name: String, node: StudyNode<*, *>) {
+    private fun serialize(name: String, node: StudyNode) {
         val xs = xStream
 
         val expected = readTextFile(SerializationTest::class.java, String.format("expected%s.xml", name))

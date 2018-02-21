@@ -25,7 +25,7 @@ import javax.swing.tree.TreePath
 
 
 object NavigationUtils {
-    fun navigate(project: Project, targetNode: StudyNode<*, *>) {
+    fun navigate(project: Project, targetNode: StudyNode) {
         for (file in FileEditorManager.getInstance(project).openFiles) {
             ApplicationManager.getApplication().invokeAndWait { FileEditorManager.getInstance(project).closeFile(file) }
         }
