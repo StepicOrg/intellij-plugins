@@ -2,29 +2,24 @@ package org.stepik.core.auth.ui
 
 import com.intellij.icons.AllIcons
 import com.intellij.util.ui.UIUtil
-import com.sun.javafx.application.PlatformImpl
 import javafx.application.Platform
 import javafx.beans.value.ChangeListener
 import javafx.beans.value.ObservableValue
 import javafx.concurrent.Worker
-import javafx.embed.swing.JFXPanel
 import javafx.embed.swing.SwingFXUtils
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.Node
-import javafx.scene.Scene
 import javafx.scene.control.Button
 import javafx.scene.control.ProgressBar
 import javafx.scene.control.Tooltip
 import javafx.scene.image.ImageView
-import javafx.scene.layout.BorderPane
 import javafx.scene.layout.HBox
-import javafx.scene.web.WebEngine
-import javafx.scene.web.WebView
 import org.stepik.api.urls.Urls
 import org.stepik.core.auth.webkit.network.CookieManager
 import org.stepik.core.stepik.StepikAuthManager
 import org.stepik.core.templates.Templater
+import org.stepik.core.ui.Browser
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.Frame
@@ -35,48 +30,28 @@ import javax.swing.JDialog
 import javax.swing.WindowConstants
 
 
-class AuthDialog private constructor() : JDialog(null as Frame?, true) {
-    private val map = HashMap<String, String>()
-    private var clearedCookies: Boolean = false
+class AuthBrowser internal constructor() : Browser() {
+    internal val map = HashMap<String, String>()
+    internal var clearedCookies: Boolean = false
     private val cookieManager = initCookieManager(false)
     private var url: String? = null
-    private var engine: WebEngine? = null
     private var progressBar: Node? = null
-    private val panel: JFXPanel
 
-    init {
-        title = "Authorize"
-        size = Dimension(640, 480)
-        setLocationRelativeTo(null)
-        layout = BorderLayout()
-        panel = JFXPanel()
-        Platform.setImplicitExit(false)
-        PlatformImpl.startup {
-            val pane = BorderPane()
-            val toolPane = HBox()
-            toolPane.spacing = 5.0
-            toolPane.alignment = Pos.CENTER_LEFT
-            val webComponent = WebView()
-            engine = webComponent.engine
-            progressBar = makeProgressBarWithListener()
-            pane.top = toolPane
-            pane.center = webComponent
-            val scene = Scene(pane)
-            panel.scene = scene
-            panel.isVisible = true
+    override fun afterInitComponents() {
+        val toolPane = HBox()
+        toolPane.spacing = 5.0
+        toolPane.alignment = Pos.CENTER_LEFT
+        progressBar = makeProgressBarWithListener()
+        pane!!.top = toolPane
+        val backButton = makeGoBackButton()
+        addButtonsAvailabilityListeners(backButton)
+        val homeButton = makeHomeButton()
+        val exitButton = makeExitButton()
+        toolPane.children.addAll(backButton, homeButton, exitButton, progressBar)
+        toolPane.padding = Insets(5.0)
 
-            val backButton = makeGoBackButton()
-            addButtonsAvailabilityListeners(backButton)
-            val homeButton = makeHomeButton()
-            val exitButton = makeExitButton()
-            toolPane.children.addAll(backButton, homeButton, exitButton, progressBar)
-            toolPane.padding = Insets(5.0)
-
-            url = StepikAuthManager.implicitGrantUrl
-            engine!!.load(url)
-        }
-        add(panel, BorderLayout.CENTER)
-        defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+        url = StepikAuthManager.implicitGrantUrl
+        engine!!.load("https://stepik.org")
     }
 
     private fun initCookieManager(clearCookies: Boolean): CookieManager {
@@ -91,7 +66,7 @@ class AuthDialog private constructor() : JDialog(null as Frame?, true) {
         return cookieManager
     }
 
-    private fun saveCookies() {
+    internal fun saveCookies() {
         cookieManager.save()
     }
 
@@ -131,7 +106,7 @@ class AuthDialog private constructor() : JDialog(null as Frame?, true) {
             tooltip = Tooltip("Login to another account")
             setOnAction {
                 Platform.runLater {
-                    initCookieManager(true)
+                    //                    initCookieManager(true)
                     engine!!.load(url)
                 }
             }
@@ -191,7 +166,7 @@ class AuthDialog private constructor() : JDialog(null as Frame?, true) {
                                 progressBar?.isVisible = newState == Worker.State.RUNNING
 
                                 if (newState == Worker.State.SUCCEEDED) {
-                                    this@AuthDialog.title = engine.title
+                                    this@AuthBrowser.title = engine.title
                                 }
                             }
                         }
@@ -206,20 +181,31 @@ class AuthDialog private constructor() : JDialog(null as Frame?, true) {
 
         return progress
     }
+}
 
-    companion object {
 
-        fun showAuthForm(): Map<String, String> {
-            val instance = AuthDialog()
-            instance.isVisible = true
-            val isCanceled = instance.map.isEmpty() || instance.map.containsKey("error")
-            if (!instance.clearedCookies || !isCanceled) {
-                instance.saveCookies()
-            } else {
-                // Restore cookies from store
-                CookieManager.setDefault(CookieManager())
-            }
-            return instance.map
-        }
+class AuthDialog : JDialog(null as Frame?, true) {
+    internal val browser = AuthBrowser()
+
+    init {
+        title = "Authorize"
+        size = Dimension(640, 480)
+        setLocationRelativeTo(null)
+        add(browser.panel, BorderLayout.CENTER)
+        defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
     }
+}
+
+
+fun showAuthForm(): Map<String, String> {
+    val dialog = AuthDialog()
+    dialog.isVisible = true
+    val isCanceled = dialog.browser.map.isEmpty() || "error" in dialog.browser.map
+    if (!dialog.browser.clearedCookies || !isCanceled) {
+        dialog.browser.saveCookies()
+    } else {
+        // Restore cookies from store
+        CookieManager.setDefault(CookieManager())
+    }
+    return dialog.browser.map
 }

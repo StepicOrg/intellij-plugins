@@ -14,7 +14,7 @@ import org.stepik.api.exceptions.StepikClientException
 import org.stepik.api.objects.auth.TokenInfo
 import org.stepik.api.objects.users.User
 import org.stepik.core.ProjectManager
-import org.stepik.core.auth.ui.AuthDialog
+import org.stepik.core.auth.ui.showAuthForm
 import org.stepik.core.common.Loggable
 import org.stepik.core.metrics.Metrics
 import org.stepik.core.stepik.StepikAuthState.AUTH
@@ -154,16 +154,16 @@ object StepikAuthManager : Loggable {
     }
 
     private fun showDialog(): StepikAuthState {
-        val map = AuthDialog.showAuthForm()
+        val result = showAuthForm()
         var newState = NOT_AUTH
         val tokenInfo = TokenInfo()
-        if (!map.isEmpty() && !map.containsKey("error")) {
+        if (result.isNotEmpty() && "error" !in result) {
             newState = AUTH
-            tokenInfo.accessToken = map["access_token"]
-            tokenInfo.expiresIn = map.getOrDefault("expires_in", "0").toInt()
-            tokenInfo.scope = map["scope"]
-            tokenInfo.tokenType = map["token_type"]
-            tokenInfo.refreshToken = map["refresh_token"]
+            tokenInfo.accessToken = result["access_token"]
+            tokenInfo.expiresIn = result.getOrDefault("expires_in", "0").toInt()
+            tokenInfo.scope = result["scope"]
+            tokenInfo.tokenType = result["token_type"]
+            tokenInfo.refreshToken = result["refresh_token"]
         }
 
         stepikApiClient.setTokenInfo(tokenInfo)

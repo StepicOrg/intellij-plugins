@@ -1,125 +1,25 @@
 package org.stepik.core.ui
 
 import com.intellij.ide.ui.LafManager
-import com.intellij.ide.ui.LafManagerListener
 import com.intellij.ide.ui.laf.darcula.DarculaLookAndFeelInfo
-import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.project.Project
 import javafx.application.Platform
 import javafx.concurrent.Worker
-import javafx.embed.swing.JFXPanel
-import javafx.scene.Scene
-import javafx.scene.layout.StackPane
-import javafx.scene.web.WebEngine
-import javafx.scene.web.WebView
 import netscape.javascript.JSException
-import netscape.javascript.JSObject
-import org.intellij.lang.annotations.Language
 import org.stepik.core.common.Loggable
-import org.stepik.core.courseFormat.stepHelpers.VideoTheoryHelper
 import org.stepik.core.templates.Templater
+import org.stepik.core.ui.FormListener.Companion.EVENT_TYPE_SUBMIT
 import org.w3c.dom.events.EventListener
 import org.w3c.dom.events.EventTarget
 import org.w3c.dom.html.HTMLFormElement
 import org.w3c.dom.html.HTMLInputElement
-import java.awt.BorderLayout
-import java.awt.Dimension
 import java.nio.charset.Charset
-import javax.swing.JFrame
-import javax.swing.WindowConstants
 
-class StudyBrowserWindow internal constructor(private val project: Project) : JFrame(), Loggable {
-    private val bridge = JavaBridge()
-    val panel: JFXPanel = JFXPanel()
-    private var webComponent: WebView? = null
-    private var pane: StackPane? = null
-    private var engine: WebEngine? = null
+class StudyBrowserWindow internal constructor(private val project: Project) : Browser(), Loggable {
 
-    init {
-        size = Dimension(900, 800)
-        layout = BorderLayout()
-        title = "Study Browser"
-        LafManager.getInstance().addLafManagerListener(StudyLafManagerListener())
-        initComponents()
-    }
-
-    private fun updateLaf(isDarcula: Boolean) {
-        if (isDarcula) {
-            updateLafDarcula()
-        } else {
-            updateIntellijAndGTKLaf()
-        }
-    }
-
-    private fun updateIntellijAndGTKLaf() {
-        Platform.runLater {
-            val scrollBarStyleUrl = getExternalURL("/style/javaFXBrowserScrollBar.css")
-            pane!!.stylesheets.add(scrollBarStyleUrl)
-            engine!!.userStyleSheetLocation = null
-            engine!!.reload()
-        }
-    }
-
-    private fun updateLafDarcula() {
-        Platform.runLater {
-            val engineStyleUrl = getExternalURL("/style/javaFXBrowserDarcula.css")
-            val scrollBarStyleUrl = getExternalURL("/style/javaFXBrowserDarculaScrollBar.css")
-            engine!!.userStyleSheetLocation = engineStyleUrl
-            pane!!.stylesheets.add(scrollBarStyleUrl)
-            pane!!.style = "-fx-background-color: #3c3f41"
-            panel.scene.stylesheets.add(engineStyleUrl)
-            engine!!.reload()
-        }
-    }
-
-    private fun initComponents() {
-        Platform.runLater {
-            pane = StackPane()
-            webComponent = WebView()
-            engine = webComponent!!.engine
-            pane!!.children.add(webComponent)
-            initHyperlinkListener()
-            initConsoleListener()
-            val scene = Scene(pane!!)
-            panel.scene = scene
-            panel.isVisible = true
-            updateLaf(LafManager.getInstance().currentLookAndFeel is DarculaLookAndFeelInfo)
-        }
-
-        add(panel, BorderLayout.CENTER)
-        defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
-    }
-
-    private fun initConsoleListener() {
-        engine!!.loadWorker
-                .stateProperty()
-                .addListener { _, _, newValue ->
-                    if (newValue != Worker.State.SUCCEEDED) {
-                        return@addListener
-                    }
-                    val window = engine!!.executeScript("window") as JSObject
-                    window.setMember("java", bridge)
-                    @Language("JavaScript")
-                    val script = """
-                        console.error = function (message) {
-                            java.error(message);
-                        };
-                        console.warn = function (message) {
-                            java.warn(message);
-                        };
-                        console.log = function (message) {
-                            java.log(message);
-                        };
-                        console.debug = function (message) {
-                            java.debug(message);
-                        };
-                        window.addEventListener('error', function (e) {
-                            java.doError(e.filename, e.lineno, e.colno, e.message);
-                            return true;
-                        });"""
-                    engine!!.executeScript(script)
-                }
+    override fun afterInitComponents() {
+        initListeners()
     }
 
     fun loadContent(template: String, context: Map<String, Any>, init: () -> Unit = {}) {
@@ -165,11 +65,7 @@ class StudyBrowserWindow internal constructor(private val project: Project) : JF
         return Templater.processTemplate(template, map)
     }
 
-    private fun getExternalURL(internalPath: String): String {
-        return javaClass.getResource(internalPath).toExternalForm()
-    }
-
-    private fun initHyperlinkListener() {
+    private fun initListeners() {
         engine!!.loadWorker.stateProperty().addListener { _, _, newState ->
             if (newState == Worker.State.SUCCEEDED) {
                 val linkListener = makeHyperLinkListener()
@@ -177,7 +73,7 @@ class StudyBrowserWindow internal constructor(private val project: Project) : JF
 
                 val formListener = FormListener(project, this)
                 val doc = engine!!.document
-                (doc as EventTarget).addEventListener(FormListener.EVENT_TYPE_SUBMIT, formListener, false)
+                (doc as EventTarget).addEventListener(EVENT_TYPE_SUBMIT, formListener, false)
             }
         }
     }
@@ -213,39 +109,6 @@ class StudyBrowserWindow internal constructor(private val project: Project) : JF
             } catch (e: JSException) {
                 logger.error(e)
             }
-        }
-    }
-
-    private inner class StudyLafManagerListener : LafManagerListener {
-        override fun lookAndFeelChanged(manager: LafManager) {
-            updateLaf(manager.currentLookAndFeel is DarculaLookAndFeelInfo)
-        }
-    }
-
-    inner class JavaBridge {
-        fun log(text: String) {
-            logger.info("console: $text")
-        }
-
-        fun error(text: String) {
-            logger.error("console: $text")
-        }
-
-        fun warn(text: String) {
-            logger.warn("console: $text")
-        }
-
-        fun debug(text: String) {
-            logger.debug("console: $text")
-        }
-
-        fun doError(filename: String, lineno: Int, colno: Int, message: String) {
-            error("\nfilename: $filename\nline: $lineno\ncolumn: $colno\nmessage: $message")
-        }
-
-        fun setVideoQuality(value: Int?) {
-            PropertiesComponent.getInstance()
-                    .setValue(VideoTheoryHelper.VIDEO_QUALITY_PROPERTY_NAME, value.toString())
         }
     }
 
