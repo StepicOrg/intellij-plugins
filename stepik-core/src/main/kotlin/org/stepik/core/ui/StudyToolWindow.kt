@@ -97,7 +97,10 @@ class StudyToolWindow internal constructor() :
 
     private fun setEmptyText() {
         val content = getConfigurator(project!!)?.pluginDescription() ?: ""
-        val context = mapOf("description" to content)
+        val context = mapOf(
+                "description" to content,
+                "authenticated" to isAuthenticated
+        )
         browserWindow?.loadContent("quiz/empty", context)
     }
 
