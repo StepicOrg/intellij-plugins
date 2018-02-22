@@ -15,7 +15,7 @@ pycharm {
 
 dependencies {
     compile project(":stepik-java-api")
-    compile 'org.freemarker:freemarker:2.3.23'
+    compile 'org.freemarker:freemarker:2.3.27-incubating'
 }
 
 group 'org.stepik'
