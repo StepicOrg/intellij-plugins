@@ -42,7 +42,7 @@ object StudyUtils : Loggable {
         val toolWindowManager = ToolWindowManager.getInstance(project) ?: return null
         val contents = toolWindowManager.getToolWindow(STUDY_TOOL_WINDOW)
                 ?.contentManager?.contents
-        return contents?.mapNotNull { it.component as? StudyToolWindow }?.first()
+        return contents?.mapNotNull { it.component as? StudyToolWindow }?.firstOrNull()
     }
 
     fun getConfigurator(project: Project): StudyPluginConfigurator? {

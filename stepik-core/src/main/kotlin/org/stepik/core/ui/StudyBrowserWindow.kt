@@ -26,7 +26,6 @@ import org.w3c.dom.html.HTMLInputElement
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.nio.charset.Charset
-import java.util.*
 import javax.swing.JFrame
 import javax.swing.WindowConstants
 
@@ -123,19 +122,23 @@ class StudyBrowserWindow internal constructor(private val project: Project) : JF
                 }
     }
 
-    fun loadContent(template: String, context: Map<String, Any>) {
+    fun loadContent(template: String, context: Map<String, Any>, init: () -> Unit = {}) {
         val content = getContent(template, context)
         Platform.runLater {
-            val document = engine!!.document
-            if (document != null) {
-                val form = document.getElementById("answer_form") as? HTMLFormElement
-                if (form != null) {
-                    val action = form.elements.namedItem("action") as HTMLInputElement
-                    action.value = "save_reply"
-                    FormListener.handle(project, this, form)
-                }
+            val form = engine!!.document?.getElementById("answer_form") as? HTMLFormElement
+            if (form != null) {
+                val action = form.elements.namedItem("action") as HTMLInputElement
+                action.value = "save_reply"
+                FormListener.handle(project, this, form)
             }
             engine!!.loadContent(content)
+            engine!!.loadWorker
+                    .stateProperty()
+                    .addListener { _, _, newValue ->
+                        if (newValue == Worker.State.SUCCEEDED) {
+                            init()
+                        }
+                    }
         }
     }
 
@@ -143,17 +146,20 @@ class StudyBrowserWindow internal constructor(private val project: Project) : JF
         val editorColorsScheme = EditorColorsManager.getInstance().globalScheme
         val fontSize = editorColorsScheme.editorFontSize
 
-        val map = HashMap<String, Any>()
-        map["font_size"] = (fontSize - 2).toString()
-        map["highlight"] = getExternalURL("/highlight/highlight.pack.js")
-        if (LafManager.getInstance().currentLookAndFeel is DarculaLookAndFeelInfo) {
-            map["css_highlight"] = getExternalURL("/highlight/styles/darcula.css")
-        } else {
-            map["css_highlight"] = getExternalURL("/highlight/styles/idea.css")
-        }
-        map["charset"] = Charset.defaultCharset().displayName()
-        map["loader"] = getExternalURL("/templates/img/loader.svg")
-        map["login_css"] = getExternalURL("/templates/login/css/login.css")
+        val map = mutableMapOf<String, Any>(
+                "font_size" to (fontSize - 2).toString(),
+                "highlight" to getExternalURL("/highlight/highlight.pack.js"),
+                "css_highlight" to getExternalURL(
+                        if (LafManager.getInstance().currentLookAndFeel is DarculaLookAndFeelInfo) {
+                            "/highlight/styles/darcula.css"
+                        } else {
+                            "/highlight/styles/idea.css"
+                        }
+                ),
+                "charset" to Charset.defaultCharset().displayName(),
+                "loader" to getExternalURL("/templates/img/loader.svg"),
+                "login_css" to getExternalURL("/templates/login/css/login.css")
+        )
         map.putAll(context)
 
         return Templater.processTemplate(template, map)

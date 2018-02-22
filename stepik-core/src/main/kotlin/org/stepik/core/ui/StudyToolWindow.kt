@@ -55,8 +55,11 @@ import org.stepik.core.courseFormat.stepHelpers.StringQuizHelper
 import org.stepik.core.courseFormat.stepHelpers.TableQuizHelper
 import org.stepik.core.courseFormat.stepHelpers.TextTheoryHelper
 import org.stepik.core.courseFormat.stepHelpers.VideoTheoryHelper
+import org.stepik.core.stepik.StepikAuthManager
 import org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient
 import org.stepik.core.stepik.StepikAuthManager.isAuthenticated
+import org.stepik.core.stepik.StepikAuthManagerListener
+import org.stepik.core.stepik.StepikAuthState
 import org.stepik.core.utils.ProgrammingLanguageUtils.switchProgrammingLanguage
 import java.awt.BorderLayout
 import java.awt.CardLayout
@@ -71,7 +74,7 @@ import javax.swing.JPanel
 import javax.swing.SwingUtilities
 
 class StudyToolWindow internal constructor() :
-        SimpleToolWindowPanel(true, true), DataProvider, Disposable, ActionListener {
+        SimpleToolWindowPanel(true, true), DataProvider, Disposable, ActionListener, StepikAuthManagerListener {
 
     private val languageBox: JComboBox<SupportedLanguages>
     private val cardLayout: JBCardLayout
@@ -94,9 +97,10 @@ class StudyToolWindow internal constructor() :
 
     private fun setEmptyText() {
         val context = mapOf("content" to EMPTY_STEP_TEXT)
-        browserWindow?.loadContent("template", context)
-        if (!isAuthenticated) {
-            browserWindow?.callFunction("showLogin")
+        browserWindow?.loadContent("quiz/empty", context) {
+            if (!isAuthenticated) {
+                browserWindow?.callFunction("showLogin")
+            }
         }
     }
 
@@ -129,6 +133,7 @@ class StudyToolWindow internal constructor() :
             project.messageBus.connect().subscribe(FILE_EDITOR_MANAGER, listener)
         }
         setStepNode(getProjectManager(project)?.selected)
+        StepikAuthManager.addListener(this)
     }
 
     private fun setActionToolbar(group: DefaultActionGroup) {
@@ -318,6 +323,10 @@ class StudyToolWindow internal constructor() :
                 StudyBasePluginConfigurator.defaultActionGroup
             }
         }
+    }
+
+    override fun stateChanged(oldState: StepikAuthState, newState: StepikAuthState) {
+        setStepNode(stepNode, true)
     }
 
     init {

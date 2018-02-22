@@ -1,30 +1,24 @@
 package org.stepik.core.templates
 
 import freemarker.template.Configuration
-import freemarker.template.TemplateException
 import org.stepik.core.common.Loggable
 import java.io.ByteArrayOutputStream
-import java.io.IOException
 import java.io.PrintWriter
 
 
 object Templater : Loggable {
-    private var config: Configuration? = null
+    private val config by lazy {
+        initConfig()
+    }
 
     fun processTemplate(templateName: String, map: Map<String, Any?>): String {
-        if (config == null) {
-            config = initConfig()
-        }
-
         try {
             ByteArrayOutputStream().use {
-                val template = config!!.getTemplate("$templateName.ftl")
+                val template = config.getTemplate("$templateName.ftl")
                 template.process(map, PrintWriter(it))
                 return it.toString()
             }
-        } catch (e: TemplateException) {
-            logger.warn(e)
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             logger.warn(e)
         }
 
