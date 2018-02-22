@@ -24,6 +24,10 @@ import org.stepik.plugin.projectWizard.idea.SandboxModuleBuilder
 import org.stepik.plugin.projectWizard.idea.StepModuleBuilder
 
 class StepikPluginConfigurator : StudyBasePluginConfigurator() {
+    override fun pluginDescription(): String {
+        return "Please, open any step to see step description"
+    }
+
     override fun getSandboxModuleBuilder(path: String): BaseModuleBuilder? {
         return SandboxModuleBuilder(path)
     }

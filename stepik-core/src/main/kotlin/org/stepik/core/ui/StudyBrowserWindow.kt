@@ -127,8 +127,8 @@ class StudyBrowserWindow internal constructor(private val project: Project) : JF
         Platform.runLater {
             val form = engine!!.document?.getElementById("answer_form") as? HTMLFormElement
             if (form != null) {
-                val action = form.elements.namedItem("action") as HTMLInputElement
-                action.value = "save_reply"
+                val action = form.elements.namedItem("action") as? HTMLInputElement
+                action?.value = "save_reply"
                 FormListener.handle(project, this, form)
             }
             engine!!.loadContent(content)

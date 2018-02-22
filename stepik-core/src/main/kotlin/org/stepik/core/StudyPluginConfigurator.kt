@@ -31,6 +31,9 @@ interface StudyPluginConfigurator {
     fun getProjectGenerator(): ProjectGenerator?
 
     fun getStepModuleBuilder(moduleDir: String, step: StepNode): BaseModuleBuilder?
+
     fun getSandboxModuleBuilder(path: String): BaseModuleBuilder?
+
+    fun pluginDescription(): String
 }
 

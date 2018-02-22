@@ -1,3 +1,5 @@
+<#-- @ftlvariable name="description" type="java.lang.String" -->
+
 <#include "../template.ftl">
 
 <@styles>
@@ -7,9 +9,12 @@
 </@styles>
 
 <@content>
-    <#macro step_content>
-        <#nested/>
-    </#macro>
+    ${description}
+
+    <div>
+        <button type="button" onclick="showLogin()">Login</button>
+    </div>
+
 </@content>
 
 <@scripts>

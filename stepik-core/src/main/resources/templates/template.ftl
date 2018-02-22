@@ -1,6 +1,5 @@
 <#-- @ftlvariable name="stepNode" type="org.stepik.core.courseFormat.stepHelpers.StepHelper" -->
 <#-- @ftlvariable name="login_css" type="java.lang.String" -->
-<#-- @ftlvariable name="content" type="java.lang.String" -->
 <#-- @ftlvariable name="loader" type="java.lang.String" -->
 <#-- @ftlvariable name="mathjax" type="java.lang.String" -->
 <#-- @ftlvariable name="charset" type="java.lang.String" -->
@@ -41,10 +40,6 @@
     <#nested/>
 </#macro>
 
-<#if content?has_content>
-    ${content}
-</#if>
-
 </head>
 <body>
 
@@ -79,6 +74,7 @@
       TeX: {extensions: ["mhchem.js", "color.js"]},
       messageStyle: "none",
     });
+
 
 
 </script>

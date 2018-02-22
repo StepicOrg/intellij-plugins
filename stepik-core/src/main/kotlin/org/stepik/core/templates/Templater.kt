@@ -26,7 +26,7 @@ object Templater : Loggable {
     }
 
     private fun initConfig(): Configuration {
-        val config = Configuration(Configuration.VERSION_2_3_23)
+        val config = Configuration(Configuration.VERSION_2_3_27)
         config.setClassLoaderForTemplateLoading(Templater::class.java.classLoader, "/templates")
         return config
     }

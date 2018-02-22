@@ -96,12 +96,9 @@ class StudyToolWindow internal constructor() :
     }
 
     private fun setEmptyText() {
-        val context = mapOf("content" to EMPTY_STEP_TEXT)
-        browserWindow?.loadContent("quiz/empty", context) {
-            if (!isAuthenticated) {
-                browserWindow?.callFunction("showLogin")
-            }
-        }
+        val content = getConfigurator(project!!)?.pluginDescription() ?: ""
+        val context = mapOf("description" to content)
+        browserWindow?.loadContent("quiz/empty", context)
     }
 
     private fun createToolbarPanel(group: ActionGroup): JPanel {
@@ -305,7 +302,6 @@ class StudyToolWindow internal constructor() :
 
     companion object : Loggable {
         private const val STEP_INFO_ID = "stepInfo"
-        private const val EMPTY_STEP_TEXT = "Please, open any step to see step description"
         private val executor = Executors.newSingleThreadExecutor()
 
         private fun getActionGroup(project: Project): DefaultActionGroup {
