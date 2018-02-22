@@ -6,7 +6,7 @@ import javax.swing.Icon
 
 abstract class StudyActionWithShortcut protected constructor(text: String?,
                                                              description: String?,
-                                                             icon: Icon?) :
+                                                             icon: Icon? = null) :
         DumbAwareAction(text, description, icon), Loggable {
     abstract fun getActionId(): String
     abstract fun getShortcuts(): Array<String>?

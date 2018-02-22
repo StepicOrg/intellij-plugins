@@ -28,9 +28,18 @@
     <action id="Alt.OpenInBrowser" class="org.stepik.alt.actions.step.OpenInBrowserAction" />
     <action id="STEPIK.TestSamplesAction" class="org.stepik.core.actions.step.TestSamplesAction" />
 
+    <group id="StepikMenu" popup="true" text="Stepik">
+      <action id="STEPIK.LoginAction" class="org.stepik.core.actions.LoginAction" />
+      <action id="STEPIK.LogoutAction" class="org.stepik.core.actions.LogoutAction" />
+      <separator />
+      <action id="Alt.AboutAltAction" class="org.stepik.alt.actions.AboutAction" />
+
+      <add-to-group group-id="MainMenu" anchor="last" />
+    </group>
+
     <action id="Alt.StartAltAction" class="org.stepik.alt.actions.StartAltAction">
       <add-to-group group-id="WelcomeScreen.QuickStart" anchor="first" />
-      <add-to-group group-id="FileMenu" anchor="first" />
+      <add-to-group group-id="StepikMenu" anchor="first" />
     </action>
   </actions>
 

@@ -84,7 +84,7 @@ class StudyToolWindow internal constructor() :
     private val rightPanel: Panel
     private var project: Project? = null
     private var stepNode: StepNode? = null
-    private var browserWindow: StudyBrowserWindow? = null
+    var browserWindow: StudyBrowserWindow? = null
 
     private fun createStepInfoPanel(project: Project): JComponent {
         val browserWindow = StudyBrowserWindow(project)
