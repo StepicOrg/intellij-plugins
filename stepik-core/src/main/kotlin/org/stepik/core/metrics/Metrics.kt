@@ -1,11 +1,10 @@
 package org.stepik.core.metrics
 
 import com.intellij.openapi.application.ApplicationInfo
-import com.intellij.openapi.components.ServiceManager.getService
 import com.intellij.openapi.project.Project
 import org.stepik.api.client.StepikApiClient
 import org.stepik.api.objects.metrics.Metric
-import org.stepik.core.ProjectManager
+import org.stepik.core.StudyUtils.getProjectManager
 import org.stepik.core.SupportedLanguages
 import org.stepik.core.common.Loggable
 import org.stepik.core.courseFormat.StepNode
@@ -49,7 +48,7 @@ object Metrics : Loggable {
                     .data("session", session)
                     .tags("status", status)
 
-            val projectManager = getService(project, ProjectManager::class.java)
+            val projectManager = getProjectManager(project)
 
             if (projectManager != null) {
                 query.data("project_id", projectManager.getUuid())

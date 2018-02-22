@@ -1,7 +1,6 @@
 package org.stepik.plugin.projectWizard.pycharm
 
 import com.intellij.openapi.application.ApplicationManager.getApplication
-import com.intellij.openapi.components.ServiceManager.getService
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.DefaultProjectFactory
 import com.intellij.openapi.project.Project
@@ -17,8 +16,8 @@ import com.jetbrains.python.newProject.PyNewProjectSettings
 import com.jetbrains.python.newProject.PythonProjectGenerator
 import com.jetbrains.python.remote.PyProjectSynchronizer
 import org.jetbrains.annotations.Nls
-import org.stepik.core.ProjectManager
 import org.stepik.core.StudyProjectComponent
+import org.stepik.core.StudyUtils.getProjectManager
 import org.stepik.core.common.Loggable
 import org.stepik.core.core.EduNames
 import org.stepik.core.courseFormat.StepNode
@@ -143,7 +142,7 @@ internal class StepikPyProjectGenerator private constructor() :
 
         FileUtil.createDirectory(File(project.basePath, EduNames.SANDBOX_DIR))
 
-        val projectManager = getService(project, ProjectManager::class.java)
+        val projectManager = getProjectManager(project)
         if (projectManager == null) {
             logger.warn("failed to generate builders: StepikProjectManager is null")
             return

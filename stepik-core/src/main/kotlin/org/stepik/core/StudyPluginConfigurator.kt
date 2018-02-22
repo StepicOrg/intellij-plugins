@@ -1,7 +1,6 @@
 package org.stepik.core
 
 import com.intellij.openapi.actionSystem.DefaultActionGroup
-import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.fileEditor.FileEditorManagerListener
 import com.intellij.openapi.project.Project
 import org.stepik.core.courseFormat.StepNode
@@ -30,12 +29,6 @@ interface StudyPluginConfigurator {
     fun nextAction(node: StepNode?): StudyNode?
 
     fun getProjectGenerator(): ProjectGenerator?
-
-    companion object {
-        val EP_NAME = ExtensionPointName.create<StudyPluginConfigurator>(
-                "org.stepik.plugin.union.studyPluginConfigurator")
-
-    }
 
     fun getStepModuleBuilder(moduleDir: String, step: StepNode): BaseModuleBuilder?
     fun getSandboxModuleBuilder(path: String): BaseModuleBuilder?

@@ -4,12 +4,11 @@ import com.intellij.ide.projectView.ProjectView
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.ApplicationManager.getApplication
 import com.intellij.openapi.command.CommandProcessor
-import com.intellij.openapi.components.ServiceManager.getService
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
 import com.intellij.problems.WolfTheProblemSolver
-import org.stepik.core.ProjectManager
+import org.stepik.core.StudyUtils.getProjectManager
 import org.stepik.core.actions.getShortcutText
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.icons.AllStepikIcons
@@ -58,8 +57,7 @@ class StepikResetStepAction : CodeQuizAction(TEXT, DESCRIPTION, AllStepikIcons.T
                         ProjectView.getInstance(project).refresh()
                         WolfTheProblemSolver.getInstance(project).clearProblems(mainFile)
                     }
-                    val projectManager = getService(project, ProjectManager::class.java)
-                    projectManager?.updateSelection()
+                    getProjectManager(project)?.updateSelection()
                 }
             }
         }

@@ -1,14 +1,13 @@
 package org.stepik.alt.projectWizard.idea
 
 import com.intellij.ide.highlighter.ModuleFileType
-import com.intellij.openapi.components.ServiceManager.getService
 import com.intellij.openapi.module.ModifiableModuleModel
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.VirtualFileManager
 import org.stepik.alt.projectWizard.StepikProjectGenerator
-import org.stepik.core.ProjectManager
+import org.stepik.core.StudyUtils.getProjectManager
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.projectWizard.ProjectWizardUtils.createSubDirectories
 import org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory
@@ -38,8 +37,7 @@ class CourseModuleBuilder(moduleDir: String? = null) : AbstractModuleBuilder() {
         logger.info("Module dir = $moduleDir")
         SandboxModuleBuilder(moduleDir).createModule(moduleModel)
 
-        val projectManager = getService(project, ProjectManager::class.java)
-        val root = projectManager?.projectRoot
+        val root = getProjectManager(project)?.projectRoot
         if (root == null) {
             logger.info("Failed to generate builders: project root is null")
             return

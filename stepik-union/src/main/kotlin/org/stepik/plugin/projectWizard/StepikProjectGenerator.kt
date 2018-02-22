@@ -1,13 +1,12 @@
 package org.stepik.plugin.projectWizard
 
-import com.intellij.openapi.components.ServiceManager.getService
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ex.ProjectEx
 import org.stepik.api.exceptions.StepikClientException
 import org.stepik.api.objects.StudyObject
 import org.stepik.core.ProjectGenerator
-import org.stepik.core.ProjectManager
+import org.stepik.core.StudyUtils.getProjectManager
 import org.stepik.core.SupportedLanguages
 import org.stepik.core.common.Loggable
 import org.stepik.core.courseFormat.StudyNode
@@ -42,7 +41,7 @@ object StepikProjectGenerator : ProjectGenerator, Loggable {
     }
 
     fun generateProject(project: Project) {
-        val projectManager = getService(project, ProjectManager::class.java)
+        val projectManager = getProjectManager(project)
         if (projectManager == null) {
             Metrics.createProject(project, TARGET_NOT_FOUND)
             return

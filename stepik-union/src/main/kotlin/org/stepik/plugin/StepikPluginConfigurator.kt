@@ -1,9 +1,11 @@
 package org.stepik.plugin
 
 import com.intellij.openapi.actionSystem.DefaultActionGroup
+import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.project.Project
 import org.stepik.core.ProjectGenerator
 import org.stepik.core.StudyBasePluginConfigurator
+import org.stepik.core.StudyPluginConfigurator
 import org.stepik.core.StudyUtils.isStepikProject
 import org.stepik.core.actions.navigation.StudyNavigator
 import org.stepik.core.actions.step.DownloadSubmission
@@ -56,5 +58,11 @@ class StepikPluginConfigurator : StudyBasePluginConfigurator() {
 
     override fun accept(project: Project): Boolean {
         return isStepikProject(project)
+    }
+
+    companion object {
+        val EP_NAME = ExtensionPointName.create<StudyPluginConfigurator>(
+                "org.stepik.plugin.union.studyPluginConfigurator")
+
     }
 }

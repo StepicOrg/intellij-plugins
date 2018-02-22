@@ -3,7 +3,6 @@ package org.stepik.core.utils
 import com.intellij.ide.projectView.ProjectView
 import com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.components.ServiceManager.getService
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
@@ -13,7 +12,7 @@ import com.intellij.psi.PsiFileSystemItem
 import com.intellij.psi.PsiManager
 import com.intellij.util.ui.tree.TreeUtil
 import com.intellij.util.ui.tree.TreeUtil.getPathFromRoot
-import org.stepik.core.ProjectManager
+import org.stepik.core.StudyUtils.getProjectManager
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.StudyNode
 import org.stepik.core.metrics.Metrics
@@ -50,10 +49,8 @@ object NavigationUtils {
             }
         }
         Metrics.navigateAction(project, targetNode)
-        val projectManager = getService(project, ProjectManager::class.java)
-        if (projectManager != null) {
-            projectManager.selected = targetNode
-        }
+
+        getProjectManager(project)?.selected = targetNode
 
         val runToolWindow = ToolWindowManager.getInstance(project).getToolWindow(ToolWindowId.RUN)
         if (runToolWindow != null) {

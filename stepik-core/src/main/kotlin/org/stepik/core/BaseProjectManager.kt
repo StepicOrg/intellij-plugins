@@ -5,6 +5,7 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ApplicationManager.getApplication
 import com.intellij.openapi.components.PersistentStateComponent
+import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.progress.ProgressIndicator
@@ -17,7 +18,6 @@ import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.thoughtworks.xstream.annotations.XStreamOmitField
 import org.jdom.Element
-import org.stepik.core.StudyUtils.getConfigurator
 import org.stepik.core.common.Loggable
 import org.stepik.core.core.EduNames
 import org.stepik.core.courseFormat.StepNode
@@ -288,4 +288,12 @@ abstract class BaseProjectManager constructor(@field:XStreamOmitField val projec
         StepikAuthManager.removeListener(this)
         executor.shutdown()
     }
+
+
+    override fun getConfigurator(project: Project): StudyPluginConfigurator? {
+        val extensions = getConfiguratorEPName().extensions
+        return extensions.firstOrNull { it.accept(project) }
+    }
+
+    abstract fun getConfiguratorEPName(): ExtensionPointName<StudyPluginConfigurator>
 }

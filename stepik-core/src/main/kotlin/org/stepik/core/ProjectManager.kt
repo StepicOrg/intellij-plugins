@@ -1,5 +1,6 @@
 package org.stepik.core
 
+import com.intellij.openapi.project.Project
 import org.stepik.core.courseFormat.StudyNode
 
 interface ProjectManager {
@@ -14,4 +15,5 @@ interface ProjectManager {
     fun updateAdaptiveSelected() // FIXME
     var createdBy: Long
     fun refreshProjectFiles()
+    fun getConfigurator(project: Project): StudyPluginConfigurator?
 }

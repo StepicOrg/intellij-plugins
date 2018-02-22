@@ -3,11 +3,10 @@ package org.stepik.core.actions
 import com.intellij.execution.ui.ConsoleViewContentType.ERROR_OUTPUT
 import com.intellij.ide.projectView.ProjectView
 import com.intellij.openapi.application.ApplicationManager.getApplication
-import com.intellij.openapi.components.ServiceManager.getService
 import com.intellij.openapi.project.Project
 import org.stepik.api.client.StepikApiClient
 import org.stepik.api.objects.submissions.Submission
-import org.stepik.core.ProjectManager
+import org.stepik.core.StudyUtils.getProjectManager
 import org.stepik.core.common.Loggable
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.StudyStatus
@@ -92,8 +91,7 @@ object SendAction : Loggable {
             if (!project.isDisposed) {
                 ProjectView.getInstance(project).refresh()
             }
-            val projectManager = getService(project, ProjectManager::class.java)
-            projectManager?.updateSelection()
+            getProjectManager(project)?.updateSelection()
         }
         logger.info("Finish check a status for step: $stepIdString with status: $stepStatus")
     }

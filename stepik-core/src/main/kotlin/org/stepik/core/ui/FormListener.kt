@@ -2,14 +2,13 @@ package org.stepik.core.ui
 
 import com.intellij.execution.ui.ConsoleViewContentType
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.components.ServiceManager.getService
 import com.intellij.openapi.project.Project
 import javafx.application.Platform
 import javafx.stage.FileChooser
 import org.stepik.api.objects.ObjectsContainer
-import org.stepik.core.ProjectManager
-import org.stepik.core.StudyUtils
 import org.stepik.core.StudyUtils.getConfigurator
+import org.stepik.core.StudyUtils.getProjectManager
+import org.stepik.core.StudyUtils.getStudyNode
 import org.stepik.core.actions.SendAction
 import org.stepik.core.common.Loggable
 import org.stepik.core.courseFormat.StepNode
@@ -74,8 +73,7 @@ internal class FormListener(private val project: Project, private val browser: S
                     .whenComplete { attempts, e ->
                         if (attempts != null) {
                             node.cleanLastReply()
-                            val projectManager = getService(project, ProjectManager::class.java)
-                            projectManager?.updateSelection()
+                            getProjectManager(project)?.updateSelection()
                         } else {
                             logger.warn(e)
                         }
@@ -116,8 +114,7 @@ internal class FormListener(private val project: Project, private val browser: S
 
                         if (submissions == null) {
                             printError(e, resultWindow)
-                            val projectManager = getService(project, ProjectManager::class.java)
-                            projectManager?.updateSelection()
+                            getProjectManager(project)?.updateSelection()
                             return@whenComplete
                         }
 
@@ -145,12 +142,11 @@ internal class FormListener(private val project: Project, private val browser: S
                 project: Project,
                 browser: StudyBrowserWindow,
                 form: HTMLFormElement) {
-            val projectManager = getService(project, ProjectManager::class.java)
-            val root = projectManager?.projectRoot ?: return
+            val root = getProjectManager(project)?.projectRoot ?: return
 
             val elements = Elements(form.elements)
 
-            val node = StudyUtils.getStudyNode(root, form.action) as? StepNode
+            val node = getStudyNode(root, form.action) as? StepNode
 
             if (node == null && elements.action !in listOf("login", "next_step")) {
                 return

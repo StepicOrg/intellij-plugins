@@ -1,6 +1,7 @@
 package org.stepik.alt
 
 import com.intellij.openapi.actionSystem.DefaultActionGroup
+import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.project.Project
 import org.stepik.alt.actions.navigation.StepikNextStepAction
 import org.stepik.alt.actions.step.OpenInBrowserAction
@@ -9,6 +10,7 @@ import org.stepik.alt.projectWizard.idea.SandboxModuleBuilder
 import org.stepik.alt.projectWizard.idea.StepModuleBuilder
 import org.stepik.core.ProjectGenerator
 import org.stepik.core.StudyBasePluginConfigurator
+import org.stepik.core.StudyPluginConfigurator
 import org.stepik.core.StudyUtils.isStepikProject
 import org.stepik.core.actions.step.DownloadSubmission
 import org.stepik.core.actions.step.InsertStepikDirectives
@@ -19,7 +21,7 @@ import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.StudyNode
 import org.stepik.core.projectWizard.idea.BaseModuleBuilder
 
-class StepikPluginConfigurator : StudyBasePluginConfigurator() {
+class AltProjectConfigurator : StudyBasePluginConfigurator() {
     override fun getSandboxModuleBuilder(path: String): BaseModuleBuilder? {
         return SandboxModuleBuilder(path)
     }
@@ -53,5 +55,11 @@ class StepikPluginConfigurator : StudyBasePluginConfigurator() {
 
     override fun accept(project: Project): Boolean {
         return isStepikProject(project)
+    }
+
+    companion object {
+        val EP_NAME = ExtensionPointName.create<StudyPluginConfigurator>(
+                "org.stepik.alt.studyPluginConfigurator")
+
     }
 }

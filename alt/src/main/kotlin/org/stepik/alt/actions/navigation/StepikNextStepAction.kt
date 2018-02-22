@@ -2,10 +2,9 @@ package org.stepik.alt.actions.navigation
 
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ex.MessagesEx
-import org.stepik.core.ProjectManager
+import org.stepik.core.StudyUtils.getProjectManager
 import org.stepik.core.actions.getShortcutText
 import org.stepik.core.actions.navigation.StudyNavigator
 import org.stepik.core.actions.navigation.StudyStepNavigationAction
@@ -25,9 +24,9 @@ class StepikNextStepAction : StudyStepNavigationAction(TEXT, DESCRIPTION, AllIco
             val matcher = template.matchEntire(input)
             if (matcher != null) {
                 val lessonId = matcher.groups[1]!!.value
-                val projectManager = ServiceManager.getService(project, ProjectManager::class.java)
+                val projectManager = getProjectManager(project)
                 val stepikApiClient = authAndGetStepikApiClient()
-                val root = projectManager.projectRoot
+                val root = projectManager?.projectRoot
                 lesson = LessonNode(project, stepikApiClient)
                 lesson.id = lessonId.toLong()
                 lesson.parent = root

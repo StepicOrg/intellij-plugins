@@ -2,7 +2,6 @@ package org.stepik.core.ui
 
 import com.intellij.ide.BrowserUtil
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.components.ServiceManager.getService
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import javafx.scene.web.WebEngine
@@ -14,6 +13,7 @@ import org.stepik.api.objects.recommendations.ReactionValues.of
 import org.stepik.api.urls.Urls
 import org.stepik.core.ProjectManager
 import org.stepik.core.StudyUtils
+import org.stepik.core.StudyUtils.getProjectManager
 import org.stepik.core.common.Loggable
 import org.stepik.core.courseFormat.LessonNode
 import org.stepik.core.courseFormat.StepNode
@@ -33,11 +33,7 @@ class LinkListener(val project: Project,
                    val engine: WebEngine) : EventListener, Loggable {
     private val protocolPattern = Pattern.compile("([a-z]+):(.*)")
     private val pattern = Pattern.compile("/lesson(?:/|/[^/]*-)(\\d+)/step/(\\d+).*")
-    private val projectManager: ProjectManager? = if (!project.isDisposed) {
-        getService(project, ProjectManager::class.java)
-    } else {
-        null
-    }
+    private val projectManager: ProjectManager? = if (!project.isDisposed) getProjectManager(project) else null
 
     override fun handleEvent(ev: Event) {
         if (ev.type == "click") {

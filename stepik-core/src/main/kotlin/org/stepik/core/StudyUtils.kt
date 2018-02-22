@@ -12,6 +12,7 @@ import org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient
 import org.stepik.core.stepik.StepikAuthManager.isAuthenticated
 import org.stepik.core.ui.StudyToolWindow
 import org.stepik.core.ui.StudyToolWindowFactory
+import org.stepik.core.ui.StudyToolWindowFactory.Companion.STUDY_TOOL_WINDOW
 import org.stepik.core.utils.ProjectFilesUtils
 import java.util.regex.Pattern
 
@@ -23,15 +24,15 @@ object StudyUtils : Loggable {
             "(?:section([0-9]+)/lesson([0-9]+))|" +
             "(?:section([0-9]+))" +
             ").*$"
-    private var pathPattern: Pattern? = null
+    private val pathPattern by lazy {
+        Pattern.compile(PATH_PATTERN)
+    }
 
     fun initToolWindows(project: Project) {
-        val windowManager = ToolWindowManager.getInstance(project)
-        windowManager.getToolWindow(StudyToolWindowFactory.STUDY_TOOL_WINDOW)
-                .contentManager
-                .removeAllContents(false)
-        val factory = StudyToolWindowFactory()
-        factory.createToolWindowContent(project, windowManager.getToolWindow(StudyToolWindowFactory.STUDY_TOOL_WINDOW))
+        val toolWindow = ToolWindowManager.getInstance(project)
+                .getToolWindow(STUDY_TOOL_WINDOW)
+        toolWindow.contentManager.removeAllContents(false)
+        StudyToolWindowFactory().createToolWindowContent(project, toolWindow)
     }
 
     fun getStudyToolWindow(project: Project): StudyToolWindow? {
@@ -39,35 +40,28 @@ object StudyUtils : Loggable {
             return null
         }
         val toolWindowManager = ToolWindowManager.getInstance(project) ?: return null
-        val toolWindow = toolWindowManager.getToolWindow(StudyToolWindowFactory.STUDY_TOOL_WINDOW)
-        if (toolWindow != null) {
-            val contents = toolWindow.contentManager.contents
-            for (content in contents) {
-                val component = content.component
-                if (component != null && component is StudyToolWindow) {
-                    return component
-                }
-            }
-        }
-        return null
+        val contents = toolWindowManager.getToolWindow(STUDY_TOOL_WINDOW)
+                ?.contentManager?.contents
+        return contents?.mapNotNull { it.component as? StudyToolWindow }?.first()
     }
 
     fun getConfigurator(project: Project): StudyPluginConfigurator? {
-        val extensions = StudyPluginConfigurator.EP_NAME.extensions
-        return extensions.firstOrNull { it.accept(project) }
+        return getProjectManager(project)?.getConfigurator(project)
+    }
+
+    fun getProjectManager(project: Project): ProjectManager? {
+        return getService(project, ProjectManager::class.java)
     }
 
     private fun getRelativePath(project: Project, item: VirtualFile): String {
-        val path = item.path
-        val basePath = project.basePath ?: return path
+        val basePath = project.basePath ?: return item.path
 
-        return ProjectFilesUtils.getRelativePath(basePath, path)
+        return ProjectFilesUtils.getRelativePath(basePath, item.path)
     }
 
     fun getStudyNode(project: Project, nodeVF: VirtualFile): StudyNode? {
+        val root = getProjectManager(project)?.projectRoot ?: return null
         val path = getRelativePath(project, nodeVF)
-        val projectManager = getService(project, ProjectManager::class.java)
-        val root = projectManager?.projectRoot ?: return null
 
         return getStudyNode(root, path)
     }
@@ -78,24 +72,13 @@ object StudyUtils : Loggable {
             return myRoot
         }
 
-        if (pathPattern == null) {
-            pathPattern = Pattern.compile(PATH_PATTERN)
-        }
-        val matcher = pathPattern!!.matcher(relativePath)
+        val matcher = pathPattern.matcher(relativePath)
         if (!matcher.matches()) {
             return null
         }
 
-        for (i in 1..matcher.groupCount()) {
-            val idString = matcher.group(i) ?: continue
-
-            val id = Integer.parseInt(idString)
-
-            myRoot = myRoot?.getChildById(id.toLong())
-            if (myRoot == null) {
-                return null
-            }
-        }
+        (1..matcher.groupCount()).mapNotNull { matcher.group(it) }
+                .forEach { myRoot = myRoot?.getChildById(it.toLong()) ?: return null }
 
         return myRoot
     }
@@ -119,9 +102,7 @@ object StudyUtils : Loggable {
                     .course(root.id)
                     .execute()
             if (!recommendations.isEmpty) {
-                val recommendation = recommendations.first
-
-                val lesson = recommendation.lesson
+                val lesson = recommendations.first.lesson
 
                 val steps = stepikClient.steps()
                         .get()
@@ -140,10 +121,7 @@ object StudyUtils : Loggable {
     }
 
     fun isStepikProject(project: Project?): Boolean {
-        if (project == null) {
-            return false
-        }
-        val projectManager = getService(project, ProjectManager::class.java)
-        return projectManager?.projectRoot != null
+        project ?: return false
+        return getProjectManager(project)?.projectRoot != null
     }
 }

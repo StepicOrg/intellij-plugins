@@ -3,14 +3,13 @@ package org.stepik.core.projectView
 import com.intellij.ide.projectView.TreeStructureProvider
 import com.intellij.ide.projectView.ViewSettings
 import com.intellij.ide.util.treeView.AbstractTreeNode
-import com.intellij.openapi.components.ServiceManager.getService
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiDirectory
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiFileSystemItem
-import org.stepik.core.ProjectManager
 import org.stepik.core.StudyUtils
+import org.stepik.core.StudyUtils.getProjectManager
 import org.stepik.core.StudyUtils.isStepikProject
 import org.stepik.core.utils.PresentationDataUtils.isVisibleDirectory
 import org.stepik.core.utils.PresentationDataUtils.isVisibleFile
@@ -46,9 +45,9 @@ abstract class StepikTreeStructureProvider : TreeStructureProvider, DumbAware {
     }
 
     private fun isHidden(project: Project, value: Any?): Boolean {
-        val projectManager = getService(project, ProjectManager::class.java)
+        val projectManager = getProjectManager(project) ?: return false
 
-        if (projectManager?.isAdaptive == true) {
+        if (projectManager.isAdaptive) {
             return false
         }
 

@@ -15,8 +15,8 @@
     <moduleType id="STEPIK_MODULE_TYPE" implementationClass="org.stepik.alt.projectWizard.idea.StepikModuleType" />
   </extensions>
 
-  <extensions defaultExtensionNs="org.stepik.plugin.union">
-    <studyPluginConfigurator implementation="org.stepik.alt.StepikPluginConfigurator" />
+  <extensions defaultExtensionNs="org.stepik.alt">
+    <studyPluginConfigurator implementation="org.stepik.alt.AltProjectConfigurator" />
   </extensions>
 
   <actions>
@@ -41,7 +41,7 @@
   </project-components>
 
   <extensionPoints>
-    <extensionPoint qualifiedName="org.stepik.plugin.union.studyPluginConfigurator"
+    <extensionPoint qualifiedName="org.stepik.alt.studyPluginConfigurator"
                     interface="org.stepik.core.StudyPluginConfigurator" />
   </extensionPoints>
 

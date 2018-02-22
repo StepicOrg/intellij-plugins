@@ -2,15 +2,20 @@ package org.stepik.plugin
 
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
+import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.project.Project
 import org.jdom.Element
 import org.stepik.core.BaseProjectManager
+import org.stepik.core.StudyPluginConfigurator
 import org.stepik.core.serialization.StudySerializationUtils
 import org.stepik.plugin.serialization.SerializationUtils
 import org.stepik.plugin.serialization.SerializationUtils.MAIN_ELEMENT
 
 @State(name = "StepikStudySettings", storages = arrayOf(Storage("stepik_study_project.xml")))
 class StepikProjectManager @JvmOverloads constructor(project: Project? = null) : BaseProjectManager(project) {
+    override fun getConfiguratorEPName(): ExtensionPointName<StudyPluginConfigurator> {
+        return StepikPluginConfigurator.EP_NAME
+    }
 
     init {
         version = getCurrentVersion()

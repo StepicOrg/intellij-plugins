@@ -1,9 +1,8 @@
 package org.stepik.core.actions.navigation
 
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.components.ServiceManager.getService
 import com.intellij.openapi.project.Project
-import org.stepik.core.ProjectManager
+import org.stepik.core.StudyUtils.getProjectManager
 import org.stepik.core.actions.StudyActionWithShortcut
 import org.stepik.core.courseFormat.StudyNode
 import org.stepik.core.utils.NavigationUtils
@@ -17,8 +16,7 @@ abstract class StudyStepNavigationAction(text: String?,
 
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
-        val projectManager = getService(project, ProjectManager::class.java)
-        val currentNode = projectManager?.selected ?: projectManager?.projectRoot
+        val currentNode = getProjectManager(project)?.run { selected ?: projectRoot }
         val targetNode = getTargetStep(project, currentNode) ?: return
         NavigationUtils.navigate(project, targetNode)
     }
@@ -30,7 +28,7 @@ abstract class StudyStepNavigationAction(text: String?,
         val project = e.project ?: return
         presentation.isEnabled = false
 
-        val projectManager = getService(project, ProjectManager::class.java) ?: return
+        val projectManager = getProjectManager(project) ?: return
         val selected = projectManager.selected
         val target = getTargetStep(project, selected)
         val enabled = selected == null || target != null

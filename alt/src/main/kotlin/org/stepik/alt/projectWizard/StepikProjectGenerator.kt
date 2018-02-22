@@ -2,8 +2,6 @@ package org.stepik.alt.projectWizard
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.PathManager
-import com.intellij.openapi.components.ServiceManager
-import com.intellij.openapi.components.ServiceManager.getService
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
@@ -14,7 +12,7 @@ import com.intellij.openapi.vfs.VirtualFileManager
 import org.stepik.alt.courseFormat.AltTree
 import org.stepik.alt.projectWizard.idea.SandboxModuleBuilder
 import org.stepik.core.ProjectGenerator
-import org.stepik.core.ProjectManager
+import org.stepik.core.StudyUtils.getProjectManager
 import org.stepik.core.SupportedLanguages
 import org.stepik.core.common.Loggable
 import org.stepik.core.courseFormat.StepNode
@@ -41,7 +39,7 @@ object StepikProjectGenerator : ProjectGenerator, Loggable {
     }
 
     fun generateProject(project: Project) {
-        val projectManager = getService(project, ProjectManager::class.java)
+        val projectManager = getProjectManager(project)
         if (projectManager == null) {
             Metrics.createProject(project, TARGET_NOT_FOUND)
             return
@@ -73,8 +71,7 @@ object StepikProjectGenerator : ProjectGenerator, Loggable {
         ApplicationManager.getApplication().runWriteAction {
             SandboxModuleBuilder(moduleDir).createModule(moduleModel)
 
-            val projectManager = ServiceManager.getService(project, ProjectManager::class.java)
-            val root = projectManager?.projectRoot
+            val root = getProjectManager(project)?.projectRoot
             if (root == null) {
                 logger.info("Failed to generate builders: project root is null")
                 return@runWriteAction

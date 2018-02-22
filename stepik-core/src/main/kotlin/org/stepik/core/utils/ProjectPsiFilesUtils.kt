@@ -1,9 +1,8 @@
 package org.stepik.core.utils
 
-import com.intellij.openapi.components.ServiceManager.getService
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFileSystemItem
-import org.stepik.core.ProjectManager
+import org.stepik.core.StudyUtils.getProjectManager
 import org.stepik.core.StudyUtils.isStepikProject
 
 
@@ -50,8 +49,7 @@ object ProjectPsiFilesUtils {
             acceptableClasses: Set<Class<out PsiElement>>): Boolean {
         val project = element.project
 
-        val projectManager = getService(project, ProjectManager::class.java)
-        val root = projectManager?.projectRoot ?: return false
+        val root = getProjectManager(project)?.projectRoot ?: return false
 
         if (notAccept(element, acceptableClasses)) {
             return false
