@@ -3,6 +3,7 @@ package org.stepik.api.objects.sections;
 import com.google.gson.annotations.SerializedName;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.api.Utils;
 import org.stepik.api.objects.StudyObject;
 
 import java.util.ArrayList;
@@ -10,8 +11,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import static org.stepik.api.Utils.timeISOFormat;
-import static org.stepik.api.Utils.toDate;
 
 /**
  * @author meanmail
@@ -420,13 +419,13 @@ public class Section extends StudyObject {
     @NotNull
     public Date getUpdateDate() {
         if (utcUpdateDate == null) {
-            utcUpdateDate = toDate(updateDate);
+            utcUpdateDate = Utils.INSTANCE.toDate(updateDate);
         }
         return utcUpdateDate;
     }
 
     public void setUpdateDate(@Nullable Date updateDate) {
-        this.updateDate = timeISOFormat.format(updateDate);
+        this.updateDate = Utils.INSTANCE.getTimeISOFormat().format(updateDate);
         utcUpdateDate = updateDate;
     }
 

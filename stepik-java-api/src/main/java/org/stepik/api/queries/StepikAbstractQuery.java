@@ -106,7 +106,7 @@ abstract class StepikAbstractQuery<T> {
     protected abstract String getUrl();
 
     @NotNull
-    public  CompletableFuture<T> executeAsync() {
+    public CompletableFuture<T> executeAsync() {
         return CompletableFuture.supplyAsync(this::execute);
     }
 
@@ -171,7 +171,7 @@ abstract class StepikAbstractQuery<T> {
     @NotNull
     private String mapToGetString() {
         return params.entrySet().stream()
-                .map(entry -> Utils.mapToGetString(entry.getKey(), entry.getValue()))
+                .map(entry -> Utils.INSTANCE.mapToGetString(entry.getKey(), entry.getValue()))
                 .collect(Collectors.joining("&"));
     }
 

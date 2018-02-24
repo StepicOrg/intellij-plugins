@@ -3,13 +3,12 @@ package org.stepik.api.objects.submissions;
 import com.google.gson.annotations.SerializedName;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.stepik.api.Utils;
 import org.stepik.api.objects.AbstractObject;
 
 import java.text.ParseException;
 import java.time.Instant;
 import java.util.Date;
-
-import static org.stepik.api.Utils.timeISOFormat;
 
 /**
  * @author meanmail
@@ -68,7 +67,7 @@ public class Submission extends AbstractObject {
     public Date getTime() {
         if (utcTime == null) {
             try {
-                utcTime = timeISOFormat.parse(time);
+                utcTime = Utils.INSTANCE.getTimeISOFormat().parse(time);
             } catch (ParseException e) {
                 return Date.from(Instant.EPOCH);
             }
@@ -77,7 +76,7 @@ public class Submission extends AbstractObject {
     }
 
     public void setTime(@Nullable Date time) {
-        this.time = timeISOFormat.format(time);
+        this.time = Utils.INSTANCE.getTimeISOFormat().format(time);
         utcTime = time;
     }
 

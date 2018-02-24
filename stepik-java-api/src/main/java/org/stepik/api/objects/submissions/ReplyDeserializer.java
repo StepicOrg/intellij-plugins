@@ -6,15 +6,11 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import org.stepik.api.Utils;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.stepik.api.Utils.getJsonArray;
-import static org.stepik.api.Utils.getList;
-import static org.stepik.api.Utils.getString;
-import static org.stepik.api.Utils.getStringList;
 
 /**
  * @author meanmail
@@ -31,34 +27,34 @@ public class ReplyDeserializer implements JsonDeserializer<Reply> {
         Reply reply = new Reply();
         JsonObject object = json.getAsJsonObject();
 
-        String language = getString(object, "language");
+        String language = Utils.INSTANCE.getString(object, "language");
         reply.setLanguage(language);
 
-        String code = getString(object, "code");
+        String code = Utils.INSTANCE.getString(object, "code");
         reply.setCode(code);
 
-        String formula = getString(object, "formula");
+        String formula = Utils.INSTANCE.getString(object, "formula");
         reply.setFormula(formula);
 
-        String text = getString(object, "text");
+        String text = Utils.INSTANCE.getString(object, "text");
         reply.setText(text);
 
-        String number = getString(object, "number");
+        String number = Utils.INSTANCE.getString(object, "number");
         reply.setNumber(number);
 
-        JsonArray ordering = getJsonArray(object, "ordering");
+        JsonArray ordering = Utils.INSTANCE.getJsonArray(object, "ordering");
         if (ordering != null) {
             List<Integer> intOrdering = new ArrayList<>();
             ordering.forEach(item -> intOrdering.add(item.getAsInt()));
             reply.setOrdering(intOrdering);
         }
 
-        reply.setAttachments(getList(object,
+        reply.setAttachments(Utils.INSTANCE.getList(object,
                 "attachments",
                 (jsonElement) -> context.deserialize(jsonElement, Attachment.class)));
-        reply.setFiles(getStringList(object, "files"));
+        reply.setFiles(Utils.INSTANCE.getStringList(object, "files"));
 
-        JsonArray choices = getJsonArray(object, "choices");
+        JsonArray choices = Utils.INSTANCE.getJsonArray(object, "choices");
         if (choices != null && choices.size() > 0) {
             if (choices.get(0).isJsonPrimitive()) {
                 List<Boolean> list = new ArrayList<>();
@@ -71,7 +67,7 @@ public class ReplyDeserializer implements JsonDeserializer<Reply> {
             }
         }
 
-        reply.setBlanks(getStringList(object, "blanks"));
+        reply.setBlanks(Utils.INSTANCE.getStringList(object, "blanks"));
 
         return reply;
     }

@@ -114,7 +114,7 @@ public abstract class StepikAbstractGetQuery<T extends StepikAbstractGetQuery, R
                     if (diff > 0 && diff <= getCacheLifeTime()) {
                         Object item = null;
                         try {
-                            String text = Utils.readFile(file);
+                            String text = Utils.INSTANCE.readFile(file.toFile());
                             //noinspection unchecked
                             item = getJsonConverter().fromJson(text, items.getItemClass());
                         } catch (JsonSyntaxException ignored) {
