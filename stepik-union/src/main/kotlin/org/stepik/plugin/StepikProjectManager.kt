@@ -8,8 +8,8 @@ import org.jdom.Element
 import org.stepik.core.BaseProjectManager
 import org.stepik.core.StudyPluginConfigurator
 import org.stepik.core.serialization.StudySerializationUtils
-import org.stepik.plugin.serialization.SerializationUtils
-import org.stepik.plugin.serialization.SerializationUtils.MAIN_ELEMENT
+import serialization.SerializationUtils
+import serialization.SerializationUtils.MAIN_ELEMENT
 
 @State(name = "StepikStudySettings", storages = arrayOf(Storage("stepik_study_project.xml")))
 class StepikProjectManager @JvmOverloads constructor(project: Project? = null) : BaseProjectManager(project) {

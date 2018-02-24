@@ -10,7 +10,7 @@ import org.stepik.core.TestUtils.readTextFile
 import org.stepik.core.TestUtils.readXmlFile
 import org.stepik.core.serialization.SerializationUtils.xStream
 import org.stepik.core.serialization.StudyUnrecognizedFormatException
-import org.stepik.plugin.serialization.SerializationUtils
+import serialization.SerializationUtils
 import java.text.MessageFormat.format
 
 
