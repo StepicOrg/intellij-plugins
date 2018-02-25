@@ -6,6 +6,7 @@ import com.thoughtworks.xstream.annotations.XStreamOmitField
 import org.stepik.api.client.StepikApiClient
 import org.stepik.api.exceptions.StepikClientException
 import org.stepik.api.objects.StudyObject
+import org.stepik.api.objects.progresses.Progresses
 import org.stepik.core.courseFormat.StudyStatus.FAILED
 import org.stepik.core.courseFormat.StudyStatus.SOLVED
 import org.stepik.core.courseFormat.StudyStatus.UNCHECKED
@@ -83,23 +84,29 @@ abstract class Node(project: Project? = null,
                 .associateBy { it.data.progress }
 
         if (progressIdToNode.isNotEmpty()) {
-            progressIdToNode.keys.batch(20).forEach { ids ->
-                val query = stepikApiClient.progresses()
-                        .get()
-                        .id(*ids.toTypedArray())
-                try {
-                    query.execute().items.forEach { progress ->
-                        val id = progress.id
-                        val node = progressIdToNode[id] ?: if (id == data.progress) this else null
-                        node?.apply {
-                            _status = if (progress.isPassed) SOLVED else FAILED
-                            checkingStatus = false
+            progressIdToNode.keys.batch(100).forEach { ids ->
+                var page = 1
+                var progresses: Progresses
+                do {
+                    val query = stepikApiClient.progresses()
+                            .get()
+                            .id(*ids.toTypedArray())
+                            .page(page++)
+                    try {
+                        progresses = query.execute()
+                        progresses.forEach { progress ->
+                            val id = progress.id
+                            val node = progressIdToNode[id] ?: if (id == data.progress) this else null
+                            node?.apply {
+                                _status = if (progress.isPassed) SOLVED else FAILED
+                                checkingStatus = false
+                            }
                         }
+                    } catch (e: StepikClientException) {
+                        logger.warn(e)
+                        break
                     }
-                } catch (e: StepikClientException) {
-                    logger.warn(e)
-                    return
-                }
+                } while (progresses.meta.hasNext)
             }
         }
 

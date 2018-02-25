@@ -96,12 +96,23 @@ object Utils {
 
     fun cleanString(string: String) =
             string.replace("[\\u0000-\\u0008\\u000b\\u000c\\u000e-\\u001f]".toRegex(), "")
+}
 
-    fun toDate(date: String?): Date {
-        return try {
-            timeISOFormat.parse(date)
-        } catch (e: Exception) {
-            Date.from(Instant.EPOCH)
-        }
+fun Instant.toDate(): Date {
+    return Date.from(this)
+}
+
+fun Date?.toIsoFormat(): String? {
+    if (this == null || this == Instant.EPOCH.toDate()) {
+        return null
+    }
+    return Utils.timeISOFormat.format(this)
+}
+
+fun String?.toDate(): Date {
+    return try {
+        Utils.timeISOFormat.parse(this)
+    } catch (e: Exception) {
+        Instant.EPOCH.toDate()
     }
 }

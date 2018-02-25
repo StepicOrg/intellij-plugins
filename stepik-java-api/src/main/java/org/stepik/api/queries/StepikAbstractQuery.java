@@ -7,10 +7,10 @@ import org.slf4j.LoggerFactory;
 import org.stepik.api.Utils;
 import org.stepik.api.actions.StepikAbstractAction;
 import org.stepik.api.client.ClientResponse;
-import org.stepik.api.client.JsonConverter;
 import org.stepik.api.client.StatusCodes;
 import org.stepik.api.client.StepikApiClient;
 import org.stepik.api.client.TransportClient;
+import org.stepik.api.client.serialization.JsonConverter;
 import org.stepik.api.exceptions.StepikClientException;
 import org.stepik.api.exceptions.StepikUnauthorizedException;
 import org.stepik.api.objects.auth.TokenInfo;
@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 /**
  * @author meanmail
  */
-abstract class StepikAbstractQuery<T> {
+abstract public class StepikAbstractQuery<T> {
     private static final Logger logger = LoggerFactory.getLogger(StepikAbstractQuery.class);
 
     private final StepikAbstractAction stepikAction;

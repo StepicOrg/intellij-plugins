@@ -63,7 +63,7 @@ open class StepHelper(val project: Project, internal val stepNode: StepNode) : L
                     .id(progressId)
                     .execute()
 
-            return !progresses.isEmpty && progresses.first.isPassed
+            return progresses.isNotEmpty && progresses.first().isPassed
         } catch (e: StepikClientException) {
             logger.warn(e)
         }

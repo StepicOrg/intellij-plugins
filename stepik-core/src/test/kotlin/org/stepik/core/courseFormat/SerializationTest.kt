@@ -4,6 +4,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Test
 import org.stepik.api.objects.lessons.CompoundUnitLesson
+import org.stepik.api.objects.steps.BlockView
 import org.stepik.api.objects.steps.Limit
 import org.stepik.api.objects.steps.Step
 import org.stepik.core.TestUtils.readTextFile
@@ -53,7 +54,9 @@ class SerializationTest {
         limit.time = 8
         val data = node.data as Step
         assertNotNull(data)
-        data.block.options.limits["Java 8"] = limit
+        data.block = BlockView().apply {
+            options.limits["Java 8"] = limit
+        }
         serialize("StepNode", node)
     }
 

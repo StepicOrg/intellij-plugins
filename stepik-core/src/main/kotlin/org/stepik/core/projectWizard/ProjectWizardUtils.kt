@@ -69,16 +69,16 @@ object ProjectWizardUtils : Loggable {
                         .id(sectionId)
                         .execute()
 
-                if (!sections.isEmpty) {
-                    val courseId = sections.first.id
+                if (sections.isNotEmpty) {
+                    val courseId = sections.first().id
 
                     if (courseId != 0L) {
                         val courses = stepikApiClient.courses()
                                 .get()
                                 .id(courseId)
                                 .execute()
-                        if (!courses.isEmpty) {
-                            enrollment(stepikApiClient, courses.first)
+                        if (courses.isNotEmpty) {
+                            enrollment(stepikApiClient, courses.first())
                         }
                     }
                 }

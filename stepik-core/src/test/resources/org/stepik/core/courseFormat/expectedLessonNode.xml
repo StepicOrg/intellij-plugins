@@ -1,26 +1,61 @@
 <LessonNode id="1">
   <data class="CompoundUnitLesson" id="2">
     <id>0</id>
-    <unit id="3">
+    <title></title>
+    <isAdaptive>false</isAdaptive>
+    <description></description>
+    <position>0</position>
+    <progress></progress>
+    <createDate id="3">1970-01-01 00:00:00.0 UTC</createDate>
+    <updateDate id="4">1970-01-01 00:00:00.0 UTC</updateDate>
+    <unit id="5">
       <id>0</id>
       <section>0</section>
       <lesson>0</lesson>
       <position>0</position>
       <isActive>false</isActive>
     </unit>
-    <lesson id="4">
+    <lesson id="6">
       <id>0</id>
+      <title></title>
+      <isAdaptive>false</isAdaptive>
+      <description></description>
+      <position>0</position>
+      <progress></progress>
+      <createDate id="7">1970-01-01 00:00:00.0 UTC</createDate>
+      <updateDate id="8">1970-01-01 00:00:00.0 UTC</updateDate>
+      <discussionsCount>0</discussionsCount>
+      <discussionProxy></discussionProxy>
+      <discussionThreads class="kotlin.collections.EmptyList" id="9"/>
+      <steps class="kotlin.collections.EmptyList" reference="9"/>
+      <actions class="kotlin.collections.EmptyMap" id="10"/>
+      <tags class="kotlin.collections.EmptyList" reference="9"/>
+      <requiredTags class="kotlin.collections.EmptyList" reference="9"/>
+      <playlists class="kotlin.collections.EmptyList" reference="9"/>
       <isPrime>false</isPrime>
+      <subscriptions class="kotlin.collections.EmptyList" reference="9"/>
       <viewedBy>0</viewedBy>
       <passedBy>0</passedBy>
+      <dependencies class="kotlin.collections.EmptyList" reference="9"/>
+      <followers class="kotlin.collections.EmptyList" reference="9"/>
       <timeToComplete>0</timeToComplete>
-      <isCommentsEnabled>false</isCommentsEnabled>
+      <coverUrl></coverUrl>
+      <isCommentsEnabled>true</isCommentsEnabled>
       <owner>0</owner>
+      <language></language>
       <isFeatured>false</isFeatured>
       <isPublic>false</isPublic>
-      <discussionsCount>0</discussionsCount>
+      <slug></slug>
+      <learnersGroup></learnersGroup>
+      <testersGroup></testersGroup>
+      <moderatorsGroup></moderatorsGroup>
+      <teachersGroup></teachersGroup>
+      <adminsGroup></adminsGroup>
       <epicCount>0</epicCount>
       <abuseCount>0</abuseCount>
+      <vote></vote>
+      <ltiConsumerKey></ltiConsumerKey>
+      <ltiSecretKey></ltiSecretKey>
     </lesson>
   </data>
   <wasDeleted>false</wasDeleted>

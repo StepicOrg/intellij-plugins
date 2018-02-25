@@ -33,16 +33,9 @@ class SectionNode(project: Project? = null, stepikApiClient: StepikApiClient? = 
                     .id(id)
                     .execute()
 
-            val data: Section
+            val data = sections.firstOrDefault(Section().apply { this.id = id })
 
-            if (!sections.isEmpty) {
-                data = sections.first
-            } else {
-                data = Section()
-                data.id = id
-            }
-
-            val oldData = this.data as Section
+            val oldData = this.data
             this.data = data
             return oldData.updateDate != data.updateDate
         } catch (logged: StepikClientException) {
@@ -95,9 +88,9 @@ class SectionNode(project: Project? = null, stepikApiClient: StepikApiClient? = 
                             .id(lessonsIds)
                             .execute()
 
-                    lessons.lessons
+                    lessons.items
                             .forEach { lesson ->
-                                objects.add(CompoundUnitLesson(unitsMap[lesson.id],
+                                objects.add(CompoundUnitLesson(unitsMap.getOrDefault(lesson.id, Unit()),
                                         lesson))
                             }
                 }

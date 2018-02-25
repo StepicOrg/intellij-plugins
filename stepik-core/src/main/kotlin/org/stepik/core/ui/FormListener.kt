@@ -123,7 +123,7 @@ internal class FormListener(private val project: Project, private val browser: S
                             return@whenComplete
                         }
 
-                        val submission = submissions.first
+                        val submission = submissions.first()
                         SendAction.checkStepStatus(project,
                                 stepikApiClient,
                                 stepNode,

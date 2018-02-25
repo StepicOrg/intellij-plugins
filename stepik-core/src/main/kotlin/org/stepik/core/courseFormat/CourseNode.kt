@@ -52,14 +52,7 @@ class CourseNode(project: Project? = null, stepikApiClient: StepikApiClient? = n
                     .id(id)
                     .execute()
 
-            val data: Course
-
-            if (!courses.isEmpty) {
-                data = courses.first
-            } else {
-                data = Course()
-                data.id = id
-            }
+            val data = courses.firstOrDefault(Course().apply { this.id = id })
 
             val oldData = this.data as Course
             this.data = data

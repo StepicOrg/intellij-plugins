@@ -2,24 +2,31 @@
   <root class="CourseNode" id="2">
     <data id="3">
       <id>187</id>
+      <title>Java. Базовый курс</title>
+      <isAdaptive>false</isAdaptive>
+      <description>Simple text</description>
+      <position>0</position>
     </data>
     <children id="4">
       <SectionNode id="5">
         <data class="Section" id="6">
           <id>537</id>
-          <course>0</course>
+          <title>Введение в Java</title>
+          <isAdaptive>false</isAdaptive>
           <position>1</position>
+          <course>0</course>
           <requiredPercent>0</requiredPercent>
           <isRequirementSatisfied>false</isRequirementSatisfied>
           <isExam>false</isExam>
           <examDurationMinutes>0</examDurationMinutes>
-          <title>Введение в Java</title>
           <isActive>false</isActive>
         </data>
         <children id="7">
           <LessonNode id="8">
             <data class="CompoundUnitLesson" id="9">
               <id>0</id>
+              <isAdaptive>false</isAdaptive>
+              <position>0</position>
               <unit id="10">
                 <id>0</id>
                 <section>0</section>
@@ -29,6 +36,10 @@
               </unit>
               <lesson id="11">
                 <id>12755</id>
+                <title>Первый контакт — Hello World</title>
+                <isAdaptive>false</isAdaptive>
+                <position>0</position>
+                <discussionsCount>0</discussionsCount>
                 <isPrime>false</isPrime>
                 <viewedBy>0</viewedBy>
                 <passedBy>0</passedBy>
@@ -37,8 +48,6 @@
                 <owner>0</owner>
                 <isFeatured>false</isFeatured>
                 <isPublic>false</isPublic>
-                <title>Первый контакт — Hello World</title>
-                <discussionsCount>0</discussionsCount>
                 <epicCount>0</epicCount>
                 <abuseCount>0</abuseCount>
               </lesson>
@@ -47,8 +56,10 @@
               <StepNode id="13">
                 <data class="Step" id="14">
                   <id>44236</id>
-                  <lesson>0</lesson>
+                  <isAdaptive>false</isAdaptive>
                   <position>14</position>
+                  <discussionsCount>0</discussionsCount>
+                  <lesson>0</lesson>
                   <block id="15">
                     <name>code</name>
                     <text>Simple text</text>
@@ -65,16 +76,14 @@
                     </options>
                   </block>
                   <instruction>0</instruction>
-                  <session>0</session>
                   <viewedBy>0</viewedBy>
                   <passedBy>0</passedBy>
-                  <correctRatio>0.0</correctRatio>
-                  <worth>0</worth>
                   <isSolutionsUnlocked>false</isSolutionsUnlocked>
                   <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
-                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <isHasSubmissionsRestrictions>false</isHasSubmissionsRestrictions>
                   <maxSubmissionsCount>0</maxSubmissionsCount>
-                  <discussionsCount>0</discussionsCount>
+                  <variation>0</variation>
+                  <variationsCount>0</variationsCount>
                 </data>
                 <wasDeleted>false</wasDeleted>
                 <supportedLanguages id="19">
@@ -94,19 +103,22 @@
       <SectionNode id="20">
         <data class="Section" id="21">
           <id>538</id>
-          <course>0</course>
+          <title>Базовый синтаксис Java</title>
+          <isAdaptive>false</isAdaptive>
           <position>2</position>
+          <course>0</course>
           <requiredPercent>0</requiredPercent>
           <isRequirementSatisfied>false</isRequirementSatisfied>
           <isExam>false</isExam>
           <examDurationMinutes>0</examDurationMinutes>
-          <title>Базовый синтаксис Java</title>
           <isActive>false</isActive>
         </data>
         <children id="22">
           <LessonNode id="23">
             <data class="CompoundUnitLesson" id="24">
               <id>0</id>
+              <isAdaptive>false</isAdaptive>
+              <position>0</position>
               <unit id="25">
                 <id>0</id>
                 <section>0</section>
@@ -116,6 +128,10 @@
               </unit>
               <lesson id="26">
                 <id>12759</id>
+                <title>Примитивные типы</title>
+                <isAdaptive>false</isAdaptive>
+                <position>0</position>
+                <discussionsCount>0</discussionsCount>
                 <isPrime>false</isPrime>
                 <viewedBy>0</viewedBy>
                 <passedBy>0</passedBy>
@@ -124,8 +140,6 @@
                 <owner>0</owner>
                 <isFeatured>false</isFeatured>
                 <isPublic>false</isPublic>
-                <title>Примитивные типы</title>
-                <discussionsCount>0</discussionsCount>
                 <epicCount>0</epicCount>
                 <abuseCount>0</abuseCount>
               </lesson>
@@ -134,8 +148,10 @@
               <StepNode id="28">
                 <data class="Step" id="29">
                   <id>47519</id>
-                  <lesson>0</lesson>
+                  <isAdaptive>false</isAdaptive>
                   <position>6</position>
+                  <discussionsCount>0</discussionsCount>
+                  <lesson>0</lesson>
                   <block id="30">
                     <name>code</name>
                     <text>Simple text</text>
@@ -152,16 +168,14 @@
                     </options>
                   </block>
                   <instruction>0</instruction>
-                  <session>0</session>
                   <viewedBy>0</viewedBy>
                   <passedBy>0</passedBy>
-                  <correctRatio>0.0</correctRatio>
-                  <worth>0</worth>
                   <isSolutionsUnlocked>false</isSolutionsUnlocked>
                   <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
-                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <isHasSubmissionsRestrictions>false</isHasSubmissionsRestrictions>
                   <maxSubmissionsCount>0</maxSubmissionsCount>
-                  <discussionsCount>0</discussionsCount>
+                  <variation>0</variation>
+                  <variationsCount>0</variationsCount>
                 </data>
                 <wasDeleted>false</wasDeleted>
                 <supportedLanguages id="34">
@@ -174,8 +188,10 @@
               <StepNode id="35">
                 <data class="Step" id="36">
                   <id>47533</id>
-                  <lesson>0</lesson>
+                  <isAdaptive>false</isAdaptive>
                   <position>8</position>
+                  <discussionsCount>0</discussionsCount>
+                  <lesson>0</lesson>
                   <block id="37">
                     <name>code</name>
                     <text>Simple text</text>
@@ -192,16 +208,14 @@
                     </options>
                   </block>
                   <instruction>0</instruction>
-                  <session>0</session>
                   <viewedBy>0</viewedBy>
                   <passedBy>0</passedBy>
-                  <correctRatio>0.0</correctRatio>
-                  <worth>0</worth>
                   <isSolutionsUnlocked>false</isSolutionsUnlocked>
                   <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
-                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <isHasSubmissionsRestrictions>false</isHasSubmissionsRestrictions>
                   <maxSubmissionsCount>0</maxSubmissionsCount>
-                  <discussionsCount>0</discussionsCount>
+                  <variation>0</variation>
+                  <variationsCount>0</variationsCount>
                 </data>
                 <wasDeleted>false</wasDeleted>
                 <supportedLanguages id="41">
@@ -214,8 +228,10 @@
               <StepNode id="42">
                 <data class="Step" id="43">
                   <id>47538</id>
-                  <lesson>0</lesson>
+                  <isAdaptive>false</isAdaptive>
                   <position>12</position>
+                  <discussionsCount>0</discussionsCount>
+                  <lesson>0</lesson>
                   <block id="44">
                     <name>code</name>
                     <text>Simple text</text>
@@ -232,16 +248,14 @@
                     </options>
                   </block>
                   <instruction>0</instruction>
-                  <session>0</session>
                   <viewedBy>0</viewedBy>
                   <passedBy>0</passedBy>
-                  <correctRatio>0.0</correctRatio>
-                  <worth>0</worth>
                   <isSolutionsUnlocked>false</isSolutionsUnlocked>
                   <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
-                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <isHasSubmissionsRestrictions>false</isHasSubmissionsRestrictions>
                   <maxSubmissionsCount>0</maxSubmissionsCount>
-                  <discussionsCount>0</discussionsCount>
+                  <variation>0</variation>
+                  <variationsCount>0</variationsCount>
                 </data>
                 <wasDeleted>false</wasDeleted>
                 <supportedLanguages id="48">
@@ -254,8 +268,10 @@
               <StepNode id="49">
                 <data class="Step" id="50">
                   <id>47316</id>
-                  <lesson>0</lesson>
+                  <isAdaptive>false</isAdaptive>
                   <position>15</position>
+                  <discussionsCount>0</discussionsCount>
+                  <lesson>0</lesson>
                   <block id="51">
                     <name>code</name>
                     <text>Simple text</text>
@@ -272,16 +288,14 @@
                     </options>
                   </block>
                   <instruction>0</instruction>
-                  <session>0</session>
                   <viewedBy>0</viewedBy>
                   <passedBy>0</passedBy>
-                  <correctRatio>0.0</correctRatio>
-                  <worth>0</worth>
                   <isSolutionsUnlocked>false</isSolutionsUnlocked>
                   <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
-                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <isHasSubmissionsRestrictions>false</isHasSubmissionsRestrictions>
                   <maxSubmissionsCount>0</maxSubmissionsCount>
-                  <discussionsCount>0</discussionsCount>
+                  <variation>0</variation>
+                  <variationsCount>0</variationsCount>
                 </data>
                 <wasDeleted>false</wasDeleted>
                 <supportedLanguages id="55">
@@ -298,6 +312,8 @@
           <LessonNode id="56">
             <data class="CompoundUnitLesson" id="57">
               <id>0</id>
+              <isAdaptive>false</isAdaptive>
+              <position>0</position>
               <unit id="58">
                 <id>0</id>
                 <section>0</section>
@@ -307,6 +323,10 @@
               </unit>
               <lesson id="59">
                 <id>12760</id>
+                <title>Преобразование типов</title>
+                <isAdaptive>false</isAdaptive>
+                <position>0</position>
+                <discussionsCount>0</discussionsCount>
                 <isPrime>false</isPrime>
                 <viewedBy>0</viewedBy>
                 <passedBy>0</passedBy>
@@ -315,8 +335,6 @@
                 <owner>0</owner>
                 <isFeatured>false</isFeatured>
                 <isPublic>false</isPublic>
-                <title>Преобразование типов</title>
-                <discussionsCount>0</discussionsCount>
                 <epicCount>0</epicCount>
                 <abuseCount>0</abuseCount>
               </lesson>
@@ -325,8 +343,10 @@
               <StepNode id="61">
                 <data class="Step" id="62">
                   <id>47682</id>
-                  <lesson>0</lesson>
+                  <isAdaptive>false</isAdaptive>
                   <position>3</position>
+                  <discussionsCount>0</discussionsCount>
+                  <lesson>0</lesson>
                   <block id="63">
                     <name>code</name>
                     <text>Simple text</text>
@@ -343,16 +363,14 @@
                     </options>
                   </block>
                   <instruction>0</instruction>
-                  <session>0</session>
                   <viewedBy>0</viewedBy>
                   <passedBy>0</passedBy>
-                  <correctRatio>0.0</correctRatio>
-                  <worth>0</worth>
                   <isSolutionsUnlocked>false</isSolutionsUnlocked>
                   <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
-                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <isHasSubmissionsRestrictions>false</isHasSubmissionsRestrictions>
                   <maxSubmissionsCount>0</maxSubmissionsCount>
-                  <discussionsCount>0</discussionsCount>
+                  <variation>0</variation>
+                  <variationsCount>0</variationsCount>
                 </data>
                 <wasDeleted>false</wasDeleted>
                 <supportedLanguages id="67">
@@ -365,8 +383,10 @@
               <StepNode id="68">
                 <data class="Step" id="69">
                   <id>47329</id>
-                  <lesson>0</lesson>
+                  <isAdaptive>false</isAdaptive>
                   <position>9</position>
+                  <discussionsCount>0</discussionsCount>
+                  <lesson>0</lesson>
                   <block id="70">
                     <name>code</name>
                     <text>Simple text</text>
@@ -383,16 +403,14 @@
                     </options>
                   </block>
                   <instruction>0</instruction>
-                  <session>0</session>
                   <viewedBy>0</viewedBy>
                   <passedBy>0</passedBy>
-                  <correctRatio>0.0</correctRatio>
-                  <worth>0</worth>
                   <isSolutionsUnlocked>false</isSolutionsUnlocked>
                   <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
-                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <isHasSubmissionsRestrictions>false</isHasSubmissionsRestrictions>
                   <maxSubmissionsCount>0</maxSubmissionsCount>
-                  <discussionsCount>0</discussionsCount>
+                  <variation>0</variation>
+                  <variationsCount>0</variationsCount>
                 </data>
                 <wasDeleted>false</wasDeleted>
                 <supportedLanguages id="74">
@@ -409,6 +427,8 @@
           <LessonNode id="75">
             <data class="CompoundUnitLesson" id="76">
               <id>0</id>
+              <isAdaptive>false</isAdaptive>
+              <position>0</position>
               <unit id="77">
                 <id>0</id>
                 <section>0</section>
@@ -418,6 +438,10 @@
               </unit>
               <lesson id="78">
                 <id>12761</id>
+                <title>Массивы и строки</title>
+                <isAdaptive>false</isAdaptive>
+                <position>0</position>
+                <discussionsCount>0</discussionsCount>
                 <isPrime>false</isPrime>
                 <viewedBy>0</viewedBy>
                 <passedBy>0</passedBy>
@@ -426,8 +450,6 @@
                 <owner>0</owner>
                 <isFeatured>false</isFeatured>
                 <isPublic>false</isPublic>
-                <title>Массивы и строки</title>
-                <discussionsCount>0</discussionsCount>
                 <epicCount>0</epicCount>
                 <abuseCount>0</abuseCount>
               </lesson>
@@ -436,8 +458,10 @@
               <StepNode id="80">
                 <data class="Step" id="81">
                   <id>47333</id>
-                  <lesson>0</lesson>
+                  <isAdaptive>false</isAdaptive>
                   <position>10</position>
+                  <discussionsCount>0</discussionsCount>
+                  <lesson>0</lesson>
                   <block id="82">
                     <name>code</name>
                     <text>Simple text</text>
@@ -454,16 +478,14 @@
                     </options>
                   </block>
                   <instruction>0</instruction>
-                  <session>0</session>
                   <viewedBy>0</viewedBy>
                   <passedBy>0</passedBy>
-                  <correctRatio>0.0</correctRatio>
-                  <worth>0</worth>
                   <isSolutionsUnlocked>false</isSolutionsUnlocked>
                   <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
-                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <isHasSubmissionsRestrictions>false</isHasSubmissionsRestrictions>
                   <maxSubmissionsCount>0</maxSubmissionsCount>
-                  <discussionsCount>0</discussionsCount>
+                  <variation>0</variation>
+                  <variationsCount>0</variationsCount>
                 </data>
                 <wasDeleted>false</wasDeleted>
                 <supportedLanguages id="86">
@@ -480,6 +502,8 @@
           <LessonNode id="87">
             <data class="CompoundUnitLesson" id="88">
               <id>0</id>
+              <isAdaptive>false</isAdaptive>
+              <position>0</position>
               <unit id="89">
                 <id>0</id>
                 <section>0</section>
@@ -489,6 +513,10 @@
               </unit>
               <lesson id="90">
                 <id>12762</id>
+                <title>Управляющие конструкции: условные операторы и циклы</title>
+                <isAdaptive>false</isAdaptive>
+                <position>0</position>
+                <discussionsCount>0</discussionsCount>
                 <isPrime>false</isPrime>
                 <viewedBy>0</viewedBy>
                 <passedBy>0</passedBy>
@@ -497,8 +525,6 @@
                 <owner>0</owner>
                 <isFeatured>false</isFeatured>
                 <isPublic>false</isPublic>
-                <title>Управляющие конструкции: условные операторы и циклы</title>
-                <discussionsCount>0</discussionsCount>
                 <epicCount>0</epicCount>
                 <abuseCount>0</abuseCount>
               </lesson>
@@ -507,8 +533,10 @@
               <StepNode id="92">
                 <data class="Step" id="93">
                   <id>47334</id>
-                  <lesson>0</lesson>
+                  <isAdaptive>false</isAdaptive>
                   <position>8</position>
+                  <discussionsCount>0</discussionsCount>
+                  <lesson>0</lesson>
                   <block id="94">
                     <name>code</name>
                     <text>Simple text</text>
@@ -525,16 +553,14 @@
                     </options>
                   </block>
                   <instruction>0</instruction>
-                  <session>0</session>
                   <viewedBy>0</viewedBy>
                   <passedBy>0</passedBy>
-                  <correctRatio>0.0</correctRatio>
-                  <worth>0</worth>
                   <isSolutionsUnlocked>false</isSolutionsUnlocked>
                   <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
-                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <isHasSubmissionsRestrictions>false</isHasSubmissionsRestrictions>
                   <maxSubmissionsCount>0</maxSubmissionsCount>
-                  <discussionsCount>0</discussionsCount>
+                  <variation>0</variation>
+                  <variationsCount>0</variationsCount>
                 </data>
                 <wasDeleted>false</wasDeleted>
                 <supportedLanguages id="98">
@@ -547,8 +573,10 @@
               <StepNode id="99">
                 <data class="Step" id="100">
                   <id>47347</id>
-                  <lesson>0</lesson>
+                  <isAdaptive>false</isAdaptive>
                   <position>9</position>
+                  <discussionsCount>0</discussionsCount>
+                  <lesson>0</lesson>
                   <block id="101">
                     <name>code</name>
                     <text>Simple text</text>
@@ -565,16 +593,14 @@
                     </options>
                   </block>
                   <instruction>0</instruction>
-                  <session>0</session>
                   <viewedBy>0</viewedBy>
                   <passedBy>0</passedBy>
-                  <correctRatio>0.0</correctRatio>
-                  <worth>0</worth>
                   <isSolutionsUnlocked>false</isSolutionsUnlocked>
                   <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
-                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <isHasSubmissionsRestrictions>false</isHasSubmissionsRestrictions>
                   <maxSubmissionsCount>0</maxSubmissionsCount>
-                  <discussionsCount>0</discussionsCount>
+                  <variation>0</variation>
+                  <variationsCount>0</variationsCount>
                 </data>
                 <wasDeleted>false</wasDeleted>
                 <supportedLanguages id="105">
@@ -587,8 +613,10 @@
               <StepNode id="106">
                 <data class="Step" id="107">
                   <id>47721</id>
-                  <lesson>0</lesson>
+                  <isAdaptive>false</isAdaptive>
                   <position>10</position>
+                  <discussionsCount>0</discussionsCount>
+                  <lesson>0</lesson>
                   <block id="108">
                     <name>code</name>
                     <text>Simple text</text>
@@ -605,16 +633,14 @@
                     </options>
                   </block>
                   <instruction>0</instruction>
-                  <session>0</session>
                   <viewedBy>0</viewedBy>
                   <passedBy>0</passedBy>
-                  <correctRatio>0.0</correctRatio>
-                  <worth>0</worth>
                   <isSolutionsUnlocked>false</isSolutionsUnlocked>
                   <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
-                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <isHasSubmissionsRestrictions>false</isHasSubmissionsRestrictions>
                   <maxSubmissionsCount>0</maxSubmissionsCount>
-                  <discussionsCount>0</discussionsCount>
+                  <variation>0</variation>
+                  <variationsCount>0</variationsCount>
                 </data>
                 <wasDeleted>false</wasDeleted>
                 <supportedLanguages id="112">
@@ -634,19 +660,22 @@
       <SectionNode id="113">
         <data class="Section" id="114">
           <id>539</id>
-          <course>0</course>
+          <title>Объекты, классы и пакеты в Java</title>
+          <isAdaptive>false</isAdaptive>
           <position>3</position>
+          <course>0</course>
           <requiredPercent>0</requiredPercent>
           <isRequirementSatisfied>false</isRequirementSatisfied>
           <isExam>false</isExam>
           <examDurationMinutes>0</examDurationMinutes>
-          <title>Объекты, классы и пакеты в Java</title>
           <isActive>false</isActive>
         </data>
         <children id="115">
           <LessonNode id="116">
             <data class="CompoundUnitLesson" id="117">
               <id>0</id>
+              <isAdaptive>false</isAdaptive>
+              <position>0</position>
               <unit id="118">
                 <id>0</id>
                 <section>0</section>
@@ -656,6 +685,10 @@
               </unit>
               <lesson id="119">
                 <id>12766</id>
+                <title>Объявление класса</title>
+                <isAdaptive>false</isAdaptive>
+                <position>0</position>
+                <discussionsCount>0</discussionsCount>
                 <isPrime>false</isPrime>
                 <viewedBy>0</viewedBy>
                 <passedBy>0</passedBy>
@@ -664,8 +697,6 @@
                 <owner>0</owner>
                 <isFeatured>false</isFeatured>
                 <isPublic>false</isPublic>
-                <title>Объявление класса</title>
-                <discussionsCount>0</discussionsCount>
                 <epicCount>0</epicCount>
                 <abuseCount>0</abuseCount>
               </lesson>
@@ -674,8 +705,10 @@
               <StepNode id="121">
                 <data class="Step" id="122">
                   <id>49992</id>
-                  <lesson>0</lesson>
+                  <isAdaptive>false</isAdaptive>
                   <position>12</position>
+                  <discussionsCount>0</discussionsCount>
+                  <lesson>0</lesson>
                   <block id="123">
                     <name>code</name>
                     <text>Simple text</text>
@@ -692,16 +725,14 @@
                     </options>
                   </block>
                   <instruction>0</instruction>
-                  <session>0</session>
                   <viewedBy>0</viewedBy>
                   <passedBy>0</passedBy>
-                  <correctRatio>0.0</correctRatio>
-                  <worth>0</worth>
                   <isSolutionsUnlocked>false</isSolutionsUnlocked>
                   <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
-                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <isHasSubmissionsRestrictions>false</isHasSubmissionsRestrictions>
                   <maxSubmissionsCount>0</maxSubmissionsCount>
-                  <discussionsCount>0</discussionsCount>
+                  <variation>0</variation>
+                  <variationsCount>0</variationsCount>
                 </data>
                 <wasDeleted>false</wasDeleted>
                 <supportedLanguages id="127">
@@ -718,6 +749,8 @@
           <LessonNode id="128">
             <data class="CompoundUnitLesson" id="129">
               <id>0</id>
+              <isAdaptive>false</isAdaptive>
+              <position>0</position>
               <unit id="130">
                 <id>0</id>
                 <section>0</section>
@@ -727,6 +760,10 @@
               </unit>
               <lesson id="131">
                 <id>12769</id>
+                <title>Наследование. Класс Object</title>
+                <isAdaptive>false</isAdaptive>
+                <position>0</position>
+                <discussionsCount>0</discussionsCount>
                 <isPrime>false</isPrime>
                 <viewedBy>0</viewedBy>
                 <passedBy>0</passedBy>
@@ -735,8 +772,6 @@
                 <owner>0</owner>
                 <isFeatured>false</isFeatured>
                 <isPublic>false</isPublic>
-                <title>Наследование. Класс Object</title>
-                <discussionsCount>0</discussionsCount>
                 <epicCount>0</epicCount>
                 <abuseCount>0</abuseCount>
               </lesson>
@@ -745,8 +780,10 @@
               <StepNode id="133">
                 <data class="Step" id="134">
                   <id>49971</id>
-                  <lesson>0</lesson>
+                  <isAdaptive>false</isAdaptive>
                   <position>9</position>
+                  <discussionsCount>0</discussionsCount>
+                  <lesson>0</lesson>
                   <block id="135">
                     <name>code</name>
                     <text>Simple text</text>
@@ -763,16 +800,14 @@
                     </options>
                   </block>
                   <instruction>0</instruction>
-                  <session>0</session>
                   <viewedBy>0</viewedBy>
                   <passedBy>0</passedBy>
-                  <correctRatio>0.0</correctRatio>
-                  <worth>0</worth>
                   <isSolutionsUnlocked>false</isSolutionsUnlocked>
                   <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
-                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <isHasSubmissionsRestrictions>false</isHasSubmissionsRestrictions>
                   <maxSubmissionsCount>0</maxSubmissionsCount>
-                  <discussionsCount>0</discussionsCount>
+                  <variation>0</variation>
+                  <variationsCount>0</variationsCount>
                 </data>
                 <wasDeleted>false</wasDeleted>
                 <supportedLanguages id="139">
@@ -789,6 +824,8 @@
           <LessonNode id="140">
             <data class="CompoundUnitLesson" id="141">
               <id>0</id>
+              <isAdaptive>false</isAdaptive>
+              <position>0</position>
               <unit id="142">
                 <id>0</id>
                 <section>0</section>
@@ -798,6 +835,10 @@
               </unit>
               <lesson id="143">
                 <id>14513</id>
+                <title>Абстрактные классы и интерфейсы</title>
+                <isAdaptive>false</isAdaptive>
+                <position>0</position>
+                <discussionsCount>0</discussionsCount>
                 <isPrime>false</isPrime>
                 <viewedBy>0</viewedBy>
                 <passedBy>0</passedBy>
@@ -806,8 +847,6 @@
                 <owner>0</owner>
                 <isFeatured>false</isFeatured>
                 <isPublic>false</isPublic>
-                <title>Абстрактные классы и интерфейсы</title>
-                <discussionsCount>0</discussionsCount>
                 <epicCount>0</epicCount>
                 <abuseCount>0</abuseCount>
               </lesson>
@@ -816,8 +855,10 @@
               <StepNode id="145">
                 <data class="Step" id="146">
                   <id>49950</id>
-                  <lesson>0</lesson>
+                  <isAdaptive>false</isAdaptive>
                   <position>7</position>
+                  <discussionsCount>0</discussionsCount>
+                  <lesson>0</lesson>
                   <block id="147">
                     <name>code</name>
                     <text>Simple text</text>
@@ -834,16 +875,14 @@
                     </options>
                   </block>
                   <instruction>0</instruction>
-                  <session>0</session>
                   <viewedBy>0</viewedBy>
                   <passedBy>0</passedBy>
-                  <correctRatio>0.0</correctRatio>
-                  <worth>0</worth>
                   <isSolutionsUnlocked>false</isSolutionsUnlocked>
                   <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
-                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <isHasSubmissionsRestrictions>false</isHasSubmissionsRestrictions>
                   <maxSubmissionsCount>0</maxSubmissionsCount>
-                  <discussionsCount>0</discussionsCount>
+                  <variation>0</variation>
+                  <variationsCount>0</variationsCount>
                 </data>
                 <wasDeleted>false</wasDeleted>
                 <supportedLanguages id="151">
@@ -856,8 +895,10 @@
               <StepNode id="152">
                 <data class="Step" id="153">
                   <id>50005</id>
-                  <lesson>0</lesson>
+                  <isAdaptive>false</isAdaptive>
                   <position>8</position>
+                  <discussionsCount>0</discussionsCount>
+                  <lesson>0</lesson>
                   <block id="154">
                     <name>code</name>
                     <text>Simple text</text>
@@ -874,16 +915,14 @@
                     </options>
                   </block>
                   <instruction>0</instruction>
-                  <session>0</session>
                   <viewedBy>0</viewedBy>
                   <passedBy>0</passedBy>
-                  <correctRatio>0.0</correctRatio>
-                  <worth>0</worth>
                   <isSolutionsUnlocked>false</isSolutionsUnlocked>
                   <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
-                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <isHasSubmissionsRestrictions>false</isHasSubmissionsRestrictions>
                   <maxSubmissionsCount>0</maxSubmissionsCount>
-                  <discussionsCount>0</discussionsCount>
+                  <variation>0</variation>
+                  <variationsCount>0</variationsCount>
                 </data>
                 <wasDeleted>false</wasDeleted>
                 <supportedLanguages id="158">
@@ -896,8 +935,10 @@
               <StepNode id="159">
                 <data class="Step" id="160">
                   <id>50386</id>
-                  <lesson>0</lesson>
+                  <isAdaptive>false</isAdaptive>
                   <position>9</position>
+                  <discussionsCount>0</discussionsCount>
+                  <lesson>0</lesson>
                   <block id="161">
                     <name>code</name>
                     <text>Simple text</text>
@@ -914,16 +955,14 @@
                     </options>
                   </block>
                   <instruction>0</instruction>
-                  <session>0</session>
                   <viewedBy>0</viewedBy>
                   <passedBy>0</passedBy>
-                  <correctRatio>0.0</correctRatio>
-                  <worth>0</worth>
                   <isSolutionsUnlocked>false</isSolutionsUnlocked>
                   <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
-                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <isHasSubmissionsRestrictions>false</isHasSubmissionsRestrictions>
                   <maxSubmissionsCount>0</maxSubmissionsCount>
-                  <discussionsCount>0</discussionsCount>
+                  <variation>0</variation>
+                  <variationsCount>0</variationsCount>
                 </data>
                 <wasDeleted>false</wasDeleted>
                 <supportedLanguages id="165">
@@ -943,19 +982,22 @@
       <SectionNode id="166">
         <data class="Section" id="167">
           <id>540</id>
-          <course>0</course>
+          <title>Обработка ошибок, исключения, отладка</title>
+          <isAdaptive>false</isAdaptive>
           <position>4</position>
+          <course>0</course>
           <requiredPercent>0</requiredPercent>
           <isRequirementSatisfied>false</isRequirementSatisfied>
           <isExam>false</isExam>
           <examDurationMinutes>0</examDurationMinutes>
-          <title>Обработка ошибок, исключения, отладка</title>
           <isActive>false</isActive>
         </data>
         <children id="168">
           <LessonNode id="169">
             <data class="CompoundUnitLesson" id="170">
               <id>0</id>
+              <isAdaptive>false</isAdaptive>
+              <position>0</position>
               <unit id="171">
                 <id>0</id>
                 <section>0</section>
@@ -965,6 +1007,10 @@
               </unit>
               <lesson id="172">
                 <id>12772</id>
+                <title>Знакомство с исключениями</title>
+                <isAdaptive>false</isAdaptive>
+                <position>0</position>
+                <discussionsCount>0</discussionsCount>
                 <isPrime>false</isPrime>
                 <viewedBy>0</viewedBy>
                 <passedBy>0</passedBy>
@@ -973,8 +1019,6 @@
                 <owner>0</owner>
                 <isFeatured>false</isFeatured>
                 <isPublic>false</isPublic>
-                <title>Знакомство с исключениями</title>
-                <discussionsCount>0</discussionsCount>
                 <epicCount>0</epicCount>
                 <abuseCount>0</abuseCount>
               </lesson>
@@ -983,8 +1027,10 @@
               <StepNode id="174">
                 <data class="Step" id="175">
                   <id>53596</id>
-                  <lesson>0</lesson>
+                  <isAdaptive>false</isAdaptive>
                   <position>9</position>
+                  <discussionsCount>0</discussionsCount>
+                  <lesson>0</lesson>
                   <block id="176">
                     <name>code</name>
                     <text>Simple text</text>
@@ -1001,16 +1047,14 @@
                     </options>
                   </block>
                   <instruction>0</instruction>
-                  <session>0</session>
                   <viewedBy>0</viewedBy>
                   <passedBy>0</passedBy>
-                  <correctRatio>0.0</correctRatio>
-                  <worth>0</worth>
                   <isSolutionsUnlocked>false</isSolutionsUnlocked>
                   <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
-                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <isHasSubmissionsRestrictions>false</isHasSubmissionsRestrictions>
                   <maxSubmissionsCount>0</maxSubmissionsCount>
-                  <discussionsCount>0</discussionsCount>
+                  <variation>0</variation>
+                  <variationsCount>0</variationsCount>
                 </data>
                 <wasDeleted>false</wasDeleted>
                 <supportedLanguages id="180">
@@ -1023,8 +1067,10 @@
               <StepNode id="181">
                 <data class="Step" id="182">
                   <id>53676</id>
-                  <lesson>0</lesson>
+                  <isAdaptive>false</isAdaptive>
                   <position>10</position>
+                  <discussionsCount>0</discussionsCount>
+                  <lesson>0</lesson>
                   <block id="183">
                     <name>code</name>
                     <text>Simple text</text>
@@ -1041,16 +1087,14 @@
                     </options>
                   </block>
                   <instruction>0</instruction>
-                  <session>0</session>
                   <viewedBy>0</viewedBy>
                   <passedBy>0</passedBy>
-                  <correctRatio>0.0</correctRatio>
-                  <worth>0</worth>
                   <isSolutionsUnlocked>false</isSolutionsUnlocked>
                   <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
-                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <isHasSubmissionsRestrictions>false</isHasSubmissionsRestrictions>
                   <maxSubmissionsCount>0</maxSubmissionsCount>
-                  <discussionsCount>0</discussionsCount>
+                  <variation>0</variation>
+                  <variationsCount>0</variationsCount>
                 </data>
                 <wasDeleted>false</wasDeleted>
                 <supportedLanguages id="187">
@@ -1067,6 +1111,8 @@
           <LessonNode id="188">
             <data class="CompoundUnitLesson" id="189">
               <id>0</id>
+              <isAdaptive>false</isAdaptive>
+              <position>0</position>
               <unit id="190">
                 <id>0</id>
                 <section>0</section>
@@ -1076,6 +1122,10 @@
               </unit>
               <lesson id="191">
                 <id>12773</id>
+                <title>Обработка исключений. Try-catch</title>
+                <isAdaptive>false</isAdaptive>
+                <position>0</position>
+                <discussionsCount>0</discussionsCount>
                 <isPrime>false</isPrime>
                 <viewedBy>0</viewedBy>
                 <passedBy>0</passedBy>
@@ -1084,8 +1134,6 @@
                 <owner>0</owner>
                 <isFeatured>false</isFeatured>
                 <isPublic>false</isPublic>
-                <title>Обработка исключений. Try-catch</title>
-                <discussionsCount>0</discussionsCount>
                 <epicCount>0</epicCount>
                 <abuseCount>0</abuseCount>
               </lesson>
@@ -1094,8 +1142,10 @@
               <StepNode id="193">
                 <data class="Step" id="194">
                   <id>53606</id>
-                  <lesson>0</lesson>
+                  <isAdaptive>false</isAdaptive>
                   <position>7</position>
+                  <discussionsCount>0</discussionsCount>
+                  <lesson>0</lesson>
                   <block id="195">
                     <name>code</name>
                     <text>Simple text</text>
@@ -1112,16 +1162,14 @@
                     </options>
                   </block>
                   <instruction>0</instruction>
-                  <session>0</session>
                   <viewedBy>0</viewedBy>
                   <passedBy>0</passedBy>
-                  <correctRatio>0.0</correctRatio>
-                  <worth>0</worth>
                   <isSolutionsUnlocked>false</isSolutionsUnlocked>
                   <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
-                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <isHasSubmissionsRestrictions>false</isHasSubmissionsRestrictions>
                   <maxSubmissionsCount>0</maxSubmissionsCount>
-                  <discussionsCount>0</discussionsCount>
+                  <variation>0</variation>
+                  <variationsCount>0</variationsCount>
                 </data>
                 <wasDeleted>false</wasDeleted>
                 <supportedLanguages id="199">
@@ -1138,6 +1186,8 @@
           <LessonNode id="200">
             <data class="CompoundUnitLesson" id="201">
               <id>0</id>
+              <isAdaptive>false</isAdaptive>
+              <position>0</position>
               <unit id="202">
                 <id>0</id>
                 <section>0</section>
@@ -1147,6 +1197,10 @@
               </unit>
               <lesson id="203">
                 <id>12774</id>
+                <title>Логирование</title>
+                <isAdaptive>false</isAdaptive>
+                <position>0</position>
+                <discussionsCount>0</discussionsCount>
                 <isPrime>false</isPrime>
                 <viewedBy>0</viewedBy>
                 <passedBy>0</passedBy>
@@ -1155,8 +1209,6 @@
                 <owner>0</owner>
                 <isFeatured>false</isFeatured>
                 <isPublic>false</isPublic>
-                <title>Логирование</title>
-                <discussionsCount>0</discussionsCount>
                 <epicCount>0</epicCount>
                 <abuseCount>0</abuseCount>
               </lesson>
@@ -1165,8 +1217,10 @@
               <StepNode id="205">
                 <data class="Step" id="206">
                   <id>53619</id>
-                  <lesson>0</lesson>
+                  <isAdaptive>false</isAdaptive>
                   <position>8</position>
+                  <discussionsCount>0</discussionsCount>
+                  <lesson>0</lesson>
                   <block id="207">
                     <name>code</name>
                     <text>Simple text</text>
@@ -1183,16 +1237,14 @@
                     </options>
                   </block>
                   <instruction>0</instruction>
-                  <session>0</session>
                   <viewedBy>0</viewedBy>
                   <passedBy>0</passedBy>
-                  <correctRatio>0.0</correctRatio>
-                  <worth>0</worth>
                   <isSolutionsUnlocked>false</isSolutionsUnlocked>
                   <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
-                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <isHasSubmissionsRestrictions>false</isHasSubmissionsRestrictions>
                   <maxSubmissionsCount>0</maxSubmissionsCount>
-                  <discussionsCount>0</discussionsCount>
+                  <variation>0</variation>
+                  <variationsCount>0</variationsCount>
                 </data>
                 <wasDeleted>false</wasDeleted>
                 <supportedLanguages id="211">
@@ -1205,8 +1257,10 @@
               <StepNode id="212">
                 <data class="Step" id="213">
                   <id>53996</id>
-                  <lesson>0</lesson>
+                  <isAdaptive>false</isAdaptive>
                   <position>9</position>
+                  <discussionsCount>0</discussionsCount>
+                  <lesson>0</lesson>
                   <block id="214">
                     <name>code</name>
                     <text>Simple text</text>
@@ -1223,16 +1277,14 @@
                     </options>
                   </block>
                   <instruction>0</instruction>
-                  <session>0</session>
                   <viewedBy>0</viewedBy>
                   <passedBy>0</passedBy>
-                  <correctRatio>0.0</correctRatio>
-                  <worth>0</worth>
                   <isSolutionsUnlocked>false</isSolutionsUnlocked>
                   <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
-                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <isHasSubmissionsRestrictions>false</isHasSubmissionsRestrictions>
                   <maxSubmissionsCount>0</maxSubmissionsCount>
-                  <discussionsCount>0</discussionsCount>
+                  <variation>0</variation>
+                  <variationsCount>0</variationsCount>
                 </data>
                 <wasDeleted>false</wasDeleted>
                 <supportedLanguages id="218">
@@ -1252,19 +1304,22 @@
       <SectionNode id="219">
         <data class="Section" id="220">
           <id>542</id>
-          <course>0</course>
+          <title>Ввод-вывод, доступ к файловой системе</title>
+          <isAdaptive>false</isAdaptive>
           <position>5</position>
+          <course>0</course>
           <requiredPercent>0</requiredPercent>
           <isRequirementSatisfied>false</isRequirementSatisfied>
           <isExam>false</isExam>
           <examDurationMinutes>0</examDurationMinutes>
-          <title>Ввод-вывод, доступ к файловой системе</title>
           <isActive>false</isActive>
         </data>
         <children id="221">
           <LessonNode id="222">
             <data class="CompoundUnitLesson" id="223">
               <id>0</id>
+              <isAdaptive>false</isAdaptive>
+              <position>0</position>
               <unit id="224">
                 <id>0</id>
                 <section>0</section>
@@ -1274,6 +1329,10 @@
               </unit>
               <lesson id="225">
                 <id>12783</id>
+                <title>Потоки байт</title>
+                <isAdaptive>false</isAdaptive>
+                <position>0</position>
+                <discussionsCount>0</discussionsCount>
                 <isPrime>false</isPrime>
                 <viewedBy>0</viewedBy>
                 <passedBy>0</passedBy>
@@ -1282,8 +1341,6 @@
                 <owner>0</owner>
                 <isFeatured>false</isFeatured>
                 <isPublic>false</isPublic>
-                <title>Потоки байт</title>
-                <discussionsCount>0</discussionsCount>
                 <epicCount>0</epicCount>
                 <abuseCount>0</abuseCount>
               </lesson>
@@ -1292,8 +1349,10 @@
               <StepNode id="227">
                 <data class="Step" id="228">
                   <id>55630</id>
-                  <lesson>0</lesson>
+                  <isAdaptive>false</isAdaptive>
                   <position>8</position>
+                  <discussionsCount>0</discussionsCount>
+                  <lesson>0</lesson>
                   <block id="229">
                     <name>code</name>
                     <text>Simple text</text>
@@ -1310,16 +1369,14 @@
                     </options>
                   </block>
                   <instruction>0</instruction>
-                  <session>0</session>
                   <viewedBy>0</viewedBy>
                   <passedBy>0</passedBy>
-                  <correctRatio>0.0</correctRatio>
-                  <worth>0</worth>
                   <isSolutionsUnlocked>false</isSolutionsUnlocked>
                   <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
-                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <isHasSubmissionsRestrictions>false</isHasSubmissionsRestrictions>
                   <maxSubmissionsCount>0</maxSubmissionsCount>
-                  <discussionsCount>0</discussionsCount>
+                  <variation>0</variation>
+                  <variationsCount>0</variationsCount>
                 </data>
                 <wasDeleted>false</wasDeleted>
                 <supportedLanguages id="233">
@@ -1332,8 +1389,10 @@
               <StepNode id="234">
                 <data class="Step" id="235">
                   <id>55646</id>
-                  <lesson>0</lesson>
+                  <isAdaptive>false</isAdaptive>
                   <position>9</position>
+                  <discussionsCount>0</discussionsCount>
+                  <lesson>0</lesson>
                   <block id="236">
                     <name>code</name>
                     <text>Simple text</text>
@@ -1350,16 +1409,14 @@
                     </options>
                   </block>
                   <instruction>0</instruction>
-                  <session>0</session>
                   <viewedBy>0</viewedBy>
                   <passedBy>0</passedBy>
-                  <correctRatio>0.0</correctRatio>
-                  <worth>0</worth>
                   <isSolutionsUnlocked>false</isSolutionsUnlocked>
                   <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
-                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <isHasSubmissionsRestrictions>false</isHasSubmissionsRestrictions>
                   <maxSubmissionsCount>0</maxSubmissionsCount>
-                  <discussionsCount>0</discussionsCount>
+                  <variation>0</variation>
+                  <variationsCount>0</variationsCount>
                 </data>
                 <wasDeleted>false</wasDeleted>
                 <supportedLanguages id="240">
@@ -1376,6 +1433,8 @@
           <LessonNode id="241">
             <data class="CompoundUnitLesson" id="242">
               <id>0</id>
+              <isAdaptive>false</isAdaptive>
+              <position>0</position>
               <unit id="243">
                 <id>0</id>
                 <section>0</section>
@@ -1385,6 +1444,10 @@
               </unit>
               <lesson id="244">
                 <id>12784</id>
+                <title>Потоки символов</title>
+                <isAdaptive>false</isAdaptive>
+                <position>0</position>
+                <discussionsCount>0</discussionsCount>
                 <isPrime>false</isPrime>
                 <viewedBy>0</viewedBy>
                 <passedBy>0</passedBy>
@@ -1393,8 +1456,6 @@
                 <owner>0</owner>
                 <isFeatured>false</isFeatured>
                 <isPublic>false</isPublic>
-                <title>Потоки символов</title>
-                <discussionsCount>0</discussionsCount>
                 <epicCount>0</epicCount>
                 <abuseCount>0</abuseCount>
               </lesson>
@@ -1403,8 +1464,10 @@
               <StepNode id="246">
                 <data class="Step" id="247">
                   <id>55673</id>
-                  <lesson>0</lesson>
+                  <isAdaptive>false</isAdaptive>
                   <position>12</position>
+                  <discussionsCount>0</discussionsCount>
+                  <lesson>0</lesson>
                   <block id="248">
                     <name>code</name>
                     <text>Simple text</text>
@@ -1421,16 +1484,14 @@
                     </options>
                   </block>
                   <instruction>0</instruction>
-                  <session>0</session>
                   <viewedBy>0</viewedBy>
                   <passedBy>0</passedBy>
-                  <correctRatio>0.0</correctRatio>
-                  <worth>0</worth>
                   <isSolutionsUnlocked>false</isSolutionsUnlocked>
                   <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
-                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <isHasSubmissionsRestrictions>false</isHasSubmissionsRestrictions>
                   <maxSubmissionsCount>0</maxSubmissionsCount>
-                  <discussionsCount>0</discussionsCount>
+                  <variation>0</variation>
+                  <variationsCount>0</variationsCount>
                 </data>
                 <wasDeleted>false</wasDeleted>
                 <supportedLanguages id="252">
@@ -1443,8 +1504,10 @@
               <StepNode id="253">
                 <data class="Step" id="254">
                   <id>55689</id>
-                  <lesson>0</lesson>
+                  <isAdaptive>false</isAdaptive>
                   <position>13</position>
+                  <discussionsCount>0</discussionsCount>
+                  <lesson>0</lesson>
                   <block id="255">
                     <name>code</name>
                     <text>Simple text</text>
@@ -1461,16 +1524,14 @@
                     </options>
                   </block>
                   <instruction>0</instruction>
-                  <session>0</session>
                   <viewedBy>0</viewedBy>
                   <passedBy>0</passedBy>
-                  <correctRatio>0.0</correctRatio>
-                  <worth>0</worth>
                   <isSolutionsUnlocked>false</isSolutionsUnlocked>
                   <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
-                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <isHasSubmissionsRestrictions>false</isHasSubmissionsRestrictions>
                   <maxSubmissionsCount>0</maxSubmissionsCount>
-                  <discussionsCount>0</discussionsCount>
+                  <variation>0</variation>
+                  <variationsCount>0</variationsCount>
                 </data>
                 <wasDeleted>false</wasDeleted>
                 <supportedLanguages id="259">
@@ -1487,6 +1548,8 @@
           <LessonNode id="260">
             <data class="CompoundUnitLesson" id="261">
               <id>0</id>
+              <isAdaptive>false</isAdaptive>
+              <position>0</position>
               <unit id="262">
                 <id>0</id>
                 <section>0</section>
@@ -1496,6 +1559,10 @@
               </unit>
               <lesson id="263">
                 <id>12785</id>
+                <title>Продвинутые возможности</title>
+                <isAdaptive>false</isAdaptive>
+                <position>0</position>
+                <discussionsCount>0</discussionsCount>
                 <isPrime>false</isPrime>
                 <viewedBy>0</viewedBy>
                 <passedBy>0</passedBy>
@@ -1504,8 +1571,6 @@
                 <owner>0</owner>
                 <isFeatured>false</isFeatured>
                 <isPublic>false</isPublic>
-                <title>Продвинутые возможности</title>
-                <discussionsCount>0</discussionsCount>
                 <epicCount>0</epicCount>
                 <abuseCount>0</abuseCount>
               </lesson>
@@ -1514,8 +1579,10 @@
               <StepNode id="265">
                 <data class="Step" id="266">
                   <id>55715</id>
-                  <lesson>0</lesson>
+                  <isAdaptive>false</isAdaptive>
                   <position>8</position>
+                  <discussionsCount>0</discussionsCount>
+                  <lesson>0</lesson>
                   <block id="267">
                     <name>code</name>
                     <text>Simple text</text>
@@ -1532,16 +1599,14 @@
                     </options>
                   </block>
                   <instruction>0</instruction>
-                  <session>0</session>
                   <viewedBy>0</viewedBy>
                   <passedBy>0</passedBy>
-                  <correctRatio>0.0</correctRatio>
-                  <worth>0</worth>
                   <isSolutionsUnlocked>false</isSolutionsUnlocked>
                   <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
-                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <isHasSubmissionsRestrictions>false</isHasSubmissionsRestrictions>
                   <maxSubmissionsCount>0</maxSubmissionsCount>
-                  <discussionsCount>0</discussionsCount>
+                  <variation>0</variation>
+                  <variationsCount>0</variationsCount>
                 </data>
                 <wasDeleted>false</wasDeleted>
                 <supportedLanguages id="271">
@@ -1561,19 +1626,22 @@
       <SectionNode id="272">
         <data class="Section" id="273">
           <id>541</id>
-          <course>0</course>
+          <title>Generics. Collections. Streams</title>
+          <isAdaptive>false</isAdaptive>
           <position>6</position>
+          <course>0</course>
           <requiredPercent>0</requiredPercent>
           <isRequirementSatisfied>false</isRequirementSatisfied>
           <isExam>false</isExam>
           <examDurationMinutes>0</examDurationMinutes>
-          <title>Generics. Collections. Streams</title>
           <isActive>false</isActive>
         </data>
         <children id="274">
           <LessonNode id="275">
             <data class="CompoundUnitLesson" id="276">
               <id>0</id>
+              <isAdaptive>false</isAdaptive>
+              <position>0</position>
               <unit id="277">
                 <id>0</id>
                 <section>0</section>
@@ -1583,6 +1651,10 @@
               </unit>
               <lesson id="278">
                 <id>12775</id>
+                <title>Generics</title>
+                <isAdaptive>false</isAdaptive>
+                <position>0</position>
+                <discussionsCount>0</discussionsCount>
                 <isPrime>false</isPrime>
                 <viewedBy>0</viewedBy>
                 <passedBy>0</passedBy>
@@ -1591,8 +1663,6 @@
                 <owner>0</owner>
                 <isFeatured>false</isFeatured>
                 <isPublic>false</isPublic>
-                <title>Generics</title>
-                <discussionsCount>0</discussionsCount>
                 <epicCount>0</epicCount>
                 <abuseCount>0</abuseCount>
               </lesson>
@@ -1601,8 +1671,10 @@
               <StepNode id="280">
                 <data class="Step" id="281">
                   <id>57792</id>
-                  <lesson>0</lesson>
+                  <isAdaptive>false</isAdaptive>
                   <position>12</position>
+                  <discussionsCount>0</discussionsCount>
+                  <lesson>0</lesson>
                   <block id="282">
                     <name>code</name>
                     <text>Simple text</text>
@@ -1619,16 +1691,14 @@
                     </options>
                   </block>
                   <instruction>0</instruction>
-                  <session>0</session>
                   <viewedBy>0</viewedBy>
                   <passedBy>0</passedBy>
-                  <correctRatio>0.0</correctRatio>
-                  <worth>0</worth>
                   <isSolutionsUnlocked>false</isSolutionsUnlocked>
                   <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
-                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <isHasSubmissionsRestrictions>false</isHasSubmissionsRestrictions>
                   <maxSubmissionsCount>0</maxSubmissionsCount>
-                  <discussionsCount>0</discussionsCount>
+                  <variation>0</variation>
+                  <variationsCount>0</variationsCount>
                 </data>
                 <wasDeleted>false</wasDeleted>
                 <supportedLanguages id="286">
@@ -1645,6 +1715,8 @@
           <LessonNode id="287">
             <data class="CompoundUnitLesson" id="288">
               <id>0</id>
+              <isAdaptive>false</isAdaptive>
+              <position>0</position>
               <unit id="289">
                 <id>0</id>
                 <section>0</section>
@@ -1654,6 +1726,10 @@
               </unit>
               <lesson id="290">
                 <id>12776</id>
+                <title>Коллекции</title>
+                <isAdaptive>false</isAdaptive>
+                <position>0</position>
+                <discussionsCount>0</discussionsCount>
                 <isPrime>false</isPrime>
                 <viewedBy>0</viewedBy>
                 <passedBy>0</passedBy>
@@ -1662,8 +1738,6 @@
                 <owner>0</owner>
                 <isFeatured>false</isFeatured>
                 <isPublic>false</isPublic>
-                <title>Коллекции</title>
-                <discussionsCount>0</discussionsCount>
                 <epicCount>0</epicCount>
                 <abuseCount>0</abuseCount>
               </lesson>
@@ -1672,8 +1746,10 @@
               <StepNode id="292">
                 <data class="Step" id="293">
                   <id>58081</id>
-                  <lesson>0</lesson>
+                  <isAdaptive>false</isAdaptive>
                   <position>14</position>
+                  <discussionsCount>0</discussionsCount>
+                  <lesson>0</lesson>
                   <block id="294">
                     <name>code</name>
                     <text>Simple text</text>
@@ -1690,16 +1766,14 @@
                     </options>
                   </block>
                   <instruction>0</instruction>
-                  <session>0</session>
                   <viewedBy>0</viewedBy>
                   <passedBy>0</passedBy>
-                  <correctRatio>0.0</correctRatio>
-                  <worth>0</worth>
                   <isSolutionsUnlocked>false</isSolutionsUnlocked>
                   <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
-                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <isHasSubmissionsRestrictions>false</isHasSubmissionsRestrictions>
                   <maxSubmissionsCount>0</maxSubmissionsCount>
-                  <discussionsCount>0</discussionsCount>
+                  <variation>0</variation>
+                  <variationsCount>0</variationsCount>
                 </data>
                 <wasDeleted>false</wasDeleted>
                 <supportedLanguages id="298">
@@ -1712,8 +1786,10 @@
               <StepNode id="299">
                 <data class="Step" id="300">
                   <id>57810</id>
-                  <lesson>0</lesson>
+                  <isAdaptive>false</isAdaptive>
                   <position>15</position>
+                  <discussionsCount>0</discussionsCount>
+                  <lesson>0</lesson>
                   <block id="301">
                     <name>code</name>
                     <text>Simple text</text>
@@ -1730,16 +1806,14 @@
                     </options>
                   </block>
                   <instruction>0</instruction>
-                  <session>0</session>
                   <viewedBy>0</viewedBy>
                   <passedBy>0</passedBy>
-                  <correctRatio>0.0</correctRatio>
-                  <worth>0</worth>
                   <isSolutionsUnlocked>false</isSolutionsUnlocked>
                   <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
-                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <isHasSubmissionsRestrictions>false</isHasSubmissionsRestrictions>
                   <maxSubmissionsCount>0</maxSubmissionsCount>
-                  <discussionsCount>0</discussionsCount>
+                  <variation>0</variation>
+                  <variationsCount>0</variationsCount>
                 </data>
                 <wasDeleted>false</wasDeleted>
                 <supportedLanguages id="305">
@@ -1756,6 +1830,8 @@
           <LessonNode id="306">
             <data class="CompoundUnitLesson" id="307">
               <id>0</id>
+              <isAdaptive>false</isAdaptive>
+              <position>0</position>
               <unit id="308">
                 <id>0</id>
                 <section>0</section>
@@ -1765,6 +1841,10 @@
               </unit>
               <lesson id="309">
                 <id>12777</id>
+                <title>Функциональные интерфейсы</title>
+                <isAdaptive>false</isAdaptive>
+                <position>0</position>
+                <discussionsCount>0</discussionsCount>
                 <isPrime>false</isPrime>
                 <viewedBy>0</viewedBy>
                 <passedBy>0</passedBy>
@@ -1773,8 +1853,6 @@
                 <owner>0</owner>
                 <isFeatured>false</isFeatured>
                 <isPublic>false</isPublic>
-                <title>Функциональные интерфейсы</title>
-                <discussionsCount>0</discussionsCount>
                 <epicCount>0</epicCount>
                 <abuseCount>0</abuseCount>
               </lesson>
@@ -1783,8 +1861,10 @@
               <StepNode id="311">
                 <data class="Step" id="312">
                   <id>57838</id>
-                  <lesson>0</lesson>
+                  <isAdaptive>false</isAdaptive>
                   <position>8</position>
+                  <discussionsCount>0</discussionsCount>
+                  <lesson>0</lesson>
                   <block id="313">
                     <name>code</name>
                     <text>Simple text</text>
@@ -1801,16 +1881,14 @@
                     </options>
                   </block>
                   <instruction>0</instruction>
-                  <session>0</session>
                   <viewedBy>0</viewedBy>
                   <passedBy>0</passedBy>
-                  <correctRatio>0.0</correctRatio>
-                  <worth>0</worth>
                   <isSolutionsUnlocked>false</isSolutionsUnlocked>
                   <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
-                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <isHasSubmissionsRestrictions>false</isHasSubmissionsRestrictions>
                   <maxSubmissionsCount>0</maxSubmissionsCount>
-                  <discussionsCount>0</discussionsCount>
+                  <variation>0</variation>
+                  <variationsCount>0</variationsCount>
                 </data>
                 <wasDeleted>false</wasDeleted>
                 <supportedLanguages id="317">
@@ -1827,6 +1905,8 @@
           <LessonNode id="318">
             <data class="CompoundUnitLesson" id="319">
               <id>0</id>
+              <isAdaptive>false</isAdaptive>
+              <position>0</position>
               <unit id="320">
                 <id>0</id>
                 <section>0</section>
@@ -1836,6 +1916,10 @@
               </unit>
               <lesson id="321">
                 <id>12781</id>
+                <title>Stream API</title>
+                <isAdaptive>false</isAdaptive>
+                <position>0</position>
+                <discussionsCount>0</discussionsCount>
                 <isPrime>false</isPrime>
                 <viewedBy>0</viewedBy>
                 <passedBy>0</passedBy>
@@ -1844,8 +1928,6 @@
                 <owner>0</owner>
                 <isFeatured>false</isFeatured>
                 <isPublic>false</isPublic>
-                <title>Stream API</title>
-                <discussionsCount>0</discussionsCount>
                 <epicCount>0</epicCount>
                 <abuseCount>0</abuseCount>
               </lesson>
@@ -1854,8 +1936,10 @@
               <StepNode id="323">
                 <data class="Step" id="324">
                   <id>57848</id>
-                  <lesson>0</lesson>
+                  <isAdaptive>false</isAdaptive>
                   <position>11</position>
+                  <discussionsCount>0</discussionsCount>
+                  <lesson>0</lesson>
                   <block id="325">
                     <name>code</name>
                     <text>Simple text</text>
@@ -1872,16 +1956,14 @@
                     </options>
                   </block>
                   <instruction>0</instruction>
-                  <session>0</session>
                   <viewedBy>0</viewedBy>
                   <passedBy>0</passedBy>
-                  <correctRatio>0.0</correctRatio>
-                  <worth>0</worth>
                   <isSolutionsUnlocked>false</isSolutionsUnlocked>
                   <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
-                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <isHasSubmissionsRestrictions>false</isHasSubmissionsRestrictions>
                   <maxSubmissionsCount>0</maxSubmissionsCount>
-                  <discussionsCount>0</discussionsCount>
+                  <variation>0</variation>
+                  <variationsCount>0</variationsCount>
                 </data>
                 <wasDeleted>false</wasDeleted>
                 <supportedLanguages id="329">
@@ -1894,8 +1976,10 @@
               <StepNode id="330">
                 <data class="Step" id="331">
                   <id>58088</id>
-                  <lesson>0</lesson>
+                  <isAdaptive>false</isAdaptive>
                   <position>12</position>
+                  <discussionsCount>0</discussionsCount>
+                  <lesson>0</lesson>
                   <block id="332">
                     <name>code</name>
                     <text>Simple text</text>
@@ -1912,16 +1996,14 @@
                     </options>
                   </block>
                   <instruction>0</instruction>
-                  <session>0</session>
                   <viewedBy>0</viewedBy>
                   <passedBy>0</passedBy>
-                  <correctRatio>0.0</correctRatio>
-                  <worth>0</worth>
                   <isSolutionsUnlocked>false</isSolutionsUnlocked>
                   <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
-                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <isHasSubmissionsRestrictions>false</isHasSubmissionsRestrictions>
                   <maxSubmissionsCount>0</maxSubmissionsCount>
-                  <discussionsCount>0</discussionsCount>
+                  <variation>0</variation>
+                  <variationsCount>0</variationsCount>
                 </data>
                 <wasDeleted>false</wasDeleted>
                 <supportedLanguages id="336">
@@ -1934,8 +2016,10 @@
               <StepNode id="337">
                 <data class="Step" id="338">
                   <id>57858</id>
-                  <lesson>0</lesson>
+                  <isAdaptive>false</isAdaptive>
                   <position>13</position>
+                  <discussionsCount>0</discussionsCount>
+                  <lesson>0</lesson>
                   <block id="339">
                     <name>code</name>
                     <text>Simple text</text>
@@ -1952,16 +2036,14 @@
                     </options>
                   </block>
                   <instruction>0</instruction>
-                  <session>0</session>
                   <viewedBy>0</viewedBy>
                   <passedBy>0</passedBy>
-                  <correctRatio>0.0</correctRatio>
-                  <worth>0</worth>
                   <isSolutionsUnlocked>false</isSolutionsUnlocked>
                   <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
-                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <isHasSubmissionsRestrictions>false</isHasSubmissionsRestrictions>
                   <maxSubmissionsCount>0</maxSubmissionsCount>
-                  <discussionsCount>0</discussionsCount>
+                  <variation>0</variation>
+                  <variationsCount>0</variationsCount>
                 </data>
                 <wasDeleted>false</wasDeleted>
                 <supportedLanguages id="343">
@@ -1974,8 +2056,10 @@
               <StepNode id="344">
                 <data class="Step" id="345">
                   <id>58108</id>
-                  <lesson>0</lesson>
+                  <isAdaptive>false</isAdaptive>
                   <position>14</position>
+                  <discussionsCount>0</discussionsCount>
+                  <lesson>0</lesson>
                   <block id="346">
                     <name>code</name>
                     <text>Simple text</text>
@@ -1992,16 +2076,14 @@
                     </options>
                   </block>
                   <instruction>0</instruction>
-                  <session>0</session>
                   <viewedBy>0</viewedBy>
                   <passedBy>0</passedBy>
-                  <correctRatio>0.0</correctRatio>
-                  <worth>0</worth>
                   <isSolutionsUnlocked>false</isSolutionsUnlocked>
                   <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
-                  <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
+                  <isHasSubmissionsRestrictions>false</isHasSubmissionsRestrictions>
                   <maxSubmissionsCount>0</maxSubmissionsCount>
-                  <discussionsCount>0</discussionsCount>
+                  <variation>0</variation>
+                  <variationsCount>0</variationsCount>
                 </data>
                 <wasDeleted>false</wasDeleted>
                 <supportedLanguages id="350">

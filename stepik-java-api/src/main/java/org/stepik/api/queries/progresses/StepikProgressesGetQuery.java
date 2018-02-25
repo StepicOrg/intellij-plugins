@@ -24,4 +24,10 @@ public class StepikProgressesGetQuery extends StepikAbstractGetQuery<StepikProgr
     protected boolean isCacheEnabled() {
         return false;
     }
+
+    @NotNull
+    public StepikProgressesGetQuery page(int page) {
+        addParam("page", page);
+        return this;
+    }
 }

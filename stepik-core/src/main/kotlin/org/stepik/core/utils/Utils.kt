@@ -45,8 +45,8 @@ val EMPTY_STUDY_OBJECT = initEmptyStudyNode()
 
 private fun initEmptyStudyNode(): StudyObject {
     val course = Course()
-    course.setTitle("Empty")
-    course.setDescription("Please, press refresh button")
+    course.title = "Empty"
+    course.description = "Please, press refresh button"
     return course
 }
 

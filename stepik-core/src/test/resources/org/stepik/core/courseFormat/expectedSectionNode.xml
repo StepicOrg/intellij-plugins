@@ -1,39 +1,80 @@
 <SectionNode id="1">
   <data class="Section" id="2">
     <id>0</id>
-    <course>0</course>
+    <title></title>
+    <isAdaptive>false</isAdaptive>
+    <description></description>
     <position>0</position>
+    <progress></progress>
+    <createDate id="3">1970-01-01 00:00:00.0 UTC</createDate>
+    <updateDate id="4">1970-01-01 00:00:00.0 UTC</updateDate>
+    <course>0</course>
     <requiredPercent>0</requiredPercent>
     <isRequirementSatisfied>false</isRequirementSatisfied>
     <isExam>false</isExam>
     <examDurationMinutes>0</examDurationMinutes>
     <isActive>false</isActive>
   </data>
-  <children class="singleton-list" id="3">
-    <LessonNode id="4">
+  <children class="singleton-list" id="5">
+    <LessonNode id="6">
       <parent class="SectionNode" reference="1"/>
-      <data class="CompoundUnitLesson" id="5">
+      <data class="CompoundUnitLesson" id="7">
         <id>0</id>
-        <unit id="6">
+        <title></title>
+        <isAdaptive>false</isAdaptive>
+        <description></description>
+        <position>0</position>
+        <progress></progress>
+        <createDate id="8">1970-01-01 00:00:00.0 UTC</createDate>
+        <updateDate id="9">1970-01-01 00:00:00.0 UTC</updateDate>
+        <unit id="10">
           <id>0</id>
           <section>0</section>
           <lesson>0</lesson>
           <position>0</position>
           <isActive>false</isActive>
         </unit>
-        <lesson id="7">
+        <lesson id="11">
           <id>0</id>
+          <title></title>
+          <isAdaptive>false</isAdaptive>
+          <description></description>
+          <position>0</position>
+          <progress></progress>
+          <createDate id="12">1970-01-01 00:00:00.0 UTC</createDate>
+          <updateDate id="13">1970-01-01 00:00:00.0 UTC</updateDate>
+          <discussionsCount>0</discussionsCount>
+          <discussionProxy></discussionProxy>
+          <discussionThreads class="kotlin.collections.EmptyList" id="14"/>
+          <steps class="kotlin.collections.EmptyList" reference="14"/>
+          <actions class="kotlin.collections.EmptyMap" id="15"/>
+          <tags class="kotlin.collections.EmptyList" reference="14"/>
+          <requiredTags class="kotlin.collections.EmptyList" reference="14"/>
+          <playlists class="kotlin.collections.EmptyList" reference="14"/>
           <isPrime>false</isPrime>
+          <subscriptions class="kotlin.collections.EmptyList" reference="14"/>
           <viewedBy>0</viewedBy>
           <passedBy>0</passedBy>
+          <dependencies class="kotlin.collections.EmptyList" reference="14"/>
+          <followers class="kotlin.collections.EmptyList" reference="14"/>
           <timeToComplete>0</timeToComplete>
-          <isCommentsEnabled>false</isCommentsEnabled>
+          <coverUrl></coverUrl>
+          <isCommentsEnabled>true</isCommentsEnabled>
           <owner>0</owner>
+          <language></language>
           <isFeatured>false</isFeatured>
           <isPublic>false</isPublic>
-          <discussionsCount>0</discussionsCount>
+          <slug></slug>
+          <learnersGroup></learnersGroup>
+          <testersGroup></testersGroup>
+          <moderatorsGroup></moderatorsGroup>
+          <teachersGroup></teachersGroup>
+          <adminsGroup></adminsGroup>
           <epicCount>0</epicCount>
           <abuseCount>0</abuseCount>
+          <vote></vote>
+          <ltiConsumerKey></ltiConsumerKey>
+          <ltiSecretKey></ltiSecretKey>
         </lesson>
       </data>
       <wasDeleted>false</wasDeleted>

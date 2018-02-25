@@ -119,7 +119,7 @@ class StepikSendAction : CodeQuizAction(TEXT, DESCRIPTION, AllStepikIcons.ToolWi
                 return null
             }
 
-            return attempts.first.id
+            return attempts.first().id
         }
 
         private fun getSubmissionId(
@@ -156,7 +156,7 @@ class StepikSendAction : CodeQuizAction(TEXT, DESCRIPTION, AllStepikIcons.ToolWi
                 return null
             }
 
-            return submissions.first.id
+            return submissions.first().id
         }
 
         private fun getCode(

@@ -1,14 +1,24 @@
 <StepNode id="1">
   <data class="Step" id="2">
     <id>100</id>
-    <lesson>0</lesson>
+    <title></title>
+    <isAdaptive>false</isAdaptive>
+    <description></description>
     <position>0</position>
-    <block id="3">
-      <options id="4">
-        <limits id="5">
+    <progress></progress>
+    <createDate id="3">1970-01-01 00:00:00.0 UTC</createDate>
+    <updateDate id="4">1970-01-01 00:00:00.0 UTC</updateDate>
+    <discussionsCount>0</discussionsCount>
+    <discussionProxy></discussionProxy>
+    <discussionThreads class="kotlin.collections.EmptyList" id="5"/>
+    <lesson>0</lesson>
+    <status></status>
+    <block id="6">
+      <options id="7">
+        <limits id="8">
           <entry>
             <string>Java 8</string>
-            <Limit id="6">
+            <Limit id="9">
               <time>8</time>
               <memory>256</memory>
             </Limit>
@@ -16,17 +26,19 @@
         </limits>
       </options>
     </block>
+    <actions class="empty-map"/>
+    <subscriptions class="empty-list"/>
     <instruction>0</instruction>
-    <session>0</session>
+    <session></session>
+    <instructionType></instructionType>
     <viewedBy>0</viewedBy>
     <passedBy>0</passedBy>
-    <correctRatio>0.0</correctRatio>
-    <worth>0</worth>
     <isSolutionsUnlocked>false</isSolutionsUnlocked>
-    <solutionsUnlockedAttempts>0</solutionsUnlockedAttempts>
-    <hasSubmissionsRestrictions>false</hasSubmissionsRestrictions>
-    <maxSubmissionsCount>0</maxSubmissionsCount>
-    <discussionsCount>0</discussionsCount>
+    <solutionsUnlockedAttempts>3</solutionsUnlockedAttempts>
+    <isHasSubmissionsRestrictions>false</isHasSubmissionsRestrictions>
+    <maxSubmissionsCount>3</maxSubmissionsCount>
+    <variation>1</variation>
+    <variationsCount>1</variationsCount>
   </data>
   <wasDeleted>false</wasDeleted>
   <courseId>0</courseId>

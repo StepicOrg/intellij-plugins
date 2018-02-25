@@ -88,6 +88,8 @@ import org.stepik.api.actions.StepikViewsAction;
 import org.stepik.api.actions.StepikVotesAction;
 import org.stepik.api.actions.StepikWsAction;
 import org.stepik.api.auth.OAuth2;
+import org.stepik.api.client.serialization.DefaultJsonConverter;
+import org.stepik.api.client.serialization.JsonConverter;
 import org.stepik.api.objects.auth.TokenInfo;
 
 import java.nio.file.Path;
@@ -97,7 +99,7 @@ import java.nio.file.Paths;
  * @author meanmail
  */
 public class StepikApiClient {
-    private static final String VERSION = "0.1";
+    private static final String VERSION = "0.2";
     private final TransportClient transportClient;
     private final JsonConverter jsonConverter;
     private volatile TokenInfo tokenInfo;
@@ -110,7 +112,7 @@ public class StepikApiClient {
 
     public StepikApiClient(@NotNull HttpTransportClient transportClient) {
         this.transportClient = transportClient;
-        this.jsonConverter = DefaultJsonConverter.getInstance();
+        this.jsonConverter = DefaultJsonConverter.INSTANCE;
     }
 
     @NotNull

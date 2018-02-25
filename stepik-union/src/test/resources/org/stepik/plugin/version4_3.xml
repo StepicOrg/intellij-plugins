@@ -6,6 +6,8 @@
           <LessonNode id="6">
             <data class="CompoundUnitLesson" id="7">
               <id>0</id>
+              <isAdaptive>false</isAdaptive>
+              <position>0</position>
               <unit id="8">
                 <id>0</id>
                 <section>0</section>
@@ -15,6 +17,9 @@
               </unit>
               <lesson id="9">
                 <id>0</id>
+                <isAdaptive>false</isAdaptive>
+                <position>0</position>
+                <discussionsCount>0</discussionsCount>
                 <isPrime>false</isPrime>
                 <viewedBy>0</viewedBy>
                 <passedBy>0</passedBy>
@@ -23,7 +28,6 @@
                 <owner>0</owner>
                 <isFeatured>false</isFeatured>
                 <isPublic>false</isPublic>
-                <discussionsCount>0</discussionsCount>
                 <epicCount>0</epicCount>
                 <abuseCount>0</abuseCount>
               </lesson>

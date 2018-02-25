@@ -41,8 +41,8 @@ object SendAction : Loggable {
                         .id(submissionId)
                         .execute()
 
-                if (!submission.isEmpty) {
-                    currentSubmission = submission.first
+                if (submission.isNotEmpty) {
+                    currentSubmission = submission.first()
                     if (showedTimer) {
                         resultWindow.clearLastLine()
                     } else {

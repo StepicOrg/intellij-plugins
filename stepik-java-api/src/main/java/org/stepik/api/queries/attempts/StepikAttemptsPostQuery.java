@@ -26,7 +26,7 @@ public class StepikAttemptsPostQuery extends StepikAbstractPostQuery<Attempts> {
     @NotNull
     @Override
     protected String getBody() {
-        return getJsonConverter().toJson(attempts);
+        return getJsonConverter().toJson(attempts, false);
     }
 
     @NotNull

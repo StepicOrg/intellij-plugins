@@ -83,17 +83,15 @@ object StepikUrlUtils : Loggable {
             stepikApiClient: StepikApiClient,
             unitId: Long,
             lessonId: Long): CompoundUnitLesson {
-        var unit: Unit? = null
+        var unit = Unit()
 
         if (unitId != 0L) {
             try {
-                val units = stepikApiClient.units()
+                unit = stepikApiClient.units()
                         .get()
                         .id(unitId)
                         .execute()
-                if (!units.isEmpty) {
-                    unit = units.first
-                }
+                        .firstOrDefault(Unit())
             } catch (e: StepikClientException) {
                 logger.warn(e)
             }
@@ -109,13 +107,11 @@ object StepikUrlUtils : Loggable {
             sectionId: Long): Section? {
         if (sectionId != 0L) {
             try {
-                val sections = stepikApiClient.sections()
+                return stepikApiClient.sections()
                         .get()
                         .id(sectionId)
                         .execute()
-                if (!sections.isEmpty) {
-                    return sections.first
-                }
+                        .firstOrNull()
             } catch (e: StepikClientException) {
                 logger.warn(e)
             }
@@ -127,14 +123,11 @@ object StepikUrlUtils : Loggable {
     private fun getLesson(lessonId: Long, stepikApiClient: StepikApiClient): Lesson? {
         if (lessonId != 0L) {
             try {
-                val lessons = stepikApiClient.lessons()
+                return stepikApiClient.lessons()
                         .get()
                         .id(lessonId)
                         .execute()
-
-                if (!lessons.isEmpty) {
-                    return lessons.first
-                }
+                        .firstOrNull()
             } catch (e: StepikClientException) {
                 logger.warn(e)
             }
@@ -152,13 +145,11 @@ object StepikUrlUtils : Loggable {
             id: Long): Course? {
         if (id != 0L) {
             try {
-                val courses = stepikApiClient.courses()
+                return stepikApiClient.courses()
                         .get()
                         .id(id)
                         .execute()
-                if (!courses.isEmpty) {
-                    return courses.first
-                }
+                        .firstOrNull()
             } catch (e: StepikClientException) {
                 logger.warn(e)
             }

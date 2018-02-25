@@ -29,10 +29,11 @@ class StepNode(project: Project? = null, stepikApiClient: StepikApiClient? = nul
         get() {
             if (_supportedLanguages == null) {
                 if (type === CODE) {
-                    _supportedLanguages = (data as Step).block
-                            .options.codeTemplates.map {
-                        langOfName(it.key)
-                    }.filter { it !== INVALID }
+                    _supportedLanguages = (data as Step).block?.let {
+                        it.options.codeTemplates.map {
+                            langOfName(it.key)
+                        }
+                    }?.filter { it !== INVALID } ?: emptyList()
                 } else {
                     return emptyList()
                 }
@@ -109,13 +110,13 @@ class StepNode(project: Project? = null, stepikApiClient: StepikApiClient? = nul
         get() = Step::class.java
 
     val text: String
-        get() = (data as Step).block.text
+        get() = (data as Step).block?.text ?: ""
 
     val currentTemplate: String
         get() = getTemplate(currentLang)
 
     private val limits: Map<String, Limit>
-        get() = (data as Step).block.options.limits
+        get() = (data as Step).block?.options?.limits ?: emptyMap()
 
     val limit: Limit
         get() = limits.getOrDefault(currentLang.langName, Limit())
@@ -126,14 +127,14 @@ class StepNode(project: Project? = null, stepikApiClient: StepikApiClient? = nul
     val samples: List<Sample>
         get() {
             if (type === CODE) {
-                return (data as Step).block.options.samples
+                return (data as Step).block?.options?.samples ?: emptyList()
             }
 
             return emptyList()
         }
 
     val type: StepType
-        get() = StepType.of((data as Step).block.name)
+        get() = StepType.of((data as Step).block?.name)
 
     override val directoryPrefix
         get() = EduNames.STEP
@@ -145,19 +146,12 @@ class StepNode(project: Project? = null, stepikApiClient: StepikApiClient? = nul
 
     override fun loadData(stepikApiClient: StepikApiClient, id: Long): Boolean {
         try {
-            val steps = stepikApiClient.steps()
+            val data = stepikApiClient.steps()
                     .get()
                     .id(id)
                     .execute()
-
-            val data: Step
-
-            if (!steps.isEmpty) {
-                data = steps.first
-            } else {
-                data = Step()
-                data.id = id
-            }
+                    .firstOrNull()
+                    ?: Step().also { it.id = id }
 
             val oldData = this.data
             this.data = data
@@ -170,7 +164,7 @@ class StepNode(project: Project? = null, stepikApiClient: StepikApiClient? = nul
     }
 
     fun getTemplate(language: SupportedLanguages): String {
-        val templates = (data as Step).block.options.codeTemplates
+        val templates = (data as Step).block?.options?.codeTemplates ?: emptyMap()
         return templates.getOrDefault(language.langName, "")
     }
 
@@ -190,17 +184,16 @@ class StepNode(project: Project? = null, stepikApiClient: StepikApiClient? = nul
         }
 
         try {
-            val units = stepikApiClient.units()
+            val unit = stepikApiClient.units()
                     .get()
                     .lesson(lessonId.toLong())
                     .execute()
-            if (units.isEmpty) {
-                return 0
-            }
+                    .firstOrNull()
+                    ?: return 0
 
             val lessonNode = LessonNode()
             val lessonData = lessonNode.data as CompoundUnitLesson
-            lessonData.setUnit(units.first)
+            lessonData.unit = unit
 
             courseId = lessonNode.getCourseId(stepikApiClient)
             return courseId

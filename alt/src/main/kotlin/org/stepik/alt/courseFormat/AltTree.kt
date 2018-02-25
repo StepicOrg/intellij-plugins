@@ -32,14 +32,12 @@ class AltTree(project: Project? = null, stepikApiClient: StepikApiClient? = null
         try {
             val lessonsIds = children.map { it.id }
             if (lessonsIds.isNotEmpty()) {
-                val lessons = stepikApiClient.lessons()
+                stepikApiClient.lessons()
                         .get()
                         .id(lessonsIds)
                         .execute()
-
-                lessons.lessons
                         .forEach { lesson ->
-                            objects.add(CompoundUnitLesson(null, lesson))
+                            objects.add(CompoundUnitLesson(lesson = lesson))
                         }
             }
         } catch (logged: StepikClientException) {

@@ -18,8 +18,8 @@ class SampleConverter : SingleValueConverter {
 
         val matcher = pattern.matcher(s)
         if (matcher.matches()) {
-            sample.setInput(matcher.group(1))
-            sample.setOutput(matcher.group(2))
+            sample.input = matcher.group(1)
+            sample.output = matcher.group(2)
         }
         return sample
     }

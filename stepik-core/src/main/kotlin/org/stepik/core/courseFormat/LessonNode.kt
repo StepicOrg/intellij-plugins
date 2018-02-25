@@ -33,7 +33,7 @@ open class LessonNode(project: Project? = null, stepikApiClient: StepikApiClient
                 return stepikApiClient.steps()
                         .get()
                         .id(stepsIds)
-                        .execute().steps
+                        .execute().items
             }
         } catch (logged: StepikClientException) {
             logger.warn("A lesson initialization don't is fully", logged)
@@ -57,14 +57,7 @@ open class LessonNode(project: Project? = null, stepikApiClient: StepikApiClient
                     .id(id)
                     .execute()
 
-            val lesson: Lesson
-            if (!lessons.isEmpty) {
-                lesson = lessons.first
-            } else {
-                lesson = Lesson()
-                lesson.id = id
-            }
-            data.setLesson(lesson)
+            data.lesson = lessons.firstOrDefault(Lesson().apply { this.id = id })
 
             return updateDate != data.updateDate
         } catch (logged: StepikClientException) {
@@ -90,16 +83,16 @@ open class LessonNode(project: Project? = null, stepikApiClient: StepikApiClient
         }
 
         try {
-            val sections = stepikApiClient.sections()
+            val section = stepikApiClient.sections()
                     .get()
                     .id(sectionId)
                     .execute()
-            if (sections.isEmpty) {
-                return 0
-            }
-            courseId = sections.first.course.toLong()
+                    .firstOrNull()
+                    ?: return 0
+            courseId = section.course.toLong()
             return courseId
-        } catch (ignored: StepikClientException) {
+        } catch (e: StepikClientException) {
+            logger.warn(e)
         }
 
         return 0

@@ -18,8 +18,8 @@ class SampleConverterTest {
     @Test
     fun toStringTest() {
         val sample = Sample()
-        sample.setInput("1 2 3")
-        sample.setOutput("123")
+        sample.input = "1 2 3"
+        sample.output = "123"
 
         val sampleString = sampleConverter!!.toString(sample)
 
@@ -33,8 +33,8 @@ class SampleConverterTest {
         val sample = sampleConverter!!.fromString(string)
 
         val expected = Sample()
-        expected.setInput("1 2 3")
-        expected.setOutput("123")
+        expected.input = "1 2 3"
+        expected.output = "123"
 
         assertEquals(expected, sample)
     }

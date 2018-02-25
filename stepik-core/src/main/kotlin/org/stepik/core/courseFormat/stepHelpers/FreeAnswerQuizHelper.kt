@@ -34,8 +34,8 @@ class FreeAnswerQuizHelper(project: Project, stepNode: StepNode) : StringQuizHel
                         .get()
                         .id(instructionId)
                         .execute()
-                if (!instructions.isEmpty) {
-                    return instructions.first.isFrozen
+                if (instructions.isNotEmpty) {
+                    return instructions.first().isFrozen
                 }
             } catch (e: StepikClientException) {
                 logger.warn(e)
@@ -82,7 +82,7 @@ class FreeAnswerQuizHelper(project: Project, stepNode: StepNode) : StringQuizHel
 
     private fun needSendSubmission(): Boolean {
         initStepOptions()
-        return data.session == 0
+        return data.session.isEmpty()
     }
 
     private fun needReview(): Boolean {

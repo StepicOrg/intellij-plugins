@@ -18,7 +18,7 @@ object StudyNodeFactory {
         return when (data) {
             is Course -> CourseNode(project, stepikApiClient, data)
             is Section -> SectionNode(project, stepikApiClient, data)
-            is Lesson -> LessonNode(project, stepikApiClient, CompoundUnitLesson(null, data))
+            is Lesson -> LessonNode(project, stepikApiClient, CompoundUnitLesson(lesson = data))
             is CompoundUnitLesson -> LessonNode(project, stepikApiClient, data)
             is Step -> StepNode(project, stepikApiClient, data)
             else -> null

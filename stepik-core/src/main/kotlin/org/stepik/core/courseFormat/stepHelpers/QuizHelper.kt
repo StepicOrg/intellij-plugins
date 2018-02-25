@@ -103,13 +103,14 @@ open class QuizHelper(project: Project, stepNode: StepNode) : StepHelper(project
                 .step(stepNode.id)
                 .user(userId)
                 .execute()
+
+        attempt = attempts.firstOrDefault(Attempt())
+
         if (attempts.isEmpty) {
-            attempt = Attempt()
             action = GET_FIRST_ATTEMPT
             return false
         }
 
-        attempt = attempts.first
         action = if (attempt.status == ACTIVE) SUBMIT else GET_ATTEMPT
         return true
     }
@@ -130,8 +131,8 @@ open class QuizHelper(project: Project, stepNode: StepNode) : StepHelper(project
         val submissions = query.execute()
         isModified = false
 
-        if (!submissions.isEmpty) {
-            val lastSubmission = submissions.first
+        if (submissions.isNotEmpty) {
+            val lastSubmission = submissions.first()
             submission = lastSubmission
 
             val isLastSubmission = lastSubmission.id == stepNode.lastSubmissionId

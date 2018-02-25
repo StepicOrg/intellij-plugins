@@ -15,6 +15,7 @@ import org.stepik.api.exceptions.StepikClientException
 import org.stepik.api.queries.Order
 import org.stepik.core.StudyUtils
 import org.stepik.core.SupportedLanguages
+import org.stepik.core.SupportedLanguages.Companion.langOfName
 import org.stepik.core.common.Loggable
 import org.stepik.core.core.EduNames
 import org.stepik.core.courseFormat.StepNode
@@ -170,38 +171,27 @@ object ProgrammingLanguageUtils : Loggable {
                         val user = currentUser
                         if (!user.isGuest) {
                             try {
-                                val submissions = stepikApiClient.submissions()
+                                stepikApiClient.submissions()
                                         .get()
                                         .user(user.id)
                                         .order(Order.DESC)
                                         .step(stepNode.id)
                                         .execute()
-
-                                if (!submissions.isEmpty) {
-                                    val lastSubmission = submissions.items
-                                            .stream()
-                                            .filter { submission ->
-                                                SupportedLanguages.langOfName(submission
-                                                        .reply
-                                                        .language) === language
-                                            }
-                                            .limit(1)
-                                            .findFirst()
-                                    if (lastSubmission.isPresent) {
-                                        template = lastSubmission.get().reply.code
-                                    }
-                                }
+                                        .firstOrNull {
+                                            langOfName(it.reply.language) === language
+                                        }?.also {
+                                            template = it.reply.code
+                                        }
                             } catch (e: StepikClientException) {
                                 logger.warn(e)
                             }
-
                         }
 
                         if (template == null) {
                             template = stepNode.getTemplate(language)
                         }
 
-                        file!!.setBinaryContent(template.toByteArray())
+                        file!!.setBinaryContent(template!!.toByteArray())
                     } catch (e: IOException) {
                         file = null
                     }

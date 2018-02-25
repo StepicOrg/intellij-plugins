@@ -33,7 +33,7 @@ public class StepikViewsPostQuery extends StepikAbstractPostQuery<Views> {
     @NotNull
     @Override
     protected String getBody() {
-        return getJsonConverter().toJson(views);
+        return getJsonConverter().toJson(views, false);
     }
 
     @NotNull

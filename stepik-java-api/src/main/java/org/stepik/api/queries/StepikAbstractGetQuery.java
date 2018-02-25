@@ -136,7 +136,7 @@ public abstract class StepikAbstractGetQuery<T extends StepikAbstractGetQuery, R
             id(idsForQuery);
             R loadedItems = super.execute();
 //            noinspection unchecked
-            loadedItems.getItems().forEach((item) -> flushCourse(item, courseCache));
+            loadedItems.forEach((item) -> flushCourse(item, courseCache));
             //noinspection unchecked
             items.getItems().addAll(loadedItems.getItems());
         }
@@ -158,7 +158,7 @@ public abstract class StepikAbstractGetQuery<T extends StepikAbstractGetQuery, R
 
         try {
             Files.createDirectories(courseCache.getParent());
-            byte[] content = getJsonConverter().toJson(item).getBytes(StandardCharsets.UTF_8);
+            byte[] content = getJsonConverter().toJson(item, false).getBytes(StandardCharsets.UTF_8);
             Files.write(courseCache, content, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
         } catch (IOException ignored) {
         }

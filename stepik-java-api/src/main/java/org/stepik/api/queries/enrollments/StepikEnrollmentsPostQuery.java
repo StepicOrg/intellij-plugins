@@ -26,7 +26,7 @@ public class StepikEnrollmentsPostQuery extends StepikAbstractPostQuery<Enrollme
     @NotNull
     @Override
     protected String getBody() {
-        return getJsonConverter().toJson(enrollment);
+        return getJsonConverter().toJson(enrollment, false);
     }
 
     @NotNull

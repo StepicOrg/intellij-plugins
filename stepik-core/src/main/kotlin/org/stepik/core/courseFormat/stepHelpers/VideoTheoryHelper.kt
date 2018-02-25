@@ -33,11 +33,11 @@ class VideoTheoryHelper(project: Project, stepNode: StepNode) : StepHelper(proje
 
     val videoUrls: List<VideoUrl>
         get() {
-            return data.block.video.urls.sortedBy { it.quality }
+            return data.block?.video?.urls?.sortedBy { it.quality } ?: emptyList()
         }
 
     fun hasContent(): Boolean {
-        return data.block.video.urls.isNotEmpty()
+        return data.block?.video?.urls?.isNotEmpty() ?: false
     }
 
     fun getQuality(): Int {

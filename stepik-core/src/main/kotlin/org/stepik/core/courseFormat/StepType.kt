@@ -27,6 +27,6 @@ enum class StepType(val typeName: String) {
             values().associateBy { it.typeName }
         }
 
-        fun of(typeName: String) = map.getOrDefault(typeName, UNKNOWN)
+        fun of(typeName: String?) = map.getOrDefault(typeName, UNKNOWN)
     }
 }

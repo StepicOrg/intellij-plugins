@@ -101,15 +101,16 @@ object StudyUtils : Loggable {
                     .get()
                     .course(root.id)
                     .execute()
-            if (!recommendations.isEmpty) {
-                val lesson = recommendations.first.lesson
+            if (recommendations.isNotEmpty) {
+                val lesson = recommendations.first().lesson
 
-                val steps = stepikClient.steps()
+                val step = stepikClient.steps()
                         .get()
                         .lesson(lesson)
                         .execute()
-                if (!steps.isEmpty) {
-                    val stepId = steps.first.id
+                        .firstOrNull()
+                if (step != null) {
+                    val stepId = step.id
                     studyNode = root.getChildByClassAndId(StepNode::class.java, stepId)
                 }
             }
