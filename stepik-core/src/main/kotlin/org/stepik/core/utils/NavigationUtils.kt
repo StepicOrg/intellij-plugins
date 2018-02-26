@@ -45,7 +45,7 @@ object NavigationUtils {
 
         if (mainFile != null) {
             ApplicationManager.getApplication().invokeAndWait {
-                updateProjectView(project, mainFile!!)
+                updateProjectView(project, mainFile)
             }
         }
         Metrics.navigateAction(project, targetNode)

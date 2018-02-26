@@ -130,7 +130,7 @@ object ProjectFilesUtils {
                     application.runWriteAction {
                         ModuleUtils.createStepModule(project, stepNode, myModel!!)
                         if (modelOwner) {
-                            myModel!!.commit()
+                            myModel.commit()
                         }
                     }
                 }

@@ -85,7 +85,7 @@ object SendAction : Loggable {
         }
         resultWindow.apply {
             println(stepStatus)
-            println(currentSubmission!!.hint)
+            println(currentSubmission.hint)
         }
         getApplication().invokeLater {
             if (!project.isDisposed) {
