@@ -51,6 +51,8 @@ open class StepHelper(val project: Project, internal val stepNode: StepNode) : L
 
     val parent: Long = stepNode.parent?.id ?: 0
 
+    val parentTitle: String? = stepNode.parent?.data?.title
+
     open val isAutoCreateAttempt: Boolean
         get() = hasSubmitButton()
 

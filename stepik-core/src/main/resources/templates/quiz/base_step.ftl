@@ -67,7 +67,9 @@
             <button type="button" onclick="showLogin()">Login</button>
             </#if>
         </#if>
-
+        <#if stepNode.parent?has_content>
+            <p><b>${stepNode.parentTitle}</b></p>
+        </#if>
         ${stepNode.getContent()}<br>
     <div>
         <form id="answer_form" action="${stepNode.getPath()}">
