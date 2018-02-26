@@ -77,7 +77,9 @@ class TestSamplesAction : CodeQuizAction(TEXT, DESCRIPTION, AllIcons.Actions.Res
         }
         stepNode.samples.forEach { sample ->
             resultWindow.print("Test #${counter++} ")
-            val result = runner.testSamples(project, stepNode, sample.input, { it == sample.output }, testClass = testClass)
+            val result = runner.testSamples(project, stepNode, sample.input,
+                    { it.trimEnd() == sample.output.trimEnd() },
+                    testClass = testClass)
             val status = getStatusString(result)
 
             resultWindow.println(status)
