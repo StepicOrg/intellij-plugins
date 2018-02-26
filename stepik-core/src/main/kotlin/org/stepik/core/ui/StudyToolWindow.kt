@@ -23,6 +23,11 @@ import org.stepik.core.StudyUtils.getConfigurator
 import org.stepik.core.StudyUtils.getProjectManager
 import org.stepik.core.StudyUtils.isStepikProject
 import org.stepik.core.SupportedLanguages
+import org.stepik.core.auth.StepikAuthManager
+import org.stepik.core.auth.StepikAuthManager.authAndGetStepikApiClient
+import org.stepik.core.auth.StepikAuthManager.isAuthenticated
+import org.stepik.core.auth.StepikAuthManagerListener
+import org.stepik.core.auth.StepikAuthState
 import org.stepik.core.common.Loggable
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.StepType.CHOICE
@@ -55,11 +60,6 @@ import org.stepik.core.courseFormat.stepHelpers.StringQuizHelper
 import org.stepik.core.courseFormat.stepHelpers.TableQuizHelper
 import org.stepik.core.courseFormat.stepHelpers.TextTheoryHelper
 import org.stepik.core.courseFormat.stepHelpers.VideoTheoryHelper
-import org.stepik.core.stepik.StepikAuthManager
-import org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient
-import org.stepik.core.stepik.StepikAuthManager.isAuthenticated
-import org.stepik.core.stepik.StepikAuthManagerListener
-import org.stepik.core.stepik.StepikAuthState
 import org.stepik.core.utils.ProgrammingLanguageUtils.switchProgrammingLanguage
 import java.awt.BorderLayout
 import java.awt.CardLayout
@@ -84,7 +84,7 @@ class StudyToolWindow internal constructor() :
     private val rightPanel: Panel
     private var project: Project? = null
     private var stepNode: StepNode? = null
-    var browserWindow: StudyBrowserWindow? = null
+    private var browserWindow: StudyBrowserWindow? = null
 
     private fun createStepInfoPanel(project: Project): JComponent {
         val browserWindow = StudyBrowserWindow(project)

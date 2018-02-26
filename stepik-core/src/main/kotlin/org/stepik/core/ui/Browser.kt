@@ -4,6 +4,7 @@ import com.intellij.ide.ui.LafManager
 import com.intellij.ide.ui.LafManagerListener
 import com.intellij.ide.ui.laf.darcula.DarculaLookAndFeelInfo
 import com.intellij.ide.util.PropertiesComponent
+import com.sun.javafx.webkit.WebConsoleListener
 import javafx.application.Platform
 import javafx.concurrent.Worker
 import javafx.embed.swing.JFXPanel
@@ -25,7 +26,7 @@ open class Browser internal constructor() : JFrame(), Loggable {
     private val bridge = JavaBridge
     internal val panel: JFXPanel = JFXPanel()
     private var webComponent: WebView? = null
-    internal var pane: BorderPane? = null
+    private var pane: BorderPane? = null
     var engine: WebEngine? = null
 
     init {
@@ -34,6 +35,10 @@ open class Browser internal constructor() : JFrame(), Loggable {
         title = "Study Browser"
         LafManager.getInstance().addLafManagerListener(StudyLafManagerListener())
         initComponents()
+
+        WebConsoleListener.setDefaultListener { _, message, lineNumber, sourceId ->
+            logger.warn("Console: [$sourceId:$lineNumber] $message")
+        }
     }
 
     private fun updateLaf(isDarcula: Boolean) {
@@ -108,11 +113,7 @@ open class Browser internal constructor() : JFrame(), Loggable {
                         };
                         console.debug = function (message) {
                             java.debug(message);
-                        };
-                        window.addEventListener('error', function (e) {
-                            java.doError(e.filename, e.lineno, e.colno, e.message);
-                            return true;
-                        });"""
+                        };"""
                     engine!!.executeScript(script)
                 }
     }
@@ -143,10 +144,6 @@ open class Browser internal constructor() : JFrame(), Loggable {
 
         fun debug(text: String) {
             logger.debug("console: $text")
-        }
-
-        fun doError(filename: String, lineno: Int, colno: Int, message: String) {
-            error("\nfilename: $filename\nline: $lineno\ncolumn: $colno\nmessage: $message")
         }
 
         fun setVideoQuality(value: Int?) {

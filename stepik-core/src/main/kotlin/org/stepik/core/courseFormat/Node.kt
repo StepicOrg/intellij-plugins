@@ -7,11 +7,11 @@ import org.stepik.api.client.StepikApiClient
 import org.stepik.api.exceptions.StepikClientException
 import org.stepik.api.objects.StudyObject
 import org.stepik.api.objects.progresses.Progresses
+import org.stepik.core.auth.StepikAuthManager
+import org.stepik.core.auth.StepikAuthManager.isAuthenticated
 import org.stepik.core.courseFormat.StudyStatus.FAILED
 import org.stepik.core.courseFormat.StudyStatus.SOLVED
 import org.stepik.core.courseFormat.StudyStatus.UNCHECKED
-import org.stepik.core.stepik.StepikAuthManager
-import org.stepik.core.stepik.StepikAuthManager.isAuthenticated
 import org.stepik.core.utils.batch
 import org.stepik.core.utils.refreshProjectView
 import java.util.concurrent.Executors

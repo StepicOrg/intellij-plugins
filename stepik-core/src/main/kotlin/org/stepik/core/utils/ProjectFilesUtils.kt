@@ -10,8 +10,8 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.psi.PsiDirectory
 import com.intellij.psi.PsiManager
+import org.stepik.core.EduNames
 import org.stepik.core.StudyUtils
-import org.stepik.core.core.EduNames
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.StudyNode
 import org.stepik.core.utils.ProductGroup.IDEA

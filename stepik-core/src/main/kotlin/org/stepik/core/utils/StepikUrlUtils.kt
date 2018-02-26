@@ -9,8 +9,8 @@ import org.stepik.api.objects.lessons.CompoundUnitLesson
 import org.stepik.api.objects.lessons.Lesson
 import org.stepik.api.objects.sections.Section
 import org.stepik.api.objects.units.Unit
+import org.stepik.core.auth.StepikAuthManager.authAndGetStepikApiClient
 import org.stepik.core.common.Loggable
-import org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient
 import org.stepik.core.templates.Templater
 import java.text.SimpleDateFormat
 

@@ -10,7 +10,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
-import org.stepik.core.core.EduNames
+import org.stepik.core.EduNames
 import org.stepik.core.courseFormat.StepNode
 
 abstract class JetRunner : Runner {

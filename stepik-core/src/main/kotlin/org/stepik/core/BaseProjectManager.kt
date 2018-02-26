@@ -18,21 +18,19 @@ import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.thoughtworks.xstream.annotations.XStreamOmitField
 import org.jdom.Element
+import org.stepik.core.auth.StepikAuthManager
+import org.stepik.core.auth.StepikAuthManager.authAndGetStepikApiClient
+import org.stepik.core.auth.StepikAuthManager.isAuthenticated
+import org.stepik.core.auth.StepikAuthManagerListener
+import org.stepik.core.auth.StepikAuthState
+import org.stepik.core.auth.StepikAuthState.AUTH
+import org.stepik.core.auth.StepikAuthState.NOT_AUTH
 import org.stepik.core.common.Loggable
-import org.stepik.core.core.EduNames
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.StudyNode
 import org.stepik.core.serialization.SerializationUtils.elementToXml
 import org.stepik.core.serialization.SerializationUtils.toElement
 import org.stepik.core.serialization.SerializationUtils.xStream
-import org.stepik.core.stepik.StepikAuthManager
-import org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient
-import org.stepik.core.stepik.StepikAuthManager.isAuthenticated
-import org.stepik.core.stepik.StepikAuthManagerListener
-import org.stepik.core.stepik.StepikAuthState
-import org.stepik.core.stepik.StepikAuthState.AUTH
-import org.stepik.core.stepik.StepikAuthState.NOT_AUTH
-import org.stepik.core.stepik.StepikAuthState.SHOW_DIALOG
 import org.stepik.core.utils.ProjectFilesUtils
 import java.io.ByteArrayOutputStream
 import java.io.OutputStreamWriter
@@ -276,11 +274,7 @@ abstract class BaseProjectManager constructor(@field:XStreamOmitField val projec
                 }
             }
 
-            if (oldState === SHOW_DIALOG && newState === NOT_AUTH) {
-                updateToolWindow()
-            } else {
-                updateSelection()
-            }
+            updateSelection()
         }
     }
 

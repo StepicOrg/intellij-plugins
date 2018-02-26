@@ -14,14 +14,14 @@ import org.stepik.alt.projectWizard.idea.SandboxModuleBuilder
 import org.stepik.core.ProjectGenerator
 import org.stepik.core.StudyUtils.getProjectManager
 import org.stepik.core.SupportedLanguages
+import org.stepik.core.auth.StepikAuthManager.authAndGetStepikApiClient
+import org.stepik.core.auth.StepikAuthManager.currentUser
 import org.stepik.core.common.Loggable
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.StudyNode
 import org.stepik.core.metrics.Metrics
 import org.stepik.core.metrics.MetricsStatus.TARGET_NOT_FOUND
 import org.stepik.core.projectWizard.ProjectWizardUtils
-import org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient
-import org.stepik.core.stepik.StepikAuthManager.currentUser
 import org.stepik.core.utils.ProjectFilesUtils
 
 object StepikProjectGenerator : ProjectGenerator, Loggable {

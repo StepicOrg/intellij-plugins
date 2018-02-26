@@ -13,6 +13,7 @@
   <extensions defaultExtensionNs="com.intellij">
     <applicationConfigurable instance="org.stepik.core.ui.StepikSettingsConfigurable" />
     <moduleType id="STEPIK_MODULE_TYPE" implementationClass="org.stepik.alt.projectWizard.idea.StepikModuleType" />
+    <httpRequestHandler implementation="org.stepik.core.auth.StepikRestService" />
   </extensions>
 
   <extensions defaultExtensionNs="org.stepik.alt">

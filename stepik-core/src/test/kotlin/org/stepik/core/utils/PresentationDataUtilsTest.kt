@@ -7,8 +7,8 @@ import org.junit.experimental.theories.FromDataPoints
 import org.junit.experimental.theories.Theories
 import org.junit.experimental.theories.Theory
 import org.junit.runner.RunWith
+import org.stepik.core.EduNames
 import org.stepik.core.TestUtils.join
-import org.stepik.core.core.EduNames
 
 
 @RunWith(Theories::class)

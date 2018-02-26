@@ -12,14 +12,14 @@ import org.stepik.api.objects.submissions.Submission
 import org.stepik.api.objects.submissions.Submissions
 import org.stepik.api.queries.Order
 import org.stepik.api.urls.Urls
+import org.stepik.core.auth.StepikAuthManager.authAndGetStepikApiClient
+import org.stepik.core.auth.StepikAuthManager.currentUser
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.StudyStatus
 import org.stepik.core.courseFormat.stepHelpers.Actions.GET_ATTEMPT
 import org.stepik.core.courseFormat.stepHelpers.Actions.GET_FIRST_ATTEMPT
 import org.stepik.core.courseFormat.stepHelpers.Actions.NEED_LOGIN
 import org.stepik.core.courseFormat.stepHelpers.Actions.SUBMIT
-import org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient
-import org.stepik.core.stepik.StepikAuthManager.currentUser
 
 
 open class QuizHelper(project: Project, stepNode: StepNode) : StepHelper(project, stepNode) {

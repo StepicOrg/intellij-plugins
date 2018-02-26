@@ -10,12 +10,11 @@ import org.stepik.core.StudyUtils.getConfigurator
 import org.stepik.core.StudyUtils.getProjectManager
 import org.stepik.core.StudyUtils.getStudyNode
 import org.stepik.core.actions.SendAction
+import org.stepik.core.auth.StepikAuthManager.authAndGetStepikApiClient
+import org.stepik.core.auth.StepikAuthManager.authentication
 import org.stepik.core.common.Loggable
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.StepType
-import org.stepik.core.stepik.StepikAuthManager
-import org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient
-import org.stepik.core.stepik.StepikAuthState
 import org.stepik.core.testFramework.toolWindow.StepikTestResultToolWindow
 import org.stepik.core.testFramework.toolWindow.StepikTestToolWindowUtils
 import org.stepik.core.ui.StepDescriptionUtils.getReply
@@ -168,16 +167,7 @@ internal class FormListener(private val project: Project, private val browser: S
                     getReply(node!!, type, elements, null)
                 }
                 "login" -> {
-                    val email = elements.getInputValue("email")
-                    val password = elements.getInputValue("password")
-                    browser.showLoadAnimation()
-                    StepikAuthManager.authentication(email, password)
-                            .whenComplete { state, _ ->
-                                if (state != StepikAuthState.AUTH) {
-                                    browser.callFunction("setErrorMessage", "Wrong email or password")
-                                }
-                                browser.hideLoadAnimation()
-                            }
+                    authentication()
                 }
                 "next_step" -> {
                     val targetNode = getConfigurator(project)?.nextAction(node) ?: return

@@ -5,11 +5,11 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.wm.ToolWindowManager
 import org.stepik.api.exceptions.StepikClientException
+import org.stepik.core.auth.StepikAuthManager.authAndGetStepikApiClient
+import org.stepik.core.auth.StepikAuthManager.isAuthenticated
 import org.stepik.core.common.Loggable
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.StudyNode
-import org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient
-import org.stepik.core.stepik.StepikAuthManager.isAuthenticated
 import org.stepik.core.ui.StudyToolWindow
 import org.stepik.core.ui.StudyToolWindowFactory
 import org.stepik.core.ui.StudyToolWindowFactory.Companion.STUDY_TOOL_WINDOW

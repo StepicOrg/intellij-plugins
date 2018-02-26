@@ -6,9 +6,9 @@ import com.intellij.psi.PsiDirectory
 import com.intellij.psi.PsiFile
 import com.intellij.ui.JBColor
 import com.intellij.ui.SimpleTextAttributes
+import org.stepik.core.EduNames
 import org.stepik.core.StudyUtils.getStudyNode
 import org.stepik.core.StudyUtils.isStepikProject
-import org.stepik.core.core.EduNames
 import org.stepik.core.courseFormat.StudyNode
 import org.stepik.core.icons.AllStepikIcons
 import org.stepik.core.utils.PresentationUtils.getColor

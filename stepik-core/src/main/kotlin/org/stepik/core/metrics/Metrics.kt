@@ -6,12 +6,12 @@ import org.stepik.api.client.StepikApiClient
 import org.stepik.api.objects.metrics.Metric
 import org.stepik.core.StudyUtils.getProjectManager
 import org.stepik.core.SupportedLanguages
+import org.stepik.core.auth.StepikAuthManager.authAndGetStepikApiClient
+import org.stepik.core.auth.StepikAuthManager.isAuthenticated
 import org.stepik.core.common.Loggable
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.StudyNode
 import org.stepik.core.metrics.MetricsStatus.SUCCESSFUL
-import org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient
-import org.stepik.core.stepik.StepikAuthManager.isAuthenticated
 import org.stepik.core.utils.PluginUtils
 import org.stepik.core.utils.Utils
 import java.util.*

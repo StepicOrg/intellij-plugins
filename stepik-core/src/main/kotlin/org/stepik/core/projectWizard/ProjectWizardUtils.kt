@@ -11,11 +11,11 @@ import org.stepik.api.objects.lessons.CompoundUnitLesson
 import org.stepik.api.objects.sections.Section
 import org.stepik.api.objects.steps.Step
 import org.stepik.core.SupportedLanguages
+import org.stepik.core.auth.StepikAuthManager
+import org.stepik.core.auth.StepikAuthManager.isAuthenticated
 import org.stepik.core.common.Loggable
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.StudyNode
-import org.stepik.core.stepik.StepikAuthManager
-import org.stepik.core.stepik.StepikAuthManager.isAuthenticated
 import org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory
 import java.io.File
 

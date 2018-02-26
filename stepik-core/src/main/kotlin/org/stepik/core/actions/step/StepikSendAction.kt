@@ -11,14 +11,14 @@ import org.stepik.api.objects.submissions.Submissions
 import org.stepik.core.SupportedLanguages
 import org.stepik.core.actions.SendAction.checkStepStatus
 import org.stepik.core.actions.getShortcutText
+import org.stepik.core.auth.StepikAuthManager.authAndGetStepikApiClient
+import org.stepik.core.auth.StepikAuthManager.isAuthenticated
 import org.stepik.core.common.Loggable
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.icons.AllStepikIcons
 import org.stepik.core.metrics.Metrics
 import org.stepik.core.metrics.MetricsStatus.DATA_NOT_LOADED
 import org.stepik.core.metrics.MetricsStatus.FAILED_POST
-import org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient
-import org.stepik.core.stepik.StepikAuthManager.isAuthenticated
 import org.stepik.core.testFramework.toolWindow.StepikTestResultToolWindow
 import org.stepik.core.testFramework.toolWindow.StepikTestToolWindowUtils.Companion.showTestResultsToolWindow
 import org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory

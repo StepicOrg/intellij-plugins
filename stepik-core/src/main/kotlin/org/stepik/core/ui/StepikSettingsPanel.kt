@@ -4,12 +4,14 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.components.ServiceManager
 import org.stepik.core.ProjectManager
-import org.stepik.core.stepik.StepikAuthManager
-import org.stepik.core.stepik.StepikAuthManager.isAuthenticated
-import org.stepik.core.stepik.StepikAuthManagerListener
-import org.stepik.core.stepik.StepikAuthState
-import org.stepik.core.stepik.StepikAuthState.AUTH
-import org.stepik.core.stepik.StepikAuthState.NOT_AUTH
+import org.stepik.core.auth.StepikAuthManager
+import org.stepik.core.auth.StepikAuthManager.authentication
+import org.stepik.core.auth.StepikAuthManager.isAuthenticated
+import org.stepik.core.auth.StepikAuthManager.logout
+import org.stepik.core.auth.StepikAuthManagerListener
+import org.stepik.core.auth.StepikAuthState
+import org.stepik.core.auth.StepikAuthState.AUTH
+import org.stepik.core.auth.StepikAuthState.NOT_AUTH
 import org.stepik.core.utils.Utils
 import javax.swing.JButton
 import javax.swing.JCheckBox
@@ -35,9 +37,9 @@ internal class StepikSettingsPanel : StepikAuthManagerListener {
         hintCheckBox!!.addActionListener { isModified = true }
         logoutButton!!.addActionListener {
             if (isAuthenticated) {
-                StepikAuthManager.logout()
+                logout()
             } else {
-                StepikAuthManager.authentication(true)
+                authentication()
             }
         }
 

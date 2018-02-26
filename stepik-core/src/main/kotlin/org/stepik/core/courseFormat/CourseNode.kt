@@ -8,7 +8,7 @@ import org.stepik.api.objects.courses.Course
 import org.stepik.api.objects.sections.Section
 import org.stepik.api.objects.sections.Sections
 import org.stepik.api.objects.users.User
-import org.stepik.core.stepik.StepikAuthManager
+import org.stepik.core.auth.StepikAuthManager
 
 class CourseNode(project: Project? = null, stepikApiClient: StepikApiClient? = null, data: StudyObject? = null) :
         Node(project, stepikApiClient, data) {

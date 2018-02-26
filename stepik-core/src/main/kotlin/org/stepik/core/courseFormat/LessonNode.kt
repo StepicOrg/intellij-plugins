@@ -7,7 +7,7 @@ import org.stepik.api.objects.StudyObject
 import org.stepik.api.objects.lessons.CompoundUnitLesson
 import org.stepik.api.objects.lessons.Lesson
 import org.stepik.api.objects.steps.Step
-import org.stepik.core.core.EduNames
+import org.stepik.core.EduNames
 
 open class LessonNode(project: Project? = null, stepikApiClient: StepikApiClient? = null, data: StudyObject? = null) :
         Node(project, stepikApiClient, data) {

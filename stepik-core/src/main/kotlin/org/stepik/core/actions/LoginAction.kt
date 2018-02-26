@@ -1,13 +1,12 @@
 package org.stepik.core.actions
 
 import com.intellij.openapi.actionSystem.AnActionEvent
-import org.stepik.core.StudyUtils.getStudyToolWindow
-import org.stepik.core.stepik.StepikAuthManager.isAuthenticated
+import org.stepik.core.auth.StepikAuthManager.authentication
+import org.stepik.core.auth.StepikAuthManager.isAuthenticated
 
 class LoginAction : StudyActionWithShortcut(TEXT, DESCRIPTION) {
     override fun actionPerformed(e: AnActionEvent?) {
-        val project = e?.project ?: return
-        getStudyToolWindow(project)?.browserWindow?.callFunction("showLogin")
+        authentication()
     }
 
     override fun getActionId() = ACTION_ID

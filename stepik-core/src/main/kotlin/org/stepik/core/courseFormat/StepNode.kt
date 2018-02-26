@@ -11,10 +11,10 @@ import org.stepik.api.objects.steps.Limit
 import org.stepik.api.objects.steps.Sample
 import org.stepik.api.objects.steps.Step
 import org.stepik.api.objects.submissions.Reply
+import org.stepik.core.EduNames
 import org.stepik.core.SupportedLanguages
 import org.stepik.core.SupportedLanguages.Companion.langOfName
 import org.stepik.core.SupportedLanguages.INVALID
-import org.stepik.core.core.EduNames
 import org.stepik.core.courseFormat.StepType.CODE
 import java.time.Instant
 import java.util.*

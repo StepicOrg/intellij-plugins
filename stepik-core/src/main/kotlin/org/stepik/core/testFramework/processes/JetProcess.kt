@@ -13,7 +13,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.io.FileUtil
-import org.stepik.core.core.EduNames
+import org.stepik.core.EduNames
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.testFramework.createDirectories
 import org.stepik.core.utils.Utils

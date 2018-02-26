@@ -2,7 +2,7 @@ package org.stepik.alt.projectWizard.idea
 
 import com.intellij.ide.highlighter.ModuleFileType
 import com.intellij.openapi.util.io.FileUtil
-import org.stepik.core.core.EduNames
+import org.stepik.core.EduNames
 
 class SandboxModuleBuilder(moduleDir: String) : ModuleBuilderWithSrc() {
     init {

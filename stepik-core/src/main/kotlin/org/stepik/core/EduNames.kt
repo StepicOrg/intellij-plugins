@@ -1,4 +1,4 @@
-package org.stepik.core.core
+package org.stepik.core
 
 import org.jetbrains.annotations.NonNls
 

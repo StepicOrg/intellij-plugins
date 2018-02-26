@@ -14,7 +14,10 @@
 
     <#if !authenticated>
     <div>
-        <button type="button" onclick="showLogin()">Login</button>
+        <form id="answer_form" action="/">
+            <input id="action" type="hidden" name="action"/>
+            <input type="submit" onclick="login()" value="Login"/>
+        </form>
     </div>
     </#if>
 

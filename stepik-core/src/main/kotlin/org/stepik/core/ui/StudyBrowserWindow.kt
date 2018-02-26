@@ -57,8 +57,7 @@ class StudyBrowserWindow internal constructor(private val project: Project) : Br
                         }
                 ),
                 "charset" to Charset.defaultCharset().displayName(),
-                "loader" to getExternalURL("/templates/img/loader.svg"),
-                "login_css" to getExternalURL("/templates/login/css/login.css")
+                "loader" to getExternalURL("/templates/img/loader.svg")
         )
         map.putAll(context)
 
@@ -100,7 +99,7 @@ class StudyBrowserWindow internal constructor(private val project: Project) : Br
         callFunction("hideLoadAnimation")
     }
 
-    internal fun callFunction(name: String, vararg args: String) {
+    private fun callFunction(name: String, vararg args: String) {
         Platform.runLater {
             try {
                 val argsString = args.joinToString(",") { "\"$it\"" }

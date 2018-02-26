@@ -7,7 +7,7 @@ import org.stepik.api.objects.StudyObject
 import org.stepik.api.objects.lessons.CompoundUnitLesson
 import org.stepik.api.objects.sections.Section
 import org.stepik.api.objects.units.Unit
-import org.stepik.core.core.EduNames
+import org.stepik.core.EduNames
 import java.util.*
 
 

@@ -2,9 +2,9 @@ package org.stepik.core.courseFormat.stepHelpers
 
 import com.intellij.openapi.project.Project
 import org.stepik.api.exceptions.StepikClientException
+import org.stepik.core.auth.StepikAuthManager.authAndGetStepikApiClient
+import org.stepik.core.auth.StepikAuthManager.isAuthenticated
 import org.stepik.core.courseFormat.StepNode
-import org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient
-import org.stepik.core.stepik.StepikAuthManager.isAuthenticated
 
 
 class FreeAnswerQuizHelper(project: Project, stepNode: StepNode) : StringQuizHelper(project, stepNode) {

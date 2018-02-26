@@ -9,11 +9,11 @@ import org.stepik.core.StudyUtils.getProjectManager
 import org.stepik.core.actions.getShortcutText
 import org.stepik.core.actions.navigation.StudyNavigator
 import org.stepik.core.actions.navigation.StudyStepNavigationAction
+import org.stepik.core.auth.StepikAuthManager.authAndGetStepikApiClient
 import org.stepik.core.courseFormat.LessonNode
 import org.stepik.core.courseFormat.Node
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.StudyNode
-import org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient
 
 class StepikNextStepAction : StudyStepNavigationAction(TEXT, DESCRIPTION, AllIcons.Actions.Forward) {
 

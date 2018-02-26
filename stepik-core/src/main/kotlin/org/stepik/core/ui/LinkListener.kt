@@ -14,12 +14,12 @@ import org.stepik.api.urls.Urls
 import org.stepik.core.ProjectManager
 import org.stepik.core.StudyUtils
 import org.stepik.core.StudyUtils.getProjectManager
+import org.stepik.core.auth.StepikAuthManager
+import org.stepik.core.auth.StepikAuthManager.currentUser
 import org.stepik.core.common.Loggable
 import org.stepik.core.courseFormat.LessonNode
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.StudyNode
-import org.stepik.core.stepik.StepikAuthManager
-import org.stepik.core.stepik.StepikAuthManager.currentUser
 import org.stepik.core.utils.NavigationUtils
 import org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory
 import org.w3c.dom.Element

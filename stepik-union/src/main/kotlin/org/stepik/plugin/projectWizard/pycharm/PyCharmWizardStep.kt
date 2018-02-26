@@ -3,11 +3,11 @@ package org.stepik.plugin.projectWizard.pycharm
 import com.intellij.facet.ui.ValidationResult
 import com.intellij.openapi.application.ApplicationManager
 import org.stepik.core.SupportedLanguages
-import org.stepik.core.stepik.StepikAuthManager
-import org.stepik.core.stepik.StepikAuthManager.authentication
-import org.stepik.core.stepik.StepikAuthManagerListener
-import org.stepik.core.stepik.StepikAuthState
-import org.stepik.core.stepik.StepikAuthState.AUTH
+import org.stepik.core.auth.StepikAuthManager
+import org.stepik.core.auth.StepikAuthManager.authentication
+import org.stepik.core.auth.StepikAuthManagerListener
+import org.stepik.core.auth.StepikAuthState
+import org.stepik.core.auth.StepikAuthState.AUTH
 import org.stepik.plugin.projectWizard.ui.ProjectSettingListener
 import org.stepik.plugin.projectWizard.ui.ProjectSettingsPanel
 

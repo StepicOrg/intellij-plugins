@@ -4,10 +4,10 @@ import com.intellij.ide.util.projectWizard.ModuleWizardStep
 import com.intellij.openapi.options.ConfigurationException
 import com.intellij.openapi.project.Project
 import org.stepik.api.objects.StudyObject
+import org.stepik.core.auth.StepikAuthManager.authentication
+import org.stepik.core.auth.StepikAuthState.AUTH
 import org.stepik.core.common.Loggable
 import org.stepik.core.projectWizard.ProjectWizardUtils.enrollmentCourse
-import org.stepik.core.stepik.StepikAuthManager.authentication
-import org.stepik.core.stepik.StepikAuthState.AUTH
 import org.stepik.plugin.projectWizard.StepikProjectGenerator
 import org.stepik.plugin.projectWizard.ui.ProjectSettingsPanel
 
@@ -31,7 +31,7 @@ internal class JavaWizardStep(private val generator: StepikProjectGenerator,
     }
 
     override fun validate(): Boolean {
-        if (authentication(true) != AUTH) {
+        if (authentication() != AUTH) {
             throw ConfigurationException("Please, you should login", "Error")
         }
         valid = panel.validate()

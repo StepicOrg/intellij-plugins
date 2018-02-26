@@ -6,12 +6,12 @@ import org.stepik.api.objects.steps.Step
 import org.stepik.api.urls.Urls
 import org.stepik.core.StudyUtils.getConfigurator
 import org.stepik.core.StudyUtils.getProjectManager
+import org.stepik.core.auth.StepikAuthManager.authAndGetStepikApiClient
+import org.stepik.core.auth.StepikAuthManager.isAuthenticated
 import org.stepik.core.common.Loggable
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.stepHelpers.Actions.NEED_LOGIN
 import org.stepik.core.courseFormat.stepHelpers.Actions.NOTHING
-import org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient
-import org.stepik.core.stepik.StepikAuthManager.isAuthenticated
 
 
 open class StepHelper(val project: Project, internal val stepNode: StepNode) : Loggable {

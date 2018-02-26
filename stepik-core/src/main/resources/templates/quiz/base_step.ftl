@@ -64,7 +64,7 @@
                 <a class="adaptive-button" href="adaptive:too_hard/${lessonId}">Lesson is too hard</a>
             </div>
             <#else>
-            <button type="button" onclick="showLogin()">Login</button>
+            <input type="submit" onclick="login()" value="Login"/>
             </#if>
         </#if>
         <#if stepNode.parent?has_content>
@@ -108,7 +108,7 @@
             </#if>
 
             <#if needLogin>
-                <button type="button" onclick="showLogin()">Login</button>
+                <input type="submit" value="Login" onclick="login()"/>
             </#if>
 
             <#if stepNode.hasNextStep()>

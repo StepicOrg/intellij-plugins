@@ -1,5 +1,4 @@
 <#-- @ftlvariable name="stepNode" type="org.stepik.core.courseFormat.stepHelpers.StepHelper" -->
-<#-- @ftlvariable name="login_css" type="java.lang.String" -->
 <#-- @ftlvariable name="loader" type="java.lang.String" -->
 <#-- @ftlvariable name="mathjax" type="java.lang.String" -->
 <#-- @ftlvariable name="charset" type="java.lang.String" -->
@@ -8,13 +7,13 @@
 <#-- @ftlvariable name="css_highlight" type="java.lang.String" -->
 
 <!DOCTYPE html>
+
 <html>
 <head>
     <meta charset="${charset}">
 
 <#macro styles>
     <link rel="stylesheet" href="${css_highlight}">
-    <link rel="stylesheet" href="${login_css}">
 
     <style media="screen" type="text/css">
         body {
@@ -22,7 +21,7 @@
             padding: 10px 15px;
         }
 
-        #load_animation, #login {
+        #load_animation {
             display: none;
             position: absolute;
             width: 100%;
@@ -47,20 +46,6 @@
     <#nested/>
 </#macro>
 
-<div id="login">
-    <form id="login-form" action="<#if stepNode??>${stepNode.getPath()}</#if>" method="post">
-        <div id="login-form-close" onclick="hideLogin()">Close</div>
-        <h2>Login on Stepik</h2>
-        <p id="login-form-errors"></p>
-        <label for="login-form-email"> Email:</label>
-        <input id="login-form-email" type="email" name="email" value="">
-        <label for="login-form-password"> Password:</label>
-        <input id="login-form-password" type="password" name="password" value="">
-        <input type="submit" value="Login" onclick="checkValues()">
-        <input type="hidden" name="action" value="login">
-    </form>
-</div>
-
 <div id="load_animation">
     <object type="image/svg+xml" data="${loader}" class='icon'></object>
 </div>
@@ -74,6 +59,9 @@
       TeX: {extensions: ["mhchem.js", "color.js"]},
       messageStyle: "none",
     });
+
+
+
 
 
 
@@ -96,18 +84,6 @@
         load_animation.style.display = "none";
     }
 
-    var login = document.getElementById("login");
-
-    function showLogin() {
-        login.style.display = "flex";
-        setErrorMessage("");
-    }
-
-    //noinspection JSUnusedLocalSymbols
-    function hideLogin() {
-        login.style.display = "none";
-    }
-
     var nodeList = document.body.getElementsByTagName("code");
 
     for (var i = 0; i < nodeList.length; i++) {
@@ -118,15 +94,11 @@
     //noinspection JSUnresolvedVariable
     hljs.initHighlighting();
 
-    function checkValues() {
-        setErrorMessage("");
+    function login() {
+        var action_element = document.getElementById("action");
+        action_element.setAttribute("value", "login");
     }
 
-    var errors = document.getElementById("login-form-errors");
-
-    function setErrorMessage(message) {
-        errors.innerText = message;
-    }
 </script>
     <#nested/>
 </#macro>

@@ -7,8 +7,8 @@ import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Computable
 import com.intellij.openapi.vfs.VirtualFile
+import org.stepik.core.EduNames
 import org.stepik.core.common.Loggable
-import org.stepik.core.core.EduNames
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.testFramework.createDirectory
 import org.stepik.core.testFramework.processes.TestProcess

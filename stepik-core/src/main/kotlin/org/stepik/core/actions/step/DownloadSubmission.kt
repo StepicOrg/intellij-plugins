@@ -21,6 +21,9 @@ import org.stepik.api.objects.submissions.Submission
 import org.stepik.api.queries.Order
 import org.stepik.core.SupportedLanguages
 import org.stepik.core.actions.getShortcutText
+import org.stepik.core.auth.StepikAuthManager.authAndGetStepikApiClient
+import org.stepik.core.auth.StepikAuthManager.currentUser
+import org.stepik.core.auth.StepikAuthManager.isAuthenticated
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.StudyStatus
 import org.stepik.core.icons.AllStepikIcons
@@ -29,9 +32,6 @@ import org.stepik.core.metrics.MetricsStatus.DATA_NOT_LOADED
 import org.stepik.core.metrics.MetricsStatus.EMPTY_SOURCE
 import org.stepik.core.metrics.MetricsStatus.TARGET_NOT_FOUND
 import org.stepik.core.metrics.MetricsStatus.USER_CANCELED
-import org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient
-import org.stepik.core.stepik.StepikAuthManager.currentUser
-import org.stepik.core.stepik.StepikAuthManager.isAuthenticated
 import org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory
 import org.stepik.core.utils.Utils
 import org.stepik.core.utils.containsDirectives

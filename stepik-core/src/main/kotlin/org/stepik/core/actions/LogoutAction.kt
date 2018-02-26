@@ -1,8 +1,8 @@
 package org.stepik.core.actions
 
 import com.intellij.openapi.actionSystem.AnActionEvent
-import org.stepik.core.stepik.StepikAuthManager
-import org.stepik.core.stepik.StepikAuthManager.isAuthenticated
+import org.stepik.core.auth.StepikAuthManager
+import org.stepik.core.auth.StepikAuthManager.isAuthenticated
 
 class LogoutAction : StudyActionWithShortcut(TEXT, DESCRIPTION) {
     override fun actionPerformed(e: AnActionEvent?) {
