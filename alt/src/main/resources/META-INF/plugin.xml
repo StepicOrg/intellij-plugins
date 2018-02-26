@@ -20,15 +20,15 @@
   </extensions>
 
   <actions>
-    <action id="STEPIK.StepikSendAction" class="org.stepik.core.actions.step.StepikSendAction" />
-    <action id="Alt.NextStepAction" class="org.stepik.alt.actions.navigation.StepikNextStepAction" />
-    <action id="STEPIK.DownloadSubmission" class="org.stepik.core.actions.step.DownloadSubmission" />
-    <action id="STEPIK.InsertStepikDirectives" class="org.stepik.core.actions.step.InsertStepikDirectives" />
-    <action id="STEPIK.RefreshStepAction" class="org.stepik.core.actions.step.StepikResetStepAction" />
-    <action id="Alt.OpenInBrowser" class="org.stepik.alt.actions.step.OpenInBrowserAction" />
-    <action id="STEPIK.TestSamplesAction" class="org.stepik.core.actions.step.TestSamplesAction" />
-
     <group id="StepikMenu" popup="true" text="Stepik">
+      <action id="STEPIK.StepikSendAction" class="org.stepik.core.actions.step.StepikSendAction" />
+      <action id="STEPIK.TestSamplesAction" class="org.stepik.core.actions.step.TestSamplesAction" />
+      <action id="Alt.NextStepAction" class="org.stepik.alt.actions.navigation.StepikNextStepAction" />
+      <action id="STEPIK.DownloadSubmission" class="org.stepik.core.actions.step.DownloadSubmission" />
+      <action id="STEPIK.InsertStepikDirectives" class="org.stepik.core.actions.step.InsertStepikDirectives" />
+      <action id="STEPIK.RefreshStepAction" class="org.stepik.core.actions.step.StepikResetStepAction" />
+      <action id="Alt.OpenInBrowser" class="org.stepik.alt.actions.step.OpenInBrowserAction" />
+      <separator />
       <action id="STEPIK.LoginAction" class="org.stepik.core.actions.LoginAction" />
       <action id="STEPIK.LogoutAction" class="org.stepik.core.actions.LogoutAction" />
       <separator />
