@@ -25,7 +25,7 @@ import org.stepik.core.stepik.StepikAuthManager.currentUser
 import org.stepik.core.utils.ProjectFilesUtils
 
 object StepikProjectGenerator : ProjectGenerator, Loggable {
-    var defaultLang = SupportedLanguages.INVALID
+    var defaultLang = SupportedLanguages.JAVA8
 
     private fun createTreeUnderProgress(project: Project) {
         ProgressManager.getInstance()
