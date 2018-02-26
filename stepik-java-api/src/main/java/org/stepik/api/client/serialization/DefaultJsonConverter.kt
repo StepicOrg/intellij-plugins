@@ -13,7 +13,7 @@ import org.stepik.api.objects.submissions.ReplyDeserializer
 
 
 object DefaultJsonConverter : JsonConverter, Loggable {
-    private val gson: Gson = GsonBuilder()
+    internal val gson: Gson = GsonBuilder()
             .registerTypeAdapter(Dataset::class.java, DatasetDeserializer())
             .registerTypeAdapter(Reply::class.java, ReplyDeserializer())
             .registerTypeAdapter(BlockView::class.java, BlockViewDeserializer())

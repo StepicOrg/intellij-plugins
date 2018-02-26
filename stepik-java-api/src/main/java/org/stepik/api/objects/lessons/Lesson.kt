@@ -2,6 +2,8 @@ package org.stepik.api.objects.lessons
 
 import com.google.gson.annotations.JsonAdapter
 import com.google.gson.annotations.SerializedName
+import org.stepik.api.client.serialization.DefaultAsEmptyIntArrayAdapter
+import org.stepik.api.client.serialization.DefaultAsEmptyLongArrayAdapter
 import org.stepik.api.client.serialization.DefaultAsEmptyStringAdapter
 import org.stepik.api.client.serialization.DefaultAsEmptyStringArrayAdapter
 import org.stepik.api.client.serialization.DefaultAsEmptyStringStringMapAdapter
@@ -10,21 +12,21 @@ import org.stepik.api.urls.Urls
 
 
 data class Lesson(
-        @JsonAdapter(DefaultAsEmptyStringArrayAdapter::class, nullSafe = false)
+        @JsonAdapter(DefaultAsEmptyLongArrayAdapter::class, nullSafe = false)
         var steps: List<Long> = emptyList(),
 
         @JsonAdapter(DefaultAsEmptyStringStringMapAdapter::class, nullSafe = false)
         var actions: Map<String, String> = emptyMap(),
 
-        @JsonAdapter(DefaultAsEmptyStringArrayAdapter::class, nullSafe = false)
+        @JsonAdapter(DefaultAsEmptyIntArrayAdapter::class, nullSafe = false)
         var tags: List<Int> = emptyList(),
 
         @SerializedName("required_tags")
-        @JsonAdapter(DefaultAsEmptyStringArrayAdapter::class, nullSafe = false)
+        @JsonAdapter(DefaultAsEmptyIntArrayAdapter::class, nullSafe = false)
         var requiredTags: List<Int> = emptyList(),
 
         @JsonAdapter(DefaultAsEmptyStringArrayAdapter::class, nullSafe = false)
-        var playlists: List<Any> = emptyList(),
+        var playlists: List<String> = emptyList(),
 
         @SerializedName("is_prime")
         var isPrime: Boolean = false,

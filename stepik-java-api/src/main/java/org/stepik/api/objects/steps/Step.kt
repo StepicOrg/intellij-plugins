@@ -23,7 +23,7 @@ data class Step(
         var actions: MutableMap<String, String> = emptyMap(),
 
         @JsonAdapter(DefaultAsEmptyStringArrayAdapter::class, nullSafe = false)
-        var subscriptions: MutableList<String> = emptyList(),
+        var subscriptions: List<String> = emptyList(),
 
         var instruction: Int = 0,
 

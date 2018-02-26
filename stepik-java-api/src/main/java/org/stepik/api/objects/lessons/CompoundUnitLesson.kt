@@ -1,5 +1,6 @@
 package org.stepik.api.objects.lessons
 
+import com.google.gson.annotations.JsonAdapter
 import com.google.gson.annotations.SerializedName
 import org.stepik.api.objects.StudyObject
 import org.stepik.api.objects.units.Unit

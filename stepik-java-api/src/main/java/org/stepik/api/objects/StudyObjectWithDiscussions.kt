@@ -4,7 +4,6 @@ import com.google.gson.annotations.JsonAdapter
 import com.google.gson.annotations.SerializedName
 import org.stepik.api.client.serialization.DefaultAsEmptyStringAdapter
 import org.stepik.api.client.serialization.DefaultAsEmptyStringArrayAdapter
-import java.util.*
 
 open class StudyObjectWithDiscussions : StudyObject() {
     @SerializedName("discussions_count")
