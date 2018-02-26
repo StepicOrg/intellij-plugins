@@ -8,6 +8,8 @@ import org.stepik.api.objects.lessons.Lessons
 import org.stepik.api.objects.steps.Sample
 import org.stepik.api.objects.steps.Step
 import org.stepik.api.objects.steps.Steps
+import org.stepik.api.objects.submissions.Submission
+import org.stepik.api.objects.submissions.Submissions
 import kotlin.reflect.KVisibility
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.javaField
@@ -43,7 +45,8 @@ class SerializationTest {
                 Lesson(),
                 Lessons(),
                 CompoundUnitLesson(),
-                Sample()
+                Sample(),
+                Submission()
         ).forEach {
             serialize(it)
         }
@@ -57,7 +60,8 @@ class SerializationTest {
                 Lesson(),
                 Lessons(),
                 CompoundUnitLesson(),
-                Sample()
+                Sample(),
+                Submission()
         ).forEach {
             deserialize(it)
         }
@@ -69,8 +73,8 @@ class SerializationTest {
 
     @Test
     fun lessons() {
-        val json = "{\"meta\": {\"page\": 1, \"has_next\": false, \"has_previous\": false}, \"lessons\": [{\"id\": 50509, \"steps\": [202943], \"actions\": {}, \"tags\": [], \"required_tags\": [], \"progress\": \"76-50509\", \"subscriptions\": [\"31-76-50509\", \"30-76-50509\"], \"viewed_by\": 141, \"passed_by\": 118, \"time_to_complete\": 35, \"cover_url\": null, \"is_comments_enabled\": true, \"owner\": 1810113, \"language\": \"en\", \"is_featured\": false, \"is_public\": true, \"title\": \"Boolean type and logical operation - Q2\", \"slug\": \"Boolean-type-and-logical-operation-Q2-50509\", \"create_date\": \"2017-07-14T16:26:19Z\", \"update_date\": \"2017-12-19T13:15:22Z\", \"learners_group\": null, \"testers_group\": null, \"moderators_group\": null, \"teachers_group\": null, \"admins_group\": null, \"discussions_count\": 0, \"discussion_proxy\": \"76-50509-1\", \"discussion_threads\": [\"76-50509-1\"], \"epic_count\": 2, \"abuse_count\": 0, \"vote\": \"76-50509\", \"lti_consumer_key\": \"\", \"lti_secret_key\": \"\"}]}"
-        assertNotNull(DefaultJsonConverter.fromJson(json, Lessons::class.java))
+        val json = readJson("submissions.json")
+        assertNotNull(DefaultJsonConverter.fromJson(json, Submissions::class.java))
     }
 }
 

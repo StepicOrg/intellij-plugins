@@ -8,6 +8,8 @@ import org.stepik.api.objects.attempts.Dataset
 import org.stepik.api.objects.attempts.DatasetDeserializer
 import org.stepik.api.objects.steps.BlockView
 import org.stepik.api.objects.steps.BlockViewDeserializer
+import org.stepik.api.objects.submissions.Feedback
+import org.stepik.api.objects.submissions.FeedbackDeserializer
 import org.stepik.api.objects.submissions.Reply
 import org.stepik.api.objects.submissions.ReplyDeserializer
 
@@ -16,12 +18,14 @@ object DefaultJsonConverter : JsonConverter, Loggable {
     internal val gson: Gson = GsonBuilder()
             .registerTypeAdapter(Dataset::class.java, DatasetDeserializer())
             .registerTypeAdapter(Reply::class.java, ReplyDeserializer())
+            .registerTypeAdapter(Feedback::class.java, FeedbackDeserializer())
             .registerTypeAdapter(BlockView::class.java, BlockViewDeserializer())
             .create()
 
     private val pretty_gson: Gson = GsonBuilder()
             .registerTypeAdapter(Dataset::class.java, DatasetDeserializer())
             .registerTypeAdapter(Reply::class.java, ReplyDeserializer())
+            .registerTypeAdapter(Feedback::class.java, FeedbackDeserializer())
             .registerTypeAdapter(BlockView::class.java, BlockViewDeserializer())
             .setPrettyPrinting()
             .serializeNulls()

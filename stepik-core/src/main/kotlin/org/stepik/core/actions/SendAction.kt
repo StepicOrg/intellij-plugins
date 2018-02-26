@@ -48,7 +48,7 @@ object SendAction : Loggable {
                     } else {
                         showedTimer = true
                     }
-                    setupCheckProgress(resultWindow, currentSubmission!!, timer)
+                    setupCheckProgress(resultWindow, currentSubmission, timer)
                     stepStatus = currentSubmission.status
                     if (stepStatus != EVALUATION) {
                         if (showedTimer) {

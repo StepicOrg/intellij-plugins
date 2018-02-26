@@ -7,6 +7,7 @@ import com.google.gson.stream.JsonWriter
 import org.stepik.api.objects.Meta
 import org.stepik.api.objects.lessons.Lesson
 import org.stepik.api.objects.steps.Step
+import org.stepik.api.objects.submissions.Submission
 import org.stepik.api.toDate
 import org.stepik.api.toIsoFormat
 import java.util.*
@@ -51,11 +52,49 @@ class DefaultAsEmptyStringAdapter : TypeAdapter<String>() {
 
 }
 
+class DefaultAsEmptyIntAdapter : TypeAdapter<Int>() {
+    override fun write(out: JsonWriter, value: Int?) {
+        if (value == null) {
+            out.nullValue()
+        } else {
+            out.value(value)
+        }
+    }
+
+    override fun read(input: JsonReader): Int {
+        if (input.peek() === JsonToken.NULL) {
+            input.skipValue()
+            return 0
+        }
+        return input.nextInt()
+    }
+
+}
+
+class DefaultAsEmptyDoubleAdapter : TypeAdapter<Double>() {
+    override fun write(out: JsonWriter, value: Double?) {
+        if (value == null) {
+            out.nullValue()
+        } else {
+            out.value(value)
+        }
+    }
+
+    override fun read(input: JsonReader): Double {
+        if (input.peek() === JsonToken.NULL) {
+            input.skipValue()
+            return 0.0
+        }
+        return input.nextDouble()
+    }
+
+}
+
 private fun <T> getAdapter(clazz: Class<T>): TypeAdapter<T> {
     return DefaultJsonConverter.gson.getAdapter(clazz)
 }
 
-private fun <T> write(out: JsonWriter, adapter : TypeAdapter<T>, value: List<T>?) {
+private fun <T> writeArray(out: JsonWriter, adapter: TypeAdapter<T>, value: List<T>?) {
     if (value == null) {
         out.nullValue()
         return
@@ -68,7 +107,7 @@ private fun <T> write(out: JsonWriter, adapter : TypeAdapter<T>, value: List<T>?
     out.endArray()
 }
 
-private fun <T> read(input: JsonReader, adapter : TypeAdapter<T>): List<T> {
+private fun <T> readArray(input: JsonReader, adapter: TypeAdapter<T>): List<T> {
     if (input.peek() === JsonToken.NULL) {
         input.skipValue()
         return emptyList()
@@ -84,15 +123,34 @@ private fun <T> read(input: JsonReader, adapter : TypeAdapter<T>): List<T> {
     return list
 }
 
+private fun <T> writeObject(out: JsonWriter, adapter: TypeAdapter<T>, value: T?) {
+    if (value == null) {
+        out.nullValue()
+        return
+    }
+
+    adapter.write(out, value)
+}
+
+private fun <T> readObject(input: JsonReader, adapter: TypeAdapter<T>, default: T): T {
+    if (input.peek() === JsonToken.NULL) {
+        input.skipValue()
+        return default
+    }
+
+
+    return adapter.read(input)
+}
+
 class DefaultAsEmptyStringArrayAdapter : TypeAdapter<List<String>>() {
     private val adapter = getAdapter(String::class.java)
 
     override fun write(out: JsonWriter, value: List<String>?) {
-        write(out, adapter, value)
+        writeArray(out, adapter, value)
     }
 
     override fun read(input: JsonReader): List<String> {
-        return read(input, adapter)
+        return readArray(input, adapter)
     }
 
 }
@@ -101,11 +159,11 @@ class DefaultAsEmptyIntArrayAdapter : TypeAdapter<List<Int>>() {
     private val adapter = getAdapter(Int::class.java)
 
     override fun write(out: JsonWriter, value: List<Int>?) {
-        write(out, adapter, value)
+        writeArray(out, adapter, value)
     }
 
     override fun read(input: JsonReader): List<Int> {
-        return read(input, adapter)
+        return readArray(input, adapter)
     }
 }
 
@@ -113,11 +171,23 @@ class DefaultAsEmptyLongArrayAdapter : TypeAdapter<List<Long>>() {
     private val adapter = getAdapter(Long::class.java)
 
     override fun write(out: JsonWriter, value: List<Long>?) {
-        write(out, adapter, value)
+        writeArray(out, adapter, value)
     }
 
     override fun read(input: JsonReader): List<Long> {
-        return read(input, adapter)
+        return readArray(input, adapter)
+    }
+}
+
+class DefaultAsEmptySubmissionArrayAdapter : TypeAdapter<List<Submission>>() {
+    private val adapter = getAdapter(Submission::class.java)
+
+    override fun write(out: JsonWriter, value: List<Submission>?) {
+        writeArray(out, adapter, value)
+    }
+
+    override fun read(input: JsonReader): List<Submission> {
+        return readArray(input, adapter)
     }
 }
 
@@ -125,11 +195,11 @@ class DefaultAsEmptyLessonArrayAdapter : TypeAdapter<List<Lesson>>() {
     private val adapter = getAdapter(Lesson::class.java)
 
     override fun write(out: JsonWriter, value: List<Lesson>?) {
-        write(out, adapter, value)
+        writeArray(out, adapter, value)
     }
 
     override fun read(input: JsonReader): List<Lesson> {
-        return read(input, adapter)
+        return readArray(input, adapter)
     }
 }
 
@@ -137,11 +207,11 @@ class DefaultAsEmptyStepArrayAdapter : TypeAdapter<List<Step>>() {
     private val adapter = getAdapter(Step::class.java)
 
     override fun write(out: JsonWriter, value: List<Step>?) {
-        write(out, adapter, value)
+        writeArray(out, adapter, value)
     }
 
     override fun read(input: JsonReader): List<Step> {
-        return read(input, adapter)
+        return readArray(input, adapter)
     }
 }
 

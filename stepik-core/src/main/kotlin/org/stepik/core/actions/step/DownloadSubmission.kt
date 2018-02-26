@@ -102,7 +102,7 @@ class DownloadSubmission : CodeQuizAction(TEXT, DESCRIPTION, AllStepikIcons.Tool
                     .user(currentUser.id)
                     .order(Order.DESC)
                     .execute()
-                    .submissions
+                    .items
         } catch (e: StepikClientException) {
             logger.warn("Failed get submissions", e)
             null

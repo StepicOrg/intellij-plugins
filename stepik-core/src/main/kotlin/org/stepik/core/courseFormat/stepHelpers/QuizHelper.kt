@@ -136,7 +136,7 @@ open class QuizHelper(project: Project, stepNode: StepNode) : StepHelper(project
             submission = lastSubmission
 
             val isLastSubmission = lastSubmission.id == stepNode.lastSubmissionId
-            val outdated = stepNode.lastReplyTime.after(lastSubmission!!.time)
+            val outdated = stepNode.lastReplyTime.after(lastSubmission.time)
             if (isLastSubmission && outdated) {
                 reply = stepNode.lastReply
                 isModified = lastSubmission.reply != reply
