@@ -3,6 +3,7 @@ package org.stepik.alt.actions.navigation
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.InputValidator
 import com.intellij.openapi.ui.ex.MessagesEx
 import org.stepik.core.StudyUtils.getProjectManager
 import org.stepik.core.actions.getShortcutText
@@ -10,6 +11,7 @@ import org.stepik.core.actions.navigation.StudyNavigator
 import org.stepik.core.actions.navigation.StudyStepNavigationAction
 import org.stepik.core.courseFormat.LessonNode
 import org.stepik.core.courseFormat.Node
+import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.StudyNode
 import org.stepik.core.stepik.StepikAuthManager.authAndGetStepikApiClient
 
@@ -17,10 +19,23 @@ class StepikNextStepAction : StudyStepNavigationAction(TEXT, DESCRIPTION, AllIco
 
     override fun getTargetStep(project: Project, currentStepNode: StudyNode?): StudyNode? {
         var lesson: LessonNode? = null
+        val initialValue = "https://alt.stepik.org/topics/lesson/" + when (currentStepNode) {
+            is StepNode -> currentStepNode.parent?.id ?: ""
+            is LessonNode -> currentStepNode.id
+            else -> ""
+        }
         val input = MessagesEx.showInputDialog("Example, https://alt.stepik.org/topics/lesson/50509",
-                "Input link to lesson", null)
+                "Input link to lesson", null, initialValue, object : InputValidator {
+            override fun checkInput(value: String?): Boolean {
+                return value != null && template.matchEntire(value) != null
+            }
+
+            override fun canClose(value: String?): Boolean {
+                return true
+            }
+
+        })
         if (input != null) {
-            val template = ".*/lesson/(\\d+)".toRegex()
             val matcher = template.matchEntire(input)
             if (matcher != null) {
                 val lessonId = matcher.groups[1]!!.value
@@ -58,6 +73,7 @@ class StepikNextStepAction : StudyStepNavigationAction(TEXT, DESCRIPTION, AllIco
         private val SHORTCUT_TEXT = getShortcutText(SHORTCUT)
         private val TEXT = "Next Step ($SHORTCUT_TEXT)"
         private const val DESCRIPTION = "Navigate to the next step"
+        private val template = ".*/lesson/(\\d+)".toRegex()
 
         fun getNextStep(): StudyNode? {
             return StudyNavigator.nextLeaf(null)
