@@ -71,8 +71,8 @@ class StepikNextStepAction : StudyStepNavigationAction(TEXT, DESCRIPTION, AllIco
         private const val ACTION_ID = "Alt.NextStepAction"
         private const val SHORTCUT = "ctrl pressed PERIOD"
         private val SHORTCUT_TEXT = getShortcutText(SHORTCUT)
-        private val TEXT = "Next Step ($SHORTCUT_TEXT)"
-        private const val DESCRIPTION = "Navigate to the next step"
+        private val TEXT = "Load problem ($SHORTCUT_TEXT)"
+        private const val DESCRIPTION = "Load problem"
         private val template = ".*/lesson/(\\d+)".toRegex()
 
         fun getNextStep(): StudyNode? {
