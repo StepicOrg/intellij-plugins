@@ -50,7 +50,7 @@
 <div id="login">
     <form id="login-form" action="<#if stepNode??>${stepNode.getPath()}</#if>" method="post">
         <div id="login-form-close" onclick="hideLogin()">Close</div>
-        <h2>Login</h2>
+        <h2>Login on Stepik</h2>
         <p id="login-form-errors"></p>
         <label for="login-form-email"> Email:</label>
         <input id="login-form-email" type="email" name="email" value="">
