@@ -12,9 +12,11 @@ import org.stepik.api.objects.steps.Sample
 import org.stepik.api.objects.steps.Step
 import org.stepik.api.objects.submissions.Reply
 import org.stepik.core.EduNames
+import org.stepik.core.StudyUtils.getProjectManager
 import org.stepik.core.SupportedLanguages
 import org.stepik.core.SupportedLanguages.Companion.langOfName
 import org.stepik.core.SupportedLanguages.INVALID
+import org.stepik.core.SupportedLanguages.JAVA8
 import org.stepik.core.courseFormat.StepType.CODE
 import java.time.Instant
 import java.util.*
@@ -47,7 +49,10 @@ class StepNode(project: Project? = null, stepikApiClient: StepikApiClient? = nul
 
     var currentLang: SupportedLanguages
         get() {
-            val currentLang = _currentLang ?: INVALID
+            if (_currentLang == null) {
+                _currentLang = getProjectManager(project)?.defaultLang ?: JAVA8
+            }
+            val currentLang = _currentLang
             if (currentLang === INVALID || currentLang !in supportedLanguages) {
                 _currentLang = supportedLanguages.firstOrNull() ?: INVALID
             }

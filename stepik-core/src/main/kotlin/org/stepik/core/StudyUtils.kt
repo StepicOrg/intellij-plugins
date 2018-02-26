@@ -49,7 +49,8 @@ object StudyUtils : Loggable {
         return getProjectManager(project)?.getConfigurator(project)
     }
 
-    fun getProjectManager(project: Project): ProjectManager? {
+    fun getProjectManager(project: Project?): ProjectManager? {
+        project ?: return null
         return getService(project, ProjectManager::class.java)
     }
 
