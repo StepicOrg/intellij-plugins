@@ -7,6 +7,8 @@
 
     ${stepNode.getSamples()}
 
-<p><b>Limits:</b> ${stepNode.getTimeLimit()} s; ${stepNode.getMemoryLimit()} Mib</p>
+<p><b>Time limit:</b> ${stepNode.getTimeLimit()} seconds <br>
+    <b>Memory limit:</b> ${stepNode.getMemoryLimit()} MB
+</p>
 
 </@step_content>
