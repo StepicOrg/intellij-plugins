@@ -29,6 +29,11 @@ class StartAltAction : StudyActionWithShortcut(TEXT, DESCRIPTION, AllStepikIcons
 
     override fun getShortcuts() = arrayOf(SHORTCUT)
 
+    override fun update(e: AnActionEvent?) {
+        val presentation = e?.presentation ?: return
+        presentation.isVisible = presentation.isVisible && !isStepikProject(e.project)
+    }
+    
     companion object {
         private const val ACTION_ID = "Alt.StartAltAction"
         private const val SHORTCUT = "ctrl pressed ENTER"
