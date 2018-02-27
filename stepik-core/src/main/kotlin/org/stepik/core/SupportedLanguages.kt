@@ -14,7 +14,7 @@ enum class SupportedLanguages constructor(val title: String,
                                           val beforeCode: String? = null,
                                           val afterCode: String? = null,
                                           private val nextVersion: SupportedLanguages? = null,
-                                          val runner: Runner = StubRunner.instance) {
+                                          val runner: Runner = StubRunner) {
     ASM32("asm32", "asm32", "main32.asm", "test32.asm", "#"),
     ASM64("asm64", "asm64", "main64.asm", "test64.asm", "#"),
     C("C", "c", "main.c", "test.c", "//"),
