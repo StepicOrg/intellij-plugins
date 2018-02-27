@@ -42,10 +42,10 @@ object StepikUrlUtils : Loggable {
 
         val matcher = mainPattern.matchEntire(link) ?: return EMPTY_STUDY_OBJECT
 
-        val groups = matcher.groups
-        val studyObject = groups[1]!!.value
-        val id = groups[2]!!.value.toLong()
-        val params = groups[3]!!.value
+        val groups = matcher.groupValues
+        val studyObject = groups[1]
+        val id = groups[2].toLong()
+        val params = groups[3]
 
         return when (studyObject) {
             "course" -> getCourseStudyObject(id)
@@ -61,7 +61,7 @@ object StepikUrlUtils : Loggable {
 
     fun parseUnitId(link: String): Long {
         val matcher = unitPattern.matchEntire(link) ?: return 0
-        return matcher.groups[1]!!.value.toLong()
+        return matcher.groupValues[1].toLong()
     }
 
     private fun getLessonStudyObject(lessonId: Long, unitId: Long): StudyObject {

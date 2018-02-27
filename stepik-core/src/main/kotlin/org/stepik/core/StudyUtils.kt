@@ -14,18 +14,17 @@ import org.stepik.core.ui.StudyToolWindow
 import org.stepik.core.ui.StudyToolWindowFactory
 import org.stepik.core.ui.StudyToolWindowFactory.Companion.STUDY_TOOL_WINDOW
 import org.stepik.core.utils.getRelativePath
-import java.util.regex.Pattern
 
 
 object StudyUtils : Loggable {
-    private const val PATH_PATTERN = "^(?:(?:section([0-9]+)/lesson([0-9]+)/step([0-9]+))|" +
-            "(?:lesson([0-9]+)/step([0-9]+))|" +
-            "(?:step([0-9]+))|" +
-            "(?:section([0-9]+)/lesson([0-9]+))|" +
-            "(?:section([0-9]+))" +
-            ").*$"
     private val pathPattern by lazy {
-        Pattern.compile(PATH_PATTERN)
+        ("^(?:(?:section([0-9]+)/lesson([0-9]+)/step([0-9]+))|" +
+                "(?:lesson([0-9]+)/step([0-9]+))|" +
+                "(?:step([0-9]+))|" +
+                "(?:section([0-9]+)/lesson([0-9]+))|" +
+                "(?:section([0-9]+))" +
+                ").*$"
+                ).toRegex()
     }
 
     fun initToolWindows(project: Project) {
@@ -67,20 +66,18 @@ object StudyUtils : Loggable {
     }
 
     fun getStudyNode(root: StudyNode, relativePath: String): StudyNode? {
-        var myRoot: StudyNode? = root
         if (relativePath == ".") {
-            return myRoot
+            return root
         }
 
-        val matcher = pathPattern.matcher(relativePath)
-        if (!matcher.matches()) {
-            return null
-        }
+        val matcher = pathPattern.matchEntire(relativePath) ?: return null
 
-        (1..matcher.groupCount()).mapNotNull { matcher.group(it) }
-                .forEach { myRoot = myRoot?.getChildById(it.toLong()) ?: return null }
-
-        return myRoot
+        return matcher.groupValues.drop(1)
+                .filterNot { it.isEmpty() }
+                .map { it.toLong() }
+                .fold(root as StudyNode?) { newRoot, id ->
+                    newRoot?.getChildById(id)
+                }
     }
 
     fun getRecommendation(root: StudyNode): StudyNode? {

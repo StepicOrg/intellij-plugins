@@ -1,26 +1,24 @@
 package org.stepik.core.serialization
 
 import com.thoughtworks.xstream.converters.SingleValueConverter
-import org.intellij.lang.annotations.Language
 import org.stepik.api.objects.steps.Sample
-import java.util.regex.Pattern
 
 class SampleConverter : SingleValueConverter {
 
-    override fun toString(o: Any): String {
-        val sample = o as Sample
+    override fun toString(sample: Any): String {
+        sample as Sample
 
-        return String.format(TEMPLATE, sample.input, sample.output)
+        return "<input>${sample.input}</input><output>${sample.output}</output>"
     }
 
     override fun fromString(s: String): Any {
         val sample = Sample()
 
-        val matcher = pattern.matcher(s)
-        if (matcher.matches()) {
-            sample.input = matcher.group(1)
-            sample.output = matcher.group(2)
-        }
+        val matcher = pattern.matchEntire(s) ?: return sample
+
+        sample.input = matcher.groupValues[1]
+        sample.output = matcher.groupValues[2]
+
         return sample
     }
 
@@ -29,10 +27,6 @@ class SampleConverter : SingleValueConverter {
     }
 
     companion object {
-        @Language("HTML")
-        private val TEMPLATE = "<input>%s</input><output>%s</output>"
-        @Language("REGEXP")
-        private val PATTERN_INPUT = "<input>([^<>]*)</input><output>([^<>]*)</output>"
-        private val pattern = Pattern.compile(PATTERN_INPUT)
+        private val pattern = "<input>([^<>]*)</input><output>([^<>]*)</output>".toRegex()
     }
 }

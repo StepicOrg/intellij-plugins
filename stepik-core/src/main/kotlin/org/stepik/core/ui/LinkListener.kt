@@ -1,7 +1,7 @@
 package org.stepik.core.ui
 
 import com.intellij.ide.BrowserUtil
-import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.ApplicationManager.getApplication
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import javafx.scene.web.WebEngine
@@ -19,20 +19,18 @@ import org.stepik.core.auth.StepikAuthManager.currentUser
 import org.stepik.core.common.Loggable
 import org.stepik.core.courseFormat.LessonNode
 import org.stepik.core.courseFormat.StepNode
-import org.stepik.core.courseFormat.StudyNode
 import org.stepik.core.utils.getOrCreateSrcDirectory
 import org.stepik.core.utils.navigate
 import org.w3c.dom.Element
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.EventListener
 import java.io.IOException
-import java.util.regex.Pattern
 
 class LinkListener(val project: Project,
                    private val browser: StudyBrowserWindow,
                    val engine: WebEngine) : EventListener, Loggable {
-    private val protocolPattern = Pattern.compile("([a-z]+):(.*)")
-    private val pattern = Pattern.compile("/lesson(?:/|/[^/]*-)(\\d+)/step/(\\d+).*")
+    private val protocolPattern = "([a-z]+):(.*)".toRegex()
+    private val pattern = "/lesson(?:/|/[^/]*-)(\\d+)/step/(\\d+).*".toRegex()
     private val projectManager: ProjectManager? = if (!project.isDisposed) getProjectManager(project) else null
 
     override fun handleEvent(ev: Event) {
@@ -42,10 +40,11 @@ class LinkListener(val project: Project,
             ev.preventDefault()
             val target = ev.target as Element
             var href = getLink(target)
-            val matcher = protocolPattern.matcher(href)
-            if (matcher.matches()) {
-                val protocol = matcher.group(1)
-                val link = matcher.group(2)
+            val matcher = protocolPattern.matchEntire(href)
+            if (matcher != null) {
+                val protocol = matcher.groupValues[1]
+                val link = matcher.groupValues[2]
+
                 when (protocol) {
                     "inner" -> {
                         browseInnerLink(target, link)
@@ -88,22 +87,23 @@ class LinkListener(val project: Project,
         }
 
         val srcDirectory = getOrCreateSrcDirectory(project, (node as StepNode?)!!, true) ?: return
-        val application = ApplicationManager.getApplication()
-        application.invokeLater {
-            application.runWriteAction {
-                var index = 1
-                val filename = "${prefix}_${node.id}"
-                var currentFileName = filename + extension
-                while (srcDirectory.findChild(currentFileName) != null) {
-                    currentFileName = "${filename}_${index++}$extension"
-                }
-                val file = srcDirectory.createChildData(null, currentFileName)
-                file.setBinaryContent(content.toByteArray())
+        getApplication().let {
+            it.invokeLater {
+                it.runWriteAction {
+                    var index = 1
+                    val filename = "${prefix}_${node.id}"
+                    var currentFileName = filename + extension
+                    while (srcDirectory.findChild(currentFileName) != null) {
+                        currentFileName = "${filename}_${index++}$extension"
+                    }
+                    val file = srcDirectory.createChildData(null, currentFileName)
+                    file.setBinaryContent(content.toByteArray())
 
-                try {
-                    FileEditorManager.getInstance(project).openFile(file, false)
-                } catch (e: IOException) {
-                    logger.warn(e)
+                    try {
+                        FileEditorManager.getInstance(project).openFile(file, false)
+                    } catch (e: IOException) {
+                        logger.warn(e)
+                    }
                 }
             }
         }
@@ -158,24 +158,18 @@ class LinkListener(val project: Project,
     }
 
     private fun browseProject(href: String): Boolean {
-        val matcher = pattern.matcher(href)
-        if (matcher.matches()) {
-            val lessonId = matcher.group(1).toLong()
-            val stepPosition = matcher.group(2).toInt()
+        val matcher = pattern.matchEntire(href) ?: return false
+        val lessonId = matcher.groupValues[1].toLong()
+        val stepPosition = matcher.groupValues[2].toInt()
 
-            val step: StudyNode?
+        val root = projectManager?.projectRoot ?: return false
+        val lessonNode = root.getChildByClassAndId(LessonNode::class.java, lessonId)
 
-            val root = projectManager?.projectRoot
-            if (root != null) {
-                val lessonNode = root.getChildByClassAndId(LessonNode::class.java, lessonId)
+        val step = lessonNode?.getChildByPosition(stepPosition) ?: return false
 
-                step = lessonNode?.getChildByPosition(stepPosition) ?: return false
+        getApplication().invokeLater { navigate(project, step) }
 
-                ApplicationManager.getApplication().invokeLater { navigate(project, step) }
-                return true
-            }
-        }
-        return false
+        return true
     }
 
     private fun getLink(element: Element): String {
