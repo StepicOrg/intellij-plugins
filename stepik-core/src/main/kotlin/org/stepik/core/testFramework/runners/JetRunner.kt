@@ -11,6 +11,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import org.stepik.core.EduNames
 import org.stepik.core.courseFormat.StepNode
+import org.stepik.core.testFramework.StepRunConfiguration
 import org.stepik.core.utils.runWriteActionAndWait
 
 abstract class JetRunner : Runner {
@@ -21,7 +22,7 @@ abstract class JetRunner : Runner {
 
         val settingName = "${stepNode.parent?.name ?: "Lesson"} | step ${stepNode.position} ($language)"
 
-        val runConfiguration = getRunConfiguration(runManager, settingName)
+        val runConfiguration = getRunConfiguration(runManager, settingName, stepNode)
         if (runConfiguration == null) {
             setConfiguration(runManager)
             return
@@ -38,22 +39,25 @@ abstract class JetRunner : Runner {
         setConfiguration(runManager, runConfiguration)
     }
 
-    private fun getRunConfiguration(runManager: RunManagerImpl,
-                                    settingName: String): RunnerAndConfigurationSettings? {
+    private fun getRunConfiguration(runManager: RunManagerImpl, settingName: String,
+                                    stepNode: StepNode): RunnerAndConfigurationSettings? {
         val type = runManager.getConfigurationType(typeName) ?: return null
         return runManager.getConfigurationSettingsList(type)
-                .firstOrNull { it.name == settingName }
-                ?: createRunConfiguration(runManager, settingName)
+                .firstOrNull { it is StepRunConfiguration && it.stepNode == stepNode }
+                ?: createRunConfiguration(runManager, settingName, stepNode)
     }
 
     protected abstract val typeName: String
 
     protected abstract val factoryName: String
 
-    private fun createRunConfiguration(runManager: RunManagerImpl,
-                                       settingName: String): RunnerAndConfigurationSettings? {
+    private fun createRunConfiguration(runManager: RunManagerImpl, settingName: String,
+                                       stepNode: StepNode): RunnerAndConfigurationSettings? {
         val factory = runManager.getFactory(typeName, factoryName) ?: return null
-        val runConfiguration = runManager.createRunConfiguration(settingName, factory)
+        val runConfiguration = StepRunConfiguration(stepNode,
+                runManager.createRunConfiguration(settingName, factory),
+                runManager
+        )
 
         runManager.addConfiguration(runConfiguration, true)
         logger.info("Created run configuration: ${runConfiguration.name}")

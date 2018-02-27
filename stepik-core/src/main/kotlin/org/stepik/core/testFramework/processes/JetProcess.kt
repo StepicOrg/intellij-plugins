@@ -6,8 +6,7 @@ import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.configurations.ModuleBasedConfiguration
 import com.intellij.execution.configurations.RunConfiguration
 import com.intellij.execution.impl.RunManagerImpl
-import com.intellij.openapi.application.Application
-import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.ApplicationManager.getApplication
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ModuleRootManager
@@ -22,13 +21,13 @@ import java.io.IOException
 abstract class JetProcess(project: Project, stepNode: StepNode, mainFilePath: String) :
         TestProcess(project, stepNode, mainFilePath) {
 
-    open fun getMainClass(application: Application, runConfiguration: RunConfiguration,
+    open fun getMainClass(runConfiguration: RunConfiguration,
                           testClass: Boolean = false): String? {
         if (testClass) {
             return this.testClass
         }
 
-        return application.runReadAction(Computable {
+        return getApplication().runReadAction(Computable {
             (runConfiguration as CommonJavaRunConfigurationParameters).runClass
         })
     }
@@ -41,17 +40,16 @@ abstract class JetProcess(project: Project, stepNode: StepNode, mainFilePath: St
         val sourcePath = getSourcePath(project, stepNode)
         val outDirectoryPath = "out/production/step${stepNode.id}"
         val baseDir = project.baseDir
-        val application = ApplicationManager.getApplication()
         val outDirectory = (baseDir.findFileByRelativePath(outDirectoryPath)
                 ?: createDirectories(baseDir, outDirectoryPath))?.path ?: return null
         val module = getModule(runConfiguration) ?: return null
         val sdk = ModuleRootManager.getInstance(module).sdk ?: return null
 
-        application.invokeAndWait {
+        getApplication().invokeAndWait {
             project.saveAllDocuments()
         }
 
-        val mainClass = getMainClass(application, runConfiguration, testClass) ?: return null
+        val mainClass = getMainClass(runConfiguration, testClass) ?: return null
 
         val context = ProcessContext(runConfiguration, module, sdk, sourcePath, mainFilePath, mainClass, outDirectory)
 

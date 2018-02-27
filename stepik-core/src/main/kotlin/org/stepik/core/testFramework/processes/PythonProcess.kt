@@ -2,7 +2,7 @@ package org.stepik.core.testFramework.processes
 
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.configurations.RunConfiguration
-import com.intellij.openapi.application.Application
+import com.intellij.openapi.application.ApplicationManager.getApplication
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Computable
 import com.jetbrains.python.run.PythonRunConfiguration
@@ -13,12 +13,12 @@ import java.io.File
 
 class PythonProcess(project: Project, stepNode: StepNode, mainFilePath: String) : JetProcess(project, stepNode, mainFilePath) {
 
-    override fun getMainClass(application: Application, runConfiguration: RunConfiguration, testClass: Boolean): String? {
+    override fun getMainClass(runConfiguration: RunConfiguration, testClass: Boolean): String? {
         if (testClass) {
             return null
         }
 
-        return application.runReadAction(Computable {
+        return getApplication().runReadAction(Computable {
             (runConfiguration as PythonRunConfigurationParams).scriptName
         })
     }

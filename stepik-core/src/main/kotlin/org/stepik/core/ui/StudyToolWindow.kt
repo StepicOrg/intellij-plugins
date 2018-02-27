@@ -8,7 +8,6 @@ import com.intellij.openapi.actionSystem.ActionGroup
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.DataProvider
 import com.intellij.openapi.actionSystem.DefaultActionGroup
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ApplicationManager.getApplication
 import com.intellij.openapi.fileEditor.FileEditorManagerListener.FILE_EDITOR_MANAGER
 import com.intellij.openapi.project.Project
@@ -288,14 +287,14 @@ class StudyToolWindow internal constructor() :
 
         executor.execute {
             var selectedLang: SupportedLanguages? = null
-            ApplicationManager.getApplication().invokeAndWait {
+            getApplication().invokeAndWait {
                 selectedLang = languageBox.selectedItem as? SupportedLanguages
             }
 
             if (selectedLang != null) {
                 switchProgrammingLanguage(project!!, targetNode!!, selectedLang!!)
                 if (selectedLang !== targetNode.currentLang) {
-                    ApplicationManager.getApplication().invokeLater {
+                    getApplication().invokeLater {
                         languageBox.setSelectedItem(targetNode.currentLang)
                     }
                 }

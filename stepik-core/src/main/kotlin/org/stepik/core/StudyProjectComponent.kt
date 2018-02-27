@@ -1,5 +1,8 @@
 package org.stepik.core
 
+import com.intellij.execution.RunManager
+import com.intellij.execution.RunManagerListener
+import com.intellij.execution.impl.RunManagerImpl
 import com.intellij.ide.ui.UISettings
 import com.intellij.openapi.actionSystem.KeyboardShortcut
 import com.intellij.openapi.application.ApplicationManager.getApplication
@@ -20,15 +23,20 @@ import org.stepik.core.StudyUtils.isStepikProject
 import org.stepik.core.actions.StudyActionWithShortcut
 import org.stepik.core.common.Loggable
 import org.stepik.core.metrics.Metrics
+import org.stepik.core.testFramework.StepRunConfiguration
 import org.stepik.core.ui.StudyToolWindowFactory.Companion.STUDY_TOOL_WINDOW
 import org.stepik.core.utils.runWriteActionLater
 import java.util.concurrent.Executors
 import javax.swing.KeyStroke
 
-class StudyProjectComponent private constructor(private val project: Project) : ProjectComponent, Loggable {
+class StudyProjectComponent private constructor(private val project: Project) :
+        ProjectComponent, RunManagerListener, Loggable {
     private val deletedShortcuts = HashMap<Keymap, MutableList<Pair<String, String>>>()
 
     override fun projectOpened() {
+        if (!isStepikProject(project)) {
+            return
+        }
         val projectManager = getProjectManager(project) ?: return
 
         Platform.setImplicitExit(false)
@@ -43,6 +51,10 @@ class StudyProjectComponent private constructor(private val project: Project) : 
             logger.info("register Shortcuts")
             registerShortcuts()
         }
+
+        val runManager = RunManager.getInstance(project) as RunManagerImpl
+        runManager.addRunManagerListener(this)
+
 
         Metrics.openProject(project)
 
@@ -99,6 +111,9 @@ class StudyProjectComponent private constructor(private val project: Project) : 
             return
         }
 
+        val runManager = RunManager.getInstance(project) as RunManagerImpl
+        runManager.removeRunManagerListener(this)
+
         ToolWindowManager.getInstance(project)
                 .getToolWindow(STUDY_TOOL_WINDOW)?.contentManager?.removeAllContents(false)
 
@@ -110,6 +125,14 @@ class StudyProjectComponent private constructor(private val project: Project) : 
                             KeyboardShortcut(KeyStroke.getKeyStroke(actionShortcut.second), null))
                 }
             }
+        }
+    }
+
+    override fun runConfigurationSelected() {
+        val runManager = RunManager.getInstance(project) as RunManagerImpl
+        val selectedConfiguration = runManager.selectedConfiguration
+        if (selectedConfiguration is StepRunConfiguration) {
+            getProjectManager(project)?.selected = selectedConfiguration.stepNode
         }
     }
 

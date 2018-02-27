@@ -48,14 +48,14 @@ object ProgrammingLanguageUtils : Loggable {
         val mainFilePath = arrayOf(targetStepNode.path, EduNames.SRC, currentMainFileName).joinToString("/")
         val mainFile = project.baseDir.findFileByRelativePath(mainFilePath)
 
-        val mainFileExists = mainFile != null
-
-        if (currentLang === language && mainFileExists) {
+        if (mainFile != null && currentLang === language) {
+            openFile(project, mainFile)
             return
         }
 
-        if (currentMainFileName == language.mainFileName && mainFileExists) {
+        if (mainFile != null && currentMainFileName == language.mainFileName) {
             targetStepNode.currentLang = language
+            openFile(project, mainFile)
             Metrics.switchLanguage(project, targetStepNode)
             return
         }
@@ -85,8 +85,9 @@ object ProgrammingLanguageUtils : Loggable {
         targetStepNode.currentLang = language
         val needClose = getNeedCloseFiles(project, targetStepNode)
 
+        openFile(project, second!!.virtualFile)
+
         getApplication().invokeAndWait {
-            FileEditorManager.getInstance(project).openFile(second!!.virtualFile, true)
             val editorManager = FileEditorManager.getInstance(project)
             needClose.forEach { editorManager.closeFile(it) }
 
@@ -96,6 +97,12 @@ object ProgrammingLanguageUtils : Loggable {
         }
 
         Metrics.switchLanguage(project, targetStepNode)
+    }
+
+    private fun openFile(project: Project, file: VirtualFile) {
+        getApplication().invokeAndWait {
+            FileEditorManager.getInstance(project).openFile(file, true)
+        }
     }
 
     private fun findFile(parent: PsiDirectory, name: String): PsiFile? {
