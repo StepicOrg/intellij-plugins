@@ -1,6 +1,6 @@
 package org.stepik.core.utils
 
-import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.ApplicationManager.getApplication
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
@@ -18,24 +18,23 @@ private const val END_HINT = "Please note, only the code ABOVE will be sent to S
 private const val MESSAGE = "Do you want to remove Stepik directives and external code?\n" + "You can undo this action using \"ctrl + Z\"."
 
 fun getFileText(vf: VirtualFile): String {
-    return ApplicationManager.getApplication().runReadAction(Computable<String> {
+    return getApplication().runReadAction(Computable {
         val document = FileDocumentManager.getInstance().getDocument(vf)
-        document?.text ?: ""
+        return@Computable document?.text ?: ""
     })
 }
 
 fun getTextUnderDirectives(text: String, language: SupportedLanguages): String {
-    val splittedText = text.split("\n")
-    val result = ArrayList<String>(splittedText)
-    val (start, end) = findDirectives(splittedText, language)
+    val result = text.split("\n").toMutableList()
+    val (start, end) = findDirectives(result, language)
 
     val commentPrefix = language.comment
 
     for (i in 0 until start) {
-        result[i] = commentPrefix + splittedText[i]
+        result[i] = commentPrefix + result[i]
     }
-    for (i in end + 1 until splittedText.size) {
-        result[i] = commentPrefix + splittedText[i]
+    for (i in end + 1 until result.size) {
+        result[i] = commentPrefix + result[i]
     }
 
     return result.joinToString("\n")
@@ -74,30 +73,24 @@ fun findDirectives(text: List<String>, language: SupportedLanguages): Pair<Int, 
         }
     }
 
-    return Pair(start, end)
+    return start to end
 }
 
 private fun isStart(line: String, commentPrefixSize: Int): Boolean {
-    return START_DIRECTIVE == line.trim { it <= ' ' }.substring(commentPrefixSize).trim { it <= ' ' }
+    return START_DIRECTIVE == line.trim().substring(commentPrefixSize).trim()
 }
 
 private fun isEnd(line: String, commentPrefixSize: Int): Boolean {
-    return END_DIRECTIVE == line.trim { it <= ' ' }.substring(commentPrefixSize).trim { it <= ' ' }
+    return END_DIRECTIVE == line.trim().substring(commentPrefixSize).trim()
 }
 
-fun writeInToFile(text: String, file: VirtualFile, project: Project) {
+fun writeTextToFile(text: String, file: VirtualFile, project: Project) {
     val document = FileDocumentManager.getInstance().getDocument(file) ?: return
 
-    CommandProcessor
-            .getInstance()
-            .executeCommand(project,
-                    {
-                        ApplicationManager
-                                .getApplication()
-                                .runWriteAction { document.setText(text) }
-                    },
-                    "Stepik directives process",
-                    "Stepik directives process")
+    CommandProcessor.getInstance()
+            .executeCommand(project, {
+                getApplication().runWriteAction { document.setText(text) }
+            }, "Stepik directives process", "Stepik directives process")
 }
 
 fun removeAmbientCode(text: String, showHint: Boolean, language: SupportedLanguages, confirm: Boolean = true): String {
@@ -120,24 +113,21 @@ fun removeAmbientCode(text: String, showHint: Boolean, language: SupportedLangua
     return splittedText.subList(start + 1, end).joinToString("\n")
 }
 
-fun StringBuilder.appendLn(string: String): StringBuilder {
-    return append(string).append("\n")
-}
 
 fun StringBuilder.appendLnIf(string: String, condition: Boolean): StringBuilder {
     return if (condition) {
-        appendLn(string)
+        appendln(string)
     } else {
         this
     }
 }
 
 fun insertAmbientCode(text: String, lang: SupportedLanguages, showHint: Boolean): String {
-    return StringBuilder().appendLn(lang.beforeCode ?: "")
+    return StringBuilder().appendln(lang.beforeCode ?: "")
             .appendLnIf(lang.comment(START_HINT), showHint)
-            .appendLn(lang.comment(START_DIRECTIVE))
-            .appendLn(text)
-            .appendLn(lang.comment(END_DIRECTIVE))
+            .appendln(lang.comment(START_DIRECTIVE))
+            .appendln(text)
+            .appendln(lang.comment(END_DIRECTIVE))
             .appendLnIf(lang.comment(END_HINT), showHint)
             .append(lang.afterCode ?: "")
             .toString()
@@ -151,7 +141,7 @@ fun replaceCode(text: String, code: String, language: SupportedLanguages): Strin
     val beforeCodeSize = start + 1
     val afterCodeSize = textLines.size - end
 
-    val resultLines = ArrayList<String>()
+    val resultLines = mutableListOf<String>()
     resultLines.addAll(textLines.subList(0, beforeCodeSize))
     resultLines.addAll(codeLines)
     resultLines.addAll(textLines.subList(end, end + afterCodeSize))
@@ -193,7 +183,7 @@ fun containsDirectives(text: String, language: SupportedLanguages): Boolean {
     for (i in splittedText.indices) {
         var line = splittedText[i]
         if (language.isCommentedLine(line)) {
-            line = splittedText[i].trim { it <= ' ' }.substring(commentPrefixSize).trim { it <= ' ' }
+            line = splittedText[i].trim().substring(commentPrefixSize).trim()
             if (START_DIRECTIVE == line || END_DIRECTIVE == line) {
                 return true
             }

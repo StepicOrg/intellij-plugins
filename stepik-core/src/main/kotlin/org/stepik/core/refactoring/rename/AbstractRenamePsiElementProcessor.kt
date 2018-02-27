@@ -5,7 +5,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
 import com.intellij.refactoring.rename.RenameDialog
 import com.intellij.refactoring.rename.RenamePsiElementProcessor
-import org.stepik.core.utils.ProjectPsiFilesUtils.isNotMovableOrRenameElement
+import org.stepik.core.utils.isNotMoveOrRenameElement
 
 
 abstract class AbstractRenamePsiElementProcessor : RenamePsiElementProcessor() {
@@ -16,7 +16,7 @@ abstract class AbstractRenamePsiElementProcessor : RenamePsiElementProcessor() {
     }
 
     override fun canProcessElement(element: PsiElement): Boolean {
-        return isNotMovableOrRenameElement(element, acceptableClasses)
+        return element.isNotMoveOrRenameElement(acceptableClasses)
     }
 
     override fun createRenameDialog(

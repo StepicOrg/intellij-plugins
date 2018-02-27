@@ -17,7 +17,7 @@ import com.jetbrains.python.sdk.flavors.PythonSdkFlavor
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.testFramework.processes.PythonProcess
 import org.stepik.core.testFramework.processes.TestProcess
-import org.stepik.core.utils.ProjectFilesUtils
+import org.stepik.core.utils.getRelativePath
 import java.io.File
 
 class PythonRunner : JetRunner() {
@@ -39,10 +39,10 @@ class PythonRunner : JetRunner() {
         val scriptPath = mainVirtualFile?.path
         val scriptRelativePath: String
 
-        if (workingDirectory != null && scriptPath != null) {
-            scriptRelativePath = ProjectFilesUtils.getRelativePath(workingDirectory, scriptPath)
+        scriptRelativePath = if (workingDirectory != null && scriptPath != null) {
+            workingDirectory.getRelativePath(scriptPath)
         } else {
-            scriptRelativePath = ""
+            ""
         }
 
         appConfiguration.scriptName = scriptRelativePath

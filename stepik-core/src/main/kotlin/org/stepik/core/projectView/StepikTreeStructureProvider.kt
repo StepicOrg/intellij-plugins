@@ -8,12 +8,12 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiDirectory
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiFileSystemItem
-import org.stepik.core.StudyUtils
 import org.stepik.core.StudyUtils.getProjectManager
+import org.stepik.core.StudyUtils.getStudyNode
 import org.stepik.core.StudyUtils.isStepikProject
-import org.stepik.core.utils.PresentationDataUtils.isVisibleDirectory
-import org.stepik.core.utils.PresentationDataUtils.isVisibleFile
-import org.stepik.core.utils.ProjectPsiFilesUtils.getRelativePath
+import org.stepik.core.utils.isVisibleDirectory
+import org.stepik.core.utils.isVisibleFile
+import org.stepik.core.utils.relativePath
 
 abstract class StepikTreeStructureProvider : TreeStructureProvider, DumbAware {
     override fun modify(
@@ -30,10 +30,10 @@ abstract class StepikTreeStructureProvider : TreeStructureProvider, DumbAware {
             if (isHidden(project, value)) return@mapNotNull null
 
             when (value) {
-                is PsiDirectory -> if (isVisibleDirectory(value)) {
+                is PsiDirectory -> if (value.isVisibleDirectory()) {
                     return@mapNotNull StepikDirectoryNode(project, value, settings)
                 }
-                is PsiFile -> if (isVisibleFile(value)) {
+                is PsiFile -> if (value.isVisibleFile()) {
                     return@mapNotNull node
                 }
                 else -> if (shouldAdd(value)) {
@@ -56,8 +56,7 @@ abstract class StepikTreeStructureProvider : TreeStructureProvider, DumbAware {
         }
 
         val root = projectManager.projectRoot ?: return false
-        val relativePath = getRelativePath(value)
-        val node = StudyUtils.getStudyNode(root, relativePath) ?: return false
+        val node = getStudyNode(root, value.relativePath) ?: return false
         val selected = projectManager.selected ?: return true
         val selectedPath = selected.path
         val nodePath = node.path

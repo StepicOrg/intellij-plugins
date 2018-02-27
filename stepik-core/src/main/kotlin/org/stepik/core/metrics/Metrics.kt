@@ -12,8 +12,8 @@ import org.stepik.core.common.Loggable
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.StudyNode
 import org.stepik.core.metrics.MetricsStatus.SUCCESSFUL
-import org.stepik.core.utils.PluginUtils
-import org.stepik.core.utils.Utils
+import org.stepik.core.utils.currentProject
+import org.stepik.core.utils.version
 import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -44,7 +44,7 @@ object Metrics : Loggable {
                     .tags("name", "S_Union")
                     .tags("ide_name", appInfo.versionName)
                     .data("ide_version", appInfo.build.toString())
-                    .data("plugin_version", PluginUtils.version)
+                    .data("plugin_version", version)
                     .data("session", session)
                     .tags("status", status)
 
@@ -85,8 +85,7 @@ object Metrics : Loggable {
     }
 
     fun authenticate(status: MetricsStatus = SUCCESSFUL) {
-        val project = Utils.currentProject
-        postSimpleMetric(project, "authenticate", status)
+        postSimpleMetric(currentProject, "authenticate", status)
     }
 
     fun createProject(project: Project, status: MetricsStatus = SUCCESSFUL) {

@@ -31,7 +31,7 @@ import org.stepik.core.courseFormat.StudyNode
 import org.stepik.core.serialization.SerializationUtils.elementToXml
 import org.stepik.core.serialization.SerializationUtils.toElement
 import org.stepik.core.serialization.SerializationUtils.xStream
-import org.stepik.core.utils.ProjectFilesUtils
+import org.stepik.core.utils.getOrCreateSrcDirectory
 import java.io.ByteArrayOutputStream
 import java.io.OutputStreamWriter
 import java.nio.charset.StandardCharsets.UTF_8
@@ -224,7 +224,7 @@ abstract class BaseProjectManager constructor(@field:XStreamOmitField val projec
                     if (project.isDisposed) {
                         return@invokeAndWait
                     }
-                    ProjectFilesUtils.getOrCreateSrcDirectory(project, node, false)
+                    getOrCreateSrcDirectory(project, node, false)
                 }
             }
             node.children.forEach { this.repairProjectFiles(it) }

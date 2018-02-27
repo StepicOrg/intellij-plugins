@@ -13,7 +13,7 @@ import org.stepik.core.actions.getShortcutText
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.icons.AllStepikIcons
 import org.stepik.core.metrics.Metrics
-import org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory
+import org.stepik.core.utils.getOrCreateSrcDirectory
 
 class StepikResetStepAction : CodeQuizAction(TEXT, DESCRIPTION, AllStepikIcons.ToolWindow.resetTaskFile) {
 

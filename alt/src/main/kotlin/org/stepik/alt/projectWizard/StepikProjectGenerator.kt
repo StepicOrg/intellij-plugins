@@ -22,7 +22,7 @@ import org.stepik.core.courseFormat.StudyNode
 import org.stepik.core.metrics.Metrics
 import org.stepik.core.metrics.MetricsStatus.TARGET_NOT_FOUND
 import org.stepik.core.projectWizard.ProjectWizardUtils
-import org.stepik.core.utils.ProjectFilesUtils
+import org.stepik.core.utils.getOrCreateSrcDirectory
 
 object StepikProjectGenerator : ProjectGenerator, Loggable {
     var defaultLang = SupportedLanguages.JAVA8
@@ -44,9 +44,11 @@ object StepikProjectGenerator : ProjectGenerator, Loggable {
             Metrics.createProject(project, TARGET_NOT_FOUND)
             return
         }
-        projectManager.projectRoot = projectRoot
-        projectManager.createdBy = currentUser.id
-        projectManager.defaultLang = defaultLang
+        projectManager.let {
+            it.projectRoot = projectRoot
+            it.createdBy = currentUser.id
+            it.defaultLang = defaultLang
+        }
 
         (project as ProjectEx).setProjectName(projectRoot!!.name)
 
@@ -78,7 +80,7 @@ object StepikProjectGenerator : ProjectGenerator, Loggable {
             }
 
             if (root is StepNode) {
-                ProjectFilesUtils.getOrCreateSrcDirectory(project, root, true, moduleModel)
+                getOrCreateSrcDirectory(project, root, true, moduleModel)
             } else {
                 ProjectWizardUtils.createSubDirectories(project, StepikProjectGenerator.defaultLang, root, moduleModel)
                 VirtualFileManager.getInstance().syncRefresh()

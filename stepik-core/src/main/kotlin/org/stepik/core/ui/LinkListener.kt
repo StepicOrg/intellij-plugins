@@ -20,8 +20,8 @@ import org.stepik.core.common.Loggable
 import org.stepik.core.courseFormat.LessonNode
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.StudyNode
-import org.stepik.core.utils.NavigationUtils
-import org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory
+import org.stepik.core.utils.getOrCreateSrcDirectory
+import org.stepik.core.utils.navigate
 import org.w3c.dom.Element
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.EventListener
@@ -171,7 +171,7 @@ class LinkListener(val project: Project,
 
                 step = lessonNode?.getChildByPosition(stepPosition) ?: return false
 
-                ApplicationManager.getApplication().invokeLater { NavigationUtils.navigate(project, step) }
+                ApplicationManager.getApplication().invokeLater { navigate(project, step) }
                 return true
             }
         }

@@ -6,14 +6,14 @@ import com.intellij.openapi.fileEditor.FileDocumentManager
 import org.stepik.core.StudyUtils.getProjectManager
 import org.stepik.core.actions.getShortcutText
 import org.stepik.core.metrics.Metrics
-import org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory
-import org.stepik.core.utils.ReformatUtils.reformatSelectedEditor
-import org.stepik.core.utils.Utils
 import org.stepik.core.utils.containsDirectives
 import org.stepik.core.utils.getFileText
+import org.stepik.core.utils.getOrCreateSrcDirectory
 import org.stepik.core.utils.insertAmbientCode
+import org.stepik.core.utils.reformatDocument
 import org.stepik.core.utils.removeAmbientCode
-import org.stepik.core.utils.writeInToFile
+import org.stepik.core.utils.saveAllDocuments
+import org.stepik.core.utils.writeTextToFile
 
 
 class InsertStepikDirectives : CodeQuizAction(TEXT, DESCRIPTION, AllIcons.General.ExternalToolsSmall) {
@@ -25,7 +25,7 @@ class InsertStepikDirectives : CodeQuizAction(TEXT, DESCRIPTION, AllIcons.Genera
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
 
-        Utils.saveAllDocuments(project)
+        project.saveAllDocuments()
 
         val stepNode = getCurrentCodeStepNode(project) ?: return
 
@@ -38,7 +38,9 @@ class InsertStepikDirectives : CodeQuizAction(TEXT, DESCRIPTION, AllIcons.Genera
         var text = getFileText(file)
 
         val showHint = getProjectManager(project)?.showHint ?: false
+
         val needInsert = !containsDirectives(text, currentLang)
+
         if (needInsert) {
             text = insertAmbientCode(text, currentLang, showHint)
             Metrics.insertAmbientCodeAction(project, stepNode)
@@ -47,12 +49,12 @@ class InsertStepikDirectives : CodeQuizAction(TEXT, DESCRIPTION, AllIcons.Genera
             Metrics.removeAmbientCodeAction(project, stepNode)
         }
 
-        writeInToFile(text, file, project)
+        writeTextToFile(text, file, project)
 
         if (needInsert) {
             val document = FileDocumentManager.getInstance().getDocument(file)
             if (document != null) {
-                reformatSelectedEditor(project, document)
+                project.reformatDocument(document)
             }
         }
 

@@ -16,7 +16,7 @@ import com.intellij.openapi.util.io.FileUtil
 import org.stepik.core.EduNames
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.testFramework.createDirectories
-import org.stepik.core.utils.Utils
+import org.stepik.core.utils.saveAllDocuments
 import java.io.File
 import java.io.IOException
 
@@ -47,7 +47,7 @@ abstract class JetProcess(project: Project, stepNode: StepNode, mainFilePath: St
         val sdk = ModuleRootManager.getInstance(module).sdk ?: return null
 
         application.invokeAndWait {
-            Utils.saveAllDocuments(project)
+            project.saveAllDocuments()
         }
 
         val mainClass = getMainClass(application, runConfiguration, testClass) ?: return null

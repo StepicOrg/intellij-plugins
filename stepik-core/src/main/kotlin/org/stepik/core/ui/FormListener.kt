@@ -18,8 +18,8 @@ import org.stepik.core.courseFormat.StepType
 import org.stepik.core.testFramework.toolWindow.StepikTestResultToolWindow
 import org.stepik.core.testFramework.toolWindow.StepikTestToolWindowUtils
 import org.stepik.core.ui.StepDescriptionUtils.getReply
-import org.stepik.core.utils.NavigationUtils
-import org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory
+import org.stepik.core.utils.getOrCreateSrcDirectory
+import org.stepik.core.utils.navigate
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.EventListener
 import org.w3c.dom.html.HTMLFormElement
@@ -172,7 +172,7 @@ internal class FormListener(private val project: Project, private val browser: S
                 "next_step" -> {
                     val targetNode = getConfigurator(project)?.nextAction(node) ?: return
 
-                    Platform.runLater { NavigationUtils.navigate(project, targetNode) }
+                    Platform.runLater { navigate(project, targetNode) }
                 }
                 else -> browser.hideLoadAnimation()
             }

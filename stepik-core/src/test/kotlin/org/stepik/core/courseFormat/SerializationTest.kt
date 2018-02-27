@@ -7,7 +7,7 @@ import org.stepik.api.objects.lessons.CompoundUnitLesson
 import org.stepik.api.objects.steps.BlockView
 import org.stepik.api.objects.steps.Limit
 import org.stepik.api.objects.steps.Step
-import org.stepik.core.TestUtils.readTextFile
+import org.stepik.core.readTextFile
 import org.stepik.core.serialization.SerializationUtils.xStream
 
 

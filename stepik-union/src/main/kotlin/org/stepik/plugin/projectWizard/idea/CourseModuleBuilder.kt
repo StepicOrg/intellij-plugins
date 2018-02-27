@@ -11,7 +11,7 @@ import com.intellij.openapi.vfs.VirtualFileManager
 import org.stepik.core.StudyUtils.getProjectManager
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.projectWizard.ProjectWizardUtils.createSubDirectories
-import org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory
+import org.stepik.core.utils.getOrCreateSrcDirectory
 import org.stepik.plugin.projectWizard.StepikProjectGenerator
 
 class CourseModuleBuilder : AbstractModuleBuilder() {

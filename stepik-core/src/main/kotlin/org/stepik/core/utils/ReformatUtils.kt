@@ -6,13 +6,11 @@ import com.intellij.openapi.editor.Document
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiDocumentManager
 
-object ReformatUtils {
 
-    fun reformatSelectedEditor(project: Project, document: Document) {
-        PsiDocumentManager.getInstance(project).commitAllDocuments()
+fun Project.reformatDocument(document: Document) {
+    PsiDocumentManager.getInstance(this).commitAllDocuments()
 
-        val file = PsiDocumentManager.getInstance(project).getPsiFile(document) ?: return
+    val file = PsiDocumentManager.getInstance(this).getPsiFile(document) ?: return
 
-        ReformatCodeProcessor(OptimizeImportsProcessor(project, file), false).run()
-    }
+    ReformatCodeProcessor(OptimizeImportsProcessor(this, file), false).run()
 }

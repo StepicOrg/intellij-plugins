@@ -13,7 +13,7 @@ import org.stepik.core.courseFormat.StudyNode
 import org.stepik.core.ui.StudyToolWindow
 import org.stepik.core.ui.StudyToolWindowFactory
 import org.stepik.core.ui.StudyToolWindowFactory.Companion.STUDY_TOOL_WINDOW
-import org.stepik.core.utils.ProjectFilesUtils
+import org.stepik.core.utils.getRelativePath
 import java.util.regex.Pattern
 
 
@@ -56,8 +56,7 @@ object StudyUtils : Loggable {
 
     private fun getRelativePath(project: Project, item: VirtualFile): String {
         val basePath = project.basePath ?: return item.path
-
-        return ProjectFilesUtils.getRelativePath(basePath, item.path)
+        return basePath.getRelativePath(item.path)
     }
 
     fun getStudyNode(project: Project, nodeVF: VirtualFile): StudyNode? {

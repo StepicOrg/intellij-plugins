@@ -4,7 +4,7 @@ import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.project.Project
 import org.stepik.api.objects.steps.VideoUrl
 import org.stepik.core.courseFormat.StepNode
-import org.stepik.core.utils.PluginUtils
+import org.stepik.core.utils.PLUGIN_ID
 
 
 class VideoTheoryHelper(project: Project, stepNode: StepNode) : StepHelper(project, stepNode) {
@@ -55,6 +55,6 @@ class VideoTheoryHelper(project: Project, stepNode: StepNode) : StepHelper(proje
     }
 
     companion object {
-        const val VIDEO_QUALITY_PROPERTY_NAME = "${PluginUtils.PLUGIN_ID}.VIDEO_QUALITY"
+        const val VIDEO_QUALITY_PROPERTY_NAME = "$PLUGIN_ID.VIDEO_QUALITY"
     }
 }

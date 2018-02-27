@@ -16,7 +16,7 @@ import org.stepik.core.auth.StepikAuthManager.isAuthenticated
 import org.stepik.core.common.Loggable
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.StudyNode
-import org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory
+import org.stepik.core.utils.getOrCreateSrcDirectory
 import java.io.File
 
 

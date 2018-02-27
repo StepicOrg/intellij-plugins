@@ -32,9 +32,9 @@ import org.stepik.core.metrics.MetricsStatus.DATA_NOT_LOADED
 import org.stepik.core.metrics.MetricsStatus.EMPTY_SOURCE
 import org.stepik.core.metrics.MetricsStatus.TARGET_NOT_FOUND
 import org.stepik.core.metrics.MetricsStatus.USER_CANCELED
-import org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory
-import org.stepik.core.utils.Utils
 import org.stepik.core.utils.containsDirectives
+import org.stepik.core.utils.getOrCreateSrcDirectory
+import org.stepik.core.utils.isCanceled
 import org.stepik.core.utils.replaceCode
 import org.stepik.core.utils.uncommentAmbientCode
 import java.text.SimpleDateFormat
@@ -73,7 +73,7 @@ class DownloadSubmission : CodeQuizAction(TEXT, DESCRIPTION, AllStepikIcons.Tool
                         progressIndicator.text2 = stepNode.name
                         val submissions = getSubmissions(stepikApiClient, stepNode)
 
-                        if (Utils.isCanceled) {
+                        if (isCanceled) {
                             Metrics.downloadAction(project, stepNode, USER_CANCELED)
                             return null
                         }

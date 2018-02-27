@@ -7,9 +7,9 @@ import com.intellij.psi.PsiDirectory
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import org.stepik.core.ProjectManager
-import org.stepik.core.utils.PresentationDataUtils.isVisibleDirectory
-import org.stepik.core.utils.PresentationDataUtils.isVisibleFile
-import org.stepik.core.utils.PresentationDataUtils.updatePresentationData
+import org.stepik.core.utils.isVisibleDirectory
+import org.stepik.core.utils.isVisibleFile
+import org.stepik.core.utils.updatePresentationData
 
 
 object NavBarModelExtensionUtils {
@@ -33,8 +33,8 @@ object NavBarModelExtensionUtils {
         projectManager?.projectRoot ?: return psiElement
 
         when (psiElement) {
-            is PsiDirectory -> if (!isVisibleDirectory(psiElement)) return null
-            is PsiFile -> if (!isVisibleFile(psiElement)) return null
+            is PsiDirectory -> if (!psiElement.isVisibleDirectory()) return null
+            is PsiFile -> if (!psiElement.isVisibleFile()) return null
         }
 
         return psiElement

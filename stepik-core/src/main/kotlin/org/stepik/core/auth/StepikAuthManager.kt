@@ -19,10 +19,10 @@ import org.stepik.core.auth.StepikAuthState.UNKNOWN
 import org.stepik.core.auth.StepikRestService.Companion.redirectUri
 import org.stepik.core.common.Loggable
 import org.stepik.core.metrics.Metrics
-import org.stepik.core.utils.PluginUtils
-import org.stepik.core.utils.PluginUtils.getCurrentProduct
-import org.stepik.core.utils.PluginUtils.getCurrentProductVersion
-import org.stepik.core.utils.PluginUtils.version
+import org.stepik.core.utils.PLUGIN_ID
+import org.stepik.core.utils.getCurrentProduct
+import org.stepik.core.utils.getCurrentProductVersion
+import org.stepik.core.utils.version
 import java.util.*
 import java.util.concurrent.Executors
 import java.lang.System.getProperty as getSysProperty
@@ -31,7 +31,7 @@ object StepikAuthManager : Loggable {
     const val CLIENT_ID_CODE = "IexnxCQMMPkEanIsjlbQM4iFlZeJTqoVSbYP30AB"
     val authorizationCodeUrl = "${Urls.STEPIK_URL}/oauth2/authorize/?" +
             "client_id=$CLIENT_ID_CODE&redirect_uri=$redirectUri&response_type=code"
-    private const val LAST_USER_PROPERTY_NAME = "${PluginUtils.PLUGIN_ID}.LAST_USER"
+    private const val LAST_USER_PROPERTY_NAME = "$PLUGIN_ID.LAST_USER"
     private val userAgent = "Stepik Union/$version (${getSysProperty("os.name")}) " +
             "StepikApiClient/${StepikApiClient.getVersion()} " +
             "${getCurrentProduct()}/${getCurrentProductVersion()} " +

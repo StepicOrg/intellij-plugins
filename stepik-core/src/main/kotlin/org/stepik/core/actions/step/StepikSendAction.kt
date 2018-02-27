@@ -21,8 +21,8 @@ import org.stepik.core.metrics.MetricsStatus.DATA_NOT_LOADED
 import org.stepik.core.metrics.MetricsStatus.FAILED_POST
 import org.stepik.core.testFramework.toolWindow.StepikTestResultToolWindow
 import org.stepik.core.testFramework.toolWindow.StepikTestToolWindowUtils.Companion.showTestResultsToolWindow
-import org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory
 import org.stepik.core.utils.getFileText
+import org.stepik.core.utils.getOrCreateSrcDirectory
 import org.stepik.core.utils.getTextUnderDirectives
 
 class StepikSendAction : CodeQuizAction(TEXT, DESCRIPTION, AllStepikIcons.ToolWindow.checkTask) {

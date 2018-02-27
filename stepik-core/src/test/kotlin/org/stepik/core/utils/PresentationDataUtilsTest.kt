@@ -8,7 +8,7 @@ import org.junit.experimental.theories.Theories
 import org.junit.experimental.theories.Theory
 import org.junit.runner.RunWith
 import org.stepik.core.EduNames
-import org.stepik.core.TestUtils.join
+import org.stepik.core.join
 
 
 @RunWith(Theories::class)
@@ -16,22 +16,22 @@ class PresentationDataUtilsTest {
 
     @Theory(nullsAccepted = false)
     fun directoryIsVisible(@FromDataPoints("visiblePaths") directory: String) {
-        assertTrue(PresentationUtils.isVisibleDirectory(directory))
+        assertTrue(directory.isVisibleDirectory())
     }
 
     @Theory(nullsAccepted = false)
     fun directoryIsNonVisible(@FromDataPoints("nonVisiblePaths") directory: String) {
-        assertFalse(PresentationUtils.isVisibleDirectory(directory))
+        assertFalse(directory.isVisibleDirectory())
     }
 
     @Theory(nullsAccepted = false)
     fun fileIsVisible(@FromDataPoints("visibleFiles") file: String) {
-        assertTrue(PresentationUtils.isVisibleFile(file))
+        assertTrue(file.isVisibleFile())
     }
 
     @Theory(nullsAccepted = false)
     fun fileIsNonVisible(@FromDataPoints("nonVisibleFiles") file: String) {
-        assertFalse(PresentationUtils.isVisibleFile(file))
+        assertFalse(file.isVisibleFile())
     }
 
     companion object {

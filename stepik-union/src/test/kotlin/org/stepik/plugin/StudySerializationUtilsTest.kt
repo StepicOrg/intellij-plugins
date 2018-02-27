@@ -6,12 +6,11 @@ import org.jdom.output.XMLOutputter
 import org.junit.Assert.assertEquals
 import org.junit.BeforeClass
 import org.junit.Test
-import org.stepik.core.TestUtils.readTextFile
-import org.stepik.core.TestUtils.readXmlFile
+import org.stepik.core.readTextFile
+import org.stepik.core.readXmlFile
 import org.stepik.core.serialization.SerializationUtils.xStream
 import org.stepik.core.serialization.StudyUnrecognizedFormatException
 import serialization.SerializationUtils
-import java.text.MessageFormat.format
 
 
 class StudySerializationUtilsTest {
@@ -36,7 +35,7 @@ class StudySerializationUtilsTest {
             val actual = outputter.outputString(stateVersion3)
             val expected = readSourceTextFile(3, i)
 
-            assertEquals("#" + i, expected, actual)
+            assertEquals("#$i", expected, actual)
         }
     }
 
@@ -60,7 +59,7 @@ class StudySerializationUtilsTest {
             val actual = xs.toXML(obj)
             val expected = readSourceTextFile(4, i)
 
-            assertEquals("#" + i, expected, actual)
+            assertEquals("#$i", expected, actual)
         }
     }
 
@@ -77,11 +76,11 @@ class StudySerializationUtilsTest {
         }
 
         private fun readSourceXmlFile(version: Int, index: Int): Element {
-            return readXmlFile(StudySerializationUtilsTest::class.java, format("version{0}_{1}.xml", version, index))
+            return readXmlFile(StudySerializationUtilsTest::class.java, "version${version}_$index.xml")
         }
 
         private fun readSourceTextFile(version: Int, index: Int): String {
-            return readTextFile(StudySerializationUtilsTest::class.java, format("version{0}_{1}.xml", version, index))
+            return readTextFile(StudySerializationUtilsTest::class.java, "version${version}_$index.xml")
         }
     }
 }

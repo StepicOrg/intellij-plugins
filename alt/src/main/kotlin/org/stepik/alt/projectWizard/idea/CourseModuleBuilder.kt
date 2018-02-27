@@ -10,7 +10,7 @@ import org.stepik.alt.projectWizard.StepikProjectGenerator
 import org.stepik.core.StudyUtils.getProjectManager
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.projectWizard.ProjectWizardUtils.createSubDirectories
-import org.stepik.core.utils.ProjectFilesUtils.getOrCreateSrcDirectory
+import org.stepik.core.utils.getOrCreateSrcDirectory
 
 class CourseModuleBuilder(moduleDir: String? = null) : AbstractModuleBuilder() {
     private val generator = StepikProjectGenerator

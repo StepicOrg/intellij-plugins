@@ -13,18 +13,16 @@ internal object ModuleUtils : Loggable {
             project: Project,
             step: StepNode,
             moduleModel: ModifiableModuleModel) {
-        val lesson = step.parent
-        if (lesson != null) {
-            val moduleDir = arrayOf(project.basePath, lesson.path).joinToString("/")
-            val stepModuleBuilder = getConfigurator(project)?.getStepModuleBuilder(moduleDir, step)
-            try {
-                val module = stepModuleBuilder?.createModule(moduleModel)
-                if (module == null) {
-                    logger.warn("Cannot create step: ${step.directory}")
-                }
-            } catch (e: Exception) {
-                logger.warn("Cannot create step: ${step.directory}", e)
+        val lesson = step.parent ?: return
+        val moduleDir = arrayOf(project.basePath, lesson.path).joinToString("/")
+        val stepModuleBuilder = getConfigurator(project)?.getStepModuleBuilder(moduleDir, step)
+        try {
+            val module = stepModuleBuilder?.createModule(moduleModel)
+            if (module == null) {
+                logger.warn("Cannot create step: ${step.directory}")
             }
+        } catch (e: Exception) {
+            logger.warn("Cannot create step: ${step.directory}", e)
         }
     }
 }

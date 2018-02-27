@@ -7,7 +7,7 @@ import com.intellij.refactoring.safeDelete.NonCodeUsageSearchInfo
 import com.intellij.refactoring.safeDelete.SafeDeleteProcessorDelegateBase
 import com.intellij.usageView.UsageInfo
 import com.intellij.util.IncorrectOperationException
-import org.stepik.core.utils.ProjectPsiFilesUtils.isNotMovableOrRenameElement
+import org.stepik.core.utils.isNotMoveOrRenameElement
 
 
 abstract class AbstractSafeDeleteProcessorDelegate : SafeDeleteProcessorDelegateBase() {
@@ -23,7 +23,7 @@ abstract class AbstractSafeDeleteProcessorDelegate : SafeDeleteProcessorDelegate
             allElementsToDelete: Collection<PsiElement>): Collection<PsiElement>? = null
 
     override fun handlesElement(element: PsiElement): Boolean {
-        return isNotMovableOrRenameElement(element, acceptableClasses)
+        return element.isNotMoveOrRenameElement(acceptableClasses)
     }
 
     override fun findUsages(

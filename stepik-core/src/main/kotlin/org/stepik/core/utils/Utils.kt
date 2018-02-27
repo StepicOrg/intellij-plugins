@@ -11,34 +11,32 @@ import com.intellij.openapi.project.ProjectManager
 import org.stepik.api.objects.StudyObject
 import org.stepik.api.objects.courses.Course
 
-object Utils {
-    val currentProject: Project
-        get() {
-            val projectManger = ProjectManager.getInstance()
-            return if (projectManger.openProjects.isEmpty()) {
-                projectManger.defaultProject
-            } else {
-                projectManger.openProjects[0]
-            }
+val currentProject: Project
+    get() {
+        val projectManger = ProjectManager.getInstance()
+        return if (projectManger.openProjects.isEmpty()) {
+            projectManger.defaultProject
+        } else {
+            projectManger.openProjects[0]
         }
-
-    val isCanceled: Boolean
-        get() {
-            try {
-                ProgressManager.checkCanceled()
-            } catch (e: ProcessCanceledException) {
-                return true
-            }
-
-            return false
-        }
-
-    fun saveAllDocuments(project: Project) {
-        val documentManager = FileDocumentManager.getInstance()
-        FileEditorManager.getInstance(project).openFiles
-                .mapNotNull { documentManager.getDocument(it) }
-                .forEach { documentManager.saveDocument(it) }
     }
+
+val isCanceled: Boolean
+    get() {
+        try {
+            ProgressManager.checkCanceled()
+        } catch (e: ProcessCanceledException) {
+            return true
+        }
+
+        return false
+    }
+
+fun Project.saveAllDocuments() {
+    val documentManager = FileDocumentManager.getInstance()
+    FileEditorManager.getInstance(this).openFiles
+            .mapNotNull { documentManager.getDocument(it) }
+            .forEach { documentManager.saveDocument(it) }
 }
 
 val EMPTY_STUDY_OBJECT = initEmptyStudyNode()
@@ -68,8 +66,9 @@ private class BatchingSequence<out T>(val source: Sequence<T>, val batchSize: In
 }
 
 fun refreshProjectView(project: Project?) {
+    project ?: return
     ApplicationManager.getApplication().invokeLater {
-        if (project?.isDisposed == false) {
+        if (!project.isDisposed) {
             ProjectView.getInstance(project).refresh()
         }
     }

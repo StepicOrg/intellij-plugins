@@ -6,58 +6,46 @@ import org.stepik.core.StudyUtils.getProjectManager
 import org.stepik.core.StudyUtils.isStepikProject
 
 
-object ProjectPsiFilesUtils {
-
-    fun getFile(target: PsiElement): PsiFileSystemItem? {
-        return (target as? PsiFileSystemItem) ?: target.containingFile
+val PsiElement.file: PsiFileSystemItem?
+    get() {
+        return (this as? PsiFileSystemItem) ?: this.containingFile
     }
 
-    fun isCanNotBeTarget(
-            target: PsiElement?,
-            acceptableClasses: Set<Class<out PsiElement>>): Boolean {
-        target ?: return false
 
-        if (isStepikProject(target.project)) {
-            return false
-        }
+fun PsiElement?.isNotTarget(acceptableClasses: Set<Class<out PsiElement>>): Boolean {
+    this ?: return false
 
-        if (notAccept(target, acceptableClasses)) {
-            return false
-        }
-
-        val item = getFile(target) ?: return false
-
-        val targetPath = getRelativePath(item)
-
-        return ProjectFilesUtils.isCanNotBeTarget(targetPath)
+    if (isStepikProject(this.project)) {
+        return false
     }
 
-    private fun notAccept(
-            target: PsiElement,
-            acceptableClasses: Set<Class<out PsiElement>>): Boolean {
-        return acceptableClasses.none { it.isInstance(target) }
+    if (this.notAccept(acceptableClasses)) {
+        return false
     }
 
-    fun getRelativePath(item: PsiFileSystemItem): String {
-        val path = item.virtualFile.path
-        val projectPath = item.project.basePath ?: return path
-        return ProjectFilesUtils.getRelativePath(projectPath, path)
+    val item = this.file ?: return false
+
+    return item.relativePath.isNotTarget()
+}
+
+private fun PsiElement.notAccept(acceptableClasses: Set<Class<out PsiElement>>): Boolean {
+    return acceptableClasses.none { it.isInstance(this) }
+}
+
+val PsiFileSystemItem.relativePath: String
+    get() {
+        val path = this.virtualFile.path
+        val projectPath = this.project.basePath ?: return path
+        return projectPath.getRelativePath(path)
     }
 
-    fun isNotMovableOrRenameElement(
-            element: PsiElement,
-            acceptableClasses: Set<Class<out PsiElement>>): Boolean {
-        val project = element.project
+fun PsiElement.isNotMoveOrRenameElement(acceptableClasses: Set<Class<out PsiElement>>): Boolean {
+    val root = getProjectManager(this.project)?.projectRoot ?: return false
 
-        val root = getProjectManager(project)?.projectRoot ?: return false
-
-        if (notAccept(element, acceptableClasses)) {
-            return false
-        }
-
-        val file = getFile(element) ?: return false
-        val path = getRelativePath(file)
-        return ProjectFilesUtils.isNotMovableOrRenameElement(root, path)
+    if (this.notAccept(acceptableClasses)) {
+        return false
     }
 
+    val file = this.file ?: return false
+    return isNotMovableOrRenameElement(root, file.relativePath)
 }

@@ -5,7 +5,7 @@ import com.intellij.openapi.project.Project
 import org.stepik.core.StudyUtils.getProjectManager
 import org.stepik.core.actions.StudyActionWithShortcut
 import org.stepik.core.courseFormat.StudyNode
-import org.stepik.core.utils.NavigationUtils
+import org.stepik.core.utils.navigate
 import javax.swing.Icon
 
 
@@ -18,7 +18,7 @@ abstract class StudyStepNavigationAction(text: String?,
         val project = e.project ?: return
         val currentNode = getProjectManager(project)?.run { selected ?: projectRoot }
         val targetNode = getTargetStep(project, currentNode) ?: return
-        NavigationUtils.navigate(project, targetNode)
+        navigate(project, targetNode)
     }
 
     protected abstract fun getTargetStep(project: Project, currentStepNode: StudyNode?): StudyNode?

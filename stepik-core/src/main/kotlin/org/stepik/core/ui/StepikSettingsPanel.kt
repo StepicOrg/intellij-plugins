@@ -12,7 +12,7 @@ import org.stepik.core.auth.StepikAuthManagerListener
 import org.stepik.core.auth.StepikAuthState
 import org.stepik.core.auth.StepikAuthState.AUTH
 import org.stepik.core.auth.StepikAuthState.NOT_AUTH
-import org.stepik.core.utils.Utils
+import org.stepik.core.utils.currentProject
 import javax.swing.JButton
 import javax.swing.JCheckBox
 import javax.swing.JComponent
@@ -51,7 +51,7 @@ internal class StepikSettingsPanel : StepikAuthManagerListener {
     }
 
     private fun initProjectOfSettings() {
-        projectManager = ServiceManager.getService(Utils.currentProject, ProjectManager::class.java)
+        projectManager = ServiceManager.getService(currentProject, ProjectManager::class.java)
         hintCheckBox!!.isSelected = projectManager != null && projectManager!!.showHint
         logoutButton!!.text = if (isAuthenticated) "Logout" else "Login"
     }
