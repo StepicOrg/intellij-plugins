@@ -57,7 +57,7 @@ class StepikRestService : RestService(), Loggable {
             when {
                 error != null -> {
                     logger.warn(error)
-                    sendHTMLResponse(request, context, "auth_failed",
+                    sendHTMLResponse(request, context, "auth_failure",
                             mapOf(
                                     "link" to authorizationCodeUrl,
                                     "error" to error
@@ -86,7 +86,7 @@ class StepikRestService : RestService(), Loggable {
                         }
                     } catch (e: StepikClientException) {
                         logger.warn(e)
-                        sendHTMLResponse(request, context, "auth_failed",
+                        sendHTMLResponse(request, context, "auth_failure",
                                 mapOf(
                                         "link" to authorizationCodeUrl,
                                         "error" to e.message
@@ -106,7 +106,7 @@ class StepikRestService : RestService(), Loggable {
                     }
                 }
                 else -> {
-                    sendHTMLResponse(request, context, "auth_failed",
+                    sendHTMLResponse(request, context, "auth_failure",
                             mapOf(
                                     "link" to authorizationCodeUrl,
                                     "error" to "Unknown error"

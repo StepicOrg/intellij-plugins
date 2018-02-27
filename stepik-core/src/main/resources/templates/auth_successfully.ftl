@@ -18,7 +18,7 @@
     </style>
 </head>
 <body>
-<h1>Authorization on Stepik is successfully</h1>
+<h1>Authorization on Stepik is successful</h1>
 
 <p>You can close this page and return to the IDE</p>
 </body>
