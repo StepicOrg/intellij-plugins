@@ -13,7 +13,6 @@ import org.stepik.core.StudyBasePluginConfigurator
 import org.stepik.core.StudyPluginConfigurator
 import org.stepik.core.StudyUtils.isStepikProject
 import org.stepik.core.actions.step.DownloadSubmission
-import org.stepik.core.actions.step.InsertStepikDirectives
 import org.stepik.core.actions.step.StepikResetStepAction
 import org.stepik.core.actions.step.StepikSendAction
 import org.stepik.core.actions.step.TestSamplesAction
@@ -52,7 +51,6 @@ class AltProjectConfigurator : StudyBasePluginConfigurator() {
                 StepikNextStepAction(),
                 StepikResetStepAction(),
                 DownloadSubmission(),
-                InsertStepikDirectives(),
                 OpenInBrowserAction()
         )
 

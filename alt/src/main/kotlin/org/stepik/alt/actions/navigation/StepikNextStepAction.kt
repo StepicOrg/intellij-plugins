@@ -6,6 +6,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.InputValidator
 import com.intellij.openapi.ui.ex.MessagesEx.showInputDialog
 import org.stepik.core.StudyUtils.getProjectManager
+import org.stepik.core.StudyUtils.isStepikProject
 import org.stepik.core.actions.getShortcutText
 import org.stepik.core.actions.navigation.StudyNavigator
 import org.stepik.core.actions.navigation.StudyStepNavigationAction
@@ -70,8 +71,7 @@ class StepikNextStepAction : StudyStepNavigationAction(TEXT, DESCRIPTION, AllIco
     override fun getShortcuts() = arrayOf(SHORTCUT)
 
     override fun update(e: AnActionEvent?) {
-        val presentation = e?.presentation ?: return
-        presentation.isEnabled = true
+        e?.presentation?.isEnabled = isStepikProject(e?.project)
     }
 
     companion object {

@@ -31,7 +31,7 @@ abstract class StudyStepNavigationAction(text: String?,
         val projectManager = getProjectManager(project) ?: return
         val selected = projectManager.selected
         val target = getTargetStep(project, selected)
-        val enabled = selected == null || target != null
+        val enabled = projectManager.projectRoot != null && (selected == null || target != null)
         presentation.isEnabled = isEnabled(project, enabled, selected, target)
     }
 
