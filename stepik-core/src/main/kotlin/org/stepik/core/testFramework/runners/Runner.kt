@@ -1,8 +1,6 @@
 package org.stepik.core.testFramework.runners
 
 import com.intellij.execution.RunManager
-import com.intellij.openapi.application.Application
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ApplicationManager.getApplication
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
@@ -11,11 +9,12 @@ import com.intellij.openapi.vfs.VirtualFile
 import org.stepik.core.EduNames
 import org.stepik.core.common.Loggable
 import org.stepik.core.courseFormat.StepNode
-import org.stepik.core.testFramework.createDirectory
+import org.stepik.core.testFramework.createDirectories
 import org.stepik.core.testFramework.processes.TestProcess
 import org.stepik.core.utils.getTextUnderDirectives
 import org.stepik.core.utils.replaceCode
 import org.stepik.core.utils.runWriteActionAndWait
+import java.io.IOException
 import java.util.concurrent.TimeUnit
 
 interface Runner : Loggable {
@@ -75,33 +74,25 @@ interface Runner : Loggable {
     }
 
     private fun prepareMainFile(project: Project, stepNode: StepNode): String? {
-        val application = ApplicationManager.getApplication()
         val language = stepNode.currentLang
 
         val testFileName = language.testFileName
 
         val stepDirectory = project.baseDir.findFileByRelativePath(stepNode.path) ?: return null
 
-        val testFile = stepDirectory.let {
-            return@let it.findFileByRelativePath(listOf("tests", language.langName).joinToString("/"))
-        }?.let {
-                    return@let it.findChild(testFileName)
-                }
+        val testFile = stepDirectory.findFileByRelativePath(listOf("tests", language.langName)
+                .joinToString("/"))
+                ?: stepDirectory.findChild(testFileName)
 
         val mainFile = getMainFilePath(project, stepNode) ?: return null
 
-        val targetFilePath = stepDirectory.let {
-            val out = "out"
-            return@let it.findChild(out) ?: createDirectory(it, out)
-        }?.let {
-                    val out = language.langName
-                    return@let it.findChild(out) ?: createDirectory(it, out)
-                }?.let {
-                    return@let it.findChild(testFileName) ?: createFile(application, it, testFileName)
-                } ?: return null
+        val targetFileDirectory = createDirectories(stepDirectory,
+                "out/${language.langName}") ?: return null
+        val targetFilePath = targetFileDirectory.findChild(testFileName)
+                ?: createFile(targetFileDirectory, testFileName) ?: return null
 
         val documentManager = FileDocumentManager.getInstance()
-        val text = application.runReadAction(Computable<String> {
+        val text = getApplication().runReadAction(Computable<String> {
             val submissionText = documentManager.getDocument(mainFile)?.text ?: return@Computable null
             val submission = getTextUnderDirectives(submissionText, language)
             if (testFile != null) {
@@ -112,22 +103,26 @@ interface Runner : Loggable {
             }
         }) ?: return null
 
-        writeText(application, documentManager, targetFilePath, text)
+        writeText(documentManager, targetFilePath, text)
 
         return targetFilePath.path
     }
 
-    fun writeText(application: Application, documentManager: FileDocumentManager, targetFilePath: VirtualFile, text: String) {
-        application.runWriteActionAndWait {
+    fun writeText(documentManager: FileDocumentManager, targetFilePath: VirtualFile, text: String) {
+        getApplication().runWriteActionAndWait {
             val document = documentManager.getDocument(targetFilePath) ?: return@runWriteActionAndWait
             document.setText(text)
             documentManager.saveDocument(document)
         }
     }
 
-    fun createFile(application: Application, parent: VirtualFile, testFileName: String): VirtualFile? {
-        return application.runWriteActionAndWait {
-            parent.findOrCreateChildData(null, testFileName)
+    fun createFile(parent: VirtualFile, testFileName: String): VirtualFile? {
+        return getApplication().runWriteActionAndWait {
+            return@runWriteActionAndWait try {
+                parent.findOrCreateChildData(null, testFileName)
+            } catch (e: IOException) {
+                null
+            }
         }
     }
 }

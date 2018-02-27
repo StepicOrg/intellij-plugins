@@ -43,7 +43,7 @@ abstract class JetProcess(project: Project, stepNode: StepNode, mainFilePath: St
         val baseDir = project.baseDir
         val application = ApplicationManager.getApplication()
         val outDirectory = (baseDir.findFileByRelativePath(outDirectoryPath)
-                ?: createDirectories(application, baseDir, outDirectoryPath))?.path ?: return null
+                ?: createDirectories(baseDir, outDirectoryPath))?.path ?: return null
         val module = getModule(runConfiguration) ?: return null
         val sdk = ModuleRootManager.getInstance(module).sdk ?: return null
 
