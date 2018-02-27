@@ -16,7 +16,7 @@ import org.stepik.core.common.Loggable
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.StepType
 import org.stepik.core.testFramework.toolWindow.StepikTestResultToolWindow
-import org.stepik.core.testFramework.toolWindow.StepikTestToolWindowUtils
+import org.stepik.core.testFramework.toolWindow.showTestResultsToolWindow
 import org.stepik.core.ui.StepDescriptionUtils.getReply
 import org.stepik.core.utils.getOrCreateSrcDirectory
 import org.stepik.core.utils.navigate
@@ -103,8 +103,7 @@ internal class FormListener(private val project: Project, private val browser: S
 
                         val title = "$lessonName : ${stepNode.name}"
                         ApplicationManager.getApplication().invokeAndWait {
-                            resultWindows[0] = StepikTestToolWindowUtils
-                                    .showTestResultsToolWindow(project, title)
+                            resultWindows[0] = showTestResultsToolWindow(project, title)
                         }
 
                         val resultWindow = resultWindows[0]!!

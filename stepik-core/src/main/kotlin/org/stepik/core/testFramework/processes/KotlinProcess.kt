@@ -16,11 +16,13 @@ class KotlinProcess(project: Project, stepNode: StepNode, mainFilePath: String) 
     override fun prepareCompileCommand(commandLine: GeneralCommandLine, context: ProcessContext): Boolean {
         val jdkHome = context.sdk.homePath ?: return false
 
-        commandLine.addParameter(context.mainFilePath)
-        commandLine.addParameter("-d")
-        commandLine.addParameter(context.outDirectory)
-        commandLine.addParameter("-jdk-home")
-        commandLine.addParameter(jdkHome)
+        commandLine.run {
+            addParameter(context.mainFilePath)
+            addParameter("-d")
+            addParameter(context.outDirectory)
+            addParameter("-jdk-home")
+            addParameter(jdkHome)
+        }
         return true
     }
 
@@ -30,11 +32,13 @@ class KotlinProcess(project: Project, stepNode: StepNode, mainFilePath: String) 
     }
 
     override fun prepareExecuteCommand(commandLine: GeneralCommandLine, context: ProcessContext): Boolean {
-        commandLine.addParameter("-classpath")
-        commandLine.addParameter(context.outDirectory)
-        commandLine.addParameter(context.mainClass)
+        commandLine.run {
+            addParameter("-classpath")
+            addParameter(context.outDirectory)
+            addParameter(context.mainClass)
+        }
         return true
     }
 
-    override fun getTestClass(): String? = "TestKt"
+    override val testClass = "TestKt"
 }

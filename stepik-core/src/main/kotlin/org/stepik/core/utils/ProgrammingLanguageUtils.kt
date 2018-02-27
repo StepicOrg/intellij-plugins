@@ -99,7 +99,9 @@ object ProgrammingLanguageUtils : Loggable {
     }
 
     private fun findFile(parent: PsiDirectory, name: String): PsiFile? {
-        return getApplication().runReadAction(Computable { parent.findFile(name) })
+        return getApplication().runReadAction(Computable {
+            parent.findFile(name)
+        })
     }
 
     private fun exchangeFiles(
@@ -142,42 +144,38 @@ object ProgrammingLanguageUtils : Loggable {
         var file = parent.findChild(fileName)
 
         if (file == null) {
-            getApplication().let {
-                it.invokeAndWait {
-                    it.runWriteAction {
+            getApplication().runWriteActionAndWait {
+                try {
+                    file = parent.createChildData(null, fileName)
+                    var template: String? = null
+
+                    val stepikApiClient = authAndGetStepikApiClient()
+                    val user = currentUser
+                    if (!user.isGuest) {
                         try {
-                            file = parent.createChildData(null, fileName)
-                            var template: String? = null
-
-                            val stepikApiClient = authAndGetStepikApiClient()
-                            val user = currentUser
-                            if (!user.isGuest) {
-                                try {
-                                    stepikApiClient.submissions()
-                                            .get()
-                                            .user(user.id)
-                                            .order(Order.DESC)
-                                            .step(stepNode.id)
-                                            .execute()
-                                            .firstOrNull {
-                                                langOfName(it.reply.language) === language
-                                            }?.also {
-                                                template = it.reply.code
-                                            }
-                                } catch (e: StepikClientException) {
-                                    logger.warn(e)
-                                }
-                            }
-
-                            if (template == null) {
-                                template = stepNode.getTemplate(language)
-                            }
-
-                            file!!.setBinaryContent(template!!.toByteArray())
-                        } catch (e: IOException) {
-                            file = null
+                            stepikApiClient.submissions()
+                                    .get()
+                                    .user(user.id)
+                                    .order(Order.DESC)
+                                    .step(stepNode.id)
+                                    .execute()
+                                    .firstOrNull {
+                                        langOfName(it.reply.language) === language
+                                    }?.also {
+                                        template = it.reply.code
+                                    }
+                        } catch (e: StepikClientException) {
+                            logger.warn(e)
                         }
                     }
+
+                    if (template == null) {
+                        template = stepNode.getTemplate(language)
+                    }
+
+                    file!!.setBinaryContent(template!!.toByteArray())
+                } catch (e: IOException) {
+                    file = null
                 }
             }
         }

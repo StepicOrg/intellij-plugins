@@ -8,15 +8,17 @@ import java.io.File
 
 class JavaProcess(project: Project, stepNode: StepNode, mainFilePath: String) : JetProcess(project, stepNode, mainFilePath) {
 
-    override fun getCompilerPath(context: ProcessContext): File =
+    override fun getCompilerPath(context: ProcessContext) =
             File(SimpleJavaSdkType().getBinPath(context.sdk) + File.separator + "javac")
 
     override fun prepareCompileCommand(commandLine: GeneralCommandLine, context: ProcessContext): Boolean {
-        commandLine.addParameter("-sourcepath")
-        commandLine.addParameter(context.sourcePath)
-        commandLine.addParameter("-d")
-        commandLine.addParameter(context.outDirectory)
-        commandLine.addParameter(context.mainFilePath)
+        commandLine.run {
+            addParameter("-sourcepath")
+            addParameter(context.sourcePath)
+            addParameter("-d")
+            addParameter(context.outDirectory)
+            addParameter(context.mainFilePath)
+        }
         return true
     }
 
@@ -26,9 +28,11 @@ class JavaProcess(project: Project, stepNode: StepNode, mainFilePath: String) : 
     }
 
     override fun prepareExecuteCommand(commandLine: GeneralCommandLine, context: ProcessContext): Boolean {
-        commandLine.addParameter("-classpath")
-        commandLine.addParameter(context.outDirectory)
-        commandLine.addParameter(context.mainClass)
+        commandLine.run {
+            addParameter("-classpath")
+            addParameter(context.outDirectory)
+            addParameter(context.mainClass)
+        }
         return true
     }
 }

@@ -21,6 +21,7 @@ import org.stepik.core.actions.StudyActionWithShortcut
 import org.stepik.core.common.Loggable
 import org.stepik.core.metrics.Metrics
 import org.stepik.core.ui.StudyToolWindowFactory.Companion.STUDY_TOOL_WINDOW
+import org.stepik.core.utils.runWriteActionLater
 import java.util.concurrent.Executors
 import javax.swing.KeyStroke
 
@@ -34,18 +35,15 @@ class StudyProjectComponent private constructor(private val project: Project) : 
 
         registerStudyToolWindow()
 
-        getApplication().also {
-            it.invokeLater {
-                it.runWriteAction {
-                    UISettings.instance.apply {
-                        hideToolStripes = false
-                        fireUISettingsChanged()
-                    }
-                    logger.info("register Shortcuts")
-                    registerShortcuts()
-                }
+        getApplication().runWriteActionLater {
+            UISettings.instance.apply {
+                hideToolStripes = false
+                fireUISettingsChanged()
             }
+            logger.info("register Shortcuts")
+            registerShortcuts()
         }
+
         Metrics.openProject(project)
 
         executor.execute { projectManager.updateAdaptiveSelected() }

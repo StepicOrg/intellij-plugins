@@ -2,7 +2,6 @@ package org.stepik.core.actions.step
 
 import com.intellij.ide.projectView.ProjectView
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ApplicationManager.getApplication
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.fileEditor.FileDocumentManager
@@ -156,33 +155,28 @@ class DownloadSubmission : CodeQuizAction(TEXT, DESCRIPTION, AllStepikIcons.Tool
 
         val code = submission.reply.code
 
-        CommandProcessor.getInstance().executeCommand(project,
-                {
-                    ApplicationManager.getApplication().runWriteAction {
-                        val documentManager = FileDocumentManager.getInstance()
-                        val document = documentManager.getDocument(mainFile)
+        CommandProcessor.getInstance().executeCommand(project, {
+            getApplication().runWriteAction {
+                val documentManager = FileDocumentManager.getInstance()
+                val document = documentManager.getDocument(mainFile) ?: return@runWriteAction
 
-                        if (document != null) {
-                            val language = SupportedLanguages.langOfName(submission.reply.language)
-                            val text = if (containsDirectives(code, language)) {
-                                uncommentAmbientCode(code, language)
-                            } else {
-                                replaceCode(document.text, code, language)
-                            }
-                            document.setText(text)
+                val language = SupportedLanguages.langOfName(submission.reply.language)
+                val text = if (containsDirectives(code, language)) {
+                    uncommentAmbientCode(code, language)
+                } else {
+                    replaceCode(document.text, code, language)
+                }
+                document.setText(text)
 
-                            val status = StudyStatus.of(submission.status)
-                            stepNode.status = status
-                            FileEditorManager.getInstance(project).openFile(mainFile, true)
-                            ProjectView.getInstance(project).refresh()
-                            Metrics.downloadAction(project, stepNode)
+                stepNode.status = StudyStatus.of(submission.status)
+                FileEditorManager.getInstance(project).openFile(mainFile, true)
+                ProjectView.getInstance(project).refresh()
 
-                            language.runner.updateRunConfiguration(project, stepNode)
-                        }
-                    }
-                },
-                "Download submission",
-                "Download submission")
+                Metrics.downloadAction(project, stepNode)
+
+                language.runner.updateRunConfiguration(project, stepNode)
+            }
+        }, "Download submission", "Download submission")
     }
 
     private class SubmissionDecorator internal constructor(internal val submission: Submission) {

@@ -7,7 +7,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Computable
 import com.jetbrains.python.run.PythonRunConfiguration
 import com.jetbrains.python.run.PythonRunConfigurationParams
-import com.jetbrains.python.sdk.PythonSdkType
+import com.jetbrains.python.sdk.PythonSdkType.getPythonExecutable
 import org.stepik.core.courseFormat.StepNode
 import java.io.File
 
@@ -17,17 +17,17 @@ class PythonProcess(project: Project, stepNode: StepNode, mainFilePath: String) 
         if (testClass) {
             return null
         }
-        val appConfiguration = runConfiguration as PythonRunConfigurationParams
+
         return application.runReadAction(Computable {
-            return@Computable appConfiguration.scriptName
+            (runConfiguration as PythonRunConfigurationParams).scriptName
         })
     }
 
-    override fun isNeedCompile() = false
+    override val isNeedCompile = false
 
     override fun getExecutorPath(context: ProcessContext): File? {
         val sdkHome = (context.runConfiguration as PythonRunConfiguration).sdkHome ?: ""
-        val executable = PythonSdkType.getPythonExecutable(sdkHome) ?: return null
+        val executable = getPythonExecutable(sdkHome) ?: return null
         return File(executable)
     }
 

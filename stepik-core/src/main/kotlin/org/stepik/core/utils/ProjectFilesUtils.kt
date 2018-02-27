@@ -119,14 +119,10 @@ fun getOrCreateSrcDirectory(project: Project, stepNode: StepNode,
             if (modelOwner) {
                 myModel = ModuleManager.getInstance(project).modifiableModel
             }
-            getApplication().let {
-                it.invokeAndWait {
-                    it.runWriteAction {
-                        createStepModule(project, stepNode, myModel!!)
-                        if (modelOwner) {
-                            myModel.commit()
-                        }
-                    }
+            getApplication().runWriteActionAndWait {
+                createStepModule(project, stepNode, myModel!!)
+                if (modelOwner) {
+                    myModel.commit()
                 }
             }
             if (refresh) {
@@ -145,26 +141,17 @@ internal fun getOrCreateSrcPsiDirectory(project: Project, stepNode: StepNode): P
 }
 
 private fun getOrCreateDirectory(baseDir: VirtualFile, directoryPath: String): VirtualFile? {
-    var srcDir = baseDir.findFileByRelativePath(directoryPath)
-    if (srcDir == null) {
-        getApplication().let {
-            it.invokeAndWait {
-                srcDir = it.runWriteAction(Computable {
-                    var dir = baseDir
-                    try {
-                        for (path in directoryPath.splitPath()) {
-                            val child = dir.findChild(path)
-                            dir = child ?: dir.createChildDirectory(null, path)
+    return baseDir.findFileByRelativePath(directoryPath)
+            ?: getApplication().runWriteActionAndWait {
+                return@runWriteActionAndWait directoryPath.splitPath()
+                        .fold(baseDir) { dir, part ->
+                            try {
+                                return@fold dir.findChild(part) ?: dir.createChildDirectory(null, part)
+                            } catch (e: IOException) {
+                                return@runWriteActionAndWait null
+                            }
                         }
-                    } catch (e: IOException) {
-                        return@Computable null
-                    }
-                    return@Computable dir
-                })
             }
-        }
-    }
-    return srcDir
 }
 
 internal fun getOrCreatePsiDirectory(project: Project, baseDir: PsiDirectory,

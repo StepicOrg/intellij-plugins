@@ -14,6 +14,7 @@ import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.icons.AllStepikIcons
 import org.stepik.core.metrics.Metrics
 import org.stepik.core.utils.getOrCreateSrcDirectory
+import org.stepik.core.utils.runWriteActionLater
 
 class StepikResetStepAction : CodeQuizAction(TEXT, DESCRIPTION, AllStepikIcons.ToolWindow.resetTaskFile) {
 
@@ -34,9 +35,8 @@ class StepikResetStepAction : CodeQuizAction(TEXT, DESCRIPTION, AllStepikIcons.T
         private const val DESCRIPTION = "Reset to default template"
 
         private fun reset(project: Project) {
-            val application = getApplication()
-            application.invokeLater {
-                application.runWriteAction { resetFile(project) }
+            getApplication().runWriteActionLater {
+                resetFile(project)
             }
         }
 
@@ -63,15 +63,13 @@ class StepikResetStepAction : CodeQuizAction(TEXT, DESCRIPTION, AllStepikIcons.T
         }
 
         private fun resetDocument(project: Project, document: Document, stepNode: StepNode) {
-            CommandProcessor.getInstance().executeCommand(project,
-                    {
-                        getApplication().runWriteAction {
-                            document.setText(stepNode.currentTemplate)
-                            Metrics.resetStepAction(project, stepNode)
-                            stepNode.currentLang.runner.updateRunConfiguration(project, stepNode)
-                        }
-                    },
-                    DESCRIPTION, DESCRIPTION
+            CommandProcessor.getInstance().executeCommand(project, {
+                getApplication().runWriteAction {
+                    document.setText(stepNode.currentTemplate)
+                    Metrics.resetStepAction(project, stepNode)
+                    stepNode.currentLang.runner.updateRunConfiguration(project, stepNode)
+                }
+            }, DESCRIPTION, DESCRIPTION
             )
         }
     }

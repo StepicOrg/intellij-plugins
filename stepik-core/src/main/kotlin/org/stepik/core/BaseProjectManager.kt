@@ -32,6 +32,7 @@ import org.stepik.core.serialization.SerializationUtils.elementToXml
 import org.stepik.core.serialization.SerializationUtils.toElement
 import org.stepik.core.serialization.SerializationUtils.xStream
 import org.stepik.core.utils.getOrCreateSrcDirectory
+import org.stepik.core.utils.runWriteActionLater
 import java.io.ByteArrayOutputStream
 import java.io.OutputStreamWriter
 import java.nio.charset.StandardCharsets.UTF_8
@@ -191,24 +192,21 @@ abstract class BaseProjectManager constructor(@field:XStreamOmitField val projec
                         val application = ApplicationManager.getApplication()
 
                         val model = application.runReadAction(Computable {
-                            ModuleManager.getInstance(project!!)
-                                    .modifiableModel
+                            ModuleManager.getInstance(project!!).modifiableModel
                         })
 
-                        application.invokeLater {
-                            application.runWriteAction {
-                                try {
-                                    val moduleBuilder = getConfigurator(project)
-                                            ?.getSandboxModuleBuilder(projectDir.path)
-                                    val module = moduleBuilder?.createModule(model)
-                                    if (module == null) {
-                                        logger.warn("Failed repair Sandbox")
-                                        return@runWriteAction
-                                    }
-                                    model.commit()
-                                } catch (e: Exception) {
-                                    logger.warn("Failed repair Sandbox", e)
+                        application.runWriteActionLater {
+                            try {
+                                val moduleBuilder = getConfigurator(project)
+                                        ?.getSandboxModuleBuilder(projectDir.path)
+                                val module = moduleBuilder?.createModule(model)
+                                if (module == null) {
+                                    logger.warn("Failed repair Sandbox")
+                                    return@runWriteActionLater
                                 }
+                                model.commit()
+                            } catch (e: Exception) {
+                                logger.warn("Failed repair Sandbox", e)
                             }
                         }
                     }

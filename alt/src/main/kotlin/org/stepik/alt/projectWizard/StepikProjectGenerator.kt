@@ -1,6 +1,6 @@
 package org.stepik.alt.projectWizard
 
-import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.ApplicationManager.getApplication
 import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.progress.ProgressManager
@@ -21,7 +21,7 @@ import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.StudyNode
 import org.stepik.core.metrics.Metrics
 import org.stepik.core.metrics.MetricsStatus.TARGET_NOT_FOUND
-import org.stepik.core.projectWizard.ProjectWizardUtils
+import org.stepik.core.projectWizard.ProjectWizardUtils.createSubDirectories
 import org.stepik.core.utils.getOrCreateSrcDirectory
 
 object StepikProjectGenerator : ProjectGenerator, Loggable {
@@ -62,15 +62,14 @@ object StepikProjectGenerator : ProjectGenerator, Loggable {
         StepikProjectGenerator.createTreeUnderProgress(project)
         StepikProjectGenerator.generateProject(project)
 
-        val moduleModel = ApplicationManager.getApplication().runReadAction(Computable {
-            ModuleManager.getInstance(project)
-                    .modifiableModel
+        val moduleModel = getApplication().runReadAction(Computable {
+            ModuleManager.getInstance(project).modifiableModel
         })
 
         val plugins = PathManager.getPluginsPath()
         val moduleDir = FileUtil.join(plugins, "alt", "alt")
 
-        ApplicationManager.getApplication().runWriteAction {
+        getApplication().runWriteAction {
             SandboxModuleBuilder(moduleDir).createModule(moduleModel)
 
             val root = getProjectManager(project)?.projectRoot
@@ -82,7 +81,7 @@ object StepikProjectGenerator : ProjectGenerator, Loggable {
             if (root is StepNode) {
                 getOrCreateSrcDirectory(project, root, true, moduleModel)
             } else {
-                ProjectWizardUtils.createSubDirectories(project, StepikProjectGenerator.defaultLang, root, moduleModel)
+                createSubDirectories(project, StepikProjectGenerator.defaultLang, root, moduleModel)
                 VirtualFileManager.getInstance().syncRefresh()
             }
 

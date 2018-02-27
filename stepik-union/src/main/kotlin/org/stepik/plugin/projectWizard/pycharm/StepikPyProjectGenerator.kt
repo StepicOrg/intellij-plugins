@@ -28,6 +28,7 @@ import org.stepik.core.icons.AllStepikIcons
 import org.stepik.core.projectWizard.ProjectWizardUtils
 import org.stepik.core.projectWizard.ProjectWizardUtils.createSubDirectories
 import org.stepik.core.utils.getOrCreateSrcDirectory
+import org.stepik.core.utils.runWriteActionLater
 import org.stepik.plugin.projectWizard.StepikProjectGenerator
 import java.awt.Container
 import java.io.File
@@ -161,13 +162,10 @@ internal class StepikPyProjectGenerator private constructor() :
             VirtualFileManager.getInstance().syncRefresh()
         }
 
-        val application = getApplication()
-        application.invokeLater {
-            application.runWriteAction {
-                StudyProjectComponent.getInstance(project)
-                        .registerStudyToolWindow()
-                projectManager.updateAdaptiveSelected()
-            }
+        getApplication().runWriteActionLater {
+            StudyProjectComponent.getInstance(project)
+                    .registerStudyToolWindow()
+            projectManager.updateAdaptiveSelected()
         }
     }
 

@@ -1,33 +1,21 @@
 package org.stepik.core.testFramework
 
 import com.intellij.openapi.application.Application
-import com.intellij.openapi.util.Computable
+import com.intellij.openapi.application.ApplicationManager.getApplication
 import com.intellij.openapi.vfs.VirtualFile
+import org.stepik.core.utils.runWriteActionAndWait
 
-fun createDirectory(application: Application, parent: VirtualFile, directoryName: String): VirtualFile? {
-    var directory: VirtualFile? = null
-    application.invokeAndWait {
-        directory = application.runWriteAction(Computable<VirtualFile> {
-            parent.createChildDirectory(null, directoryName)
-        })
+fun createDirectory(parent: VirtualFile, directoryName: String): VirtualFile? {
+    return getApplication().runWriteActionAndWait {
+        parent.createChildDirectory(null, directoryName)
     }
-
-    return directory
 }
 
 fun createDirectories(application: Application, parent: VirtualFile, directoryRelativePath: String): VirtualFile? {
-    var directory: VirtualFile? = null
-    application.invokeAndWait {
-        directory = application.runWriteAction(Computable<VirtualFile> {
-            val directories = directoryRelativePath.split('/')
-            var newDirectory = parent
-            directories.forEach {
-                newDirectory = newDirectory.findChild(it) ?: newDirectory.createChildDirectory(null, it)
-            }
-
-            return@Computable newDirectory
-        })
+    return application.runWriteActionAndWait {
+        return@runWriteActionAndWait directoryRelativePath.split('/')
+                .fold(parent) { dir, part ->
+                    return@fold dir.findChild(part) ?: dir.createChildDirectory(null, part)
+                }
     }
-
-    return directory
 }

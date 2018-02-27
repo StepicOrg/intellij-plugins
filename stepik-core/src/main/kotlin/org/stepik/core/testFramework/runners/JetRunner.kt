@@ -5,18 +5,17 @@ import com.intellij.execution.RunnerAndConfigurationSettings
 import com.intellij.execution.configurations.ModuleBasedConfiguration
 import com.intellij.execution.configurations.RunConfiguration
 import com.intellij.execution.impl.RunManagerImpl
-import com.intellij.openapi.application.Application
-import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.ApplicationManager.getApplication
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import org.stepik.core.EduNames
 import org.stepik.core.courseFormat.StepNode
+import org.stepik.core.utils.runWriteActionAndWait
 
 abstract class JetRunner : Runner {
 
     override fun updateRunConfiguration(project: Project, stepNode: StepNode) {
-        val application = ApplicationManager.getApplication()
         val runManager = RunManager.getInstance(project) as RunManagerImpl
         val language = stepNode.currentLang
 
@@ -24,7 +23,7 @@ abstract class JetRunner : Runner {
 
         val runConfiguration = getRunConfiguration(runManager, settingName)
         if (runConfiguration == null) {
-            setConfiguration(application, runManager)
+            setConfiguration(runManager)
             return
         }
 
@@ -33,64 +32,56 @@ abstract class JetRunner : Runner {
         setWorkingDirectory(appConfiguration, workingVirtualDirectory)
         val mainRelativePath = listOf(EduNames.SRC, language.mainFileName).joinToString("/")
         val mainVirtualFile = workingVirtualDirectory.findFileByRelativePath(mainRelativePath)
-        setMainClass(application, project, appConfiguration, mainVirtualFile)
-        setModule(application, project, appConfiguration, mainVirtualFile)
+        setMainClass(project, appConfiguration, mainVirtualFile)
+        setModule(project, appConfiguration, mainVirtualFile)
         setSdk(project, appConfiguration, mainVirtualFile)
-        setConfiguration(application, runManager, runConfiguration)
+        setConfiguration(runManager, runConfiguration)
     }
 
     private fun getRunConfiguration(runManager: RunManagerImpl,
                                     settingName: String): RunnerAndConfigurationSettings? {
-        val type = runManager.getConfigurationType(getTypeName()) ?: return null
+        val type = runManager.getConfigurationType(typeName) ?: return null
         return runManager.getConfigurationSettingsList(type)
-                .firstOrNull { x -> x.name == settingName }
+                .firstOrNull { it.name == settingName }
                 ?: createRunConfiguration(runManager, settingName)
     }
 
-    protected abstract fun getTypeName(): String
+    protected abstract val typeName: String
 
-    protected abstract fun getFactoryName(): String
+    protected abstract val factoryName: String
 
     private fun createRunConfiguration(runManager: RunManagerImpl,
                                        settingName: String): RunnerAndConfigurationSettings? {
-        val factory = runManager.getFactory(getTypeName(), getFactoryName()) ?: return null
+        val factory = runManager.getFactory(typeName, factoryName) ?: return null
         val runConfiguration = runManager.createRunConfiguration(settingName, factory)
 
         runManager.addConfiguration(runConfiguration, true)
-        logger.info("Created run configuration: " + runConfiguration.name)
+        logger.info("Created run configuration: ${runConfiguration.name}")
         return runConfiguration
     }
 
     protected abstract fun setWorkingDirectory(appConfiguration: RunConfiguration,
                                                workingVirtualDirectory: VirtualFile)
 
-    protected abstract fun setMainClass(application: Application,
-                                        project: Project,
+    protected abstract fun setMainClass(project: Project,
                                         appConfiguration: RunConfiguration,
                                         mainVirtualFile: VirtualFile?)
 
-    private fun setModule(application: Application,
-                          project: Project,
-                          appConfiguration: RunConfiguration,
+    private fun setModule(project: Project, appConfiguration: RunConfiguration,
                           mainVirtualFile: VirtualFile?) {
         if (mainVirtualFile != null && appConfiguration is ModuleBasedConfiguration<*>) {
-            application.invokeAndWait {
-                application.runWriteAction {
-                    val module = ModuleUtilCore.findModuleForFile(mainVirtualFile, project)
-                    appConfiguration.setModule(module)
-                }
+            getApplication().runWriteActionAndWait {
+                val module = ModuleUtilCore.findModuleForFile(mainVirtualFile, project)
+                appConfiguration.setModule(module)
             }
         }
     }
 
-    protected open fun setSdk(project: Project,
-                              appConfiguration: RunConfiguration,
-                              mainVirtualFile: VirtualFile?) {
-    }
+    protected open fun setSdk(project: Project, appConfiguration: RunConfiguration,
+                              mainVirtualFile: VirtualFile?) = Unit
 
-    private fun setConfiguration(application: Application,
-                                 runManager: RunManager,
+    private fun setConfiguration(runManager: RunManager,
                                  configuration: RunnerAndConfigurationSettings? = null) {
-        application.invokeLater { runManager.selectedConfiguration = configuration }
+        getApplication().invokeLater { runManager.selectedConfiguration = configuration }
     }
 }

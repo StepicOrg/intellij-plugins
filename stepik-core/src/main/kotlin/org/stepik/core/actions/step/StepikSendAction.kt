@@ -20,7 +20,7 @@ import org.stepik.core.metrics.Metrics
 import org.stepik.core.metrics.MetricsStatus.DATA_NOT_LOADED
 import org.stepik.core.metrics.MetricsStatus.FAILED_POST
 import org.stepik.core.testFramework.toolWindow.StepikTestResultToolWindow
-import org.stepik.core.testFramework.toolWindow.StepikTestToolWindowUtils.Companion.showTestResultsToolWindow
+import org.stepik.core.testFramework.toolWindow.showTestResultsToolWindow
 import org.stepik.core.utils.getFileText
 import org.stepik.core.utils.getOrCreateSrcDirectory
 import org.stepik.core.utils.getTextUnderDirectives
@@ -34,16 +34,19 @@ class StepikSendAction : CodeQuizAction(TEXT, DESCRIPTION, AllStepikIcons.ToolWi
         logger.info("Start checking step")
 
         val stepNode = getCurrentCodeStepNode(project)
+
         if (stepNode == null) {
             logger.info("Stop checking step: step is null or it is not StepNode ")
             return
         }
+
         val title = "${stepNode.parent?.name ?: "Lesson"} : ${stepNode.name}"
-        val resultWindow = showTestResultsToolWindow(project, title)
-        resultWindow.apply {
+
+        val resultWindow = showTestResultsToolWindow(project, title).apply {
             clear()
             println("Test method: send to Stepik")
         }
+
         getApplication().executeOnPooledThread {
             val stepikApiClient = authAndGetStepikApiClient(true)
             if (!isAuthenticated) {

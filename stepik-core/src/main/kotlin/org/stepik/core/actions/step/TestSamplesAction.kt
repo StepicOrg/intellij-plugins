@@ -2,7 +2,7 @@ package org.stepik.core.actions.step
 
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.ApplicationManager.getApplication
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFileManager
 import org.stepik.core.actions.getShortcutText
@@ -12,7 +12,7 @@ import org.stepik.core.testFramework.runners.ExitCause
 import org.stepik.core.testFramework.runners.Runner
 import org.stepik.core.testFramework.runners.TestResult
 import org.stepik.core.testFramework.toolWindow.StepikTestResultToolWindow
-import org.stepik.core.testFramework.toolWindow.StepikTestToolWindowUtils
+import org.stepik.core.testFramework.toolWindow.showTestResultsToolWindow
 
 
 class TestSamplesAction : CodeQuizAction(TEXT, DESCRIPTION, AllIcons.Actions.Resume) {
@@ -27,17 +27,18 @@ class TestSamplesAction : CodeQuizAction(TEXT, DESCRIPTION, AllIcons.Actions.Res
         val language = stepNode.currentLang
         val runner = language.runner
         val title = "${stepNode.parent?.name ?: "Lesson"} : ${stepNode.name}"
-        val resultWindow = StepikTestToolWindowUtils.showTestResultsToolWindow(project, title)
+        val resultWindow = showTestResultsToolWindow(project, title)
         val stepDirectory = project.baseDir.findFileByRelativePath(stepNode.path)
-        val application = ApplicationManager.getApplication()
-        application.runWriteAction {
+
+        getApplication().runWriteAction {
             VirtualFileManager.getInstance().syncRefresh()
         }
+
         val haveTests = stepDirectory?.findFileByRelativePath(
                 listOf("tests", language.langName, language.testFileName).joinToString("/")
         ) != null
 
-        application.executeOnPooledThread {
+        getApplication().executeOnPooledThread {
             if (haveTests) {
                 testWithTestFile(resultWindow, stepNode, runner, project)
             } else {

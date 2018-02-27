@@ -21,6 +21,7 @@ import org.stepik.core.courseFormat.LessonNode
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.utils.getOrCreateSrcDirectory
 import org.stepik.core.utils.navigate
+import org.stepik.core.utils.runWriteActionLater
 import org.w3c.dom.Element
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.EventListener
@@ -87,24 +88,20 @@ class LinkListener(val project: Project,
         }
 
         val srcDirectory = getOrCreateSrcDirectory(project, (node as StepNode?)!!, true) ?: return
-        getApplication().let {
-            it.invokeLater {
-                it.runWriteAction {
-                    var index = 1
-                    val filename = "${prefix}_${node.id}"
-                    var currentFileName = filename + extension
-                    while (srcDirectory.findChild(currentFileName) != null) {
-                        currentFileName = "${filename}_${index++}$extension"
-                    }
-                    val file = srcDirectory.createChildData(null, currentFileName)
-                    file.setBinaryContent(content.toByteArray())
+        getApplication().runWriteActionLater {
+            var index = 1
+            val filename = "${prefix}_${node.id}"
+            var currentFileName = filename + extension
+            while (srcDirectory.findChild(currentFileName) != null) {
+                currentFileName = "${filename}_${index++}$extension"
+            }
+            val file = srcDirectory.createChildData(null, currentFileName)
+            file.setBinaryContent(content.toByteArray())
 
-                    try {
-                        FileEditorManager.getInstance(project).openFile(file, false)
-                    } catch (e: IOException) {
-                        logger.warn(e)
-                    }
-                }
+            try {
+                FileEditorManager.getInstance(project).openFile(file, false)
+            } catch (e: IOException) {
+                logger.warn(e)
             }
         }
     }
