@@ -231,7 +231,7 @@ class DownloadSubmission : CodeQuizAction(TEXT, DESCRIPTION, AllStepikIcons.Tool
         private const val ACTION_ID = "STEPIK.DownloadSubmission"
         private const val SHORTCUT = "ctrl alt pressed PAGE_DOWN"
         private val SHORTCUT_TEXT = getShortcutText(SHORTCUT)
-        private val TEXT = "Download submission from the List ($SHORTCUT_TEXT)"
-        private const val DESCRIPTION = "Download submission from the List"
+        private val TEXT = "Open my previous submission ($SHORTCUT_TEXT)"
+        private const val DESCRIPTION = "Open my previous submission"
     }
 }

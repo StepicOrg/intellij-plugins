@@ -16,7 +16,7 @@ import org.stepik.core.courseFormat.Node
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.StudyNode
 
-class StepikNextStepAction : StudyStepNavigationAction(TEXT, DESCRIPTION, AllIcons.Actions.Forward) {
+class LoadProblemAction : StudyStepNavigationAction(TEXT, DESCRIPTION, AllIcons.Actions.Forward) {
 
     override fun getTargetStep(project: Project, currentStepNode: StudyNode?): StudyNode? {
         val input = inputLink(currentStepNode)
@@ -75,7 +75,7 @@ class StepikNextStepAction : StudyStepNavigationAction(TEXT, DESCRIPTION, AllIco
     }
 
     companion object {
-        private const val ACTION_ID = "Alt.NextStepAction"
+        private const val ACTION_ID = "Alt.LoadProblemAction"
         private const val SHORTCUT = "ctrl pressed PERIOD"
         private val SHORTCUT_TEXT = getShortcutText(SHORTCUT)
         private val TEXT = "Load problem ($SHORTCUT_TEXT)"

@@ -3,7 +3,7 @@ package org.stepik.alt
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.project.Project
-import org.stepik.alt.actions.navigation.StepikNextStepAction
+import org.stepik.alt.actions.navigation.LoadProblemAction
 import org.stepik.alt.actions.step.OpenInBrowserAction
 import org.stepik.alt.projectWizard.StepikProjectGenerator
 import org.stepik.alt.projectWizard.idea.SandboxModuleBuilder
@@ -40,7 +40,7 @@ class AltProjectConfigurator : StudyBasePluginConfigurator() {
     }
 
     override fun nextAction(node: StepNode?): StudyNode? {
-        return StepikNextStepAction.getNextStep()
+        return LoadProblemAction.getNextStep()
     }
 
     override fun getActionGroup(project: Project): DefaultActionGroup {
@@ -48,7 +48,7 @@ class AltProjectConfigurator : StudyBasePluginConfigurator() {
         group.addAll(
                 StepikSendAction(),
                 TestSamplesAction(),
-                StepikNextStepAction(),
+                LoadProblemAction(),
                 StepikResetStepAction(),
                 DownloadSubmission(),
                 OpenInBrowserAction()

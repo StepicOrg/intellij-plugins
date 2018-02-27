@@ -110,7 +110,7 @@ class TestSamplesAction : CodeQuizAction(TEXT, DESCRIPTION, AllIcons.Actions.Res
         private const val SHORTCUT = "ctrl shift pressed F10"
         private const val ACTION_ID = "STEPIK.TestSamplesAction"
         private val SHORTCUT_TEXT = getShortcutText(SHORTCUT)
-        private val TEXT = "Test a code ($SHORTCUT_TEXT)"
-        private const val DESCRIPTION = "Test a code"
+        private val TEXT = "Test solution locally ($SHORTCUT_TEXT)"
+        private const val DESCRIPTION = "Test solution locally"
     }
 }

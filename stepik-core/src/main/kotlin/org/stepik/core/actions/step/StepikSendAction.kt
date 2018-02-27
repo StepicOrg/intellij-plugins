@@ -68,8 +68,8 @@ class StepikSendAction : CodeQuizAction(TEXT, DESCRIPTION, AllStepikIcons.ToolWi
         private const val ACTION_ID = "STEPIC.StepikSendAction"
         private const val SHORTCUT = "ctrl alt pressed ENTER"
         private val SHORTCUT_TEXT = getShortcutText(SHORTCUT)
-        private val TEXT = "Check Step ($SHORTCUT_TEXT)"
-        private const val DESCRIPTION = "Check current step"
+        private val TEXT = "Submit solution ($SHORTCUT_TEXT)"
+        private const val DESCRIPTION = "Submit solution for the current step"
 
         private fun sendStep(
                 stepikApiClient: StepikApiClient,

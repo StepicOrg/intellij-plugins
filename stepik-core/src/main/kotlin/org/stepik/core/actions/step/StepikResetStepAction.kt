@@ -30,8 +30,8 @@ class StepikResetStepAction : CodeQuizAction(TEXT, DESCRIPTION, AllStepikIcons.T
         private const val ACTION_ID = "STEPIK.ResetStepAction"
         private const val SHORTCUT = "ctrl shift pressed X"
         private val SHORTCUT_TEXT = getShortcutText(SHORTCUT)
-        private val TEXT = "Reset Step File ($SHORTCUT_TEXT)"
-        private const val DESCRIPTION = "Reset current step"
+        private val TEXT = "Reset to default template ($SHORTCUT_TEXT)"
+        private const val DESCRIPTION = "Reset to default template"
 
         private fun reset(project: Project) {
             val application = getApplication()
@@ -71,7 +71,7 @@ class StepikResetStepAction : CodeQuizAction(TEXT, DESCRIPTION, AllStepikIcons.T
                             stepNode.currentLang.runner.updateRunConfiguration(project, stepNode)
                         }
                     },
-                    "Stepik reset step", "Stepik reset step"
+                    DESCRIPTION, DESCRIPTION
             )
         }
     }
