@@ -43,7 +43,7 @@ class TestSamplesAction : CodeQuizAction(TEXT, DESCRIPTION, AllIcons.Actions.Res
         Metrics.testCodeAction(project, stepNode)
     }
 
-    private fun haveTests(project: Project, stepNode : StepNode): Boolean {
+    private fun haveTests(project: Project, stepNode: StepNode): Boolean {
         val stepDirectory = project.baseDir.findFileByRelativePath(stepNode.path)
         val language = stepNode.currentLang
 
