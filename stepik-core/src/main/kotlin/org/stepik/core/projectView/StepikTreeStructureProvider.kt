@@ -11,17 +11,19 @@ import com.intellij.psi.PsiFileSystemItem
 import org.stepik.core.StudyUtils.getProjectManager
 import org.stepik.core.StudyUtils.getStudyNode
 import org.stepik.core.StudyUtils.isStepikProject
+import org.stepik.core.projectView.ProjectTreeMode.FULL
 import org.stepik.core.utils.isVisibleDirectory
 import org.stepik.core.utils.isVisibleFile
 import org.stepik.core.utils.relativePath
 
 abstract class StepikTreeStructureProvider : TreeStructureProvider, DumbAware {
+
     override fun modify(
             parent: AbstractTreeNode<*>,
             children: Collection<AbstractTreeNode<*>>,
-            settings: ViewSettings): List<AbstractTreeNode<out Any>?> {
+            settings: ViewSettings): Collection<AbstractTreeNode<out Any>?> {
         if (!needModify(parent)) {
-            return children.toList()
+            return children
         }
 
         return children.mapNotNull { node ->
@@ -47,7 +49,7 @@ abstract class StepikTreeStructureProvider : TreeStructureProvider, DumbAware {
     private fun isHidden(project: Project, value: Any?): Boolean {
         val projectManager = getProjectManager(project) ?: return false
 
-        if (projectManager.isAdaptive) {
+        if (projectManager.projectTreeMode === FULL) {
             return false
         }
 
@@ -58,9 +60,13 @@ abstract class StepikTreeStructureProvider : TreeStructureProvider, DumbAware {
         val root = projectManager.projectRoot ?: return false
         val node = getStudyNode(root, value.relativePath) ?: return false
         val selected = projectManager.selected ?: return true
-        val selectedPath = selected.path
-        val nodePath = node.path
-        return !selectedPath.startsWith(nodePath) && selected.parent !== node.parent
+        val parent = selected.parent
+        val single = node.children.size == 1
+        return if (single) {
+            node.parent != parent
+        } else {
+            node != parent && node.parent != parent
+        }
     }
 
     protected abstract fun shouldAdd(any: Any): Boolean

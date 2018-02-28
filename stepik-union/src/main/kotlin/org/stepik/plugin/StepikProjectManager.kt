@@ -7,12 +7,18 @@ import com.intellij.openapi.project.Project
 import org.jdom.Element
 import org.stepik.core.BaseProjectManager
 import org.stepik.core.StudyPluginConfigurator
+import org.stepik.core.projectView.ProjectTreeMode
+import org.stepik.core.projectView.ProjectTreeMode.FULL
+import org.stepik.core.projectView.ProjectTreeMode.LESSON
 import org.stepik.core.serialization.StudySerializationUtils
 import serialization.SerializationUtils
 import serialization.SerializationUtils.MAIN_ELEMENT
 
-@State(name = "StepikStudySettings", storages = arrayOf(Storage("stepik_study_project.xml")))
+@State(name = "StepikStudySettings", storages = [(Storage("stepik_study_project.xml"))])
 class StepikProjectManager @JvmOverloads constructor(project: Project? = null) : BaseProjectManager(project) {
+    override val projectTreeMode: ProjectTreeMode
+        get() = if (isAdaptive) LESSON else FULL
+
     override fun getConfiguratorEPName(): ExtensionPointName<StudyPluginConfigurator> {
         return StepikPluginConfigurator.EP_NAME
     }

@@ -9,10 +9,12 @@ import com.intellij.ui.SimpleTextAttributes
 import com.intellij.ui.SimpleTextAttributes.STYLE_PLAIN
 import com.intellij.ui.SimpleTextAttributes.STYLE_STRIKEOUT
 import org.stepik.core.EduNames.SANDBOX_DIR
+import org.stepik.core.StudyUtils.getProjectManager
 import org.stepik.core.StudyUtils.getStudyNode
 import org.stepik.core.StudyUtils.isStepikProject
 import org.stepik.core.courseFormat.StudyNode
 import org.stepik.core.icons.AllStepikIcons.ProjectTree.sandbox
+import org.stepik.core.projectView.ProjectTreeMode.LESSON
 import javax.swing.Icon
 
 
@@ -42,7 +44,20 @@ fun updatePresentationData(data: PresentationData, psiDirectory: PsiDirectory) {
 private fun setAttributes(project: Project, data: PresentationData, item: StudyNode) {
     item.project = project
     val status = item.status
-    setAttributes(data, item.name, status.getColor(), item.getIcon(), item.wasDeleted)
+    val projectTreeMode = getProjectManager(project)?.projectTreeMode
+    val itemName = when (projectTreeMode) {
+        LESSON -> {
+            val parent = item.parent
+
+            if (parent != null && parent.children.size == 1) {
+                parent.name
+            } else {
+                item.name
+            }
+        }
+        else -> item.name
+    }
+    setAttributes(data, itemName, status.getColor(), item.getIcon(), item.wasDeleted)
 }
 
 private fun setAttributes(data: PresentationData, text: String, color: JBColor, icon: Icon?, deleted: Boolean) {
