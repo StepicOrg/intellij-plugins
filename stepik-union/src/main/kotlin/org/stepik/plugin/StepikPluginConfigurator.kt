@@ -24,9 +24,10 @@ import org.stepik.plugin.projectWizard.idea.SandboxModuleBuilder
 import org.stepik.plugin.projectWizard.idea.StepModuleBuilder
 
 class StepikPluginConfigurator : StudyBasePluginConfigurator() {
-    override fun pluginDescription(): String {
-        return "Please, open any step to see step description"
-    }
+
+    override val pluginDescription = "Please, open any step to see step description"
+
+    override val nextButtonCaption = "Next Step"
 
     override fun getSandboxModuleBuilder(path: String): BaseModuleBuilder? {
         return SandboxModuleBuilder(path)
@@ -40,8 +41,12 @@ class StepikPluginConfigurator : StudyBasePluginConfigurator() {
         return StepikProjectGenerator
     }
 
-    override fun nextAction(node: StepNode?): StudyNode? {
+    override fun nextAction(project: Project, node: StepNode?): StudyNode? {
         return StudyNavigator.nextLeaf(node)
+    }
+
+    override fun enabledNextAction(project: Project, currentNode: StepNode?): Boolean {
+        return StudyNavigator.nextLeaf(currentNode) != null
     }
 
     override fun getActionGroup(project: Project): DefaultActionGroup {

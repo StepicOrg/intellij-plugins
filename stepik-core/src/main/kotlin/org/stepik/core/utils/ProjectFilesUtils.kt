@@ -117,7 +117,9 @@ fun getOrCreateSrcDirectory(project: Project, stepNode: StepNode,
         if (srcDirectory != null && IDEA.isCurrent()) {
             val modelOwner = myModel == null
             if (modelOwner) {
-                myModel = ModuleManager.getInstance(project).modifiableModel
+                myModel = getApplication().runReadAction(Computable {
+                    ModuleManager.getInstance(project).modifiableModel
+                })
             }
             getApplication().runWriteActionAndWait {
                 createStepModule(project, stepNode, myModel!!)
@@ -125,8 +127,11 @@ fun getOrCreateSrcDirectory(project: Project, stepNode: StepNode,
                     myModel.commit()
                 }
             }
-            if (refresh) {
-                VirtualFileManager.getInstance().syncRefresh()
+
+            getApplication().invokeAndWait {
+                if (refresh) {
+                    VirtualFileManager.getInstance().syncRefresh()
+                }
             }
         }
     }

@@ -26,7 +26,11 @@ interface StudyPluginConfigurator {
 
     fun accept(project: Project): Boolean
 
-    fun nextAction(node: StepNode?): StudyNode?
+    fun nextAction(project: Project, node: StepNode?): StudyNode?
+
+    fun enabledNextAction(project: Project, currentNode: StepNode?): Boolean
+
+    val nextButtonCaption: String?
 
     fun getProjectGenerator(): ProjectGenerator?
 
@@ -34,6 +38,6 @@ interface StudyPluginConfigurator {
 
     fun getSandboxModuleBuilder(path: String): BaseModuleBuilder?
 
-    fun pluginDescription(): String
+    val pluginDescription: String
 }
 

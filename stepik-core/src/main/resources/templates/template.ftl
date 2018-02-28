@@ -65,6 +65,7 @@
 
 
 
+
 </script>
 
 <script type="text/javascript" async
@@ -94,9 +95,14 @@
     //noinspection JSUnresolvedVariable
     hljs.initHighlighting();
 
+    var action_element = document.getElementById("action");
+
     function login() {
-        var action_element = document.getElementById("action");
         action_element.setAttribute("value", "login");
+    }
+
+    function next_step() {
+        action_element.setAttribute("value", "next_step");
     }
 
 </script>

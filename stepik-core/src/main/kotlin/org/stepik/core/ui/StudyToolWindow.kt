@@ -95,10 +95,14 @@ class StudyToolWindow internal constructor() :
     }
 
     private fun setEmptyText() {
-        val content = getConfigurator(project!!)?.pluginDescription() ?: ""
+        val configurator = getConfigurator(project!!)
+        val content = configurator?.pluginDescription ?: ""
+        val nextButtonCaption = configurator?.nextButtonCaption ?: ""
         val context = mapOf(
                 "description" to content,
-                "authenticated" to isAuthenticated
+                "authenticated" to isAuthenticated,
+                "nextButtonCaption" to nextButtonCaption,
+                "darcula" to (LafManager.getInstance().currentLookAndFeel is DarculaLookAndFeelInfo)
         )
         browserWindow?.loadContent("quiz/empty", context)
     }

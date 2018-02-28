@@ -112,7 +112,7 @@
             </#if>
 
             <#if stepNode.hasNextStep()>
-                <input type="submit" value="Next step" onclick="next_step()"/>
+                <input type="submit" value="${stepNode.nextButtonCaption()}" onclick="next_step()"/>
             </#if>
         </form>
 
@@ -145,10 +145,6 @@
 
             function solve_again() {
                 action_element.setAttribute("value", "get_attempt");
-            }
-
-            function next_step() {
-                action_element.setAttribute("value", "next_step");
             }
         </script>
 

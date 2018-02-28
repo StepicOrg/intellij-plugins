@@ -27,6 +27,7 @@ import java.io.File
 import java.io.IOException
 import java.nio.file.Files
 
+
 internal class FormListener(private val project: Project, private val browser: StudyBrowserWindow) : EventListener {
 
     override fun handleEvent(event: Event) {
@@ -169,9 +170,10 @@ internal class FormListener(private val project: Project, private val browser: S
                     authentication()
                 }
                 "next_step" -> {
-                    val targetNode = getConfigurator(project)?.nextAction(node) ?: return
-
-                    Platform.runLater { navigate(project, targetNode) }
+                    Platform.runLater {
+                        val targetNode = getConfigurator(project)?.nextAction(project, node) ?: return@runLater
+                        navigate(project, targetNode)
+                    }
                 }
                 else -> browser.hideLoadAnimation()
             }

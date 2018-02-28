@@ -21,11 +21,13 @@ import org.stepik.core.courseFormat.StudyNode
 import org.stepik.core.projectWizard.idea.BaseModuleBuilder
 
 class AltProjectConfigurator : StudyBasePluginConfigurator() {
-    override fun pluginDescription(): String {
-        return "Welcome to the Stepik ALT platform! Using our adaptive system you can learn some of basic Java topics. " +
-                "    We will at first test your knowledge and then give you lessons, " +
-                "    which will help you to learn new topics and to apply knowledge in solving practice."
-    }
+
+    override val pluginDescription = "Welcome to the Stepik ALT platform! " +
+            "Using our adaptive system you can learn some of basic Java topics. " +
+            "We will at first test your knowledge and then give you lessons, " +
+            "which will help you to learn new topics and to apply knowledge in solving practice."
+
+    override val nextButtonCaption = LoadProblemAction.DESCRIPTION
 
     override fun getSandboxModuleBuilder(path: String): BaseModuleBuilder? {
         return SandboxModuleBuilder(path)
@@ -39,8 +41,12 @@ class AltProjectConfigurator : StudyBasePluginConfigurator() {
         return StepikProjectGenerator
     }
 
-    override fun nextAction(node: StepNode?): StudyNode? {
-        return LoadProblemAction.getNextStep()
+    override fun nextAction(project: Project, node: StepNode?): StudyNode? {
+        return LoadProblemAction.loadProblem(project, node)
+    }
+
+    override fun enabledNextAction(project: Project, currentNode: StepNode?): Boolean {
+        return true
     }
 
     override fun getActionGroup(project: Project): DefaultActionGroup {

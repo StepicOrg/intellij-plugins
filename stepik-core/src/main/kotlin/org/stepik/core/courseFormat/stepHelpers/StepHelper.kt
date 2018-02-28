@@ -74,7 +74,11 @@ open class StepHelper(val project: Project, internal val stepNode: StepNode) : L
     }
 
     fun hasNextStep(): Boolean {
-        return getConfigurator(project)?.nextAction(stepNode) != null
+        return getConfigurator(project)?.enabledNextAction(project, stepNode) ?: false
+    }
+
+    fun nextButtonCaption(): String {
+        return getConfigurator(project)?.nextButtonCaption ?: ""
     }
 
     open fun hasSubmitButton() = false
