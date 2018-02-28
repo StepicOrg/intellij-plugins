@@ -10,7 +10,7 @@ import org.stepik.core.SupportedLanguages.GO
 import org.stepik.core.SupportedLanguages.HASKELL
 import org.stepik.core.SupportedLanguages.HASKELL_7_10
 import org.stepik.core.SupportedLanguages.HASKELL_8_0
-import org.stepik.core.SupportedLanguages.JAVA
+import org.stepik.core.SupportedLanguages.JAVA7
 import org.stepik.core.SupportedLanguages.JAVA8
 import org.stepik.core.SupportedLanguages.JAVASCRIPT
 import org.stepik.core.SupportedLanguages.KOTLIN
@@ -49,7 +49,7 @@ object CoursesList {
             HASKELL to HASKELL_COURSES,
             HASKELL_7_10 to HASKELL_COURSES,
             HASKELL_8_0 to HASKELL_COURSES,
-            JAVA to JAVA_COURSES,
+            JAVA7 to JAVA_COURSES,
             JAVA8 to JAVA_COURSES,
             JAVASCRIPT to JAVASCRIPT_COURSES,
             KOTLIN to KOTLIN_COURSES,

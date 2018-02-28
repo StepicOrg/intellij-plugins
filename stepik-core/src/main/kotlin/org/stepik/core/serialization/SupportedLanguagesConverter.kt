@@ -5,20 +5,24 @@ import org.stepik.core.SupportedLanguages
 import org.stepik.core.SupportedLanguages.INVALID
 
 class SupportedLanguagesConverter : SingleValueConverter {
-    override fun toString(o: Any): String {
-        return (o as SupportedLanguages).title
+    override fun toString(any: Any): String {
+        return (any as SupportedLanguages).title
     }
 
-    override fun fromString(s: String): Any {
-        val language = SupportedLanguages.langOfName(s)
+    override fun fromString(str: String): SupportedLanguages {
+        val language = SupportedLanguages.langOfName(str)
         if (language != INVALID) {
             return language
         }
 
-        return SupportedLanguages.langOfTitle(s)
+        if (str == "Java") {
+            return SupportedLanguages.JAVA7
+        }
+
+        return SupportedLanguages.langOfTitle(str)
     }
 
-    override fun canConvert(aClass: Class<*>): Boolean {
-        return aClass == SupportedLanguages::class.java
+    override fun canConvert(clazz: Class<*>): Boolean {
+        return clazz == SupportedLanguages::class.java
     }
 }

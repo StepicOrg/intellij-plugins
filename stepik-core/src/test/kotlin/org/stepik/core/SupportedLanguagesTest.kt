@@ -19,7 +19,7 @@ import org.stepik.core.SupportedLanguages.GO
 import org.stepik.core.SupportedLanguages.HASKELL
 import org.stepik.core.SupportedLanguages.HASKELL_7_10
 import org.stepik.core.SupportedLanguages.HASKELL_8_0
-import org.stepik.core.SupportedLanguages.JAVA
+import org.stepik.core.SupportedLanguages.JAVA7
 import org.stepik.core.SupportedLanguages.JAVA8
 import org.stepik.core.SupportedLanguages.JAVASCRIPT
 import org.stepik.core.SupportedLanguages.KOTLIN
@@ -59,8 +59,8 @@ class SupportedLanguagesTest {
 
     @Test
     fun upgradedTo() {
-        assertTrue(JAVA.canUpgradedTo(JAVA))
-        assertTrue(JAVA.canUpgradedTo(JAVA8))
+        assertTrue(JAVA7.canUpgradedTo(JAVA7))
+        assertTrue(JAVA7.canUpgradedTo(JAVA8))
     }
 
     @Test
@@ -82,7 +82,7 @@ class SupportedLanguagesTest {
                 HASKELL to "haskell",
                 HASKELL_7_10 to "haskell 7.10",
                 HASKELL_8_0 to "haskell 8.0",
-                JAVA to "java",
+                JAVA7 to "java",
                 JAVA8 to "java8",
                 JAVASCRIPT to "javascript",
                 KOTLIN to "kotlin",
@@ -109,7 +109,7 @@ class SupportedLanguagesTest {
                 HASKELL to "Haskell 7.8",
                 HASKELL_7_10 to "Haskell 7.10",
                 HASKELL_8_0 to "Haskell 8.0",
-                JAVA to "Java",
+                JAVA7 to "Java 7",
                 JAVA8 to "Java 8",
                 JAVASCRIPT to "JavaScript",
                 KOTLIN to "Kotlin",
