@@ -85,15 +85,18 @@ object ProgrammingLanguageUtils : Loggable {
         targetStepNode.currentLang = language
         val needClose = getNeedCloseFiles(project, targetStepNode)
 
-        openFile(project, second!!.virtualFile)
-
         getApplication().invokeAndWait {
             val editorManager = FileEditorManager.getInstance(project)
             needClose.forEach { editorManager.closeFile(it) }
 
-            exchangeFiles(src, hide, first, second, moveFirst, moveSecond)
+            exchangeFiles(src, hide, first, second!!, moveFirst, moveSecond)
 
             ProjectView.getInstance(project).selectPsiElement(second, false)
+        }
+
+        val newMainFile = findFile(src, language.mainFileName)?.virtualFile
+        if (newMainFile != null) {
+            openFile(project, newMainFile)
         }
 
         Metrics.switchLanguage(project, targetStepNode)

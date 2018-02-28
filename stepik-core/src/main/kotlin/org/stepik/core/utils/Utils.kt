@@ -2,6 +2,7 @@ package org.stepik.core.utils
 
 import com.intellij.ide.projectView.ProjectView
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.ApplicationManager.getApplication
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.progress.ProcessCanceledException
@@ -33,10 +34,12 @@ val isCanceled: Boolean
     }
 
 fun Project.saveAllDocuments() {
-    val documentManager = FileDocumentManager.getInstance()
-    FileEditorManager.getInstance(this).openFiles
-            .mapNotNull { documentManager.getDocument(it) }
-            .forEach { documentManager.saveDocument(it) }
+    getApplication().invokeAndWait {
+        val documentManager = FileDocumentManager.getInstance()
+        FileEditorManager.getInstance(this).openFiles
+                .mapNotNull { documentManager.getDocument(it) }
+                .forEach { documentManager.saveDocument(it) }
+    }
 }
 
 val EMPTY_STUDY_OBJECT = initEmptyStudyNode()
