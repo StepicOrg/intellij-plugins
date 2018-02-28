@@ -1,11 +1,14 @@
 package org.stepik.alt.actions.navigation
 
 import com.intellij.icons.AllIcons
+import com.intellij.notification.Notification
+import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.ApplicationManager.getApplication
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.InputValidator
 import com.intellij.openapi.ui.ex.MessagesEx.showInputDialog
+import org.stepik.api.objects.lessons.CompoundUnitLesson
 import org.stepik.core.StudyUtils.getProjectManager
 import org.stepik.core.StudyUtils.isStepikProject
 import org.stepik.core.actions.getShortcutText
@@ -68,12 +71,12 @@ class LoadProblemAction : StudyStepNavigationAction(TEXT, DESCRIPTION, AllIcons.
         }
 
         fun loadProblem(project: Project, currentStepNode: StudyNode?): StudyNode? {
-            val input = inputLink(currentStepNode)
+            val link = inputLink(currentStepNode)
 
             var lesson: LessonNode? = null
 
-            if (input != null) {
-                val matcher = template.matchEntire(input)
+            if (link != null) {
+                val matcher = template.matchEntire(link)
                 if (matcher != null) {
                     val lessonId = matcher.groupValues[1].toLong()
                     val projectManager = getProjectManager(project)
@@ -89,6 +92,11 @@ class LoadProblemAction : StudyStepNavigationAction(TEXT, DESCRIPTION, AllIcons.
                         (root as Node).setChildren(children)
                         projectManager.refreshProjectFiles()
                     }
+                }
+
+                if (lesson == null || (lesson.data as CompoundUnitLesson).lesson.steps.isEmpty()) {
+                    Notification("alt.CantLoadProblem", "Can not load problem",
+                            "Can not load problem: $link", NotificationType.ERROR).notify(project)
                 }
             }
 
