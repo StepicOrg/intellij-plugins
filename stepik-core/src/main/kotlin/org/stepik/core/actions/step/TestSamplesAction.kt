@@ -24,22 +24,16 @@ class TestSamplesAction : CodeQuizAction(TEXT, DESCRIPTION, AllIcons.Actions.Res
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
         val stepNode = getCurrentCodeStepNode(project) ?: return
-        val language = stepNode.currentLang
-        val runner = language.runner
+        val runner = stepNode.currentLang.runner
         val title = "${stepNode.parent?.name ?: "Lesson"} : ${stepNode.name}"
         val resultWindow = showTestResultsToolWindow(project, title)
-        val stepDirectory = project.baseDir.findFileByRelativePath(stepNode.path)
 
         getApplication().runWriteAction {
             VirtualFileManager.getInstance().syncRefresh()
         }
 
-        val haveTests = stepDirectory?.findFileByRelativePath(
-                listOf("tests", language.langName, language.testFileName).joinToString("/")
-        ) != null
-
         getApplication().executeOnPooledThread {
-            if (haveTests) {
+            if (haveTests(project, stepNode)) {
                 testWithTestFile(resultWindow, stepNode, runner, project)
             } else {
                 testSamples(resultWindow, stepNode, runner, project)
@@ -47,6 +41,15 @@ class TestSamplesAction : CodeQuizAction(TEXT, DESCRIPTION, AllIcons.Actions.Res
         }
 
         Metrics.testCodeAction(project, stepNode)
+    }
+
+    private fun haveTests(project: Project, stepNode : StepNode): Boolean {
+        val stepDirectory = project.baseDir.findFileByRelativePath(stepNode.path)
+        val language = stepNode.currentLang
+
+        return stepDirectory?.findFileByRelativePath(
+                listOf("tests", language.langName, language.testFileName).joinToString("/")
+        ) != null
     }
 
     private fun testWithTestFile(resultWindow: StepikTestResultToolWindow, stepNode: StepNode, runner: Runner, project: Project) {
@@ -71,13 +74,17 @@ class TestSamplesAction : CodeQuizAction(TEXT, DESCRIPTION, AllIcons.Actions.Res
                             runner: Runner,
                             project: Project,
                             testClass: Boolean = false) {
-        var counter = 0
         resultWindow.apply {
             clear()
             println("Test method: samples")
+            if (stepNode.samples.isEmpty()) {
+                println("This step doesn't contain samples")
+                return
+            }
         }
-        stepNode.samples.forEach { sample ->
-            resultWindow.print("Test #${counter++} ")
+
+        stepNode.samples.forEachIndexed { index, sample ->
+            resultWindow.print("Sample #${index + 1} ")
             val result = runner.testSamples(project, stepNode, sample.input,
                     { it.trimEnd() == sample.output.trimEnd() },
                     testClass = testClass)
@@ -105,6 +112,19 @@ class TestSamplesAction : CodeQuizAction(TEXT, DESCRIPTION, AllIcons.Actions.Res
                 else -> "FAIL"
             }
         }
+    }
+
+    override fun update(e: AnActionEvent?) {
+        super.update(e)
+        val presentation = e?.presentation ?: return
+        if (!presentation.isEnabled) {
+            return
+        }
+
+        val project = e.project ?: return
+        val stepNode = getCurrentCodeStepNode(project) ?: return
+
+        presentation.isEnabled = haveTests(project, stepNode) || stepNode.samples.isNotEmpty()
     }
 
     companion object {
