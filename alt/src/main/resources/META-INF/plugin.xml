@@ -43,6 +43,13 @@
     </action>
   </actions>
 
+  <application-components>
+    <component>
+      <implementation-class>org.stepik.alt.AltPluginSettings</implementation-class>
+      <interface-class>org.stepik.core.PluginSettings</interface-class>
+    </component>
+  </application-components>
+
   <project-components>
     <component>
       <implementation-class>org.stepik.core.StudyProjectComponent</implementation-class>

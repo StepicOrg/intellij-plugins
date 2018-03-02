@@ -5,18 +5,16 @@ import com.intellij.openapi.application.ApplicationInfo
 import com.intellij.openapi.extensions.PluginId
 
 
-const val PLUGIN_ID = "org.stepik.plugin.union"
 private const val DEFAULT_PLUGIN_VERSION = "unknown"
 private var currentProduct: Product? = null
 private var currentProductVersion: String? = null
 private var currentProductGroup: ProductGroup? = null
 
-val version: String
-    get() {
-        val pluginId = PluginId.getId(PLUGIN_ID)
-        val plugin = PluginManager.getPlugin(pluginId)
-        return if (plugin != null) plugin.version else DEFAULT_PLUGIN_VERSION
-    }
+fun version(pluginId: String): String {
+    val myPluginId = PluginId.getId(pluginId)
+    val plugin = PluginManager.getPlugin(myPluginId)
+    return if (plugin != null) plugin.version else DEFAULT_PLUGIN_VERSION
+}
 
 fun getCurrentProduct(): Product {
     if (currentProduct == null) {

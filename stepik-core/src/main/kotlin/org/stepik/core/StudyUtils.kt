@@ -122,4 +122,8 @@ object StudyUtils : Loggable {
         project ?: return false
         return getProjectManager(project)?.projectRoot != null
     }
+
+    val pluginId = getService(PluginSettings::class.java).pluginId
+
+    val pluginName = getService(PluginSettings::class.java).pluginName
 }

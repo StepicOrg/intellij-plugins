@@ -15,6 +15,8 @@ import org.stepik.core.auth.StepikAuthManager.authentication
 import org.stepik.core.common.Loggable
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.StepType
+import org.stepik.core.metrics.Metrics
+import org.stepik.core.metrics.MetricsStatus.FAILED_POST
 import org.stepik.core.testFramework.toolWindow.StepikTestResultToolWindow
 import org.stepik.core.testFramework.toolWindow.showTestResultsToolWindow
 import org.stepik.core.ui.StepDescriptionUtils.getReply
@@ -114,13 +116,17 @@ internal class FormListener(private val project: Project, private val browser: S
                         if (submissions == null) {
                             printError(e, resultWindow)
                             getProjectManager(project)?.updateSelection()
+                            Metrics.sendAction(project, stepNode, FAILED_POST)
                             return@whenComplete
                         }
 
                         if (submissions.isEmpty) {
                             printError(e, resultWindow)
+                            Metrics.sendAction(project, stepNode, FAILED_POST)
                             return@whenComplete
                         }
+
+                        Metrics.sendAction(project, stepNode)
 
                         val submission = submissions.first()
                         SendAction.checkStepStatus(project,

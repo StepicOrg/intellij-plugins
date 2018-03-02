@@ -1,10 +1,13 @@
 package org.stepik.core.metrics
 
 import com.intellij.openapi.application.ApplicationInfo
+import com.intellij.openapi.components.ServiceManager.getService
 import com.intellij.openapi.project.Project
 import org.stepik.api.client.StepikApiClient
 import org.stepik.api.objects.metrics.Metric
+import org.stepik.core.PluginSettings
 import org.stepik.core.StudyUtils.getProjectManager
+import org.stepik.core.StudyUtils.pluginName
 import org.stepik.core.SupportedLanguages
 import org.stepik.core.auth.StepikAuthManager.authAndGetStepikApiClient
 import org.stepik.core.auth.StepikAuthManager.isAuthenticated
@@ -22,6 +25,7 @@ import java.util.concurrent.TimeUnit
 object Metrics : Loggable {
     private val session = UUID.randomUUID().toString()
     private val executor = Executors.newScheduledThreadPool(1)
+    private val pluginId = getService(PluginSettings::class.java).pluginId
 
     private fun postMetrics(
             project: Project,
@@ -41,10 +45,10 @@ object Metrics : Loggable {
                     .tags(metric.tags!!)
                     .data(metric.data!!)
                     .name("ide_plugin")
-                    .tags("name", "S_Union")
+                    .tags("name", pluginName)
                     .tags("ide_name", appInfo.versionName)
                     .data("ide_version", appInfo.build.toString())
-                    .data("plugin_version", version)
+                    .data("plugin_version", version(pluginId))
                     .data("session", session)
                     .tags("status", status)
 
@@ -105,7 +109,7 @@ object Metrics : Loggable {
             addTags("action", actionName)
             addData("step_id", stepNode.id)
             addTags("step_programming_language", stepNode.currentLang.langName)
-            addTags("step_type", stepNode.type.name)
+            addTags("step_type", stepNode.type.typeName)
         }
         postMetrics(project, metric, status)
     }
