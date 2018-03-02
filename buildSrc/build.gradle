@@ -1,3 +1,15 @@
+buildscript {
+    ext.kotlinVersion = '1.2.21'
+
+    configure([repositories, project.repositories]) {
+        maven { url 'https://repo.gradle.org/gradle/repo' }
+    }
+
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+    }
+}
+
 plugins {
     id 'java-gradle-plugin'
 }
@@ -7,23 +19,10 @@ repositories {
     mavenCentral()
 }
 
-dependencies {
-    compile gradleApi()
-    compile 'org.jetbrains:annotations:13.0'
-    compile 'org.jetbrains.intellij:plugin-repository-rest-client:0.4.26'
-    compile 'org.jetbrains.intellij.plugins:intellij-plugin-structure:2.3'
-    compile 'org.jdom:jdom2:2.0.6'
-    compile group: 'org.rauschig', name: 'jarchivelib', version: '0.7.1'
-
-    testCompile 'org.hamcrest:java-hamcrest:2.0.0.0'
-
-    testCompile('junit:junit:4+') {
-        exclude group: 'org.hamcrest'
-    }
-}
-
-version = '0.1'
+version = '0.2'
 group = 'org.stepik.gradle.plugins'
+
+apply plugin: 'kotlin'
 
 gradlePlugin {
     //noinspection GroovyAssignabilityCheck
@@ -41,6 +40,27 @@ gradlePlugin {
             implementationClass = "org.stepik.gradle.plugins.clion.CLionPlugin"
         }
     }
+}
+
+dependencies {
+    compile gradleApi()
+    compile 'org.jetbrains:annotations:13.0'
+    compile 'org.jetbrains.intellij:plugin-repository-rest-client:0.4.26'
+    compile 'org.jetbrains.intellij.plugins:intellij-plugin-structure:2.3'
+    compile 'org.jdom:jdom2:2.0.6'
+    compile group: 'org.rauschig', name: 'jarchivelib', version: '0.7.1'
+    compile "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
+    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
+
+    testCompile 'org.hamcrest:java-hamcrest:2.0.0.0'
+
+    testCompile('junit:junit:4+') {
+        exclude group: 'org.hamcrest'
+    }
+
+    testCompile gradleTestKit()
+    testCompile "org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion"
 }
 
 task sourcesJar(type: Jar) {

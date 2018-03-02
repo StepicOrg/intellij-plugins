@@ -7,31 +7,34 @@ def descriptionFile = file("description.html")
 def changeNotesFile = file("change-notes.html")
 
 intellij {
-    version = project.getProperties().get('ideaVersion')
-    sandboxDirectory = project.getProperties().get('ideaSandboxDir')
-    idePath = project.getProperties().get('ideaPath')
-    publish.username = project.getProperties().get('username')
-    publish.password = project.getProperties().get('password')
-    publish.channels = [project.getProperties().get('channel') ?: ["EAP"]]
-    pluginDescription = descriptionFile
-    changeNotes = changeNotesFile
+    version = project.getProperties().get("ideaVersion", "2017.1")
+    sandboxDirectory = project.getProperties().get("ideaSandboxDir", "build/idea-sandbox/")
+    if ("ideaPath" in project.getProperties()) {
+        idePath = project.getProperties().get("ideaPath")
+    }
+    publish.username = project.getProperties().get("username", "")
+    publish.password = project.getProperties().get("password", "")
+    publish.channels = [project.getProperties().get("channel", "EAP")]
+    pluginDescription = "description.html"
+    changeNotes = "change-notes.html"
 }
 
 pycharm {
-    version = project.getProperties().get('pyCharmVersion')
-    sandboxDirectory = project.getProperties().get('pyCharmSandboxDir')
-    idePath = project.getProperties().get('pyCharmPath')
-    publish.username = project.getProperties().get('username')
-    publish.password = project.getProperties().get('password')
-    publish.channels = [project.getProperties().get('channel') ?: ["EAP"]]
-    pluginDescription = descriptionFile
-    changeNotes = changeNotesFile
+    version = project.getProperties().get("pyCharmVersion", "2017.1")
+    sandboxDirectory = project.getProperties().get("pyCharmSandboxDir", "build/pycharm-sandbox/")
+    if ("pyCharmPath" in project.getProperties()) {
+        idePath = project.getProperties().get("pyCharmPath")
+    }
+    publish.username = project.getProperties().get("username", "")
+    publish.password = project.getProperties().get("password", "")
+    publish.channels = [project.getProperties().get("channel", "EAP")]
+    pluginDescription = "description.html"
+    changeNotes = "change-notes.html"
 }
 
 dependencies {
     compile project(":stepik-java-api")
     compile project(":stepik-core")
-    compile 'org.freemarker:freemarker:2.3.23'
 
     testCompile project(':stepik-core').sourceSets.test.output
 }
