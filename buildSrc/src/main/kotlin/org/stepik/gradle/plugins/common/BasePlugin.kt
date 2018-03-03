@@ -8,7 +8,6 @@ import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPlugin.JAR_TASK_NAME
 import org.gradle.api.plugins.JavaPlugin.PROCESS_RESOURCES_TASK_NAME
 import org.gradle.api.plugins.JavaPlugin.RUNTIME_ELEMENTS_CONFIGURATION_NAME
-import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.bundling.Zip
 import org.gradle.api.tasks.testing.Test
 import org.gradle.internal.jvm.Jvm
@@ -20,44 +19,30 @@ import org.stepik.gradle.plugins.common.dependency.DependencyManager.register
 import org.stepik.gradle.plugins.common.dependency.DependencyManager.resolveLocal
 import org.stepik.gradle.plugins.common.dependency.DependencyManager.resolveLocalCashRepository
 import org.stepik.gradle.plugins.common.dependency.DependencyManager.resolveRemoteMaven
-import org.stepik.gradle.plugins.common.tasks.BaseRunTask
-import org.stepik.gradle.plugins.common.tasks.InstrumentCodeTask
 import org.stepik.gradle.plugins.common.tasks.PatchPluginXmlTask
 import org.stepik.gradle.plugins.common.tasks.PrepareSandboxTask
 import org.stepik.gradle.plugins.common.tasks.PublishTask
-import java.io.File
 
 
-abstract class BasePlugin(
-        val extensionName: String,
-        val productName: String,
-        val productType: String,
-        val productGroup: String,
-        val tasksGroupName: String,
-        val runTaskClass: Class<out BaseRunTask>,
-        val extensionInstrumentCode: Boolean,
-        val repositoryType: RepositoryType,
-        val repositoryTemplate: String
-) : Plugin<Project> {
+abstract class BasePlugin(private val productSettings: ProductSettings) : Plugin<Project> {
     private val logger = LoggerFactory.getLogger(BasePlugin::class.java)
 
-    val prepareSandboxTaskName = "prepare${productName}Sandbox"
-    private val prepareTestSandboxTaskName = "prepare${productName}TestSandbox"
-    private val patchPluginXmlTaskName = "patch${productName}PluginXml"
-    val buildPluginTaskName = "build${productName}Plugin"
+    val prepareSandboxTaskName = "prepare${productSettings.productName}Sandbox"
+    private val prepareTestSandboxTaskName = "prepare${productSettings.productName}TestSandbox"
+    private val patchPluginXmlTaskName = "patch${productSettings.productName}PluginXml"
+    val buildPluginTaskName = "build${productSettings.productName}Plugin"
 
     override fun apply(project: Project) {
         project.plugins.apply(JavaPlugin::class.java)
+
         val extension = project.extensions
-                .createProductPluginExtension(extensionName,
-                        productName = productName,
-                        productType = productType,
-                        productGroup = productGroup,
-                        repository = repositoryTemplate,
+                .createProductPluginExtension(productSettings.extensionName,
+                        productName = productSettings.productName,
+                        productType = productSettings.productType,
+                        productGroup = productSettings.productGroup,
+                        repository = productSettings.repositoryTemplate,
                         project = project,
-                        plugin = this,
-                        instrumentCode = extensionInstrumentCode,
-                        repositoryType = repositoryType,
+                        repositoryType = productSettings.repositoryType,
                         publish = ProductPluginExtensionPublish()
                 )
 
@@ -65,7 +50,7 @@ abstract class BasePlugin(
     }
 
     private fun configureTasks(project: Project, extension: ProductPluginExtension) {
-        logger.info("Configuring {} gradle plugin", productName)
+        logger.info("Configuring {} gradle plugin", productSettings.productName)
 
         configurePatchPluginXmlTask(project, extension)
         configurePrepareSandboxTask(project, extension)
@@ -82,22 +67,21 @@ abstract class BasePlugin(
                                               extension: ProductPluginExtension) {
         project.subprojects.forEach {
             val subprojectExtension = it.extensions
-                    .findByName(extensionName) as ProductPluginExtension? ?: return@forEach
+                    .findByName(productSettings.extensionName) as ProductPluginExtension? ?: return@forEach
             configureProjectAfterEvaluate(it, subprojectExtension)
         }
 
         configureDependency(project, extension)
-        configureInstrumentation(project, extension)
         configureTestTasks(project, extension)
     }
 
     private fun configureDependency(project: Project, extension: ProductPluginExtension) {
-        logger.info("Configuring {} dependency", productName)
+        logger.info("Configuring {} dependency", productSettings.productName)
 
         val dependency = if (extension.repositoryType == MAVEN) {
             resolveRemoteMaven(project, extension)
         } else {
-            resolveLocalCashRepository(project, this, extension)
+            resolveLocalCashRepository(project, extension)
         } ?: resolveLocal(project, extension) ?: throw IllegalDependencyNotation()
 
         extension.dependency = dependency
@@ -108,10 +92,10 @@ abstract class BasePlugin(
     }
 
     private fun configurePrepareSandboxTask(project: Project, ext: ProductPluginExtension) {
-        logger.info("Configuring prepare {} sandbox task", productName)
+        logger.info("Configuring prepare {} sandbox task", productSettings.productName)
 
         project.tasks.create(prepareSandboxTaskName, PrepareSandboxTask::class.java).apply {
-            group = tasksGroupName
+            group = productSettings.productName
             description = "Prepare sandbox directory with installed plugin and its dependencies."
             extension = ext
             dependsOn(JAR_TASK_NAME)
@@ -122,18 +106,18 @@ abstract class BasePlugin(
         logger.info("Configuring patch plugin.xml task")
 
         project.tasks.create(patchPluginXmlTaskName, PatchPluginXmlTask::class.java).apply {
-            group = tasksGroupName
+            group = productSettings.productName
             description = "Patch plugin xml files with corresponding since/until build numbers and version attributes"
             extension = ext
         }
     }
 
     private fun configureRunTask(project: Project, ext: ProductPluginExtension) {
-        logger.info("Configuring run {} task", productName)
+        logger.info("Configuring run {} task", productSettings.productName)
 
-        project.tasks.create("run$productName", runTaskClass).apply {
-            group = tasksGroupName
-            description = "Runs $productName with installed plugin."
+        project.tasks.create("run${productSettings.productName}", productSettings.runTaskClass).apply {
+            group = productSettings.productName
+            description = "Runs ${productSettings.productName} with installed plugin."
             extension = ext
             plugin = this@BasePlugin
             dependsOn(prepareSandboxTaskName)
@@ -141,9 +125,9 @@ abstract class BasePlugin(
     }
 
     private fun configurePublishPluginTask(project: Project, ext: ProductPluginExtension) {
-        logger.info("Configuring publishing {} plugin task", productName)
-        project.tasks.create("publish$productName", PublishTask::class.java).apply {
-            group = tasksGroupName
+        logger.info("Configuring publishing {} plugin task", productSettings.productName)
+        project.tasks.create("publish${productSettings.productName}", PublishTask::class.java).apply {
+            group = productSettings.productName
             description = "Publish plugin distribution on plugins.jetbrains.com."
             extension = ext
             plugin = this@BasePlugin
@@ -152,7 +136,7 @@ abstract class BasePlugin(
     }
 
     private fun configureProcessResources(project: Project) {
-        logger.info("Configuring {} resources task", productName)
+        logger.info("Configuring {} resources task", productSettings.productName)
 
         val processResourcesTask = project.tasks.findByName(PROCESS_RESOURCES_TASK_NAME) as ProcessResources?
         if (processResourcesTask != null) {
@@ -161,24 +145,6 @@ abstract class BasePlugin(
                 it.into("META-INF")
                 it.duplicatesStrategy = INCLUDE
             }
-        }
-    }
-
-    private fun configureInstrumentation(project: Project, extension: ProductPluginExtension) {
-        logger.info("Configuring IntelliJ compile tasks")
-        project.convention.getPlugin(JavaPluginConvention::class.java).sourceSets.forEach {
-            val name = it.getTaskName("${productName}Instrument", "code")
-            val instrumentTask = project.tasks.create(name, InstrumentCodeTask::class.java).apply {
-                this.sourceSet = it
-                dependsOn(it.classesTaskName)
-                onlyIf { extension.instrumentCode && extension.productType != "RS" }
-
-                conventionMapping("ideaDependency", { extension.dependency })
-                conventionMapping("outputDir", { File(it.output.classesDirs.first().parent, it.name) })
-            }
-
-            // Ensure that our task is invoked when the source set is built
-            it.compiledBy(instrumentTask)
         }
     }
 
@@ -210,7 +176,7 @@ abstract class BasePlugin(
         val prepareSandboxTask = project.tasks.findByName(prepareSandboxTaskName) as PrepareSandboxTask
         project.tasks.create(buildPluginTaskName, Zip::class.java).apply {
             description = "Bundles the project as a distribution."
-            group = tasksGroupName
+            group = productSettings.productName
             from("${prepareSandboxTask.destinationDir}/${project.name}")
             into(project.name)
             dependsOn(prepareSandboxTask)

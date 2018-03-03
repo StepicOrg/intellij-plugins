@@ -24,10 +24,7 @@ object Utils {
     private val logger = LoggerFactory.getLogger(Utils::class.java)
     const val APPLICATION = "application"
     const val COMPONENT = "component"
-    const val COMPONENT_NAME = "componentName"
     const val NAME = "name"
-    const val OPTIONS = "options"
-    const val OPTION_TAG = "optionTag"
     const val VALUE = "value"
 
     class IdeXml(
@@ -72,14 +69,9 @@ object Utils {
         }
     }
 
-    fun mainSourceSet(project: Project): SourceSet {
+    private fun mainSourceSet(project: Project): SourceSet {
         val javaConvention = project.convention.getPlugin(JavaPluginConvention::class.java)
         return javaConvention.sourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME)
-    }
-
-    fun testSourceSet(project: Project): SourceSet {
-        val javaConvention = project.convention.getPlugin(JavaPluginConvention::class.java)
-        return javaConvention.sourceSets.getByName(SourceSet.TEST_SOURCE_SET_NAME)
     }
 
     fun sourcePluginXmlFiles(project: Project): FileCollection {
@@ -194,19 +186,18 @@ object Utils {
     }
 
 
-    fun getDefaultIdePath(project: Project, plugin: BasePlugin, type: String,
-                          version: String, archiveType: String): String {
+    fun getDefaultIdePath(project: Project, extension: ProductPluginExtension): String {
         val gradleHomePath = project.gradle.gradleUserHomeDir.absolutePath
-        val name = plugin.productName.toLowerCase()
-        val defaultRelativePath = "caches/modules-2/files-2.1/${plugin.productGroup}/$name/$name$type"
+        val name = extension.productName.toLowerCase()
+        val defaultRelativePath = "caches/modules-2/files-2.1/" +
+                "${extension.productGroup}/$name/$name${extension.productType}"
 
-        return "$gradleHomePath/$defaultRelativePath/$version/$archiveType"
+        return "$gradleHomePath/$defaultRelativePath/${extension.version}/${extension.archiveType}"
     }
 
-    fun getArchivePath(project: Project, plugin: BasePlugin, extension: ProductPluginExtension): File {
-        val defaultIdePath = File(getDefaultIdePath(project, plugin, extension.productType,
-                extension.version, extension.archiveType))
-        val name = plugin.productName.toLowerCase()
+    fun getArchivePath(project: Project, extension: ProductPluginExtension): File {
+        val defaultIdePath = File(getDefaultIdePath(project, extension))
+        val name = extension.productName.toLowerCase()
         return File(defaultIdePath.parentFile, "$name${extension.productType}-${extension.version}.${extension.archiveType}")
     }
 
@@ -255,10 +246,7 @@ object Utils {
         archiver.extract(archive, destination)
     }
 
-    fun downloadProduct(
-            basePlugin: BasePlugin,
-            extension: ProductPluginExtension,
-            archive: File): File? {
+    fun downloadProduct(extension: ProductPluginExtension, archive: File): File? {
         val repository = extension.repository
 
         try {
@@ -271,8 +259,8 @@ object Utils {
                 }
             }
         } catch (e: IOException) {
-            logger.error("Failure download ${basePlugin.productName} from $repository", e)
-            println("Failure download ${basePlugin.productName} from $repository")
+            logger.error("Failure download ${extension.productName} from $repository", e)
+            println("Failure download ${extension.productName} from $repository")
             return null
         }
         return archive

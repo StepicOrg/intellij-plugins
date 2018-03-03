@@ -10,7 +10,6 @@ import org.gradle.api.publish.ivy.internal.publication.DefaultIvyPublicationIden
 import org.gradle.api.publish.ivy.internal.publisher.IvyDescriptorFileGenerator
 import org.gradle.tooling.BuildException
 import org.slf4j.LoggerFactory
-import org.stepik.gradle.plugins.common.BasePlugin
 import org.stepik.gradle.plugins.common.ProductPluginExtension
 import org.stepik.gradle.plugins.common.Utils.downloadProduct
 import org.stepik.gradle.plugins.common.Utils.getArchivePath
@@ -139,19 +138,18 @@ object DependencyManager {
         return artifact
     }
 
-    fun resolveLocalCashRepository(project: Project, basePlugin: BasePlugin,
-                                   extension: ProductPluginExtension): ProductDependency? {
+    fun resolveLocalCashRepository(project: Project, extension: ProductPluginExtension): ProductDependency? {
         val idePath = extension.ideDirectory ?: return null
         val ideArchiveType = extension.archiveType
-        val productName = basePlugin.productName
+        val productName = extension.productName
 
         if (!idePath.exists()) {
-            val archive: File = getArchivePath(project, basePlugin, extension)
+            val archive: File = getArchivePath(project, extension)
             if (!archive.exists()) {
                 logger.info("Download {}", extension.repository)
                 println("Download ${extension.repository}")
 
-                downloadProduct(basePlugin, extension, archive)
+                downloadProduct(extension, archive)
 
                 if (!archive.exists()) {
                     println("$productName not loaded from ${extension.repository}")

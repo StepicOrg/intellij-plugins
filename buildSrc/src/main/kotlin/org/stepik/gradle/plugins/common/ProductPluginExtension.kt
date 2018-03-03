@@ -16,8 +16,6 @@ open class ProductPluginExtension(
         val productGroup: String,
         repository: String,
         private val project: Project,
-        private val plugin: BasePlugin,
-        var instrumentCode: Boolean,
         @get:Input var repositoryType: RepositoryType,
         val publish: ProductPluginExtensionPublish
 ) {
@@ -48,7 +46,7 @@ open class ProductPluginExtension(
                 return field
             }
 
-            return getDefaultIdePath(project, plugin, productType, version, archiveType)
+            return getDefaultIdePath(project, this)
         }
 
     val ideDirectory: File?
@@ -68,9 +66,9 @@ open class ProductPluginExtension(
 
     var repository: String = repository
         get() {
-            return field.replace("[productName]", plugin.productName)
-                    .replace("[productName.toLowerCase()]", plugin.productName.toLowerCase())
-                    .replace("[productType]", plugin.productType)
+            return field.replace("[productName]", productName)
+                    .replace("[productName.toLowerCase()]", productName.toLowerCase())
+                    .replace("[productType]", productType)
                     .replace("[version]", version)
                     .replace("[archiveType]", archiveType)
         }
@@ -125,12 +123,10 @@ fun ExtensionContainer.createProductPluginExtension(name: String,
                                                     productGroup: String,
                                                     repository: String,
                                                     project: Project,
-                                                    plugin: BasePlugin,
-                                                    instrumentCode: Boolean,
                                                     repositoryType: RepositoryType,
                                                     publish: ProductPluginExtensionPublish
 ): ProductPluginExtension {
     return create(name, ProductPluginExtension::class.java, productName, productType,
-            productGroup, repository, project, plugin, instrumentCode,
+            productGroup, repository, project,
             repositoryType, publish)
 }
