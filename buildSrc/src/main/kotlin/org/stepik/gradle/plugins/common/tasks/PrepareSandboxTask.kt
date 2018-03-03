@@ -10,6 +10,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.TaskExecutionException
 import org.gradle.internal.jvm.Jvm
 import org.gradle.jvm.tasks.Jar
 import org.stepik.gradle.plugins.common.ProductPluginExtension
@@ -57,14 +58,16 @@ open class PrepareSandboxTask : DefaultTask() {
     fun copy() {
         val pluginJar = pluginJar
         if (pluginJar == null) {
-            log.error("Failed prepare sandbox task: plugin jar is null")
-            return
+            val message = "Failed prepare sandbox task: plugin jar is null"
+            log.error(message)
+            throw TaskExecutionException(this, RuntimeException(message))
         }
 
         val destinationDir = destinationDir
         if (destinationDir == null) {
-            log.error("Failed prepare sandbox task: plugins directory is null")
-            return
+            val message = "Failed prepare sandbox task: plugins directory is null"
+            log.error(message)
+            throw TaskExecutionException(this, RuntimeException(message))
         }
         val dependenciesJars = getDependenciesJars(project).toMutableSet()
         dependenciesJars.add(pluginJar)
@@ -78,8 +81,9 @@ open class PrepareSandboxTask : DefaultTask() {
                 it.copyTo(target, true)
             }
         } catch (e: IOException) {
-            log.error("Failed prepare sandbox task: copy from $dependenciesJars to $libPath")
-            return
+            val message = "Failed prepare sandbox task: copy from $dependenciesJars to $libPath"
+            log.error(message, e)
+            throw TaskExecutionException(this, RuntimeException(message, e))
         }
         disableIdeUpdate()
     }

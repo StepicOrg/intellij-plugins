@@ -1,5 +1,3 @@
-import org.stepik.gradle.plugins.common.tasks.PublishTask
-
 apply plugin: 'org.stepik.gradle.plugins.pycharm'
 apply plugin: 'org.stepik.gradle.plugins.idea'
 
@@ -36,16 +34,3 @@ group 'org.stepik'
 version project.getProperties().get('ALTVersion') ?: 'SNAPSHOT'
 
 defaultTasks "runIdea"
-
-task("publishBranch", type: PublishTask) {
-    extension = intellij
-    plugin = intellij.plugin
-    def buildNumber = project.getProperties().get('buildNumber')
-    def branch = project.getProperties().get('branch')
-
-    if (buildNumber && branch) {
-        project.version = "${project.version}-${branch}-${buildNumber}"
-    }
-}
-
-publishBranch.dependsOn(buildIdeaPlugin)

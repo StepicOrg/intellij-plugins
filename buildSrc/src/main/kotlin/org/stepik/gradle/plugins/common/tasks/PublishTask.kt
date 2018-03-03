@@ -39,18 +39,17 @@ open class PublishTask : ConventionTask() {
     }
 
     @Input
-    fun getUsername(): String {
+    private fun getUsername(): String {
         return extension?.publish?.username ?: ""
     }
 
     @Input
-    fun getPassword(): String {
+    private fun getPassword(): String {
         return extension?.publish?.password ?: ""
     }
 
-    @Input
-    @Optional
-    fun getChannels(): Array<String> {
+    @[Input Optional]
+    private fun getChannels(): Array<String> {
         return extension?.publish?.channels ?: emptyArray()
     }
 
@@ -78,8 +77,8 @@ open class PublishTask : ConventionTask() {
                     val repoClient = PluginRepositoryInstance(host, getUsername(), getPassword())
                     repoClient.uploadPlugin(pluginId, distributionFile, channel)
                     logger.info("Uploaded successfully")
-                } catch (exception: Exception) {
-                    throw TaskExecutionException(this, RuntimeException("Failed to upload plugin", exception))
+                } catch (e: Exception) {
+                    throw TaskExecutionException(this, RuntimeException("Failed to upload plugin", e))
                 }
             }
         }
