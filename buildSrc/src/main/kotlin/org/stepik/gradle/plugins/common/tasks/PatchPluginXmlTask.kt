@@ -22,7 +22,12 @@ import java.io.IOException
 
 open class PatchPluginXmlTask : ConventionTask() {
 
-    var destinationDirName: String? = null
+    @get:Input
+    private var destinationDirName: String? = "patchedPluginXmlFiles"
+        get() {
+            val directory = extension?.productName ?: return field
+            return "$directory${File.separator}$field"
+        }
 
     var extension: ProductPluginExtension? = null
 
@@ -43,9 +48,13 @@ open class PatchPluginXmlTask : ConventionTask() {
             return sourcePluginXmlFiles(project)
         }
 
-    @get:[Input Optional]
-    private val pluginDescription: String?
-        get() = extension?.pluginDescription
+    @get:Input
+    private val pluginDescription: String
+        get() {
+            val filename = extension?.pluginDescription ?: return ""
+            val file = File(filename)
+            return if (file.exists()) file.readText() else ""
+        }
 
     @get:[Input Optional]
     private val sinceBuild: String?
@@ -55,9 +64,13 @@ open class PatchPluginXmlTask : ConventionTask() {
     private val untilBuild: String?
         get() = extension?.untilBuild
 
-    @get:[Input Optional]
-    private val changeNotes: String?
-        get() = extension?.changeNotes
+    @get:Input
+    private val changeNotes: String
+        get() {
+            val filename = extension?.changeNotes ?: return ""
+            val file = File(filename)
+            return if (file.exists()) file.readText() else ""
+        }
 
     @TaskAction
     fun patchPluginXmlFiles() {

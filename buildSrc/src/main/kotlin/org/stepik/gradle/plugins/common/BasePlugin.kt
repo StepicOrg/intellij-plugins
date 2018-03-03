@@ -44,7 +44,6 @@ abstract class BasePlugin(
     val prepareSandboxTaskName = "prepare${productName}Sandbox"
     private val prepareTestSandboxTaskName = "prepare${productName}TestSandbox"
     private val patchPluginXmlTaskName = "patch${productName}PluginXml"
-    private val pluginXmlDirName = "patched${productName}PluginXmlFiles"
     val buildPluginTaskName = "build${productName}Plugin"
 
     override fun apply(project: Project) {
@@ -127,7 +126,6 @@ abstract class BasePlugin(
         project.tasks.create(patchPluginXmlTaskName, PatchPluginXmlTask::class.java).apply {
             group = tasksGroupName
             description = "Patch plugin xml files with corresponding since/until build numbers and version attributes"
-            destinationDirName = pluginXmlDirName
             extension = ext
         }
     }
