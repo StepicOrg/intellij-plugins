@@ -1,49 +1,71 @@
-<idea-plugin version="2">
-    <id>org.stepik.plugin.union</id>
-    <name>Stepik Union</name>
-    <version>SNAPSHOT</version>
-    <idea-version since-build="163.7743.44"/>
-    <vendor email="plugin@stepik.org" url="https://stepik.org">Stepik</vendor>
+<idea-plugin>
+  <id>org.stepik.plugin.union</id>
+  <name>Stepik Union</name>
+  <version>SNAPSHOT</version>
+  <idea-version since-build="163.7743.44" />
+  <vendor email="plugin@stepik.org" url="https://stepik.org">Stepik</vendor>
 
-    <depends>com.intellij.modules.lang</depends>
-    <depends optional="true">org.jetbrains.kotlin</depends>
-    <depends optional="true" config-file="idea.xml">com.intellij.modules.java</depends>
-    <depends optional="true" config-file="pycharm.xml">com.intellij.modules.python</depends>
+  <depends>com.intellij.modules.lang</depends>
+  <depends optional="true">org.jetbrains.kotlin</depends>
+  <depends optional="true" config-file="idea.xml">com.intellij.modules.java</depends>
+  <depends optional="true" config-file="pycharm.xml">com.intellij.modules.python</depends>
 
-    <extensions defaultExtensionNs="com.intellij">
-        <applicationConfigurable instance="org.stepik.plugin.collective.ui.StepikSettingsConfigurable"/>
-        <moduleType id="STEPIK_MODULE_TYPE" implementationClass="org.stepik.plugin.projectWizard.idea.StepikModuleType"/>
-    </extensions>
+  <extensions defaultExtensionNs="com.intellij">
+    <applicationConfigurable instance="org.stepik.core.ui.StepikSettingsConfigurable" />
+    <moduleType id="STEPIK_MODULE_TYPE" implementationClass="org.stepik.plugin.projectWizard.idea.StepikModuleType" />
+    <httpRequestHandler implementation="org.stepik.core.auth.StepikRestService" />
+  </extensions>
 
-    <extensions defaultExtensionNs="org.stepik.plugin.union">
-        <studyPluginConfigurator implementation="org.stepik.plugin.StepikPluginConfigurator"/>
-    </extensions>
+  <extensions defaultExtensionNs="org.stepik.plugin.union">
+    <studyPluginConfigurator implementation="org.stepik.plugin.StepikPluginConfigurator" />
+  </extensions>
 
-    <actions>
-        <action id="STEPIK.StepikSendAction" class="org.stepik.plugin.actions.step.StepikSendAction"/>
-        <action id="STEPIK.PreviousStepAction" class="org.stepik.plugin.actions.navigation.StepikPreviousStepAction"/>
-        <action id="STEPIK.NextStepAction" class="org.stepik.plugin.actions.navigation.StepikNextStepAction"/>
-        <action id="STEPIK.DownloadSubmission" class="org.stepik.plugin.actions.step.DownloadSubmission"/>
-        <action id="STEPIK.InsertStepikDirectives" class="org.stepik.plugin.actions.step.InsertStepikDirectives"/>
-        <action id="STEPIK.RefreshStepAction" class="org.stepik.plugin.actions.step.StepikResetStepAction"/>
-        <action id="STEPIK.OpenInBrowser" class="org.stepik.plugin.actions.step.OpenInBrowserAction"/>
-        <action id="STEPIK.TestSamplesAction" class="org.stepik.plugin.actions.step.TestSamplesAction"/>
-    </actions>
+  <actions>
+    <group id="StepikMenu" popup="true" text="Stepik">
+      <action id="STEPIK.StepikSendAction" class="org.stepik.core.actions.step.StepikSendAction" />
+      <action id="STEPIK.TestSamplesAction" class="org.stepik.core.actions.step.TestSamplesAction" />
+      <action id="STEPIK.PreviousStepAction" class="org.stepik.plugin.actions.navigation.StepikPreviousStepAction" />
+      <action id="STEPIK.NextStepAction" class="org.stepik.plugin.actions.navigation.StepikNextStepAction" />
+      <action id="STEPIK.DownloadSubmission" class="org.stepik.core.actions.step.DownloadSubmission" />
+      <action id="STEPIK.InsertStepikDirectives" class="org.stepik.core.actions.step.InsertStepikDirectives" />
+      <action id="STEPIK.RefreshStepAction" class="org.stepik.core.actions.step.StepikResetStepAction" />
+      <action id="STEPIK.OpenInBrowser" class="org.stepik.plugin.actions.step.OpenInBrowserAction" />
+      <action id="STEPIK.LoginAction" class="org.stepik.core.actions.LoginAction" />
+      <action id="STEPIK.LogoutAction" class="org.stepik.core.actions.LogoutAction" />
+      <separator />
+      <action id="STEPIK.AboutAction" class="org.stepik.plugin.actions.AboutAction" />
 
-    <project-components>
-        <component>
-            <implementation-class>org.stepik.core.StudyProjectComponent</implementation-class>
-        </component>
-    </project-components>
+      <add-to-group group-id="MainMenu" anchor="last" />
+    </group>
+  </actions>
 
-    <extensionPoints>
-        <extensionPoint qualifiedName="org.stepik.plugin.union.studyPluginConfigurator" interface="org.stepik.core.StudyPluginConfigurator"/>
-    </extensionPoints>
+  <application-components>
+    <component>
+      <implementation-class>org.stepik.plugin.UnionPluginSettings</implementation-class>
+      <interface-class>org.stepik.core.PluginSettings</interface-class>
+    </component>
+  </application-components>
 
-    <extensions defaultExtensionNs="com.intellij">
-        <projectService serviceInterface="com.intellij.codeInsight.documentation.DocumentationManager" serviceImplementation="org.stepik.core.StudyDocumentationManager" overrides="true"/>
-        <toolWindow id="Step Description" anchor="right" factoryClass="org.stepik.core.ui.StudyToolWindowFactory" conditionClass="org.stepik.core.ui.StudyCondition"/>
-        <toolWindow id="Stepik Test" anchor="bottom" factoryClass="org.stepik.core.testFramework.toolWindow.StepikTestToolWindowFactory" conditionClass="org.stepik.core.testFramework.toolWindow.StudyCondition"/>
-        <projectService serviceInterface="org.stepik.core.StepikProjectManager" serviceImplementation="org.stepik.core.StepikProjectManager"/>
-    </extensions>
+  <project-components>
+    <component>
+      <implementation-class>org.stepik.core.StudyProjectComponent</implementation-class>
+    </component>
+  </project-components>
+
+  <extensionPoints>
+    <extensionPoint qualifiedName="org.stepik.plugin.union.studyPluginConfigurator"
+                    interface="org.stepik.core.StudyPluginConfigurator" />
+  </extensionPoints>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <projectService serviceInterface="com.intellij.codeInsight.documentation.DocumentationManager"
+                    serviceImplementation="org.stepik.core.StudyDocumentationManager" overrides="true" />
+    <toolWindow id="Step Description" anchor="right" factoryClass="org.stepik.core.ui.StudyToolWindowFactory"
+                conditionClass="org.stepik.core.ui.StudyCondition" />
+    <toolWindow id="Stepik Test" anchor="bottom"
+                factoryClass="org.stepik.core.testFramework.toolWindow.StepikTestToolWindowFactory"
+                conditionClass="org.stepik.core.testFramework.toolWindow.StudyCondition" />
+    <projectService serviceInterface="org.stepik.core.ProjectManager"
+                    serviceImplementation="org.stepik.plugin.StepikProjectManager" />
+  </extensions>
 </idea-plugin>

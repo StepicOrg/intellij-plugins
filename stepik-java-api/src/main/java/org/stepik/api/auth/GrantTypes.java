@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
  * @author meanmail
  */
 public enum GrantTypes {
-    REFRESH_TOKEN, PASSWORD;
+    REFRESH_TOKEN, PASSWORD, AUTHORIZATION_CODE;
 
     @NotNull
     @Override

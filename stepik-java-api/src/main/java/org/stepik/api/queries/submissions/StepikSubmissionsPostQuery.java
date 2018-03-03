@@ -97,7 +97,7 @@ public class StepikSubmissionsPostQuery extends StepikAbstractPostQuery<Submissi
     @NotNull
     @Override
     protected String getBody() {
-        return getJsonConverter().toJson(submissions);
+        return getJsonConverter().toJson(submissions, false);
     }
 
     public StepikSubmissionsPostQuery reply(@NotNull Reply reply) {

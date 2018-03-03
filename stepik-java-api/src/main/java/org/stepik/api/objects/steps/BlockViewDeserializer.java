@@ -4,11 +4,9 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import org.stepik.api.Utils;
 
 import java.lang.reflect.Type;
-
-import static org.stepik.api.Utils.cleanString;
-import static org.stepik.api.Utils.getStringList;
 
 public class BlockViewDeserializer implements JsonDeserializer<BlockView> {
 
@@ -24,14 +22,14 @@ public class BlockViewDeserializer implements JsonDeserializer<BlockView> {
         JsonElement textMember = object.get("text");
 
         if (textMember != null) {
-            String text = cleanString(textMember.getAsString());
+            String text = Utils.INSTANCE.cleanString(textMember.getAsString());
             block.setText(text);
         }
 
         block.setVideo(context.deserialize(object.get("video"), Video.class));
         block.setAnimation(context.deserialize(object.get("animation"), Object.class));
         block.setOptions(context.deserialize(object.get("options"), BlockViewOptions.class));
-        block.setSubtitleFiles(getStringList(object, "subtitle_files"));
+        block.setSubtitleFiles(Utils.INSTANCE.getStringList(object, "subtitle_files"));
 
         return block;
     }

@@ -1,10 +1,15 @@
-<idea-plugin version="2">
+<idea-plugin>
     <extensions defaultExtensionNs="com.intellij">
-        <treeStructureProvider implementation="org.stepik.plugin.projectView.pycharm.PyCharmTreeStructureProvider"/>
-        <navbar implementation="org.stepik.plugin.projectView.pycharm.PyCharmNavBarModelExtension"/>
+        <treeStructureProvider implementation="org.stepik.core.projectView.pycharm.PyCharmTreeStructureProvider"/>
+        <navbar implementation="org.stepik.core.projectView.pycharm.PyCharmNavBarModelExtension"/>
         <directoryProjectGenerator implementation="org.stepik.plugin.projectWizard.pycharm.StepikPyProjectGenerator"/>
-        <refactoring.moveHandler implementation="org.stepik.plugin.refactoring.impl.pycharm.move.MoveHandlerDelegate" order="first"/>
-        <renamePsiElementProcessor implementation="org.stepik.plugin.refactoring.impl.pycharm.rename.RenamePsiElementProcessor" order="first"/>
-        <refactoring.safeDeleteProcessor implementation="org.stepik.plugin.refactoring.impl.pycharm.safeDelete.SafeDeleteProcessorDelegate" order="first"/>
+        <refactoring.moveHandler implementation="org.stepik.core.refactoring.impl.pycharm.move.MoveHandlerDelegate"
+                                 order="first"/>
+        <renamePsiElementProcessor
+                implementation="org.stepik.core.refactoring.impl.pycharm.rename.RenamePsiElementProcessor"
+                order="first"/>
+        <refactoring.safeDeleteProcessor
+                implementation="org.stepik.core.refactoring.impl.pycharm.safeDelete.SafeDeleteProcessorDelegate"
+                order="first"/>
     </extensions>
 </idea-plugin>

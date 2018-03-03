@@ -7,15 +7,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import org.jetbrains.annotations.NotNull;
+import org.stepik.api.Utils;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import static org.stepik.api.Utils.getBoolean;
-import static org.stepik.api.Utils.getJsonArray;
-import static org.stepik.api.Utils.getString;
 
 /**
  * @author meanmail
@@ -24,7 +21,7 @@ public class DatasetDeserializer implements JsonDeserializer<Dataset> {
 
     @NotNull
     private static List<String> getStringList(@NotNull JsonObject object, @NotNull String memberName) {
-        JsonArray jsonArray = getJsonArray(object, memberName);
+        JsonArray jsonArray = Utils.INSTANCE.getJsonArray(object, memberName);
         if (jsonArray != null) {
             List<String> array = new ArrayList<>();
             jsonArray.forEach(element -> array.add(element.getAsString()));
@@ -43,15 +40,15 @@ public class DatasetDeserializer implements JsonDeserializer<Dataset> {
         Dataset dataset = new Dataset();
         JsonObject object = json.getAsJsonObject();
 
-        Boolean multipleChoice = getBoolean(object, "is_multiple_choice");
+        Boolean multipleChoice = Utils.INSTANCE.getBoolean(object, "is_multiple_choice");
         dataset.setMultipleChoice(multipleChoice);
 
-        Boolean textDisabled = getBoolean(object, "is_text_disabled");
+        Boolean textDisabled = Utils.INSTANCE.getBoolean(object, "is_text_disabled");
         dataset.setTextDisabled(textDisabled);
 
         dataset.setOptions(getStringList(object, "options"));
 
-        JsonArray pairs = getJsonArray(object, "pairs");
+        JsonArray pairs = Utils.INSTANCE.getJsonArray(object, "pairs");
         if (pairs != null) {
             List<StringPair> array = new ArrayList<>();
             pairs.forEach(pair -> array.add(context.deserialize(pair, StringPair.class)));
@@ -61,13 +58,13 @@ public class DatasetDeserializer implements JsonDeserializer<Dataset> {
         dataset.setRows(getStringList(object, "rows"));
         dataset.setColumns(getStringList(object, "columns"));
 
-        Boolean isCheckbox = getBoolean(object, "is_checkbox");
+        Boolean isCheckbox = Utils.INSTANCE.getBoolean(object, "is_checkbox");
         dataset.setCheckbox(isCheckbox);
 
-        String description = getString(object, "description");
+        String description = Utils.INSTANCE.getString(object, "description");
         dataset.setDescription(description);
 
-        JsonArray components = getJsonArray(object, "components");
+        JsonArray components = Utils.INSTANCE.getJsonArray(object, "components");
         if (components != null) {
             List<Component> array = new ArrayList<>();
             components.forEach(component -> array.add(context.deserialize(component, Component.class)));

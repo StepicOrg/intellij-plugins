@@ -114,7 +114,7 @@ public abstract class StepikAbstractGetQuery<T extends StepikAbstractGetQuery, R
                     if (diff > 0 && diff <= getCacheLifeTime()) {
                         Object item = null;
                         try {
-                            String text = Utils.readFile(file);
+                            String text = Utils.INSTANCE.readFile(file.toFile());
                             //noinspection unchecked
                             item = getJsonConverter().fromJson(text, items.getItemClass());
                         } catch (JsonSyntaxException ignored) {
@@ -136,7 +136,7 @@ public abstract class StepikAbstractGetQuery<T extends StepikAbstractGetQuery, R
             id(idsForQuery);
             R loadedItems = super.execute();
 //            noinspection unchecked
-            loadedItems.getItems().forEach((item) -> flushCourse(item, courseCache));
+            loadedItems.forEach((item) -> flushCourse(item, courseCache));
             //noinspection unchecked
             items.getItems().addAll(loadedItems.getItems());
         }
@@ -158,7 +158,7 @@ public abstract class StepikAbstractGetQuery<T extends StepikAbstractGetQuery, R
 
         try {
             Files.createDirectories(courseCache.getParent());
-            byte[] content = getJsonConverter().toJson(item).getBytes(StandardCharsets.UTF_8);
+            byte[] content = getJsonConverter().toJson(item, false).getBytes(StandardCharsets.UTF_8);
             Files.write(courseCache, content, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
         } catch (IOException ignored) {
         }

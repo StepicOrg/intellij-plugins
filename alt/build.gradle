@@ -1,0 +1,36 @@
+apply plugin: 'org.stepik.gradle.plugins.pycharm'
+apply plugin: 'org.stepik.gradle.plugins.idea'
+
+intellij {
+    version = project.getProperties().get("ideaVersion", "2017.1")
+    if ("ideaPath" in project.getProperties()) {
+        idePath = project.getProperties().get("ideaPath")
+    }
+    publish.username = project.getProperties().get("username", "")
+    publish.password = project.getProperties().get("password", "")
+    publish.channels = [project.getProperties().get("channel", "EAP")]
+    pluginDescription = "description.html"
+    changeNotes = "change-notes.html"
+}
+
+pycharm {
+    version = project.getProperties().get("pyCharmVersion", "2017.1")
+    if ("pyCharmPath" in project.getProperties()) {
+        idePath = project.getProperties().get("pyCharmPath")
+    }
+    publish.username = project.getProperties().get("username", "")
+    publish.password = project.getProperties().get("password", "")
+    publish.channels = [project.getProperties().get("channel", "EAP")]
+    pluginDescription = "description.html"
+    changeNotes = "change-notes.html"
+}
+
+dependencies {
+    compile project(":stepik-java-api")
+    compile project(":stepik-core")
+}
+
+group 'org.stepik'
+version project.getProperties().get('ALTVersion') ?: 'SNAPSHOT'
+
+defaultTasks "runIdea"

@@ -39,7 +39,7 @@ public class StepikReactionsPostQuery extends StepikAbstractPostQuery<Reactions>
     @NotNull
     @Override
     protected String getBody() {
-        return getJsonConverter().toJson(reactions);
+        return getJsonConverter().toJson(reactions, false);
     }
 
     @NotNull

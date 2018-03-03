@@ -3,6 +3,7 @@ package org.stepik.api.auth;
 import org.jetbrains.annotations.NotNull;
 import org.stepik.api.actions.StepikAbstractAction;
 import org.stepik.api.client.StepikApiClient;
+import org.stepik.api.queries.auth.CodeAuthenticationPostQuery;
 import org.stepik.api.queries.auth.UserAuthenticationRefreshPostQuery;
 import org.stepik.api.queries.auth.UserPasswordAuthenticationPostQuery;
 
@@ -25,6 +26,20 @@ public class OAuth2 extends StepikAbstractAction {
         query.clientId(clientId);
         query.username(login);
         query.password(password);
+
+        return query;
+    }
+
+    @NotNull
+    public CodeAuthenticationPostQuery userAuthenticationCode(
+            String clientId,
+            String redirectUri,
+            String code) {
+        CodeAuthenticationPostQuery query = new CodeAuthenticationPostQuery(this);
+
+        query.clientId(clientId);
+        query.redirectUri(redirectUri);
+        query.code(code);
 
         return query;
     }

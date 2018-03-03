@@ -1,2 +1,0 @@
-# Stepik code: start
-replaced

@@ -26,7 +26,7 @@ public class StepikReviewSessionsPostQuery extends StepikAbstractPostQuery<Revie
     @NotNull
     @Override
     protected String getBody() {
-        return getJsonConverter().toJson(reviewSessions);
+        return getJsonConverter().toJson(reviewSessions, false);
     }
 
     @NotNull

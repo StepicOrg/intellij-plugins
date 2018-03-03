@@ -1,0 +1,26 @@
+apply plugin: 'org.stepik.gradle.plugins.pycharm'
+apply plugin: 'org.stepik.gradle.plugins.idea'
+
+intellij {
+    version = project.getProperties().get("ideaVersion", "2017.1")
+    if ("ideaPath" in project.getProperties()) {
+        idePath = project.getProperties().get("ideaPath")
+    }
+}
+
+pycharm {
+    version = project.getProperties().get("pyCharmVersion", "2017.1")
+    if ("pyCharmPath" in project.getProperties()) {
+        idePath = project.getProperties().get("pyCharmPath")
+    }
+}
+
+dependencies {
+    compile project(":stepik-java-api")
+    compile 'org.freemarker:freemarker:2.3.27-incubating'
+}
+
+group 'org.stepik'
+version 5.4
+
+defaultTasks "runIdea"

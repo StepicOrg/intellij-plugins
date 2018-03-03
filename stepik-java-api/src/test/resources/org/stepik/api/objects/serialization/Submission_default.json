@@ -1,0 +1,28 @@
+{
+  "status": "",
+  "score": 0.0,
+  "hint": "",
+  "feedback": {
+    "message": "",
+    "data": {}
+  },
+  "time": null,
+  "reply": {
+    "language": null,
+    "code": null,
+    "formula": null,
+    "attachments": null,
+    "text": null,
+    "files": null,
+    "choices": null,
+    "ordering": null,
+    "number": null,
+    "file": null,
+    "blanks": null
+  },
+  "reply_url": "",
+  "attempt": 0,
+  "session": "",
+  "eta": 0.0,
+  "id": 0
+}

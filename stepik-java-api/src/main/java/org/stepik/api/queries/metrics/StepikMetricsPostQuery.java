@@ -64,7 +64,7 @@ public class StepikMetricsPostQuery extends StepikAbstractPostQuery<VoidResult> 
     @NotNull
     @Override
     protected String getBody() {
-        return getJsonConverter().toJson(metrics);
+        return getJsonConverter().toJson(metrics, false);
     }
 
     @NotNull
@@ -75,6 +75,6 @@ public class StepikMetricsPostQuery extends StepikAbstractPostQuery<VoidResult> 
 
     @Override
     public String toString() {
-        return getJsonConverter().toJson(metrics);
+        return getJsonConverter().toJson(metrics, false);
     }
 }
