@@ -3,7 +3,6 @@ apply plugin: 'org.stepik.gradle.plugins.idea'
 
 intellij {
     version = project.getProperties().get("ideaVersion", "2017.1")
-    sandboxDirectory = project.getProperties().get("ideaSandboxDir", "build/idea-sandbox/")
     if ("ideaPath" in project.getProperties()) {
         idePath = project.getProperties().get("ideaPath")
     }
@@ -11,7 +10,6 @@ intellij {
 
 pycharm {
     version = project.getProperties().get("pyCharmVersion", "2017.1")
-    sandboxDirectory = project.getProperties().get("pyCharmSandboxDir", "build/pycharm-sandbox/")
     if ("pyCharmPath" in project.getProperties()) {
         idePath = project.getProperties().get("pyCharmPath")
     }

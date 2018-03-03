@@ -3,6 +3,7 @@ package org.stepik.gradle.plugins.common
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionContainer
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.OutputDirectory
 import org.stepik.gradle.plugins.common.Utils.getDefaultArchiveType
 import org.stepik.gradle.plugins.common.Utils.getDefaultIdePath
 import org.stepik.gradle.plugins.common.dependency.ProductDependency
@@ -10,18 +11,20 @@ import java.io.File
 
 
 open class ProductPluginExtension(
-        val projectName: String,
         val productName: String,
         val productType: String,
         val productGroup: String,
-        var sandboxDirectory: String,
         repository: String,
-        val project: Project,
-        val plugin: BasePlugin,
+        private val project: Project,
+        private val plugin: BasePlugin,
         var instrumentCode: Boolean,
         @get:Input var repositoryType: RepositoryType,
         val publish: ProductPluginExtensionPublish
 ) {
+
+    @get:OutputDirectory
+    val sandboxDirectory: String =
+            project.buildDir.resolve(File(productName, "sandbox")).toString()
 
     var systemProperties = mutableMapOf<String, Any>()
         set(value) {
@@ -117,11 +120,9 @@ open class ProductPluginExtension(
 }
 
 fun ExtensionContainer.createProductPluginExtension(name: String,
-                                                    projectName: String,
                                                     productName: String,
                                                     productType: String,
                                                     productGroup: String,
-                                                    sandboxDirectory: String,
                                                     repository: String,
                                                     project: Project,
                                                     plugin: BasePlugin,
@@ -129,7 +130,7 @@ fun ExtensionContainer.createProductPluginExtension(name: String,
                                                     repositoryType: RepositoryType,
                                                     publish: ProductPluginExtensionPublish
 ): ProductPluginExtension {
-    return create(name, ProductPluginExtension::class.java, projectName, productName, productType,
-            productGroup, sandboxDirectory, repository, project, plugin, instrumentCode,
+    return create(name, ProductPluginExtension::class.java, productName, productType,
+            productGroup, repository, project, plugin, instrumentCode,
             repositoryType, publish)
 }

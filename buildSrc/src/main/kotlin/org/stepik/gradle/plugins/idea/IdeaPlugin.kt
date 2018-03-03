@@ -11,7 +11,7 @@ class IdeaPlugin : BasePlugin(
         productGroup = "com.jetbrains.intellij.idea",
         tasksGroupName = "intellij",
         runTaskClass = RunIdeaTask::class.java,
-        extensionInstrumentCode = true,
+        extensionInstrumentCode = false,
         repositoryType = RepositoryType.MAVEN,
         repositoryTemplate = "https://www.jetbrains.com/intellij-repository/releases"
 )

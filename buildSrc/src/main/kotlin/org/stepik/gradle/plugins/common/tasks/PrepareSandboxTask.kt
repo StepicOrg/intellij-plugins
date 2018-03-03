@@ -5,12 +5,11 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.logging.Logging
 import org.gradle.api.plugins.JavaPlugin.JAR_TASK_NAME
-import org.gradle.api.plugins.JavaPlugin.RUNTIME_ELEMENTS_CONFIGURATION_NAME
+import org.gradle.api.plugins.JavaPlugin.RUNTIME_CONFIGURATION_NAME
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
-import org.gradle.internal.FileUtils
 import org.gradle.internal.jvm.Jvm
 import org.gradle.jvm.tasks.Jar
 import org.stepik.gradle.plugins.common.ProductPluginExtension
@@ -21,9 +20,6 @@ import org.stepik.gradle.plugins.common.Utils.findTask
 import org.stepik.gradle.plugins.common.dependency.DependencyManager
 import java.io.File
 import java.io.IOException
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.StandardCopyOption
 
 
 open class PrepareSandboxTask : DefaultTask() {
@@ -40,11 +36,7 @@ open class PrepareSandboxTask : DefaultTask() {
         }
 
     @get:Input
-    val pluginName: String?
-        get() {
-            val pluginName = extension?.projectName ?: return null
-            return FileUtils.toSafeFileName(pluginName)
-        }
+    private val pluginName: String = project.name
 
     @get:OutputDirectory
     val configDirectory: File?
@@ -75,15 +67,15 @@ open class PrepareSandboxTask : DefaultTask() {
             return
         }
         val dependenciesJars = getDependenciesJars(project).toMutableSet()
-        dependenciesJars.add(pluginJar.toPath())
-        val pluginPath = destinationDir.toPath().resolve(pluginName)
+        dependenciesJars.add(pluginJar)
+        val pluginPath = destinationDir.resolve(pluginName)
         val libPath = pluginPath.resolve("lib")
         try {
-            pluginPath.toFile().deleteRecursively()
-            Files.createDirectories(libPath)
+            pluginPath.deleteRecursively()
+            libPath.mkdirs()
             dependenciesJars.forEach {
-                val target = libPath.resolve(it.fileName)
-                Files.copy(it, target, StandardCopyOption.REPLACE_EXISTING)
+                val target = libPath.resolve(it.name)
+                it.copyTo(target, true)
             }
         } catch (e: IOException) {
             log.error("Failed prepare sandbox task: copy from $dependenciesJars to $libPath")
@@ -92,8 +84,8 @@ open class PrepareSandboxTask : DefaultTask() {
         disableIdeUpdate()
     }
 
-    private fun getDependenciesJars(project: Project): Set<Path> {
-        val runtimeConfiguration = project.configurations.getByName(RUNTIME_ELEMENTS_CONFIGURATION_NAME)
+    private fun getDependenciesJars(project: Project): Set<File> {
+        val runtimeConfiguration = project.configurations.getByName(RUNTIME_CONFIGURATION_NAME)
 
         val libsToIgnored = mutableListOf(Jvm.current().toolsJar)
 
@@ -101,13 +93,13 @@ open class PrepareSandboxTask : DefaultTask() {
             libsToIgnored.addAll(it.jarFiles)
         }
 
-        val result = mutableSetOf<Path>()
+        val result = mutableSetOf<File>()
         runtimeConfiguration.allDependencies.forEach {
             if (it is ProjectDependency) {
                 val dependencyProject = it.dependencyProject
                 val jarTask = findTask(dependencyProject, JAR_TASK_NAME) as Jar
 
-                if (result.add(jarTask.archivePath.toPath())) {
+                if (result.add(jarTask.archivePath)) {
                     val dependenciesJars = getDependenciesJars(dependencyProject)
                     result.addAll(dependenciesJars)
                 }
@@ -118,7 +110,7 @@ open class PrepareSandboxTask : DefaultTask() {
                         !it.name.startsWith("slf4j-") && it !in libsToIgnored
                     }
                     .forEach {
-                        result.add(it.absoluteFile.toPath())
+                        result.add(it.absoluteFile)
                     }
         }
 

@@ -50,11 +50,9 @@ abstract class BasePlugin(
         project.plugins.apply(JavaPlugin::class.java)
         val extension = project.extensions
                 .createProductPluginExtension(extensionName,
-                        projectName = project.name,
                         productName = productName,
                         productType = productType,
                         productGroup = productGroup,
-                        sandboxDirectory = File(project.buildDir, "${productName.toLowerCase()}-sandbox").toString(),
                         repository = repositoryTemplate,
                         project = project,
                         plugin = this,
@@ -213,10 +211,10 @@ abstract class BasePlugin(
         project.tasks.create(buildPluginTaskName, Zip::class.java).apply {
             description = "Bundles the project as a distribution."
             group = tasksGroupName
-            from("${prepareSandboxTask.destinationDir}/${prepareSandboxTask.pluginName}")
-            into { prepareSandboxTask.pluginName }
+            from("${prepareSandboxTask.destinationDir}/${project.name}")
+            into(project.name)
             dependsOn(prepareSandboxTask)
-            baseName = prepareSandboxTask.pluginName
+            baseName = project.name
         }
     }
 
