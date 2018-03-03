@@ -1,4 +1,4 @@
-package org.stepik.gradle.plugins.jetbrains
+package org.stepik.gradle.plugins.jetbrains.tasks
 
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection

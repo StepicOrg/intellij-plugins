@@ -8,7 +8,7 @@ class IdeaPlugin : BasePlugin(
         extensionName = "intellij",
         productName = "Idea",
         productType = "IC",
-        productGroup = "com.jetbrains",
+        productGroup = "com.jetbrains.intellij.idea",
         tasksGroupName = "intellij",
         runTaskClass = RunIdeaTask::class.java,
         extensionInstrumentCode = true,

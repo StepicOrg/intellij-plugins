@@ -1,10 +1,7 @@
-import org.stepik.gradle.plugins.jetbrains.PublishTask
+import org.stepik.gradle.plugins.jetbrains.tasks.PublishTask
 
 apply plugin: 'org.stepik.gradle.plugins.pycharm'
 apply plugin: 'org.stepik.gradle.plugins.idea'
-
-def descriptionFile = file("description.html")
-def changeNotesFile = file("change-notes.html")
 
 intellij {
     version = project.getProperties().get("ideaVersion", "2017.1")

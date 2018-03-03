@@ -1,6 +1,6 @@
 package org.stepik.gradle.plugins.pycharm
 
-import org.stepik.gradle.plugins.jetbrains.BaseRunTask
+import org.stepik.gradle.plugins.jetbrains.tasks.BaseRunTask
 
 
 open class RunPyCharmTask : BaseRunTask() {

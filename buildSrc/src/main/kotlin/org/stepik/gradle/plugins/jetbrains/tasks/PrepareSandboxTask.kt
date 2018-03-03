@@ -1,4 +1,4 @@
-package org.stepik.gradle.plugins.jetbrains
+package org.stepik.gradle.plugins.jetbrains.tasks
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
@@ -13,6 +13,7 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.internal.FileUtils
 import org.gradle.internal.jvm.Jvm
 import org.gradle.jvm.tasks.Jar
+import org.stepik.gradle.plugins.jetbrains.ProductPluginExtension
 import org.stepik.gradle.plugins.jetbrains.Utils.createOrRepairIdeGeneralXml
 import org.stepik.gradle.plugins.jetbrains.Utils.createOrRepairOptionsXml
 import org.stepik.gradle.plugins.jetbrains.Utils.createOrRepairUpdateXml

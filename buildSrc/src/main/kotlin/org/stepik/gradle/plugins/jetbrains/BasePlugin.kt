@@ -20,6 +20,11 @@ import org.stepik.gradle.plugins.jetbrains.dependency.DependencyManager.register
 import org.stepik.gradle.plugins.jetbrains.dependency.DependencyManager.resolveLocal
 import org.stepik.gradle.plugins.jetbrains.dependency.DependencyManager.resolveLocalCashRepository
 import org.stepik.gradle.plugins.jetbrains.dependency.DependencyManager.resolveRemoteMaven
+import org.stepik.gradle.plugins.jetbrains.tasks.BaseRunTask
+import org.stepik.gradle.plugins.jetbrains.tasks.InstrumentCodeTask
+import org.stepik.gradle.plugins.jetbrains.tasks.PatchPluginXmlTask
+import org.stepik.gradle.plugins.jetbrains.tasks.PrepareSandboxTask
+import org.stepik.gradle.plugins.jetbrains.tasks.PublishTask
 import java.io.File
 
 
@@ -47,7 +52,9 @@ abstract class BasePlugin(
         val extension = project.extensions
                 .createProductPluginExtension(extensionName,
                         projectName = project.name,
+                        productName = productName,
                         productType = productType,
+                        productGroup = productGroup,
                         sandboxDirectory = File(project.buildDir, "${productName.toLowerCase()}-sandbox").toString(),
                         repository = repositoryTemplate,
                         project = project,
@@ -91,13 +98,13 @@ abstract class BasePlugin(
         logger.info("Configuring {} dependency", productName)
 
         val dependency = if (extension.repositoryType == MAVEN) {
-            resolveRemoteMaven(project, this, extension)
+            resolveRemoteMaven(project, extension)
         } else {
             resolveLocalCashRepository(project, this, extension)
-        } ?: resolveLocal(project, extension, productName) ?: throw IllegalDependencyNotation()
+        } ?: resolveLocal(project, extension) ?: throw IllegalDependencyNotation()
 
         extension.dependency = dependency
-        register(project, dependency, productName + productType)
+        register(project, dependency, extension)
 
         val toolsJar = Jvm.current().toolsJar ?: return
         project.dependencies.add(RUNTIME_ELEMENTS_CONFIGURATION_NAME, project.files(toolsJar))

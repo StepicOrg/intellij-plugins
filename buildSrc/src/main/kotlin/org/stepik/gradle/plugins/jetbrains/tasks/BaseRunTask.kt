@@ -1,4 +1,4 @@
-package org.stepik.gradle.plugins.jetbrains
+package org.stepik.gradle.plugins.jetbrains.tasks
 
 import org.gradle.api.Project
 import org.gradle.api.tasks.Input
@@ -8,6 +8,8 @@ import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.internal.jvm.Jvm
 import org.gradle.internal.os.OperatingSystem
+import org.stepik.gradle.plugins.jetbrains.BasePlugin
+import org.stepik.gradle.plugins.jetbrains.ProductPluginExtension
 import org.stepik.gradle.plugins.jetbrains.Utils.findTask
 import org.stepik.gradle.plugins.jetbrains.Utils.getProductJvmArgs
 import org.stepik.gradle.plugins.jetbrains.Utils.getProductSystemProperties
@@ -104,7 +106,7 @@ abstract class BaseRunTask : JavaExec() {
         if (operatingSystem.isMacOsX) {
             systemProperty("idea.smooth.progress", false)
             systemProperty("apple.laf.useScreenMenuBar", true)
-        } else if (operatingSystem.isUnix && !getSystemProperties().containsKey("sun.awt.disablegrab")) {
+        } else if (operatingSystem.isUnix && !systemProperties.containsKey("sun.awt.disablegrab")) {
             systemProperty("sun.awt.disablegrab", true)
         }
 

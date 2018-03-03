@@ -24,16 +24,15 @@ object DependencyManager {
 
     val dependencies: MutableSet<ProductDependency> = mutableSetOf()
 
-    fun resolveRemoteMaven(project: Project, plugin: BasePlugin,
-                           extension: ProductPluginExtension): ProductDependency {
-        logger.debug("Adding $plugin.productName repository")
+    fun resolveRemoteMaven(project: Project, extension: ProductPluginExtension): ProductDependency {
+        logger.debug("Adding ${extension.productName} repository")
         project.repositories.maven { it.url = URI(extension.repository) }
 
-        logger.debug("Adding ${plugin.productName} dependency")
-        val libraryType = extension.productType.toLowerCase()
+        logger.debug("Adding ${extension.productName} dependency")
+        val libraryType = extension.productType
         val version = extension.version
-        val group = plugin.productGroup
-        val name = plugin.productName.toLowerCase()
+        val group = extension.productGroup
+        val name = extension.productName.toLowerCase()
         val dependency = project.dependencies.create("$group:$name$libraryType:$version")
         val configuration = project.configurations.detachedConfiguration(dependency)
 
@@ -63,14 +62,13 @@ object DependencyManager {
         return cacheDirectory
     }
 
-    fun resolveLocal(project: Project, extension: ProductPluginExtension,
-                     productName: String): ProductDependency? {
+    fun resolveLocal(project: Project, extension: ProductPluginExtension): ProductDependency? {
         val idePath = extension.ideDirectory ?: return null
         if (!idePath.exists() || !idePath.isDirectory) {
-            throw BuildException("Specified idePath '$idePath' is not path to $productName", null)
+            throw BuildException("Specified idePath '$idePath' is not path to ${extension.productName}", null)
         }
 
-        return createCompileDependency(project, productName.toLowerCase(), extension.version, idePath)
+        return createCompileDependency(project, extension.productName.toLowerCase(), extension.version, idePath)
     }
 
 
@@ -90,8 +88,8 @@ object DependencyManager {
         }
     }
 
-    fun register(project: Project, dependency: ProductDependency, productName: String) {
-        val name = productName.toLowerCase()
+    fun register(project: Project, dependency: ProductDependency, extension: ProductPluginExtension) {
+        val name = (extension.productName + extension.productType).toLowerCase()
 
         val ivyFile = getOrCreateIvyXml(dependency, name)
         project.repositories.ivy {
@@ -176,7 +174,7 @@ object DependencyManager {
             println("Unarchived $productName to $idePath")
         }
 
-        return resolveLocal(project, extension, productName)
+        return resolveLocal(project, extension)
     }
 
 }

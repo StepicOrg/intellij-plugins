@@ -9,9 +9,11 @@ import org.stepik.gradle.plugins.jetbrains.dependency.ProductDependency
 import java.io.File
 
 
-open class ProductPluginExtension (
+open class ProductPluginExtension(
         val projectName: String,
+        val productName: String,
         val productType: String,
+        val productGroup: String,
         var sandboxDirectory: String,
         repository: String,
         val project: Project,
@@ -48,7 +50,7 @@ open class ProductPluginExtension (
 
     val ideDirectory: File?
         get() {
-            val idePath = idePath?:return null
+            val idePath = idePath ?: return null
             return File(idePath)
         }
 
@@ -109,14 +111,16 @@ open class ProductPluginExtension (
     companion object {
 
         private val DEFAULT_ARCHIVE_TYPE = getDefaultArchiveType()
-        private val DEFAULT_VERSION = "LATEST-EAP-SNAPSHOT"
+        private const val DEFAULT_VERSION = "LATEST-EAP-SNAPSHOT"
 
     }
 }
 
 fun ExtensionContainer.createProductPluginExtension(name: String,
                                                     projectName: String,
+                                                    productName: String,
                                                     productType: String,
+                                                    productGroup: String,
                                                     sandboxDirectory: String,
                                                     repository: String,
                                                     project: Project,
@@ -125,6 +129,7 @@ fun ExtensionContainer.createProductPluginExtension(name: String,
                                                     repositoryType: RepositoryType,
                                                     publish: ProductPluginExtensionPublish
 ): ProductPluginExtension {
-    return create(name, ProductPluginExtension::class.java, projectName, productType, sandboxDirectory, repository,
-            project, plugin, instrumentCode, repositoryType, publish)
+    return create(name, ProductPluginExtension::class.java, projectName, productName, productType,
+            productGroup, sandboxDirectory, repository, project, plugin, instrumentCode,
+            repositoryType, publish)
 }
