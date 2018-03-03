@@ -1,4 +1,4 @@
-package org.stepik.gradle.plugins.jetbrains
+package org.stepik.gradle.plugins.common
 
 import org.gradle.api.IllegalDependencyNotation
 import org.gradle.api.Plugin
@@ -14,17 +14,17 @@ import org.gradle.api.tasks.testing.Test
 import org.gradle.internal.jvm.Jvm
 import org.gradle.language.jvm.tasks.ProcessResources
 import org.slf4j.LoggerFactory
-import org.stepik.gradle.plugins.jetbrains.RepositoryType.MAVEN
-import org.stepik.gradle.plugins.jetbrains.Utils.getProductJvmArgs
-import org.stepik.gradle.plugins.jetbrains.dependency.DependencyManager.register
-import org.stepik.gradle.plugins.jetbrains.dependency.DependencyManager.resolveLocal
-import org.stepik.gradle.plugins.jetbrains.dependency.DependencyManager.resolveLocalCashRepository
-import org.stepik.gradle.plugins.jetbrains.dependency.DependencyManager.resolveRemoteMaven
-import org.stepik.gradle.plugins.jetbrains.tasks.BaseRunTask
-import org.stepik.gradle.plugins.jetbrains.tasks.InstrumentCodeTask
-import org.stepik.gradle.plugins.jetbrains.tasks.PatchPluginXmlTask
-import org.stepik.gradle.plugins.jetbrains.tasks.PrepareSandboxTask
-import org.stepik.gradle.plugins.jetbrains.tasks.PublishTask
+import org.stepik.gradle.plugins.common.RepositoryType.MAVEN
+import org.stepik.gradle.plugins.common.Utils.getProductJvmArgs
+import org.stepik.gradle.plugins.common.dependency.DependencyManager.register
+import org.stepik.gradle.plugins.common.dependency.DependencyManager.resolveLocal
+import org.stepik.gradle.plugins.common.dependency.DependencyManager.resolveLocalCashRepository
+import org.stepik.gradle.plugins.common.dependency.DependencyManager.resolveRemoteMaven
+import org.stepik.gradle.plugins.common.tasks.BaseRunTask
+import org.stepik.gradle.plugins.common.tasks.InstrumentCodeTask
+import org.stepik.gradle.plugins.common.tasks.PatchPluginXmlTask
+import org.stepik.gradle.plugins.common.tasks.PrepareSandboxTask
+import org.stepik.gradle.plugins.common.tasks.PublishTask
 import java.io.File
 
 

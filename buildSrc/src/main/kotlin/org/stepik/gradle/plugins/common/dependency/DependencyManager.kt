@@ -1,4 +1,4 @@
-package org.stepik.gradle.plugins.jetbrains.dependency
+package org.stepik.gradle.plugins.common.dependency
 
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
@@ -10,12 +10,12 @@ import org.gradle.api.publish.ivy.internal.publication.DefaultIvyPublicationIden
 import org.gradle.api.publish.ivy.internal.publisher.IvyDescriptorFileGenerator
 import org.gradle.tooling.BuildException
 import org.slf4j.LoggerFactory
-import org.stepik.gradle.plugins.jetbrains.BasePlugin
-import org.stepik.gradle.plugins.jetbrains.ProductPluginExtension
-import org.stepik.gradle.plugins.jetbrains.Utils.downloadProduct
-import org.stepik.gradle.plugins.jetbrains.Utils.getArchivePath
-import org.stepik.gradle.plugins.jetbrains.Utils.untgz
-import org.stepik.gradle.plugins.jetbrains.Utils.unzip
+import org.stepik.gradle.plugins.common.BasePlugin
+import org.stepik.gradle.plugins.common.ProductPluginExtension
+import org.stepik.gradle.plugins.common.Utils.downloadProduct
+import org.stepik.gradle.plugins.common.Utils.getArchivePath
+import org.stepik.gradle.plugins.common.Utils.untgz
+import org.stepik.gradle.plugins.common.Utils.unzip
 import java.io.File
 import java.net.URI
 

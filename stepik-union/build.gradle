@@ -1,4 +1,4 @@
-import org.stepik.gradle.plugins.jetbrains.tasks.PublishTask
+import org.stepik.gradle.plugins.common.tasks.PublishTask
 
 apply plugin: 'org.stepik.gradle.plugins.pycharm'
 apply plugin: 'org.stepik.gradle.plugins.idea'

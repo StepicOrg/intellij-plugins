@@ -1,4 +1,4 @@
-package org.stepik.gradle.plugins.jetbrains
+package org.stepik.gradle.plugins.common
 
 class ProductPluginExtensionPublish {
     var username: String = ""

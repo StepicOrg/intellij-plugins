@@ -1,4 +1,4 @@
-package org.stepik.gradle.plugins.jetbrains
+package org.stepik.gradle.plugins.common
 
 class IdeVersion(private vararg val components: Int) {
 

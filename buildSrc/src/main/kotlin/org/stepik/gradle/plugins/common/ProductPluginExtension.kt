@@ -1,11 +1,11 @@
-package org.stepik.gradle.plugins.jetbrains
+package org.stepik.gradle.plugins.common
 
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionContainer
 import org.gradle.api.tasks.Input
-import org.stepik.gradle.plugins.jetbrains.Utils.getDefaultArchiveType
-import org.stepik.gradle.plugins.jetbrains.Utils.getDefaultIdePath
-import org.stepik.gradle.plugins.jetbrains.dependency.ProductDependency
+import org.stepik.gradle.plugins.common.Utils.getDefaultArchiveType
+import org.stepik.gradle.plugins.common.Utils.getDefaultIdePath
+import org.stepik.gradle.plugins.common.dependency.ProductDependency
 import java.io.File
 
 

@@ -1,4 +1,4 @@
-package org.stepik.gradle.plugins.jetbrains.tasks
+package org.stepik.gradle.plugins.common.tasks
 
 import org.gradle.api.file.FileCollection
 import org.gradle.api.internal.ConventionTask
@@ -13,9 +13,9 @@ import org.jdom2.Content
 import org.jdom2.Document
 import org.jdom2.Element
 import org.jdom2.Text
-import org.stepik.gradle.plugins.jetbrains.ProductPluginExtension
-import org.stepik.gradle.plugins.jetbrains.Utils
-import org.stepik.gradle.plugins.jetbrains.Utils.sourcePluginXmlFiles
+import org.stepik.gradle.plugins.common.ProductPluginExtension
+import org.stepik.gradle.plugins.common.Utils
+import org.stepik.gradle.plugins.common.Utils.sourcePluginXmlFiles
 import java.io.File
 import java.io.IOException
 

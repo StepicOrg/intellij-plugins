@@ -1,4 +1,4 @@
-package org.stepik.gradle.plugins.jetbrains.tasks
+package org.stepik.gradle.plugins.common.tasks
 
 import org.gradle.api.Project
 import org.gradle.api.tasks.Input
@@ -8,11 +8,11 @@ import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.internal.jvm.Jvm
 import org.gradle.internal.os.OperatingSystem
-import org.stepik.gradle.plugins.jetbrains.BasePlugin
-import org.stepik.gradle.plugins.jetbrains.ProductPluginExtension
-import org.stepik.gradle.plugins.jetbrains.Utils.findTask
-import org.stepik.gradle.plugins.jetbrains.Utils.getProductJvmArgs
-import org.stepik.gradle.plugins.jetbrains.Utils.getProductSystemProperties
+import org.stepik.gradle.plugins.common.BasePlugin
+import org.stepik.gradle.plugins.common.ProductPluginExtension
+import org.stepik.gradle.plugins.common.Utils.findTask
+import org.stepik.gradle.plugins.common.Utils.getProductJvmArgs
+import org.stepik.gradle.plugins.common.Utils.getProductSystemProperties
 import java.io.File
 
 

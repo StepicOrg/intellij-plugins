@@ -1,7 +1,7 @@
 package org.stepik.gradle.plugins.clion
 
-import org.stepik.gradle.plugins.jetbrains.BasePlugin
-import org.stepik.gradle.plugins.jetbrains.RepositoryType
+import org.stepik.gradle.plugins.common.BasePlugin
+import org.stepik.gradle.plugins.common.RepositoryType
 
 
 class CLionPlugin : BasePlugin(

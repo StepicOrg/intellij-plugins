@@ -1,4 +1,4 @@
-package org.stepik.gradle.plugins.jetbrains.dependency
+package org.stepik.gradle.plugins.common.dependency
 
 import groovy.transform.ToString
 import org.gradle.api.artifacts.Dependency

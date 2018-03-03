@@ -1,4 +1,4 @@
-package org.stepik.gradle.plugins.jetbrains
+package org.stepik.gradle.plugins.common
 
 import org.gradle.api.Project
 import org.gradle.api.Task

@@ -1,4 +1,4 @@
-package org.stepik.gradle.plugins.jetbrains.tasks
+package org.stepik.gradle.plugins.common.tasks
 
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
@@ -10,7 +10,7 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.TaskAction
 import org.gradle.tooling.BuildException
-import org.stepik.gradle.plugins.jetbrains.dependency.ProductDependency
+import org.stepik.gradle.plugins.common.dependency.ProductDependency
 import java.io.File
 
 open class InstrumentCodeTask : ConventionTask() {

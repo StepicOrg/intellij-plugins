@@ -1,4 +1,4 @@
-package org.stepik.gradle.plugins.jetbrains.tasks
+package org.stepik.gradle.plugins.common.tasks
 
 import com.intellij.structure.plugin.PluginCreationFail
 import com.intellij.structure.plugin.PluginCreationSuccess
@@ -12,8 +12,8 @@ import org.gradle.api.tasks.TaskExecutionException
 import org.gradle.api.tasks.bundling.Zip
 import org.jetbrains.intellij.pluginRepository.PluginRepositoryInstance
 import org.slf4j.LoggerFactory
-import org.stepik.gradle.plugins.jetbrains.BasePlugin
-import org.stepik.gradle.plugins.jetbrains.ProductPluginExtension
+import org.stepik.gradle.plugins.common.BasePlugin
+import org.stepik.gradle.plugins.common.ProductPluginExtension
 import java.io.File
 
 open class PublishTask : ConventionTask() {

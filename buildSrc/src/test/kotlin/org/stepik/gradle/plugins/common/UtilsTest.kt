@@ -1,4 +1,4 @@
-package org.stepik.gradle.plugins.jetbrains
+package org.stepik.gradle.plugins.common
 
 import org.jdom2.Document
 import org.jdom2.Element
@@ -6,11 +6,11 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
-import org.stepik.gradle.plugins.jetbrains.Utils.APPLICATION
-import org.stepik.gradle.plugins.jetbrains.Utils.COMPONENT
-import org.stepik.gradle.plugins.jetbrains.Utils.IdeXml
-import org.stepik.gradle.plugins.jetbrains.Utils.NAME
-import org.stepik.gradle.plugins.jetbrains.Utils.VALUE
+import org.stepik.gradle.plugins.common.Utils.APPLICATION
+import org.stepik.gradle.plugins.common.Utils.COMPONENT
+import org.stepik.gradle.plugins.common.Utils.IdeXml
+import org.stepik.gradle.plugins.common.Utils.NAME
+import org.stepik.gradle.plugins.common.Utils.VALUE
 
 
 class UtilsTest {
