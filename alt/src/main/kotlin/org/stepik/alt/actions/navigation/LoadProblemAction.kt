@@ -11,6 +11,7 @@ import com.intellij.openapi.ui.ex.MessagesEx.showInputDialog
 import org.stepik.api.objects.lessons.CompoundUnitLesson
 import org.stepik.core.StudyUtils.getProjectManager
 import org.stepik.core.StudyUtils.isStepikProject
+import org.stepik.core.StudyUtils.pluginId
 import org.stepik.core.actions.getShortcutText
 import org.stepik.core.actions.navigation.StudyNavigator
 import org.stepik.core.actions.navigation.StudyStepNavigationAction
@@ -35,7 +36,7 @@ class LoadProblemAction : StudyStepNavigationAction(TEXT, DESCRIPTION, AllIcons.
     }
 
     companion object {
-        internal const val ACTION_ID = "Alt.LoadProblemAction"
+        internal val ACTION_ID = "$pluginId.LoadProblemAction"
         private const val SHORTCUT = "ctrl pressed PERIOD"
         private val SHORTCUT_TEXT = getShortcutText(SHORTCUT)
         private val TEXT = "Load problem ($SHORTCUT_TEXT)"

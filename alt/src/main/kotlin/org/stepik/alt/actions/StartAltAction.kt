@@ -6,6 +6,7 @@ import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.util.io.FileUtil
 import org.stepik.alt.projectWizard.StepikProjectGenerator
 import org.stepik.core.StudyUtils.isStepikProject
+import org.stepik.core.StudyUtils.pluginId
 import org.stepik.core.actions.StudyActionWithShortcut
 import org.stepik.core.actions.getShortcutText
 import org.stepik.core.icons.AllStepikIcons
@@ -33,9 +34,9 @@ class StartAltAction : StudyActionWithShortcut(TEXT, DESCRIPTION, AllStepikIcons
         val presentation = e?.presentation ?: return
         presentation.isVisible = presentation.isVisible && !isStepikProject(e.project)
     }
-    
+
     companion object {
-        private const val ACTION_ID = "Alt.StartAltAction"
+        private val ACTION_ID = "$pluginId.StartAltAction"
         private const val SHORTCUT = "ctrl pressed ENTER"
         private val SHORTCUT_TEXT = getShortcutText(SHORTCUT)
         private val TEXT = "Start Alt ($SHORTCUT_TEXT)"

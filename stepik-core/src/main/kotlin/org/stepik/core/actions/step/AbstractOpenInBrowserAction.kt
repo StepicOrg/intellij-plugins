@@ -4,6 +4,7 @@ import com.intellij.ide.BrowserUtil
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.ApplicationManager.getApplication
 import com.intellij.openapi.project.Project
+import org.stepik.core.StudyUtils.pluginId
 import org.stepik.core.actions.getShortcutText
 import org.stepik.core.courseFormat.StudyNode
 import org.stepik.core.icons.AllStepikIcons
@@ -41,7 +42,7 @@ abstract class AbstractOpenInBrowserAction : AbstractStepAction(TEXT, DESCRIPTIO
     }
 
     companion object {
-        private const val ACTION_ID = "STEPIK.OpenInBrowser"
+        private val ACTION_ID = "$pluginId.OpenInBrowser"
         private const val SHORTCUT = "ctrl shift pressed HOME"
         private val SHORTCUT_TEXT = getShortcutText(SHORTCUT)
         private val TEXT = "View this step on Stepik ($SHORTCUT_TEXT)"

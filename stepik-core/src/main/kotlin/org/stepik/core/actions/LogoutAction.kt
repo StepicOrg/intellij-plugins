@@ -1,6 +1,7 @@
 package org.stepik.core.actions
 
 import com.intellij.openapi.actionSystem.AnActionEvent
+import org.stepik.core.StudyUtils.pluginId
 import org.stepik.core.auth.StepikAuthManager
 import org.stepik.core.auth.StepikAuthManager.isAuthenticated
 
@@ -18,7 +19,7 @@ class LogoutAction : StudyActionWithShortcut(TEXT, DESCRIPTION) {
     }
 
     companion object {
-        private const val ACTION_ID = "STEPIK.LogoutAction"
+        private val ACTION_ID = "$pluginId.LogoutAction"
         private const val TEXT = "Logout from Stepik"
         private const val DESCRIPTION = "Logout on Stepik"
     }

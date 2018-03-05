@@ -8,6 +8,7 @@ import org.stepik.api.client.StepikApiClient
 import org.stepik.api.exceptions.StepikClientException
 import org.stepik.api.objects.attempts.Attempts
 import org.stepik.api.objects.submissions.Submissions
+import org.stepik.core.StudyUtils.pluginId
 import org.stepik.core.SupportedLanguages
 import org.stepik.core.actions.SendAction.checkStepStatus
 import org.stepik.core.actions.getShortcutText
@@ -68,7 +69,7 @@ class StepikSendAction : CodeQuizAction(TEXT, DESCRIPTION, AllStepikIcons.ToolWi
     override fun getActionId() = ACTION_ID
 
     companion object : Loggable {
-        private const val ACTION_ID = "STEPIC.StepikSendAction"
+        private val ACTION_ID = "$pluginId.StepikSendAction"
         private const val SHORTCUT = "ctrl alt pressed ENTER"
         private val SHORTCUT_TEXT = getShortcutText(SHORTCUT)
         private val TEXT = "Submit solution ($SHORTCUT_TEXT)"

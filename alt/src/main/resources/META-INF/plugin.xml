@@ -22,22 +22,22 @@
 
   <actions>
     <group id="StepikMenu" popup="true" text="Stepik">
-      <action id="STEPIK.StepikSendAction" class="org.stepik.core.actions.step.StepikSendAction" />
-      <action id="STEPIK.TestSamplesAction" class="org.stepik.core.actions.step.TestSamplesAction" />
-      <action id="Alt.LoadProblemAction" class="org.stepik.alt.actions.navigation.LoadProblemAction" />
-      <action id="STEPIK.DownloadSubmission" class="org.stepik.core.actions.step.DownloadSubmission" />
-      <action id="STEPIK.RefreshStepAction" class="org.stepik.core.actions.step.StepikResetStepAction" />
-      <action id="Alt.OpenInBrowser" class="org.stepik.alt.actions.step.OpenInBrowserAction" />
+      <action id="org.stepik.alt.StepikSendAction" class="org.stepik.core.actions.step.StepikSendAction" />
+      <action id="org.stepik.alt.TestSamplesAction" class="org.stepik.core.actions.step.TestSamplesAction" />
+      <action id="org.stepik.alt.LoadProblemAction" class="org.stepik.alt.actions.navigation.LoadProblemAction" />
+      <action id="org.stepik.alt.DownloadSubmission" class="org.stepik.core.actions.step.DownloadSubmission" />
+      <action id="org.stepik.alt.RefreshStepAction" class="org.stepik.core.actions.step.StepikResetStepAction" />
+      <action id="org.stepik.alt.OpenInBrowser" class="org.stepik.alt.actions.step.OpenInBrowserAction" />
       <separator />
-      <action id="STEPIK.LoginAction" class="org.stepik.core.actions.LoginAction" />
-      <action id="STEPIK.LogoutAction" class="org.stepik.core.actions.LogoutAction" />
+      <action id="org.stepik.alt.LoginAction" class="org.stepik.core.actions.LoginAction" />
+      <action id="org.stepik.alt.LogoutAction" class="org.stepik.core.actions.LogoutAction" />
       <separator />
-      <action id="Alt.AboutAltAction" class="org.stepik.alt.actions.AboutAction" />
+      <action id="org.stepik.alt.AboutAltAction" class="org.stepik.alt.actions.AboutAction" />
 
       <add-to-group group-id="MainMenu" anchor="last" />
     </group>
 
-    <action id="Alt.StartAltAction" class="org.stepik.alt.actions.StartAltAction">
+    <action id="org.stepik.alt.StartAltAction" class="org.stepik.alt.actions.StartAltAction">
       <add-to-group group-id="WelcomeScreen.QuickStart" anchor="first" />
       <add-to-group group-id="StepikMenu" anchor="first" />
     </action>

@@ -18,6 +18,7 @@ import org.stepik.api.client.StepikApiClient
 import org.stepik.api.exceptions.StepikClientException
 import org.stepik.api.objects.submissions.Submission
 import org.stepik.api.queries.Order
+import org.stepik.core.StudyUtils.pluginId
 import org.stepik.core.SupportedLanguages
 import org.stepik.core.actions.getShortcutText
 import org.stepik.core.auth.StepikAuthManager.authAndGetStepikApiClient
@@ -222,7 +223,7 @@ class DownloadSubmission : CodeQuizAction(TEXT, DESCRIPTION, AllStepikIcons.Tool
     }
 
     companion object {
-        private const val ACTION_ID = "STEPIK.DownloadSubmission"
+        private val ACTION_ID = "$pluginId.DownloadSubmission"
         private const val SHORTCUT = "ctrl alt pressed PAGE_DOWN"
         private val SHORTCUT_TEXT = getShortcutText(SHORTCUT)
         private val TEXT = "Open my previous submission ($SHORTCUT_TEXT)"

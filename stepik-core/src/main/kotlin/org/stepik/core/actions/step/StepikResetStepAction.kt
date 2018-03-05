@@ -9,6 +9,7 @@ import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
 import com.intellij.problems.WolfTheProblemSolver
 import org.stepik.core.StudyUtils.getProjectManager
+import org.stepik.core.StudyUtils.pluginId
 import org.stepik.core.actions.getShortcutText
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.icons.AllStepikIcons
@@ -28,7 +29,7 @@ class StepikResetStepAction : CodeQuizAction(TEXT, DESCRIPTION, AllStepikIcons.T
     override fun getShortcuts() = arrayOf(SHORTCUT)
 
     companion object {
-        private const val ACTION_ID = "STEPIK.ResetStepAction"
+        private val ACTION_ID = "$pluginId.ResetStepAction"
         private const val SHORTCUT = "ctrl shift pressed X"
         private val SHORTCUT_TEXT = getShortcutText(SHORTCUT)
         private val TEXT = "Reset to default template ($SHORTCUT_TEXT)"

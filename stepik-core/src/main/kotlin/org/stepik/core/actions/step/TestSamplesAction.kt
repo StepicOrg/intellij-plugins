@@ -5,6 +5,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.ApplicationManager.getApplication
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFileManager
+import org.stepik.core.StudyUtils.pluginId
 import org.stepik.core.actions.getShortcutText
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.metrics.Metrics
@@ -128,8 +129,8 @@ class TestSamplesAction : CodeQuizAction(TEXT, DESCRIPTION, AllIcons.Actions.Res
     }
 
     companion object {
+        private val ACTION_ID = "$pluginId.TestSamplesAction"
         private const val SHORTCUT = "ctrl shift pressed F10"
-        private const val ACTION_ID = "STEPIK.TestSamplesAction"
         private val SHORTCUT_TEXT = getShortcutText(SHORTCUT)
         private val TEXT = "Test solution locally ($SHORTCUT_TEXT)"
         private const val DESCRIPTION = "Test solution locally"

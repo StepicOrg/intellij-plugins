@@ -4,6 +4,7 @@ import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import org.stepik.core.StudyUtils.getProjectManager
+import org.stepik.core.StudyUtils.pluginId
 import org.stepik.core.actions.getShortcutText
 import org.stepik.core.metrics.Metrics
 import org.stepik.core.utils.containsDirectives
@@ -63,7 +64,7 @@ class InsertStepikDirectives : CodeQuizAction(TEXT, DESCRIPTION, AllIcons.Genera
 
     companion object {
         private const val SHORTCUT = "ctrl alt pressed R"
-        private const val ACTION_ID = "STEPIK.InsertStepikDirectives"
+        private val ACTION_ID = "$pluginId.InsertStepikDirectives"
         private val SHORTCUT_TEXT = getShortcutText(SHORTCUT)
         private val TEXT = "Repair standard template ($SHORTCUT_TEXT)"
         private const val DESCRIPTION = "Insert Stepik directives. Repair ordinary template if it is possible."

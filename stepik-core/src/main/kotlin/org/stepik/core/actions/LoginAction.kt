@@ -1,6 +1,7 @@
 package org.stepik.core.actions
 
 import com.intellij.openapi.actionSystem.AnActionEvent
+import org.stepik.core.StudyUtils.pluginId
 import org.stepik.core.auth.StepikAuthManager.authentication
 import org.stepik.core.auth.StepikAuthManager.isAuthenticated
 
@@ -18,7 +19,7 @@ class LoginAction : StudyActionWithShortcut(TEXT, DESCRIPTION) {
     }
 
     companion object {
-        private const val ACTION_ID = "STEPIK.LoginAction"
+        private val ACTION_ID = "$pluginId.LoginAction"
         private const val SHORTCUT = "ctrl alt pressed L"
         private val SHORTCUT_TEXT = getShortcutText(SHORTCUT)
         private val TEXT = "Login on Stepik ($SHORTCUT_TEXT)"

@@ -2,6 +2,7 @@ package org.stepik.alt.actions
 
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.ui.ex.MessagesEx
+import org.stepik.core.StudyUtils.pluginId
 import org.stepik.core.actions.StudyActionWithShortcut
 
 class AboutAction : StudyActionWithShortcut(TEXT, DESCRIPTION) {
@@ -14,7 +15,7 @@ class AboutAction : StudyActionWithShortcut(TEXT, DESCRIPTION) {
     override fun getShortcuts() = emptyArray<String>()
 
     companion object {
-        private const val ACTION_ID = "Alt.AboutAction"
+        private val ACTION_ID = "$pluginId.AboutAction"
         private const val TEXT = "About Stepik ALT"
         private const val DESCRIPTION = "About Stepik ALT"
     }
