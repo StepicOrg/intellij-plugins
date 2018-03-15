@@ -57,7 +57,7 @@ class LoadProblemAction : StudyStepNavigationAction(TEXT, DESCRIPTION, AllIcons.
             var link: String? = null
 
             getApplication().invokeAndWait {
-                link = showInputDialog("Example, $exampleLink$exampleLessonId", "Input link to lesson",
+                link = showInputDialog("Example: $exampleLink$exampleLessonId", "Paste a link to lesson",
                         null, initialValue, object : InputValidator {
                     override fun checkInput(value: String): Boolean {
                         return template.matchEntire(value) != null
