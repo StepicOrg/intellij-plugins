@@ -15,6 +15,7 @@ enum class SupportedLanguages constructor(val title: String,
                                           val afterCode: String? = null,
                                           private val nextVersion: SupportedLanguages? = null,
                                           val runner: Runner = StubRunner) {
+    
     ASM32("asm32", "asm32", "main32.asm", "test32.asm", "#"),
     ASM64("asm64", "asm64", "main64.asm", "test64.asm", "#"),
     C("C", "c", "main.c", "test.c", "//"),
@@ -28,7 +29,8 @@ enum class SupportedLanguages constructor(val title: String,
             "module Main where\nmain = print $ \"Hello, world!\""),
     HASKELL_8_0("Haskell 8.0", "haskell 8.0", "Main.hs", "Test_8_0.hs", "--",
             "module Main where\nmain = print $ \"Hello, world!\""),
-    JAVA8("Java 8", "java8", "Main.java", "Test.java", "//", "class Main {", "}", runner = JavaRunner()),
+    JAVA9("Java 9", "java9", "Main.java", "Test.java", "//", "class Main {", "}", runner = JavaRunner()),
+    JAVA8("Java 8", "java8", "Main.java", "Test.java", "//", "class Main {", "}", JAVA9, runner = JavaRunner()),
     JAVA7("Java 7", "java", "Main.java", "Test.java", "//", "class Main {", "}", JAVA8, runner = JavaRunner()),
     JAVASCRIPT("JavaScript", "javascript", "main.js", "test.js", "//"),
     KOTLIN("Kotlin", "kotlin", "Main.kt", "Test.kt", "//", runner = KotlinRunner()),
@@ -42,29 +44,29 @@ enum class SupportedLanguages constructor(val title: String,
     SCALA("Scala", "scala", "Main.scala", "test.scala", "//"),
     SHELL("Shell", "shell", "main.sh", "test.sh", "#"),
     INVALID("invalid", "invalid", "", "", "");
-
+    
     fun isCommentedLine(line: String) = line.trimStart { it.isWhitespace() }.startsWith(comment)
-
+    
     override fun toString() = title
-
+    
     fun canUpgradedTo(language: SupportedLanguages): Boolean {
         return language == this || nextVersion?.canUpgradedTo(language) ?: false
     }
-
+    
     fun comment(string: String) = "$comment$string"
-
+    
     companion object {
-
+        
         private val nameMap by lazy {
             values().associateBy { it.langName }
         }
-
+        
         private val titleMap by lazy {
             values().associateBy { it.title }
         }
-
+        
         fun langOfName(lang: String) = nameMap.getOrDefault(lang, INVALID)
-
+        
         fun langOfTitle(lang: String) = titleMap.getOrDefault(lang, INVALID)
     }
 }

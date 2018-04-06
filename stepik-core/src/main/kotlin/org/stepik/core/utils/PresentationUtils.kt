@@ -29,7 +29,6 @@ import org.stepik.core.icons.AllStepikIcons.ProjectTree.stepVideoCorrect
 import java.awt.Color
 import javax.swing.Icon
 
-
 private val SOLVED_COLOR = JBColor(Color(0, 134, 0), Color(98, 150, 85))
 private val WRONG_COLOR = JBColor(Color(175, 65, 45), Color(175, 75, 60))
 private val icons by lazy {
@@ -45,27 +44,26 @@ private val icons by lazy {
 }
 
 fun StudyNode.getIcon(): Icon? {
-    val setIndex = when (this.javaClass) {
-        StepNode::class.java -> {
-            this as StepNode
+    val setIndex = when (this) {
+        is StepNode    -> {
             when (type) {
-                CODE -> 3
-                TEXT -> 4
+                CODE  -> 3
+                TEXT  -> 4
                 VIDEO -> 5
-                else -> 6
+                else  -> 6
             }
         }
-        LessonNode::class.java -> 2
-        SectionNode::class.java -> 1
-        CourseNode::class.java -> 0
-        else -> return null
+        is LessonNode  -> 2
+        is SectionNode -> 1
+        is CourseNode  -> 0
+        else           -> return null
     }
-
+    
     val set = icons[setIndex]
-
+    
     return when (status) {
         SOLVED -> set[1]
-        else -> set[0]
+        else   -> set[0]
     }
 }
 
@@ -73,7 +71,7 @@ fun StudyStatus?.getColor(): JBColor {
     return when (this) {
         SOLVED -> return SOLVED_COLOR
         FAILED -> return WRONG_COLOR
-        else -> JBColor.BLACK
+        else   -> JBColor.BLACK
     }
 }
 
@@ -81,24 +79,24 @@ fun String.isVisibleDirectory(): Boolean {
     if (startsWith("../")) {
         return true
     }
-
+    
     if (isHideDir() || isWithinHideDir()) {
         return false
     }
-
+    
     return if (isSandbox() || isStudyItemDir()) {
         true
     } else isWithinSrc() || isWithinSandbox()
-
+    
 }
 
 fun String.isVisibleFile(): Boolean {
     if (startsWith("../")) {
         return true
     }
-
+    
     val parentDir = getParent(this)
-
+    
     return if (parentDir == null || !parentDir.isVisibleDirectory()) {
         false
     } else isWithinSrc() || isWithinSandbox()

@@ -6,27 +6,27 @@ import com.intellij.openapi.project.Project
 import org.stepik.api.client.StepikApiClient
 import org.stepik.api.objects.metrics.Metric
 import org.stepik.core.PluginSettings
-import org.stepik.core.StudyUtils.getProjectManager
-import org.stepik.core.StudyUtils.pluginName
 import org.stepik.core.SupportedLanguages
 import org.stepik.core.auth.StepikAuthManager.authAndGetStepikApiClient
 import org.stepik.core.auth.StepikAuthManager.isAuthenticated
 import org.stepik.core.common.Loggable
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.StudyNode
+import org.stepik.core.getProjectManager
 import org.stepik.core.metrics.MetricsStatus.SUCCESSFUL
+import org.stepik.core.pluginName
 import org.stepik.core.utils.currentProject
 import org.stepik.core.utils.version
 import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
-
 object Metrics : Loggable {
-    private val session = UUID.randomUUID().toString()
+    private val session = UUID.randomUUID()
+            .toString()
     private val executor = Executors.newScheduledThreadPool(1)
     private val pluginId = getService(PluginSettings::class.java).pluginId
-
+    
     private fun postMetrics(
             project: Project,
             metric: Metric,
@@ -36,9 +36,9 @@ object Metrics : Loggable {
             if (!isAuthenticated) {
                 return@schedule
             }
-
+            
             val appInfo = ApplicationInfo.getInstance()
-
+            
             val query = stepikApiClient.metrics()
                     .post()
                     .timestamp(System.currentTimeMillis() / 1000L)
@@ -51,26 +51,26 @@ object Metrics : Loggable {
                     .data("plugin_version", version(pluginId))
                     .data("session", session)
                     .tags("status", status)
-
+            
             val projectManager = getProjectManager(project)
-
+            
             if (projectManager != null) {
                 query.data("project_id", projectManager.getUuid())
                         .tags("project_programming_language",
                                 (projectManager.defaultLang ?: SupportedLanguages.INVALID).langName)
                         .data("project_manager_version", projectManager.version)
-
+                
                 val projectRoot = projectManager.projectRoot
-
+                
                 if (projectRoot != null) {
                     val projectRootClass = projectRoot.javaClass
                     query.tags("project_root_class", projectRootClass.simpleName)
                             .data("project_root_id", projectRoot.id)
-
+                    
                     query.data("course_id", projectRoot.getCourseId(stepikApiClient))
                 }
             }
-
+            
             query.executeAsync()
                     .exceptionally { e ->
                         val message = String.format("Failed post metric: %s", query.toString())
@@ -79,7 +79,7 @@ object Metrics : Loggable {
                     }
         }, 500, TimeUnit.MILLISECONDS)
     }
-
+    
     private fun postSimpleMetric(
             project: Project,
             action: String,
@@ -87,19 +87,19 @@ object Metrics : Loggable {
         val metric = Metric().addTags("action", action)
         postMetrics(project, metric, status)
     }
-
+    
     fun authenticate(status: MetricsStatus = SUCCESSFUL) {
         postSimpleMetric(currentProject, "authenticate", status)
     }
-
+    
     fun createProject(project: Project, status: MetricsStatus = SUCCESSFUL) {
         postSimpleMetric(project, "create_project", status)
     }
-
+    
     fun openProject(project: Project, status: MetricsStatus = SUCCESSFUL) {
         postSimpleMetric(project, "open_project", status)
     }
-
+    
     private fun stepAction(
             actionName: String,
             project: Project,
@@ -113,35 +113,35 @@ object Metrics : Loggable {
         }
         postMetrics(project, metric, status)
     }
-
+    
     fun sendAction(
             project: Project,
             stepNode: StepNode,
             status: MetricsStatus = SUCCESSFUL) {
         stepAction("send", project, stepNode, status)
     }
-
+    
     fun downloadAction(
             project: Project,
             stepNode: StepNode,
             status: MetricsStatus = SUCCESSFUL) {
         stepAction("download", project, stepNode, status)
     }
-
+    
     fun getStepStatusAction(
             project: Project,
             stepNode: StepNode,
             status: MetricsStatus = SUCCESSFUL) {
         stepAction("get_step_status", project, stepNode, status)
     }
-
+    
     fun insertAmbientCodeAction(
             project: Project,
             stepNode: StepNode,
             status: MetricsStatus = SUCCESSFUL) {
         stepAction("insert_ambient_code", project, stepNode, status)
     }
-
+    
     fun navigateAction(
             project: Project,
             studyNode: StudyNode,
@@ -150,7 +150,7 @@ object Metrics : Loggable {
             stepAction("navigate", project, studyNode, status)
         }
     }
-
+    
     fun openInBrowserAction(
             project: Project,
             studyNode: StudyNode) {
@@ -158,28 +158,28 @@ object Metrics : Loggable {
             stepAction("open_in_browser", project, studyNode, SUCCESSFUL)
         }
     }
-
+    
     fun resetStepAction(
             project: Project,
             stepNode: StepNode,
             status: MetricsStatus = SUCCESSFUL) {
         stepAction("reset_step", project, stepNode, status)
     }
-
+    
     fun removeAmbientCodeAction(
             project: Project,
             stepNode: StepNode,
             status: MetricsStatus = SUCCESSFUL) {
         stepAction("remove_ambient_code", project, stepNode, status)
     }
-
+    
     fun switchLanguage(
             project: Project,
             stepNode: StepNode,
             status: MetricsStatus = SUCCESSFUL) {
         stepAction("switch_language", project, stepNode, status)
     }
-
+    
     fun testCodeAction(
             project: Project,
             stepNode: StepNode,

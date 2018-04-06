@@ -2,13 +2,12 @@ package org.stepik.core.utils
 
 import com.intellij.openapi.module.ModifiableModuleModel
 import com.intellij.openapi.project.Project
-import org.stepik.core.StudyUtils.getConfigurator
 import org.stepik.core.common.Loggable
 import org.stepik.core.courseFormat.StepNode
-
+import org.stepik.core.getConfigurator
 
 internal object ModuleUtils : Loggable {
-
+    
     fun createStepModule(
             project: Project,
             step: StepNode,

@@ -23,7 +23,7 @@
     <group id="StepikMenu" popup="true" text="Stepik">
       <action id="org.stepik.alt.StepikSendAction" class="org.stepik.core.actions.step.StepikSendAction" />
       <action id="org.stepik.alt.TestSamplesAction" class="org.stepik.core.actions.step.TestSamplesAction" />
-      <action id="org.stepik.alt.LoadProblemAction" class="org.stepik.alt.actions.navigation.LoadProblemAction" />
+      <action id="org.stepik.alt.LoadProblemAction" class="org.stepik.alt.actions.navigation.OpenProblemAction" />
       <action id="org.stepik.alt.DownloadSubmission" class="org.stepik.core.actions.step.DownloadSubmission" />
       <action id="org.stepik.alt.RefreshStepAction" class="org.stepik.core.actions.step.StepikResetStepAction" />
       <action id="org.stepik.alt.OpenInBrowser" class="org.stepik.alt.actions.step.OpenInBrowserAction" />

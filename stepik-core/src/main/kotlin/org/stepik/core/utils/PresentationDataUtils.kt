@@ -9,30 +9,29 @@ import com.intellij.ui.SimpleTextAttributes
 import com.intellij.ui.SimpleTextAttributes.STYLE_PLAIN
 import com.intellij.ui.SimpleTextAttributes.STYLE_STRIKEOUT
 import org.stepik.core.EduNames.SANDBOX_DIR
-import org.stepik.core.StudyUtils.getProjectManager
-import org.stepik.core.StudyUtils.getStudyNode
-import org.stepik.core.StudyUtils.isStepikProject
 import org.stepik.core.courseFormat.StudyNode
+import org.stepik.core.getProjectManager
+import org.stepik.core.getStudyNode
 import org.stepik.core.icons.AllStepikIcons.ProjectTree.sandbox
+import org.stepik.core.isStepikProject
 import org.stepik.core.projectView.ProjectTreeMode.LESSON
 import javax.swing.Icon
 
-
 fun updatePresentationData(data: PresentationData, psiDirectory: PsiDirectory) {
     val project = psiDirectory.project
-
+    
     if (!isStepikProject(project)) {
         return
     }
-
+    
     var path = psiDirectory.relativePath
     if (path.isSandbox()) {
         setAttributes(data, SANDBOX_DIR, JBColor.BLACK, sandbox, false)
         return
     }
-
+    
     path = if (path == ".") "" else path
-
+    
     val node = getStudyNode(project, psiDirectory.virtualFile)
     if (path == node?.path) {
         setAttributes(project, data, node)
@@ -48,14 +47,14 @@ private fun setAttributes(project: Project, data: PresentationData, item: StudyN
     val itemName = when (projectTreeMode) {
         LESSON -> {
             val parent = item.parent
-
+            
             if (parent != null && parent.children.size == 1) {
                 parent.name
             } else {
                 item.name
             }
         }
-        else -> item.name
+        else   -> item.name
     }
     setAttributes(data, itemName, status.getColor(), item.getIcon(), item.wasDeleted)
 }
@@ -73,10 +72,10 @@ private fun setAttributes(data: PresentationData, text: String, color: JBColor, 
     }
 }
 
-fun PsiDirectory.isVisibleDirectory(): Boolean {
+fun PsiDirectory.isVisible(): Boolean {
     return this.relativePath.isVisibleDirectory()
 }
 
-fun PsiFile.isVisibleFile(): Boolean {
+fun PsiFile.isVisible(): Boolean {
     return this.relativePath.isVisibleFile()
 }

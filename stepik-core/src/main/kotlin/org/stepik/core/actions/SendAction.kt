@@ -6,11 +6,11 @@ import com.intellij.openapi.application.ApplicationManager.getApplication
 import com.intellij.openapi.project.Project
 import org.stepik.api.client.StepikApiClient
 import org.stepik.api.objects.submissions.Submission
-import org.stepik.core.StudyUtils.getProjectManager
 import org.stepik.core.common.Loggable
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.StudyStatus
 import org.stepik.core.courseFormat.StudyStatus.SOLVED
+import org.stepik.core.getProjectManager
 import org.stepik.core.metrics.Metrics
 import org.stepik.core.metrics.MetricsStatus.SUCCESSFUL
 import org.stepik.core.metrics.MetricsStatus.TIME_OVER
@@ -20,7 +20,7 @@ object SendAction : Loggable {
     private const val EVALUATION = "evaluation"
     private const val PERIOD = 2 * 1000L //ms
     private const val FIVE_MINUTES = 5 * MILLISECONDS_IN_MINUTES //ms
-
+    
     fun checkStepStatus(
             project: Project,
             stepikApiClient: StepikApiClient,
@@ -32,7 +32,7 @@ object SendAction : Loggable {
         var stepStatus = EVALUATION
         var timer = 0L
         var showedTimer = false
-
+        
         var currentSubmission: Submission? = null
         while (timer < FIVE_MINUTES) {
             try {
@@ -40,7 +40,7 @@ object SendAction : Loggable {
                         .get()
                         .id(submissionId)
                         .execute()
-
+                
                 if (submission.isNotEmpty) {
                     currentSubmission = submission.first()
                     if (showedTimer) {
@@ -57,7 +57,7 @@ object SendAction : Loggable {
                         break
                     }
                 }
-
+                
                 Thread.sleep(PERIOD)
                 timer += PERIOD
             } catch (e: Exception) {
@@ -72,14 +72,14 @@ object SendAction : Loggable {
                 return
             }
         }
-
+        
         if (currentSubmission == null) {
             logger.info("Stop check a status for step: $stepIdString without result")
             return
         }
         val actionStatus = if (stepStatus == EVALUATION) TIME_OVER else SUCCESSFUL
         Metrics.getStepStatusAction(project, stepNode, actionStatus)
-
+        
         if (StudyStatus.of(stepStatus) == SOLVED) {
             stepNode.passed()
         }
@@ -89,7 +89,8 @@ object SendAction : Loggable {
         }
         getApplication().invokeLater {
             if (!project.isDisposed) {
-                ProjectView.getInstance(project).refresh()
+                ProjectView.getInstance(project)
+                        .refresh()
             }
             getProjectManager(project)?.updateSelection()
         }

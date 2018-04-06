@@ -12,13 +12,13 @@ import org.stepik.api.objects.recommendations.ReactionValues.TOO_HARD
 import org.stepik.api.objects.recommendations.ReactionValues.of
 import org.stepik.api.urls.Urls
 import org.stepik.core.ProjectManager
-import org.stepik.core.StudyUtils
-import org.stepik.core.StudyUtils.getProjectManager
 import org.stepik.core.auth.StepikAuthManager
 import org.stepik.core.auth.StepikAuthManager.currentUser
 import org.stepik.core.common.Loggable
 import org.stepik.core.courseFormat.LessonNode
 import org.stepik.core.courseFormat.StepNode
+import org.stepik.core.getProjectManager
+import org.stepik.core.getStudyNode
 import org.stepik.core.utils.getOrCreateSrcDirectory
 import org.stepik.core.utils.navigate
 import org.stepik.core.utils.runWriteActionLater
@@ -30,10 +30,11 @@ import java.io.IOException
 class LinkListener(val project: Project,
                    private val browser: StudyBrowserWindow,
                    val engine: WebEngine) : EventListener, Loggable {
+    
     private val protocolPattern = "([a-z]+):(.*)".toRegex()
     private val pattern = "/lesson(?:/|/[^/]*-)(\\d+)/step/(\\d+).*".toRegex()
     private val projectManager: ProjectManager? = if (!project.isDisposed) getProjectManager(project) else null
-
+    
     override fun handleEvent(ev: Event) {
         if (ev.type == "click") {
             engine.isJavaScriptEnabled = true
@@ -45,9 +46,9 @@ class LinkListener(val project: Project,
             if (matcher != null) {
                 val protocol = matcher.groupValues[1]
                 val link = matcher.groupValues[2]
-
+                
                 when (protocol) {
-                    "inner" -> {
+                    "inner"    -> {
                         browseInnerLink(target, link)
                         return
                     }
@@ -57,36 +58,37 @@ class LinkListener(val project: Project,
                     }
                 }
             }
-
+            
             if (browseProject(href)) {
                 return
             }
-
+            
             if (href.startsWith("/")) {
                 href = Urls.STEPIK_URL + href
             }
-
+            
             BrowserUtil.browse(href)
         }
     }
-
+    
     private fun browseInnerLink(target: Element, link: String) {
         val root = projectManager?.projectRoot ?: return
         val stepPath = target.getAttribute("data-step-path")
-        val node = StudyUtils.getStudyNode(root, stepPath) as? StepNode ?: return
+        val node = getStudyNode(root, stepPath) as? StepNode ?: return
         val contentType = target.getAttribute("data-content-type")
         val prefix = target.getAttribute("data-file-prefix")
         val extension = target.getAttribute("data-file-ext")
-
+        
         val stepikApiClient = StepikAuthManager.stepikApiClient
         val content: String
         try {
-            content = stepikApiClient.files().get(link, contentType)
+            content = stepikApiClient.files()
+                    .get(link, contentType)
         } catch (e: StepikClientException) {
             logger.warn(e)
             return
         }
-
+        
         val srcDirectory = getOrCreateSrcDirectory(project, (node as StepNode?)!!, true) ?: return
         getApplication().runWriteActionLater {
             var index = 1
@@ -97,28 +99,29 @@ class LinkListener(val project: Project,
             }
             val file = srcDirectory.createChildData(null, currentFileName)
             file.setBinaryContent(content.toByteArray())
-
+            
             try {
-                FileEditorManager.getInstance(project).openFile(file, false)
+                FileEditorManager.getInstance(project)
+                        .openFile(file, false)
             } catch (e: IOException) {
                 logger.warn(e)
             }
         }
     }
-
+    
     private fun browseAdaptiveLink(link: String) {
         val items = link.split("/")
         if (items.size < 2) {
             return
         }
-
+        
         val reaction = of(items[0])
         if (reaction !in listOf(TOO_EASY, TOO_HARD, SOLVED)) {
             return
         }
-
+        
         browser.showLoadAnimation()
-
+        
         if (reaction in listOf(TOO_EASY, TOO_HARD)) {
             val lessonId: Long
             try {
@@ -127,14 +130,14 @@ class LinkListener(val project: Project,
                 browser.hideLoadAnimation()
                 return
             }
-
+            
             val stepikClient = StepikAuthManager.authAndGetStepikApiClient(true)
             val user = currentUser
             if (user.isGuest) {
                 browser.hideLoadAnimation()
                 return
             }
-
+            
             stepikClient.recommendationReactions()
                     .post()
                     .user(user.id)
@@ -153,26 +156,26 @@ class LinkListener(val project: Project,
             browser.hideLoadAnimation()
         }
     }
-
+    
     private fun browseProject(href: String): Boolean {
         val matcher = pattern.matchEntire(href) ?: return false
         val lessonId = matcher.groupValues[1].toLong()
         val stepPosition = matcher.groupValues[2].toInt()
-
+        
         val root = projectManager?.projectRoot ?: return false
         val lessonNode = root.getChildByClassAndId(LessonNode::class.java, lessonId)
-
+        
         val step = lessonNode?.getChildByPosition(stepPosition) ?: return false
-
+        
         getApplication().invokeLater { navigate(project, step) }
-
+        
         return true
     }
-
+    
     private fun getLink(element: Element): String {
         return element.getAttribute("href") ?: getLinkFromNodeWithCodeTag(element)
     }
-
+    
     private fun getLinkFromNodeWithCodeTag(element: Element): String {
         var parentNode = element.parentNode
         var attributes = parentNode.attributes
@@ -180,7 +183,7 @@ class LinkListener(val project: Project,
             parentNode = parentNode.parentNode
             attributes = parentNode.attributes
         }
-
+        
         return attributes.getNamedItem("href")?.nodeValue ?: ""
     }
 }

@@ -12,29 +12,29 @@ import com.intellij.psi.PsiFileSystemItem
 import com.intellij.psi.PsiManager
 import com.intellij.util.ui.tree.TreeUtil
 import com.intellij.util.ui.tree.TreeUtil.getPathFromRoot
-import org.stepik.core.StudyUtils.getProjectManager
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.StudyNode
+import org.stepik.core.getProjectManager
 import org.stepik.core.metrics.Metrics
 import java.util.*
 import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.TreeNode
 import javax.swing.tree.TreePath
 
-
 fun navigate(project: Project, targetNode: StudyNode) {
     getApplication().invokeAndWait {
         for (file in FileEditorManager.getInstance(project).openFiles) {
-            FileEditorManager.getInstance(project).closeFile(file)
+            FileEditorManager.getInstance(project)
+                    .closeFile(file)
         }
     }
-
+    
     val projectDir = project.baseDir ?: return
-
+    
     var mainFile: VirtualFile?
     if (targetNode is StepNode) {
         val srcDir = getOrCreateSrcDirectory(project, targetNode, true) ?: return
-
+        
         mainFile = srcDir.findChild(targetNode.currentLang.mainFileName)
         if (mainFile == null) {
             mainFile = if (srcDir.children.isNotEmpty()) srcDir else srcDir.parent
@@ -42,17 +42,18 @@ fun navigate(project: Project, targetNode: StudyNode) {
     } else {
         mainFile = projectDir.findFileByRelativePath(targetNode.path)
     }
-
+    
     if (mainFile != null) {
         getApplication().invokeAndWait {
             updateProjectView(project, mainFile)
         }
     }
     Metrics.navigateAction(project, targetNode)
-
+    
     getProjectManager(project)?.selected = targetNode
-
-    val runToolWindow = ToolWindowManager.getInstance(project).getToolWindow(ToolWindowId.RUN)
+    
+    val runToolWindow = ToolWindowManager.getInstance(project)
+            .getToolWindow(ToolWindowId.RUN)
     if (runToolWindow != null) {
         getApplication().invokeLater { runToolWindow.hide(null) }
     }
@@ -61,13 +62,16 @@ fun navigate(project: Project, targetNode: StudyNode) {
 private fun updateProjectView(project: Project, shouldBeActive: VirtualFile) {
     var file: PsiFileSystemItem?
     if (shouldBeActive.isDirectory) {
-        file = PsiManager.getInstance(project).findDirectory(shouldBeActive)
+        file = PsiManager.getInstance(project)
+                .findDirectory(shouldBeActive)
     } else {
-        file = PsiManager.getInstance(project).findFile(shouldBeActive)
-        FileEditorManager.getInstance(project).openFile(shouldBeActive, false)
+        file = PsiManager.getInstance(project)
+                .findFile(shouldBeActive)
+        FileEditorManager.getInstance(project)
+                .openFile(shouldBeActive, false)
         file = file?.parent
     }
-
+    
     if (file != null) {
         if (file.canNavigate()) {
             file.navigate(true)
@@ -83,7 +87,7 @@ private fun collapseNonSelected(file: PsiFileSystemItem) {
     val paths = HashSet(TreeUtil.collectExpandedPaths(tree))
     val root = tree.model.root as DefaultMutableTreeNode
     val selectionNode = findNodeWithObject(root, file) ?: return
-
+    
     val toCollapse = mutableListOf<TreePath>()
     val selectedPath = getPathFromRoot(selectionNode)
     for (treePath in paths) {
@@ -92,7 +96,7 @@ private fun collapseNonSelected(file: PsiFileSystemItem) {
         }
         var currPath = treePath
         var parent: TreePath? = treePath.parentPath
-
+        
         while (parent != null) {
             if (parent.isDescendant(selectedPath)) {
                 toCollapse.add(currPath)
