@@ -13,13 +13,12 @@ import com.intellij.psi.PsiManager
 import org.stepik.core.EduNames.HIDE
 import org.stepik.core.EduNames.SANDBOX_DIR
 import org.stepik.core.EduNames.SRC
-import org.stepik.core.StudyUtils.getStudyNode
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.StudyNode
+import org.stepik.core.getStudyNode
 import org.stepik.core.utils.ModuleUtils.createStepModule
 import org.stepik.core.utils.ProductGroup.IDEA
 import java.io.IOException
-
 
 const val SEPARATOR = "/"
 private const val SEPARATOR_CHAR = '/'
@@ -38,9 +37,9 @@ fun String.isNotTarget(): Boolean {
 
 private fun isStepFile(root: StudyNode, path: String): Boolean {
     val studyNode = getStudyNode(root, path)
-
+    
     studyNode as? StepNode ?: return false
-
+    
     val filename = studyNode.path.getRelativePath(path)
     return studyNode.isStepFile(filename)
 }
@@ -49,7 +48,7 @@ fun isNotMovableOrRenameElement(node: StudyNode, path: String): Boolean {
     return if (path.isWithinSrc()) {
         path.isHideDir() || path.isWithinHideDir() || isStepFile(node, path)
     } else !path.isWithinSandbox()
-
+    
 }
 
 fun String.isSandbox(): Boolean {
@@ -78,7 +77,9 @@ fun String.isStudyItemDir(): Boolean {
 }
 
 private fun String.splitPath(): Array<String> {
-    return this.split(SEPARATOR).dropLastWhile { it.isEmpty() }.toTypedArray()
+    return this.split(SEPARATOR)
+            .dropLastWhile { it.isEmpty() }
+            .toTypedArray()
 }
 
 fun String.isWithinHideDir(): Boolean {
@@ -96,13 +97,14 @@ fun getParent(path: String): String? {
     } else if (dirs.size == 1) {
         return "."
     }
-
+    
     val parentPath = StringBuilder(dirs[0])
-
+    
     for (i in 1 until dirs.size - 1) {
-        parentPath.append(SEPARATOR).append(dirs[i])
+        parentPath.append(SEPARATOR)
+                .append(dirs[i])
     }
-
+    
     return parentPath.toString()
 }
 
@@ -118,7 +120,8 @@ fun getOrCreateSrcDirectory(project: Project, stepNode: StepNode,
             val modelOwner = myModel == null
             if (modelOwner) {
                 myModel = getApplication().runReadAction(Computable {
-                    ModuleManager.getInstance(project).modifiableModel
+                    ModuleManager.getInstance(project)
+                            .modifiableModel
                 })
             }
             getApplication().runWriteActionAndWait {
@@ -127,10 +130,11 @@ fun getOrCreateSrcDirectory(project: Project, stepNode: StepNode,
                     myModel.commit()
                 }
             }
-
+            
             getApplication().invokeAndWait {
                 if (refresh) {
-                    VirtualFileManager.getInstance().syncRefresh()
+                    VirtualFileManager.getInstance()
+                            .syncRefresh()
                 }
             }
         }
@@ -141,29 +145,31 @@ fun getOrCreateSrcDirectory(project: Project, stepNode: StepNode,
 internal fun getOrCreateSrcPsiDirectory(project: Project, stepNode: StepNode): PsiDirectory? {
     return getApplication().runReadAction(Computable {
         val directory = getOrCreateSrcDirectory(project, stepNode, true) ?: return@Computable null
-        return@Computable PsiManager.getInstance(project).findDirectory(directory)
+        return@Computable PsiManager.getInstance(project)
+                .findDirectory(directory)
     })
 }
 
 private fun getOrCreateDirectory(baseDir: VirtualFile, directoryPath: String): VirtualFile? {
     return baseDir.findFileByRelativePath(directoryPath)
-            ?: getApplication().runWriteActionAndWait {
-                return@runWriteActionAndWait directoryPath.splitPath()
-                        .fold(baseDir) { dir, part ->
-                            try {
-                                return@fold dir.findChild(part) ?: dir.createChildDirectory(null, part)
-                            } catch (e: IOException) {
-                                return@runWriteActionAndWait null
-                            }
-                        }
-            }
+           ?: getApplication().runWriteActionAndWait {
+               return@runWriteActionAndWait directoryPath.splitPath()
+                       .fold(baseDir) { dir, part ->
+                           try {
+                               return@fold dir.findChild(part) ?: dir.createChildDirectory(null, part)
+                           } catch (e: IOException) {
+                               return@runWriteActionAndWait null
+                           }
+                       }
+           }
 }
 
 internal fun getOrCreatePsiDirectory(project: Project, baseDir: PsiDirectory,
                                      relativePath: String): PsiDirectory? {
     val directory = getOrCreateDirectory(baseDir.virtualFile, relativePath) ?: return null
-
+    
     return getApplication().runReadAction(Computable {
-        PsiManager.getInstance(project).findDirectory(directory)
+        PsiManager.getInstance(project)
+                .findDirectory(directory)
     })
 }

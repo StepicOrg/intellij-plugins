@@ -9,9 +9,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.InputValidator
 import com.intellij.openapi.ui.ex.MessagesEx.showInputDialog
 import org.stepik.api.objects.lessons.CompoundUnitLesson
-import org.stepik.core.StudyUtils.getProjectManager
-import org.stepik.core.StudyUtils.isStepikProject
-import org.stepik.core.StudyUtils.pluginId
 import org.stepik.core.actions.getShortcutText
 import org.stepik.core.actions.navigation.StudyNavigator
 import org.stepik.core.actions.navigation.StudyStepNavigationAction
@@ -20,6 +17,9 @@ import org.stepik.core.courseFormat.LessonNode
 import org.stepik.core.courseFormat.Node
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.StudyNode
+import org.stepik.core.getProjectManager
+import org.stepik.core.isStepikProject
+import org.stepik.core.pluginId
 
 class OpenProblemAction : StudyStepNavigationAction(TEXT, DESCRIPTION, AllIcons.Actions.Forward) {
     

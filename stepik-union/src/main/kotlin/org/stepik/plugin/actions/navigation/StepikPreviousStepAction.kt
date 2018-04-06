@@ -2,21 +2,21 @@ package org.stepik.plugin.actions.navigation
 
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.project.Project
-import org.stepik.core.StudyUtils.pluginId
 import org.stepik.core.actions.getShortcutText
 import org.stepik.core.actions.navigation.StudyNavigator.previousLeaf
 import org.stepik.core.courseFormat.StudyNode
+import org.stepik.core.pluginId
 
 class StepikPreviousStepAction : StepikNavigationAction(TEXT, DESCRIPTION, AllIcons.Actions.Back) {
-
+    
     override fun getTargetStep(project: Project, currentStepNode: StudyNode?): StudyNode? {
         return previousLeaf(currentStepNode)
     }
-
+    
     override fun getActionId() = ACTION_ID
-
+    
     override fun getShortcuts() = arrayOf(SHORTCUT)
-
+    
     companion object {
         private val ACTION_ID = "$pluginId.PreviousStepAction"
         private const val SHORTCUT = "ctrl pressed COMMA"

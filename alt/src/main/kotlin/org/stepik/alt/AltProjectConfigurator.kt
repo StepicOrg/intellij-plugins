@@ -11,13 +11,13 @@ import org.stepik.alt.projectWizard.idea.StepModuleBuilder
 import org.stepik.core.ProjectGenerator
 import org.stepik.core.StudyBasePluginConfigurator
 import org.stepik.core.StudyPluginConfigurator
-import org.stepik.core.StudyUtils.isStepikProject
 import org.stepik.core.actions.step.DownloadSubmission
 import org.stepik.core.actions.step.StepikResetStepAction
 import org.stepik.core.actions.step.StepikSendAction
 import org.stepik.core.actions.step.TestSamplesAction
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.StudyNode
+import org.stepik.core.isStepikProject
 import org.stepik.core.projectWizard.idea.BaseModuleBuilder
 
 class AltProjectConfigurator : StudyBasePluginConfigurator() {

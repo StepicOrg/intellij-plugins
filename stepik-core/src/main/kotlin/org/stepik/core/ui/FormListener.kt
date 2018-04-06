@@ -6,15 +6,15 @@ import com.intellij.openapi.project.Project
 import javafx.application.Platform
 import javafx.stage.FileChooser
 import org.stepik.api.objects.ObjectsContainer
-import org.stepik.core.StudyUtils.getConfigurator
-import org.stepik.core.StudyUtils.getProjectManager
-import org.stepik.core.StudyUtils.getStudyNode
 import org.stepik.core.actions.SendAction
 import org.stepik.core.auth.StepikAuthManager.authAndGetStepikApiClient
 import org.stepik.core.auth.StepikAuthManager.authentication
 import org.stepik.core.common.Loggable
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.StepType
+import org.stepik.core.getConfigurator
+import org.stepik.core.getProjectManager
+import org.stepik.core.getStudyNode
 import org.stepik.core.metrics.Metrics
 import org.stepik.core.metrics.MetricsStatus.FAILED_POST
 import org.stepik.core.testFramework.toolWindow.StepikTestResultToolWindow
@@ -29,9 +29,8 @@ import java.io.File
 import java.io.IOException
 import java.nio.file.Files
 
-
 internal class FormListener(private val project: Project, private val browser: StudyBrowserWindow) : EventListener {
-
+    
     override fun handleEvent(event: Event) {
         val domEventType = event.type
         if (EVENT_TYPE_SUBMIT == domEventType) {
@@ -41,10 +40,10 @@ internal class FormListener(private val project: Project, private val browser: S
             event.stopPropagation()
         }
     }
-
+    
     companion object : Loggable {
         const val EVENT_TYPE_SUBMIT = "submit"
-
+        
         private fun getDataFromFile(stepNode: StepNode, project: Project): String? {
             val fileChooser = FileChooser()
             fileChooser.title = "Open file"
@@ -64,10 +63,10 @@ internal class FormListener(private val project: Project, private val browser: S
             }
             return null
         }
-
+        
         fun getAttempt(project: Project, node: StepNode) {
             val stepikApiClient = authAndGetStepikApiClient(true)
-
+            
             stepikApiClient.attempts()
                     .post<ObjectsContainer<*>>()
                     .step(node.id)
@@ -81,7 +80,7 @@ internal class FormListener(private val project: Project, private val browser: S
                         }
                     }
         }
-
+        
         private fun sendStep(
                 project: Project,
                 stepNode: StepNode,
@@ -90,44 +89,45 @@ internal class FormListener(private val project: Project, private val browser: S
                 attemptId: Long,
                 data: String?) {
             val stepikApiClient = authAndGetStepikApiClient(true)
-
+            
             val query = stepikApiClient.submissions()
                     .post()
                     .attempt(attemptId)
             val reply = getReply(stepNode, type, elements, data) ?: return
-
+            
             query.reply(reply)
                     .executeAsync()
                     .whenComplete { submissions, e ->
                         val lesson = stepNode.parent
                         val lessonName = lesson?.name ?: ""
-
+                        
                         val resultWindows = arrayOfNulls<StepikTestResultToolWindow>(1)
-
+                        
                         val title = "$lessonName : ${stepNode.name}"
-                        ApplicationManager.getApplication().invokeAndWait {
-                            resultWindows[0] = showTestResultsToolWindow(project, title)
-                        }
-
+                        ApplicationManager.getApplication()
+                                .invokeAndWait {
+                                    resultWindows[0] = showTestResultsToolWindow(project, title)
+                                }
+                        
                         val resultWindow = resultWindows[0]!!
                         resultWindow.clear()
                         resultWindow.println("Test method: send to Stepik")
-
+                        
                         if (submissions == null) {
                             printError(e, resultWindow)
                             getProjectManager(project)?.updateSelection()
                             Metrics.sendAction(project, stepNode, FAILED_POST)
                             return@whenComplete
                         }
-
+                        
                         if (submissions.isEmpty) {
                             printError(e, resultWindow)
                             Metrics.sendAction(project, stepNode, FAILED_POST)
                             return@whenComplete
                         }
-
+                        
                         Metrics.sendAction(project, stepNode)
-
+                        
                         val submission = submissions.first()
                         SendAction.checkStepStatus(project,
                                 stepikApiClient,
@@ -136,52 +136,50 @@ internal class FormListener(private val project: Project, private val browser: S
                                 resultWindow)
                     }
         }
-
+        
         private fun printError(e: Throwable, resultWindow: StepikTestResultToolWindow) {
             resultWindow.println("Failed send step from browser", ConsoleViewContentType.ERROR_OUTPUT)
             resultWindow.println(e.message ?: "", ConsoleViewContentType.ERROR_OUTPUT)
             logger.warn("Failed send step from browser", e)
         }
-
+        
         fun handle(
                 project: Project,
                 browser: StudyBrowserWindow,
                 form: HTMLFormElement) {
             val root = getProjectManager(project)?.projectRoot ?: return
-
+            
             val elements = Elements(form.elements)
-
+            
             val node = getStudyNode(root, form.action) as? StepNode
-
+            
             if (node == null && elements.action !in listOf("login", "next_step")) {
                 return
             }
-
+            
             when (elements.action) {
                 "get_first_attempt", "get_attempt" -> if (!elements.isLocked) {
                     getAttempt(project, node!!)
                 }
-                "submit" -> {
+                "submit"                           -> {
                     val type = StepType.of(elements.type)
                     val isFromFile = elements.isFromFile
                     val data = if (isFromFile) getDataFromFile(node!!, project) else null
                     val attemptId = elements.attemptId
                     sendStep(project, node!!, elements, type, attemptId, data)
                 }
-                "save_reply" -> {
+                "save_reply"                       -> {
                     val type = StepType.of(elements.type)
                     getReply(node!!, type, elements, null)
                 }
-                "login" -> {
-                    authentication()
-                }
-                "next_step" -> {
+                "login"                            -> authentication()
+                "next_step"                        -> {
                     Platform.runLater {
                         val targetNode = getConfigurator(project)?.nextAction(project, node) ?: return@runLater
                         navigate(project, targetNode)
                     }
                 }
-                else -> browser.hideLoadAnimation()
+                else                               -> browser.hideLoadAnimation()
             }
         }
     }

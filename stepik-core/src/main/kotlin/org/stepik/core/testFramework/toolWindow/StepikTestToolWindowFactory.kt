@@ -10,15 +10,15 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
-import org.stepik.core.StudyUtils.getProjectManager
+import org.stepik.core.getProjectManager
 
 class StepikTestToolWindowFactory : ToolWindowFactory {
-
+    
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
         getProjectManager(project)?.selected ?: return
-
+        
         toolWindow.isToHideOnEmptyContent = true
-
+        
         val contentManager = toolWindow.contentManager
         val consoleView = ConsoleViewImpl(project, true)
         val content = contentManager.factory.createContent(consoleView.component, null, false)
@@ -27,23 +27,24 @@ class StepikTestToolWindowFactory : ToolWindowFactory {
         if (editor is EditorEx) {
             editor.isRendererMode = true
         }
-
+        
         val handler = StepikTestFileEditorManagerListener(toolWindow)
-        project.messageBus.connect().subscribe(FILE_EDITOR_MANAGER, handler)
+        project.messageBus.connect()
+                .subscribe(FILE_EDITOR_MANAGER, handler)
     }
-
+    
     class StepikTestFileEditorManagerListener(val toolWindow: ToolWindow) : FileEditorManagerListener {
         override fun fileOpened(source: FileEditorManager, file: VirtualFile) = Unit
-
+        
         override fun fileClosed(source: FileEditorManager, file: VirtualFile) {
             toolWindow.setAvailable(false, {})
         }
-
+        
         override fun selectionChanged(event: FileEditorManagerEvent) {
             toolWindow.setAvailable(false, {})
         }
     }
-
+    
     companion object {
         const val ID = "Stepik Test"
     }
