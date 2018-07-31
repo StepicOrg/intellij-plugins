@@ -1,2 +1,2 @@
 rootProject.name = 'intellij-plugins'
-include 'stepik-core', 'stepik-java-api', 'stepik-union', 'alt'
+include 'stepik-core', 'stepik-java-api', 'stepik-union', 'hyperskill'

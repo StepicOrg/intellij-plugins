@@ -1,6 +1,6 @@
 package org.stepik.api.client;
 
-import javafx.util.Pair;
+import kotlin.Pair;
 import org.apache.http.Consts;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -107,7 +107,10 @@ public class HttpTransportClient implements TransportClient {
     }
 
     @NotNull
-    public static HttpTransportClient getInstance(@Nullable String proxyHost, int proxyPort, @NotNull String userAgent) {
+    public static HttpTransportClient getInstance(
+            @Nullable String proxyHost,
+            int proxyPort,
+            @NotNull String userAgent) {
         Pair<String, Integer> proxy = new Pair<>(proxyHost, proxyPort);
 
         return instances.computeIfAbsent(proxy,

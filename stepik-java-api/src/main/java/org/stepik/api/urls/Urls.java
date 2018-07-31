@@ -7,6 +7,7 @@ public class Urls {
     public static final String STEPIK_URL = "https://stepik.org";
     public static final String OAUTH_URL = STEPIK_URL + "/oauth2/token/";
     public static final String COURSE = STEPIK_URL + "/course";
+    public static final String HYPERSKILL_URL = "https://hyperskill.org";
     private static final String STEPIK_API_URL = STEPIK_URL + "/api";
     public static final String ATTEMPTS = STEPIK_API_URL + "/attempts";
     public static final String COURSES = STEPIK_API_URL + "/courses";
@@ -24,6 +25,4 @@ public class Urls {
     public static final String UNITS = STEPIK_API_URL + "/units";
     public static final String USERS = STEPIK_API_URL + "/users";
     public static final String VIEWS = STEPIK_API_URL + "/views";
-
-    public static final String ALT_URL = "https://alt.stepik.org";
 }

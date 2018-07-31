@@ -45,7 +45,7 @@ abstract class AbstractOpenInBrowserAction : AbstractStepAction(TEXT, DESCRIPTIO
         private val ACTION_ID = "$pluginId.OpenInBrowser"
         private const val SHORTCUT = "ctrl shift pressed HOME"
         private val SHORTCUT_TEXT = getShortcutText(SHORTCUT)
-        private val TEXT = "View this step on Stepik ($SHORTCUT_TEXT)"
-        private const val DESCRIPTION = "View this step on Stepik"
+        private val TEXT = "View this step on Hyperskill ($SHORTCUT_TEXT)"
+        private const val DESCRIPTION = "View this step on Hyperskill"
     }
 }
