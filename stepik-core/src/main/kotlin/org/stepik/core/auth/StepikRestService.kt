@@ -1,6 +1,5 @@
 package org.stepik.core.auth
 
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ApplicationManager.getApplication
 import com.intellij.openapi.util.io.BufferExposingByteArrayOutputStream
 import com.intellij.openapi.util.io.StreamUtil
@@ -21,22 +20,21 @@ import org.jetbrains.io.addNoCache
 import org.jetbrains.io.response
 import org.jetbrains.io.send
 import org.stepik.api.exceptions.StepikClientException
-import org.stepik.core.auth.StepikAuthManager.CLIENT_ID_CODE
 import org.stepik.core.auth.StepikAuthManager.authorizationCodeUrl
 import org.stepik.core.auth.StepikAuthManager.stepikApiClient
+import org.stepik.core.clientId
 import org.stepik.core.common.Loggable
 import org.stepik.core.templates.Templater
 import java.io.ByteArrayInputStream
 
-
 class StepikRestService : RestService(), Loggable {
-
+    
     override fun getServiceName() = SERVICE_NAME
-
+    
     override fun isMethodSupported(method: HttpMethod) = method === GET
-
+    
     override fun isPrefixlessAllowed() = true
-
+    
     override fun isHostTrusted(request: FullHttpRequest): Boolean {
         val codeMatcher = OAUTH_URI_PATTERN.matchEntire(request.uri())
         return if (request.method() === GET && codeMatcher != null) {
@@ -45,11 +43,12 @@ class StepikRestService : RestService(), Loggable {
             super.isHostTrusted(request)
         }
     }
-
-    override fun execute(urlDecoder: QueryStringDecoder, request: FullHttpRequest, context: ChannelHandlerContext): String? {
+    
+    override fun execute(urlDecoder: QueryStringDecoder, request: FullHttpRequest,
+                         context: ChannelHandlerContext): String? {
         val uri = urlDecoder.uri()
         logger.info("Process the request $uri")
-
+        
         val codeMatcher = OAUTH_URI_PATTERN.matchEntire(uri)
         if (codeMatcher != null) {
             val code = getStringParameter("code", urlDecoder)
@@ -65,23 +64,23 @@ class StepikRestService : RestService(), Loggable {
                     )
                     return error
                 }
-                code != null -> {
+                code != null  -> {
                     var newState = StepikAuthState.NOT_AUTH
                     try {
                         val tokenInfo = stepikApiClient.oauth2()
-                                .userAuthenticationCode(CLIENT_ID_CODE, redirectUri, code)
+                                .userAuthenticationCode(clientId, redirectUri, code)
                                 .execute()
                         if (tokenInfo.accessToken != null) {
                             newState = StepikAuthState.AUTH
-
-                            stepikApiClient.setTokenInfo(tokenInfo)
+                            
+                            stepikApiClient.tokenInfo = tokenInfo
                             val user = StepikAuthManager.getCurrentUser(true)
                             if (!user.isGuest) {
                                 StepikAuthManager.setTokenInfo(user.id, tokenInfo)
                             } else {
                                 newState = StepikAuthState.NOT_AUTH
                             }
-
+                            
                             logger.info("Open a user browser with result: $newState")
                         }
                     } catch (e: StepikClientException) {
@@ -97,15 +96,17 @@ class StepikRestService : RestService(), Loggable {
                     StepikAuthManager.setState(newState)
                     if (newState === StepikAuthState.AUTH) {
                         sendHTMLResponse(request, context, "auth_successfully")
-                        val frame = WindowManager.getInstance().findVisibleFrame()
+                        val frame = WindowManager.getInstance()
+                                .findVisibleFrame()
                         getApplication().invokeLater {
-                            AppIcon.getInstance().requestFocus(frame as IdeFrame)
+                            AppIcon.getInstance()
+                                    .requestFocus(frame as IdeFrame)
                             frame.toFront()
                         }
                         return null
                     }
                 }
-                else -> {
+                else          -> {
                     sendHTMLResponse(request, context, "auth_failure",
                             mapOf(
                                     "link" to authorizationCodeUrl,
@@ -116,16 +117,17 @@ class StepikRestService : RestService(), Loggable {
                 }
             }
         }
-
+        
         sendStatus(HttpResponseStatus.BAD_REQUEST, false, context.channel())
         val message = "Unknown command $uri"
         logger.info(message)
         return message
     }
-
+    
     companion object {
         const val SERVICE_NAME = "$PREFIX/stepik"
-        val port = BuiltInServerManager.getInstance().port
+        val port = BuiltInServerManager.getInstance()
+                .port
         val redirectUri = "http://localhost:$port/$SERVICE_NAME/oauth"
         val OAUTH_URI_PATTERN = "/$SERVICE_NAME/oauth[^/]*".toRegex()
     }
@@ -138,8 +140,9 @@ private fun sendHTMLResponse(request: HttpRequest, context: ChannelHandlerContex
         it.write(StreamUtil.loadFromStream(ByteArrayInputStream(pageTemplate.toByteArray())))
         val response = response("text/html", wrappedBuffer(it.internalBuffer, 0, it.size()))
         response.addNoCache()
-        response.headers().set("X-Frame-Options", "Deny")
+        response.headers()
+                .set("X-Frame-Options", "Deny")
         response.send(context.channel(), request)
     }
-
+    
 }

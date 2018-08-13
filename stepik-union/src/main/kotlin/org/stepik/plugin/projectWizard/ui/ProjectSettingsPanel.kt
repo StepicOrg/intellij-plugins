@@ -21,7 +21,9 @@ import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JScrollPane
 
-class ProjectSettingsPanel(visibleLangBox: Boolean) : ProjectSetting, HierarchyListener, StepikAuthManagerListener, Loggable {
+class ProjectSettingsPanel(visibleLangBox: Boolean) : ProjectSetting, HierarchyListener, StepikAuthManagerListener,
+        Loggable {
+    
     private val listeners = ArrayList<ProjectSettingListener>()
     private var mainPanel: JPanel? = null
     private var nameLabel: JLabel? = null
@@ -36,13 +38,13 @@ class ProjectSettingsPanel(visibleLangBox: Boolean) : ProjectSetting, HierarchyL
     private var loginButton: JButton? = null
     var selectedStudyObject = EMPTY_STUDY_OBJECT
         private set
-
+    
     var language: SupportedLanguages
         get() = langComboBox!!.selectedItem
         set(language) {
             langComboBox!!.selectedItem = language
         }
-
+    
     init {
         refreshListButton!!.target = courseListComboBox!!
         courseListComboBox!!.target = this
@@ -53,14 +55,14 @@ class ProjectSettingsPanel(visibleLangBox: Boolean) : ProjectSetting, HierarchyL
         loginButton!!.addActionListener { StepikAuthManager.relogin() }
         StepikAuthManager.addListener(this)
     }
-
+    
     fun getComponent() = mainPanel
-
+    
     private fun setUsername() {
         val username = StepikAuthManager.currentUserFullName
         userName!!.text = username
     }
-
+    
     fun updateStep() {
         logger.info("Start updating settings")
         courseListComboBox!!.refresh(langComboBox!!.selectedItem)
@@ -68,13 +70,13 @@ class ProjectSettingsPanel(visibleLangBox: Boolean) : ProjectSetting, HierarchyL
         loginButton!!.text = if (isAuthenticated) "Change user" else "Login"
         logger.info("Updating settings is done")
     }
-
+    
     fun validate(): Boolean {
         val valid = selectedStudyObject.id != 0L
-        logger.info("Validation is " + valid)
+        logger.info("Validation is $valid")
         return valid
     }
-
+    
     override fun selectedStudyNode(studyObject: StudyObject) {
         selectedStudyObject = studyObject
         val description = getCourseDescription(studyObject)
@@ -82,37 +84,37 @@ class ProjectSettingsPanel(visibleLangBox: Boolean) : ProjectSetting, HierarchyL
         // Scroll to top
         courseListDescription!!.selectionStart = 0
         courseListDescription!!.selectionEnd = 0
-        logger.info("Has selected the course: " + studyObject)
+        logger.info("Has selected the course: $studyObject")
         notifyListeners()
     }
-
+    
     private fun notifyListeners() {
-        listeners.forEach({ it.changed() })
+        listeners.forEach { it.changed() }
     }
-
+    
     override fun addListener(listener: ProjectSettingListener) {
         listeners.add(listener)
     }
-
+    
     override fun removeListener(listener: ProjectSettingListener) {
         listeners.remove(listener)
     }
-
+    
     override fun selectedProgrammingLanguage(language: SupportedLanguages) {
         courseListComboBox!!.refresh(language)
     }
-
+    
     override fun hierarchyChanged(e: HierarchyEvent) {
         notifyListeners()
     }
-
+    
     override fun stateChanged(oldState: StepikAuthState, newState: StepikAuthState) {
         if (newState == NOT_AUTH || newState == AUTH) {
             ApplicationManager.getApplication()
                     .invokeLater({ this.updateStep() }, ModalityState.stateForComponent(mainPanel!!))
         }
     }
-
+    
     fun dispose() {
         StepikAuthManager.removeListener(this)
     }

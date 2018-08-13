@@ -42,7 +42,6 @@ fun updatePresentationData(data: PresentationData, psiDirectory: PsiDirectory) {
 
 private fun setAttributes(project: Project, data: PresentationData, item: StudyNode) {
     item.project = project
-    val status = item.status
     val projectTreeMode = getProjectManager(project)?.projectTreeMode
     val itemName = when (projectTreeMode) {
         LESSON -> {
@@ -56,7 +55,7 @@ private fun setAttributes(project: Project, data: PresentationData, item: StudyN
         }
         else   -> item.name
     }
-    setAttributes(data, itemName, status.getColor(), item.getIcon(), item.wasDeleted)
+    setAttributes(data, itemName, item.status.getColor(), item.getIcon(), item.wasDeleted)
 }
 
 private fun setAttributes(data: PresentationData, text: String, color: JBColor, icon: Icon?, deleted: Boolean) {

@@ -20,7 +20,7 @@ public class ReplyDeserializer implements JsonDeserializer<Reply> {
     @Override
     public Reply deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
             throws JsonParseException {
-        if (json == null || !(json instanceof JsonObject)) {
+        if (!(json instanceof JsonObject)) {
             return null;
         }
 

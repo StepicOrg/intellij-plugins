@@ -16,35 +16,36 @@ import org.stepik.core.testFramework.processes.TestProcess
 
 class JavaRunner : JetRunner() {
     override val typeName: String = "Application"
-
+    
     override val factoryName: String = "Application"
-
+    
     override fun setWorkingDirectory(appConfiguration: RunConfiguration,
                                      workingVirtualDirectory: VirtualFile) {
         val workingDirectory = workingVirtualDirectory.path
         (appConfiguration as ApplicationConfiguration).workingDirectory = workingDirectory
     }
-
+    
     override fun setMainClass(project: Project, appConfiguration: RunConfiguration,
                               mainVirtualFile: VirtualFile?) {
         if (mainVirtualFile != null) {
-            val mainPsiFile = Array<Any?>(1, { null })
+            val mainPsiFile = Array<Any?>(1) { null }
             getApplication().invokeAndWait {
                 val psiManager = PsiManager.getInstance(project)
                 mainPsiFile[0] = psiManager.findFile(mainVirtualFile)
             }
             val mainPsiClass = mainPsiFile[0]
             if (mainPsiClass is PsiJavaFile) {
-                DumbService.getInstance(project).runReadActionInSmartMode {
-                    val mainClass = mainPsiClass.classes.firstOrNull {
-                        isRunnableClass(it, false) && hasMainMethod(it)
-                    } ?: return@runReadActionInSmartMode
-                    (appConfiguration as ApplicationConfiguration).mainClass = mainClass
-                }
+                DumbService.getInstance(project)
+                        .runReadActionInSmartMode {
+                            val mainClass = mainPsiClass.classes.firstOrNull {
+                                isRunnableClass(it, false) && hasMainMethod(it)
+                            } ?: return@runReadActionInSmartMode
+                            (appConfiguration as ApplicationConfiguration).setMainClass(mainClass)
+                        }
             }
         }
     }
-
+    
     override fun createTestProcess(project: Project, stepNode: StepNode, mainFilePath: String): TestProcess {
         return JavaProcess(project, stepNode, mainFilePath)
     }

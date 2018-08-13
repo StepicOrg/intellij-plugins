@@ -27,8 +27,9 @@ import java.util.stream.Collectors;
  */
 abstract public class StepikAbstractQuery<T> {
     private static final Logger logger = LoggerFactory.getLogger(StepikAbstractQuery.class);
+    protected static final String IDS_KEY = "ids[]";
 
-    private final StepikAbstractAction stepikAction;
+    protected final StepikAbstractAction stepikAction;
     private final Class<T> responseClass;
     private final QueryMethod method;
     private final Map<String, String[]> params = new HashMap<>();
@@ -129,7 +130,17 @@ abstract public class StepikAbstractQuery<T> {
         ClientResponse response = null;
         switch (method) {
             case GET:
-                url += "?" + mapToGetString();
+                String[] ids = params.get(IDS_KEY);
+                if (ids.length == 1) {
+                    if (!url.endsWith("/")) {
+                        url += '/';
+                    }
+                    url += ids[0];
+                    params.remove(IDS_KEY);
+                }
+                if (!params.isEmpty()) {
+                    url += "?" + mapToGetString();
+                }
                 response = transportClient.get(stepikApi, url, headers);
                 break;
             case POST:

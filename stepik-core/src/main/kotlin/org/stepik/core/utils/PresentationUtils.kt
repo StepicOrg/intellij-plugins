@@ -67,7 +67,7 @@ fun StudyNode.getIcon(): Icon? {
     }
 }
 
-fun StudyStatus?.getColor(): JBColor {
+fun StudyStatus.getColor(): JBColor {
     return when (this) {
         SOLVED -> return SOLVED_COLOR
         FAILED -> return WRONG_COLOR

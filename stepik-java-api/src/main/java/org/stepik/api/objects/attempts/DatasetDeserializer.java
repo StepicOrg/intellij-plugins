@@ -33,7 +33,7 @@ public class DatasetDeserializer implements JsonDeserializer<Dataset> {
     @Override
     public Dataset deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
             throws JsonParseException {
-        if (json == null || !(json instanceof JsonObject)) {
+        if (!(json instanceof JsonObject)) {
             return null;
         }
 

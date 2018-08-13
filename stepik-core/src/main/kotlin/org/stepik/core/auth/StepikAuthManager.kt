@@ -11,13 +11,15 @@ import org.stepik.api.client.StepikApiClient
 import org.stepik.api.exceptions.StepikClientException
 import org.stepik.api.objects.auth.TokenInfo
 import org.stepik.api.objects.users.User
-import org.stepik.api.urls.Urls
 import org.stepik.core.ProjectManager
 import org.stepik.core.auth.StepikAuthState.AUTH
 import org.stepik.core.auth.StepikAuthState.NOT_AUTH
 import org.stepik.core.auth.StepikAuthState.UNKNOWN
 import org.stepik.core.auth.StepikRestService.Companion.redirectUri
+import org.stepik.core.clientId
 import org.stepik.core.common.Loggable
+import org.stepik.core.host
+import org.stepik.core.loadCurrentUser
 import org.stepik.core.metrics.Metrics
 import org.stepik.core.pluginId
 import org.stepik.core.utils.getCurrentProduct
@@ -28,12 +30,11 @@ import java.util.concurrent.Executors
 import java.lang.System.getProperty as getSysProperty
 
 object StepikAuthManager : Loggable {
-    const val CLIENT_ID_CODE = "IexnxCQMMPkEanIsjlbQM4iFlZeJTqoVSbYP30AB"
-    val authorizationCodeUrl = "${Urls.STEPIK_URL}/oauth2/authorize/?" +
-                               "client_id=$CLIENT_ID_CODE&redirect_uri=$redirectUri&response_type=code"
+    val authorizationCodeUrl = "$host/oauth2/authorize/?" +
+                               "client_id=$clientId&redirect_uri=$redirectUri&response_type=code"
     private val LAST_USER_PROPERTY_NAME = "$pluginId.LAST_USER"
     private val userAgent = "Stepik Union/${version(pluginId)} (${getSysProperty("os.name")}) " +
-                            "StepikApiClient/${StepikApiClient.getVersion()} " +
+                            "StepikApiClient/${StepikApiClient.version} " +
                             "${getCurrentProduct()}/${getCurrentProductVersion()} " +
                             "JRE/${getSysProperty("java.version")}"
     val stepikApiClient = initStepikApiClient()
@@ -53,7 +54,7 @@ object StepikAuthManager : Loggable {
                 return false
             }
             
-            stepikApiClient.tokenInfo.accessToken ?: return false
+            stepikApiClient.tokenInfo?.accessToken ?: return false
             
             return !getCurrentUser(true).isGuest
         }
@@ -77,16 +78,16 @@ object StepikAuthManager : Loggable {
                 logger.info("Uses proxy: Host = ${instance.PROXY_HOST}, Port = ${instance.PROXY_PORT}")
                 val transportClient: HttpTransportClient =
                         HttpTransportClient.getInstance(instance.PROXY_HOST, instance.PROXY_PORT, userAgent)
-                StepikApiClient(transportClient)
+                StepikApiClient(transportClient, host)
             } else {
-                StepikApiClient(userAgent)
+                StepikApiClient(userAgent, host)
             }
             
             val lastUserId = lastUser
             
             val tokenInfo = getTokenInfo(lastUserId, client)
             
-            client.setTokenInfo(tokenInfo)
+            client.tokenInfo = tokenInfo
             
             return client
         }
@@ -120,7 +121,7 @@ object StepikAuthManager : Loggable {
         state = value
         
         if (state === NOT_AUTH) {
-            stepikApiClient.setTokenInfo(null)
+            stepikApiClient.tokenInfo = null
             user = null
             val userId = lastUser
             setTokenInfo(userId, TokenInfo())
@@ -140,23 +141,20 @@ object StepikAuthManager : Loggable {
             return AUTH
         }
         
-        var refreshToken = stepikApiClient.tokenInfo.refreshToken
-        if (refreshToken == null) {
-            val tokenInfo = getTokenInfo(lastUser)
-            refreshToken = tokenInfo.refreshToken
-        }
+        val tokenInfo = stepikApiClient.tokenInfo ?: getTokenInfo(lastUser)
+        
+        val refreshToken = tokenInfo.refreshToken
         
         if (refreshToken != null) {
             try {
                 stepikApiClient.oauth2()
-                        .userAuthenticationRefresh(CLIENT_ID_CODE, refreshToken)
+                        .userAuthenticationRefresh(clientId, refreshToken)
                         .execute()
                 logger.info("Refresh a token is successfully")
                 return AUTH
             } catch (re: StepikClientException) {
                 logger.info("Refresh a token failed: " + re.message)
             }
-            
         }
         
         return NOT_AUTH
@@ -178,9 +176,7 @@ object StepikAuthManager : Loggable {
             val password = credentials.getPasswordAsString()
             authInfo = client.jsonConverter.fromJson(password, TokenInfo::class.java)
         }
-        return if (authInfo == null) {
-            TokenInfo()
-        } else authInfo
+        return authInfo ?: TokenInfo()
     }
     
     internal fun setTokenInfo(userId: Long, tokenInfo: TokenInfo) {
@@ -198,8 +194,7 @@ object StepikAuthManager : Loggable {
     internal fun getCurrentUser(request: Boolean): User {
         if (user == null || user!!.id == 0L || request) {
             user = try {
-                stepikApiClient.stepiks()
-                        .currentUser
+                loadCurrentUser(stepikApiClient)
             } catch (e: StepikClientException) {
                 logger.warn("Get current user failed", e)
                 User()

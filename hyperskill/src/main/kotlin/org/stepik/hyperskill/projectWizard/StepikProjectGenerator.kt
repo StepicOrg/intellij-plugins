@@ -68,7 +68,7 @@ object StepikProjectGenerator : ProjectGenerator, Loggable {
         })
         
         val plugins = PathManager.getPluginsPath()
-        val moduleDir = FileUtil.join(plugins, "alt", "hyperskill")
+        val moduleDir = FileUtil.join(plugins, "hyperskill", "hyperskill")
         
         getApplication().runWriteAction {
             SandboxModuleBuilder(moduleDir).createModule(moduleModel)

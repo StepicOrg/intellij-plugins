@@ -3,7 +3,6 @@ package org.stepik.core.courseFormat.stepHelpers
 import com.intellij.openapi.project.Project
 import org.stepik.api.exceptions.StepikClientException
 import org.stepik.api.objects.steps.Step
-import org.stepik.api.urls.Urls
 import org.stepik.core.auth.StepikAuthManager.authAndGetStepikApiClient
 import org.stepik.core.auth.StepikAuthManager.isAuthenticated
 import org.stepik.core.common.Loggable
@@ -12,6 +11,7 @@ import org.stepik.core.courseFormat.stepHelpers.Actions.NEED_LOGIN
 import org.stepik.core.courseFormat.stepHelpers.Actions.NOTHING
 import org.stepik.core.getConfigurator
 import org.stepik.core.getProjectManager
+import org.stepik.core.host
 
 open class StepHelper(val project: Project, internal val stepNode: StepNode) : Loggable {
     val data
@@ -30,8 +30,8 @@ open class StepHelper(val project: Project, internal val stepNode: StepNode) : L
     
     val link: String
         get() {
-            val parent = stepNode.parent ?: return Urls.STEPIK_URL
-            return "${Urls.STEPIK_URL}/lesson/${parent.id}/step/${parent.position}"
+            val parent = stepNode.parent ?: return host
+            return "$host/lesson/${parent.id}/step/${parent.position}"
         }
     
     val path: String

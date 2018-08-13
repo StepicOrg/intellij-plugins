@@ -29,7 +29,7 @@ class StepikModuleType : ModuleType<CourseModuleBuilder>(ID) {
             settingsStep: SettingsStep,
             moduleBuilder: ModuleBuilder): ModuleWizardStep? {
         return ProjectWizardStepFactory.getInstance()
-                .createJavaSettingsStep(settingsStep, moduleBuilder, { moduleBuilder.isSuitableSdkType(it) })
+                .createJavaSettingsStep(settingsStep, moduleBuilder) { moduleBuilder.isSuitableSdkType(it) }
     }
     
     override fun isValidSdk(module: Module, projectSdk: Sdk?) = isValidJavaSdk(module)

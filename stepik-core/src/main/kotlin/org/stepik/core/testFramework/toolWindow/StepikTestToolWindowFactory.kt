@@ -37,11 +37,11 @@ class StepikTestToolWindowFactory : ToolWindowFactory {
         override fun fileOpened(source: FileEditorManager, file: VirtualFile) = Unit
         
         override fun fileClosed(source: FileEditorManager, file: VirtualFile) {
-            toolWindow.setAvailable(false, {})
+            toolWindow.setAvailable(false) {}
         }
         
         override fun selectionChanged(event: FileEditorManagerEvent) {
-            toolWindow.setAvailable(false, {})
+            toolWindow.setAvailable(false) {}
         }
     }
     

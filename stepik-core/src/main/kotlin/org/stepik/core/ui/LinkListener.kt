@@ -10,7 +10,6 @@ import org.stepik.api.objects.recommendations.ReactionValues.SOLVED
 import org.stepik.api.objects.recommendations.ReactionValues.TOO_EASY
 import org.stepik.api.objects.recommendations.ReactionValues.TOO_HARD
 import org.stepik.api.objects.recommendations.ReactionValues.of
-import org.stepik.api.urls.Urls
 import org.stepik.core.ProjectManager
 import org.stepik.core.auth.StepikAuthManager
 import org.stepik.core.auth.StepikAuthManager.currentUser
@@ -19,6 +18,7 @@ import org.stepik.core.courseFormat.LessonNode
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.getProjectManager
 import org.stepik.core.getStudyNode
+import org.stepik.core.host
 import org.stepik.core.utils.getOrCreateSrcDirectory
 import org.stepik.core.utils.navigate
 import org.stepik.core.utils.runWriteActionLater
@@ -64,7 +64,7 @@ class LinkListener(val project: Project,
             }
             
             if (href.startsWith("/")) {
-                href = Urls.STEPIK_URL + href
+                href = host + href
             }
             
             BrowserUtil.browse(href)

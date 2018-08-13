@@ -23,7 +23,6 @@ import java.util.List;
  * @author meanmail
  */
 public abstract class StepikAbstractGetQuery<T extends StepikAbstractGetQuery, R extends ObjectsContainer> extends StepikAbstractQuery<R> {
-    private static final String IDS_KEY = "ids[]";
     private static final String JSON_EXTENSION = ".json";
 
     protected StepikAbstractGetQuery(@NotNull StepikAbstractAction stepikAction, @NotNull Class<R> responseClass) {

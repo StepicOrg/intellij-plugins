@@ -15,26 +15,26 @@ import org.stepik.core.icons.AllStepikIcons
 import org.stepik.core.projectWizard.ProjectWizardUtils
 
 class StepikModuleType : ModuleType<CourseModuleBuilder>(ID) {
-
+    
     override fun createModuleBuilder() = CourseModuleBuilder()
-
+    
     override fun getName() = MODULE_NAME
-
+    
     override fun getDescription() = "Stepik Module Type"
-
+    
     override fun getBigIcon() = AllStepikIcons.stepikLogoBig
-
+    
     override fun getNodeIcon(b: Boolean) = AllStepikIcons.stepikLogo
-
+    
     override fun modifyProjectTypeStep(
             settingsStep: SettingsStep,
             moduleBuilder: ModuleBuilder): ModuleWizardStep? {
         return ProjectWizardStepFactory.getInstance()
-                .createJavaSettingsStep(settingsStep, moduleBuilder, { moduleBuilder.isSuitableSdkType(it) })
+                .createJavaSettingsStep(settingsStep, moduleBuilder) { moduleBuilder.isSuitableSdkType(it) }
     }
-
+    
     override fun isValidSdk(module: Module, projectSdk: Sdk?) = isValidJavaSdk(module)
-
+    
     override fun modifySettingsStep(
             settingsStep: SettingsStep, moduleBuilder: ModuleBuilder): ModuleWizardStep? {
         val nameField = settingsStep.moduleNameField ?: return null
@@ -45,12 +45,12 @@ class StepikModuleType : ModuleType<CourseModuleBuilder>(ID) {
         nameField.text = projectName
         return null
     }
-
+    
     companion object {
         internal const val MODULE_NAME = "Stepik"
         internal val STEPIK_MODULE_TYPE: StepikModuleType = instantiate()
         private const val ID = "STEPIK_MODULE_TYPE"
-
+        
         private fun instantiate(): StepikModuleType {
             try {
                 return Class.forName("org.stepik.plugin.projectWizard.idea.StepikModuleType")
@@ -59,7 +59,7 @@ class StepikModuleType : ModuleType<CourseModuleBuilder>(ID) {
                 throw IllegalArgumentException(e)
             }
         }
-
+        
         private fun isValidJavaSdk(module: Module): Boolean {
             val moduleRootManager = ModuleRootManager.getInstance(module)
             return if (moduleRootManager.getSourceRoots(JavaModuleSourceRootTypes.SOURCES).isEmpty()) {

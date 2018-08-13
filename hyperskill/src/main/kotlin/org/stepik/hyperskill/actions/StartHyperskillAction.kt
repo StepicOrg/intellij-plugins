@@ -16,7 +16,7 @@ class StartHyperskillAction : StudyActionWithShortcut(TEXT, DESCRIPTION, AllStep
     override fun actionPerformed(e: AnActionEvent?) {
         val prjManager = AppProjectManager.getInstanceEx()
         val plugins = PathManager.getPluginsPath()
-        val moduleDir = FileUtil.join(plugins, "alt", "hyperskill")
+        val moduleDir = FileUtil.join(plugins, "hyperskill", "hyperskill")
         val path = FileUtil.join(moduleDir, "hyperskill${ModuleFileType.DOT_DEFAULT_EXTENSION}")
         val project = prjManager.loadProject(path, "Hyperskill") ?: return
         
