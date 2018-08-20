@@ -1,4 +1,4 @@
-package org.stepik.hyperskill.actions.navigation
+package org.hyperskill.actions.navigation
 
 import com.intellij.icons.AllIcons
 import com.intellij.notification.Notification
@@ -21,7 +21,8 @@ import org.stepik.core.getProjectManager
 import org.stepik.core.isStepikProject
 import org.stepik.core.pluginId
 
-class OpenProblemAction : StudyStepNavigationAction(TEXT, DESCRIPTION, AllIcons.Actions.Forward) {
+class OpenProblemAction : StudyStepNavigationAction(TEXT,
+        DESCRIPTION, AllIcons.Actions.Forward) {
     
     override fun getTargetStep(project: Project, currentStepNode: StudyNode?): StudyNode? {
         return loadProblem(project, currentStepNode)
@@ -38,7 +39,8 @@ class OpenProblemAction : StudyStepNavigationAction(TEXT, DESCRIPTION, AllIcons.
     companion object {
         internal val ACTION_ID = "$pluginId.OpenProblemAction"
         private const val SHORTCUT = "ctrl pressed PERIOD"
-        private val SHORTCUT_TEXT = getShortcutText(SHORTCUT)
+        private val SHORTCUT_TEXT = getShortcutText(
+                SHORTCUT)
         private val TEXT = "Open problem ($SHORTCUT_TEXT)"
         internal const val DESCRIPTION = "Open problem"
         private val template = "(?:.*/lesson/|)(\\d+)".toRegex()

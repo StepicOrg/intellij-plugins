@@ -1,4 +1,4 @@
-package org.stepik.hyperskill.projectWizard.idea
+package org.hyperskill.projectWizard.idea
 
 import com.intellij.ide.highlighter.ModuleFileType
 import com.intellij.openapi.util.io.FileUtil

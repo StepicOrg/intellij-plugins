@@ -12,34 +12,34 @@
 
   <extensions defaultExtensionNs="com.intellij">
     <moduleType id="STEPIK_MODULE_TYPE"
-                implementationClass="org.stepik.hyperskill.projectWizard.idea.StepikModuleType" />
+                implementationClass="org.hyperskill.projectWizard.idea.StepikModuleType" />
     <httpRequestHandler implementation="org.stepik.core.auth.StepikRestService" />
   </extensions>
 
-  <extensions defaultExtensionNs="org.stepik.hyperskill">
-    <studyPluginConfigurator implementation="org.stepik.hyperskill.HyperskillProjectConfigurator" />
+  <extensions defaultExtensionNs="org.hyperskill">
+    <studyPluginConfigurator implementation="org.hyperskill.HyperskillProjectConfigurator" />
   </extensions>
 
   <actions>
     <group id="HyperskillMenu" popup="true" text="Hyperskill">
-      <action id="org.stepik.hyperskill.StepikSendAction" class="org.stepik.core.actions.step.StepikSendAction" />
-      <action id="org.stepik.hyperskill.TestSamplesAction" class="org.stepik.core.actions.step.TestSamplesAction" />
-      <action id="org.stepik.hyperskill.LoadProblemAction"
-              class="org.stepik.hyperskill.actions.navigation.OpenProblemAction" />
-      <action id="org.stepik.hyperskill.DownloadSubmission" class="org.stepik.core.actions.step.DownloadSubmission" />
-      <action id="org.stepik.hyperskill.RefreshStepAction" class="org.stepik.core.actions.step.StepikResetStepAction" />
-      <action id="org.stepik.hyperskill.OpenInBrowser" class="org.stepik.hyperskill.actions.step.OpenInBrowserAction" />
+      <action id="org.hyperskill.StepikSendAction" class="org.stepik.core.actions.step.StepikSendAction" />
+      <action id="org.hyperskill.TestSamplesAction" class="org.stepik.core.actions.step.TestSamplesAction" />
+      <action id="org.hyperskill.LoadProblemAction"
+              class="org.hyperskill.actions.navigation.OpenProblemAction" />
+      <action id="org.hyperskill.DownloadSubmission" class="org.stepik.core.actions.step.DownloadSubmission" />
+      <action id="org.hyperskill.RefreshStepAction" class="org.stepik.core.actions.step.StepikResetStepAction" />
+      <action id="org.hyperskill.OpenInBrowser" class="org.hyperskill.actions.step.OpenInBrowserAction" />
       <separator />
-      <action id="org.stepik.hyperskill.LoginAction" class="org.stepik.core.actions.LoginAction" />
-      <action id="org.stepik.hyperskill.LogoutAction" class="org.stepik.core.actions.LogoutAction" />
+      <action id="org.hyperskill.LoginAction" class="org.stepik.core.actions.LoginAction" />
+      <action id="org.hyperskill.LogoutAction" class="org.stepik.core.actions.LogoutAction" />
       <separator />
-      <action id="org.stepik.hyperskill.AboutHyperskillAction" class="org.stepik.hyperskill.actions.AboutAction" />
+      <action id="org.hyperskill.AboutHyperskillAction" class="org.hyperskill.actions.AboutAction" />
 
       <add-to-group group-id="MainMenu" anchor="last" />
     </group>
 
-    <action id="org.stepik.hyperskill.StartHyperskillAction"
-            class="org.stepik.hyperskill.actions.StartHyperskillAction">
+    <action id="org.hyperskill.StartHyperskillAction"
+            class="org.hyperskill.actions.StartHyperskillAction">
       <add-to-group group-id="WelcomeScreen.QuickStart" anchor="first" />
       <add-to-group group-id="HyperskillMenu" anchor="first" />
     </action>
@@ -47,7 +47,7 @@
 
   <application-components>
     <component>
-      <implementation-class>org.stepik.hyperskill.HyperskillPluginSettings</implementation-class>
+      <implementation-class>org.hyperskill.HyperskillPluginSettings</implementation-class>
       <interface-class>org.stepik.core.PluginSettings</interface-class>
     </component>
   </application-components>
@@ -59,7 +59,7 @@
   </project-components>
 
   <extensionPoints>
-    <extensionPoint qualifiedName="org.stepik.hyperskill.studyPluginConfigurator"
+    <extensionPoint qualifiedName="org.hyperskill.studyPluginConfigurator"
                     interface="org.stepik.core.StudyPluginConfigurator" />
   </extensionPoints>
 
@@ -72,6 +72,6 @@
                 factoryClass="org.stepik.core.testFramework.toolWindow.StepikTestToolWindowFactory"
                 conditionClass="org.stepik.core.testFramework.toolWindow.StudyCondition" />
     <projectService serviceInterface="org.stepik.core.ProjectManager"
-                    serviceImplementation="org.stepik.hyperskill.HyperskillProjectManager" />
+                    serviceImplementation="org.hyperskill.HyperskillProjectManager" />
   </extensions>
 </idea-plugin>

@@ -1,4 +1,4 @@
-package org.stepik.hyperskill.projectWizard.idea
+package org.hyperskill.projectWizard.idea
 
 import com.intellij.ide.util.projectWizard.ModuleBuilder
 import com.intellij.ide.util.projectWizard.ModuleWizardStep
@@ -13,7 +13,8 @@ import com.intellij.psi.JavaPsiFacade
 import org.jetbrains.jps.model.java.JavaModuleSourceRootTypes
 import org.stepik.core.icons.AllStepikIcons
 
-class StepikModuleType : ModuleType<CourseModuleBuilder>(ID) {
+class StepikModuleType : ModuleType<CourseModuleBuilder>(
+        ID) {
     
     override fun createModuleBuilder() = CourseModuleBuilder()
     
@@ -32,7 +33,8 @@ class StepikModuleType : ModuleType<CourseModuleBuilder>(ID) {
                 .createJavaSettingsStep(settingsStep, moduleBuilder) { moduleBuilder.isSuitableSdkType(it) }
     }
     
-    override fun isValidSdk(module: Module, projectSdk: Sdk?) = isValidJavaSdk(module)
+    override fun isValidSdk(module: Module, projectSdk: Sdk?) = isValidJavaSdk(
+            module)
     
     companion object {
         internal const val MODULE_NAME = "Stepik"
@@ -41,7 +43,7 @@ class StepikModuleType : ModuleType<CourseModuleBuilder>(ID) {
         
         private fun instantiate(): StepikModuleType {
             try {
-                return Class.forName("org.stepik.hyperskill.projectWizard.idea.StepikModuleType")
+                return Class.forName("org.hyperskill.projectWizard.idea.StepikModuleType")
                         .newInstance() as StepikModuleType
             } catch (e: Exception) {
                 throw IllegalArgumentException(e)

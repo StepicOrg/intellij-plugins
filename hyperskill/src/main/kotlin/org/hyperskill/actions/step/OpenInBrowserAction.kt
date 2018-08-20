@@ -1,4 +1,4 @@
-package org.stepik.hyperskill.actions.step
+package org.hyperskill.actions.step
 
 import com.intellij.openapi.project.Project
 import org.stepik.core.actions.step.AbstractOpenInBrowserAction

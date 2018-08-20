@@ -1,11 +1,10 @@
-package org.stepik.hyperskill.courseFormat
+package org.hyperskill.courseFormat
 
 import com.intellij.openapi.project.Project
 import org.stepik.api.client.StepikApiClient
 import org.stepik.api.exceptions.StepikClientException
 import org.stepik.api.objects.StudyObject
 import org.stepik.api.objects.lessons.CompoundUnitLesson
-import org.stepik.core.courseFormat.LessonNode
 import org.stepik.core.courseFormat.Node
 
 class HyperskillTree(project: Project? = null, stepikApiClient: StepikApiClient? = null,
@@ -13,7 +12,7 @@ class HyperskillTree(project: Project? = null, stepikApiClient: StepikApiClient?
         Node(project, stepikApiClient, data) {
     
     override val childClass: Class<out Node>
-        get() = LessonNode::class.java
+        get() = HSLessonNode::class.java
     
     override val childDataClass: Class<out StudyObject>
         get() = CompoundUnitLesson::class.java

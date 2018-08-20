@@ -1,4 +1,4 @@
-package org.stepik.hyperskill.projectWizard
+package org.hyperskill.projectWizard
 
 import com.intellij.openapi.application.ApplicationManager.getApplication
 import com.intellij.openapi.application.PathManager
@@ -21,8 +21,8 @@ import org.stepik.core.metrics.Metrics
 import org.stepik.core.metrics.MetricsStatus.TARGET_NOT_FOUND
 import org.stepik.core.projectWizard.ProjectWizardUtils.createSubDirectories
 import org.stepik.core.utils.getOrCreateSrcDirectory
-import org.stepik.hyperskill.courseFormat.HyperskillTree
-import org.stepik.hyperskill.projectWizard.idea.SandboxModuleBuilder
+import org.hyperskill.courseFormat.HyperskillTree
+import org.hyperskill.projectWizard.idea.SandboxModuleBuilder
 
 object StepikProjectGenerator : ProjectGenerator, Loggable {
     var defaultLang = SupportedLanguages.JAVA8
@@ -35,7 +35,8 @@ object StepikProjectGenerator : ProjectGenerator, Loggable {
                     indicator.isIndeterminate = true
                     
                     val stepikApiClient = authAndGetStepikApiClient()
-                    projectRoot = HyperskillTree(project, stepikApiClient)
+                    projectRoot = HyperskillTree(
+                            project, stepikApiClient)
                 }, "Creating Project", true, project)
     }
     
@@ -59,8 +60,8 @@ object StepikProjectGenerator : ProjectGenerator, Loggable {
     private var projectRoot: StudyNode? = null
     
     fun createProject(project: Project) {
-        StepikProjectGenerator.createTreeUnderProgress(project)
-        StepikProjectGenerator.generateProject(project)
+        createTreeUnderProgress(project)
+        generateProject(project)
         
         val moduleModel = getApplication().runReadAction(Computable {
             ModuleManager.getInstance(project)
@@ -71,7 +72,8 @@ object StepikProjectGenerator : ProjectGenerator, Loggable {
         val moduleDir = FileUtil.join(plugins, "hyperskill", "hyperskill")
         
         getApplication().runWriteAction {
-            SandboxModuleBuilder(moduleDir).createModule(moduleModel)
+            SandboxModuleBuilder(moduleDir)
+                    .createModule(moduleModel)
             
             val root = getProjectManager(project)?.projectRoot
             if (root == null) {
@@ -82,7 +84,7 @@ object StepikProjectGenerator : ProjectGenerator, Loggable {
             if (root is StepNode) {
                 getOrCreateSrcDirectory(project, root, true, moduleModel)
             } else {
-                createSubDirectories(project, StepikProjectGenerator.defaultLang, root, moduleModel)
+                createSubDirectories(project, defaultLang, root, moduleModel)
                 VirtualFileManager.getInstance()
                         .syncRefresh()
             }

@@ -1,4 +1,4 @@
-package org.stepik.hyperskill.projectWizard.idea
+package org.hyperskill.projectWizard.idea
 
 import com.intellij.ide.highlighter.ModuleFileType
 import com.intellij.openapi.module.ModifiableModuleModel
@@ -10,7 +10,7 @@ import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.getProjectManager
 import org.stepik.core.projectWizard.ProjectWizardUtils.createSubDirectories
 import org.stepik.core.utils.getOrCreateSrcDirectory
-import org.stepik.hyperskill.projectWizard.StepikProjectGenerator
+import org.hyperskill.projectWizard.StepikProjectGenerator
 
 class CourseModuleBuilder(moduleDir: String? = null) : AbstractModuleBuilder() {
     private val generator = StepikProjectGenerator
@@ -35,7 +35,8 @@ class CourseModuleBuilder(moduleDir: String? = null) : AbstractModuleBuilder() {
         val moduleDir = moduleFileDirectory ?: return
         
         logger.info("Module dir = $moduleDir")
-        SandboxModuleBuilder(moduleDir).createModule(moduleModel)
+        SandboxModuleBuilder(moduleDir)
+                .createModule(moduleModel)
         
         val root = getProjectManager(project)?.projectRoot
         if (root == null) {

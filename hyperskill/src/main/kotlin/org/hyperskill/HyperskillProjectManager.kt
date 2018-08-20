@@ -1,4 +1,4 @@
-package org.stepik.hyperskill
+package org.hyperskill
 
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
@@ -10,7 +10,7 @@ import org.stepik.core.StudyPluginConfigurator
 import org.stepik.core.projectView.ProjectTreeMode.LESSON
 import org.stepik.core.serialization.SerializationUtils
 import org.stepik.core.serialization.StudySerializationUtils
-import org.stepik.hyperskill.courseFormat.HyperskillTree
+import org.hyperskill.courseFormat.HyperskillTree
 
 @State(name = "HyperskillSettings", storages = [(Storage("hyperskill_project.xml"))])
 class HyperskillProjectManager @JvmOverloads constructor(project: Project? = null) : BaseProjectManager(project) {

@@ -1,4 +1,4 @@
-package org.stepik.hyperskill
+package org.hyperskill
 
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.extensions.ExtensionPointName
@@ -14,11 +14,11 @@ import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.StudyNode
 import org.stepik.core.isStepikProject
 import org.stepik.core.projectWizard.idea.BaseModuleBuilder
-import org.stepik.hyperskill.actions.navigation.OpenProblemAction
-import org.stepik.hyperskill.actions.step.OpenInBrowserAction
-import org.stepik.hyperskill.projectWizard.StepikProjectGenerator
-import org.stepik.hyperskill.projectWizard.idea.SandboxModuleBuilder
-import org.stepik.hyperskill.projectWizard.idea.StepModuleBuilder
+import org.hyperskill.actions.navigation.OpenProblemAction
+import org.hyperskill.actions.step.OpenInBrowserAction
+import org.hyperskill.projectWizard.StepikProjectGenerator
+import org.hyperskill.projectWizard.idea.SandboxModuleBuilder
+import org.hyperskill.projectWizard.idea.StepModuleBuilder
 
 class HyperskillProjectConfigurator : StudyBasePluginConfigurator() {
     
@@ -71,7 +71,7 @@ class HyperskillProjectConfigurator : StudyBasePluginConfigurator() {
     companion object {
         
         val EP_NAME = ExtensionPointName.create<StudyPluginConfigurator>(
-                "org.stepik.hyperskill.studyPluginConfigurator")
+                "org.hyperskill.studyPluginConfigurator")
         
     }
 }

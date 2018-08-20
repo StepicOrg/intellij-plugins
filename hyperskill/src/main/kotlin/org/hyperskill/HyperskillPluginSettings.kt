@@ -1,4 +1,4 @@
-package org.stepik.hyperskill
+package org.hyperskill
 
 import org.stepik.api.client.StepikApiClient
 import org.stepik.api.client.hsUsers

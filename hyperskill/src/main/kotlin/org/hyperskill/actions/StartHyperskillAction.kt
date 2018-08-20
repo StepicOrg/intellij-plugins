@@ -1,4 +1,4 @@
-package org.stepik.hyperskill.actions
+package org.hyperskill.actions
 
 import com.intellij.ide.highlighter.ModuleFileType
 import com.intellij.openapi.actionSystem.AnActionEvent
@@ -9,10 +9,11 @@ import org.stepik.core.actions.getShortcutText
 import org.stepik.core.icons.AllStepikIcons
 import org.stepik.core.isStepikProject
 import org.stepik.core.pluginId
-import org.stepik.hyperskill.projectWizard.StepikProjectGenerator
+import org.hyperskill.projectWizard.StepikProjectGenerator
 import com.intellij.openapi.project.ex.ProjectManagerEx as AppProjectManager
 
-class StartHyperskillAction : StudyActionWithShortcut(TEXT, DESCRIPTION, AllStepikIcons.stepikLogo) {
+class StartHyperskillAction : StudyActionWithShortcut(TEXT,
+        DESCRIPTION, AllStepikIcons.stepikLogo) {
     override fun actionPerformed(e: AnActionEvent?) {
         val prjManager = AppProjectManager.getInstanceEx()
         val plugins = PathManager.getPluginsPath()
