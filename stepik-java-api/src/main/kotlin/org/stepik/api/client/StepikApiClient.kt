@@ -1,6 +1,5 @@
 package org.stepik.api.client
 
-import org.stepik.api.actions.HSUsersAction
 import org.stepik.api.actions.StepikAnnouncementsAction
 import org.stepik.api.actions.StepikAssignmentsAction
 import org.stepik.api.actions.StepikAttachmentsAction
@@ -437,10 +436,6 @@ class StepikApiClient(transportClient: HttpTransportClient, val host: String) {
     
     fun users(): StepikUsersAction {
         return StepikUsersAction(this)
-    }
-    
-    fun hsUsers(): HSUsersAction {
-        return HSUsersAction(this)
     }
     
     fun videoStats(): StepikVideoStatsAction {

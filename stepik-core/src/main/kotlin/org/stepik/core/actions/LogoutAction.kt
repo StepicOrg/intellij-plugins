@@ -20,7 +20,7 @@ class LogoutAction : StudyActionWithShortcut(TEXT, DESCRIPTION) {
     
     companion object {
         private val ACTION_ID = "$pluginId.LogoutAction"
-        private const val TEXT = "Logout from Stepik"
-        private const val DESCRIPTION = "Logout on Stepik"
+        private const val TEXT = "Logout"
+        private const val DESCRIPTION = "Logout"
     }
 }

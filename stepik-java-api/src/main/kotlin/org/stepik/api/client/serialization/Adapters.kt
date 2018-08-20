@@ -263,6 +263,8 @@ class DefaultAsEmptyMetaAdapter : TypeAdapter<Meta>() {
         out.value(value.hasNext)
         out.name("has_previous")
         out.value(value.hasPrevious)
+        out.name("count")
+        out.value(value.count)
         out.endObject()
     }
     
@@ -280,6 +282,7 @@ class DefaultAsEmptyMetaAdapter : TypeAdapter<Meta>() {
                 "page"         -> meta.page = input.nextInt()
                 "has_next"     -> meta.hasNext = input.nextBoolean()
                 "has_previous" -> meta.hasNext = input.nextBoolean()
+                "count"        -> meta.count = input.nextInt()
             }
         }
         input.endObject()

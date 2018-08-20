@@ -26,11 +26,9 @@ pycharm {
 }
 
 dependencies {
-    compile project(":stepik-java-api")
+    compile project(":hs-api")
     compile project(":stepik-core")
 }
 
-group 'org.stepik'
+group 'org.hyperskill'
 version project.getProperties().get('HyperskillVersion') ?: 'SNAPSHOT'
-
-defaultTasks "runIdea"

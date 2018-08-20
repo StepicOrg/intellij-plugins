@@ -9,5 +9,7 @@ data class Meta(
         var hasNext: Boolean = false,
         
         @SerializedName("has_previous")
-        var hasPrevious: Boolean = false
+        var hasPrevious: Boolean = false,
+        
+        var count: Int = 0
 )
