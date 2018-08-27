@@ -2,7 +2,8 @@
   "meta": {
     "page": 1,
     "has_next": true,
-    "has_previous": false
+    "has_previous": false,
+    "count": 0
   },
   "submissions": [
     {

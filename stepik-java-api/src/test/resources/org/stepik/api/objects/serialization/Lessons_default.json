@@ -3,6 +3,7 @@
   "meta": {
     "page": 1,
     "has_next": false,
-    "has_previous": false
+    "has_previous": false,
+    "count": 0
   }
 }
