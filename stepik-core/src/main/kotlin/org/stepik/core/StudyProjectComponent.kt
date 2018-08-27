@@ -19,7 +19,6 @@ import javafx.application.Platform
 import org.stepik.core.actions.StudyActionWithShortcut
 import org.stepik.core.common.Loggable
 import org.stepik.core.metrics.Metrics
-import org.stepik.core.testFramework.StepRunConfiguration
 import org.stepik.core.ui.StudyToolWindowFactory.Companion.STUDY_TOOL_WINDOW
 import org.stepik.core.utils.runWriteActionLater
 import java.util.concurrent.Executors
@@ -110,10 +109,7 @@ class StudyProjectComponent private constructor(private val project: Project) :
         if (!isStepikProject(project)) {
             return
         }
-        
-        val runManager = RunManager.getInstance(project) as RunManagerImpl
-        runManager.removeRunManagerListener(this)
-        
+
         ToolWindowManager.getInstance(project)
                 .getToolWindow(STUDY_TOOL_WINDOW)
                 ?.contentManager?.removeAllContents(false)
@@ -126,14 +122,6 @@ class StudyProjectComponent private constructor(private val project: Project) :
                             KeyboardShortcut(KeyStroke.getKeyStroke(actionShortcut.second), null))
                 }
             }
-        }
-    }
-    
-    override fun runConfigurationSelected() {
-        val runManager = RunManager.getInstance(project) as RunManagerImpl
-        val selectedConfiguration = runManager.selectedConfiguration
-        if (selectedConfiguration is StepRunConfiguration) {
-            getProjectManager(project)?.selected = selectedConfiguration.stepNode
         }
     }
     

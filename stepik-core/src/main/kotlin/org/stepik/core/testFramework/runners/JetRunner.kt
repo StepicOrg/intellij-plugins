@@ -11,23 +11,22 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import org.stepik.core.EduNames
 import org.stepik.core.courseFormat.StepNode
-import org.stepik.core.testFramework.StepRunConfiguration
 import org.stepik.core.utils.runWriteActionAndWait
 
 abstract class JetRunner : Runner {
-
+    
     override fun updateRunConfiguration(project: Project, stepNode: StepNode) {
         val runManager = RunManager.getInstance(project) as RunManagerImpl
         val language = stepNode.currentLang
-
+        
         val settingName = "${stepNode.parent?.name ?: "Lesson"} | step ${stepNode.position} ($language)"
-
+        
         val runConfiguration = getRunConfiguration(runManager, settingName, stepNode)
         if (runConfiguration == null) {
             setConfiguration(runManager)
             return
         }
-
+        
         val appConfiguration = runConfiguration.configuration
         val workingVirtualDirectory = project.baseDir.findFileByRelativePath(stepNode.path) ?: return
         setWorkingDirectory(appConfiguration, workingVirtualDirectory)
@@ -38,39 +37,23 @@ abstract class JetRunner : Runner {
         setSdk(project, appConfiguration, mainVirtualFile)
         setConfiguration(runManager, runConfiguration)
     }
-
+    
     private fun getRunConfiguration(runManager: RunManagerImpl, settingName: String,
                                     stepNode: StepNode): RunnerAndConfigurationSettings? {
-        val type = runManager.getConfigurationType(typeName) ?: return null
-        return runManager.getConfigurationSettingsList(type)
-                .firstOrNull { it is StepRunConfiguration && it.stepNode == stepNode }
-                ?: createRunConfiguration(runManager, settingName, stepNode)
+        return null
     }
-
+    
     protected abstract val typeName: String
-
+    
     protected abstract val factoryName: String
-
-    private fun createRunConfiguration(runManager: RunManagerImpl, settingName: String,
-                                       stepNode: StepNode): RunnerAndConfigurationSettings? {
-        val factory = runManager.getFactory(typeName, factoryName) ?: return null
-        val runConfiguration = StepRunConfiguration(stepNode,
-                runManager.createRunConfiguration(settingName, factory),
-                runManager
-        )
-
-        runManager.addConfiguration(runConfiguration, true)
-        logger.info("Created run configuration: ${runConfiguration.name}")
-        return runConfiguration
-    }
-
+    
     protected abstract fun setWorkingDirectory(appConfiguration: RunConfiguration,
                                                workingVirtualDirectory: VirtualFile)
-
+    
     protected abstract fun setMainClass(project: Project,
                                         appConfiguration: RunConfiguration,
                                         mainVirtualFile: VirtualFile?)
-
+    
     private fun setModule(project: Project, appConfiguration: RunConfiguration,
                           mainVirtualFile: VirtualFile?) {
         if (mainVirtualFile != null && appConfiguration is ModuleBasedConfiguration<*>) {
@@ -80,10 +63,10 @@ abstract class JetRunner : Runner {
             }
         }
     }
-
+    
     protected open fun setSdk(project: Project, appConfiguration: RunConfiguration,
                               mainVirtualFile: VirtualFile?) = Unit
-
+    
     private fun setConfiguration(runManager: RunManager,
                                  configuration: RunnerAndConfigurationSettings? = null) {
         getApplication().invokeLater { runManager.selectedConfiguration = configuration }

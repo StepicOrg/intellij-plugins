@@ -1,5 +1,5 @@
 <idea-plugin>
-  <id>org.stepik.hyperskill</id>
+  <id>org.stepik.alt</id>
   <name>Hyperskill</name>
   <version>SNAPSHOT</version>
   <idea-version since-build="163.7743.44" />
