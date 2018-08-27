@@ -9,6 +9,8 @@ import com.intellij.openapi.project.ex.ProjectEx
 import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.VirtualFileManager
+import org.hyperskill.courseFormat.HyperskillTree
+import org.hyperskill.projectWizard.idea.SandboxModuleBuilder
 import org.stepik.core.ProjectGenerator
 import org.stepik.core.SupportedLanguages
 import org.stepik.core.auth.StepikAuthManager.authAndGetStepikApiClient
@@ -21,8 +23,6 @@ import org.stepik.core.metrics.Metrics
 import org.stepik.core.metrics.MetricsStatus.TARGET_NOT_FOUND
 import org.stepik.core.projectWizard.ProjectWizardUtils.createSubDirectories
 import org.stepik.core.utils.getOrCreateSrcDirectory
-import org.hyperskill.courseFormat.HyperskillTree
-import org.hyperskill.projectWizard.idea.SandboxModuleBuilder
 
 object StepikProjectGenerator : ProjectGenerator, Loggable {
     var defaultLang = SupportedLanguages.JAVA8
@@ -35,8 +35,7 @@ object StepikProjectGenerator : ProjectGenerator, Loggable {
                     indicator.isIndeterminate = true
                     
                     val stepikApiClient = authAndGetStepikApiClient()
-                    projectRoot = HyperskillTree(
-                            project, stepikApiClient)
+                    projectRoot = HyperskillTree(project, stepikApiClient)
                 }, "Creating Project", true, project)
     }
     

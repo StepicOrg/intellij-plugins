@@ -104,7 +104,7 @@ class StepikApiClient(transportClient: HttpTransportClient, val host: String) {
             }
             return field
         }
-    var cachePath = Paths.get(System.getProperty("user.home"), ".stepik", "stepik-api", "cache")
+    var cachePath = Paths.get(System.getProperty("user.home"), ".stepik", "stepik-api", "cache")!!
     var isCacheEnabled = true
     
     constructor(userAgent: String, host: String) : this(HttpTransportClient.getInstance(userAgent), host)

@@ -75,10 +75,10 @@ class StudyProjectComponent private constructor(private val project: Project) :
     private fun registerShortcuts() {
         getStudyToolWindow(project)?.also {
             it.getActions(true)
-                    .mapNotNull { it as? StudyActionWithShortcut }
-                    .forEach {
-                        val shortcuts = it.getShortcuts() ?: return@forEach
-                        addShortcut(it.getActionId(), shortcuts)
+                    .mapNotNull { action -> action as? StudyActionWithShortcut }
+                    .forEach { action ->
+                        val shortcuts = action.getShortcuts() ?: return@forEach
+                        addShortcut(action.getActionId(), shortcuts)
                     }
         }
     }
@@ -109,7 +109,7 @@ class StudyProjectComponent private constructor(private val project: Project) :
         if (!isStepikProject(project)) {
             return
         }
-
+        
         ToolWindowManager.getInstance(project)
                 .getToolWindow(STUDY_TOOL_WINDOW)
                 ?.contentManager?.removeAllContents(false)

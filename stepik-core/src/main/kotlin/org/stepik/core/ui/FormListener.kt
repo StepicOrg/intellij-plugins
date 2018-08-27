@@ -5,7 +5,6 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import javafx.application.Platform
 import javafx.stage.FileChooser
-import org.stepik.api.objects.ObjectsContainer
 import org.stepik.core.actions.SendAction
 import org.stepik.core.auth.StepikAuthManager.authAndGetStepikApiClient
 import org.stepik.core.auth.StepikAuthManager.authentication
@@ -69,7 +68,7 @@ internal class FormListener(private val project: Project, private val browser: S
             val stepikApiClient = authAndGetStepikApiClient(true)
             
             stepikApiClient.attempts()
-                    .post<ObjectsContainer<*>>()
+                    .post()
                     .step(node.id)
                     .executeAsync()
                     .whenComplete { attempts, e ->

@@ -4,7 +4,6 @@ import com.intellij.openapi.project.Project
 import org.stepik.api.client.StepikApiClient
 import org.stepik.api.exceptions.StepikClientException
 import org.stepik.api.objects.attempts.Attempt
-import org.stepik.api.objects.attempts.Attempts
 import org.stepik.api.objects.attempts.Component
 import org.stepik.api.objects.attempts.Dataset
 import org.stepik.api.objects.submissions.Reply
@@ -98,7 +97,7 @@ open class QuizHelper(project: Project, stepNode: StepNode) : StepHelper(project
     
     private fun loadAttempt(stepikApiClient: StepikApiClient, userId: Long): Boolean {
         val attempts = stepikApiClient.attempts()
-                .get<Attempts>()
+                .get()
                 .step(stepNode.id)
                 .user(userId)
                 .execute()

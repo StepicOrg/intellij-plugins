@@ -13,8 +13,7 @@ import com.intellij.psi.JavaPsiFacade
 import org.jetbrains.jps.model.java.JavaModuleSourceRootTypes
 import org.stepik.core.icons.AllStepikIcons
 
-class StepikModuleType : ModuleType<CourseModuleBuilder>(
-        ID) {
+class StepikModuleType : ModuleType<CourseModuleBuilder>(ID) {
     
     override fun createModuleBuilder() = CourseModuleBuilder()
     
@@ -33,8 +32,7 @@ class StepikModuleType : ModuleType<CourseModuleBuilder>(
                 .createJavaSettingsStep(settingsStep, moduleBuilder) { moduleBuilder.isSuitableSdkType(it) }
     }
     
-    override fun isValidSdk(module: Module, projectSdk: Sdk?) = isValidJavaSdk(
-            module)
+    override fun isValidSdk(module: Module, projectSdk: Sdk?) = isValidJavaSdk(module)
     
     companion object {
         internal const val MODULE_NAME = "Stepik"

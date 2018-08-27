@@ -39,8 +39,7 @@ class OpenProblemAction : StudyStepNavigationAction(TEXT,
     companion object {
         internal val ACTION_ID = "$pluginId.OpenProblemAction"
         private const val SHORTCUT = "ctrl pressed PERIOD"
-        private val SHORTCUT_TEXT = getShortcutText(
-                SHORTCUT)
+        private val SHORTCUT_TEXT = getShortcutText(SHORTCUT)
         private val TEXT = "Open problem ($SHORTCUT_TEXT)"
         internal const val DESCRIPTION = "Open problem"
         private val template = "(?:.*/lesson/|)(\\d+)".toRegex()

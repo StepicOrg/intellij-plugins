@@ -2,7 +2,6 @@ package org.stepik.plugin.actions.step
 
 import org.stepik.api.client.StepikApiClient
 import org.stepik.api.objects.attempts.Attempt
-import org.stepik.api.objects.attempts.Attempts
 import org.stepik.api.objects.submissions.Submission
 import org.stepik.core.SupportedLanguages
 import org.stepik.core.actions.step.CodeQuizSendAction
@@ -11,7 +10,7 @@ import org.stepik.core.courseFormat.StepNode
 class StepikSendAction : CodeQuizSendAction() {
     override fun postAttempt(stepikApiClient: StepikApiClient, stepNode: StepNode): Attempt? {
         val attempts = stepikApiClient.attempts()
-                .post<Attempts>()
+                .post()
                 .step(stepNode.id)
                 .execute()
         
