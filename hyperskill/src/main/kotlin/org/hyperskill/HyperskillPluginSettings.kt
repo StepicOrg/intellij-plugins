@@ -1,7 +1,7 @@
 package org.hyperskill
 
+import org.hyperskill.api.client.hsUsers
 import org.stepik.api.client.StepikApiClient
-import org.stepik.api.client.hsUsers
 import org.stepik.api.objects.users.User
 import org.stepik.core.PluginSettings
 
@@ -10,7 +10,7 @@ class HyperskillPluginSettings : PluginSettings {
     
     override val pluginId = "org.stepik.alt"
     
-    override val pluginName = "ALT_plugin"
+    override val pluginMetricsName = "ALT_plugin"
     
     override val host = "https://hyperskill.org"
     
@@ -28,4 +28,6 @@ class HyperskillPluginSettings : PluginSettings {
         user.setFirstName(hsUser.fullname)
         return user
     }
+    
+    override val pluginName = "Hyperskill"
 }

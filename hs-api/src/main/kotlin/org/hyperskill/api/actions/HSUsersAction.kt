@@ -1,7 +1,8 @@
-package org.stepik.api.actions
+package org.hyperskill.api.actions
 
+import org.hyperskill.api.queries.users.HSUsersGetQuery
+import org.stepik.api.actions.StepikAbstractAction
 import org.stepik.api.client.StepikApiClient
-import org.stepik.api.queries.users.HSUsersGetQuery
 
 class HSUsersAction(stepikApiClient: StepikApiClient) : StepikAbstractAction(stepikApiClient) {
     

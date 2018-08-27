@@ -7,11 +7,13 @@ interface PluginSettings {
     
     val pluginId: String
     
-    val pluginName: String
+    val pluginMetricsName: String
     
     val host: String
     
     val clientId: String
     
     fun currentUser(stepikApiClient: StepikApiClient): User
+    
+    val pluginName: String
 }

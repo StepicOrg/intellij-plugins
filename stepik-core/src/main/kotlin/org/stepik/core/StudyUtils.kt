@@ -130,10 +130,12 @@ fun getRecommendation(root: StudyNode): StudyNode? {
 
 val pluginId = getService(PluginSettings::class.java).pluginId
 
-val pluginName = getService(PluginSettings::class.java).pluginName
+val pluginMetricsName = getService(PluginSettings::class.java).pluginMetricsName
 
 val host = getService(PluginSettings::class.java).host
 
 val clientId = getService(PluginSettings::class.java).clientId
 
 val loadCurrentUser = getService(PluginSettings::class.java)::currentUser
+
+val pluginName = getService(PluginSettings::class.java).pluginName

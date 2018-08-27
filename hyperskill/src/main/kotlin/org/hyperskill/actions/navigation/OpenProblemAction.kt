@@ -8,12 +8,12 @@ import com.intellij.openapi.application.ApplicationManager.getApplication
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.InputValidator
 import com.intellij.openapi.ui.ex.MessagesEx.showInputDialog
-import org.stepik.api.objects.lessons.CompoundUnitLesson
+import org.hyperskill.api.objects.lesson.HSLesson
+import org.hyperskill.courseFormat.HSLessonNode
 import org.stepik.core.actions.getShortcutText
 import org.stepik.core.actions.navigation.StudyNavigator
 import org.stepik.core.actions.navigation.StudyStepNavigationAction
 import org.stepik.core.auth.StepikAuthManager.authAndGetStepikApiClient
-import org.stepik.core.courseFormat.LessonNode
 import org.stepik.core.courseFormat.Node
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.StudyNode
@@ -45,14 +45,14 @@ class OpenProblemAction : StudyStepNavigationAction(TEXT,
         internal const val DESCRIPTION = "Open problem"
         private val template = "(?:.*/lesson/|)(\\d+)".toRegex()
         private const val exampleLink = "https://hyperskill.org/learn/lesson/"
-        private const val exampleLessonId = "58110"
+        private const val exampleLessonId = 58110L
         
         private fun inputLink(studyNode: StudyNode?): String? {
             val id = when (studyNode) {
-                         is StepNode   -> studyNode.parent?.id
-                         is LessonNode -> studyNode.id
-                         else          -> null
-                     } ?: exampleLessonId
+                is StepNode     -> (studyNode.parent?.data as HSLesson).stepikId
+                is HSLessonNode -> (studyNode.data as HSLesson).stepikId
+                else            -> exampleLessonId
+            }
             
             val initialValue = "https://hyperskill.org/learn/lesson/$id"
             
@@ -76,7 +76,7 @@ class OpenProblemAction : StudyStepNavigationAction(TEXT,
         fun loadProblem(project: Project, currentStepNode: StudyNode?): StudyNode? {
             val link = inputLink(currentStepNode)
             
-            var lesson: LessonNode? = null
+            var lesson: HSLessonNode? = null
             
             if (link != null) {
                 val matcher = template.matchEntire(link)
@@ -85,7 +85,7 @@ class OpenProblemAction : StudyStepNavigationAction(TEXT,
                     val projectManager = getProjectManager(project)
                     val stepikApiClient = authAndGetStepikApiClient()
                     val root = projectManager?.projectRoot
-                    lesson = LessonNode(project, stepikApiClient)
+                    lesson = HSLessonNode(project, stepikApiClient)
                     lesson.id = lessonId
                     lesson.parent = root
                     val children = root?.children?.toMutableList()
@@ -97,7 +97,7 @@ class OpenProblemAction : StudyStepNavigationAction(TEXT,
                     }
                 }
                 
-                if (lesson == null || (lesson.data as CompoundUnitLesson).lesson.steps.isEmpty()) {
+                if (lesson == null || (lesson.data as HSLesson).stepikId == 0L) {
                     Notification("hyperskill.CantOpenProblem", "Can not open problem",
                             "Can not open problem: $link", NotificationType.ERROR).notify(project)
                 }

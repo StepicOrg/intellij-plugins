@@ -21,7 +21,7 @@ import org.stepik.core.getProjectManager
 import java.time.Instant
 import java.util.*
 
-class StepNode(project: Project? = null, stepikApiClient: StepikApiClient? = null, data: StudyObject? = null) :
+open class StepNode(project: Project? = null, stepikApiClient: StepikApiClient? = null, data: StudyObject? = null) :
         Node(project, stepikApiClient, data) {
     
     @XStreamAlias("supportedLanguages")
@@ -31,8 +31,8 @@ class StepNode(project: Project? = null, stepikApiClient: StepikApiClient? = nul
         get() {
             if (_supportedLanguages == null) {
                 if (type === CODE) {
-                    _supportedLanguages = (data as Step).block?.let {
-                        it.options.codeTemplates.map {
+                    _supportedLanguages = (data as Step).block?.let { block ->
+                        block.options.codeTemplates.map {
                             langOfName(it.key)
                         }
                     }?.filter { it !== INVALID } ?: emptyList()
@@ -64,7 +64,7 @@ class StepNode(project: Project? = null, stepikApiClient: StepikApiClient? = nul
     
     private var courseId: Long = 0
     @XStreamOmitField
-    var assignment: Long? = null
+    open var assignment: Long? = null
         get() {
             if (field == null) {
                 val parent = parent

@@ -1,10 +1,11 @@
 package org.hyperskill.courseFormat
 
 import com.intellij.openapi.project.Project
+import org.hyperskill.api.client.hsLessons
+import org.hyperskill.api.objects.lesson.HSLesson
 import org.stepik.api.client.StepikApiClient
 import org.stepik.api.exceptions.StepikClientException
 import org.stepik.api.objects.StudyObject
-import org.stepik.api.objects.lessons.CompoundUnitLesson
 import org.stepik.core.courseFormat.Node
 
 class HyperskillTree(project: Project? = null, stepikApiClient: StepikApiClient? = null,
@@ -15,7 +16,7 @@ class HyperskillTree(project: Project? = null, stepikApiClient: StepikApiClient?
         get() = HSLessonNode::class.java
     
     override val childDataClass: Class<out StudyObject>
-        get() = CompoundUnitLesson::class.java
+        get() = HSLesson::class.java
     
     override val dataClass: Class<out StudyObject>
         get() = StudyObject::class.java
@@ -29,16 +30,17 @@ class HyperskillTree(project: Project? = null, stepikApiClient: StepikApiClient?
     }
     
     override fun getChildDataList(stepikApiClient: StepikApiClient): List<StudyObject> {
-        val objects = mutableListOf<CompoundUnitLesson>()
+        val objects = mutableListOf<HSLesson>()
         try {
             val lessonsIds = children.map { it.id }
+                    .toHashSet()
             if (lessonsIds.isNotEmpty()) {
-                stepikApiClient.lessons()
+                stepikApiClient.hsLessons()
                         .get()
-                        .id(lessonsIds)
+                        .id(lessonsIds.toList())
                         .execute()
                         .forEach { lesson ->
-                            objects.add(CompoundUnitLesson(lesson = lesson))
+                            objects.add(lesson)
                         }
             }
         } catch (logged: StepikClientException) {

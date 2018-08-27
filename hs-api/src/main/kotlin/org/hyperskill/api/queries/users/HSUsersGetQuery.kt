@@ -1,4 +1,4 @@
-package org.stepik.api.queries.users
+package org.hyperskill.api.queries.users
 
 import org.stepik.api.actions.StepikAbstractAction
 import org.stepik.api.objects.users.HSUsers

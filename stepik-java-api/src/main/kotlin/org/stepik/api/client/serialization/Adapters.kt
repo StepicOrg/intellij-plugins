@@ -90,11 +90,11 @@ class DefaultAsEmptyDoubleAdapter : TypeAdapter<Double>() {
     
 }
 
-private fun <T> getAdapter(clazz: Class<T>): TypeAdapter<T> {
+fun <T> getAdapter(clazz: Class<T>): TypeAdapter<T> {
     return DefaultJsonConverter.gson.getAdapter(clazz)
 }
 
-private fun <T> writeArray(out: JsonWriter, adapter: TypeAdapter<T>, value: List<T>?) {
+fun <T> writeArray(out: JsonWriter, adapter: TypeAdapter<T>, value: List<T>?) {
     if (value == null) {
         out.nullValue()
         return
@@ -107,7 +107,7 @@ private fun <T> writeArray(out: JsonWriter, adapter: TypeAdapter<T>, value: List
     out.endArray()
 }
 
-private fun <T> readArray(input: JsonReader, adapter: TypeAdapter<T>): List<T> {
+fun <T> readArray(input: JsonReader, adapter: TypeAdapter<T>): List<T> {
     if (input.peek() === JsonToken.NULL) {
         input.skipValue()
         return emptyList()

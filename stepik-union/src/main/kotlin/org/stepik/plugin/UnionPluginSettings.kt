@@ -8,7 +8,7 @@ class UnionPluginSettings : PluginSettings {
     
     override val pluginId = "org.stepik.plugin.union"
     
-    override val pluginName = "S_Union"
+    override val pluginMetricsName = "S_Union"
     
     override val host = "https://stepik.org"
     
@@ -18,4 +18,6 @@ class UnionPluginSettings : PluginSettings {
         return stepikApiClient.stepiks()
                 .currentUser
     }
+    
+    override val pluginName = "Stepik"
 }

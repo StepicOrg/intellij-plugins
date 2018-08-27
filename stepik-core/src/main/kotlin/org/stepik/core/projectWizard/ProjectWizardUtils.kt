@@ -19,47 +19,46 @@ import org.stepik.core.courseFormat.StudyNode
 import org.stepik.core.utils.getOrCreateSrcDirectory
 import java.io.File
 
-
 object ProjectWizardUtils : Loggable {
-
+    
     private fun findNonExistingFileName(searchDirectory: String, preferredName: String): String {
         var fileName = preferredName
         var idx = 1
-
+        
         while (File(searchDirectory, fileName).exists()) {
             fileName = "${preferredName}_${idx++}"
         }
-
+        
         return fileName
     }
-
+    
     fun getProjectDefaultName(projectDirectory: String, studyObject: StudyObject): String? {
         val projectName = when (studyObject) {
-            is Course -> "course"
-            is CompoundUnitLesson -> "lesson"
-            is Section -> "section"
-            is Step -> "step"
-            else -> "unknown"
-        } + studyObject.id
-
+                              is Course             -> "course"
+                              is CompoundUnitLesson -> "lesson"
+                              is Section            -> "section"
+                              is Step               -> "step"
+                              else                  -> "unknown"
+                          } + studyObject.id
+        
         return findNonExistingFileName(projectDirectory, projectName)
     }
-
+    
     fun enrollmentCourse(studyObject: StudyObject): Boolean {
         val stepikApiClient = StepikAuthManager.authAndGetStepikApiClient()
         if (!isAuthenticated) {
             return false
         }
-
+        
         if (studyObject is Course) {
             enrollment(stepikApiClient, studyObject)
         } else if (studyObject is CompoundUnitLesson) {
             enrollment(stepikApiClient, studyObject)
         }
-
+        
         return true
     }
-
+    
     private fun enrollment(stepikApiClient: StepikApiClient, studyObject: CompoundUnitLesson) {
         val sectionId = studyObject.unit.section
         if (sectionId != 0) {
@@ -68,10 +67,11 @@ object ProjectWizardUtils : Loggable {
                         .get()
                         .id(sectionId)
                         .execute()
-
+                
                 if (sections.isNotEmpty) {
-                    val courseId = sections.first().id
-
+                    val courseId = sections.first()
+                            .id
+                    
                     if (courseId != 0L) {
                         val courses = stepikApiClient.courses()
                                 .get()
@@ -89,7 +89,7 @@ object ProjectWizardUtils : Loggable {
             }
         }
     }
-
+    
     private fun enrollment(stepikApiClient: StepikApiClient, studyObject: StudyObject) {
         try {
             stepikApiClient.enrollments()
@@ -102,7 +102,7 @@ object ProjectWizardUtils : Loggable {
             logger.error(message, e)
         }
     }
-
+    
     fun createSubDirectories(
             project: Project,
             defaultLanguage: SupportedLanguages,

@@ -4,6 +4,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import org.stepik.core.auth.StepikAuthManager.authentication
 import org.stepik.core.auth.StepikAuthManager.isAuthenticated
 import org.stepik.core.pluginId
+import org.stepik.core.pluginName
 
 class LoginAction : StudyActionWithShortcut(TEXT, DESCRIPTION) {
     override fun actionPerformed(e: AnActionEvent?) {
@@ -22,7 +23,7 @@ class LoginAction : StudyActionWithShortcut(TEXT, DESCRIPTION) {
         private val ACTION_ID = "$pluginId.LoginAction"
         private const val SHORTCUT = "ctrl alt pressed L"
         private val SHORTCUT_TEXT = getShortcutText(SHORTCUT)
-        private val TEXT = "Login on Stepik ($SHORTCUT_TEXT)"
-        private const val DESCRIPTION = "Login on Stepik"
+        private val TEXT = "Login on $pluginName ($SHORTCUT_TEXT)"
+        private val DESCRIPTION = "Login on $pluginName"
     }
 }

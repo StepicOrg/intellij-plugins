@@ -1,4 +1,4 @@
-package org.stepik.api.objects.users;
+package org.hyperskill.api.objects.users;
 
 import org.jetbrains.annotations.NotNull;
 import org.stepik.api.objects.ObjectsContainer;

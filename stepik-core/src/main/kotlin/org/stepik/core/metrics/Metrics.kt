@@ -14,7 +14,7 @@ import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.StudyNode
 import org.stepik.core.getProjectManager
 import org.stepik.core.metrics.MetricsStatus.SUCCESSFUL
-import org.stepik.core.pluginName
+import org.stepik.core.pluginMetricsName
 import org.stepik.core.utils.currentProject
 import org.stepik.core.utils.version
 import java.util.*
@@ -45,7 +45,7 @@ object Metrics : Loggable {
                     .tags(metric.tags!!)
                     .data(metric.data!!)
                     .name("ide_plugin")
-                    .tags("name", pluginName)
+                    .tags("name", pluginMetricsName)
                     .tags("ide_name", appInfo.versionName)
                     .data("ide_version", appInfo.build.toString())
                     .data("plugin_version", version(pluginId))
