@@ -12,7 +12,6 @@ class HSUsersGetQuery(stepikAction: StepikAbstractAction) :
         return this
     }
     
-    override fun getUrl(): String {
-        return "${stepikAction.stepikApiClient.host}/api/users"
-    }
+    override val url = "${stepikAction.stepikApiClient.host}/api/users"
+    
 }

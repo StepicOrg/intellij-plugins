@@ -16,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -31,14 +32,14 @@ public abstract class StepikAbstractGetQuery<T extends StepikAbstractGetQuery, R
 
     @NotNull
     public T id(@NotNull Long... values) {
-        addParam(IDS_KEY, values);
+        addParam(IDS_KEY, Arrays.asList(values));
         //noinspection unchecked
         return (T) this;
     }
 
     @NotNull
     public T id(@NotNull Integer... values) {
-        addParam(IDS_KEY, values);
+        addParam(IDS_KEY, Arrays.asList(values));
         //noinspection unchecked
         return (T) this;
     }

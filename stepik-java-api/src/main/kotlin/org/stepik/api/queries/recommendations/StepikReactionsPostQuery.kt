@@ -26,11 +26,11 @@ class StepikReactionsPostQuery(stepikAction: StepikAbstractAction) :
         return this
     }
     
-    override fun getBody(): String {
-        return jsonConverter.toJson(reactions, false)
-    }
+    override val body: String
+        get () {
+            return jsonConverter.toJson(reactions, false)
+        }
     
-    override fun getUrl(): String {
-        return "${stepikAction.stepikApiClient.host}/api/recommendation-reactions"
-    }
+    override val url = "${stepikAction.stepikApiClient.host}/api/recommendation-reactions"
+    
 }

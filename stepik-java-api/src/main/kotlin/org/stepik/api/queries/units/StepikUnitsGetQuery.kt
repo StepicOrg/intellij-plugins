@@ -17,7 +17,6 @@ class StepikUnitsGetQuery(stepikAction: StepikAbstractAction) :
         return this
     }
     
-    override fun getUrl(): String {
-        return "${stepikAction.stepikApiClient.host}/api/units"
-    }
+    override val url = "${stepikAction.stepikApiClient.host}/api/units"
+    
 }

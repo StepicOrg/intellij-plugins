@@ -6,7 +6,5 @@ abstract class StepikAbstractPostQuery<T> protected constructor(stepikAction: St
                                                                 responseClass: Class<T>) :
         StepikAbstractQuery<T>(stepikAction, responseClass, QueryMethod.POST) {
     
-    override fun getContentType(): String {
-        return "application/json"
-    }
+    override val contentType: String = "application/json"
 }

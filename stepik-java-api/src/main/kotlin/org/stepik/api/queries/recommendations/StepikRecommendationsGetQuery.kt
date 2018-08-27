@@ -13,11 +13,7 @@ class StepikRecommendationsGetQuery(stepikAction: StepikAbstractAction) :
         return this
     }
     
-    override fun getUrl(): String {
-        return "${stepikAction.stepikApiClient.host}/api/recommendations"
-    }
+    override val url = "${stepikAction.stepikApiClient.host}/api/recommendations"
     
-    override fun isCacheEnabled(): Boolean {
-        return false
-    }
+    override fun isCacheEnabled() = false
 }

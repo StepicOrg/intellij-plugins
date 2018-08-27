@@ -15,11 +15,11 @@ class StepikReviewSessionsPostQuery(stepikAction: StepikAbstractAction) :
         return this
     }
     
-    override fun getBody(): String {
-        return jsonConverter.toJson(reviewSessions, false)
-    }
+    override val body: String
+        get () {
+            return jsonConverter.toJson(reviewSessions, false)
+        }
     
-    override fun getUrl(): String {
-        return "${stepikAction.stepikApiClient.host}/api/review-sessions"
-    }
+    override val url = "${stepikAction.stepikApiClient.host}/api/review-sessions"
+    
 }

@@ -17,6 +17,7 @@ import org.stepik.core.getProjectManager
 import org.stepik.core.getStudyNode
 import org.stepik.core.metrics.Metrics
 import org.stepik.core.metrics.MetricsStatus.FAILED_POST
+import org.stepik.core.pluginName
 import org.stepik.core.testFramework.toolWindow.StepikTestResultToolWindow
 import org.stepik.core.testFramework.toolWindow.showTestResultsToolWindow
 import org.stepik.core.ui.StepDescriptionUtils.getReply
@@ -111,7 +112,7 @@ internal class FormListener(private val project: Project, private val browser: S
                         
                         val resultWindow = resultWindows[0]!!
                         resultWindow.clear()
-                        resultWindow.println("Test method: send to Stepik")
+                        resultWindow.println("Test method: send to $pluginName")
                         
                         if (submissions == null) {
                             printError(e, resultWindow)

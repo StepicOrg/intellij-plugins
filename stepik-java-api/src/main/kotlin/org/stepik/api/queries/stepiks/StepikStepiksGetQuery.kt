@@ -16,7 +16,6 @@ class StepikStepiksGetQuery(stepikAction: StepikAbstractAction) :
     
     override fun isCacheEnabled() = false
     
-    override fun getUrl(): String {
-        return "${stepikAction.stepikApiClient.host}/api/stepics/$id"
-    }
+    override val url = "${stepikAction.stepikApiClient.host}/api/stepics/$id"
+    
 }

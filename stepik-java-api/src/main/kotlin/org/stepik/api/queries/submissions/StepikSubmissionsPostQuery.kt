@@ -12,9 +12,7 @@ class StepikSubmissionsPostQuery(stepikAction: StepikAbstractAction) :
     
     private val submissions = SubmissionsPost()
     
-    override fun getUrl(): String {
-        return "${stepikAction.stepikApiClient.host}/api/submissions"
-    }
+    override val url = "${stepikAction.stepikApiClient.host}/api/submissions"
     
     fun attempt(id: Long): StepikSubmissionsPostQuery {
         submissions.submission.attempt = id
@@ -71,9 +69,10 @@ class StepikSubmissionsPostQuery(stepikAction: StepikAbstractAction) :
         return this
     }
     
-    override fun getBody(): String {
-        return jsonConverter.toJson(submissions, false)
-    }
+    override val body: String
+        get() {
+            return jsonConverter.toJson(submissions, false)
+        }
     
     fun reply(reply: Reply): StepikSubmissionsPostQuery {
         submissions.submission.setReply(reply)

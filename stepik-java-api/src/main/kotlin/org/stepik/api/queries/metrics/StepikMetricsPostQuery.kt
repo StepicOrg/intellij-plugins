@@ -52,13 +52,12 @@ class StepikMetricsPostQuery(stepikAction: StepikAbstractAction) :
         return this
     }
     
-    override fun getBody(): String {
-        return jsonConverter.toJson(metrics, false)
-    }
+    override val body: String
+        get () {
+            return jsonConverter.toJson(metrics, false)
+        }
     
-    override fun getUrl(): String {
-        return "${stepikAction.stepikApiClient.host}/api/metrics"
-    }
+    override val url = "${stepikAction.stepikApiClient.host}/api/metrics"
     
     override fun toString(): String {
         return jsonConverter.toJson(metrics, false)

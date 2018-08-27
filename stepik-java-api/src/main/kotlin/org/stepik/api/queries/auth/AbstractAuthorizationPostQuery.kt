@@ -7,20 +7,17 @@ import org.stepik.api.queries.StepikAbstractPostQuery
 abstract class AbstractAuthorizationPostQuery(stepikAction: StepikAbstractAction) :
         StepikAbstractPostQuery<TokenInfo>(stepikAction, TokenInfo::class.java) {
     
-    override fun getUrl(): String {
-        return "${stepikAction.stepikApiClient.host}/oauth2/token/"
-    }
+    override val url = "${stepikAction.stepikApiClient.host}/oauth2/token/"
     
     override fun execute(): TokenInfo {
         val tokenInfo = super.execute()
         
-        val action = getStepikAction()
+        val action = stepikAction
         action.stepikApiClient.tokenInfo = tokenInfo
         
         return tokenInfo
     }
     
-    override fun getContentType(): String {
-        return "application/x-www-form-urlencoded"
-    }
+    override val contentType = "application/x-www-form-urlencoded"
+    
 }

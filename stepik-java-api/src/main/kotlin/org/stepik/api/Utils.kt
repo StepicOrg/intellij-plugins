@@ -24,7 +24,7 @@ object Utils {
         return@lazy format
     }
     
-    fun mapToGetString(name: String, values: Array<out String?>): String {
+    fun mapToGetString(name: String, values: List<String?>): String {
         val encodedName = encode(name)
         return values.filterNotNull()
                 .joinToString("&") { "$encodedName=${encode(it)}" }

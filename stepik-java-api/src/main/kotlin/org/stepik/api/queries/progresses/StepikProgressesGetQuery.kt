@@ -7,9 +7,7 @@ import org.stepik.api.queries.StepikAbstractGetQuery
 class StepikProgressesGetQuery(stepikAction: StepikAbstractAction) :
         StepikAbstractGetQuery<StepikProgressesGetQuery, Progresses>(stepikAction, Progresses::class.java) {
     
-    override fun getUrl(): String {
-        return "${stepikAction.stepikApiClient.host}/api/progresses"
-    }
+    override val url = "${stepikAction.stepikApiClient.host}/api/progresses"
     
     override fun isCacheEnabled(): Boolean {
         return false

@@ -15,11 +15,11 @@ class StepikEnrollmentsPostQuery(stepikAction: StepikAbstractAction) :
         return this
     }
     
-    override fun getBody(): String {
-        return jsonConverter.toJson(enrollment, false)
-    }
+    override val body: String
+        get() {
+            return jsonConverter.toJson(enrollment, false)
+        }
     
-    override fun getUrl(): String {
-        return "${stepikAction.stepikApiClient.host}/api/enrollments"
-    }
+    override val url = "${stepikAction.stepikApiClient.host}/api/enrollments"
+    
 }

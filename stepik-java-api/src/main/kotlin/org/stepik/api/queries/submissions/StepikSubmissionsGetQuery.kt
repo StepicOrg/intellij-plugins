@@ -58,7 +58,6 @@ class StepikSubmissionsGetQuery(stepikAction: StepikAbstractAction) :
         return false
     }
     
-    override fun getUrl(): String {
-        return "${stepikAction.stepikApiClient.host}/api/submissions"
-    }
+    override val url = "${stepikAction.stepikApiClient.host}/api/submissions"
+    
 }

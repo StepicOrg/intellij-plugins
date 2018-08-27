@@ -20,11 +20,11 @@ class StepikViewsPostQuery(stepikAction: StepikAbstractAction) :
         return this
     }
     
-    override fun getBody(): String {
-        return jsonConverter.toJson(views, false)
-    }
+    override val body: String
+        get () {
+            return jsonConverter.toJson(views, false)
+        }
     
-    override fun getUrl(): String {
-        return stepikAction.stepikApiClient.host + "/api/views"
-    }
+    override val url = "${stepikAction.stepikApiClient.host}/api/views"
+    
 }

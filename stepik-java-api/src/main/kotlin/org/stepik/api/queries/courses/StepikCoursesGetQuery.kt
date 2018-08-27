@@ -42,7 +42,6 @@ class StepikCoursesGetQuery(stepikAction: StepikAbstractAction) :
         return this
     }
     
-    override fun getUrl(): String {
-        return "${stepikAction.stepikApiClient.host}/api/courses"
-    }
+    override val url = "${stepikAction.stepikApiClient.host}/api/courses"
+    
 }
