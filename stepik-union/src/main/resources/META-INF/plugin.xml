@@ -22,13 +22,17 @@
 
   <actions>
     <group id="StepikMenu" popup="true" text="Stepik Union">
-      <action id="org.stepik.plugin.union.StepikSendAction" class="org.stepik.core.actions.step.StepikSendAction" />
+      <action id="org.stepik.plugin.union.StepikSendAction" class="org.stepik.plugin.actions.step.StepikSendAction" />
       <action id="org.stepik.plugin.union.TestSamplesAction" class="org.stepik.core.actions.step.TestSamplesAction" />
-      <action id="org.stepik.plugin.union.PreviousStepAction" class="org.stepik.plugin.actions.navigation.StepikPreviousStepAction" />
-      <action id="org.stepik.plugin.union.NextStepAction" class="org.stepik.plugin.actions.navigation.StepikNextStepAction" />
+      <action id="org.stepik.plugin.union.PreviousStepAction"
+              class="org.stepik.plugin.actions.navigation.StepikPreviousStepAction" />
+      <action id="org.stepik.plugin.union.NextStepAction"
+              class="org.stepik.plugin.actions.navigation.StepikNextStepAction" />
       <action id="org.stepik.plugin.union.DownloadSubmission" class="org.stepik.core.actions.step.DownloadSubmission" />
-      <action id="org.stepik.plugin.union.InsertStepikDirectives" class="org.stepik.core.actions.step.InsertStepikDirectives" />
-      <action id="org.stepik.plugin.union.RefreshStepAction" class="org.stepik.core.actions.step.StepikResetStepAction" />
+      <action id="org.stepik.plugin.union.InsertStepikDirectives"
+              class="org.stepik.core.actions.step.InsertStepikDirectives" />
+      <action id="org.stepik.plugin.union.RefreshStepAction"
+              class="org.stepik.core.actions.step.StepikResetStepAction" />
       <action id="org.stepik.plugin.union.OpenInBrowser" class="org.stepik.plugin.actions.step.OpenInBrowserAction" />
       <action id="org.stepik.plugin.union.LoginAction" class="org.stepik.core.actions.LoginAction" />
       <action id="org.stepik.plugin.union.LogoutAction" class="org.stepik.core.actions.LogoutAction" />

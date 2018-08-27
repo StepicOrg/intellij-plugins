@@ -22,7 +22,7 @@
 
   <actions>
     <group id="HyperskillMenu" popup="true" text="Hyperskill">
-      <action id="org.hyperskill.StepikSendAction" class="org.stepik.core.actions.step.StepikSendAction" />
+      <action id="org.hyperskill.StepikSendAction" class="org.hyperskill.actions.step.HSSendAction" />
       <action id="org.hyperskill.TestSamplesAction" class="org.stepik.core.actions.step.TestSamplesAction" />
       <action id="org.hyperskill.LoadProblemAction"
               class="org.hyperskill.actions.navigation.OpenProblemAction" />

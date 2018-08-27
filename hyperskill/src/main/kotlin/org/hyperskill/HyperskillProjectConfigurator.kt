@@ -3,22 +3,22 @@ package org.hyperskill
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.project.Project
+import org.hyperskill.actions.navigation.OpenProblemAction
+import org.hyperskill.actions.step.HSSendAction
+import org.hyperskill.actions.step.OpenInBrowserAction
+import org.hyperskill.projectWizard.StepikProjectGenerator
+import org.hyperskill.projectWizard.idea.SandboxModuleBuilder
+import org.hyperskill.projectWizard.idea.StepModuleBuilder
 import org.stepik.core.ProjectGenerator
 import org.stepik.core.StudyBasePluginConfigurator
 import org.stepik.core.StudyPluginConfigurator
 import org.stepik.core.actions.step.DownloadSubmission
 import org.stepik.core.actions.step.StepikResetStepAction
-import org.stepik.core.actions.step.StepikSendAction
 import org.stepik.core.actions.step.TestSamplesAction
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.StudyNode
 import org.stepik.core.isStepikProject
 import org.stepik.core.projectWizard.idea.BaseModuleBuilder
-import org.hyperskill.actions.navigation.OpenProblemAction
-import org.hyperskill.actions.step.OpenInBrowserAction
-import org.hyperskill.projectWizard.StepikProjectGenerator
-import org.hyperskill.projectWizard.idea.SandboxModuleBuilder
-import org.hyperskill.projectWizard.idea.StepModuleBuilder
 
 class HyperskillProjectConfigurator : StudyBasePluginConfigurator() {
     
@@ -53,7 +53,7 @@ class HyperskillProjectConfigurator : StudyBasePluginConfigurator() {
     override fun getActionGroup(project: Project): DefaultActionGroup {
         val group = DefaultActionGroup()
         group.addAll(
-                StepikSendAction(),
+                HSSendAction(),
                 TestSamplesAction(),
                 OpenProblemAction(),
                 StepikResetStepAction(),

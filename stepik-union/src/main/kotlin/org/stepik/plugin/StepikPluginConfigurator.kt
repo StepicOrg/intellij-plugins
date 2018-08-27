@@ -10,7 +10,6 @@ import org.stepik.core.actions.navigation.StudyNavigator
 import org.stepik.core.actions.step.DownloadSubmission
 import org.stepik.core.actions.step.InsertStepikDirectives
 import org.stepik.core.actions.step.StepikResetStepAction
-import org.stepik.core.actions.step.StepikSendAction
 import org.stepik.core.actions.step.TestSamplesAction
 import org.stepik.core.courseFormat.StepNode
 import org.stepik.core.courseFormat.StudyNode
@@ -19,6 +18,7 @@ import org.stepik.core.projectWizard.idea.BaseModuleBuilder
 import org.stepik.plugin.actions.navigation.StepikNextStepAction
 import org.stepik.plugin.actions.navigation.StepikPreviousStepAction
 import org.stepik.plugin.actions.step.OpenInBrowserAction
+import org.stepik.plugin.actions.step.StepikSendAction
 import org.stepik.plugin.projectWizard.StepikProjectGenerator
 import org.stepik.plugin.projectWizard.idea.SandboxModuleBuilder
 import org.stepik.plugin.projectWizard.idea.StepModuleBuilder
