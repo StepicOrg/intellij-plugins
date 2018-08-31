@@ -2,7 +2,7 @@
 
 <html>
 <head>
-    <title>Authorization on Stepik</title>
+    <title>Authorization on ${pluginName}</title>
     <meta charset="utf-8">
 
     <style>
@@ -18,7 +18,7 @@
     </style>
 </head>
 <body>
-<h1>Authorization on Stepik is successful</h1>
+<h1>Authorization on ${pluginName} is successful</h1>
 
 <p>You can close this page and return to the IDE</p>
 </body>

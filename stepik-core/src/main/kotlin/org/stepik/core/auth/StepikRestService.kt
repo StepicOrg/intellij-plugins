@@ -24,6 +24,7 @@ import org.stepik.core.auth.StepikAuthManager.authorizationCodeUrl
 import org.stepik.core.auth.StepikAuthManager.stepikApiClient
 import org.stepik.core.clientId
 import org.stepik.core.common.Loggable
+import org.stepik.core.pluginName
 import org.stepik.core.templates.Templater
 import java.io.ByteArrayInputStream
 
@@ -59,7 +60,8 @@ class StepikRestService : RestService(), Loggable {
                     sendHTMLResponse(request, context, "auth_failure",
                             mapOf(
                                     "link" to authorizationCodeUrl,
-                                    "error" to error
+                                    "error" to error,
+                                    "pluginName" to pluginName
                             )
                     )
                     return error
@@ -88,14 +90,18 @@ class StepikRestService : RestService(), Loggable {
                         sendHTMLResponse(request, context, "auth_failure",
                                 mapOf(
                                         "link" to authorizationCodeUrl,
-                                        "error" to e.message
+                                        "error" to e.message,
+                                        "pluginName" to pluginName
                                 )
                         )
                         return e.message
                     }
                     StepikAuthManager.setState(newState)
                     if (newState === StepikAuthState.AUTH) {
-                        sendHTMLResponse(request, context, "auth_successfully")
+                        sendHTMLResponse(request, context, "auth_successfully",
+                                mapOf(
+                                        "pluginName" to pluginName
+                                ))
                         val frame = WindowManager.getInstance()
                                 .findVisibleFrame()
                         getApplication().invokeLater {
@@ -110,7 +116,8 @@ class StepikRestService : RestService(), Loggable {
                     sendHTMLResponse(request, context, "auth_failure",
                             mapOf(
                                     "link" to authorizationCodeUrl,
-                                    "error" to "Unknown error"
+                                    "error" to "Unknown error",
+                                    "pluginName" to pluginName
                             )
                     )
                     return null
@@ -125,7 +132,7 @@ class StepikRestService : RestService(), Loggable {
     }
     
     companion object {
-        const val SERVICE_NAME = "$PREFIX/stepik"
+        val SERVICE_NAME = "$PREFIX/${pluginName.toLowerCase()}"
         val port = BuiltInServerManager.getInstance()
                 .port
         val redirectUri = "http://localhost:$port/$SERVICE_NAME/oauth"
